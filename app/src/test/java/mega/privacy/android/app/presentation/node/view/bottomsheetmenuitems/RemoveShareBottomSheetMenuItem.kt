@@ -14,9 +14,11 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RemoveToolbarMenuItemShareBottomSheetMenuItemTest {
+class RemoveShareBottomSheetMenuItemTest {
 
-    private val removeShareBottomSheetMenuItem = RemoveShareBottomSheetMenuItem()
+    private val removeShareBottomSheetMenuItem = RemoveShareBottomSheetMenuItem(
+        stringWithDelimitersMapper = mock()
+    )
 
     @ParameterizedTest(name = "isNodeInRubbish {0} - accessPermission {1} - isInBackups {2} - node {3} - expected {4}")
     @MethodSource("provideTestParameters")

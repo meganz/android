@@ -17,7 +17,10 @@ import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LeaveShareBottomSheetMenuItemTest {
-    private val underTest = LeaveShareBottomSheetMenuItem(LeaveShareMenuAction())
+    private val underTest = LeaveShareBottomSheetMenuItem(
+        stringWithDelimitersMapper = mock(),
+        menuAction = LeaveShareMenuAction()
+    )
 
     @ParameterizedTest(name = "isNodeInRubbish {0} - accessPermission {1} - isInBackups {2} - node {3} - expected {4}")
     @MethodSource("provideTestParameters")

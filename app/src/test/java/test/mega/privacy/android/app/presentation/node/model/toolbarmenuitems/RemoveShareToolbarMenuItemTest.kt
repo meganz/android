@@ -1,7 +1,7 @@
 package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import com.google.common.truth.Truth
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShare
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShareToolbarMenuItem
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import org.junit.jupiter.api.TestInstance
@@ -12,9 +12,11 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RemoveToolbarMenuItemShareTest {
+class RemoveShareToolbarMenuItemTest {
 
-    private val underTest = RemoveShare()
+    private val underTest = RemoveShareToolbarMenuItem(
+        stringWithDelimitersMapper = mock()
+    )
 
 
     private val sharedFolder1 = mock<TypedFolderNode> {

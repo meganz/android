@@ -25,13 +25,13 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Copy
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DisputeTakeDown
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DownloadToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.GetLinkToolbarMenuItem
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.LeaveShare
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.LeaveShareToolBarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ManageLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Move
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.MultiSelectManageLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveLinkToolbarMenuItem
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShare
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShareToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShareDropDown
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameDropDown
@@ -63,7 +63,9 @@ class NodeToolbarActionMapperTest {
             snackBarHandler = mock()
         ),
         RemoveToolbarMenuItem(RemoveMenuAction(), mock()),
-        RemoveShare(),
+        RemoveShareToolbarMenuItem(
+            stringWithDelimitersMapper = mock()
+        ),
         RemoveShareDropDown(),
         DisputeTakeDown(DisputeTakeDownMenuAction()),
         GetLinkToolbarMenuItem(GetLinkMenuAction()),
@@ -79,7 +81,10 @@ class NodeToolbarActionMapperTest {
             menuAction = ShareFolderMenuAction()
         ),
         Share(ShareMenuAction()),
-        LeaveShare(LeaveShareMenuAction()),
+        LeaveShareToolBarMenuItem(
+            stringWithDelimitersMapper = mock(),
+            menuAction = LeaveShareMenuAction()
+        ),
         RenameToolbarMenuItem(),
         RenameDropDown(),
         Move(MoveMenuAction()),

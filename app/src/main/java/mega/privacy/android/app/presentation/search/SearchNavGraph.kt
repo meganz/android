@@ -95,13 +95,11 @@ internal fun NavGraphBuilder.searchNavGraph(
     )
     removeShareFolderDialogNavigation(
         navHostController = navHostController,
-        searchActivityViewModel = searchActivityViewModel,
-        nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel
+        stringWithDelimitersMapper = listToStringWithDelimitersMapper
     )
     leaveFolderShareDialogNavigation(
         navHostController = navHostController,
-        searchActivityViewModel = searchActivityViewModel,
-        nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel
+        stringWithDelimitersMapper = listToStringWithDelimitersMapper
     )
     overQuotaDialogNavigation(navHostController = navHostController)
     foreignNodeDialogNavigation(navHostController = navHostController)
@@ -119,5 +117,4 @@ internal fun NavGraphBuilder.searchNavGraph(
  * Route for Search
  */
 internal const val searchRoute = "search/main"
-internal const val isFromToolbar = "isFromToolbar"
 internal const val nodeListHandle = "nodeListHandle"

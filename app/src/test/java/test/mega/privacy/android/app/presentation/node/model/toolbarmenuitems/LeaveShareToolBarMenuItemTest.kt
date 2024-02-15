@@ -2,7 +2,7 @@ package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import com.google.common.truth.Truth
 import mega.privacy.android.app.presentation.node.model.menuaction.LeaveShareMenuAction
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.LeaveShare
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.LeaveShareToolBarMenuItem
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import org.junit.jupiter.api.TestInstance
@@ -13,9 +13,12 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class LeaveShareTest {
+class LeaveShareToolBarMenuItemTest {
 
-    private val underTest = LeaveShare(LeaveShareMenuAction())
+    private val underTest = LeaveShareToolBarMenuItem(
+        menuAction = LeaveShareMenuAction(),
+        stringWithDelimitersMapper = mock()
+    )
 
 
     private val folder1 = mock<TypedFolderNode> {

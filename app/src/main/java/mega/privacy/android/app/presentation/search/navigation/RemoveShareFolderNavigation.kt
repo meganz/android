@@ -1,50 +1,38 @@
 package mega.privacy.android.app.presentation.search.navigation
 
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
-import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.node.dialogs.removesharefolder.RemoveShareFolderDialog
-import mega.privacy.android.app.presentation.search.SearchActivityViewModel
-import mega.privacy.android.app.presentation.search.isFromToolbar
+import mega.privacy.android.app.presentation.search.nodeListHandle
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
+import timber.log.Timber
 
 internal fun NavGraphBuilder.removeShareFolderDialogNavigation(
     navHostController: NavHostController,
-    searchActivityViewModel: SearchActivityViewModel,
-    nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel
+    stringWithDelimitersMapper: ListToStringWithDelimitersMapper,
 ) {
     dialog(
-        route = "$searchRemoveFolderShareDialog/{$isFromToolbar}",
+        route = "$searchRemoveFolderShareDialog/{$nodeListHandle}",
         arguments = listOf(
-            navArgument(isFromToolbar) { type = NavType.BoolType }
+            navArgument(nodeListHandle) { type = NavType.StringType }
         )
     ) {
-        if (it.arguments?.getBoolean(isFromToolbar) == false) {
-            val nodeOptionsState by nodeOptionsBottomSheetViewModel.state.collectAsStateWithLifecycle()
-            nodeOptionsState.node?.let { node ->
+        it.arguments?.getString(nodeListHandle)?.let { handles ->
+            runCatching {
+                stringWithDelimitersMapper<NodeId>(handles)
+            }.onSuccess { nodeIds ->
                 RemoveShareFolderDialog(
-                    nodeList = listOf(NodeId(node.id.longValue)),
+                    nodeList = nodeIds,
                     onDismiss = {
                         navHostController.navigateUp()
                     }
                 )
             }
-        } else {
-            val searchState by searchActivityViewModel.state.collectAsStateWithLifecycle()
-            val nodeIds = searchState.selectedNodes.map { typedNode ->
-                typedNode.id
-            }
-            RemoveShareFolderDialog(
-                nodeList = nodeIds,
-                onDismiss = {
-                    navHostController.navigateUp()
-                }
-            )
+                .onFailure { throwable -> Timber.e(throwable) }
         }
     }
 }

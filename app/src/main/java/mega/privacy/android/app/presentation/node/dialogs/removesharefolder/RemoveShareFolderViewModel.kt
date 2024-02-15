@@ -57,6 +57,8 @@ class RemoveShareFolderViewModel @Inject constructor(
                 }.onFailure {
                     Timber.e(it)
                 }
+            } else {
+                _state.update { it.copy(numberOfShareFolder = nodeIds.size) }
             }
         }
     }

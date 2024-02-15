@@ -16,14 +16,14 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Copy
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DisputeTakeDown
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DownloadToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.GetLinkToolbarMenuItem
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.LeaveShare
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.LeaveShareToolBarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ManageLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Move
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.MultiSelectManageLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.NodeToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveLinkDropDownMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveLinkToolbarMenuItem
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShare
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShareToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RestoreToolbarMenuItem
@@ -54,7 +54,7 @@ abstract class ToolbarItemModule {
             selectAll: SelectAll,
             clearSelection: ClearSelection,
             download: DownloadToolbarMenuItem,
-            removeShare: RemoveShare,
+            removeShareToolbarMenuItem: RemoveShareToolbarMenuItem,
             getLinkToolbarMenuItem: GetLinkToolbarMenuItem,
             manageLinkToolbarMenuItem: ManageLinkToolbarMenuItem,
             removeLinkDropDownMenuItem: RemoveLinkDropDownMenuItem,
@@ -69,7 +69,7 @@ abstract class ToolbarItemModule {
                 selectAll,
                 clearSelection,
                 download,
-                removeShare,
+                removeShareToolbarMenuItem,
                 getLinkToolbarMenuItem,
                 manageLinkToolbarMenuItem,
                 removeLinkDropDownMenuItem,
@@ -91,7 +91,7 @@ abstract class ToolbarItemModule {
         fun provideIncomingSharesToolbarItems(
             selectAll: SelectAll,
             clearSelection: ClearSelection,
-            leaveShare: LeaveShare,
+            leaveShareToolBarMenuItem: LeaveShareToolBarMenuItem,
             download: DownloadToolbarMenuItem,
             move: Move,
             copy: Copy,
@@ -103,7 +103,7 @@ abstract class ToolbarItemModule {
                 selectAll,
                 clearSelection,
                 download,
-                leaveShare,
+                leaveShareToolBarMenuItem,
                 move,
                 sendToChat,
                 renameToolbarMenuItem,
@@ -165,7 +165,7 @@ abstract class ToolbarItemModule {
             move: Move,
             sendToChat: SendToChat,
             shareFolderToolbarMenuItem: ShareFolderToolbarMenuItem,
-            removeShare: RemoveShare,
+            removeShareToolbarMenuItem: RemoveShareToolbarMenuItem,
             disputeTakeDown: DisputeTakeDown,
             share: Share,
         ): Set<NodeToolbarMenuItem<*>> {
@@ -184,7 +184,7 @@ abstract class ToolbarItemModule {
                 renameToolbarMenuItem,
                 copy,
                 trashToolbarMenuItem,
-                removeShare,
+                removeShareToolbarMenuItem,
             )
         }
 
