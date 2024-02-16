@@ -29,7 +29,6 @@ import mega.privacy.android.data.gateway.api.StreamingGateway
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
-import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
@@ -85,7 +84,6 @@ internal class FileSystemRepositoryImplTest {
     private val cacheGateway: CacheGateway = mock()
     private val nodeMapper: NodeMapper = mock()
     private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
-    private val offlineNodeInformationMapper: OfflineNodeInformationMapper = mock()
     private val fileGateway: FileGateway = mock()
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper = mock()
     private val fileVersionsOptionCache: Cache<Boolean> = mock()
@@ -120,7 +118,6 @@ internal class FileSystemRepositoryImplTest {
             cacheGateway = cacheGateway,
             nodeMapper = nodeMapper,
             fileTypeInfoMapper = fileTypeInfoMapper,
-            offlineNodeInformationMapper = offlineNodeInformationMapper,
             fileGateway = fileGateway,
             chatFilesFolderUserAttributeMapper = chatFilesFolderUserAttributeMapper,
             fileVersionsOptionCache = fileVersionsOptionCache,
@@ -146,7 +143,6 @@ internal class FileSystemRepositoryImplTest {
             cacheGateway,
             nodeMapper,
             fileTypeInfoMapper,
-            offlineNodeInformationMapper,
             fileGateway,
             chatFilesFolderUserAttributeMapper,
             fileVersionsOptionCache,
@@ -447,12 +443,13 @@ internal class FileSystemRepositoryImplTest {
         }
 
         @Test
-        fun `test that my chats files folder id is retrieved from the gateway if not set`() = runTest {
-            val handle = 11L
-            stubGetMyChatFilesFolder(handle)
-            val actual = underTest.getMyChatsFilesFolderId()
-            assertThat(actual?.longValue).isEqualTo(handle)
-        }
+        fun `test that my chats files folder id is retrieved from the gateway if not set`() =
+            runTest {
+                val handle = 11L
+                stubGetMyChatFilesFolder(handle)
+                val actual = underTest.getMyChatsFilesFolderId()
+                assertThat(actual?.longValue).isEqualTo(handle)
+            }
 
         @Test
         fun `test that my chats files folder id is cached`() = runTest {

@@ -14,6 +14,8 @@ import org.junit.jupiter.params.provider.ValueSource
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class OfflineNodeInformationMapperTest {
 
+    private val underTest = OfflineNodeInformationMapper()
+
     private val expectedPath = "path"
     private val expectedName = "name"
     private val expectedHandle = "handle"
@@ -25,7 +27,7 @@ internal class OfflineNodeInformationMapperTest {
         val origin = Offline.INCOMING
         val input = getInput(origin, isFolderNode)
 
-        assertThat(toOfflineNodeInformation(input)).isEqualTo(
+        assertThat(underTest(input)).isEqualTo(
             IncomingShareOfflineNodeInformation(
                 path = expectedPath,
                 name = expectedName,
@@ -47,7 +49,7 @@ internal class OfflineNodeInformationMapperTest {
         val origin = Offline.BACKUPS
         val input = getInput(origin, isFolderNode)
 
-        assertThat(toOfflineNodeInformation(input)).isEqualTo(
+        assertThat(underTest(input)).isEqualTo(
             BackupsOfflineNodeInformation(
                 path = expectedPath,
                 name = expectedName,
@@ -67,7 +69,7 @@ internal class OfflineNodeInformationMapperTest {
         val origin = Offline.OTHER
         val input = getInput(origin, isFolderNode)
 
-        assertThat(toOfflineNodeInformation(input)).isEqualTo(
+        assertThat(underTest(input)).isEqualTo(
             OtherOfflineNodeInformation(
                 path = expectedPath,
                 name = expectedName,

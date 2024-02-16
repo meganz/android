@@ -17,7 +17,6 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
-import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
@@ -50,7 +49,6 @@ import kotlin.coroutines.suspendCoroutine
  * @property sortOrderIntMapper
  * @property nodeMapper
  * @property fileTypeInfoMapper
- * @property offlineNodeInformationMapper
  * @property fileGateway
  * @property chatFilesFolderUserAttributeMapper
  * @property streamingGateway
@@ -69,7 +67,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
     private val sortOrderIntMapper: SortOrderIntMapper,
     private val nodeMapper: NodeMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
-    private val offlineNodeInformationMapper: OfflineNodeInformationMapper,
     private val fileGateway: FileGateway,
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
     private val streamingGateway: StreamingGateway,

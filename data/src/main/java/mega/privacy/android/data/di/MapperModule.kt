@@ -29,7 +29,6 @@ import mega.privacy.android.data.mapper.MegaPurchaseMapper
 import mega.privacy.android.data.mapper.MegaSkuMapper
 import mega.privacy.android.data.mapper.MimeTypeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
-import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.PaymentMethodTypeMapper
 import mega.privacy.android.data.mapper.PaymentPlatformTypeMapper
 import mega.privacy.android.data.mapper.PricingMapper
@@ -76,7 +75,6 @@ import mega.privacy.android.data.mapper.toMediaStoreFileTypeUri
 import mega.privacy.android.data.mapper.toMegaAchievement
 import mega.privacy.android.data.mapper.toMegaPurchase
 import mega.privacy.android.data.mapper.toMegaSku
-import mega.privacy.android.data.mapper.toOfflineNodeInformation
 import mega.privacy.android.data.mapper.toPaymentMethodType
 import mega.privacy.android.data.mapper.toPaymentPlatformType
 import mega.privacy.android.data.mapper.toPricing
@@ -277,10 +275,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideSubscriptionStatusMapper(): SubscriptionStatusMapper = ::toSubscriptionStatus
-
-        @Provides
-        fun provideOfflineNodeInformationMapper(): OfflineNodeInformationMapper =
-            ::toOfflineNodeInformation
 
         /**
          * Provide [CountryMapper] mapper

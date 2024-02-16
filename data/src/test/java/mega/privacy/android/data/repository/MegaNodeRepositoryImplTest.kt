@@ -10,7 +10,6 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -40,7 +39,6 @@ class MegaNodeRepositoryImplTest {
             sortOrderIntMapper = mock(),
             nodeMapper = mock(),
             fileTypeInfoMapper = mock(),
-            offlineNodeInformationMapper = mock(),
             fileGateway = mock(),
             chatFilesFolderUserAttributeMapper = mock(),
             streamingGateway = mock(),

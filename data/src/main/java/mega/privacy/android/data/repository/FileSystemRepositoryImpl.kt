@@ -42,7 +42,6 @@ import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
-import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
@@ -59,6 +58,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FileSystemRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_ENOENT
+import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer.COLLISION_CHECK_FINGERPRINT
@@ -86,7 +86,6 @@ import javax.inject.Inject
  * @property cacheGateway
  * @property nodeMapper
  * @property fileTypeInfoMapper
- * @property offlineNodeInformationMapper
  * @property fileGateway
  * @property chatFilesFolderUserAttributeMapper
  * @property streamingGateway
@@ -106,7 +105,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     private val cacheGateway: CacheGateway,
     private val nodeMapper: NodeMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
-    private val offlineNodeInformationMapper: OfflineNodeInformationMapper,
     private val fileGateway: FileGateway,
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
     @FileVersionsOption private val fileVersionsOptionCache: Cache<Boolean>,
@@ -142,7 +140,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
                 suspendCancellableCoroutine { continuation ->
                     val listener = OptionalMegaTransferListenerInterface(
                         onTransferFinish = { _, error ->
-                            if (error.errorCode == MegaError.API_OK) {
+                            if (error.errorCode == API_OK) {
                                 continuation.resumeWith(Result.success(file.absolutePath))
                             } else {
                                 continuation.failWithError(error, "downloadBackgroundFile")
@@ -304,8 +302,8 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request: MegaRequest, error: MegaError ->
                     when (error.errorCode) {
-                        MegaError.API_OK -> continuation.resumeWith(Result.success(request.flag))
-                        MegaError.API_ENOENT -> continuation.resumeWith(Result.success(false))
+                        API_OK -> continuation.resumeWith(Result.success(request.flag))
+                        API_ENOENT -> continuation.resumeWith(Result.success(false))
                         else -> continuation.failWithError(error, "fetchFileVersionsOption")
                     }
                 }
