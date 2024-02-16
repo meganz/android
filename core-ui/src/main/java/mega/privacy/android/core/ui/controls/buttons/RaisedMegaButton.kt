@@ -43,6 +43,26 @@ fun RaisedDefaultMegaButton(
 }
 
 /**
+ * Raised default error button
+ */
+@Composable
+fun RaisedDefaultErrorMegaButton(
+    textId: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) = RaisedErrorMegaButton(
+    onClick = onClick,
+    modifier = modifier,
+    enabled = enabled,
+) {
+    Text(
+        text = stringResource(id = textId),
+        style = MaterialTheme.typography.button
+    )
+}
+
+/**
  * Raised progress button
  */
 @Composable
@@ -81,6 +101,28 @@ private fun RaisedDefaultMegaButton(
     content()
 }
 
+/**
+ * Raised error text button
+ */
+@Composable
+private fun RaisedErrorMegaButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    content: @Composable () -> Unit,
+) = TextButton(
+    modifier = modifier,
+    onClick = onClick,
+    enabled = enabled,
+    shape = MaterialTheme.shapes.medium,
+    colors = MegaTheme.colors.raisedErrorButtonColors,
+    border = null,
+    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
+    elevation = ButtonDefaults.elevation(8.dp),
+) {
+    content()
+}
+
 @CombinedTextAndThemePreviews
 @Composable
 private fun PreviewRaisedDefaultMegaButton() {
@@ -97,11 +139,37 @@ private fun PreviewRaisedDefaultMegaButton() {
                 RaisedDefaultMegaButton(
                     textId = R.string.search_menu_title,
                     onClick = {},
-                    enabled = it)
+                    enabled = it
+                )
             }
         }
     }
 }
+
+
+@CombinedTextAndThemePreviews
+@Composable
+private fun RaisedErrorMegaButtonPreview() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        Column(
+            modifier = Modifier.padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            listOf(true, false).forEach {
+                Text(
+                    style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.onSurface),
+                    text = if (it) "Enabled" else "Disabled",
+                )
+                RaisedDefaultErrorMegaButton(
+                    textId = R.string.search_menu_title,
+                    onClick = {},
+                    enabled = it
+                )
+            }
+        }
+    }
+}
+
 
 @CombinedThemePreviews
 @Composable

@@ -1,10 +1,12 @@
 package mega.privacy.android.core.ui.theme
 
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.tokens.SemanticTokens
 
 /**
@@ -30,6 +32,15 @@ internal data class MegaColors(
         @Composable
         get() = ButtonDefaults.buttonColors(
             backgroundColor = button.primary,
+            contentColor = text.inverse,
+            disabledBackgroundColor = button.disabled,
+            disabledContentColor = text.disabled,
+        )
+
+    val raisedErrorButtonColors
+        @Composable
+        get() = ButtonDefaults.buttonColors(
+            backgroundColor = MaterialTheme.colors.red_600_red_300,
             contentColor = text.inverse,
             disabledBackgroundColor = button.disabled,
             disabledContentColor = text.disabled,

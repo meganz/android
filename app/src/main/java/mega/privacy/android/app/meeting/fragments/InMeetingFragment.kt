@@ -24,11 +24,15 @@ import android.widget.Chronometer
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.appbar.MaterialToolbar
@@ -89,6 +93,7 @@ import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
+import mega.privacy.android.app.presentation.meeting.dialog.view.LeaveMeetingBottomSheetView
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
@@ -125,6 +130,7 @@ import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.entity.meeting.SubtitleCallType
 import mega.privacy.android.domain.entity.meeting.TypeRemoteAVFlagChange
+import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -219,7 +225,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     // Meeting failed Dialog
     private var failedDialog: Dialog? = null
 
-    private var assignModeratorDialog: AssignModeratorBottomSheetDialogFragment? = null
     private var endMeetingAsModeratorDialog: EndMeetingAsModeratorBottomSheetDialogFragment? = null
 
     // Only me in the call Dialog
@@ -679,6 +684,26 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
+        binding.hostLeaveCallDialogComposeView.apply {
+            isVisible = true
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val state by inMeetingViewModel.state.collectAsStateWithLifecycle()
+
+                MegaAppTheme(isDark = true) {
+                    LeaveMeetingBottomSheetView(
+                        state = state,
+                        onAssignAndLeaveClick = {
+                            showAssignModeratorFragment()
+                        },
+                        onLeaveAnywayClick = inMeetingViewModel::hangCall,
+                        onEndForAllClick = inMeetingViewModel::endCallForAll,
+                        onDismiss = inMeetingViewModel::hideBottomPanels
+                    )
+                }
+            }
+        }
+
         // Get meeting link from the arguments supplied when the fragment was instantiated
         sharedModel.updateMeetingLink(args.meetingLink)
 
@@ -1119,6 +1144,23 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
 
             sharedModel.setSpeakerView(isSpeakerMode = state.callUIStatus == CallUIStatusType.SpeakerView)
+
+            if (state.showEndMeetingAsHostBottomPanel) {
+                if (endMeetingAsModeratorDialog == null) {
+                    endMeetingAsModeratorDialog = EndMeetingAsModeratorBottomSheetDialogFragment()
+                    endMeetingAsModeratorDialog?.run {
+                        setLeaveMeetingCallBack { inMeetingViewModel.hangCall() }
+                        setEndForAllCallBack { inMeetingViewModel.endCallForAll() }
+                        show(
+                            this@InMeetingFragment.childFragmentManager,
+                            tag
+                        )
+                    }
+                }
+            } else {
+                endMeetingAsModeratorDialog?.dismissAllowingStateLoss()
+                endMeetingAsModeratorDialog = null
+            }
         }
 
         viewLifecycleOwner.collectFlow(sharedModel.state) { state: MeetingState ->
@@ -1421,38 +1463,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     clearAnimation()
                     inMeetingViewModel.checkBannerInfo()
                 }
-            }
-        }
-
-        inMeetingViewModel.showAssignModeratorBottomPanel.observe(viewLifecycleOwner) { shouldBeShown ->
-            if (shouldBeShown) {
-                assignModeratorDialog = AssignModeratorBottomSheetDialogFragment()
-                assignModeratorDialog?.run {
-                    setLeaveMeetingCallBack { inMeetingViewModel.hangCall() }
-                    setAssignModeratorCallBack(showAssignModeratorFragment)
-                    show(
-                        this@InMeetingFragment.childFragmentManager,
-                        tag
-                    )
-                }
-            } else {
-                assignModeratorDialog?.dismissAllowingStateLoss()
-            }
-        }
-
-        inMeetingViewModel.showEndMeetingAsModeratorBottomPanel.observe(viewLifecycleOwner) { shouldBeShown ->
-            if (shouldBeShown) {
-                endMeetingAsModeratorDialog = EndMeetingAsModeratorBottomSheetDialogFragment()
-                endMeetingAsModeratorDialog?.run {
-                    setLeaveMeetingCallBack { inMeetingViewModel.checkClickLeaveButton() }
-                    setEndForAllCallBack { inMeetingViewModel.endCallForAll() }
-                    show(
-                        this@InMeetingFragment.childFragmentManager,
-                        tag
-                    )
-                }
-            } else {
-                endMeetingAsModeratorDialog?.dismissAllowingStateLoss()
             }
         }
     }
@@ -2817,7 +2827,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         dismissDialog(leaveDialog)
         dismissDialog(failedDialog)
         dismissDialog(onlyMeDialog)
-        assignModeratorDialog?.dismissAllowingStateLoss()
         endMeetingAsModeratorDialog?.dismissAllowingStateLoss()
     }
 

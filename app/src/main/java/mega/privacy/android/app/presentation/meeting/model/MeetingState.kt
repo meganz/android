@@ -4,6 +4,7 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -55,6 +56,7 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property isRingingAll                               True if is ringing for all participants or False otherwise.
  * @property newInvitedParticipants                     List of emails of the new invited participants.
  * @property isMuteFeatureFlagEnabled                   True, if Mute feature flag enabled. False, otherwise.
+ * @property subscriptionPlan                           [AccountType]
  */
 data class MeetingState(
     val chatId: Long = -1L,
@@ -98,6 +100,7 @@ data class MeetingState(
     val isRingingAll: Boolean = false,
     val newInvitedParticipants: List<String> = emptyList(),
     val isMuteFeatureFlagEnabled: Boolean = false,
+    val subscriptionPlan: AccountType = AccountType.UNKNOWN,
 ) {
     /**
      * Check if waiting room is opened

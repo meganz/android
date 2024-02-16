@@ -234,14 +234,6 @@ class InMeetingViewModel @Inject constructor(
     private val _showWaitingForOthersBanner = MutableStateFlow(false)
     val showWaitingForOthersBanner: StateFlow<Boolean> get() = _showWaitingForOthersBanner
 
-    private val _showEndMeetingAsModeratorBottomPanel = MutableLiveData<Boolean>()
-    val showEndMeetingAsModeratorBottomPanel: LiveData<Boolean> =
-        _showEndMeetingAsModeratorBottomPanel
-
-    private val _showAssignModeratorBottomPanel = MutableLiveData<Boolean>()
-    val showAssignModeratorBottomPanel: LiveData<Boolean> = _showAssignModeratorBottomPanel
-
-
     // List of participants in the meeting
     val participants: MutableLiveData<MutableList<Participant>> = MutableLiveData(mutableListOf())
 
@@ -365,7 +357,7 @@ class InMeetingViewModel @Inject constructor(
                             isOpenInvite = chat.isOpenInvite,
                             isOneToOneCall = !chat.isGroup && !chat.isMeeting,
                             isMeeting = chat.isMeeting,
-                            isPublicChat = chat.isPublic
+                            isPublicChat = chat.isPublic,
                         )
                     }
                 }
@@ -1183,9 +1175,9 @@ class InMeetingViewModel @Inject constructor(
                     it.chatId
                 )
             ) {
-                megaChatApiGateway.getChatCall(_state.value.currentChatId)?.let {
+                megaChatApiGateway.getChatCall(_state.value.currentChatId)?.let { call ->
                     Timber.d("There is a call, open it")
-                    chatIdResult.value = it.chatid
+                    chatIdResult.value = call.chatid
                     CallUtil.openMeetingInProgress(
                         MegaApplication.getInstance().applicationContext,
                         _state.value.currentChatId,
@@ -2045,7 +2037,7 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Method for ignore a call
      */
-    fun ignoreCall() {
+    private fun ignoreCall() {
         _callLiveData.value?.let {
             inMeetingRepository.ignoreCall(it.chatid)
         }
@@ -2054,7 +2046,7 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Method for remove incoming call notification
      */
-    fun removeIncomingCallNotification(chatId: Long) {
+    private fun removeIncomingCallNotification(chatId: Long) {
         inMeetingRepository.getMeeting(chatId)?.let { call ->
             rtcAudioManagerGateway.stopSounds()
             CallUtil.clearIncomingCallNotification(call.callId)
@@ -2488,7 +2480,7 @@ class InMeetingViewModel @Inject constructor(
      *
      * @return True, if I am a moderator. False if not
      */
-    fun amIAModerator(): Boolean = getOwnPrivileges() == PRIV_MODERATOR
+    private fun amIAModerator(): Boolean = getOwnPrivileges() == PRIV_MODERATOR
 
     /**
      * Determine if the participant has standard privileges
@@ -2841,7 +2833,6 @@ class InMeetingViewModel @Inject constructor(
                     EventConstants.EVENT_REMOVE_CALL_NOTIFICATION,
                     Long::class.java
                 ).post(it.callId)
-
                 hangCall(it.callId)
             }
             return
@@ -2854,9 +2845,12 @@ class InMeetingViewModel @Inject constructor(
 
         getChat()?.let { chat ->
             when (chat.ownPrivilege) {
-                PRIV_MODERATOR -> {
-                    _showAssignModeratorBottomPanel.value = false
-                    _showEndMeetingAsModeratorBottomPanel.value = true
+                PRIV_MODERATOR -> _state.update { state ->
+                    val shouldAssignHost = chat.isMeeting && shouldAssignModerator()
+                    state.copy(
+                        showEndMeetingAsHostBottomPanel = !shouldAssignHost,
+                        showEndMeetingAsOnlyHostBottomPanel = shouldAssignHost,
+                    )
                 }
 
                 else -> hangCall()
@@ -2865,25 +2859,15 @@ class InMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Control when the leave button is clicked
-     */
-    fun checkClickLeaveButton() {
-        getChat()?.let { chat ->
-            if (chat.isMeeting && shouldAssignModerator()) {
-                _showEndMeetingAsModeratorBottomPanel.value = false
-                _showAssignModeratorBottomPanel.value = true
-            } else {
-                hangCall()
-            }
-        }
-    }
-
-    /**
      * Hide bottom panels
      */
     fun hideBottomPanels() {
-        _showEndMeetingAsModeratorBottomPanel.value = false
-        _showAssignModeratorBottomPanel.value = false
+        _state.update { state ->
+            state.copy(
+                showEndMeetingAsHostBottomPanel = false,
+                showEndMeetingAsOnlyHostBottomPanel = false,
+            )
+        }
     }
 
     /**

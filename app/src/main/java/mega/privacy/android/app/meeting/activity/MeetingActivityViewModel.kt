@@ -89,6 +89,7 @@ import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
+import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
@@ -167,6 +168,7 @@ import javax.inject.Inject
  * @property allowUsersJoinCallUseCase                      [AllowUsersJoinCallUseCase]
  * @property mutePeersUseCase                               [MutePeersUseCase]
  * @property muteAllPeersUseCase                            [MuteAllPeersUseCase]
+ * @property getCurrentSubscriptionPlanUseCase              [GetCurrentSubscriptionPlanUseCase]
  * @property state                                          Current view state as [MeetingState]
  */
 @HiltViewModel
@@ -212,6 +214,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val allowUsersJoinCallUseCase: AllowUsersJoinCallUseCase,
     private val mutePeersUseCase: MutePeersUseCase,
     private val muteAllPeersUseCase: MuteAllPeersUseCase,
+    private val getCurrentSubscriptionPlanUseCase: GetCurrentSubscriptionPlanUseCase,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
@@ -339,6 +342,13 @@ class MeetingActivityViewModel @Inject constructor(
                 }
             }
         }
+
+        viewModelScope.launch {
+            getCurrentSubscriptionPlanUseCase()?.let { currentSubscriptionPlan ->
+                _state.update { it.copy(subscriptionPlan = currentSubscriptionPlan) }
+            }
+        }
+
         LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
             .observeForever(audioOutputStateObserver)
 

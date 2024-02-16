@@ -47,7 +47,7 @@
     <!-- state while importing the file -->
     <string name="general_forwarding">Forwarding</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="general_import">Import</string>
+    <string name="general_import">Add to Cloud drive</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">Error</string>
     <!-- when trying to download a file that is already downloaded in the device -->
@@ -1235,7 +1235,7 @@
     <!-- Menu option -->
     <string name="general_view">View files</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="add_to_cloud">Import</string>
+    <string name="add_to_cloud">Add to Cloud drive</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Add to Cloud drive</string>
     <!-- Menu option -->
@@ -5271,6 +5271,14 @@
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Allow access to your gallery</string>
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Grant access</string>
+    <!-- Title of the bottom panel when the only host left the call on meeting screen -->
+    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Assign host to leave call</string>
+    <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">You’re the only host on the call. Assign another host for the group before leaving so someone on the call will have host permissions. You’ll remain a host in the group.</string>
+    <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">Assign and leave</string>
+    <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_leave_option">Leave anyway</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <string name="meetings_chat_screen_app_update_dialog_title">Update Required</string>
     <string name="meetings_chat_screen_app_update_dialog_message">You’re not using the latest version of our app so you can’t start or join calls. Update now to continue.</string>
