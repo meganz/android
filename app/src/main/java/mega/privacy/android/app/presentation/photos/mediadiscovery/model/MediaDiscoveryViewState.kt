@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.mediadiscovery.model
 
+import androidx.annotation.StringRes
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.namecollision.data.NameCollision
@@ -40,6 +41,7 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property loadPhotosDone
  * @property shouldGoBack when current folder is deleted, should automatic go back
  * @property downloadEvent event to trigger the download
+ * @property errorMessage The [StringRes] of the message to display in the error banner
  */
 data class MediaDiscoveryViewState(
     val currentFolderId: Long? = null,
@@ -67,4 +69,5 @@ data class MediaDiscoveryViewState(
     val loadPhotosDone: Boolean = false,
     val shouldGoBack: Boolean = false,
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
+    @StringRes val errorMessage: Int? = null,
 )

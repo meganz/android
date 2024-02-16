@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.clouddrive
 
+import androidx.annotation.StringRes
+
 /**
  * Interface that defines what methods the Activity should implement for [FileBrowserComposeFragment]
  */
@@ -23,6 +25,11 @@ interface FileBrowserActionListener {
      * @param mediaHandle The Folder Handle that contains the Media to be displayed on that page
      * @param isAccessedByIconClick true if Media Discovery is accessed by clicking the Media
      * Discovery Icon
+     * @param errorMessage The [StringRes] of the error message to display
      */
-    fun showMediaDiscoveryFromCloudDrive(mediaHandle: Long, isAccessedByIconClick: Boolean)
+    fun showMediaDiscoveryFromCloudDrive(
+        mediaHandle: Long,
+        isAccessedByIconClick: Boolean,
+        @StringRes errorMessage: Int?,
+    )
 }

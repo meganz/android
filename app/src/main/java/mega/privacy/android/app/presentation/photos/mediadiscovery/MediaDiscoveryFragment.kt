@@ -8,6 +8,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.StringRes
 import androidx.appcompat.view.ActionMode
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -324,20 +325,28 @@ class MediaDiscoveryFragment : Fragment() {
         private const val INTENT_KEY_IS_ACCESSED_BY_ICON_CLICK = "IS_ACCESSED_BY_ICON_CLICK"
 
         /**
+         * The message to be displayed in the error banner
+         */
+        internal const val PARAM_ERROR_MESSAGE = "PARAM_ERROR_MESSAGE"
+
+        /**
          * Creates a new instance of [MediaDiscoveryFragment]
          *
          * @param mediaHandle The Folder Handle used to view its Media
          * @param isAccessedByIconClick true if [MediaDiscoveryFragment] was accessed by clicking the Media
          * Discovery icon
+         * @param errorMessage The [StringRes] of the error message to display
          */
         fun newInstance(
             mediaHandle: Long,
             isAccessedByIconClick: Boolean = false,
+            @StringRes errorMessage: Int?,
         ): MediaDiscoveryFragment {
             return MediaDiscoveryFragment().apply {
                 arguments = bundleOf(
                     INTENT_KEY_CURRENT_FOLDER_ID to mediaHandle,
-                    INTENT_KEY_IS_ACCESSED_BY_ICON_CLICK to isAccessedByIconClick
+                    INTENT_KEY_IS_ACCESSED_BY_ICON_CLICK to isAccessedByIconClick,
+                    PARAM_ERROR_MESSAGE to errorMessage,
                 )
             }
         }

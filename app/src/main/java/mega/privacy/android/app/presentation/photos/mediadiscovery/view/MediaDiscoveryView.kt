@@ -77,17 +77,15 @@ import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
+import mega.privacy.android.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.photos.Photo
 
 @Composable
 fun MediaDiscoveryView(
-    mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel = viewModel(),
-    mediaDiscoveryViewModel: MediaDiscoveryViewModel = viewModel(),
     onOKButtonClicked: () -> Unit,
     onSettingButtonClicked: () -> Unit,
-    showSettingDialog: Boolean = false,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
     onPhotoClicked: (Photo) -> Unit,
@@ -100,8 +98,10 @@ fun MediaDiscoveryView(
     onStartModalSheetShow: () -> Unit,
     onEndModalSheetHide: () -> Unit,
     onModalSheetVisibilityChange: (Boolean) -> Unit,
-    isNewMediaDiscoveryFabEnabled
-    : Boolean,
+    isNewMediaDiscoveryFabEnabled: Boolean,
+    mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel = viewModel(),
+    mediaDiscoveryViewModel: MediaDiscoveryViewModel = viewModel(),
+    showSettingDialog: Boolean = false,
 ) {
     val mediaDiscoveryViewState by mediaDiscoveryViewModel.state.collectAsStateWithLifecycle()
     val hasUIPhoto = mediaDiscoveryViewState.uiPhotoList.isNotEmpty()
@@ -300,7 +300,6 @@ private suspend fun hideModalSheet(
 
 @Composable
 private fun SlidersDropDownMenu(
-    modifier: Modifier = Modifier,
     expanded: Boolean,
     onDismissDropdownMenu: () -> Unit,
     onClickSortByDropdownMenuItem: () -> Unit,
@@ -310,6 +309,7 @@ private fun SlidersDropDownMenu(
     enableSortBy: Boolean,
     enableZoomIn: Boolean,
     enableZoomOut: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = Modifier
@@ -415,16 +415,16 @@ private fun MDView(
     mediaDiscoveryViewState: MediaDiscoveryViewState,
     onOKButtonClicked: () -> Unit,
     onSettingButtonClicked: () -> Unit,
-    showSettingDialog: Boolean = false,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
     onPhotoClicked: (Photo) -> Unit,
     onPhotoLongPressed: (Photo) -> Unit,
     onCardClick: (DateCard) -> Unit,
     onTimeBarTabSelected: (TimeBarTab) -> Unit,
-    photoDownloaderViewModel: PhotoDownloaderViewModel = viewModel(),
     onSwitchListView: () -> Unit,
     addFabButton: @Composable () -> Unit,
+    photoDownloaderViewModel: PhotoDownloaderViewModel = viewModel(),
+    showSettingDialog: Boolean = false,
 ) {
     val lazyGridState = rememberSaveable(
         mediaDiscoveryViewState.scrollStartIndex,
@@ -445,6 +445,9 @@ private fun MDView(
         contentAlignment = Alignment.BottomEnd,
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
+            mediaDiscoveryViewState.errorMessage?.let { errorMessage ->
+                WarningBanner(textString = stringResource(id = errorMessage), onCloseClick = null)
+            }
             if (showSettingDialog) {
                 MediaDiscoveryDialog(
                     onOKButtonClicked = onOKButtonClicked,

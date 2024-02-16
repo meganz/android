@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.material.SnackbarHostState
@@ -230,6 +231,7 @@ class FileBrowserComposeFragment : Fragment() {
                     isMediaDiscoveryOpen = uiState.isMediaDiscoveryOpen,
                     isMediaDiscoveryOpenedByIconClick = uiState.isMediaDiscoveryOpenedByIconClick,
                     mediaHandle = uiState.fileBrowserHandle,
+                    errorMessage = uiState.errorMessage
                 )
                 UpdateToolbarTitle(uiState.updateToolbarTitleEvent) {
                     fileBrowserViewModel.consumeUpdateToolbarTitleEvent()
@@ -257,18 +259,21 @@ class FileBrowserComposeFragment : Fragment() {
      * @param isMediaDiscoveryOpenedByIconClick true if Media Discovery was accessed by clicking the
      * Media Discovery Icon
      * @param mediaHandle The Handle used to display content in Media Discovery
+     * @param errorMessage The [StringRes] of the error message to display
      */
     @Composable
     private fun HandleMediaDiscoveryVisibility(
         isMediaDiscoveryOpen: Boolean,
         isMediaDiscoveryOpenedByIconClick: Boolean,
         mediaHandle: Long,
+        @StringRes errorMessage: Int?,
     ) {
         if (isMediaDiscoveryOpen) {
             SideEffect {
                 fileBrowserActionListener?.showMediaDiscoveryFromCloudDrive(
                     mediaHandle = mediaHandle,
                     isAccessedByIconClick = isMediaDiscoveryOpenedByIconClick,
+                    errorMessage = errorMessage,
                 )
                 fileBrowserViewModel.onItemPerformedClicked()
             }

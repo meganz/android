@@ -2831,9 +2831,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     override fun showMediaDiscoveryFromCloudDrive(
         mediaHandle: Long,
         isAccessedByIconClick: Boolean,
+        @StringRes errorMessage: Int?,
     ) = showMediaDiscovery(
         mediaHandle = mediaHandle,
         isAccessedByIconClick = isAccessedByIconClick,
+        errorMessage = errorMessage,
     )
 
     /**
@@ -2842,14 +2844,20 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param mediaHandle The Folder Handle containing Media to be displayed in that View
      * @param isAccessedByIconClick True if Media Discovery is accessed by clicking the Media
      * Discovery Icon
+     * @param errorMessage The [StringRes] of the error message to display
      */
-    private fun showMediaDiscovery(mediaHandle: Long, isAccessedByIconClick: Boolean) {
+    private fun showMediaDiscovery(
+        mediaHandle: Long,
+        isAccessedByIconClick: Boolean,
+        @StringRes errorMessage: Int?,
+    ) {
         // Remove the existing Media Discovery View first
         mediaDiscoveryFragment?.let { removeFragment(it) }
         replaceFragment(
             fragment = MediaDiscoveryFragment.newInstance(
                 mediaHandle = mediaHandle,
                 isAccessedByIconClick = isAccessedByIconClick,
+                errorMessage = errorMessage,
             ),
             fragmentTag = FragmentTag.MEDIA_DISCOVERY.tag,
         )
@@ -3999,6 +4007,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 showMediaDiscovery(
                     mediaHandle = fileBrowserViewModel.getSafeBrowserParentHandle(),
                     isAccessedByIconClick = false,
+                    errorMessage = fileBrowserViewModel.state.value.errorMessage,
                 )
             }
         } else {

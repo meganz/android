@@ -27,6 +27,7 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.INTENT_KEY_CURRENT_FOLDER_ID
+import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.PARAM_ERROR_MESSAGE
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
@@ -105,7 +106,8 @@ class MediaDiscoveryViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(
         MediaDiscoveryViewState(
-            currentFolderId = savedStateHandle.get<Long>(INTENT_KEY_CURRENT_FOLDER_ID)
+            currentFolderId = savedStateHandle.get<Long>(INTENT_KEY_CURRENT_FOLDER_ID),
+            errorMessage = savedStateHandle.get<Int>(PARAM_ERROR_MESSAGE)
         )
     )
     val state = _state.asStateFlow()
