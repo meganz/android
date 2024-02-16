@@ -1651,7 +1651,7 @@ public class ChatUtil {
             shareFile(context, new File(path), node.getName());
         } else if (node.isExported()) {
             Timber.d("Node is exported, so share the public link");
-            startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND), node.getPublicLink());
+            startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND), node.getPublicLink(), node.getName());
         } else {
             if (msgId == MEGACHAT_INVALID_HANDLE) {
                 return;
@@ -1690,7 +1690,8 @@ public class ChatUtil {
         if (areAllNodesExported(listNodes)) {
             Timber.d("All nodes are exported, so share the public links");
             startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND),
-                    links.toString());
+                    links.toString(),
+                    null);
             return;
         }
 

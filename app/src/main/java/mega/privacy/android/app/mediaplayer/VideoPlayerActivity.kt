@@ -566,9 +566,13 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                         }
 
                         FILE_LINK_ADAPTER -> {
+                            val mediaItem = mediaPlayerGateway.getCurrentMediaItem()
+                            val nodeName = videoViewModel.getPlaylistItem(mediaItem?.mediaId)?.nodeName
+
                             MegaNodeUtil.shareLink(
                                 context = this,
-                                fileLink = launchIntent.getStringExtra(URL_FILE_LINK)
+                                fileLink = launchIntent.getStringExtra(URL_FILE_LINK),
+                                title = nodeName
                             )
                         }
 

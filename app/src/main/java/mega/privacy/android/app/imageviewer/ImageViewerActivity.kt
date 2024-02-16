@@ -691,13 +691,13 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
                     imageItem is ImageItem.PublicNode -> {
                         trackOnShareClicked()
-                        MegaNodeUtil.shareLink(this, imageItem.nodePublicLink)
+                        MegaNodeUtil.shareLink(this, imageItem.nodePublicLink, imageItem.name)
                     }
 
                     imageItem.nodeItem?.node != null -> {
                         trackOnShareClicked()
                         viewModel.exportNode(imageItem.nodeItem!!.node!!).observe(this) { link ->
-                            if (!link.isNullOrBlank()) MegaNodeUtil.shareLink(this, link)
+                            if (!link.isNullOrBlank()) MegaNodeUtil.shareLink(this, link, imageItem.name)
                         }
                     }
 

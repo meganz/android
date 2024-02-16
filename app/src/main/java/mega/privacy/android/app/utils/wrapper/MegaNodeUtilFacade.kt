@@ -59,14 +59,6 @@ class MegaNodeUtilFacade @Inject constructor() : MegaNodeUtilWrapper {
         MegaNodeUtil.shareNodes(context, nodes)
     }
 
-    override fun shareLink(context: Context, fileLink: String?) {
-        MegaNodeUtil.shareLink(context, fileLink)
-    }
-
-    override fun startShareIntent(context: Context, shareIntent: Intent, link: String?) {
-        MegaNodeUtil.startShareIntent(context, shareIntent, link)
-    }
-
     override fun shouldContinueWithoutError(context: Context, node: MegaNode?) =
         MegaNodeUtil.shouldContinueWithoutError(context, node)
 

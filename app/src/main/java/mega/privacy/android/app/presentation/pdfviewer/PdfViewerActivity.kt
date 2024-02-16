@@ -1170,7 +1170,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 } else if (type == Constants.OFFLINE_ADAPTER || !inside) {
                     FileUtil.shareWithUri(this, "pdf", uri)
                 } else if (type == Constants.FILE_LINK_ADAPTER) {
-                    shareLink(this, intent.getStringExtra(Constants.URL_FILE_LINK))
+                    shareLink(this, intent.getStringExtra(Constants.URL_FILE_LINK), node?.name)
                 } else {
                     val node = megaApi.getNodeByHandle(handle)
                     shareNode(this, node)

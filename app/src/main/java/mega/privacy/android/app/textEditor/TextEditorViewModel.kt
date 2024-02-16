@@ -970,7 +970,7 @@ class TextEditorViewModel @Inject constructor(
                 getFileUri()
             )
 
-            FILE_LINK_ADAPTER -> shareLink(context, urlFileLink)
+            FILE_LINK_ADAPTER -> shareLink(context, urlFileLink, getNode()?.name)
             else -> shareNode(context, getNode()!!) { updateNode() }
         }
     }

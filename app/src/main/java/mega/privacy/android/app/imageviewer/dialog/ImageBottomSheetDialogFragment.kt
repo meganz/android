@@ -362,14 +362,14 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
                     imageItem is ImageItem.PublicNode -> {
                         trackOnShareClicked()
-                        MegaNodeUtil.shareLink(requireActivity(), imageItem.nodePublicLink)
+                        MegaNodeUtil.shareLink(requireActivity(), imageItem.nodePublicLink, imageItem.name)
                     }
 
                     node != null -> {
                         trackOnShareClicked()
                         viewModel.exportNode(node).observe(viewLifecycleOwner) { link ->
                             if (!link.isNullOrBlank()) {
-                                MegaNodeUtil.shareLink(requireActivity(), link)
+                                MegaNodeUtil.shareLink(requireActivity(), link, node.name)
                             }
                         }
                     }

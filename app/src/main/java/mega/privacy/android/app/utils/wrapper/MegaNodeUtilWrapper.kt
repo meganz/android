@@ -118,23 +118,6 @@ interface MegaNodeUtilWrapper {
     fun shareNodes(context: Context, nodes: List<MegaNode>)
 
     /**
-     * Shares a link.
-     *
-     * @param context   current Context.
-     * @param fileLink  link to share.
-     */
-    fun shareLink(context: Context, fileLink: String?)
-
-    /**
-     * Ends the creation of the share intent and starts it.
-     *
-     * @param context       current Context.
-     * @param shareIntent   intent to start the share.
-     * @param link          link of the node to share.
-     */
-    fun startShareIntent(context: Context, shareIntent: Intent, link: String?)
-
-    /**
      * Checks if there is any error before continues any action.
      *
      * @param context   current Context.

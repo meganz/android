@@ -225,7 +225,7 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
     }
 
     private fun onShareClicked() {
-        MegaNodeUtil.shareLink(this, viewModel.state.value.url)
+        MegaNodeUtil.shareLink(this, viewModel.state.value.url, viewModel.state.value.title)
     }
 
     private fun onConfirmErrorDialogClick() {

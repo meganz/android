@@ -348,9 +348,12 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                         }
 
                         FILE_LINK_ADAPTER -> {
+                            val mediaItem = serviceGateway?.getCurrentMediaItem()
+                            val nodeName = playerServiceGateway?.getPlaylistItem(mediaItem?.mediaId)?.nodeName
                             MegaNodeUtil.shareLink(
                                 context = this,
-                                fileLink = launchIntent.getStringExtra(URL_FILE_LINK)
+                                fileLink = launchIntent.getStringExtra(URL_FILE_LINK),
+                                title = nodeName
                             )
                         }
 

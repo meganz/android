@@ -247,7 +247,7 @@ class ExportListener constructor(private val context: Context) :
                         if (exportedLinks == null && numberError == 0) {
                             Timber.d("Start share one item")
                             shareIntent?.let { nonNullShareIntent ->
-                                startShareIntent(context, nonNullShareIntent, nonNullRequestLink)
+                                startShareIntent(context, nonNullShareIntent, nonNullRequestLink, null)
                                 onExportFinishedListener?.invoke()
                             }
                             return
@@ -259,7 +259,8 @@ class ExportListener constructor(private val context: Context) :
                                     startShareIntent(
                                         context,
                                         nonNullShareIntent,
-                                        exportedLinks.toString()
+                                        exportedLinks.toString(),
+                                        null
                                     )
                                 }
                             }
