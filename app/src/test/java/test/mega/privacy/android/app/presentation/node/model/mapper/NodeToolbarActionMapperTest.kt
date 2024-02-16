@@ -22,7 +22,7 @@ import mega.privacy.android.app.presentation.node.model.menuaction.ShareMenuActi
 import mega.privacy.android.app.presentation.node.model.menuaction.TrashMenuAction
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ClearSelection
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.CopyToolbarMenuItem
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DisputeTakeDown
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DisputeTakeDownMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DownloadToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.GetLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.LeaveShareToolBarMenuItem
@@ -67,7 +67,7 @@ class NodeToolbarActionMapperTest {
             stringWithDelimitersMapper = mock()
         ),
         RemoveShareDropDown(mock()),
-        DisputeTakeDown(DisputeTakeDownMenuAction()),
+        DisputeTakeDownMenuItem(DisputeTakeDownMenuAction()),
         GetLinkToolbarMenuItem(GetLinkMenuAction()),
         ManageLinkToolbarMenuItem(),
         MultiSelectManageLinkToolbarMenuItem(),

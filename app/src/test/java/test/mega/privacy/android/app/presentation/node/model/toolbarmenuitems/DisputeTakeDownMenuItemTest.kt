@@ -2,7 +2,7 @@ package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import com.google.common.truth.Truth
 import mega.privacy.android.app.presentation.node.model.menuaction.DisputeTakeDownMenuAction
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DisputeTakeDown
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DisputeTakeDownMenuItem
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import org.junit.jupiter.api.TestInstance
@@ -13,9 +13,9 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class DisputeTakeDownTest {
+class DisputeTakeDownMenuItemTest {
 
-    private val underTest = DisputeTakeDown(DisputeTakeDownMenuAction())
+    private val underTest = DisputeTakeDownMenuItem(DisputeTakeDownMenuAction())
     private val takenDownNode = mock<TypedFolderNode> {
         on { isTakenDown }.thenReturn(false)
     }
