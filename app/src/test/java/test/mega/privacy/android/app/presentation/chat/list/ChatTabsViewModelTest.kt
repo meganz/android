@@ -33,6 +33,7 @@ import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatHistoryEmptyUseCase
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingCanceledUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
@@ -80,6 +81,7 @@ internal class ChatTabsViewModelTest {
     private val getChatsUnreadStatusUseCase: GetChatsUnreadStatusUseCase = mock()
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase = mock()
     private val monitorLeaveChatUseCase: MonitorLeaveChatUseCase = mock()
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock()
 
 
     @BeforeAll
@@ -118,7 +120,8 @@ internal class ChatTabsViewModelTest {
             isParticipatingInChatCallUseCase,
             setNextMeetingTooltipUseCase,
             getChatsUnreadStatusUseCase,
-            startMeetingInWaitingRoomChatUseCase
+            startMeetingInWaitingRoomChatUseCase,
+            monitorChatCallUpdatesUseCase
         )
     }
 
@@ -146,6 +149,7 @@ internal class ChatTabsViewModelTest {
             getChatsUnreadStatusUseCase,
             startMeetingInWaitingRoomChatUseCase,
             monitorLeaveChatUseCase,
+            monitorChatCallUpdatesUseCase
         )
     }
 

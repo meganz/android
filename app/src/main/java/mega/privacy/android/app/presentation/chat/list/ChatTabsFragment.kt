@@ -52,12 +52,12 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatStatus
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.ChatScreenEvent
 import mega.privacy.mobile.analytics.event.ChatsTabEvent
 import mega.privacy.mobile.analytics.event.MeetingsTabEvent
@@ -73,6 +73,7 @@ import javax.inject.Inject
 class ChatTabsFragment : Fragment() {
     @Inject
     lateinit var navigator: MegaNavigator
+
     companion object {
         private const val EXTRA_SHOW_MEETING_TAB = "EXTRA_SHOW_MEETING_TAB"
 
@@ -172,6 +173,7 @@ class ChatTabsFragment : Fragment() {
                         onDismissDialog = ::onDismissDialog,
                         onStartChatClick = ::startChatAction,
                         onShowNextTooltip = viewModel::setNextMeetingTooltip,
+                        onDismissForceAppUpdateDialog = viewModel::onForceUpdateDialogDismissed
                     )
                 }
             }
@@ -287,6 +289,7 @@ class ChatTabsFragment : Fragment() {
 
     private fun onItemClick(chatId: Long) {
         viewModel.signalChatPresence()
+        viewModel.cancelCallUpdate()
 
         navigator.openChat(
             context = requireActivity(),

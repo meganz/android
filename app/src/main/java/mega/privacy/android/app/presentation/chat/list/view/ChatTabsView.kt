@@ -46,13 +46,14 @@ import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.model.ChatsTabState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
 import mega.privacy.android.app.presentation.meeting.view.CancelScheduledMeetingDialog
-import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
+import mega.privacy.android.app.presentation.meeting.view.ForceAppUpdateDialog
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.white_black
 import mega.privacy.android.core.ui.theme.red_600
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
+import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
 
 /**
  * Chat tabs view
@@ -81,6 +82,7 @@ fun ChatTabsView(
     onDismissDialog: () -> Unit = {},
     onStartChatClick: () -> Unit = {},
     onShowNextTooltip: (MeetingTooltipItem) -> Unit = {},
+    onDismissForceAppUpdateDialog: () -> Unit = {},
 ) {
     val initialPage = if (showMeetingTab) ChatTab.MEETINGS.ordinal else ChatTab.CHATS.ordinal
     val context = LocalContext.current
@@ -239,6 +241,9 @@ fun ChatTabsView(
                 )
             }
         }
+    }
+    if (state.showForceUpdateDialog) {
+        ForceAppUpdateDialog(onDismiss = onDismissForceAppUpdateDialog)
     }
 }
 

@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -32,6 +34,10 @@ import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItemStatus
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
+import mega.privacy.android.domain.entity.meeting.CallNotificationType
+import mega.privacy.android.domain.entity.meeting.ChatCallChanges
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
@@ -46,6 +52,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingCanceledUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
@@ -105,10 +112,13 @@ class ChatTabsViewModel @Inject constructor(
     private val getChatsUnreadStatusUseCase: GetChatsUnreadStatusUseCase,
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase,
     private val monitorLeaveChatUseCase: MonitorLeaveChatUseCase,
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
 ) : ViewModel() {
 
     private val state = MutableStateFlow(ChatsTabState())
     private var meetingsRequested = false
+
+    private var monitorChatCallUpdatesJob: Job? = null
 
     /**
      * Get view model state
@@ -307,6 +317,48 @@ class ChatTabsViewModel @Inject constructor(
     }
 
     /**
+     * Get chat call updates
+     */
+    private fun getChatCallUpdates(chatId: Long) {
+        monitorChatCallUpdatesJob?.cancel()
+        monitorChatCallUpdatesJob = viewModelScope.launch {
+            monitorChatCallUpdatesUseCase()
+                .filter { it.chatId == chatId }
+                .catch {
+                    Timber.e(it)
+                }
+                .collect { call ->
+                    call.changes?.apply {
+                        Timber.d("Monitor chat call updated, changes ${call.changes}")
+                        if (contains(ChatCallChanges.Status)) {
+                            call.status?.let {
+                                Timber.d("Monitor chat call updated, status $it, and call term code is ${call.termCode}")
+                                if (it == ChatCallStatus.TerminatingUserParticipation && call.termCode == ChatCallTermCodeType.ProtocolVersion) {
+                                    showForceUpdateDialog()
+                                }
+                            }
+                        } else if (contains(ChatCallChanges.GenericNotification)) {
+                            if (call.notificationType == CallNotificationType.SFUError && call.termCode == ChatCallTermCodeType.ProtocolVersion) {
+                                showForceUpdateDialog()
+                            }
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun showForceUpdateDialog() {
+        state.update { it.copy(showForceUpdateDialog = true) }
+    }
+
+    /**
+     * Set to false to hide the dialog
+     */
+    fun onForceUpdateDialogDismissed() {
+        state.update { it.copy(showForceUpdateDialog = false) }
+    }
+
+    /**
      * Open current call
      *
      * @param call  [ChatCall]
@@ -316,6 +368,7 @@ class ChatTabsViewModel @Inject constructor(
         chatManagement.setRequestSentCall(call.callId, call.isOutgoing)
         passcodeManagement.showPasscodeScreen = true
         MegaApplication.getInstance().openCallService(call.chatId)
+        getChatCallUpdates(call.chatId)
         state.update { it.copy(currentCallChatId = call.chatId) }
     }
 
@@ -420,6 +473,13 @@ class ChatTabsViewModel @Inject constructor(
                 Timber.e(exception)
             }
         }
+    }
+
+    /**
+     * Cancel Call Update Job
+     */
+    fun cancelCallUpdate() {
+        monitorChatCallUpdatesJob?.cancel()
     }
 
     /**

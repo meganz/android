@@ -130,11 +130,13 @@ import static mega.privacy.android.app.utils.Constants.INVITE_CONTACT_TYPE;
 import static mega.privacy.android.app.utils.Constants.LINK_IS_FOR_MEETING;
 import static mega.privacy.android.app.utils.Constants.LOCATION_PERMISSION_REQUEST_CODE;
 import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.MARKET_URI;
 import static mega.privacy.android.app.utils.Constants.MAX_REACTIONS_PER_MESSAGE;
 import static mega.privacy.android.app.utils.Constants.MAX_REACTIONS_PER_USER;
 import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_ENABLED;
 import static mega.privacy.android.app.utils.Constants.OPENED_FROM_CHAT;
+import static mega.privacy.android.app.utils.Constants.PLAY_STORE_URI;
 import static mega.privacy.android.app.utils.Constants.REACTION_ERROR_DEFAULT_VALUE;
 import static mega.privacy.android.app.utils.Constants.REACTION_ERROR_TYPE_USER;
 import static mega.privacy.android.app.utils.Constants.RECORD_VOICE_CLIP;
@@ -596,6 +598,8 @@ public class ChatActivity extends PasscodeActivity
     private AlertDialog dialogCall;
     private AlertDialog dialogOnlyMeInCall;
     private AlertDialog endCallForAllDialog;
+
+    private AlertDialog forceAppUpdateDialog;
 
     private RelativeLayout editMsgLayout;
     private RelativeLayout cancelEdit;
@@ -2142,6 +2146,10 @@ public class ChatActivity extends PasscodeActivity
                 showCallRecordingConsentDialog();
             } else if (callRecordingConsentDialogFragment != null) {
                 callRecordingConsentDialogFragment.dismissAllowingStateLoss();
+            }
+
+            if (chatState.getShowForceUpdateDialog()) {
+                showForceUpdateAppDialog();
             }
 
             return Unit.INSTANCE;
@@ -10133,5 +10141,41 @@ public class ChatActivity extends PasscodeActivity
                 }, Timber::e);
 
         composite.add(chatSubscription);
+    }
+
+    /**
+     * Show Force App Update Dialog
+     */
+    public void showForceUpdateAppDialog() {
+        if (forceAppUpdateDialog != null && forceAppUpdateDialog.isShowing()) return;
+        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
+
+        dialogBuilder.setTitle(getString(R.string.meetings_chat_screen_app_update_dialog_title))
+                .setMessage(getString(R.string.meetings_chat_screen_app_update_dialog_message))
+                .setNegativeButton(getString(R.string.meetings_chat_screen_app_update_dialog_cancel_button),
+                        (dialog, which) -> {
+                            dialog.dismiss();
+                            viewModel.onForceUpdateDialogConsumed();
+                            forceAppUpdateDialog = null;
+                        })
+                .setPositiveButton(getString(R.string.meetings_chat_screen_app_update_dialog_update_button),
+                        (dialog, which) -> {
+                            viewModel.onForceUpdateDialogConsumed();
+                            dialog.dismiss();
+                            openPlayStore();
+                            forceAppUpdateDialog = null;
+                        });
+
+        forceAppUpdateDialog = dialogBuilder.create();
+        forceAppUpdateDialog.show();
+    }
+
+    private void openPlayStore() {
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(MARKET_URI)));
+        } catch (android.content.ActivityNotFoundException exception) {
+            Timber.e(exception, "Exception opening Play Store");
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(PLAY_STORE_URI)));
+        }
     }
 }

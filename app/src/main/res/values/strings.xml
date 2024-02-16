@@ -388,19 +388,19 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Error. Folder not created</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Renamed</string>
+    <string name="context_correctly_renamed">Item renamed</string>
     <!-- error message -->
     <string name="context_no_renamed">Error. Not renamed</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Copied</string>
+    <string name="context_correctly_copied">Item copied</string>
     <!-- error message -->
     <string name="context_no_copied">Error. Not copied</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Choose a destination folder</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Moved</string>
+    <string name="context_correctly_moved">Item moved</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Moved to Rubbish bin</string>
+    <string name="context_correctly_moved_to_rubbish">Item moved to Rubbish bin</string>
     <!-- error message -->
     <string name="context_no_moved">Error. Not moved</string>
     <!-- success message when sharing a folder -->
@@ -408,7 +408,7 @@
     <!-- error message -->
     <string name="context_no_removed_shared">Error. Share failed to remove</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Deleted</string>
+    <string name="context_correctly_removed">Item deleted</string>
     <!-- error message -->
     <string name="context_no_removed">Error. Deletion failed</string>
     <!-- success message when sending multiple files -->
@@ -4473,18 +4473,12 @@
         <item quantity="one">Couldn’t copy %1$d item</item>
         <item quantity="other">Couldn’t copy %1$d items</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
-    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Copied %1$d item,&#160;</item>
         <item quantity="other">Copied %1$d items,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
-    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">couldn’t copy %1$d item</item>
         <item quantity="other">couldn’t copy %1$d items</item>
@@ -5277,4 +5271,9 @@
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Allow access to your gallery</string>
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Grant access</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_chat_screen_app_update_dialog_title">Update Required</string>
+    <string name="meetings_chat_screen_app_update_dialog_message">You’re not using the latest version of our app so you can’t start or join calls. Update now to continue.</string>
+    <string name="meetings_chat_screen_app_update_dialog_update_button">Update</string>
+    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Skip</string>
 </resources>

@@ -33,6 +33,7 @@ import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
  * @property isRecordingConsentAccepted                 True if recording consent dialog has been already accepted or False otherwise.
  * @property enabledFeatureFlags                        Set of enabled feature flags
  * @property isRingingAll                               True if is ringing for all participants or False otherwise.
+ * @property showForceUpdateDialog                      State event to show the force update dialog.
  */
 data class ChatStateLegacy(
     val chatId: Long = -1L,
@@ -58,5 +59,6 @@ data class ChatStateLegacy(
     val showRecordingConsentDialog: Boolean = false,
     val isRecordingConsentAccepted: Boolean = false,
     val enabledFeatureFlags: Set<Feature> = emptySet(),
-    val isRingingAll: Boolean = false
+    val isRingingAll: Boolean = false,
+    val showForceUpdateDialog: Boolean = false,
 )

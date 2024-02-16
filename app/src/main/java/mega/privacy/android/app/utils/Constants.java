@@ -764,7 +764,9 @@ public class Constants {
 
     public static final int MAX_BADGE_NUM = 9;
 
-    /** Event Keys */
+    /**
+     * Event Keys
+     */
     public static final String EVENT_ORDER_CHANGE = "order_change";
     public static final String EVENT_CHAT_STATUS_CHANGE = "chat_status_change";
     public static final String EVENT_HOMEPAGE_VISIBILITY = "homepage_visibility";
@@ -774,7 +776,9 @@ public class Constants {
 
     public static final String KEY_IS_SHOWED_WARNING_MESSAGE = "is_showed_meeting_warning_message_";
 
-    /** In database, invalid value is defined as '-1' */
+    /**
+     * In database, invalid value is defined as '-1'
+     */
     public static final String INVALID_NON_NULL_VALUE = "-1";
 
     public static final String STRING_SEPARATOR = " · ";
@@ -796,7 +800,9 @@ public class Constants {
 
     public static final String URL_INDICATOR = "URL=";
 
-    /** The param type returned by checkChatLink denoting the link is for a meeting room */
+    /**
+     * The param type returned by checkChatLink denoting the link is for a meeting room
+     */
     public final static int LINK_IS_FOR_MEETING = 1;
 
     public static final float MEETING_NAME_MARGIN_TOP = 16f;
@@ -805,7 +811,7 @@ public class Constants {
     public static final int AVATAR_CHANGE = 1;
 
     public static final int FIRST_NAVIGATION_LEVEL = 0;
-    
+
     public static final long LONG_SNACKBAR_DURATION = 2750;
 
     public static final String CANNOT_OPEN_FILE_SHOWN = "CANNOT_OPEN_FILE_SHOWN";
@@ -813,4 +819,9 @@ public class Constants {
     public static final int MAX_TITLE_SIZE = 30;
 
     public static final int MAX_DESCRIPTION_SIZE = 3000;
+
+
+    private static final String PACKAGE_NAME = "id=mega.privacy.android.app";
+    public static final String MARKET_URI = "market://details?" + PACKAGE_NAME;
+    public static final String PLAY_STORE_URI = "https://play.google.com/store/apps/details?" + PACKAGE_NAME;
 }
