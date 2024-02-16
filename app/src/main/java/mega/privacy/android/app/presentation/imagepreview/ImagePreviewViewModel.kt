@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
@@ -43,6 +44,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.CheckFileUriUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
+import mega.privacy.android.domain.usecase.imageviewer.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
@@ -56,6 +58,7 @@ import mega.privacy.android.domain.usecase.transfers.downloads.ResetTotalDownloa
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
+import java.io.File
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 
@@ -66,6 +69,7 @@ class ImagePreviewViewModel @Inject constructor(
     private val imagePreviewMenuMap: Map<@JvmSuppressWildcards ImagePreviewMenuSource, @JvmSuppressWildcards ImagePreviewMenu>,
     private val addImageTypeUseCase: AddImageTypeUseCase,
     private val getImageUseCase: GetImageUseCase,
+    private val getImageFromFileUseCase: GetImageFromFileUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val checkNameCollision: CheckNameCollision,
     private val copyNodeUseCase: CopyNodeUseCase,
@@ -262,13 +266,20 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     suspend fun monitorImageResult(imageNode: ImageNode): Flow<ImageResult> {
-        val typedNode = addImageTypeUseCase(imageNode)
-        return getImageUseCase(
-            node = typedNode,
-            fullSize = true,
-            highPriority = true,
-            resetDownloads = {},
-        ).catch { Timber.e("Failed to load image: $it") }
+        return if (imageNode.serializedData?.contains("local") == true) {
+            flow {
+                val file = File(imageNode.previewPath ?: return@flow)
+                emit(getImageFromFileUseCase(file))
+            }
+        } else {
+            val typedNode = addImageTypeUseCase(imageNode)
+            getImageUseCase(
+                node = typedNode,
+                fullSize = true,
+                highPriority = true,
+                resetDownloads = {},
+            )
+        }.catch { Timber.e("Failed to load image: $it") }
     }
 
     fun switchFullScreenMode() {

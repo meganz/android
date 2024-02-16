@@ -472,8 +472,20 @@ private fun ImagePreviewContent(
             Box(modifier = Modifier.fillMaxSize()) {
                 val isVideo = imageNode.type is VideoFileTypeInfo
                 ImageContent(
-                    fullSizePath = imagePath,
-                    errorImagePath = errorImagePath,
+                    fullSizePath = imageNode.run {
+                        fullSizePath.takeIf {
+                            imageNode.serializedData?.contains(
+                                "local"
+                            ) == true
+                        }
+                    } ?: imagePath,
+                    errorImagePath = imageNode.run {
+                        fullSizePath.takeIf {
+                            imageNode.serializedData?.contains(
+                                "local"
+                            ) == true
+                        }
+                    } ?: errorImagePath,
                     photoState = photoState,
                     onImageTap = onImageTap,
                     enableZoom = !isVideo

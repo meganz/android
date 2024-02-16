@@ -33,8 +33,12 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.ChatDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityZipBrowserBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
-import mega.privacy.android.domain.monitoring.CrashReporter
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.ZipImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
@@ -56,6 +60,9 @@ import mega.privacy.android.app.utils.getScreenHeight
 import mega.privacy.android.app.zippreview.domain.FileType
 import mega.privacy.android.app.zippreview.viewmodel.ZipBrowserViewModel
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.monitoring.CrashReporter
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import timber.log.Timber
 import java.io.File
 import java.nio.charset.Charset
@@ -73,6 +80,9 @@ class ZipBrowserActivity : PasscodeActivity() {
      */
     @Inject
     lateinit var crashReporter: CrashReporter
+
+    @Inject
+    lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
 
     private lateinit var zipBrowserBinding: ActivityZipBrowserBinding
     private var actionBar: ActionBar? = null
@@ -285,17 +295,33 @@ class ZipBrowserActivity : PasscodeActivity() {
      */
     private fun imageFileOpen(position: Int, file: File) {
         Timber.d("isImage")
-
-        val intent = ImageViewerActivity.getIntentForFile(this, file.toUri(), true)
-        DragToExitSupport.putThumbnailLocation(
-            intent,
-            recyclerView,
-            position,
-            VIEWER_FROM_ZIP_BROWSER,
-            zipAdapter
-        )
-        startActivity(intent)
-        overridePendingTransition(0, 0)
+        lifecycleScope.launch {
+            if (getFeatureFlagUseCase(AppFeatures.ImagePreview)) {
+                val intent = ImagePreviewActivity.createIntent(
+                    context = this@ZipBrowserActivity,
+                    imageSource = ImagePreviewFetcherSource.ZIP,
+                    menuOptionsSource = ImagePreviewMenuSource.ZIP,
+                    anchorImageNodeId = NodeId(file.hashCode().toLong()),
+                    params = mapOf(ZipImageNodeFetcher.URI to "${file.toUri()}")
+                )
+                startActivity(intent)
+            } else {
+                val intent = ImageViewerActivity.getIntentForFile(
+                    this@ZipBrowserActivity,
+                    file.toUri(),
+                    true
+                )
+                DragToExitSupport.putThumbnailLocation(
+                    intent,
+                    recyclerView,
+                    position,
+                    VIEWER_FROM_ZIP_BROWSER,
+                    zipAdapter
+                )
+                startActivity(intent)
+                overridePendingTransition(0, 0)
+            }
+        }
     }
 
     /**

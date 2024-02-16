@@ -18,4 +18,5 @@ enum class ImagePreviewFetcherSource {
     SHARED_ITEMS,
     BACKUPS,
     RUBBISH_BIN,
+    ZIP,
 }

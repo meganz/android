@@ -20,6 +20,7 @@ import mega.privacy.android.app.presentation.imagepreview.menu.PublicFileImagePr
 import mega.privacy.android.app.presentation.imagepreview.menu.RubbishBinImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.SharedItemsImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.TimelineImagePreviewMenu
+import mega.privacy.android.app.presentation.imagepreview.menu.ZipImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 
 @Module
@@ -94,4 +95,9 @@ internal interface ImagePreviewMenuModule {
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.RUBBISH_BIN)
     fun RubbishBinImagePreviewMenu.bindRubbishBinMenu(): ImagePreviewMenu
+
+    @Binds
+    @IntoMap
+    @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.ZIP)
+    fun ZipImagePreviewMenu.bindZipMenu(): ImagePreviewMenu
 }

@@ -159,4 +159,9 @@ interface PhotosRepository {
         order: SortOrder?,
         includeRubbishBin: Boolean = false,
     ): List<ImageNode>
+
+    /**
+     * Get imageNodes from files
+     */
+    suspend fun getImageNodesInFiles(files: List<File>): List<ImageNode>
 }

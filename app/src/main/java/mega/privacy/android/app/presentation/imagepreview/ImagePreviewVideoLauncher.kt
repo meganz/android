@@ -40,7 +40,16 @@ class ImagePreviewVideoLauncher @Inject constructor(
             putExtra(Constants.INTENT_EXTRA_KEY_POSITION, 0)
             putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, nodeHandle)
             putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, nodeName)
-            putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, adapterType)
+            if (imageNode.serializedData?.contains("local") == true) { //handle zip file
+                putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.VIEWER_FROM_ZIP_BROWSER)
+                putExtra(Constants.INTENT_EXTRA_KEY_PATH, imageNode.fullSizePath)
+                putExtra(
+                    Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY,
+                    imageNode.fullSizePath
+                )
+            } else {
+                putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, adapterType)
+            }
             putExtra(
                 Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                 imageNode.parentId.longValue
@@ -63,20 +72,25 @@ class ImagePreviewVideoLauncher @Inject constructor(
      * @return local file path
      */
     private suspend fun isLocalFile(
-        handle: Long,
-    ): String? =
-        getNodeByHandle(handle)?.let { node ->
-            val localPath = FileUtil.getLocalFile(node)
-            File(FileUtil.getDownloadLocation(), node.name).let { file ->
-                if (localPath != null && ((FileUtil.isFileAvailable(file) && file.length() == node.size)
-                            || (node.fingerprint == getFingerprintUseCase(localPath)))
-                ) {
-                    localPath
-                } else {
-                    null
+        imageNode: ImageNode,
+    ): String? {
+        return if (imageNode.serializedData?.contains("local") == true) {//handle zip file
+            imageNode.fullSizePath
+        } else {
+            getNodeByHandle(imageNode.id.longValue)?.let { node ->
+                val localPath = FileUtil.getLocalFile(node)
+                File(FileUtil.getDownloadLocation(), node.name).let { file ->
+                    if (localPath != null && ((FileUtil.isFileAvailable(file) && file.length() == node.size)
+                                || (node.fingerprint == getFingerprintUseCase(localPath)))
+                    ) {
+                        localPath
+                    } else {
+                        null
+                    }
                 }
             }
         }
+    }
 
     private suspend fun updateIntent(
         handle: Long,
@@ -101,7 +115,7 @@ class ImagePreviewVideoLauncher @Inject constructor(
         imageNode: ImageNode,
         intent: Intent,
     ): Intent {
-        return isLocalFile(imageNode.id.longValue)?.let { localPath ->
+        return isLocalFile(imageNode)?.let { localPath ->
             File(localPath).let { mediaFile ->
                 kotlin.runCatching {
                     FileProvider.getUriForFile(

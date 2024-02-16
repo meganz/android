@@ -256,8 +256,8 @@ private fun SlideShowContent(
             ImageContent(
                 photoState = photoState,
                 onTapImage = onTapImage,
-                fullSizePath = fullSizePath,
-                errorImagePath = errorImagePath
+                fullSizePath = if (imageNode.serializedData == "localFile") imageNode.fullSizePath else fullSizePath,
+                errorImagePath = if (imageNode.serializedData == "localFile") imageNode.fullSizePath else errorImagePath,
             )
 
             handleEffectComposable()

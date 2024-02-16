@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
@@ -30,9 +31,11 @@ import mega.privacy.android.domain.usecase.MonitorSlideshowOrderSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowRepeatSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowSpeedSettingUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileUriUseCase
+import mega.privacy.android.domain.usecase.imageviewer.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,6 +44,7 @@ class SlideshowViewModel @Inject constructor(
     private val imageNodeFetchers: Map<@JvmSuppressWildcards ImagePreviewFetcherSource, @JvmSuppressWildcards ImageNodeFetcher>,
     private val addImageTypeUseCase: AddImageTypeUseCase,
     private val getImageUseCase: GetImageUseCase,
+    private val getImageFromFileUseCase: GetImageFromFileUseCase,
     private val monitorSlideshowOrderSettingUseCase: MonitorSlideshowOrderSettingUseCase,
     private val monitorSlideshowSpeedSettingUseCase: MonitorSlideshowSpeedSettingUseCase,
     private val monitorSlideshowRepeatSettingUseCase: MonitorSlideshowRepeatSettingUseCase,
@@ -105,13 +109,20 @@ class SlideshowViewModel @Inject constructor(
     }
 
     suspend fun monitorImageResult(imageNode: ImageNode): Flow<ImageResult> {
-        val typedNode = addImageTypeUseCase(imageNode)
-        return getImageUseCase(
-            node = typedNode,
-            fullSize = true,
-            highPriority = true,
-            resetDownloads = {},
-        ).catch { Timber.e("Failed to load image: $it") }
+        return if (imageNode.serializedData?.contains("local") == true) {
+            flow {
+                val file = File(imageNode.previewPath ?: return@flow)
+                emit(getImageFromFileUseCase(file))
+            }
+        } else {
+            val typedNode = addImageTypeUseCase(imageNode)
+            getImageUseCase(
+                node = typedNode,
+                fullSize = true,
+                highPriority = true,
+                resetDownloads = {},
+            )
+        }.catch { Timber.e("Failed to load image: $it") }
     }
 
     /**

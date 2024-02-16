@@ -4,6 +4,8 @@ import android.content.Context
 import android.net.Uri
 import android.provider.DocumentsContract
 import android.webkit.MimeTypeMap
+import androidx.core.net.toFile
+import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
@@ -563,4 +565,12 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             fileGateway.copyContentUriToFile(uriString, file)
         }
     }
+
+    override suspend fun getFileSiblingByUri(uriString: String) =
+        withContext(ioDispatcher) {
+            val currentFile = uriString.toUri().toFile()
+            currentFile.parentFile?.listFiles()?.toList()?.filter {
+                it.isFile && it.exists() && it.canRead()
+            } ?: listOf(currentFile)
+        }
 }

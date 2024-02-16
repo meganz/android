@@ -36,6 +36,7 @@ import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.VideoMapper
+import mega.privacy.android.data.mapper.node.ImageNodeFileMapper
 import mega.privacy.android.data.mapper.node.ImageNodeMapper
 import mega.privacy.android.data.mapper.photos.ContentConsumptionMegaStringMapMapper
 import mega.privacy.android.data.mapper.photos.TimelineFilterPreferencesJSONMapper
@@ -82,6 +83,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val imageMapper: ImageMapper,
     private val videoMapper: VideoMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
+    private val imageNodeFileMapper: ImageNodeFileMapper,
     private val timelineFilterPreferencesJSONMapper: TimelineFilterPreferencesJSONMapper,
     private val contentConsumptionMegaStringMapMapper: ContentConsumptionMegaStringMapMapper,
     private val imageNodeMapper: ImageNodeMapper,
@@ -887,6 +889,13 @@ internal class DefaultPhotosRepository @Inject constructor(
                 offline = offlineNodesCache[megaNode.handle.toString()],
                 numVersion = megaApiFacade::getNumVersions
             )
+        }
+    }
+
+    override suspend fun getImageNodesInFiles(files: List<File>): List<ImageNode> {
+        return withContext(ioDispatcher) {
+            files.map(imageNodeFileMapper::invoke)
+                .filter { it.type is ImageFileTypeInfo || it.type is VideoFileTypeInfo }
         }
     }
 

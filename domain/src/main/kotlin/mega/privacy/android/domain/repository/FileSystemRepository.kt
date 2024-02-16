@@ -349,4 +349,9 @@ interface FileSystemRepository {
      * @param file the destination file where the original file will be copied
      */
     suspend fun copyContentUriToFile(uriString: String, file: File)
+
+    /**
+     * @return the files in same folder
+     */
+    suspend fun getFileSiblingByUri(uriString: String): List<File>
 }

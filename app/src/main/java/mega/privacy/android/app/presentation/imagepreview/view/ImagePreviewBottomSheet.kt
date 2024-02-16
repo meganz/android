@@ -444,7 +444,7 @@ private fun ImagePreviewMenuActionHeader(
     }
 
     val imageInfo = remember(imageNode) {
-        MegaNode.unserialize(imageNode.serializedData).getInfoText(context)
+        MegaNode.unserialize(imageNode.serializedData)?.getInfoText(context)
     }
 
     Row(
@@ -467,7 +467,7 @@ private fun ImagePreviewMenuActionHeader(
                 color = MaterialTheme.colors.textColorPrimary,
             )
             MiddleEllipsisText(
-                text = imageInfo,
+                text = imageInfo.orEmpty(),
                 color = MaterialTheme.colors.textColorSecondary,
             )
         }
