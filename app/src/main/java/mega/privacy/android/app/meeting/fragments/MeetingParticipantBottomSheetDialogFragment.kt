@@ -87,7 +87,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
                 }
 
         contentView = binding.root
-        itemsLayout = binding.itemsLayout
+        itemsLayout = binding.layoutItems
 
         return contentView
     }
