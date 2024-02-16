@@ -31,6 +31,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.ChatUnreadHeaderMessage
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.usecase.chat.message.GetLastMessageSeenIdUseCase
+import mega.privacy.android.domain.usecase.chat.message.MonitorChatRoomMessageUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.message.SetMessageSeenUseCase
 import mega.privacy.android.domain.usecase.chat.message.paging.GetChatPagingSourceUseCase
 import timber.log.Timber
@@ -56,6 +57,7 @@ class MessageListViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getLastMessageSeenIdUseCase: GetLastMessageSeenIdUseCase,
     private val setMessageSeenUseCase: SetMessageSeenUseCase,
+    private val monitorChatRoomMessageUpdatesUseCase: MonitorChatRoomMessageUpdatesUseCase,
 ) : ViewModel() {
 
     private val chatId = savedStateHandle.get<Long?>(Constants.CHAT_ID) ?: -1
@@ -88,6 +90,13 @@ class MessageListViewModel @Inject constructor(
             }.onFailure {
                 Timber.e(it, "Failed to get last seen message id")
             }
+        }
+
+        viewModelScope.launch {
+            runCatching { monitorChatRoomMessageUpdatesUseCase(chatId) }
+                .onFailure {
+                    Timber.e(it, "Monitor message updates threw an exception")
+                }
         }
     }
 

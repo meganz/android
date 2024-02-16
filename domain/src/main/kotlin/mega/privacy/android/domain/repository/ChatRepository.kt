@@ -966,4 +966,14 @@ interface ChatRepository {
      * @return flow of chat messages received
      */
     fun monitorChatMessages(): Flow<ChatMessageNotification?>
+
+
+    /**
+     * Monitor chat room message updates
+     *
+     * @param chatId
+     * @return A flow of all messages received from the various updates.
+     * These could be new messages or updates to existing messages.
+     */
+    fun monitorMessageUpdates(chatId: Long): Flow<ChatMessage>
 }

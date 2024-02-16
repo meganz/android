@@ -74,7 +74,8 @@ internal class MessageListViewModelTest {
             remoteMediatorFactory = remoteMediatorFactory,
             savedStateHandle = savedStateHandle,
             getLastMessageSeenIdUseCase = getLastMessageSeenIdUseCase,
-            setMessageSeenUseCase = setMessageSeenUseCase
+            setMessageSeenUseCase = setMessageSeenUseCase,
+            monitorChatRoomMessageUpdatesUseCase = mock(),
         )
     }
 

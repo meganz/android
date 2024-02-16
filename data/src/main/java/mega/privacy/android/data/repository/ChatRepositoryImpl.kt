@@ -703,6 +703,21 @@ internal class ChatRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun monitorMessageUpdates(chatId: Long) = flow {
+        getChatRoomUpdates(chatId)?.let { updates ->
+            emitAll(updates.mapNotNull {
+                when (it) {
+                    is ChatRoomUpdate.OnHistoryTruncatedByRetentionTime -> it.msg
+                    is ChatRoomUpdate.OnMessageReceived -> it.msg
+                    is ChatRoomUpdate.OnMessageUpdate -> it.msg
+                    else -> null
+                }
+            }.map {
+                chatMessageMapper(it)
+            }.flowOn(ioDispatcher))
+        }
+    }
+
     override fun monitorChatListItemUpdates(): Flow<ChatListItem> =
         megaChatApiGateway.chatUpdates
             .filterIsInstance<ChatUpdate.OnChatListItemUpdate>()
