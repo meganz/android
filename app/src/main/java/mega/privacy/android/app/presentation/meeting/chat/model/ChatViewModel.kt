@@ -45,6 +45,8 @@ import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.user.UserId
@@ -52,6 +54,7 @@ import mega.privacy.android.domain.exception.chat.CreateChatException
 import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -80,6 +83,7 @@ import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachContactsUseCase
+import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendGiphyMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
@@ -206,6 +210,8 @@ class ChatViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
     private val forwardMessagesUseCase: ForwardMessagesUseCase,
     private val forwardMessagesResultMapper: ForwardMessagesResultMapper,
+    private val attachNodeUseCase: AttachNodeUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -1083,6 +1089,29 @@ class ChatViewModel @Inject constructor(
                         Timber.e(it.exception, "${it.item} not attached")
                     }
                 }
+        }
+    }
+
+    /**
+     * Attach nodes
+     *
+     * @param nodes A list of all [NodeId] that will be attached. It should refer to [FileNode]s only, other node types will be discarded.
+     */
+    fun onAttachNodes(nodes: List<NodeId>) {
+        viewModelScope.launch {
+            val sended = nodes
+                .mapNotNull { runCatching { getNodeByIdUseCase(it) }.getOrNull() }
+                .filterIsInstance<FileNode>()
+                .map {
+                    runCatching {
+                        attachNodeUseCase(chatId, it)
+                    }.isSuccess
+                }.count { it }
+            if (sended != nodes.size) {
+                _state.update { state ->
+                    state.copy(infoToShowEvent = triggered(InfoToShow.SimpleString(R.string.files_send_to_chat_error)))
+                }
+            }
         }
     }
 

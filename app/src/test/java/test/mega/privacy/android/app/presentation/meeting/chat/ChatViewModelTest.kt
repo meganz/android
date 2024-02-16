@@ -55,6 +55,8 @@ import mega.privacy.android.domain.entity.chat.messages.ForwardResult
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -63,6 +65,7 @@ import mega.privacy.android.domain.exception.chat.CreateChatException
 import mega.privacy.android.domain.exception.chat.ParticipantAlreadyExistsException
 import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatException
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -92,6 +95,7 @@ import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachContactsUseCase
+import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendGiphyMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
@@ -267,6 +271,8 @@ internal class ChatViewModelTest {
     private val getUserUseCase = mock<GetUserUseCase>()
     private val forwardMessagesUseCase = mock<ForwardMessagesUseCase>()
     private val forwardMessagesResultMapper = mock<ForwardMessagesResultMapper>()
+    private val attachNodeUseCase = mock<AttachNodeUseCase>()
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -426,6 +432,8 @@ internal class ChatViewModelTest {
             getUserUseCase = getUserUseCase,
             forwardMessagesUseCase = forwardMessagesUseCase,
             forwardMessagesResultMapper = forwardMessagesResultMapper,
+            attachNodeUseCase = attachNodeUseCase,
+            getNodeByIdUseCase = getNodeByIdUseCase,
         )
     }
 
@@ -2641,6 +2649,48 @@ internal class ChatViewModelTest {
             val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered)
                 .content as InfoToShow.QuantityString).stringId
             assertThat(result).isEqualTo(R.plurals.num_messages_not_send)
+        }
+    }
+
+    @Test
+    fun `test that on attach nodes calls attachNodeUseCase with the correct nodes`() = runTest {
+        val nodeIds = (1L..5L).map { NodeId(it) }
+        val files = nodeIds.map { mock<TypedFileNode>() }
+        nodeIds.forEachIndexed { index, nodeId ->
+            whenever(getNodeByIdUseCase(nodeId)).thenReturn(files[index])
+        }
+        underTest.onAttachNodes(nodeIds)
+        files.forEach {
+            verify(attachNodeUseCase)(chatId, it)
+        }
+    }
+
+    @Test
+    fun `test that error message is sent when on attach nodes fails`() = runTest {
+        val nodeIds = (1L..5L).map { NodeId(it) }
+        val files = nodeIds.map { mock<TypedFileNode>() }
+        val indexWithError = 1
+        nodeIds.forEachIndexed { index, nodeId ->
+            val file = files[index]
+            whenever(getNodeByIdUseCase(nodeId)).thenReturn(file)
+            if (index == indexWithError) {
+                whenever(attachNodeUseCase(chatId, file)).thenThrow(RuntimeException())
+            } else {
+                whenever(attachNodeUseCase(chatId, file)).thenReturn(Unit)
+            }
+        }
+        underTest.state.test {
+            awaitItem() //initial
+            underTest.onAttachNodes(nodeIds)
+            val actual = awaitItem().infoToShowEvent
+            assertThat(actual).isInstanceOf(StateEventWithContentTriggered::class.java)
+            val content = (actual as StateEventWithContentTriggered).content
+            assertThat(content).isInstanceOf(InfoToShow.SimpleString::class.java)
+            val simpleString = (content as InfoToShow.SimpleString)
+            assertThat(simpleString.stringId).isEqualTo(R.string.files_send_to_chat_error)
+        }
+        files.filterIndexed { index, _ -> index != indexWithError }.forEach {
+            verify(attachNodeUseCase)(chatId, it)
         }
     }
 

@@ -40,7 +40,7 @@ fun ChatGalleryItem(
     ) {
         // we hide the border when content loaded, so it place here instead of container modifier
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .border(
                     width = 1.dp,

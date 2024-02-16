@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyPickerActivity
@@ -101,6 +102,12 @@ fun ChatToolbarBottomSheet(
                 .padding(4.dp),
             sheetState = sheetState,
             onTakePicture = onTakePicture,
+            onFileGalleryItemClicked = {
+                it.fileUri?.toUri()?.let { uri ->
+                    onAttachFiles(listOf(uri))
+                    coroutineScope.launch { sheetState.hide() }
+                }
+            },
             onCameraPermissionDenied = onCameraPermissionDenied,
         )
         Row(
@@ -204,5 +211,6 @@ internal const val TEST_TAG_ATTACH_FROM_SCAN = "chat_view:attach_panel:attach_fr
 internal const val TEST_TAG_ATTACH_FROM_LOCATION = "chat_view:attach_panel:attach_from_location"
 internal const val TEST_TAG_ATTACH_FROM_CONTACT = "chat_view:attach_panel:attach_from_contact"
 internal const val TEST_TAG_LOADING_GALLERY = "chat_view:attach_panel:loading_gallery"
+internal const val TEST_TAG_ATTACH_GALLERY_ITEM = "chat_view:attach_panel:gallery_item"
 
 

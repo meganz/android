@@ -25,17 +25,23 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.FileExplorerActivity
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.theme.MegaAppTheme
 
+/**
+ * Bottom sheet to select where to get the file to attach (cloud drive or upload from device) and return the selection.
+ */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChatAttachFileBottomSheet(
     modifier: Modifier = Modifier,
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
     onAttachFiles: (List<Uri>) -> Unit = {},
+    onAttachNodes: (List<NodeId>) -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -43,8 +49,13 @@ fun ChatAttachFileBottomSheet(
     val cloudDriveLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.StartActivityForResult()
-        ) {
-            // Manage Cloud files here
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.getLongArrayExtra(Constants.NODE_HANDLES)
+                    ?.map { NodeId(it) }
+                    ?.takeIf { it.isNotEmpty() }
+                    ?.let(onAttachNodes)
+            }
             coroutineScope.launch { sheetState.hide() }
         }
 

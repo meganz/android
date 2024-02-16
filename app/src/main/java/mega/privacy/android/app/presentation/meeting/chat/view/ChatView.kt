@@ -66,11 +66,9 @@ import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.app.presentation.meeting.chat.extension.getOpenChatId
 import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.extension.isStarted
-import mega.privacy.android.app.presentation.meeting.chat.extension.toInfoText
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
-import mega.privacy.android.app.presentation.meeting.chat.model.ForwardMessagesToChatsResult
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.meeting.chat.saver.ChatSavers
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.MessageAction
@@ -112,10 +110,10 @@ import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.shared.theme.MegaAppTheme
-import timber.log.Timber
 
 @Composable
 internal fun ChatView(
@@ -155,6 +153,7 @@ internal fun ChatView(
         createNewImage = viewModel::createNewImageUri,
         onSendLocationMessage = viewModel::sendLocationMessage,
         onAttachFiles = viewModel::onAttachFiles,
+        onAttachNodes = viewModel::onAttachNodes,
         onCloseEditing = viewModel::onCloseEditing,
         onAddReaction = viewModel::onAddReaction,
         onDeleteReaction = viewModel::onDeleteReaction,
@@ -207,7 +206,6 @@ internal fun ChatView(
  * @param onSendGiphyMessage
  * @param onAttachContacts
  * @param getUserInfoIntoReactionList
- * @param onReactionUserClick
  * @param onForwardMessages
  * @param actions
  */
@@ -290,6 +288,7 @@ internal fun ChatView(
     createNewImage: suspend () -> Uri? = { null },
     onSendLocationMessage: (Intent?) -> Unit = { _ -> },
     onAttachFiles: (List<Uri>) -> Unit = {},
+    onAttachNodes: (List<NodeId>) -> Unit = {},
     onCloseEditing: () -> Unit = {},
     onAddReaction: (Long, String) -> Unit = { _, _ -> },
     onDeleteReaction: (Long, String) -> Unit = { _, _ -> },
@@ -530,6 +529,7 @@ internal fun ChatView(
                     isFileModalShown -> {
                         ChatAttachFileBottomSheet(
                             onAttachFiles = onAttachFiles,
+                            onAttachNodes = onAttachNodes,
                             sheetState = fileModalSheetState,
                         )
                     }

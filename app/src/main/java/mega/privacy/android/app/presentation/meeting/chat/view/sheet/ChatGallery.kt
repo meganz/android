@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -79,6 +80,7 @@ fun ColumnScope.ChatGallery(
     sheetState: ModalBottomSheetState,
     modifier: Modifier = Modifier,
     onTakePicture: () -> Unit = {},
+    onFileGalleryItemClicked: (FileGalleryItem) -> Unit = {},
     onCameraPermissionDenied: () -> Unit = {},
     viewModel: ChatGalleryViewModel = hiltViewModel(),
 ) {
@@ -119,6 +121,7 @@ fun ColumnScope.ChatGallery(
     ChatGalleryContent(
         modifier = modifier,
         onTakePicture = onTakePicture,
+        onFileGalleryItemClicked = onFileGalleryItemClicked,
         onCameraPermissionDenied = onCameraPermissionDenied,
         sheetState = sheetState,
         isMediaPermissionGranted = isMediaPermissionGranted,
@@ -145,6 +148,7 @@ fun ChatGalleryContent(
     isLoading: Boolean = false,
     images: List<FileGalleryItem> = emptyList(),
     onTakePicture: () -> Unit = {},
+    onFileGalleryItemClicked: (FileGalleryItem) -> Unit = {},
     onCameraPermissionDenied: () -> Unit = {},
     onRequestMediaPermission: () -> Unit = {},
 ) {
@@ -191,7 +195,12 @@ fun ChatGalleryContent(
             if (images.isNotEmpty()) {
                 items(images) { item ->
                     ChatGalleryItem(
-                        modifier = Modifier.size(88.dp),
+                        modifier = Modifier
+                            .size(88.dp)
+                            .clickable {
+                                onFileGalleryItemClicked(item)
+                            }
+                            .testTag("$TEST_TAG_ATTACH_GALLERY_ITEM:${item.id}"),
                     ) {
                         key(item.id) {
                             if (item.isImage) {

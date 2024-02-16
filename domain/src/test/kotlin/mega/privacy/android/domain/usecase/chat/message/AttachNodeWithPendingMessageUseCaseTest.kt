@@ -10,16 +10,20 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.SetNodeAttributesAfterUploadUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.File
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AttachNodeWithPendingMessageUseCaseTest {
@@ -29,6 +33,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
     private val chatRepository = mock<ChatRepository>()
     private val getChatMessageUseCase = mock<GetChatMessageUseCase>()
     private val createSaveSentMessageRequestUseCase = mock<CreateSaveSentMessageRequestUseCase>()
+    private val setNodeAttributesAfterUploadUseCase = mock<SetNodeAttributesAfterUploadUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -37,6 +42,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
             chatRepository,
             getChatMessageUseCase,
             createSaveSentMessageRequestUseCase,
+            setNodeAttributesAfterUploadUseCase,
         )
     }
 
@@ -47,6 +53,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
             chatRepository,
             getChatMessageUseCase,
             createSaveSentMessageRequestUseCase,
+            setNodeAttributesAfterUploadUseCase,
         )
     }
 
@@ -96,6 +103,29 @@ class AttachNodeWithPendingMessageUseCaseTest {
             underTest(pendingMsgId, NodeId(1L))
             verify(chatRepository).storeMessages(listOf(createTypedMessageRequest))
             verify(chatMessageRepository).deletePendingMessage(pendingMessage)
+        }
+
+    @Test
+    fun `test that setNodeAttributesAfterUploadUseCase is invoked before attaching the file`() =
+        runTest {
+            val pendingMessage = createPendingMessageMock()
+            whenever(chatMessageRepository.getPendingMessage(pendingMsgId)).thenReturn(
+                pendingMessage
+            )
+
+            val nodeId = NodeId(nodeHandle)
+            val inOrder = inOrder(
+                setNodeAttributesAfterUploadUseCase,
+                chatMessageRepository
+            )
+
+            underTest(pendingMsgId, nodeId)
+            inOrder.verify(setNodeAttributesAfterUploadUseCase)
+                .invoke(
+                    nodeId.longValue,
+                    File(filePath),
+                )
+            inOrder.verify(chatMessageRepository).attachNode(any(), any())
         }
 
     private fun createPendingMessageMock() = mock<PendingMessage> {

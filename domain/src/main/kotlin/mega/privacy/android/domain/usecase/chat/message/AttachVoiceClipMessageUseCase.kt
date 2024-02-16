@@ -14,6 +14,7 @@ class AttachVoiceClipMessageUseCase @Inject constructor(
     private val chatMessageRepository: ChatMessageRepository,
     private val createSaveSentMessageRequestUseCase: CreateSaveSentMessageRequestUseCase,
     private val getChatMessageUseCase: GetChatMessageUseCase,
+    private val getAttachableNodeIdUseCase: GetAttachableNodeIdUseCase,
 ) {
 
     /**
@@ -23,11 +24,8 @@ class AttachVoiceClipMessageUseCase @Inject constructor(
      * @param fileNode [FileNode].
      */
     suspend operator fun invoke(chatId: Long, fileNode: FileNode) {
-        // TODO: This use case is only valid for nodes in the current logged in account.
-        //  The behaviour for checking if node is mine or not should be implemented.
-        //  If the node is not mine, then it should be copied into "My chat files folder" and then attached.
-        //  Better to create a new GetMyFileNodeUseCase for this purpose as it will be used in other places
-        chatMessageRepository.attachVoiceMessage(chatId, fileNode.id.longValue)?.let {
+        val attachableNodeId = getAttachableNodeIdUseCase(fileNode)
+        chatMessageRepository.attachVoiceMessage(chatId, attachableNodeId.longValue)?.let {
             getChatMessageUseCase(chatId, it)?.let { message ->
                 val request = createSaveSentMessageRequestUseCase(message, chatId)
                 chatRepository.storeMessages(listOf(request))

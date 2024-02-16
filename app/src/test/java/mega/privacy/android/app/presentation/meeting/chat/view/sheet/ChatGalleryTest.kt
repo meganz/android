@@ -9,11 +9,16 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.core.R
+import mega.privacy.android.domain.entity.chat.FileGalleryItem
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class ChatGalleryTest {
@@ -48,10 +53,27 @@ class ChatGalleryTest {
             .assertDoesNotExist()
     }
 
+    @Test
+    fun `test that gallery item image click is passed to upper caller`() {
+        val id = 2L
+        val onFileGalleryItemClicked = mock<(FileGalleryItem) -> Unit>()
+        val image = mock<FileGalleryItem> {
+            on { this.id } doReturn id
+        }
+        initComposeRuleContent(
+            images = listOf(image),
+            onFileGalleryItemClicked = onFileGalleryItemClicked
+        )
+        composeTestRule.onNodeWithTag("$TEST_TAG_ATTACH_GALLERY_ITEM:$id").performClick()
+        verify(onFileGalleryItemClicked).invoke(image)
+    }
+
     @OptIn(ExperimentalMaterialApi::class)
     private fun initComposeRuleContent(
         isLoading: Boolean = false,
         isMediaPermissionGranted: Boolean = true,
+        images: List<FileGalleryItem> = emptyList(),
+        onFileGalleryItemClicked: (FileGalleryItem) -> Unit = mock(),
     ) {
         composeTestRule.setContent {
             ChatGalleryContent(
@@ -61,8 +83,9 @@ class ChatGalleryTest {
                     density = LocalDensity.current,
                 ),
                 isMediaPermissionGranted = isMediaPermissionGranted,
-                images = emptyList(),
+                images = images,
                 isLoading = isLoading,
+                onFileGalleryItemClicked = onFileGalleryItemClicked
             )
         }
     }
