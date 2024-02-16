@@ -546,7 +546,7 @@ class NodeRepositoryImplTest {
 
             val share1 = mock<ShareData>()
             val share3 = mock<ShareData>()
-            whenever(shareDataMapper(megaShare1, 1)).thenReturn(share1)
+            whenever(shareDataMapper(megaShare1, 0)).thenReturn(share1)
             whenever(shareDataMapper(megaShare3, 1)).thenReturn(share3)
 
             val expected = listOf(share1, share3)

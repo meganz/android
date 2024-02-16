@@ -213,10 +213,10 @@ class OutgoingSharesComposeFragment : Fragment() {
                     )
                 }
                 LaunchedEffect(uiState.currentHandle) {
-                    if (!uiState.isInRoot) {
+                    if (!uiState.isInRootLevel) {
                         toggleAppBarElevation(false)
                     }
-                    hideTabs(!uiState.isInRoot)
+                    hideTabs(!uiState.isInRootLevel)
                 }
                 LaunchedEffect(uiState.nodesList.isEmpty()) {
                     outgoingSharesActionListener?.updateSharesPageToolbarTitleAndFAB(
@@ -459,7 +459,7 @@ class OutgoingSharesComposeFragment : Fragment() {
                 control.move().isVisible = false
                 val areAllNotTakenDown = selected.any { it.isTakenDown.not() }
                 if (areAllNotTakenDown) {
-                    if (viewModel.state.value.isInRoot) {
+                    if (viewModel.state.value.isInRootLevel) {
                         control.removeShare().setVisible(true).showAsAction =
                             MenuItem.SHOW_AS_ACTION_ALWAYS
                     }

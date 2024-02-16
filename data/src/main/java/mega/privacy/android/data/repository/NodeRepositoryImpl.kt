@@ -167,9 +167,13 @@ internal class NodeRepositoryImpl @Inject constructor(
             async { megaApiGateway.getUnverifiedIncomingShares(sortOrderIntMapper(order)) },
             async { megaApiGateway.getVerifiedIncomingShares(sortOrderIntMapper(order)) }
         )
-
-        (unverifiedShares + verifiedShares)
+        // Set count to 0, so that UI can use it as a flag
+        val unverifiedSharesMapped = unverifiedShares
             .filter { isValidNode(NodeId(it.nodeHandle)) && it.user != null }
+            .map { shareDataMapper(it, 0) }
+
+        unverifiedSharesMapped + verifiedShares
+            .filter { it.user != null }
             .map { shareDataMapper(it, 1) }
     }
 

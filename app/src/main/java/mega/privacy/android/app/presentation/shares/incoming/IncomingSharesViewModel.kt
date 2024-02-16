@@ -9,10 +9,9 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
-import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
+import mega.privacy.android.app.presentation.shares.incoming.model.LegacyIncomingSharesState
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -23,6 +22,7 @@ import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingShareParentUserEmailUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
@@ -57,15 +57,15 @@ class IncomingSharesViewModel @Inject constructor(
 ) : ViewModel() {
 
     /** private UI state */
-    private val _state = MutableStateFlow(IncomingSharesState())
+    private val _state = MutableStateFlow(LegacyIncomingSharesState())
 
     /** public UI state */
-    val state: StateFlow<IncomingSharesState> = _state
+    val state: StateFlow<LegacyIncomingSharesState> = _state
 
     /**
-     * A shorthand way of retrieving the [IncomingSharesState]
+     * A shorthand way of retrieving the [LegacyIncomingSharesState]
      *
-     * @return the [IncomingSharesState]
+     * @return the [LegacyIncomingSharesState]
      */
     fun state() = _state.value
 
@@ -128,7 +128,7 @@ class IncomingSharesViewModel @Inject constructor(
     }
 
     /**
-     * Updates the value of [IncomingSharesState.currentViewType]
+     * Updates the value of [LegacyIncomingSharesState.currentViewType]
      *
      * @param newViewType The new [ViewType]
      */

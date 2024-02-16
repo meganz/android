@@ -228,7 +228,7 @@ import mega.privacy.android.app.presentation.settings.startscreen.util.StartScre
 import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment
 import mega.privacy.android.app.presentation.shares.SharesPageAdapter
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel
-import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
+import mega.privacy.android.app.presentation.shares.incoming.model.LegacyIncomingSharesState
 import mega.privacy.android.app.presentation.shares.links.LegacyLinksViewModel
 import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.links.LinksComposeFragment
@@ -2005,7 +2005,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         this.collectFlow(
             incomingSharesViewModel.state,
             Lifecycle.State.STARTED
-        ) { incomingSharesState: IncomingSharesState ->
+        ) { incomingSharesState: LegacyIncomingSharesState ->
             addUnverifiedIncomingCountBadge(incomingSharesState.nodes.count { it.second != null })
         }
         if (enabledOutgoingSharesCompose) {

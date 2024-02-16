@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.shares.outgoing
+package mega.privacy.android.app.presentation.shares.incoming
 
 import android.view.MenuItem
 import androidx.lifecycle.ViewModel
@@ -17,7 +17,7 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.clouddrive.OptionItems
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
-import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
+import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.data.mapper.FileDurationMapper
@@ -36,11 +36,14 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
+import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
-import mega.privacy.android.domain.usecase.shares.GetOutgoingSharesChildrenNodeUseCase
+import mega.privacy.android.domain.usecase.shares.GetIncomingShareParentUserEmailUseCase
+import mega.privacy.android.domain.usecase.shares.GetIncomingSharesChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import timber.log.Timber
@@ -48,14 +51,14 @@ import java.util.Stack
 import javax.inject.Inject
 
 /**
- * ViewModel associated to OutgoingSharesComposeFragment
+ * ViewModel associated to IncomingSharesComposeFragment
  *
  * @param getRootNodeUseCase Fetch the root node
  * @param monitorNodeUpdatesUseCase Monitor node updates
  * @param monitorContactUpdatesUseCase Monitor contact updates
  * @param getParentNodeUseCase [GetParentNodeUseCase] To get parent node of current node
  * @param getIsNodeInRubbish [IsNodeInRubbish] To get current node is in rubbish
- * @param getOutgoingSharesChildrenNodeUseCase [GetOutgoingSharesChildrenNodeUseCase] To get children of current node
+ * @param getIncomingSharesChildrenNodeUseCase [GetIncomingSharesChildrenNodeUseCase] To get children of current node
  * @param getCloudSortOrder [GetCloudSortOrder] To get cloud sort order
  * @param getOthersSortOrder [GetOthersSortOrder] To get others sort order
  * @param monitorViewType [MonitorViewType] Check view type
@@ -67,15 +70,18 @@ import javax.inject.Inject
  * @param monitorConnectivityUseCase [MonitorConnectivityUseCase] Monitor connectivity
  * @param getFeatureFlagValueUseCase [GetFeatureFlagValueUseCase] Get feature flag value
  * @param durationInSecondsTextMapper [DurationInSecondsTextMapper] To map duration in seconds to text
+ * @param getContactVerificationWarningUseCase [GetContactVerificationWarningUseCase] Get contact verification warning
+ * @param areCredentialsVerifiedUseCase [AreCredentialsVerifiedUseCase] Check if credentials are verified
+ * @param getIncomingShareParentUserEmailUseCase [GetIncomingShareParentUserEmailUseCase] Get incoming share parent user email
  */
 @HiltViewModel
-class OutgoingSharesComposeViewModel @Inject constructor(
+class IncomingSharesComposeViewModel @Inject constructor(
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorContactUpdatesUseCase: MonitorContactUpdates,
     private val getParentNodeUseCase: GetParentNodeUseCase,
     private val getIsNodeInRubbish: IsNodeInRubbish,
-    private val getOutgoingSharesChildrenNodeUseCase: GetOutgoingSharesChildrenNodeUseCase,
+    private val getIncomingSharesChildrenNodeUseCase: GetIncomingSharesChildrenNodeUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
     private val monitorViewType: MonitorViewType,
@@ -87,9 +93,12 @@ class OutgoingSharesComposeViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+    private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
+    private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase,
+    private val getIncomingShareParentUserEmailUseCase: GetIncomingShareParentUserEmailUseCase,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(OutgoingSharesState())
+    private val _state = MutableStateFlow(IncomingSharesState())
 
     /**
      * Immutable State flow
@@ -103,6 +112,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
 
     init {
         refreshNodes()
+        checkContactVerification()
         monitorChildrenNodes()
         monitorContactUpdates()
         checkViewType()
@@ -156,7 +166,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
 
     /**
      * This will monitor node updates from [MonitorNodeUpdatesUseCase] and
-     * will update [OutgoingSharesState.nodesList]
+     * will update [IncomingSharesState.nodesList]
      */
     private fun monitorChildrenNodes() {
         viewModelScope.launch {
@@ -179,6 +189,30 @@ class OutgoingSharesComposeViewModel @Inject constructor(
             }
         }
     }
+
+    private fun checkContactVerification() {
+        viewModelScope.launch {
+            val isContactVerificationOn = getContactVerificationWarningUseCase()
+            _state.update {
+                it.copy(isContactVerificationOn = isContactVerificationOn)
+            }
+        }
+    }
+
+    private fun checkIfSelectedFolderIsSharedByVerifiedContact() =
+        viewModelScope.launch {
+            if (_state.value.isContactVerificationOn) {
+                val showBanner = if (_state.value.isInRootLevel) {
+                    false
+                } else {
+                    val email =
+                        getIncomingShareParentUserEmailUseCase(NodeId(_state.value.currentHandle))
+                    val verified = email?.let { areCredentialsVerifiedUseCase(it) } ?: run { false }
+                    !verified
+                }
+                _state.update { it.copy(showContactNotVerifiedBanner = showBanner) }
+            }
+        }
 
     /**
      * This will update current handle if any node is deleted from browser and
@@ -213,7 +247,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
     }
 
     /**
-     * Updates the current Handle [OutgoingSharesState.currentHandle]
+     * Updates the current Handle [IncomingSharesState.currentHandle]
      *
      * @param handle The new node handle to be set
      */
@@ -264,10 +298,10 @@ class OutgoingSharesComposeViewModel @Inject constructor(
             }
         }
 
-        val childrenNodes = getOutgoingSharesChildrenNodeUseCase(currentHandle)
+        val childrenNodes = getIncomingSharesChildrenNodeUseCase(currentHandle)
         val nodeUIItems = getNodeUiItems(childrenNodes)
         val sortOrder = if (isRootNode) getOthersSortOrder() else getCloudSortOrder()
-
+        checkIfSelectedFolderIsSharedByVerifiedContact()
         _state.update {
             it.copy(
                 nodesList = nodeUIItems,
@@ -281,7 +315,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
     /**
      * Get current tree depth
      */
-    fun outgoingTreeDepth() = if (_state.value.isInRootLevel) 0 else handleStack.size
+    fun incomingTreeDepth() = if (_state.value.isInRootLevel) 0 else handleStack.size
 
     /**
      * This will map list of [Node] to [NodeUIItem]
@@ -304,7 +338,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
     }
 
     /**
-     * Navigate back to the Outgoing Shares Root Level hierarchy
+     * Navigate back to the Incoming Shares Root Level hierarchy
      */
     fun goBackToRootLevel() {
         _state.update {
@@ -332,7 +366,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
     }
 
     /**
-     * Goes back one level from the Outgoing Shares hierarchy
+     * Goes back one level from the Incoming Shares hierarchy
      */
     fun performBackNavigation() {
         viewModelScope.launch {
@@ -350,11 +384,11 @@ class OutgoingSharesComposeViewModel @Inject constructor(
                         _state.update { it.copy(updateToolbarTitleEvent = triggered) }
                     }
                 } ?: run {
-                    // Exit OutgoingShares if there is nothing left in the Back Stack
+                    // Exit Incoming Shares if there is nothing left in the Back Stack
                     _state.update {
                         it.copy(
                             openedFolderNodeHandles = emptySet(),
-                            exitOutgoingSharesEvent = triggered
+                            exitIncomingSharesEvent = triggered
                         )
                     }
                 }
@@ -457,52 +491,12 @@ class OutgoingSharesComposeViewModel @Inject constructor(
     }
 
     /**
-     * Dismiss the Verify Contact Dialog by clearing the email
-     */
-    fun dismissVerifyContactDialog() {
-        _state.update {
-            it.copy(
-                verifyContactDialog = null
-            )
-        }
-    }
-
-    private fun showVerifyContactDialog(email: String?) {
-        _state.update {
-            it.copy(
-                verifyContactDialog = email
-            )
-        }
-    }
-
-    private fun checkShareContactStatus(nodeUIItem: NodeUIItem<ShareNode>): Boolean {
-        val shareData = nodeUIItem.node.shareData
-        val email = shareData?.user ?: return true
-        if (shareData.count > 0) {
-            return true
-        } else if (shareData.isPending) {
-            // Show a dialog if the contact is pending
-            showVerifyContactDialog(nodeUIItem.node.shareData?.user)
-            return false
-        } else if (!shareData.isVerified) {
-            // Open the Authenticity Credentials if the contact is not verified
-            _state.update {
-                it.copy(openAuthenticityCredentials = triggered(email))
-            }
-            return false
-        }
-        return true
-    }
-
-    /**
      * This method will handle Item click event from NodesView and will update
      * [state] accordingly if items already selected/unselected, update check count
      *
      * @param nodeUIItem [NodeUIItem]
      */
     fun onItemClicked(nodeUIItem: NodeUIItem<ShareNode>) {
-        if (!checkShareContactStatus(nodeUIItem)) return
-
         val index =
             _state.value.nodesList.indexOfFirst { it.node == nodeUIItem.node }
         if (_state.value.isInSelection) {
@@ -523,13 +517,11 @@ class OutgoingSharesComposeViewModel @Inject constructor(
      *
      * @param nodeUIItem [NodeUIItem]
      */
-    fun onLongItemClicked(nodeUIItem: NodeUIItem<ShareNode>): Boolean {
+    fun onLongItemClicked(nodeUIItem: NodeUIItem<ShareNode>) {
         // Turn off selection if the node is unverified share
-        if (!checkShareContactStatus(nodeUIItem)) return false
         val index =
             _state.value.nodesList.indexOfFirst { it.node == nodeUIItem.node }
         updateNodeInSelectionState(nodeUIItem = nodeUIItem, index = index)
-        return true
     }
 
     /**
@@ -610,13 +602,6 @@ class OutgoingSharesComposeViewModel @Inject constructor(
     }
 
     /**
-     * Consume open authenticity credentials
-     */
-    fun consumeOpenAuthenticityCredentials() {
-        _state.update { it.copy(openAuthenticityCredentials = consumed()) }
-    }
-
-    /**
      * Consume download event
      */
     fun consumeDownloadEvent() {
@@ -626,10 +611,10 @@ class OutgoingSharesComposeViewModel @Inject constructor(
     }
 
     /**
-     * Consumes the Exit Outgoing Shares Event
+     * Consumes the Exit Incoming Shares Event
      */
-    fun consumeExitOutgoingSharesEvent() {
-        _state.update { it.copy(exitOutgoingSharesEvent = consumed) }
+    fun consumeExitIncomingSharesEvent() {
+        _state.update { it.copy(exitIncomingSharesEvent = consumed) }
     }
 
     /**
@@ -647,7 +632,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
     fun isAccessedFolderExited() = _state.value.isAccessedFolderExited
 
     /**
-     * Resets the value of [OutgoingSharesState.isAccessedFolderExited]
+     * Resets the value of [IncomingSharesState.isAccessedFolderExited]
      */
     fun resetIsAccessedFolderExited() =
         _state.update { it.copy(isAccessedFolderExited = false) }

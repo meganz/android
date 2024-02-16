@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
-import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
 import mega.privacy.android.app.presentation.shares.outgoing.model.LegacyOutgoingSharesState
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.NodeId
@@ -88,7 +87,7 @@ class OutgoingSharesViewModel @Inject constructor(
     }
 
     /**
-     * Updates the value of [IncomingSharesState.currentViewType]
+     * Updates the value of [LegacyOutgoingSharesState.currentViewType]
      *
      * @param newViewType The new [ViewType]
      */

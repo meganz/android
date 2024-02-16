@@ -37,7 +37,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property updateToolbarTitleEvent State Event that refreshes the Toolbar Title
  * @property exitOutgoingSharesEvent State Event that exits the Outgoing Shares page
  * @property openedFolderNodeHandles Set of opened folder node handles to retain scroll position
- * @property isInRoot true if in root
+ * @property isInRootLevel true if in root of outgoing shares
  * @property isOutgoingSharesEmpty true if there's no outgoing shares
  * @property verifyContactDialog dialog to show when clicked on unverified share, contains email
  * @property openAuthenticityCredentials State Event that opens the Authenticity Credentials
@@ -66,11 +66,7 @@ data class OutgoingSharesState(
     val openAuthenticityCredentials: StateEventWithContent<String> = consumed(),
     val verifyContactDialog: String? = null,
 ) {
-    val isOutgoingSharesEmpty: Boolean
-        get() = currentHandle == -1L && nodesList.isEmpty()
-
-    val isInRoot: Boolean
-        get() = currentHandle == -1L
-
-    val selectedNodeHandles: List<Long> get() = selectedNodes.map { it.id.longValue }
+    val isOutgoingSharesEmpty: Boolean = currentHandle == -1L && nodesList.isEmpty()
+    val isInRootLevel: Boolean = currentHandle == -1L
+    val selectedNodeHandles: List<Long> = selectedNodes.map { it.id.longValue }
 }
