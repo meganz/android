@@ -4,13 +4,10 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.devicecenter.domain.entity.OwnDeviceNode
@@ -21,11 +18,10 @@ import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.icon.FolderIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -35,6 +31,7 @@ import org.mockito.kotlin.whenever
 /**
  * Test class for [DeviceCenterViewModel]
  */
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class DeviceCenterViewModelTest {
@@ -65,11 +62,6 @@ internal class DeviceCenterViewModelTest {
         folders = listOf(ownDeviceFolderUINode),
     )
 
-    @BeforeAll
-    fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
-
     @BeforeEach
     fun resetMocks() {
         reset(
@@ -83,11 +75,6 @@ internal class DeviceCenterViewModelTest {
             deviceUINodeListMapper = deviceUINodeListMapper,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
         )
-    }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     private suspend fun setupDefaultMocks() {

@@ -4,19 +4,16 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.backup.RenameDeviceUseCase
 import mega.privacy.android.feature.devicecenter.R
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
@@ -25,6 +22,7 @@ import org.mockito.kotlin.reset
 /**
  * Test Class for [RenameDeviceViewModel]
  */
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExperimentalCoroutinesApi
 internal class RenameDeviceViewModelTest {
@@ -35,18 +33,12 @@ internal class RenameDeviceViewModelTest {
 
     @BeforeAll
     fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
         underTest = RenameDeviceViewModel(renameDeviceUseCase)
     }
 
     @BeforeEach
     fun resetMocks() {
         reset(renameDeviceUseCase)
-    }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test
