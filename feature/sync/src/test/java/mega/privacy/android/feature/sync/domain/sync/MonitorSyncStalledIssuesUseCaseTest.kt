@@ -2,28 +2,21 @@ package mega.privacy.android.feature.sync.domain.sync
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class MonitorSyncStalledIssuesUseCaseTest {
 
@@ -43,14 +36,8 @@ internal class MonitorSyncStalledIssuesUseCaseTest {
         )
     )
 
-    @BeforeEach
-    fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
-
     @AfterEach
     fun resetAndTearDown() {
-        Dispatchers.resetMain()
         reset(
             syncRepository,
         )
@@ -71,5 +58,4 @@ internal class MonitorSyncStalledIssuesUseCaseTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
-
 }

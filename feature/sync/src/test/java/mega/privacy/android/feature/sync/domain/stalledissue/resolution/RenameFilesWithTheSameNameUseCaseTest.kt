@@ -1,36 +1,18 @@
 package mega.privacy.android.feature.sync.domain.stalledissue.resolution
 
 import com.google.common.truth.Truth
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.resolution.RenameFilesWithTheSameNameUseCase
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class RenameFilesWithTheSameNameUseCaseTest {
 
     @TempDir
     lateinit var temporaryFolder: File
 
     private val underTest = RenameFilesWithTheSameNameUseCase()
-
-    @BeforeEach
-    fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
-
-    @AfterEach
-    fun resetAndTearDown() {
-        Dispatchers.resetMain()
-    }
 
     @Test
     fun `test that renaming files with same name adds a counter`() = runTest {

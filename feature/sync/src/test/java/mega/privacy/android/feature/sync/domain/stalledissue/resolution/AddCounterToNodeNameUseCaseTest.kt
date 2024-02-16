@@ -1,17 +1,12 @@
 package mega.privacy.android.feature.sync.domain.stalledissue.resolution
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.resolution.AddCounterToNodeNameUseCase
-import org.junit.Test
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
@@ -27,14 +22,8 @@ class AddCounterToNodeNameUseCaseTest {
     private val underTest: AddCounterToNodeNameUseCase =
         AddCounterToNodeNameUseCase(renameNodeUseCase)
 
-    @BeforeEach
-    fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
-
     @AfterEach
     fun resetAndTearDown() {
-        Dispatchers.resetMain()
         reset(
             renameNodeUseCase,
         )

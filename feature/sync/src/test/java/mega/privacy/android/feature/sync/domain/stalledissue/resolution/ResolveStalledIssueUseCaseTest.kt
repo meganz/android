@@ -1,8 +1,5 @@
 package mega.privacy.android.feature.sync.domain.stalledissue.resolution
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -11,20 +8,20 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.usecase.camerauploads.GetNodeByFingerprintAndParentNodeUseCase
 import mega.privacy.android.domain.usecase.file.DeleteFileUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
-import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
-import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
-import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
+import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.feature.sync.domain.entity.SolvedIssue
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
+import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
+import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.feature.sync.domain.mapper.StalledIssueToSolvedIssueMapper
-import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.resolution.ResolveStalledIssueUseCase
 import mega.privacy.android.feature.sync.domain.usecase.solvedissue.SetSyncSolvedIssueUseCase
 import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.resolution.RenameFilesWithTheSameNameUseCase
 import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.resolution.RenameNodeWithTheSameNameUseCase
+import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.resolution.ResolveStalledIssueUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -37,8 +34,6 @@ import org.mockito.kotlin.whenever
 import java.io.File
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@OptIn(ExperimentalCoroutinesApi::class)
-
 class ResolveStalledIssueUseCaseTest {
 
     private val deleteFileUseCase: DeleteFileUseCase = mock()
@@ -80,7 +75,6 @@ class ResolveStalledIssueUseCaseTest {
             moveNodeUseCase,
             stalledIssueToSolvedIssueMapper
         )
-        Dispatchers.resetMain()
     }
 
     @Test

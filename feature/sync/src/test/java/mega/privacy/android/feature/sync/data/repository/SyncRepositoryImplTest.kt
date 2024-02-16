@@ -1,24 +1,21 @@
 package mega.privacy.android.feature.sync.data.repository
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGateway
 import mega.privacy.android.feature.sync.data.mapper.FolderPairMapper
+import mega.privacy.android.feature.sync.data.mapper.SyncStatusMapper
 import mega.privacy.android.feature.sync.data.mapper.stalledissue.StalledIssueTypeMapper
 import mega.privacy.android.feature.sync.data.mapper.stalledissue.StalledIssuesMapper
-import mega.privacy.android.feature.sync.data.mapper.SyncStatusMapper
 import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
 import nz.mega.sdk.MegaSyncList
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -109,10 +106,4 @@ class SyncRepositoryImplTest {
         underTest.getSyncStalledIssues()
         verify(syncGateway).getSyncStalledIssues()
     }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
-
 }
