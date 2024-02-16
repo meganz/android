@@ -603,6 +603,9 @@ class ChatViewModel @Inject constructor(
                                 ChatCallStatus.TerminatingUserParticipation -> {
                                     when (call.termCode) {
                                         ChatCallTermCodeType.TooManyParticipants -> {
+                                            _state.update {
+                                                it.copy(snackbarMessage = R.string.call_error_too_many_participants)
+                                            }
                                             ScheduledMeetingStatus.NotJoined(call.duration)
                                         }
 
