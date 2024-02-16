@@ -1,7 +1,7 @@
 package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import com.google.common.truth.Truth
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameDropDown
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameDropdownMenuItem
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import org.junit.jupiter.api.TestInstance
@@ -14,7 +14,7 @@ import java.util.stream.Stream
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RenameToolbarMenuItemDropDownTest {
 
-    private val underTest = RenameDropDown()
+    private val underTest = RenameDropdownMenuItem()
 
     private val nodeOne = mock<TypedFolderNode>()
     private val nodeTwo = mock<TypedFolderNode>()

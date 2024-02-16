@@ -10,7 +10,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.node.model.mapper.NodeLabelResourceMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.domain.entity.NodeLabel
-import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeLabelUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeLabelListUseCase
 import timber.log.Timber
@@ -29,6 +31,7 @@ class ChangeLabelBottomSheetViewModel @Inject constructor(
     private val getNodeLabelListUseCase: GetNodeLabelListUseCase,
     private val nodeLabelMapper: NodeLabelMapper,
     private val nodeLabelResourceMapper: NodeLabelResourceMapper,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChangeLabelState())
@@ -40,9 +43,15 @@ class ChangeLabelBottomSheetViewModel @Inject constructor(
 
     /**
      * get label info for a node
-     * @param node [Node]
+     * @param nodeId [NodeId]
      */
-    fun loadLabelInfo(node: Node) {
+    suspend fun loadLabelInfo(nodeId: NodeId) {
+        getTypedNode(nodeId)?.let {
+            getLabelList(it)
+        }
+    }
+
+    private fun getLabelList(node: TypedNode) {
         runCatching {
             getNodeLabelListUseCase()
         }.onFailure {
@@ -59,6 +68,12 @@ class ChangeLabelBottomSheetViewModel @Inject constructor(
             }
         }
     }
+
+    private suspend fun getTypedNode(nodeId: NodeId) = runCatching {
+        getNodeByIdUseCase(nodeId)
+    }.onFailure {
+        Timber.e(it)
+    }.getOrNull()
 
     /**
      * When label change clicked

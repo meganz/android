@@ -11,7 +11,6 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
-import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
@@ -20,7 +19,6 @@ import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersM
  * Search nav host controller
  *
  * @param viewModel Search activity view model
- * @param nodeOptionsBottomSheetViewModel
  * @param handleClick Function to handle click
  * @param navigateToLink Function to navigate to link
  * @param showSortOrderBottomSheet Function to show sort order bottom sheet
@@ -37,7 +35,6 @@ import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersM
 @Composable
 internal fun SearchNavHostController(
     viewModel: SearchActivityViewModel,
-    nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel,
     handleClick: (TypedNode?) -> Unit,
     navigateToLink: (String) -> Unit,
     showSortOrderBottomSheet: () -> Unit,
@@ -69,7 +66,6 @@ internal fun SearchNavHostController(
                 searchActivityViewModel = viewModel,
                 nodeActionHandler = nodeActionHandler,
                 onBackPressed = onBackPressed,
-                nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel,
                 nodeActionsViewModel = nodeActionsViewModel,
                 listToStringWithDelimitersMapper = listToStringWithDelimitersMapper
             )

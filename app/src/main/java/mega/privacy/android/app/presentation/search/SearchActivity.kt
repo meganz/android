@@ -51,9 +51,8 @@ import mega.privacy.android.app.presentation.filelink.view.animationSpecs
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
-import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.NodeActionHandler
-import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
+import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.navigation.contactArraySeparator
 import mega.privacy.android.app.presentation.search.navigation.searchForeignNodeDialog
@@ -71,9 +70,9 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.SearchCategory
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import mega.privacy.android.shared.theme.MegaAppTheme
@@ -91,7 +90,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     private val viewModel: SearchActivityViewModel by viewModels()
-    private val nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel by viewModels()
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
     private val transfersManagementViewModel: TransfersManagementViewModel by viewModels()
@@ -234,7 +232,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                             .padding(padding)
                             .statusBarsPadding(),
                         viewModel = viewModel,
-                        nodeOptionsBottomSheetViewModel = nodeOptionsBottomSheetViewModel,
                         nodeActionsViewModel = nodeActionsViewModel,
                         handleClick = ::handleClick,
                         navigateToLink = ::navigateToLink,

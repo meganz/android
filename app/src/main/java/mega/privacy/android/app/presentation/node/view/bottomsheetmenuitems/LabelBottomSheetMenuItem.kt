@@ -13,6 +13,7 @@ import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -77,7 +78,9 @@ class LabelBottomSheetMenuItem @Inject constructor(
         navController: NavHostController,
     ): () -> Unit = {
         onDismiss()
-        navController.navigate(route = changeLabelBottomSheetRoute)
+        navController.navigate(
+            route = changeLabelBottomSheetRoute.plus(File.separator).plus(node.id.longValue)
+        )
     }
 
     override val groupId: Int

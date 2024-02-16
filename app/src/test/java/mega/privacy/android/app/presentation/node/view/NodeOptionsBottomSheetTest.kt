@@ -55,6 +55,7 @@ class NodeOptionsBottomSheetTest {
                 handler = nodeActionHandler,
                 viewModel = viewModel,
                 navHostController = navHostController,
+                nodeId = 1L,
                 onDismiss = {}
             )
         }
@@ -93,6 +94,7 @@ class NodeOptionsBottomSheetTest {
                 handler = nodeActionHandler,
                 viewModel = viewModel,
                 navHostController = navHostController,
+                nodeId = 1L,
                 onDismiss = {},
             )
         }

@@ -33,8 +33,8 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveT
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShareToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShareDropDown
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameDropdownMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameToolbarMenuItem
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameDropDown
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RestoreToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SelectAll
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SendToChat
@@ -66,7 +66,7 @@ class NodeToolbarActionMapperTest {
         RemoveShareToolbarMenuItem(
             stringWithDelimitersMapper = mock()
         ),
-        RemoveShareDropDown(),
+        RemoveShareDropDown(mock()),
         DisputeTakeDown(DisputeTakeDownMenuAction()),
         GetLinkToolbarMenuItem(GetLinkMenuAction()),
         ManageLinkToolbarMenuItem(),
@@ -86,7 +86,7 @@ class NodeToolbarActionMapperTest {
             menuAction = LeaveShareMenuAction()
         ),
         RenameToolbarMenuItem(),
-        RenameDropDown(),
+        RenameDropdownMenuItem(),
         CopyToolbarMenuItem(CopyMenuAction()),
         MoveToolbarMenuItem(MoveMenuAction()),
         TrashToolbarMenuItem(TrashMenuAction(), mock()),

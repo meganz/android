@@ -62,6 +62,7 @@ class ChangeLabelBottomSheetViewModelTest {
             getNodeLabelListUseCase,
             nodeLabelMapper,
             nodeLabelResourceMapper,
+            getNodeByIdUseCase
         )
     }
 
@@ -76,7 +77,7 @@ class ChangeLabelBottomSheetViewModelTest {
     fun `test that changeLabelUseCase is invoked when the label changes`() = runTest {
         val nodeId = NodeId(1L)
         val selectedLabel = NodeLabel.RED
-        underTest.loadLabelInfo(node)
+        underTest.loadLabelInfo(nodeId)
         underTest.onLabelSelected(selectedLabel)
         verify(changeLabelUseCase).invoke(nodeId, selectedLabel)
     }

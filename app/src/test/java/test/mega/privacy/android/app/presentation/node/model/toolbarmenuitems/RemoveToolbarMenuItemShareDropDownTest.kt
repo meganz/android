@@ -14,7 +14,7 @@ import java.util.stream.Stream
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RemoveToolbarMenuItemShareDropDownTest {
 
-    private val underTest = RemoveShareDropDown()
+    private val underTest = RemoveShareDropDown(mock())
 
     private val sharedFolder1 = mock<TypedFolderNode> {
         on { isPendingShare }.thenReturn(true)

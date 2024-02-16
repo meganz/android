@@ -29,19 +29,19 @@ import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.domain.entity.NodeLabel
-import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 
 @Composable
 internal fun ChangeLabelBottomSheetContent(
-    node: Node,
+    nodeId: NodeId,
     viewModel: ChangeLabelBottomSheetViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
-        viewModel.loadLabelInfo(node)
+        viewModel.loadLabelInfo(nodeId)
     }
     ChangeLabelBottomSheetContent(
         state = state,

@@ -5,7 +5,6 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.MegaDatabase
@@ -16,13 +15,12 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class ActiveTransferDaoTest {
     private lateinit var activeTransferDao: ActiveTransferDao
     private lateinit var db: MegaDatabase
 
-    private val entities = TransferType.values().flatMap { transferType: TransferType ->
+    private val entities = TransferType.entries.flatMap { transferType: TransferType ->
         (1..4).map { index ->
             val tag = index + (10 * transferType.ordinal)
             ActiveTransferEntity(
@@ -32,6 +30,7 @@ class ActiveTransferDaoTest {
                 isFinished = index.rem(3) == 0,
                 isPaused = false,
                 isFolderTransfer = false,
+                isAlreadyDownloaded = false,
             )
         }
     }
@@ -61,6 +60,7 @@ class ActiveTransferDaoTest {
             isFinished = true,
             isFolderTransfer = false,
             isPaused = false,
+            isAlreadyDownloaded = false,
         )
         activeTransferDao.insertOrUpdateActiveTransfer(newEntity)
         val actual = activeTransferDao.getActiveTransferByTag(newEntity.tag)
@@ -86,7 +86,7 @@ class ActiveTransferDaoTest {
 
     @Test
     fun test_that_getActiveTransfersByType_returns_all_transfers_of_that_type() = runTest {
-        TransferType.values().forEach { type ->
+        TransferType.entries.forEach { type ->
             val expected = entities.filter { it.transferType == type }
             val actual = activeTransferDao.getActiveTransfersByType(type).first()
             assertThat(actual).containsExactlyElementsIn(expected)
@@ -95,7 +95,7 @@ class ActiveTransferDaoTest {
 
     @Test
     fun test_that_getCurrentActiveTransfersByType_returns_all_transfers_of_that_type() = runTest {
-        TransferType.values().forEach { type ->
+        TransferType.entries.forEach { type ->
             val expected = entities.filter { it.transferType == type }
             val actual = activeTransferDao.getCurrentActiveTransfersByType(type)
             assertThat(actual).containsExactlyElementsIn(expected)
@@ -104,7 +104,7 @@ class ActiveTransferDaoTest {
 
     @Test
     fun test_deleteAllActiveTransfersByType_deletes_all_transfers_of_that_type() = runTest {
-        TransferType.values().forEach { type ->
+        TransferType.entries.forEach { type ->
             val initial = activeTransferDao.getCurrentActiveTransfersByType(type)
             assertThat(initial).isNotEmpty()
             activeTransferDao.deleteAllActiveTransfersByType(type)
@@ -115,7 +115,7 @@ class ActiveTransferDaoTest {
 
     @Test
     fun test_deleteActiveTransferByTag_deletes_all_transfers_with_given_tags() = runTest {
-        TransferType.values().forEach { type ->
+        TransferType.entries.forEach { type ->
             val initial = activeTransferDao.getCurrentActiveTransfersByType(type)
             val toFinish = initial.take(initial.size / 2).filter { !it.isFinished }
             assertThat(initial).isNotEmpty()
