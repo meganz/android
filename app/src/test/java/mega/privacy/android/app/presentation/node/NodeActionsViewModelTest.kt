@@ -6,17 +6,15 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.chat.mapper.ChatRequestMessageMapper
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.model.mapper.NodeAccessPermissionIconMapper
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.ChatRequestResult
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
@@ -33,11 +31,10 @@ import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -45,6 +42,7 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NodeActionsViewModelTest {
@@ -68,17 +66,6 @@ class NodeActionsViewModelTest {
         on { id } doReturn NodeId(123)
     }
     private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
-
-    @BeforeAll
-    fun initialize() {
-        Dispatchers.setMain(Dispatchers.Unconfined)
-    }
-
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
 
     private fun initViewModel() {
         viewModel = NodeActionsViewModel(

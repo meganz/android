@@ -4,13 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
@@ -21,12 +17,11 @@ import mega.privacy.android.domain.usecase.offline.GetOfflineFolderInformationUs
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.io.TempDir
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -36,7 +31,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class OfflineFileInfoComposeViewModelTest {
 
@@ -52,11 +47,6 @@ internal class OfflineFileInfoComposeViewModelTest {
 
     @TempDir
     lateinit var temporaryFolder: File
-
-    @BeforeAll
-    fun setup() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
 
     @BeforeEach
     fun initStubCommon() {
@@ -183,10 +173,4 @@ internal class OfflineFileInfoComposeViewModelTest {
             removeOfflineNodeUseCase
         )
     }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
-
 }

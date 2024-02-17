@@ -2,29 +2,27 @@ package mega.privacy.android.app.presentation.node.dialogs.removesharefolder
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.ResultCount
 import mega.privacy.android.domain.usecase.node.RemoveShareUseCase
 import mega.privacy.android.domain.usecase.shares.GetOutShareByNodeIdUseCase
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RemoveShareFolderViewModelTest {
@@ -42,11 +40,6 @@ class RemoveShareFolderViewModelTest {
         removeShareResultMapper = removeShareResultMapper,
         snackBarHandler = snackBarHandler
     )
-
-    @BeforeAll
-    fun setDispatchers() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
 
     @Test
     fun `test that when getContactInfoForSharedFolder it updates contacts and total folder in state`() =
@@ -82,10 +75,5 @@ class RemoveShareFolderViewModelTest {
             removeShareUseCase,
             removeShareResultMapper
         )
-    }
-
-    @AfterAll
-    fun resetDispatchers() {
-        Dispatchers.resetMain()
     }
 }

@@ -1,13 +1,9 @@
 package mega.privacy.android.app.presentation.node.label
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.node.model.mapper.NodeLabelResourceMapper
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.NodeId
@@ -15,17 +11,17 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeLabelUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeLabelListUseCase
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ChangeLabelBottomSheetViewModelTest {
     private val changeLabelUseCase = mock<UpdateNodeLabelUseCase>()
@@ -69,7 +65,6 @@ class ChangeLabelBottomSheetViewModelTest {
 
     @BeforeAll
     fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
         initViewModel()
     }
 
@@ -80,11 +75,6 @@ class ChangeLabelBottomSheetViewModelTest {
         underTest.loadLabelInfo(nodeId)
         underTest.onLabelSelected(selectedLabel)
         verify(changeLabelUseCase).invoke(nodeId, selectedLabel)
-    }
-
-    @AfterAll
-    fun resetDispatchers() {
-        Dispatchers.resetMain()
     }
 
     @AfterEach

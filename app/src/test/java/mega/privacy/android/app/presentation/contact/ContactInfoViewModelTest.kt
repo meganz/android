@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.contact
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,13 +10,12 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoViewModel
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
@@ -61,11 +59,10 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -77,6 +74,7 @@ import org.mockito.kotlin.whenever
 import kotlin.random.Random
 import kotlin.test.assertFalse
 
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ContactInfoViewModelTest {
@@ -142,16 +140,6 @@ class ContactInfoViewModelTest {
         on { chatId }.thenReturn(123456L)
         on { changes }.thenReturn(null)
         on { title }.thenReturn("Chat title")
-    }
-
-    @BeforeAll
-    fun setup() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @BeforeEach

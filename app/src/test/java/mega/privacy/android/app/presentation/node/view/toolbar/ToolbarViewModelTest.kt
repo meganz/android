@@ -1,16 +1,12 @@
 package mega.privacy.android.app.presentation.node.view.toolbar
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.node.model.mapper.NodeToolbarActionMapper
 import mega.privacy.android.app.presentation.node.model.menuaction.DownloadMenuAction
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DownloadToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.NodeToolbarMenuItem
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -19,11 +15,10 @@ import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -36,7 +31,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ToolbarViewModelTest {
 
@@ -72,11 +67,6 @@ class ToolbarViewModelTest {
     private val selectedNodes = setOf(generalNode, backUpNode, rubbishNode, accessNode)
 
     private lateinit var underTest: NodeToolbarViewModel
-
-    @BeforeAll
-    fun setDispatchers() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
 
     @BeforeEach
     fun setUp() {
@@ -173,11 +163,6 @@ class ToolbarViewModelTest {
             getRubbishBinNodeUseCase,
             isNodeInBackupsUseCase,
         )
-    }
-
-    @AfterAll
-    fun resetDispatchers() {
-        Dispatchers.resetMain()
     }
 
     private suspend fun stubCommon() {

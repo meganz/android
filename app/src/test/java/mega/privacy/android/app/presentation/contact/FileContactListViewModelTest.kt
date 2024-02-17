@@ -2,25 +2,21 @@ package mega.privacy.android.app.presentation.contact
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -29,6 +25,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FileContactListViewModelTest {
@@ -47,16 +44,6 @@ class FileContactListViewModelTest {
         areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
         getOutShares = getOutShare
     )
-
-    @BeforeAll
-    fun setup() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
 
     @BeforeEach
     fun resetMocks() {

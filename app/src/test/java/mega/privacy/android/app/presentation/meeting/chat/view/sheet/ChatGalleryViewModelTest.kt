@@ -2,27 +2,23 @@ package mega.privacy.android.app.presentation.meeting.chat.view.sheet
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.chat.FileGalleryItem
 import mega.privacy.android.domain.usecase.GetAllGalleryImages
 import mega.privacy.android.domain.usecase.GetAllGalleryVideos
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class ChatGalleryViewModelTest {
     private lateinit var underTest: ChatGalleryViewModel
@@ -31,13 +27,7 @@ internal class ChatGalleryViewModelTest {
 
     @BeforeAll
     fun setup() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
         initTestClass()
-    }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @BeforeEach

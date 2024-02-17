@@ -6,33 +6,31 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.NodeId
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.domain.usecase.node.ValidNameType
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @OptIn(ExperimentalCoroutinesApi::class)
 class RenameToolbarMenuItemNodeDialogViewModelTest {
@@ -55,19 +53,9 @@ class RenameToolbarMenuItemNodeDialogViewModelTest {
         )
     }
 
-    @BeforeAll
-    fun setUpBeforeAll() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
-
     @AfterEach
     fun tearDown() {
         reset(getNodeByHandleUseCase, checkForValidNameUseCase, renameNodeUseCase, snackBarHandler)
-    }
-
-    @AfterAll
-    fun tearDownAfterAll() {
-        Dispatchers.resetMain()
     }
 
     @Test

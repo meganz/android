@@ -2,25 +2,20 @@ package mega.privacy.android.app.presentation.meeting.chat.view.message.attachme
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.usecase.node.chat.AddChatFileTypeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -28,7 +23,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import java.io.File
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NodeAttachmentMessageViewModelTest {
     lateinit var underTest: NodeAttachmentMessageViewModel
@@ -37,16 +32,6 @@ class NodeAttachmentMessageViewModelTest {
     private val addChatFileTypeUseCase = mock<AddChatFileTypeUseCase>()
     private val fileSizeStringMapper = mock<FileSizeStringMapper>()
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
-
-    @BeforeAll
-    internal fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
 
     @BeforeEach
     internal fun initTests() {

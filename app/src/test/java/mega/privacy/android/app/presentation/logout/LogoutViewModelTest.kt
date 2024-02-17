@@ -2,39 +2,29 @@ package mega.privacy.android.app.presentation.logout
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.logout.model.LogoutState
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.offline.HasOfflineFilesUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.Mockito
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class LogoutViewModelTest {
     private lateinit var underTest: LogoutViewModel
     private val hasOfflineFilesUseCase = mock<HasOfflineFilesUseCase>()
     private val ongoingTransfersExistUseCase = mock<OngoingTransfersExistUseCase>()
     private val logoutUseCase = mock<LogoutUseCase>()
-
-    @BeforeAll
-    internal fun initialise() {
-        Dispatchers.setMain(StandardTestDispatcher())
-    }
 
     @BeforeEach
     internal fun setUp() {
@@ -60,11 +50,6 @@ internal class LogoutViewModelTest {
             hasOfflineFilesUseCase = hasOfflineFilesUseCase,
             ongoingTransfersExistUseCase = ongoingTransfersExistUseCase,
         )
-    }
-
-    @AfterAll
-    internal fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test
@@ -155,5 +140,11 @@ internal class LogoutViewModelTest {
         testScheduler.advanceUntilIdle()
 
         verify(logoutUseCase).invoke()
+    }
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
     }
 }

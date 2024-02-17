@@ -3,16 +3,14 @@ package mega.privacy.android.app.main.managerSections
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.globalmanagement.TransfersManagement
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -30,9 +28,9 @@ import mega.privacy.android.domain.usecase.transfers.completed.GetAllCompletedTr
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
@@ -60,9 +58,8 @@ internal class TransfersViewModelTest {
     private val pauseTransferByTagUseCase: PauseTransferByTagUseCase = mock()
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase = mock()
 
-    @Before
+    @BeforeEach
     fun setUp() {
-        Dispatchers.setMain(StandardTestDispatcher())
         initViewModel()
     }
 
@@ -85,11 +82,6 @@ internal class TransfersViewModelTest {
             cancelTransferByTagUseCase = cancelTransferByTagUseCase,
             monitorPausedTransfersUseCase = monitorPausedTransfersUseCase
         )
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test
@@ -290,4 +282,10 @@ internal class TransfersViewModelTest {
                 this.cancelAndIgnoreRemainingEvents()
             }
         }
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
+    }
 }

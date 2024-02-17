@@ -2,18 +2,11 @@ package mega.privacy.android.app.domain.usecase.offline
 
 import android.app.Activity
 import io.reactivex.rxjava3.core.Completable
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaNode
-import org.junit.After
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -24,7 +17,6 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.lang.ref.WeakReference
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class DefaultSetNodeAvailableOfflineTest {
 
     private lateinit var underTest: SetNodeAvailableOffline
@@ -40,7 +32,6 @@ class DefaultSetNodeAvailableOfflineTest {
 
     @Before
     fun setup() {
-        Dispatchers.setMain(StandardTestDispatcher())
         underTest = DefaultSetNodeAvailableOffline(
             megaNodeRepository = megaNodeRepository,
             getNodeUseCase = getNodeUseCase,
@@ -56,11 +47,6 @@ class DefaultSetNodeAvailableOfflineTest {
         ).thenReturn(
             Completable.complete()
         )
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test

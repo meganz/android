@@ -3,13 +3,11 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 import androidx.navigation.NavHostController
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.node.model.menuaction.AvailableOfflineMenuAction
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -17,11 +15,10 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.foldernode.IsFolderEmptyUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -33,6 +30,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AvailableOfflineBottomSheetMenuItemTest {
@@ -46,17 +44,6 @@ class AvailableOfflineBottomSheetMenuItemTest {
         isFolderEmptyUseCase = isFolderEmptyUseCase,
         scope = scope
     )
-
-    @BeforeAll
-    fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
-
 
     @ParameterizedTest(name = "isNodeInRubbish {0} - accessPermission {1} - isInBackups {2} - node {3} - isConnected {4} - expected {5}")
     @MethodSource("provideTestParametersWithEmptyFolder")
@@ -175,6 +162,4 @@ class AvailableOfflineBottomSheetMenuItemTest {
         verify(onDismiss).invoke()
         verify(actionHandler).invoke(any(), any())
     }
-
-
 }
