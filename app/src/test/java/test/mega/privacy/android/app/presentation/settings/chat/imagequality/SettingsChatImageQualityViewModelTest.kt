@@ -2,31 +2,26 @@ package test.mega.privacy.android.app.presentation.settings.chat.imagequality
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.settings.chat.imagequality.SettingsChatImageQualityViewModel
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.usecase.GetChatImageQuality
 import mega.privacy.android.domain.usecase.SetChatImageQuality
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SettingsChatImageQualityViewModelTest {
 
@@ -36,21 +31,11 @@ class SettingsChatImageQualityViewModelTest {
     private val getChatImageQuality = mock<GetChatImageQuality>()
     private val setChatImageQuality = mock<SetChatImageQuality>()
 
-    @BeforeAll
-    fun setUp() {
-        Dispatchers.setMain(StandardTestDispatcher())
-    }
-
     private fun initTestClass() {
         underTest = SettingsChatImageQualityViewModel(
             getChatImageQuality = getChatImageQuality,
             setChatImageQuality = setChatImageQuality,
         )
-    }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @BeforeEach
@@ -98,4 +83,10 @@ class SettingsChatImageQualityViewModelTest {
             testScheduler.advanceUntilIdle()
             verify(setChatImageQuality).invoke(ChatImageQuality.Original)
         }
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
+    }
 }

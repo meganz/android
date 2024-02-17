@@ -2,43 +2,33 @@ package test.mega.privacy.android.app.smsVerification
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.verification.SMSVerificationTextViewModel
 import mega.privacy.android.app.presentation.verification.model.SmsVerificationTextState
 import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerificationTextErrorMapper
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.verification.VerifyPhoneNumber
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 
-@OptIn(ExperimentalCoroutinesApi::class)
 internal class SMSVerificationTextViewModelTest {
     private lateinit var underTest: SMSVerificationTextViewModel
 
     private val verifyPhoneNumber = mock<VerifyPhoneNumber>()
     private val verificationTextErrorMapper = mock<SmsVerificationTextErrorMapper>()
 
-    @Before
+    @BeforeEach
     fun setUp() {
         underTest = SMSVerificationTextViewModel(
             verifyPhoneNumber = verifyPhoneNumber,
             verificationTextErrorMapper = verificationTextErrorMapper,
         )
-        Dispatchers.setMain(StandardTestDispatcher())
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test
@@ -88,5 +78,11 @@ internal class SMSVerificationTextViewModelTest {
                 underTest.submitPin("234")
                 assertThat(awaitItem()).isEqualTo(SmsVerificationTextState.Failed(error))
             }
+    }
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
     }
 }

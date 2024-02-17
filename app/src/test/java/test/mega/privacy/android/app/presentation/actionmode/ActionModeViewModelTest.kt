@@ -1,45 +1,28 @@
 package test.mega.privacy.android.app.presentation.actionmode
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.jraska.livedata.test
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.InstantExecutorExtension
 import java.util.concurrent.TimeUnit
 
+@ExtendWith(InstantExecutorExtension::class)
 @ExperimentalCoroutinesApi
 class ActionModeViewModelTest {
 
     private lateinit var underTest: ActionModeViewModel
 
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
-
-    private val scheduler = TestCoroutineScheduler()
-
-    @get:Rule
-    var instantExecutorRule = InstantTaskExecutorRule()
-
-    @Before
-    fun setUp() {
-        Dispatchers.setMain(StandardTestDispatcher(scheduler))
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
 
     @Test
     fun `test that an action bar message is emitted if the transfers are paused`() =
@@ -66,4 +49,12 @@ class ActionModeViewModelTest {
 
             underTest.onActionBarMessage().test().assertNoValue()
         }
+
+    companion object {
+        private val scheduler = TestCoroutineScheduler()
+
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher(scheduler))
+    }
 }

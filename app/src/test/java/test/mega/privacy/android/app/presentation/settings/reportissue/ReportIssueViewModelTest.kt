@@ -3,7 +3,6 @@ package test.mega.privacy.android.app.presentation.settings.reportissue
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -16,13 +15,12 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.settings.reportissue.ReportIssueViewModel
 import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIssueResult
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
@@ -30,13 +28,12 @@ import mega.privacy.android.domain.usecase.GetSupportEmail
 import mega.privacy.android.domain.usecase.SubmitIssueUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
@@ -61,20 +58,12 @@ class ReportIssueViewModelTest {
 
     private var savedStateHandle = SavedStateHandle(mapOf())
 
-
     private val monitorConnectivityUseCase =
         mock<MonitorConnectivityUseCase>()
-
-    private val scheduler = TestCoroutineScheduler()
 
     private val supportEmail = "Support@Email.address"
     private val getSupportEmail = mock<GetSupportEmail>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
-
-    @BeforeAll
-    fun initialise() {
-        Dispatchers.setMain(StandardTestDispatcher(scheduler))
-    }
 
     @BeforeEach
     fun setUp() {
@@ -117,11 +106,6 @@ class ReportIssueViewModelTest {
             getSupportEmail,
             getFeatureFlagValueUseCase,
         )
-    }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test
@@ -413,4 +397,12 @@ class ReportIssueViewModelTest {
         }
 
     private fun getProgressFlow() = (0..100).map { Progress(it / 100f) }.asFlow()
+
+    companion object {
+        private val scheduler = TestCoroutineScheduler()
+
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher(scheduler))
+    }
 }

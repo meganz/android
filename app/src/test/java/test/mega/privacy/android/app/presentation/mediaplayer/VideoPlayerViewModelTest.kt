@@ -3,20 +3,18 @@ package test.mega.privacy.android.app.presentation.mediaplayer
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel
 import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_ADD_SUBTITLE_ITEM
 import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_MATCHED_ITEM
 import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_OFF
 import mega.privacy.android.app.mediaplayer.model.SubtitleDisplayState
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -25,9 +23,7 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiJava
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -39,10 +35,15 @@ import org.mockito.kotlin.wheneverBlocking
 import test.mega.privacy.android.app.TimberJUnit5Extension
 import test.mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
 
+@ExtendWith(
+    value = [
+        CoroutineMainDispatcherExtension::class,
+        InstantTaskExecutorExtension::class,
+        TimberJUnit5Extension::class
+    ]
+)
 @ExperimentalCoroutinesApi
-@ExtendWith(InstantTaskExecutorExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ExtendWith(TimberJUnit5Extension::class)
 internal class VideoPlayerViewModelTest {
     private lateinit var underTest: VideoPlayerViewModel
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
@@ -52,11 +53,6 @@ internal class VideoPlayerViewModelTest {
     private val expectedId = 123456L
     private val expectedName = "testName"
     private val expectedUrl = "test url"
-
-    @BeforeAll
-    fun initialise() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
 
     @BeforeEach
     fun setUp() {
@@ -116,11 +112,6 @@ internal class VideoPlayerViewModelTest {
         savedStateHandle[underTest.subtitleShowKey] = false
         savedStateHandle[underTest.videoPlayerPausedForPlaylistKey] = false
         savedStateHandle[underTest.currentSubtitleFileInfoKey] = null
-    }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test

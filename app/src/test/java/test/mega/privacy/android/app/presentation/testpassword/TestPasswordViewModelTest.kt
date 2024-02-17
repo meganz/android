@@ -6,15 +6,13 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity.Companion.KEY_IS_LOGOUT
 import mega.privacy.android.app.presentation.testpassword.TestPasswordViewModel
 import mega.privacy.android.app.presentation.testpassword.model.PasswordState
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.BlockPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
@@ -25,9 +23,9 @@ import mega.privacy.android.domain.usecase.SkipPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.account.ExportRecoveryKeyUseCase
 import mega.privacy.android.domain.usecase.account.GetPrintRecoveryKeyFileUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -50,17 +48,10 @@ internal class TestPasswordViewModelTest {
     private val logoutUseCase = mock<LogoutUseCase>()
     private val getPrintRecoveryKeyFileUseCase = mock<GetPrintRecoveryKeyFileUseCase>()
     private val exportRecoveryKeyUseCase = mock<ExportRecoveryKeyUseCase>()
-    private val dispatcher = UnconfinedTestDispatcher()
 
     @BeforeEach
     fun setup() {
-        Dispatchers.setMain(dispatcher)
         init()
-    }
-
-    @AfterEach
-    fun teardown() {
-        Dispatchers.resetMain()
     }
 
     private fun init() {
@@ -320,4 +311,12 @@ internal class TestPasswordViewModelTest {
             underTest.exportRecoveryKey(uri)
             verify(notifyPasswordCheckedUseCase, never()).invoke()
         }
+
+    companion object {
+        private val dispatcher = UnconfinedTestDispatcher()
+
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(dispatcher)
+    }
 }

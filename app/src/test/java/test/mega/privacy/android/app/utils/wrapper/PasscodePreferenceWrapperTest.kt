@@ -1,14 +1,9 @@
 package test.mega.privacy.android.app.utils.wrapper
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.PIN_4
 import mega.privacy.android.app.utils.Constants.PIN_6
 import mega.privacy.android.app.utils.Constants.PIN_ALPHANUMERIC
@@ -16,6 +11,7 @@ import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_IMMEDIATE
 import mega.privacy.android.app.utils.wrapper.PasscodePreferenceWrapper
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.model.MegaAttributes
@@ -36,6 +32,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.mock
@@ -43,7 +40,6 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import test.mega.privacy.android.app.extensions.asHotFlow
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PasscodePreferenceWrapperTest {
     private lateinit var underTest: PasscodePreferenceWrapper
@@ -54,17 +50,6 @@ class PasscodePreferenceWrapperTest {
     private val monitorPasscodeLockPreferenceUseCase = mock<MonitorPasscodeLockPreferenceUseCase?>()
     private val passcodeRepository = mock<PasscodeRepository?>()
     private val accountRepository = mock<AccountRepository?>()
-
-
-    @BeforeAll
-    fun initialise() {
-        Dispatchers.setMain(StandardTestDispatcher())
-    }
-
-    @AfterAll
-    fun cleanUp() {
-        Dispatchers.resetMain()
-    }
 
     @BeforeEach
     internal fun setUp() {
@@ -171,7 +156,7 @@ class PasscodePreferenceWrapperTest {
         @Test
         internal fun `test that database handler value is updated when setting passcode type`() =
             runTest {
-                val expected = Constants.PIN_6
+                val expected = PIN_6
                 underTest.setPasscodeLockType(expected)
 
                 verify(databaseHandler).passcodeLockType = expected
@@ -296,7 +281,7 @@ class PasscodePreferenceWrapperTest {
             mapOf(
                 PasscodeTimeout.Immediate to REQUIRE_PASSCODE_IMMEDIATE,
                 PasscodeTimeout.TimeSpan(PasscodeUtil.REQUIRE_PASSCODE_AFTER_1M.toLong()) to PasscodeUtil.REQUIRE_PASSCODE_AFTER_1M,
-                null to Constants.REQUIRE_PASSCODE_INVALID,
+                null to REQUIRE_PASSCODE_INVALID,
             ).map { (input, expected) ->
                 DynamicTest.dynamicTest("test that $input returns $expected") {
                     passcodeRepository.stub {
@@ -575,4 +560,9 @@ class PasscodePreferenceWrapperTest {
         )
     }
 
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
+    }
 }

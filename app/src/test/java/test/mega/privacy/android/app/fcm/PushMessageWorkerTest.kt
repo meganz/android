@@ -15,13 +15,10 @@ import androidx.work.impl.utils.WorkProgressUpdater
 import androidx.work.impl.utils.taskexecutor.WorkManagerTaskExecutor
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.fcm.PushMessageWorker
 import mega.privacy.android.app.notifications.ScheduledMeetingPushMessageNotification
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
@@ -39,7 +36,6 @@ import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
 import mega.privacy.android.domain.usecase.notifications.GetChatMessageNotificationDataUseCase
 import mega.privacy.android.domain.usecase.notifications.PushReceivedUseCase
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -82,8 +78,6 @@ class PushMessageWorkerTest {
 
     @Before
     fun setUp() {
-        Dispatchers.setMain(ioDispatcher)
-
         context = ApplicationProvider.getApplicationContext()
         executor = Executors.newSingleThreadExecutor()
         workExecutor = WorkManagerTaskExecutor(executor)
@@ -103,7 +97,8 @@ class PushMessageWorkerTest {
                 workExecutor,
                 WorkerFactory.getDefaultWorkerFactory(),
                 WorkProgressUpdater(workDatabase, workExecutor),
-                WorkForegroundUpdater(workDatabase,
+                WorkForegroundUpdater(
+                    workDatabase,
                     { _, _ -> }, workExecutor
                 )
             ),
@@ -128,11 +123,6 @@ class PushMessageWorkerTest {
         whenever(notificationManager.areNotificationsEnabled()).thenReturn(false)
         whenever(callsPreferencesGateway.getCallsMeetingRemindersPreference())
             .thenReturn(flowOf(CallsMeetingReminders.Disabled))
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test

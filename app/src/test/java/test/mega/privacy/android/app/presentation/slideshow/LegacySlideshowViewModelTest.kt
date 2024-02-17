@@ -1,15 +1,14 @@
 package test.mega.privacy.android.app.presentation.slideshow
 
 import app.cash.turbine.test
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.slideshow.LegacySlideshowViewModel
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
 import mega.privacy.android.domain.usecase.GetPhotosByIdsUseCase
@@ -23,8 +22,9 @@ import mega.privacy.android.domain.usecase.imageviewer.GetImageForChatMessageUse
 import mega.privacy.android.domain.usecase.slideshow.GetChatPhotoByMessageIdUseCase
 import mega.privacy.android.domain.usecase.slideshow.GetPhotoByAlbumImportNodeUseCase
 import mega.privacy.android.domain.usecase.slideshow.GetPhotoByPublicLinkUseCase
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
@@ -45,10 +45,8 @@ class LegacySlideshowViewModelTest {
     private val getImageByAlbumImportNodeUseCase: GetImageByAlbumImportNodeUseCase = mock()
     private val getPhotoByAlbumImportNodeUseCase: GetPhotoByAlbumImportNodeUseCase = mock()
 
-    @Before
+    @BeforeEach
     fun setUp() {
-        Dispatchers.setMain(StandardTestDispatcher())
-
         whenever(monitorSlideshowOrderSettingUseCase.invoke())
             .thenReturn(flowOf())
 
@@ -123,5 +121,11 @@ class LegacySlideshowViewModelTest {
             val actualSetting = awaitItem().repeat
             assertEquals(expectedSetting, actualSetting)
         }
+    }
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
     }
 }

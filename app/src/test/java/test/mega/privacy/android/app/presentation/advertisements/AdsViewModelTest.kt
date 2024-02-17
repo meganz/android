@@ -2,26 +2,23 @@ package test.mega.privacy.android.app.presentation.advertisements
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.advertisements.AdsViewModel
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.advertisements.AdDetails
 import mega.privacy.android.domain.entity.advertisements.FetchAdDetailRequest
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.advertisements.FetchAdDetailUseCase
 import mega.privacy.android.domain.usecase.advertisements.IsAccountNewUseCase
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -43,11 +40,6 @@ class AdsViewModelTest {
     private val url = "https://megaad.nz/#z_xyz"
     private val fetchedAdDetail = AdDetails(slotId, url)
 
-    @BeforeAll
-    fun setup() {
-        Dispatchers.setMain(StandardTestDispatcher())
-    }
-
     @BeforeEach
     fun resetMocks() {
         reset(
@@ -63,11 +55,6 @@ class AdsViewModelTest {
             isAccountNewUseCase = isAccountNewUseCase,
             monitorStartScreenPreference = monitorStartScreenPreference
         )
-    }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     private fun provideAdReConsumptionParameters() = Stream.of(
@@ -227,4 +214,10 @@ class AdsViewModelTest {
                 assertThat(state.showAdsView).isFalse()
             }
         }
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
+    }
 }

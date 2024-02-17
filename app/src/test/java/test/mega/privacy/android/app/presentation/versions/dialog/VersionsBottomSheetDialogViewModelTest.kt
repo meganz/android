@@ -3,27 +3,23 @@ package test.mega.privacy.android.app.presentation.versions.dialog
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.modalbottomsheet.VersionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.versions.dialog.VersionsBottomSheetDialogViewModel
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import nz.mega.sdk.MegaNode
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DynamicTest.dynamicTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.ValueSource
@@ -36,6 +32,7 @@ import org.mockito.kotlin.whenever
 /**
  * Test class for [VersionsBottomSheetDialogViewModel]
  */
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VersionsBottomSheetDialogViewModelTest {
@@ -45,11 +42,6 @@ class VersionsBottomSheetDialogViewModelTest {
     private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>()
-
-    @BeforeAll
-    fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
 
     @BeforeEach
     fun reset() {
@@ -70,11 +62,6 @@ class VersionsBottomSheetDialogViewModelTest {
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             savedStateHandle = savedStateHandle,
         )
-    }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test

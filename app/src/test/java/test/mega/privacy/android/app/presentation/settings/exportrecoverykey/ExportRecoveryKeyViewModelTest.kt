@@ -1,42 +1,38 @@
 package test.mega.privacy.android.app.presentation.settings.exportrecoverykey
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyViewModel
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
 import mega.privacy.android.domain.usecase.SetMasterKeyExportedUseCase
 import mega.privacy.android.domain.usecase.account.GetPrintRecoveryKeyFileUseCase
-import org.junit.After
 import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.InstantExecutorExtension
 import java.io.File
 
+@ExtendWith(InstantExecutorExtension::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 class ExportRecoveryKeyViewModelTest {
-    @get:Rule
-    var instantExecutorRule = InstantTaskExecutorRule()
 
     lateinit var underTest: ExportRecoveryKeyViewModel
     private val getExportMasterKeyUseCase = mock<GetExportMasterKeyUseCase>()
     private val setMasterKeyExportedUseCase = mock<SetMasterKeyExportedUseCase>()
     private val getPrintRecoveryKeyFileUseCase = mock<GetPrintRecoveryKeyFileUseCase>()
-    private val dispatcher = UnconfinedTestDispatcher()
     private val fakeRecoveryKey = "JALSJLKNDnsnda12738"
 
     private fun constructViewModel() = ExportRecoveryKeyViewModel(
@@ -46,15 +42,9 @@ class ExportRecoveryKeyViewModelTest {
         dispatcher
     )
 
-    @Before
+    @BeforeEach
     fun setUp() {
-        Dispatchers.setMain(dispatcher)
         underTest = constructViewModel()
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test
@@ -132,4 +122,12 @@ class ExportRecoveryKeyViewModelTest {
                 assertThat(result.printRecoveryKey).isInstanceOf(StateEventWithContentConsumed::class.java)
             }
         }
+
+    companion object {
+        private val dispatcher = UnconfinedTestDispatcher()
+
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(dispatcher)
+    }
 }

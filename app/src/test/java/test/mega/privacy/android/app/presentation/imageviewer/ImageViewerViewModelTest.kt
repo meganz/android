@@ -7,13 +7,9 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
@@ -29,6 +25,7 @@ import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
@@ -64,7 +61,7 @@ import test.mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorE
 import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
-@ExtendWith(InstantTaskExecutorExtension::class)
+@ExtendWith(value = [CoroutineMainDispatcherExtension::class, InstantTaskExecutorExtension::class])
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class ImageViewerViewModelTest {
     private lateinit var underTest: ImageViewerViewModel
@@ -121,7 +118,6 @@ internal class ImageViewerViewModelTest {
 
     @BeforeAll
     fun initialise() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { scheduler }
     }
 
@@ -210,7 +206,6 @@ internal class ImageViewerViewModelTest {
 
     @AfterAll
     fun tearDown() {
-        Dispatchers.resetMain()
         RxAndroidPlugins.reset()
     }
 

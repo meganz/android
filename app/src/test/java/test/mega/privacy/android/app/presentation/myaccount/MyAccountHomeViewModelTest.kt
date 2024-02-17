@@ -4,15 +4,13 @@ package test.mega.privacy.android.app.presentation.myaccount
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.myaccount.MyAccountHomeViewModel
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.UserAccount
@@ -35,10 +33,10 @@ import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -96,7 +94,6 @@ class MyAccountHomeViewModelTest {
 
     @BeforeEach
     fun setup() {
-        Dispatchers.setMain(StandardTestDispatcher())
         initViewModel()
     }
 
@@ -120,11 +117,6 @@ class MyAccountHomeViewModelTest {
             getUserFullNameUseCase,
             getMyAvatarFileUseCase,
         )
-    }
-
-    @AfterEach
-    fun teardown() {
-        Dispatchers.resetMain()
     }
 
     @Test
@@ -310,5 +302,9 @@ class MyAccountHomeViewModelTest {
                 Arguments.of(BusinessAccountStatus.GracePeriod),
             )
         }
+
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
     }
 }

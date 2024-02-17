@@ -1,16 +1,14 @@
 package test.mega.privacy.android.app.domain.usecase
 
 import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.usecase.quota.GetBandwidthOverQuotaDelayUseCase
 import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.usecase.quota.GetBandwidthOverQuotaDelayUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class GetBandwidthOverQuotaDelayUseCaseTest {
     private lateinit var underTest: GetBandwidthOverQuotaDelayUseCase
     private val repository: NodeRepository = mock()

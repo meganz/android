@@ -1,19 +1,16 @@
 package test.mega.privacy.android.app.presentation.shares.links
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.presentation.shares.links.LegacyLinksViewModel
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
@@ -23,15 +20,17 @@ import mega.privacy.android.domain.usecase.GetLinksSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import nz.mega.sdk.MegaNode
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.InstantExecutorExtension
 
+@ExtendWith(value = [CoroutineMainDispatcherExtension::class, InstantExecutorExtension::class])
 @ExperimentalCoroutinesApi
 class LegacyLinksViewModelTest {
     private lateinit var underTest: LegacyLinksViewModel
@@ -50,12 +49,8 @@ class LegacyLinksViewModelTest {
         on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
     }
 
-    @get:Rule
-    var instantExecutorRule = InstantTaskExecutorRule()
-
-    @Before
+    @BeforeEach
     fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
         underTest = LegacyLinksViewModel(
             getNodeByHandle,
             getParentNodeUseCase,

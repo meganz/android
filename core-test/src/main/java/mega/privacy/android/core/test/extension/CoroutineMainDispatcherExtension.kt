@@ -21,9 +21,9 @@ import org.junit.jupiter.api.extension.ExtensionContext
  * ### Else, use @RegisterExtension to provide a different dispatcher. [Reference](https://junit.org/junit5/docs/current/user-guide/#extensions-registration-programmatic-static-fields-kotlin)
  * ```
  * companion object {
- *     @JvmStatic
+ *     @JvmField
  *     @RegisterExtension
- *     private val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
+ *     val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
  * }
  * ```
  * @param testDispatcher Dispatcher for the test. By default is UnconfinedTestDispatcher.

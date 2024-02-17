@@ -1,7 +1,6 @@
 package test.mega.privacy.android.app.presentation.qrcode
 
 import android.graphics.Bitmap
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
@@ -41,10 +40,9 @@ import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.ResetContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
+import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.TestInstance
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
@@ -84,9 +82,6 @@ class QRCodeViewModelTest {
     private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
     private val checkNameCollisionUseCase = mock<CheckNameCollisionUseCase>()
 
-    @get:Rule
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
-
     private val initialContactLink = "https://contact_link1"
 
     @Before
@@ -116,7 +111,7 @@ class QRCodeViewModelTest {
         )
     }
 
-    @AfterAll
+    @After
     fun tearDown() {
         Dispatchers.resetMain()
     }

@@ -2,7 +2,6 @@ package test.mega.privacy.android.app.presentation.settings.advanced
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -10,20 +9,18 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.settings.advanced.SettingsAdvancedViewModel
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.IsUseHttpsEnabled
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.SetUseHttps
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
@@ -46,13 +43,6 @@ class SettingsAdvancedViewModelTest {
     }
 
     private val setUseHttps = mock<SetUseHttps>()
-
-    private val scheduler = TestCoroutineScheduler()
-
-    @BeforeAll
-    fun initialise() {
-        Dispatchers.setMain(StandardTestDispatcher(scheduler))
-    }
 
     @BeforeEach
     fun setUp() {
@@ -80,11 +70,6 @@ class SettingsAdvancedViewModelTest {
             setUseHttps = setUseHttps,
             ioDispatcher = StandardTestDispatcher()
         )
-    }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test
@@ -156,4 +141,11 @@ class SettingsAdvancedViewModelTest {
         verify(setUseHttps).invoke(true)
     }
 
+    companion object {
+        private val scheduler = TestCoroutineScheduler()
+
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher(scheduler))
+    }
 }

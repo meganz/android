@@ -3,19 +3,14 @@ package test.mega.privacy.android.app.presentation.mediaplayer
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.mediaplayer.SelectSubtitleFileViewModel
 import mega.privacy.android.app.mediaplayer.mapper.SubtitleFileInfoItemMapper
 import mega.privacy.android.app.mediaplayer.model.SubtitleLoadState
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetSRTSubtitleFileListUseCase
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -30,17 +25,12 @@ import test.mega.privacy.android.app.TimberJUnit5Extension
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ExtendWith(TimberJUnit5Extension::class)
+@ExtendWith(value = [CoroutineMainDispatcherExtension::class, TimberJUnit5Extension::class])
 internal class SelectSubtitleFileViewModelTest {
     private lateinit var underTest: SelectSubtitleFileViewModel
 
     private val getSRTSubtitleFileListUseCase = mock<GetSRTSubtitleFileListUseCase>()
     private val subtitleFileInfoItemMapper = mock<SubtitleFileInfoItemMapper>()
-
-    @BeforeAll
-    fun initialise() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
 
     @BeforeEach
     fun setUp() {
@@ -52,11 +42,6 @@ internal class SelectSubtitleFileViewModelTest {
             sendStatisticsMediaPlayerUseCase = mock(),
             savedStateHandle = SavedStateHandle()
         )
-    }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test

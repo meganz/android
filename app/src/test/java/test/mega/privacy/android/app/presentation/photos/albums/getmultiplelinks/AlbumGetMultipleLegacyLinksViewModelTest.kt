@@ -3,29 +3,26 @@ package test.mega.privacy.android.app.presentation.photos.albums.getmultiplelink
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
 import mega.privacy.android.app.presentation.photos.albums.getmultiplelinks.AlbumGetMultipleLinksViewModel
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumIdLink
 import mega.privacy.android.domain.entity.photos.AlbumLink
-import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -42,16 +39,6 @@ class AlbumGetMultipleLegacyLinksViewModelTest {
     private val exportAlbumsUseCase: ExportAlbumsUseCase = mock()
 
     private val shouldShowCopyrightUseCase: ShouldShowCopyrightUseCase = mock()
-
-    @Before
-    fun setup() {
-        Dispatchers.setMain(StandardTestDispatcher())
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
 
     @Test
     fun `test that fetch link works correctly`() = runTest {
@@ -88,11 +75,6 @@ class AlbumGetMultipleLegacyLinksViewModelTest {
 
         val selectedAlbumsIds = listOf(userAlbum1.id, userAlbum2.id)
 
-        val expectedLinks = mapOf(
-            AlbumId(1L) to AlbumLink("Link 1"),
-            AlbumId(2L) to AlbumLink("Link 2"),
-        )
-
         whenever(getUserAlbumUseCase(userAlbum1.id))
             .thenReturn(flowOf(userAlbum1))
 
@@ -119,5 +101,11 @@ class AlbumGetMultipleLegacyLinksViewModelTest {
             assertThat(state.showCopyright).isEqualTo(false)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
     }
 }

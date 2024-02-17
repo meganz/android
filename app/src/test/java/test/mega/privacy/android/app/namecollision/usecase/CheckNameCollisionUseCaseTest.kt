@@ -3,12 +3,9 @@ package test.mega.privacy.android.app.namecollision.usecase
 import com.google.common.truth.Truth.assertThat
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
@@ -37,7 +34,6 @@ internal class CheckNameCollisionUseCaseTest {
 
     @BeforeAll
     internal fun initialise() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
     }
 
@@ -59,7 +55,6 @@ internal class CheckNameCollisionUseCaseTest {
 
     @AfterAll
     fun tearDown() {
-        Dispatchers.resetMain()
         RxAndroidPlugins.reset()
     }
 

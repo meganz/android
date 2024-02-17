@@ -1,20 +1,18 @@
 package test.mega.privacy.android.app.presentation.fingerprintauth
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeViewModel
-import mega.privacy.android.domain.usecase.account.UpgradeSecurity
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import mega.privacy.android.domain.usecase.account.UpgradeSecurity
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
 class SecurityUpgradeViewModelTest {
 
@@ -22,15 +20,9 @@ class SecurityUpgradeViewModelTest {
     private val upgradeSecurity = mock<UpgradeSecurity>()
     private val setSecurityUpgradeInApp = mock<SetSecurityUpgradeInApp>()
 
-    @Before
+    @BeforeEach
     fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
         underTest = SecurityUpgradeViewModel(upgradeSecurity, setSecurityUpgradeInApp)
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test

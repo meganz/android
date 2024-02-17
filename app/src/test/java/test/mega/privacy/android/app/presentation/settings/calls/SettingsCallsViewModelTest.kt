@@ -2,7 +2,6 @@ package test.mega.privacy.android.app.presentation.settings.calls
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
@@ -10,11 +9,10 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.settings.calls.SettingsCallsViewModel
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
 import mega.privacy.android.domain.entity.CallsSoundNotifications
@@ -26,10 +24,9 @@ import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.SetCallsMeetingInvitationsUseCase
 import mega.privacy.android.domain.usecase.meeting.SetCallsMeetingRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.SetCallsSoundNotifications
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -56,18 +53,6 @@ class SettingsCallsViewModelTest {
 
     private val getFeatureFlagValue = mock<GetFeatureFlagValueUseCase>()
     private val sendStatisticsMeetings = mock<SendStatisticsMeetingsUseCase>()
-    private val scheduler = TestCoroutineScheduler()
-    private val standardDispatcher = StandardTestDispatcher(scheduler)
-
-    @Before
-    fun setUp() {
-        Dispatchers.setMain(standardDispatcher)
-    }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
 
     private suspend fun stubCommon() {
         reset(
@@ -243,4 +228,13 @@ class SettingsCallsViewModelTest {
             scheduler.advanceUntilIdle()
             verify(setCallsMeetingReminders).invoke(CallsMeetingReminders.Disabled)
         }
+
+    companion object {
+        private val scheduler = TestCoroutineScheduler()
+        private val standardDispatcher = StandardTestDispatcher(scheduler)
+
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(standardDispatcher)
+    }
 }

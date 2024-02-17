@@ -2,20 +2,18 @@ package test.mega.privacy.android.app.presentation.meeting.chat.view.bottombar
 
 import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.meeting.chat.view.bottombar.ChatBottomBarViewModel
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.chat.SetChatDraftMessageUseCase
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -26,7 +24,6 @@ import org.mockito.kotlin.verify
 internal class ChatBottomBarViewModelTest {
     private lateinit var underTest: ChatBottomBarViewModel
     private val setChatDraftMessageUseCase: SetChatDraftMessageUseCase = mock()
-    private val dispatcher = UnconfinedTestDispatcher()
     private val applicationScope: CoroutineScope = CoroutineScope(dispatcher)
     private val chatId = 123L
     private val savedStateHandle: SavedStateHandle = mock {
@@ -35,13 +32,7 @@ internal class ChatBottomBarViewModelTest {
 
     @BeforeAll
     fun setup() {
-        Dispatchers.setMain(dispatcher)
         initTestClass()
-    }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @BeforeEach
@@ -70,5 +61,13 @@ internal class ChatBottomBarViewModelTest {
             applicationScope,
             savedStateHandle,
         )
+    }
+
+    companion object {
+        private val dispatcher = UnconfinedTestDispatcher()
+
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(dispatcher)
     }
 }

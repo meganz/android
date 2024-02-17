@@ -2,17 +2,14 @@ package test.mega.privacy.android.app.presentation.contact.authenticitycredendia
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsViewModel
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetContactCredentials
@@ -21,17 +18,15 @@ import mega.privacy.android.domain.usecase.ResetCredentials
 import mega.privacy.android.domain.usecase.VerifyCredentials
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AuthenticityCredentialsViewModelTest {
 
@@ -55,21 +50,6 @@ class AuthenticityCredentialsViewModelTest {
         name = "Test Name",
         email = userEmail
     )
-    private val myCredentials = listOf(
-        "KDF8",
-        "ASDI",
-        "9S32",
-        "ASH1",
-        "ASD0",
-        "ASV1",
-        "L131",
-        "3AS3",
-        "AS31",
-        "ASDF",
-    )
-    private val myAccountCredentials = AccountCredentials.MyAccountCredentials(
-        credentials = myCredentials
-    )
     private val exception = MegaException(-5, null)
 
     private val getContactCredentials = mock<GetContactCredentials>()
@@ -79,16 +59,6 @@ class AuthenticityCredentialsViewModelTest {
     private val resetCredentials = mock<ResetCredentials>()
     private var connectivityFlow = MutableSharedFlow<Boolean>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
-
-    @BeforeAll
-    fun setUp() {
-        Dispatchers.setMain(StandardTestDispatcher())
-    }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
 
     @BeforeEach
     fun resetMocks() {
@@ -206,5 +176,11 @@ class AuthenticityCredentialsViewModelTest {
             underTest.errorShown()
             assertThat(awaitItem()).isNull()
         }
+    }
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
     }
 }

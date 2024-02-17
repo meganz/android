@@ -2,27 +2,23 @@ package test.mega.privacy.android.app.presentation.security.check
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.security.check.PasscodeCheckViewModel
 import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeLockStateUseCase
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import test.mega.privacy.android.app.extensions.asHotFlow
 import test.mega.privacy.android.app.extensions.withCoroutineExceptions
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class PasscodeCheckViewModelTest {
     private lateinit var underTest: PasscodeCheckViewModel
 
@@ -30,7 +26,6 @@ class PasscodeCheckViewModelTest {
 
     @BeforeEach
     internal fun setUp() {
-        Dispatchers.setMain(StandardTestDispatcher())
         initViewModel()
     }
 
@@ -38,11 +33,6 @@ class PasscodeCheckViewModelTest {
         underTest = PasscodeCheckViewModel(
             monitorPasscodeLockStateUseCase = monitorPasscodeLockStateUseCase,
         )
-    }
-
-    @AfterEach
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test
@@ -95,4 +85,10 @@ class PasscodeCheckViewModelTest {
                 }
             }
         }
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
+    }
 }

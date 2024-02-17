@@ -2,7 +2,6 @@ package test.mega.privacy.android.app.domain.usecase
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.DefaultGetBackupsChildrenNodes
@@ -24,7 +23,6 @@ import org.mockito.kotlin.whenever
 /**
  * Test class of [DefaultGetBackupsChildrenNodes]
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 class DefaultGetBackupsChildrenNodesTest {
 
     private lateinit var underTest: DefaultGetBackupsChildrenNodes

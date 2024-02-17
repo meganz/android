@@ -1,7 +1,6 @@
 package test.mega.privacy.android.app.domain.usecase.search
 
 import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.search.GetSearchLinkSharesNodesUseCase
 import mega.privacy.android.data.repository.MegaNodeRepository
@@ -12,7 +11,6 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class GetSearchLinkSharesNodesUseCaseTest {
     private lateinit var underTest: GetSearchLinkSharesNodesUseCase
     private val megaNodeRepository: MegaNodeRepository = mock()

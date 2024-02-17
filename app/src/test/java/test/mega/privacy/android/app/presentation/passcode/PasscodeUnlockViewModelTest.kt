@@ -2,30 +2,25 @@ package test.mega.privacy.android.app.presentation.passcode
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.passcode.PasscodeUnlockViewModel
 import mega.privacy.android.app.presentation.passcode.mapper.PasscodeTypeMapper
 import mega.privacy.android.app.presentation.passcode.model.PasscodeUIType
 import mega.privacy.android.app.presentation.passcode.model.PasscodeUnlockState
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.passcode.PasscodeType
 import mega.privacy.android.domain.entity.passcode.UnlockPasscodeRequest
 import mega.privacy.android.domain.exception.security.NoPasscodeTypeSetException
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeAttemptsUseCase
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeTypeUseCase
 import mega.privacy.android.domain.usecase.passcode.UnlockPasscodeUseCase
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -34,7 +29,7 @@ import org.mockito.kotlin.verify
 import test.mega.privacy.android.app.extensions.asHotFlow
 import test.mega.privacy.android.app.extensions.withCoroutineExceptions
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class PasscodeUnlockViewModelTest {
     private lateinit var underTest: PasscodeUnlockViewModel
@@ -42,11 +37,6 @@ internal class PasscodeUnlockViewModelTest {
     private val monitorPasscodeAttemptsUseCase = mock<MonitorPasscodeAttemptsUseCase>()
     private val monitorPasscodeTypeUseCase = mock<MonitorPasscodeTypeUseCase>()
     private val passcodeTypeMapper = mock<PasscodeTypeMapper>()
-
-    @BeforeAll
-    internal fun initialise() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
 
     @AfterEach
     internal fun cleanup() {
@@ -56,11 +46,6 @@ internal class PasscodeUnlockViewModelTest {
             monitorPasscodeTypeUseCase,
             passcodeTypeMapper,
         )
-    }
-
-    @AfterAll
-    internal fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test

@@ -9,7 +9,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.settingsFragments.download.DownloadSettingsFragment
@@ -30,7 +29,6 @@ import test.mega.privacy.android.app.di.TestDownloadSettingsUseCases.getStorageD
 import test.mega.privacy.android.app.launchFragmentInHiltContainer
 import test.mega.privacy.android.app.presentation.settings.onPreferences
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltAndroidTest
 @Config(sdk = [VERSION_CODES.Q])
 @RunWith(AndroidJUnit4::class)

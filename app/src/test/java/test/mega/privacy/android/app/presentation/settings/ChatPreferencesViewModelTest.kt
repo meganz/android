@@ -2,19 +2,17 @@ package test.mega.privacy.android.app.presentation.settings
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesViewModel
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
@@ -34,20 +32,13 @@ class ChatPreferencesViewModelTest {
             onBlocking { invoke() }.thenReturn(flowOf(Unit))
         }
 
-    @Before
+    @BeforeEach
     fun setUp() {
-        Dispatchers.setMain(StandardTestDispatcher())
         underTest = ChatPreferencesViewModel(
             monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase,
             monitorChatSignalPresenceUseCase = monitorChatSignalPresenceUseCase,
         )
     }
-
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
-
 
     @Test
     fun `test that when push notification settings is updated state is also updated`() =
@@ -98,4 +89,10 @@ class ChatPreferencesViewModelTest {
                 Truth.assertThat(updatedState.signalPresenceUpdate).isFalse()
             }
         }
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
+    }
 }

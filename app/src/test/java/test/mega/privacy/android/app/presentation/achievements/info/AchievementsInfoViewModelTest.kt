@@ -3,14 +3,10 @@ package test.mega.privacy.android.app.presentation.achievements.info
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.achievements.info.AchievementsInfoViewModel
 import mega.privacy.android.app.presentation.achievements.info.achievementTypeIdArg
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.mapper.NumberOfDaysMapper
 import mega.privacy.android.domain.entity.achievement.Achievement
@@ -18,11 +14,10 @@ import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.AwardedAchievement
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverviewUseCase
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -31,7 +26,7 @@ import java.util.Calendar
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AchievementsInfoViewModelTest {
     private lateinit var underTest: AchievementsInfoViewModel
@@ -39,16 +34,6 @@ class AchievementsInfoViewModelTest {
     private val deviceGateway = mock<DeviceGateway>()
     private val getAccountAchievementsOverviewUseCase =
         mock<GetAccountAchievementsOverviewUseCase>()
-
-    @BeforeAll
-    fun initialise() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
 
     @BeforeEach
     fun setup() {

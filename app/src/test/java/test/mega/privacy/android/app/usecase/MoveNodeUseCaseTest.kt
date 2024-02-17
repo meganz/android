@@ -3,12 +3,9 @@ package test.mega.privacy.android.app.usecase
 import com.google.common.truth.Truth
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
@@ -52,7 +49,6 @@ class MoveNodeUseCaseTest {
 
     @BeforeAll
     fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
     }
 
@@ -76,7 +72,6 @@ class MoveNodeUseCaseTest {
 
     @AfterAll
     fun tearDown() {
-        Dispatchers.resetMain()
         RxAndroidPlugins.reset()
     }
 

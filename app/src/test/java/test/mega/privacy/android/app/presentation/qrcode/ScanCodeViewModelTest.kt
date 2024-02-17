@@ -1,31 +1,29 @@
 package test.mega.privacy.android.app.presentation.qrcode
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeViewModel
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
 import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
 import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLinkUseCase
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TestRule
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.InstantExecutorExtension
 import java.io.File
 
+@ExtendWith(value = [CoroutineMainDispatcherExtension::class, InstantExecutorExtension::class])
 @ExperimentalCoroutinesApi
 class ScanCodeViewModelTest {
 
@@ -33,12 +31,8 @@ class ScanCodeViewModelTest {
     private val queryScannedContactLinkUseCase = mock<QueryScannedContactLinkUseCase>()
     private val inviteContactUseCase = mock<InviteContactUseCase>()
 
-    @get:Rule
-    var rule: TestRule = InstantTaskExecutorRule()
-
-    @Before
+    @BeforeEach
     fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
         initViewModel()
     }
 
@@ -259,7 +253,9 @@ class ScanCodeViewModelTest {
     @Test
     fun `test that on sending invite and on result Sent show invite result dialog values are updated`() =
         runTest {
-            whenever(inviteContactUseCase(any(), any(), anyOrNull())).thenReturn(InviteContactRequest.Sent)
+            whenever(inviteContactUseCase(any(), any(), anyOrNull())).thenReturn(
+                InviteContactRequest.Sent
+            )
             underTest.state.test {
                 awaitItem()
                 underTest.sendInvite()
