@@ -1534,4 +1534,10 @@ internal class MegaApiFacade @Inject constructor(
         pwd: String,
         listener: MegaRequestListenerInterface,
     ) = megaApi.confirmCancelAccount(link, pwd, listener)
+
+    override fun confirmChangeEmail(
+        link: String,
+        pwd: String,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.confirmChangeEmail(link, pwd, listener)
 }

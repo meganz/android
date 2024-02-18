@@ -45,7 +45,6 @@ import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM_
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ITUNES
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.myAccount.usecase.CancelSubscriptionsUseCase
-import mega.privacy.android.app.myAccount.usecase.ConfirmChangeEmailUseCase
 import mega.privacy.android.app.myAccount.usecase.GetUserDataUseCase
 import mega.privacy.android.app.myAccount.usecase.QueryRecoveryLinkUseCase
 import mega.privacy.android.app.presentation.login.LoginActivity
@@ -78,6 +77,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.exception.account.ConfirmCancelAccountException
+import mega.privacy.android.domain.exception.account.ConfirmChangeEmailException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
@@ -92,6 +92,7 @@ import mega.privacy.android.domain.usecase.account.BroadcastRefreshSessionUseCas
 import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.CheckVersionsUseCase
 import mega.privacy.android.domain.usecase.account.ConfirmCancelAccountUseCase
+import mega.privacy.android.domain.usecase.account.ConfirmChangeEmailUseCase
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.account.KillOtherSessionsUseCase
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
@@ -1063,7 +1064,7 @@ class MyAccountViewModel @Inject constructor(
                     Timber.e("An issue occurred when cancelling the Account:\n${exception}")
                     _state.update {
                         it.copy(
-                            cancelAccountErrorMessage = if (exception is ConfirmCancelAccountException.IncorrectPassword) {
+                            errorMessageRes = if (exception is ConfirmCancelAccountException.IncorrectPassword) {
                                 R.string.old_password_provided_incorrect
                             } else {
                                 R.string.general_text_error
@@ -1076,10 +1077,17 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Resets the value of [MyAccountUiState.cancelAccountErrorMessage] back to null
+     * Resets the value of [MyAccountUiState.errorMessage]
      */
-    fun resetCancelAccountErrorMessage() {
-        _state.update { it.copy(cancelAccountErrorMessage = null) }
+    fun resetErrorMessage() {
+        _state.update { it.copy(errorMessage = "") }
+    }
+
+    /**
+     * Resets the value of [MyAccountUiState.errorMessageRes]
+     */
+    fun resetErrorMessageRes() {
+        _state.update { it.copy(errorMessageRes = null) }
     }
 
     /**
@@ -1101,32 +1109,42 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Finish confirm change email
+     * Finishes the process of changing the User's Email Address
      *
-     * @param password
-     * @param actionSuccess
-     * @param actionError
-     * @receiver
-     * @receiver
+     * @param accountPassword The password of the Account whose email to be changed
      */
-    fun finishConfirmChangeEmail(
-        password: String,
-        actionSuccess: (String) -> Unit,
-        actionError: (String) -> Unit,
-    ) {
-        confirmationLink?.let { link ->
-            confirmChangeEmailUseCase.confirm(link, password)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy { result ->
-                    if (Patterns.EMAIL_ADDRESS.matcher(result).find()) {
-                        Timber.d("EMAIL_CHANGED")
-                        actionSuccess.invoke(result)
+    fun finishChangeEmailConfirmation(accountPassword: String) {
+        viewModelScope.launch {
+            confirmationLink?.let { link ->
+                runCatching {
+                    confirmChangeEmailUseCase(
+                        changeEmailLink = link,
+                        accountPassword = accountPassword,
+                    )
+                }.onSuccess { newEmail ->
+                    if (Patterns.EMAIL_ADDRESS.matcher(newEmail).find()) {
+                        Timber.d("Successfully changed the email address associated to the Account")
+                        snackBarHandler.postSnackbarMessage(
+                            resId = R.string.email_changed, newEmail,
+                            snackbarDuration = MegaSnackbarDuration.Long,
+                        )
                     } else {
-                        actionError.invoke(result)
+                        Timber.e("The new email address does not match the email address pattern")
+                        _state.update { it.copy(errorMessage = newEmail) }
+                    }
+                }.onFailure { exception ->
+                    Timber.e("An issue occurred when changing the email address:\n${exception}")
+                    _state.update {
+                        it.copy(
+                            errorMessageRes = when (exception) {
+                                is ConfirmChangeEmailException.EmailAlreadyInUse -> R.string.mail_already_used
+                                is ConfirmChangeEmailException.IncorrectPassword -> R.string.old_password_provided_incorrect
+                                else -> R.string.general_text_error
+                            }
+                        )
                     }
                 }
-                .addTo(composite)
+            }
         }
     }
 

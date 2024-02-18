@@ -57,6 +57,7 @@ import mega.privacy.android.domain.exception.ChangeEmailException
 import mega.privacy.android.domain.exception.ChatNotInitializedException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.account.ConfirmCancelAccountException
+import mega.privacy.android.domain.exception.account.ConfirmChangeEmailException
 import mega.privacy.android.domain.repository.AccountRepository
 import nz.mega.sdk.MegaAchievementsDetails
 import nz.mega.sdk.MegaApiJava
@@ -1435,6 +1436,117 @@ class DefaultAccountRepositoryTest {
                 underTest.confirmCancelAccount(
                     cancellationLink = "cancellation/link",
                     accountPassword = "accountPassword"
+                )
+            }
+        }
+
+    @Test
+    fun `test that confirm change email returns the new email address when the sdk is successful`() =
+        runTest {
+            val expectedEmail = "newemail@gmail.com"
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+            val megaRequest = mock<MegaRequest> {
+                on { email }.thenReturn(expectedEmail)
+            }
+            whenever(
+                megaApiGateway.confirmChangeEmail(
+                    link = any(),
+                    pwd = any(),
+                    listener = any(),
+                )
+            ).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = megaRequest,
+                    error = megaError,
+                )
+            }
+            val actualEmail = underTest.confirmChangeEmail(
+                changeEmailLink = "change/email/link",
+                accountPassword = "accountPassword",
+            )
+            assertThat(actualEmail).isEqualTo(expectedEmail)
+        }
+
+    @Test
+    fun `test that confirm change email throws an email already in use mega exception when the sdk finds the email already in use`() =
+        runTest {
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_EEXIST)
+            }
+            whenever(
+                megaApiGateway.confirmChangeEmail(
+                    link = any(),
+                    pwd = any(),
+                    listener = any(),
+                )
+            ).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = mock(),
+                    error = megaError,
+                )
+            }
+            assertThrows<ConfirmChangeEmailException.EmailAlreadyInUse> {
+                underTest.confirmChangeEmail(
+                    changeEmailLink = "change/email/link",
+                    accountPassword = "accountPassword",
+                )
+            }
+        }
+
+    @Test
+    fun `test that confirm change email throws an incorrect password mega exception when the sdk finds the password incorrect`() =
+        runTest {
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_ENOENT)
+            }
+            whenever(
+                megaApiGateway.confirmChangeEmail(
+                    link = any(),
+                    pwd = any(),
+                    listener = any(),
+                )
+            ).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = mock(),
+                    error = megaError,
+                )
+            }
+            assertThrows<ConfirmChangeEmailException.IncorrectPassword> {
+                underTest.confirmChangeEmail(
+                    changeEmailLink = "change/email/link",
+                    accountPassword = "accountPassword",
+                )
+            }
+        }
+
+    @Test
+    fun `test that confirm change email throws an unknown mega exception when the sdk returns a different error`() =
+        runTest {
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_EEXPIRED)
+            }
+            whenever(
+                megaApiGateway.confirmChangeEmail(
+                    link = any(),
+                    pwd = any(),
+                    listener = any(),
+                )
+            ).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = mock(),
+                    error = megaError,
+                )
+            }
+            assertThrows<ConfirmChangeEmailException.Unknown> {
+                underTest.confirmChangeEmail(
+                    changeEmailLink = "change/email/link",
+                    accountPassword = "accountPassword",
                 )
             }
         }
