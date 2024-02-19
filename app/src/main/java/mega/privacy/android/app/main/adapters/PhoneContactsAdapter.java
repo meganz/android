@@ -15,7 +15,6 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
@@ -50,74 +49,11 @@ public class PhoneContactsAdapter extends RecyclerView.Adapter<PhoneContactsAdap
         return phoneContacts.get(position).getName().substring(0, 1).toUpperCase();
     }
 
-    private class ContactPicture extends AsyncTask<Void, Void, Long> {
-
-        Context context;
-        ViewHolderPhoneContacts holder;
-        PhoneContactsAdapter adapter;
-        Bitmap photo = null;
-
-
-        public ContactPicture(Context context, ViewHolderPhoneContacts holder, PhoneContactsAdapter adapter) {
-            this.context = context;
-            this.holder = holder;
-            this.adapter = adapter;
-        }
-
-        @Override
-        protected Long doInBackground(Void... args) {
-            Timber.d("doInBackGround");
-
-            try {
-                InputStream inputStream = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(),
-                        ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, new Long(holder.contactId)));
-
-                if (inputStream != null) {
-                    photo = BitmapFactory.decodeStream(inputStream);
-                }
-
-                assert inputStream != null;
-                inputStream.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return new Long(holder.contactId);
-        }
-
-
-        @Override
-        protected void onPostExecute(Long id) {
-            if (photo != null) {
-                if (holder.contactId == id) {
-                    holder.imageView.setImageBitmap(photo);
-                    adapter.notifyDataSetChanged();
-                }
-            }
-        }
-    }
-
-    // Listener for item check
-    public interface OnItemCheckClickListener {
-        public void onItemCheckClick(int position);
-    }
-
     private Context mContext;
     MegaApiAndroid megaApi;
     OnItemClickListener mItemClickListener;
     private List<PhoneContactInfo> phoneContacts;
     SparseBooleanArray selectedContacts;
-
-    private OnItemCheckClickListener checkClickListener;
-
-    public PhoneContactsAdapter(Context context, ArrayList<PhoneContactInfo> phoneContacts, SparseBooleanArray selectedContacts) {
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
-        }
-        setContext(context);
-        this.phoneContacts = phoneContacts;
-        this.selectedContacts = selectedContacts;
-    }
 
     public PhoneContactsAdapter(Context context, ArrayList<PhoneContactInfo> phoneContacts) {
         if (megaApi == null) {
@@ -130,10 +66,6 @@ public class PhoneContactsAdapter extends RecyclerView.Adapter<PhoneContactsAdap
 
     public void setContext(Context context) {
         mContext = context;
-    }
-
-    public void setOnItemCheckClickListener(OnItemCheckClickListener listener) {
-        this.checkClickListener = listener;
     }
 
     // Set new contacts
@@ -177,7 +109,6 @@ public class PhoneContactsAdapter extends RecyclerView.Adapter<PhoneContactsAdap
         long contactId;
         String contactName;
         String contactMail;
-        String phoneNumber;
         int currentPosition;
 
         public ViewHolderPhoneContacts(View itemView) {
@@ -195,7 +126,7 @@ public class PhoneContactsAdapter extends RecyclerView.Adapter<PhoneContactsAdap
     }
 
     public interface OnItemClickListener {
-        public void onItemClick(View view, int position);
+        void onItemClick(View view, int position);
     }
 
     public void SetOnItemClickListener(final OnItemClickListener mItemClickListener) {
@@ -227,9 +158,6 @@ public class PhoneContactsAdapter extends RecyclerView.Adapter<PhoneContactsAdap
 
     @Override
     public void onBindViewHolder(ViewHolderPhoneContacts holder, int position) {
-
-        boolean isCheckable = false;
-        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         PhoneContactInfo contact = getItem(position);
 
