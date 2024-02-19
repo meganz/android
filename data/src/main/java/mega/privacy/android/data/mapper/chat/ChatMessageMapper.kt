@@ -21,7 +21,7 @@ internal class ChatMessageMapper @Inject constructor(
 
     suspend operator fun invoke(msg: MegaChatMessage) = ChatMessage(
         status = msg.status.toChatMessageStatus(),
-        msgId = msg.msgId,
+        messageId = msg.msgId,
         tempId = msg.tempId,
         msgIndex = msg.msgIndex,
         userHandle = msg.userHandle,

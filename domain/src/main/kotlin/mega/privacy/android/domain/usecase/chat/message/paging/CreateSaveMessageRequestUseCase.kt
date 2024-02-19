@@ -46,7 +46,7 @@ class CreateSaveMessageRequestUseCase @Inject constructor(
                     previous
                 )
                 val reactions = if (chatMessage.hasConfirmedReactions) {
-                    getReactionsUseCase(chatId, chatMessage.msgId, currentUserHandle)
+                    getReactionsUseCase(chatId, chatMessage.messageId, currentUserHandle)
                 } else {
                     emptyList()
                 }

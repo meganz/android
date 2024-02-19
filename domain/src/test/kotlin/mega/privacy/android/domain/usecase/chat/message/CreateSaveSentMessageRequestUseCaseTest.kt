@@ -23,7 +23,7 @@ class CreateSaveSentMessageRequestUseCaseTest {
         val msgId = tempId + 1
         val chatMessage = createChatMessage(msgId, tempId)
         val actual = underTest(chatMessage, chatId)
-        assertThat(actual.message.msgId).isEqualTo(tempId)
+        assertThat(actual.message.messageId).isEqualTo(tempId)
     }
 
     @Test
@@ -37,7 +37,7 @@ class CreateSaveSentMessageRequestUseCaseTest {
         msgId: Long,
         tempId: Long,
     ) = ChatMessage(
-        msgId = msgId,
+        messageId = msgId,
         tempId = tempId,
         status = ChatMessageStatus.DELIVERED,
         msgIndex = 1,

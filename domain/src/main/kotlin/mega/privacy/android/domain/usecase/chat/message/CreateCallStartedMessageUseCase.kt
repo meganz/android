@@ -10,7 +10,7 @@ internal class CreateCallStartedMessageUseCase @Inject constructor() : CreateTyp
         with(request) {
             CallStartedMessage(
                 chatId = chatId,
-                msgId = msgId,
+                msgId = messageId,
                 time = timestamp,
                 isMine = isMine,
                 userHandle = userHandle,

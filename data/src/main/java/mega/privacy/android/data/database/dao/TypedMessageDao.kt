@@ -39,7 +39,7 @@ interface TypedMessageDao {
      *
      * @param tempIds
      */
-    @Query("DELETE FROM typed_messages WHERE tempId IN (:tempIds) AND msgId = tempId")
+    @Query("DELETE FROM typed_messages WHERE tempId IN (:tempIds) AND messageId = tempId")
     suspend fun deleteStaleMessagesByTempIds(tempIds: List<Long>)
 
     /**
@@ -55,7 +55,7 @@ interface TypedMessageDao {
      *
      * @param chatId
      */
-    @Query("SELECT msgId FROM typed_messages WHERE chatId = :chatId")
+    @Query("SELECT messageId FROM typed_messages WHERE chatId = :chatId")
     suspend fun getMsgIdsByChatId(chatId: Long): List<Long>
 
     /**
@@ -77,6 +77,6 @@ interface TypedMessageDao {
      * @param chatId
      * @return
      */
-    @Query("SELECT msgId FROM typed_messages WHERE chatId = :chatId AND type = :type ORDER BY timestamp DESC")
+    @Query("SELECT messageId FROM typed_messages WHERE chatId = :chatId AND type = :type ORDER BY timestamp DESC")
     suspend fun getMessageIdsByType(chatId: Long, type: ChatMessageType): List<Long>
 }

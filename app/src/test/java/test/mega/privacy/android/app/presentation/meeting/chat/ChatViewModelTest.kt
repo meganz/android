@@ -2433,7 +2433,7 @@ internal class ChatViewModelTest {
             )
         val message = mock<ChatMessage> {
             on { content } doReturn "editing message"
-            on { msgId } doReturn 1234L
+            on { messageId } doReturn 1234L
             on { isEditable } doReturn true
         }
         whenever(getChatMessageUseCase(chatId, 1234L)).thenReturn(message)

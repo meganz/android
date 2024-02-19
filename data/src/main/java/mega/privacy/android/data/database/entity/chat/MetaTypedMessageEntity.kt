@@ -15,25 +15,25 @@ import androidx.room.Relation
 data class MetaTypedMessageEntity(
     @Embedded val typedMessageEntity: TypedMessageEntity,
     @Relation(
-        parentColumn = "msgId",
+        parentColumn = "messageId",
         entityColumn = "messageId",
         entity = ChatNodeEntity::class
     )
     val nodeList: List<ChatNodeEntity>,
     @Relation(
-        parentColumn = "msgId",
+        parentColumn = "messageId",
         entityColumn = "messageId",
         entity = RichPreviewEntity::class
     )
     val richPreviewEntity: RichPreviewEntity?,
     @Relation(
-        parentColumn = "msgId",
+        parentColumn = "messageId",
         entityColumn = "messageId",
         entity = ChatGeolocationEntity::class
     )
     val geolocationEntity: ChatGeolocationEntity?,
     @Relation(
-        parentColumn = "msgId",
+        parentColumn = "messageId",
         entityColumn = "messageId",
         entity = GiphyEntity::class
     )

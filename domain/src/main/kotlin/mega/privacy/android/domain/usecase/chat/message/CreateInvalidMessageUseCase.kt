@@ -46,7 +46,7 @@ class CreateInvalidMessageUseCase @Inject constructor() : CreateTypedMessageUseC
 
             constructor(
                 chatId,
-                msgId,
+                messageId,
                 timestamp,
                 isMine,
                 userHandle,

@@ -40,7 +40,7 @@ class AttachVoiceClipMessageUseCaseTest {
         on { id }.thenReturn(NodeId(nodeHandle))
     }
     private val message = mock<ChatMessage> {
-        on { this.msgId } doReturn msgId
+        on { this.messageId } doReturn msgId
     }
 
     @BeforeEach

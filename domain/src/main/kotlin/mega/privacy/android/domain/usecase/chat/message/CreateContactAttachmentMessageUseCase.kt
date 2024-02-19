@@ -10,7 +10,7 @@ internal class CreateContactAttachmentMessageUseCase @Inject constructor() :
     override fun invoke(request: CreateTypedMessageInfo) = with(request) {
         ContactAttachmentMessage(
             chatId = chatId,
-            msgId = msgId,
+            msgId = messageId,
             time = timestamp,
             isMine = isMine,
             userHandle = userHandle,

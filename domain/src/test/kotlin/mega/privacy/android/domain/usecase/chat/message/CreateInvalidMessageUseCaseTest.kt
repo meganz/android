@@ -23,7 +23,7 @@ class CreateInvalidMessageUseCaseTest {
     @Test
     fun `test that invalid type returns unrecognisable message`() {
         val message = mock<ChatMessage> {
-            on { msgId }.thenReturn(123L)
+            on { messageId }.thenReturn(123L)
             on { timestamp }.thenReturn(123L)
             on { userHandle }.thenReturn(123L)
             on { type }.thenReturn(ChatMessageType.INVALID)
@@ -45,7 +45,7 @@ class CreateInvalidMessageUseCaseTest {
     @Test
     fun `test that invalid format code returns invalid format message`() {
         val message = mock<ChatMessage> {
-            on { msgId }.thenReturn(123L)
+            on { messageId }.thenReturn(123L)
             on { timestamp }.thenReturn(123L)
             on { userHandle }.thenReturn(123L)
             on { type }.thenReturn(ChatMessageType.NORMAL)
@@ -68,7 +68,7 @@ class CreateInvalidMessageUseCaseTest {
     @Test
     fun `test that invalid signature code returns invalid signature message`() {
         val message = mock<ChatMessage> {
-            on { msgId }.thenReturn(123L)
+            on { messageId }.thenReturn(123L)
             on { timestamp }.thenReturn(123L)
             on { userHandle }.thenReturn(123L)
             on { type }.thenReturn(ChatMessageType.NORMAL)
@@ -91,7 +91,7 @@ class CreateInvalidMessageUseCaseTest {
     @Test
     fun `test that unrecognisable message is returned as default`() {
         val message = mock<ChatMessage> {
-            on { msgId }.thenReturn(123L)
+            on { messageId }.thenReturn(123L)
             on { timestamp }.thenReturn(123L)
             on { userHandle }.thenReturn(123L)
             on { type }.thenReturn(ChatMessageType.NORMAL)

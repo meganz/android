@@ -45,7 +45,7 @@ internal object ChatMessageNotification {
     ) = with(chatMessageNotificationData) {
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val notificationId = MegaApiJava.userHandleToBase64(msg.msgId).hashCode()
+        val notificationId = MegaApiJava.userHandleToBase64(msg.messageId).hashCode()
 
         if (msg.isDeleted || msg.status == ChatMessageStatus.SEEN) {
             notificationManager.cancel(notificationId)
@@ -60,7 +60,7 @@ internal object ChatMessageNotification {
 
         val pendingIntent = PendingIntent.getActivity(
             context,
-            msg.msgId.toInt(),
+            msg.messageId.toInt(),
             intent,
             PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
         )

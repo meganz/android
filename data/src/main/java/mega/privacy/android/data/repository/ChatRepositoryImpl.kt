@@ -1251,7 +1251,7 @@ internal class ChatRepositoryImpl @Inject constructor(
                 richPreviews = messages.mapNotNull { request ->
                     request.chatRichPreviewInfo?.let {
                         richPreviewEntityMapper(
-                            messageId = request.msgId,
+                            messageId = request.messageId,
                             info = it,
                         )
                     }
@@ -1259,7 +1259,7 @@ internal class ChatRepositoryImpl @Inject constructor(
                 giphys = messages.mapNotNull { request ->
                     request.chatGifInfo?.let {
                         giphyEntityMapper(
-                            messageId = request.msgId,
+                            messageId = request.messageId,
                             info = it,
                         )
                     }
@@ -1267,14 +1267,14 @@ internal class ChatRepositoryImpl @Inject constructor(
                 geolocations = messages.mapNotNull { request ->
                     request.chatGeolocationInfo?.let {
                         chatGeolocationEntityMapper(
-                            messageId = request.msgId,
+                            messageId = request.messageId,
                             info = it,
                         )
                     }
                 },
                 chatNodes = messages.map { request ->
                     chatNodeEntityListMapper(
-                        messageId = request.msgId,
+                        messageId = request.messageId,
                         nodes = request.nodeList,
                     )
                 }.flatten(),

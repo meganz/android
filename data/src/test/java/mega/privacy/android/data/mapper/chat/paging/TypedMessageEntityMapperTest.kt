@@ -58,7 +58,7 @@ class TypedMessageEntityMapperTest {
 
         val chatMessage = mock<ChatMessage> {
             on { status } doReturn expectedStatus
-            on { msgId } doReturn expectedMsgId
+            on { messageId } doReturn expectedMsgId
             on { tempId } doReturn expectedTempId
             on { msgIndex } doReturn expectedMsgIndex
             on { userHandle } doReturn expectedUserHandle
@@ -106,7 +106,7 @@ class TypedMessageEntityMapperTest {
 
         assertThat(actual.chatId).isEqualTo(expectedChatId)
         assertThat(actual.status).isEqualTo(expectedStatus)
-        assertThat(actual.msgId).isEqualTo(expectedMsgId)
+        assertThat(actual.messageId).isEqualTo(expectedMsgId)
         assertThat(actual.tempId).isEqualTo(expectedTempId)
         assertThat(actual.msgIndex).isEqualTo(expectedMsgIndex)
         assertThat(actual.userHandle).isEqualTo(expectedUserHandle)

@@ -10,7 +10,7 @@ internal class CreateChatLinkRemovedMessageUseCase @Inject constructor() :
     override fun invoke(request: CreateTypedMessageInfo) = with(request) {
         ChatLinkRemovedMessage(
             chatId = chatId,
-            msgId = msgId,
+            msgId = messageId,
             time = timestamp,
             isMine = isMine,
             userHandle = userHandle,

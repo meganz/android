@@ -264,7 +264,7 @@ class ChatViewModel @Inject constructor(
                         _state.update { state ->
                             state.copy(
                                 sendingText = preference.draftMessage,
-                                editingMessageId = chatMessage.msgId,
+                                editingMessageId = chatMessage.messageId,
                                 editingMessageContent = chatMessage.content
                             )
                         }

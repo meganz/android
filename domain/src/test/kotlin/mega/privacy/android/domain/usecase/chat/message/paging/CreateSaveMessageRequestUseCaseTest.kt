@@ -224,7 +224,7 @@ class CreateSaveMessageRequestUseCaseTest {
         val reaction1 = mock<Reaction>()
         val reaction2 = mock<Reaction>()
         val reactions = listOf(reaction1, reaction2)
-        whenever(getReactionsUseCase(chatId, message.msgId, myHandle)).thenReturn(reactions)
+        whenever(getReactionsUseCase(chatId, message.messageId, myHandle)).thenReturn(reactions)
 
         val actual = underTest(
             chatId = chatId,

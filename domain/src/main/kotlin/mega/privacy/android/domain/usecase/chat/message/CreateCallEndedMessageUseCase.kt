@@ -10,7 +10,7 @@ internal class CreateCallEndedMessageUseCase @Inject constructor() : CreateTyped
         with(request) {
             CallEndedMessage(
                 chatId = chatId,
-                msgId = msgId,
+                msgId = messageId,
                 time = timestamp,
                 isMine = isMine,
                 userHandle = userHandle,

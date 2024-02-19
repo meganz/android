@@ -18,7 +18,7 @@ class CreateSaveSentMessageRequestUseCase @Inject constructor() {
         chatMessage: ChatMessage,
         chatId: Long,
     ) = CreateTypedMessageRequest(
-        chatMessage = chatMessage.copy(msgId = chatMessage.tempId),
+        chatMessage = chatMessage.copy(messageId = chatMessage.tempId),
         chatId = chatId,
         isMine = true,
         shouldShowAvatar = false,

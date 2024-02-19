@@ -11,7 +11,7 @@ internal class CreateChatLinkCreatedMessageUseCase @Inject constructor() :
         with(request) {
             ChatLinkCreatedMessage(
                 chatId = chatId,
-                msgId = msgId,
+                msgId = messageId,
                 time = timestamp,
                 isMine = isMine,
                 userHandle = userHandle,

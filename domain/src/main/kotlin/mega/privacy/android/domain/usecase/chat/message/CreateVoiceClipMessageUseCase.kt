@@ -15,7 +15,7 @@ internal class CreateVoiceClipMessageUseCase @Inject constructor() : CreateTyped
         val fileNode = nodeList.firstOrNull() as? FileNode
         return VoiceClipMessage(
             chatId = chatId,
-            msgId = msgId,
+            msgId = messageId,
             time = timestamp,
             isMine = isMine,
             userHandle = userHandle,

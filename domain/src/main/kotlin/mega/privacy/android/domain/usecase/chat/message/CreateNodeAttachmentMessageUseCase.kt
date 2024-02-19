@@ -16,7 +16,7 @@ internal class CreateNodeAttachmentMessageUseCase @Inject constructor(
 
         NodeAttachmentMessage(
             chatId = chatId,
-            msgId = msgId,
+            msgId = messageId,
             time = timestamp,
             isMine = isMine,
             userHandle = userHandle,

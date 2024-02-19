@@ -63,7 +63,7 @@ class CreateNodeAttachmentMessageUseCaseTest {
         val expected = with(request) {
             NodeAttachmentMessage(
                 chatId = 123L,
-                msgId = msgId,
+                msgId = messageId,
                 time = timestamp,
                 isMine = isMine,
                 userHandle = userHandle,

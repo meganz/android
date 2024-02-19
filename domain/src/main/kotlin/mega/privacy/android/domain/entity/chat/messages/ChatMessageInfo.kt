@@ -10,7 +10,7 @@ import kotlin.time.Duration
 
 /**
  * @property status
- * @property msgId
+ * @property messageId
  * @property tempId
  * @property msgIndex
  * @property userHandle
@@ -39,7 +39,7 @@ import kotlin.time.Duration
  **/
 interface ChatMessageInfo {
     val status: ChatMessageStatus
-    val msgId: Long
+    val messageId: Long
     val tempId: Long
     val msgIndex: Int
     val userHandle: Long

@@ -20,7 +20,7 @@ import kotlin.time.Duration
  *
  * @property chatId Chat ID.
  * @property status Status of the message.
- * @property msgId Message ID. It comes from SDK
+ * @property messageId Message ID. It comes from SDK
  * @property tempId Temporary ID.
  * @property msgIndex Message index.
  * @property userHandle User handle.
@@ -55,7 +55,7 @@ import kotlin.time.Duration
 @Entity(tableName = "typed_messages")
 @TypeConverters(TypedMessageEntityConverters::class)
 data class TypedMessageEntity(
-    @PrimaryKey override val msgId: Long,
+    @PrimaryKey override val messageId: Long,
     val chatId: Long,
     override val status: ChatMessageStatus,
     override val tempId: Long,

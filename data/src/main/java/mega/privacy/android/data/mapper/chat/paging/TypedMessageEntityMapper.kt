@@ -19,7 +19,7 @@ class TypedMessageEntityMapper @Inject constructor() {
             TypedMessageEntity(
                 chatId = chatId,
                 status = status,
-                msgId = msgId,
+                messageId = messageId,
                 tempId = tempId,
                 msgIndex = msgIndex,
                 userHandle = userHandle,

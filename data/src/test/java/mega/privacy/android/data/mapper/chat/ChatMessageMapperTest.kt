@@ -104,7 +104,7 @@ class ChatMessageMapperTest {
         }
         val chatMessage = ChatMessage(
             status = ChatMessageStatus.DELIVERED,
-            msgId = megaChatMessage.msgId,
+            messageId = megaChatMessage.msgId,
             tempId = megaChatMessage.tempId,
             msgIndex = megaChatMessage.msgIndex,
             userHandle = megaChatMessage.userHandle,

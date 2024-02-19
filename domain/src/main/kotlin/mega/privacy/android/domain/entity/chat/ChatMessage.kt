@@ -9,7 +9,7 @@ import kotlin.time.Duration
  * Data class as entity for chat messages.
  *
  * @property status [ChatMessageStatus]
- * @property msgId Identifier of the message
+ * @property messageId Identifier of the message
  * @property tempId Temporal identifier of the message
  *                  This has different usages depending on the status of the message:
  *                   - ChatMessageStatus.SENDING: valid until it's confirmed by the server.
@@ -70,7 +70,7 @@ import kotlin.time.Duration
  */
 data class ChatMessage(
     override val status: ChatMessageStatus,
-    override val msgId: Long,
+    override val messageId: Long,
     override val tempId: Long,
     override val msgIndex: Int,
     override val userHandle: Long,
