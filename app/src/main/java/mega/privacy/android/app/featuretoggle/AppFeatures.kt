@@ -14,6 +14,17 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
  */
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
+
+    /**
+     * Enables the Settings Camera Uploads page in Jetpack Compose
+     */
+    SettingsCameraUploadsCompose(
+        "Enables the Settings Camera Uploads in Jetpack Compose. This requires an app " +
+                "restart for the changes to take effect.",
+        false,
+    ),
+
+
     /**
      * Enables new outgoing shares compose page
      */
@@ -21,6 +32,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
         "Enable new Outgoing Shares Compose page (requires app restart)",
         false
     ),
+
 
     /**
      * Enables new links compose page
@@ -253,6 +265,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =
-            values().firstOrNull { it == feature }?.defaultValue
+            entries.firstOrNull { it == feature }?.defaultValue
     }
 }
