@@ -219,6 +219,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                     fadeIn(animationSpecs),
                             exit = scaleOut(animationSpecs, targetScale = animationScale) +
                                     fadeOut(animationSpecs),
+                            modifier = Modifier.navigationBarsPadding(),
                         ) {
                             TransfersWidgetView(
                                 transfersData = transferState.transfersInfo,
