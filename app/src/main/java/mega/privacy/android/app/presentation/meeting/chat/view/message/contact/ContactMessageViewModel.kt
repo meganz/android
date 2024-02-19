@@ -42,9 +42,9 @@ class ContactMessageViewModel @Inject constructor(
     }
 
     /**
-     * Check contact
+     * Check user
      */
-    fun checkContact(
+    fun checkUser(
         userHandle: Long,
         email: String,
         onContactClicked: (String) -> Unit,

@@ -10,14 +10,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import mega.privacy.android.app.presentation.meeting.chat.view.message.contact.ContactMessageViewModel
+import mega.privacy.android.app.presentation.meeting.chat.view.message.contact.onUserClick
 import mega.privacy.android.core.ui.controls.chat.messages.ChatBubble
 import mega.privacy.android.core.ui.controls.dividers.DividerSpacing
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
@@ -36,7 +40,11 @@ fun ChatLinksMessageView(
     onLongClick: (TypedMessage) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ChatLinksMessageViewModel = hiltViewModel(),
+    contactViewModel: ContactMessageViewModel = hiltViewModel(),
 ) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackBarHostState.current
     var contentLinks by remember {
         mutableStateOf(listOf<LinkContent>())
     }
@@ -44,7 +52,18 @@ fun ChatLinksMessageView(
         message.links.forEach {
             when (it.type) {
                 RegexPatternType.CONTACT_LINK -> {
-                    val linkContent = viewModel.loadContactInfo(it.link)
+                    val linkContent = viewModel.loadContactInfo(it.link) { handle, email, name ->
+                        onUserClick(
+                            handle,
+                            email.orEmpty(),
+                            name.orEmpty(),
+                            context,
+                            coroutineScope,
+                            snackbarHostState,
+                            contactViewModel::checkUser,
+                            contactViewModel::inviteUser,
+                        )
+                    }
                     if (linkContent != null) {
                         contentLinks = contentLinks + linkContent
                     }
@@ -71,7 +90,6 @@ fun ChatLinksMessageView(
             }
         }
     }
-    val context = LocalContext.current
     ChatBubble(
         isMe = message.isMine,
         modifier = modifier

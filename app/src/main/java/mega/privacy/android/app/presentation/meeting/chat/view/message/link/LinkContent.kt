@@ -42,8 +42,13 @@ sealed interface LinkContent {
  * Contact link content
  *
  * @property content Contact link content
+ * @property onClick On click
  */
-data class ContactLinkContent(val content: ContactLink, override val link: String) : LinkContent {
+data class ContactLinkContent(
+    val content: ContactLink,
+    override val link: String,
+    val onClick: () -> Unit,
+) : LinkContent {
     @Composable
     override fun SubContentComposable(modifier: Modifier) {
         ContactMessageContentView(
@@ -58,6 +63,10 @@ data class ContactLinkContent(val content: ContactLink, override val link: Strin
                 )
             },
         )
+    }
+
+    override fun onClick(context: Context) {
+        onClick()
     }
 }
 

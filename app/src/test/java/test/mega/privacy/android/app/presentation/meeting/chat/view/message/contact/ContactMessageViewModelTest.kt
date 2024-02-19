@@ -127,7 +127,7 @@ internal class ContactMessageViewModelTest {
             on { email } doReturn email
         }
         whenever(getUserUseCase.invoke(userId)).thenReturn(user)
-        underTest.checkContact(
+        underTest.checkUser(
             userHandle,
             email,
             onContactClicked,
@@ -157,7 +157,7 @@ internal class ContactMessageViewModelTest {
         whenever(getUserUseCase.invoke(userId))
             .thenReturn(if (onceContact) user else null)
         whenever(isContactRequestSentUseCase.invoke(email)).thenReturn(invitationSent)
-        underTest.checkContact(
+        underTest.checkUser(
             userHandle,
             email,
             onContactClicked,

@@ -48,13 +48,33 @@ internal class ChatLinksMessageViewModelTest {
     @Test
     fun `test that load contact info return correctly`() = runTest {
         val link = "link"
-        val contactLink = mock<ContactLink>()
+        val contactHandle = 1L
+        val email = "email"
+        val fullName = "fullName"
+        val contactLink = mock<ContactLink> {
+            on { this.contactHandle } doReturn contactHandle
+            on { this.email } doReturn email
+            on { this.fullName } doReturn fullName
+        }
+        val click = mock<(Long, String?, String?) -> Unit>()
+        val expectedResult = ContactLinkContent(
+            content = contactLink,
+            link = link,
+            onClick = {
+                click(
+                    contactHandle,
+                    email,
+                    fullName
+                )
+            }
+        )
         whenever(getContactFromLinkUseCase(link)).thenReturn(contactLink)
-        underTest.loadContactInfo(link)
+        underTest.loadContactInfo(link, click)
         // make sure it is called only once because the other call we load from cache
         verify(getContactFromLinkUseCase).invoke(link)
-        Truth.assertThat(underTest.loadContactInfo(link))
-            .isEqualTo(ContactLinkContent(contactLink, link))
+        val actual = underTest.loadContactInfo(link, click) as ContactLinkContent
+        Truth.assertThat(actual.content).isEqualTo(expectedResult.content)
+        Truth.assertThat(actual.link).isEqualTo(expectedResult.link)
     }
 
     @Test

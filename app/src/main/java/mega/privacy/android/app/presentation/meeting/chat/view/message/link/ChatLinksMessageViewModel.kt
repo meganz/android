@@ -33,12 +33,22 @@ class ChatLinksMessageViewModel @Inject constructor(
      * @param link Link
      * @return Contact link
      */
-    suspend fun loadContactInfo(link: String): LinkContent? {
+    suspend fun loadContactInfo(
+        link: String,
+        onClick: (Long, String?, String?) -> Unit,
+    ): LinkContent? {
         return runCatching {
             getLinkContentFromCache(link) ?: getContactFromLinkUseCase(link)?.let { contactLink ->
                 ContactLinkContent(
                     content = contactLink,
-                    link = link
+                    link = link,
+                    onClick = {
+                        onClick(
+                            contactLink.contactHandle,
+                            contactLink.email,
+                            contactLink.fullName
+                        )
+                    }
                 ).also {
                     mutex.withLock {
                         contactLinks[link] = it
