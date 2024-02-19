@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import mega.privacy.android.data.database.entity.chat.MetaTypedMessageEntity
 import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
+import mega.privacy.android.domain.entity.chat.ChatMessageType
 
 /**
  * Typed message request dao
@@ -70,4 +71,12 @@ interface TypedMessageDao {
         timestamp: Long,
     ): TypedMessageEntity?
 
+    /**
+     * Get all node attachments message id
+     *
+     * @param chatId
+     * @return
+     */
+    @Query("SELECT msgId FROM typed_messages WHERE chatId = :chatId AND type = :type ORDER BY timestamp DESC")
+    suspend fun getMessageIdsByType(chatId: Long, type: ChatMessageType): List<Long>
 }

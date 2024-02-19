@@ -16,6 +16,7 @@ import mega.privacy.android.data.mapper.chat.messages.PendingMessageMapper
 import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.domain.entity.chat.ChatMessage
+import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -194,4 +195,9 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
             chatStorageGateway.deletePendingMessage(pendingMessage.id)
         }
     }
+
+    override suspend fun getMessageIdsByType(chatId: Long, type: ChatMessageType): List<Long> =
+        withContext(ioDispatcher) {
+            chatStorageGateway.getMessageIdsByType(chatId, type)
+        }
 }

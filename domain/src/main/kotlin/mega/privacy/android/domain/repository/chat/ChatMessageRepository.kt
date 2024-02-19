@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository.chat
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.chat.ChatMessage
+import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
 
@@ -310,4 +311,13 @@ interface ChatMessageRepository {
      * @param pendingMessage
      */
     suspend fun deletePendingMessage(pendingMessage: PendingMessage)
+
+    /**
+     * Get message ids by type
+     *
+     * @param chatId
+     * @param type
+     * @return list of message ids
+     */
+    suspend fun getMessageIdsByType(chatId: Long, type: ChatMessageType): List<Long>
 }

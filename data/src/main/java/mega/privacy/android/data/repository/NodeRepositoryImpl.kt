@@ -50,6 +50,7 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
@@ -1002,6 +1003,12 @@ internal class NodeRepositoryImpl @Inject constructor(
     override suspend fun getOwnerNodeHandle(nodeId: NodeId): Long? {
         return withContext(ioDispatcher) {
             megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.owner
+        }
+    }
+
+    override suspend fun getLocalLink(node: TypedNode): String? = withContext(ioDispatcher) {
+        megaNodeMapper(node)?.let { node ->
+            megaApiGateway.httpServerGetLocalLink(node)
         }
     }
 }

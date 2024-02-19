@@ -10,6 +10,7 @@ import mega.privacy.android.data.database.entity.chat.PendingMessageEntity
 import mega.privacy.android.data.database.entity.chat.RichPreviewEntity
 import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
 import mega.privacy.android.data.gateway.chat.ChatStorageGateway
+import mega.privacy.android.domain.entity.chat.ChatMessageType
 import javax.inject.Inject
 
 /**
@@ -108,4 +109,7 @@ internal class ChatStorageFacade @Inject constructor(
 
     override suspend fun getPendingMessage(pendingMessageId: Long): PendingMessageEntity? =
         database.pendingMessageDao().get(pendingMessageId)
+
+    override suspend fun getMessageIdsByType(chatId: Long, type: ChatMessageType): List<Long> =
+        database.typedMessageDao().getMessageIdsByType(chatId, type)
 }

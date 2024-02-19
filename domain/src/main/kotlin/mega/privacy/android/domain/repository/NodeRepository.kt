@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
@@ -689,4 +690,12 @@ interface NodeRepository {
      * @return owner node [Long]
      */
     suspend fun getOwnerNodeHandle(nodeId: NodeId): Long?
+
+    /**
+     * Get local link
+     *
+     * @param node
+     * @return local link [String]
+     */
+    suspend fun getLocalLink(node: TypedNode): String?
 }

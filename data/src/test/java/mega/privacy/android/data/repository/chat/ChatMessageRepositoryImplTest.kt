@@ -16,6 +16,7 @@ import mega.privacy.android.data.mapper.chat.messages.PendingMessageMapper
 import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.domain.entity.chat.ChatMessage
+import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
 import nz.mega.sdk.MegaChatError
@@ -315,5 +316,12 @@ class ChatMessageRepositoryImplTest {
         whenever(pendingMessageMapper(entity)).thenReturn(expected)
         val actual = underTest.getPendingMessage(pendingMessageId)
         assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that get message ids by type invokes chat storage gateway correctly`() = runTest {
+        val type = ChatMessageType.NODE_ATTACHMENT
+        underTest.getMessageIdsByType(chatId, type)
+        verify(chatStorageGateway).getMessageIdsByType(chatId, type)
     }
 }
