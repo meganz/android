@@ -156,6 +156,11 @@ class NodeActionHandler(
                 selectMoveNodeActivityLauncher?.launch(nodeHandleArray)
             }
 
+            is SendToChatMenuAction -> {
+                val nodeHandleArray = nodes.map { it.id.longValue }.toLongArray()
+                sendToChatLauncher?.launch(nodeHandleArray)
+            }
+
             else -> throw NotImplementedError("Action $action does not have a handler.")
         }
     }

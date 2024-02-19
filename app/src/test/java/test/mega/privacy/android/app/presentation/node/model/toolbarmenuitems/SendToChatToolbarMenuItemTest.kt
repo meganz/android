@@ -1,9 +1,16 @@
 package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
+import androidx.navigation.NavHostController
 import com.google.common.truth.Truth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import mega.privacy.android.app.presentation.node.model.menuaction.SendToChatMenuAction
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SendToChat
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SendToChatToolbarMenuItem
+import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -12,9 +19,14 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SendToChatTest {
+class SendToChatToolbarMenuItemTest {
 
-    private val underTest = SendToChat(SendToChatMenuAction())
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val underTest = SendToChatToolbarMenuItem(
+        SendToChatMenuAction(), mock(), CoroutineScope(
+            UnconfinedTestDispatcher()
+        )
+    )
 
     private val oneFileNodeSelected = mock<TypedFolderNode> {
         on { isTakenDown }.thenReturn(false)
@@ -39,6 +51,21 @@ class SendToChatTest {
             resultCount = 10
         )
         Truth.assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that send to chat item click function is called`() {
+        val actionHandler: (menuAction: MenuAction, nodes: List<TypedNode>) -> Unit =
+            mock()
+        val onDismiss: () -> Unit = mock()
+        val navController: NavHostController = mock()
+        val onClick = underTest.getOnClick(
+            selectedNodes = multipleNodes,
+            onDismiss = onDismiss,
+            actionHandler = actionHandler,
+            navController = navController
+        )
+        onClick.invoke()
     }
 
     private fun provideArguments() = Stream.of(

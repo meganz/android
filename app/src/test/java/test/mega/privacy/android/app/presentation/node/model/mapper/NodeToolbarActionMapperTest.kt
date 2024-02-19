@@ -29,15 +29,15 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.LeaveSh
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ManageLinkToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.MoveToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.MultiSelectManageLinkToolbarMenuItem
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveLinkToolbarMenuItem
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShareToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShareDropDown
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveShareToolbarMenuItem
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameDropdownMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RestoreToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SelectAll
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SendToChat
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SendToChatToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Share
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareFolderToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.TrashToolbarMenuItem
@@ -72,7 +72,11 @@ class NodeToolbarActionMapperTest {
         ManageLinkToolbarMenuItem(),
         MultiSelectManageLinkToolbarMenuItem(),
         RemoveLinkToolbarMenuItem(mock()),
-        SendToChat(SendToChatMenuAction()),
+        SendToChatToolbarMenuItem(
+            menuAction = SendToChatMenuAction(),
+            getNodeToAttachUseCase = mock(),
+            scope = CoroutineScope(UnconfinedTestDispatcher())
+        ),
         ShareFolderToolbarMenuItem(
             scope = CoroutineScope(UnconfinedTestDispatcher()),
             mainDispatcher = Dispatchers.Main,

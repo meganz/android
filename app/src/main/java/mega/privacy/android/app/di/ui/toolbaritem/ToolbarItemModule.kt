@@ -30,7 +30,7 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameD
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RestoreToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SelectAll
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SendToChat
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SendToChatToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Share
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareFolderToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.TrashToolbarMenuItem
@@ -60,7 +60,7 @@ abstract class ToolbarItemModule {
             getLinkToolbarMenuItem: GetLinkToolbarMenuItem,
             manageLinkToolbarMenuItem: ManageLinkToolbarMenuItem,
             removeLinkDropDownMenuItem: RemoveLinkDropDownMenuItem,
-            sendToChat: SendToChat,
+            sendToChatToolbarMenuItem: SendToChatToolbarMenuItem,
             shareFolderToolbarMenuItem: ShareFolderToolbarMenuItem,
             share: Share,
             renameToolbarMenuItem: RenameToolbarMenuItem,
@@ -75,7 +75,7 @@ abstract class ToolbarItemModule {
                 getLinkToolbarMenuItem,
                 manageLinkToolbarMenuItem,
                 removeLinkDropDownMenuItem,
-                sendToChat,
+                sendToChatToolbarMenuItem,
                 shareFolderToolbarMenuItem,
                 share,
                 renameToolbarMenuItem,
@@ -97,7 +97,7 @@ abstract class ToolbarItemModule {
             download: DownloadToolbarMenuItem,
             copyToolbarMenuItem: CopyToolbarMenuItem,
             moveToolbarMenuItem: MoveToolbarMenuItem,
-            sendToChat: SendToChat,
+            sendToChatToolbarMenuItem: SendToChatToolbarMenuItem,
             renameToolbarMenuItem: RenameToolbarMenuItem,
             trashToolbarMenuItem: TrashToolbarMenuItem,
         ): Set<NodeToolbarMenuItem<*>> {
@@ -107,7 +107,7 @@ abstract class ToolbarItemModule {
                 download,
                 leaveShareToolBarMenuItem,
                 moveToolbarMenuItem,
-                sendToChat,
+                sendToChatToolbarMenuItem,
                 renameToolbarMenuItem,
                 copyToolbarMenuItem,
                 trashToolbarMenuItem,
@@ -129,7 +129,7 @@ abstract class ToolbarItemModule {
             removeLinkToolbarMenuItem: RemoveLinkToolbarMenuItem,
             removeLinkDropDownMenuItem: RemoveLinkDropDownMenuItem,
             share: Share,
-            sendToChat: SendToChat,
+            sendToChatToolbarMenuItem: SendToChatToolbarMenuItem,
             renameDropdownMenuItem: RenameDropdownMenuItem,
             copyToolbarMenuItem: CopyToolbarMenuItem,
             trashToolbarMenuItem: TrashToolbarMenuItem,
@@ -143,7 +143,7 @@ abstract class ToolbarItemModule {
                 removeLinkToolbarMenuItem,
                 removeLinkDropDownMenuItem,
                 share,
-                sendToChat,
+                sendToChatToolbarMenuItem,
                 renameDropdownMenuItem,
                 copyToolbarMenuItem,
                 trashToolbarMenuItem,
@@ -167,7 +167,7 @@ abstract class ToolbarItemModule {
             trashToolbarMenuItem: TrashToolbarMenuItem,
             moveToolbarMenuItem: MoveToolbarMenuItem,
             copyToolbarMenuItem: CopyToolbarMenuItem,
-            sendToChat: SendToChat,
+            sendToChatToolbarMenuItem: SendToChatToolbarMenuItem,
             shareFolderToolbarMenuItem: ShareFolderToolbarMenuItem,
             removeShareDropDown: RemoveShareDropDown,
             disputeTakeDownMenuItem: DisputeTakeDownMenuItem,
@@ -182,7 +182,7 @@ abstract class ToolbarItemModule {
                 getLinkToolbarMenuItem,
                 manageLink,
                 removeLinkDropDownMenuItem,
-                sendToChat,
+                sendToChatToolbarMenuItem,
                 shareFolderToolbarMenuItem,
                 share,
                 renameToolbarMenuItem,
