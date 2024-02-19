@@ -17,13 +17,13 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
-import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
+import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionState
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTabState
+import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
@@ -43,6 +43,7 @@ import mega.privacy.android.domain.usecase.videosection.AddVideosToPlaylistUseCa
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
+import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
@@ -69,6 +70,7 @@ class VideoSectionViewModel @Inject constructor(
     private val createVideoPlaylistUseCase: CreateVideoPlaylistUseCase,
     private val addVideosToPlaylistUseCase: AddVideosToPlaylistUseCase,
     private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase,
+    private val removeVideoPlaylistsUseCase: RemoveVideoPlaylistsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VideoSectionState())
 
@@ -419,6 +421,31 @@ class VideoSectionViewModel @Inject constructor(
                     }
                 }
             }
+    }
+
+    internal fun removeVideoPlaylists(deletedList: List<VideoPlaylistUIEntity>) =
+        viewModelScope.launch {
+            runCatching {
+                removeVideoPlaylistsUseCase(deletedList.map { it.id })
+            }.onSuccess { deletedPlaylistIDs ->
+                val deletedPlaylistTitles =
+                    getDeletedVideoPlaylistTitles(
+                        playlistIDs = deletedPlaylistIDs,
+                        deletedPlaylist = deletedList
+                    )
+                _state.update {
+                    it.copy(
+                        deletedVideoPlaylistTitles = deletedPlaylistTitles
+                    )
+                }
+            }
+        }
+
+    private fun getDeletedVideoPlaylistTitles(
+        playlistIDs: List<Long>,
+        deletedPlaylist: List<VideoPlaylistUIEntity>,
+    ): List<String> = playlistIDs.mapNotNull { id ->
+        deletedPlaylist.firstOrNull { it.id.longValue == id }?.title
     }
 
     /**

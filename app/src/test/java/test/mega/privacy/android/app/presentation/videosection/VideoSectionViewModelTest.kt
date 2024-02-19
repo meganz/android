@@ -34,6 +34,7 @@ import mega.privacy.android.domain.usecase.videosection.AddVideosToPlaylistUseCa
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
+import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -70,6 +71,7 @@ class VideoSectionViewModelTest {
     private val createVideoPlaylistUseCase = mock<CreateVideoPlaylistUseCase>()
     private val addVideosToPlaylistUseCase = mock<AddVideosToPlaylistUseCase>()
     private val getNextDefaultAlbumNameUseCase = mock<GetNextDefaultAlbumNameUseCase>()
+    private val removeVideoPlaylistsUseCase = mock<RemoveVideoPlaylistsUseCase>()
 
     private val expectedVideo = mock<VideoUIEntity> { on { name }.thenReturn("video name") }
 
@@ -100,7 +102,8 @@ class VideoSectionViewModelTest {
             videoPlaylistUIEntityMapper = videoPlaylistUIEntityMapper,
             createVideoPlaylistUseCase = createVideoPlaylistUseCase,
             addVideosToPlaylistUseCase = addVideosToPlaylistUseCase,
-            getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase
+            getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
+            removeVideoPlaylistsUseCase = removeVideoPlaylistsUseCase
         )
     }
 
@@ -508,6 +511,33 @@ class VideoSectionViewModelTest {
             assertThat(awaitItem().isVideoPlaylistCreatedSuccessfully).isTrue()
             underTest.setIsVideoPlaylistCreatedSuccessfully(false)
             assertThat(awaitItem().isVideoPlaylistCreatedSuccessfully).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that the removeVideoPlaylists is correctly updated`() = runTest {
+        val videoPlaylistTitles = listOf("new playlist", "new playlist1", "new playlist2")
+        val playlistIDs = listOf(NodeId(1L), NodeId(2L), NodeId(3L))
+        val deletedPlaylistIDs = listOf(NodeId(1L), NodeId(2L))
+        val uiEntity1 = mock<VideoPlaylistUIEntity> {
+            on { id }.thenReturn(playlistIDs[0])
+            on { title }.thenReturn(videoPlaylistTitles[0])
+        }
+        val uiEntity2 = mock<VideoPlaylistUIEntity> {
+            on { id }.thenReturn(playlistIDs[1])
+            on { title }.thenReturn(videoPlaylistTitles[1])
+        }
+
+        whenever(removeVideoPlaylistsUseCase(deletedPlaylistIDs)).thenReturn(
+            deletedPlaylistIDs.map { it.longValue }
+        )
+
+        underTest.removeVideoPlaylists(listOf(uiEntity1, uiEntity2))
+
+        underTest.state.drop(1).test {
+            val actual = awaitItem()
+            assertThat(actual.deletedVideoPlaylistTitles.size).isEqualTo(2)
+            assertThat(actual.deletedVideoPlaylistTitles[0]).isEqualTo(videoPlaylistTitles[0])
         }
     }
 

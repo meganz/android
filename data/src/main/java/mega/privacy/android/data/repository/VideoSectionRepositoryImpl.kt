@@ -8,6 +8,7 @@ import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.CreateSetElementListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.listener.RemoveSetsListenerInterface
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
@@ -147,6 +148,25 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                     type = MegaSet.SET_TYPE_PLAYLIST,
                     listener = listener
                 )
+                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+            }
+        }
+
+    override suspend fun removeVideoPlaylists(playlistIDs: List<NodeId>) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = RemoveSetsListenerInterface(
+                    target = playlistIDs.size,
+                    onCompletion = { success, _ ->
+                        continuation.resumeWith(Result.success(success))
+                    }
+                )
+                for (playlistID in playlistIDs) {
+                    megaApiGateway.removeSet(
+                        sid = playlistID.longValue,
+                        listener = listener,
+                    )
+                }
                 continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }

@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.SortOrder
  * @property shouldCreateVideoPlaylistDialog true if there is a need to create a video playlist
  * @property createVideoPlaylistPlaceholderTitle the create video playlist placeholder title
  * @property createDialogErrorMessage the create dialog error message
+ * @property deletedVideoPlaylistTitles the deleted video playlist titles
  */
 data class VideoSectionState(
     val allVideos: List<VideoUIEntity> = emptyList(),
@@ -41,4 +42,5 @@ data class VideoSectionState(
     val shouldCreateVideoPlaylistDialog: Boolean = false,
     val createVideoPlaylistPlaceholderTitle: String = "",
     val createDialogErrorMessage: Int? = null,
+    val deletedVideoPlaylistTitles: List<String> = emptyList()
 )

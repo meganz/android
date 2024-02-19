@@ -197,3 +197,35 @@ internal class CopyPreviewNodeListenerInterface(
 
     override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {}
 }
+
+internal class RemoveSetsListenerInterface(
+    private val target: Int,
+    private val onCompletion: (success: List<Long>, failure: Int) -> Unit,
+) : MegaRequestListenerInterface {
+    private var failure = 0
+
+    private val success = mutableListOf<Long>()
+
+    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {}
+
+    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {}
+
+    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
+        if (e.errorCode == MegaError.API_OK) {
+            success.add(request.parentHandle)
+        } else {
+            failure++
+        }
+
+        if ((success.size + failure) == target) {
+            onCompletion(success, failure)
+        }
+    }
+
+    override fun onRequestTemporaryError(
+        api: MegaApiJava,
+        request: MegaRequest,
+        e: MegaError,
+    ) {
+    }
+}

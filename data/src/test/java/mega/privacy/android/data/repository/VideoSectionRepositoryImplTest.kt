@@ -322,4 +322,36 @@ class VideoSectionRepositoryImplTest {
                 underTest.addVideosToPlaylist(playlistID = testPlaylistId, videoIDs = testVideoIDs)
             assertThat(actual).isEqualTo(0)
         }
+
+    @Test
+    fun `test that removing video playlists returns the removed ids`() = runTest {
+        val videoPlaylistIDs = listOf(
+            NodeId(1L),
+            NodeId(2L),
+            NodeId(3L),
+        )
+
+        val megaRequestError = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+        val megaRequest = mock<MegaRequest> {
+            on { parentHandle }.thenReturn(1L)
+        }
+
+        whenever(megaApiGateway.removeSet(any(), any())).thenAnswer {
+            (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                megaRequest,
+                megaRequestError,
+            )
+        }
+
+        initUnderTest()
+
+        val actual = underTest.removeVideoPlaylists(videoPlaylistIDs)
+        assertThat(actual.size).isEqualTo(videoPlaylistIDs.size)
+        actual.map {
+            assertThat(it).isEqualTo(1L)
+        }
+    }
 }
