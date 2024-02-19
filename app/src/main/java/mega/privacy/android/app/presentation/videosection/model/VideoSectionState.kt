@@ -18,6 +18,10 @@ import mega.privacy.android.domain.entity.SortOrder
  * @property isVideoPlaylistCreatedSuccessfully the video playlist created successfully state
  * @property numberOfAddedVideos the number of added videos
  * @property isPlaylistProgressBarShown true if the playlist progress bar is being shown
+ * @property isInputTitleValid true if the input title is valid
+ * @property shouldCreateVideoPlaylistDialog true if there is a need to create a video playlist
+ * @property createVideoPlaylistPlaceholderTitle the create video playlist placeholder title
+ * @property createDialogErrorMessage the create dialog error message
  */
 data class VideoSectionState(
     val allVideos: List<VideoUIEntity> = emptyList(),
@@ -33,4 +37,8 @@ data class VideoSectionState(
     val isVideoPlaylistCreatedSuccessfully: Boolean = false,
     val numberOfAddedVideos: Int = 0,
     val isPlaylistProgressBarShown: Boolean = true,
+    val isInputTitleValid: Boolean = true,
+    val shouldCreateVideoPlaylistDialog: Boolean = false,
+    val createVideoPlaylistPlaceholderTitle: String = "",
+    val createDialogErrorMessage: Int? = null,
 )

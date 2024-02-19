@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
@@ -37,6 +38,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.videosection.AddVideosToPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
@@ -66,6 +68,7 @@ class VideoSectionViewModel @Inject constructor(
     private val videoPlaylistUIEntityMapper: VideoPlaylistUIEntityMapper,
     private val createVideoPlaylistUseCase: CreateVideoPlaylistUseCase,
     private val addVideosToPlaylistUseCase: AddVideosToPlaylistUseCase,
+    private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VideoSectionState())
 
@@ -388,30 +391,34 @@ class VideoSectionViewModel @Inject constructor(
      */
     internal fun createNewPlaylist(title: String) {
         if (createVideoPlaylistJob?.isActive == true) return
-        createVideoPlaylistJob = viewModelScope.launch {
-            runCatching {
-                title.trim().takeIf { it.isNotEmpty() }?.let { playlistTitle ->
-                    createVideoPlaylistUseCase(playlistTitle)
-                }
-            }.onSuccess { videoPlaylist ->
-                _state.update {
-                    it.copy(
-                        currentVideoPlaylist = videoPlaylist?.let {
-                            videoPlaylistUIEntityMapper(
-                                videoPlaylist
+        title.ifEmpty {
+            _state.value.createVideoPlaylistPlaceholderTitle
+        }.trim()
+            .takeIf { it.isNotEmpty() && checkVideoPlaylistTitleValidity(it) }
+            ?.let { playlistTitle ->
+                createVideoPlaylistJob = viewModelScope.launch {
+                    setShowCreateVideoPlaylistDialog(false)
+                    runCatching {
+                        createVideoPlaylistUseCase(playlistTitle)
+                    }.onSuccess { videoPlaylist ->
+                        _state.update {
+                            it.copy(
+                                currentVideoPlaylist = videoPlaylistUIEntityMapper(
+                                    videoPlaylist
+                                ),
+                                isVideoPlaylistCreatedSuccessfully = true
                             )
-                        },
-                        isVideoPlaylistCreatedSuccessfully = true
-                    )
-                }
-                Timber.d("Current video playlist: ${videoPlaylist?.title}")
-            }.onFailure { exception ->
-                Timber.e(exception)
-                _state.update {
-                    it.copy(isVideoPlaylistCreatedSuccessfully = false)
+                        }
+                        loadVideoPlaylists()
+                        Timber.d("Current video playlist: ${videoPlaylist.title}")
+                    }.onFailure { exception ->
+                        Timber.e(exception)
+                        _state.update {
+                            it.copy(isVideoPlaylistCreatedSuccessfully = false)
+                        }
+                    }
                 }
             }
-        }
     }
 
     /**
@@ -437,5 +444,62 @@ class VideoSectionViewModel @Inject constructor(
         _state.update {
             it.copy(currentVideoPlaylist = playlist)
         }
+    }
+
+    internal fun setShowCreateVideoPlaylistDialog(showCreateDialog: Boolean) = _state.update {
+        it.copy(shouldCreateVideoPlaylistDialog = showCreateDialog)
+    }
+
+    internal fun setPlaceholderTitle(placeholderTitle: String) {
+        val playlistTitles = getAllVideoPlaylistTitles()
+        _state.update {
+            it.copy(
+                createVideoPlaylistPlaceholderTitle = getNextDefaultAlbumNameUseCase(
+                    defaultName = placeholderTitle,
+                    currentNames = playlistTitles
+                )
+            )
+        }
+    }
+
+    private fun getAllVideoPlaylistTitles() = _state.value.videoPlaylists.map { it.title }
+
+    internal fun setNewPlaylistTitleValidity(valid: Boolean) = _state.update {
+        it.copy(isInputTitleValid = valid)
+    }
+
+    private fun checkVideoPlaylistTitleValidity(
+        title: String,
+    ): Boolean {
+        var errorMessage: Int? = null
+        var isTitleValid = true
+
+        if (title.isBlank()) {
+            isTitleValid = false
+            errorMessage = R.string.invalid_string
+        } else if (title in getAllVideoPlaylistTitles()) {
+            isTitleValid = false
+            errorMessage = ERROR_MESSAGE_REPEATED_TITLE
+        } else if ("[\\\\*/:<>?\"|]".toRegex().containsMatchIn(title)) {
+            isTitleValid = false
+            errorMessage = R.string.invalid_characters_defined
+        }
+
+        _state.update {
+            it.copy(
+                isInputTitleValid = isTitleValid,
+                createDialogErrorMessage = errorMessage
+            )
+        }
+
+        return isTitleValid
+    }
+
+    internal fun setIsVideoPlaylistCreatedSuccessfully(value: Boolean) = _state.update {
+        it.copy(isVideoPlaylistCreatedSuccessfully = value)
+    }
+
+    companion object {
+        private const val ERROR_MESSAGE_REPEATED_TITLE = 0
     }
 }

@@ -31,10 +31,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VideoItemView
-import mega.privacy.android.app.presentation.videosection.view.playlist.Constants.EMPTY_VIEW_TEST_TAG
-import mega.privacy.android.app.presentation.videosection.view.playlist.Constants.PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG
-import mega.privacy.android.app.presentation.videosection.view.playlist.Constants.PLAYLIST_TITLE_TEST_TAG
-import mega.privacy.android.app.presentation.videosection.view.playlist.Constants.PLAYLIST_TOTAL_DURATION_TEST_TAG
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.ui.controls.dividers.DividerSpacing
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
@@ -47,27 +43,26 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.shared.theme.MegaAppTheme
 
-internal object Constants {
-    /**
-     * Test tag for progress indicator
-     */
-    const val EMPTY_VIEW_TEST_TAG = "empty_test_tag"
+/**
+ * Test tag for empty view
+ */
+const val VIDEO_PLAYLIST_DETAIL_EMPTY_VIEW_TEST_TAG = "video_playlist_detail_empty_view_test_tag"
 
-    /**
-     * Test tag for subtitle files is empty
-     */
-    const val PLAYLIST_TITLE_TEST_TAG = "playlist_title_test_tag"
+/**
+ * Test tag for playlist title
+ */
+const val PLAYLIST_TITLE_TEST_TAG = "playlist_title_test_tag"
 
-    /**
-     * Test tag for subtitle files
-     */
-    const val PLAYLIST_TOTAL_DURATION_TEST_TAG = "playlist_total_duration_test_tag"
+/**
+ * Test tag for playlist total duration
+ */
+const val PLAYLIST_TOTAL_DURATION_TEST_TAG = "playlist_total_duration_test_tag"
 
-    /**
-     * Test tag for selected top bar
-     */
-    const val PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG = "playlist_number_of_videos_test_tag"
-}
+/**
+ * Test tag for playlist number of videos
+ */
+const val PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG = "playlist_number_of_videos_test_tag"
+
 
 internal const val videoPlaylistDetailRoute = "videoSection/video_playlist/detail"
 
@@ -99,7 +94,7 @@ fun VideoPlaylistDetailView(
         )
         when {
             items.isEmpty() -> LegacyMegaEmptyView(
-                modifier = modifier.testTag(EMPTY_VIEW_TEST_TAG),
+                modifier = modifier.testTag(VIDEO_PLAYLIST_DETAIL_EMPTY_VIEW_TEST_TAG),
                 text = stringResource(id = R.string.homepage_empty_hint_video),
                 imagePainter = painterResource(id = R.drawable.ic_homepage_empty_video)
             )

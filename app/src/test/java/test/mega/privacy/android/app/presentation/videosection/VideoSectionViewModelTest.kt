@@ -31,6 +31,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.videosection.AddVideosToPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
@@ -71,6 +72,7 @@ class VideoSectionViewModelTest {
     private val videoPlaylistUIEntityMapper = mock<VideoPlaylistUIEntityMapper>()
     private val createVideoPlaylistUseCase = mock<CreateVideoPlaylistUseCase>()
     private val addVideosToPlaylistUseCase = mock<AddVideosToPlaylistUseCase>()
+    private val getNextDefaultAlbumNameUseCase = mock<GetNextDefaultAlbumNameUseCase>()
 
     private val expectedVideo = mock<VideoUIEntity> { on { name }.thenReturn("video name") }
 
@@ -105,7 +107,8 @@ class VideoSectionViewModelTest {
             getVideoPlaylistsUseCase = getVideoPlaylistsUseCase,
             videoPlaylistUIEntityMapper = videoPlaylistUIEntityMapper,
             createVideoPlaylistUseCase = createVideoPlaylistUseCase,
-            addVideosToPlaylistUseCase = addVideosToPlaylistUseCase
+            addVideosToPlaylistUseCase = addVideosToPlaylistUseCase,
+            getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase
         )
     }
 
@@ -124,7 +127,8 @@ class VideoSectionViewModelTest {
             getVideoPlaylistsUseCase,
             videoPlaylistUIEntityMapper,
             createVideoPlaylistUseCase,
-            addVideosToPlaylistUseCase
+            addVideosToPlaylistUseCase,
+            getNextDefaultAlbumNameUseCase
         )
     }
 
@@ -393,6 +397,7 @@ class VideoSectionViewModelTest {
                 val actual = awaitItem()
                 assertThat(actual.currentVideoPlaylist?.title).isEqualTo(expectedTitle)
                 assertThat(actual.isVideoPlaylistCreatedSuccessfully).isTrue()
+                cancelAndIgnoreRemainingEvents()
             }
         }
 
@@ -445,6 +450,77 @@ class VideoSectionViewModelTest {
             assertThat(awaitItem().searchMode).isTrue()
             underTest.onTabSelected(selectTab = VideoSectionTab.All)
             assertThat(awaitItem().searchMode).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that the currentVideoPlaylist is correctly updated`() = runTest {
+        initUnderTest()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentVideoPlaylist).isNull()
+            underTest.updateCurrentVideoPlaylist(mock())
+            assertThat(awaitItem().currentVideoPlaylist).isNotNull()
+            underTest.updateCurrentVideoPlaylist(null)
+            assertThat(awaitItem().currentVideoPlaylist).isNull()
+        }
+    }
+
+    @Test
+    fun `test that the showCreateVideoPlaylistDialog is correctly updated`() = runTest {
+        initUnderTest()
+
+        underTest.state.test {
+            assertThat(awaitItem().shouldCreateVideoPlaylistDialog).isFalse()
+            underTest.setShowCreateVideoPlaylistDialog(true)
+            assertThat(awaitItem().shouldCreateVideoPlaylistDialog).isTrue()
+            underTest.setShowCreateVideoPlaylistDialog(false)
+            assertThat(awaitItem().shouldCreateVideoPlaylistDialog).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that the createVideoPlaylistPlaceholderTitle is correctly updated`() = runTest {
+        val expectedTitle = "new playlist"
+        whenever(
+            getNextDefaultAlbumNameUseCase(
+                anyOrNull(),
+                anyOrNull()
+            )
+        ).thenReturn(expectedTitle)
+
+        initUnderTest()
+
+        underTest.setPlaceholderTitle(expectedTitle)
+
+        underTest.state.test {
+            assertThat(awaitItem().createVideoPlaylistPlaceholderTitle).isEqualTo(expectedTitle)
+        }
+    }
+
+    @Test
+    fun `test that the isInputTitleValid is correctly updated`() = runTest {
+        initUnderTest()
+
+        underTest.state.test {
+            assertThat(awaitItem().isInputTitleValid).isTrue()
+            underTest.setNewPlaylistTitleValidity(false)
+            assertThat(awaitItem().isInputTitleValid).isFalse()
+            underTest.setNewPlaylistTitleValidity(true)
+            assertThat(awaitItem().isInputTitleValid).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that the isVideoPlaylistCreatedSuccessfully is correctly updated`() = runTest {
+        initUnderTest()
+
+        underTest.state.test {
+            assertThat(awaitItem().isVideoPlaylistCreatedSuccessfully).isFalse()
+            underTest.setIsVideoPlaylistCreatedSuccessfully(true)
+            assertThat(awaitItem().isVideoPlaylistCreatedSuccessfully).isTrue()
+            underTest.setIsVideoPlaylistCreatedSuccessfully(false)
+            assertThat(awaitItem().isVideoPlaylistCreatedSuccessfully).isFalse()
         }
     }
 }

@@ -61,6 +61,13 @@ internal fun VideoSectionNavHost(
     modifier: Modifier,
     viewModel: VideoSectionViewModel = hiltViewModel(),
 ) {
+    if (viewModel.state.collectAsState().value.isVideoPlaylistCreatedSuccessfully) {
+        viewModel.setIsVideoPlaylistCreatedSuccessfully(false)
+        navHostController.navigate(
+            route = videoPlaylistDetailRoute,
+        )
+    }
+
     NavHost(
         modifier = modifier,
         navController = navHostController,

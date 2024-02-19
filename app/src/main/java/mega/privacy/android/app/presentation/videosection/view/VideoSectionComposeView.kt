@@ -93,11 +93,19 @@ internal fun VideoSectionComposeView(
                     id = SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
                         ?: R.string.sortby_name
                 ),
+                errorMessage = uiState.createDialogErrorMessage,
                 modifier = Modifier,
                 onSortOrderClick = onSortOrderClick,
                 onClick = onPlaylistItemClick,
                 onLongClick = onPlaylistItemLongClick,
-                onMenuClick = onPlaylistItemMenuClick
+                onMenuClick = onPlaylistItemMenuClick,
+                setDialogInputPlaceholder = videoSectionViewModel::setPlaceholderTitle,
+                isInputTitleValid = uiState.isInputTitleValid,
+                showCreateVideoPlaylistDialog = uiState.shouldCreateVideoPlaylistDialog,
+                inputPlaceHolderText = uiState.createVideoPlaylistPlaceholderTitle,
+                setShowCreateVideoPlaylistDialog = videoSectionViewModel::setShowCreateVideoPlaylistDialog,
+                setInputValidity = videoSectionViewModel::setNewPlaylistTitleValidity,
+                onDialogPositiveButtonClicked = videoSectionViewModel::createNewPlaylist
             )
         },
         selectedTab = tabState.selectedTab,

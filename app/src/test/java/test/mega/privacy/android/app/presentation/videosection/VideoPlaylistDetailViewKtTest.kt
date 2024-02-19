@@ -6,7 +6,10 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
-import mega.privacy.android.app.presentation.videosection.view.playlist.Constants
+import mega.privacy.android.app.presentation.videosection.view.playlist.PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG
+import mega.privacy.android.app.presentation.videosection.view.playlist.PLAYLIST_TITLE_TEST_TAG
+import mega.privacy.android.app.presentation.videosection.view.playlist.PLAYLIST_TOTAL_DURATION_TEST_TAG
+import mega.privacy.android.app.presentation.videosection.view.playlist.VIDEO_PLAYLIST_DETAIL_EMPTY_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistDetailView
 import mega.privacy.android.domain.entity.node.NodeId
 import org.junit.Rule
@@ -27,17 +30,17 @@ class VideoPlaylistDetailViewKtTest {
     fun `test that ui is displayed correctly when the playlist is null`() {
         setComposeContent(null)
 
-        composeTestRule.onNodeWithTag(Constants.EMPTY_VIEW_TEST_TAG).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(Constants.PLAYLIST_TITLE_TEST_TAG).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(Constants.PLAYLIST_TITLE_TEST_TAG)
+        composeTestRule.onNodeWithTag(VIDEO_PLAYLIST_DETAIL_EMPTY_VIEW_TEST_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(PLAYLIST_TITLE_TEST_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(PLAYLIST_TITLE_TEST_TAG)
             .assertTextEquals("")
-        composeTestRule.onNodeWithTag(Constants.PLAYLIST_TOTAL_DURATION_TEST_TAG)
+        composeTestRule.onNodeWithTag(PLAYLIST_TOTAL_DURATION_TEST_TAG)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(Constants.PLAYLIST_TOTAL_DURATION_TEST_TAG)
+        composeTestRule.onNodeWithTag(PLAYLIST_TOTAL_DURATION_TEST_TAG)
             .assertTextEquals("00:00:00")
-        composeTestRule.onNodeWithTag(Constants.PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG)
+        composeTestRule.onNodeWithTag(PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(Constants.PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG)
+        composeTestRule.onNodeWithTag(PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG)
             .assertTextEquals("no videos")
     }
 
@@ -61,16 +64,16 @@ class VideoPlaylistDetailViewKtTest {
 
         setComposeContent(playlist)
 
-        composeTestRule.onNodeWithTag(Constants.PLAYLIST_TITLE_TEST_TAG).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(Constants.PLAYLIST_TITLE_TEST_TAG)
+        composeTestRule.onNodeWithTag(PLAYLIST_TITLE_TEST_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(PLAYLIST_TITLE_TEST_TAG)
             .assertTextEquals(expectedTitle)
-        composeTestRule.onNodeWithTag(Constants.PLAYLIST_TOTAL_DURATION_TEST_TAG)
+        composeTestRule.onNodeWithTag(PLAYLIST_TOTAL_DURATION_TEST_TAG)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(Constants.PLAYLIST_TOTAL_DURATION_TEST_TAG)
+        composeTestRule.onNodeWithTag(PLAYLIST_TOTAL_DURATION_TEST_TAG)
             .assertTextEquals(expectedTotalDuration)
-        composeTestRule.onNodeWithTag(Constants.PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG)
+        composeTestRule.onNodeWithTag(PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithTag(Constants.PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG)
+        composeTestRule.onNodeWithTag(PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG)
             .assertTextEquals("2 Videos")
     }
 }
