@@ -6,6 +6,8 @@ import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
+import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import javax.inject.Inject
 
@@ -14,6 +16,9 @@ import javax.inject.Inject
  *
  * @property getNodeByHandle
  * @property getChildrenNode
+ * @property getContactVerificationWarningUseCase
+ * @property areCredentialsVerifiedUseCase
+ * @property mapNodeToShareUseCase
  * @property getCloudSortOrder
  * @property getOthersSortOrder
  * @property nodeRepository
@@ -21,6 +26,8 @@ import javax.inject.Inject
 class GetIncomingSharesChildrenNodeUseCase @Inject constructor(
     private val getNodeByHandle: GetNodeByIdUseCase,
     private val getChildrenNode: GetTypedChildrenNodeUseCase,
+    private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
+    private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase,
     private val mapNodeToShareUseCase: MapNodeToShareUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
@@ -32,9 +39,14 @@ class GetIncomingSharesChildrenNodeUseCase @Inject constructor(
      */
     suspend operator fun invoke(parentHandle: Long): List<ShareNode> {
         return if (parentHandle == -1L) {
+            val isContactVerificationOn = getContactVerificationWarningUseCase()
             nodeRepository.getAllIncomingShares(getOthersSortOrder()).mapNotNull { shareData ->
                 getNodeByHandle(NodeId(shareData.nodeHandle))?.let { node ->
-                    mapNodeToShareUseCase(node, shareData)
+                    mapNodeToShareUseCase(node, shareData.let {
+                        if (isContactVerificationOn && it.user != null)
+                            it.copy(isContactCredentialsVerified = areCredentialsVerifiedUseCase(it.user))
+                        else it
+                    })
                 }
             }
         } else {

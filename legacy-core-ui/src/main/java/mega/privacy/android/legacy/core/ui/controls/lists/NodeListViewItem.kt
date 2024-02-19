@@ -176,6 +176,7 @@ fun NodeListViewItem(
     infoColor: Color? = null,
     @DrawableRes infoIcon: Int? = null,
     @DrawableRes sharesIcon: Int? = null,
+    @DrawableRes verifiedIcon: Int? = null,
     infoIconTint: Color? = null,
     labelColor: Color? = null,
     sharesSubtitle: String? = null,
@@ -356,6 +357,17 @@ fun NodeListViewItem(
                         style = MaterialTheme.typography.subtitle2,
                         color = infoColor ?: MaterialTheme.colors.textColorSecondary,
                     )
+                    if (verifiedIcon != null) {
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(
+                            modifier = Modifier
+                                .testTag(VERIFIED_TEST_TAG)
+                                .size(18.dp),
+                            painter = painterResource(verifiedIcon),
+                            tint = infoIconTint ?: Color.Unspecified,
+                            contentDescription = "Info Icon"
+                        )
+                    }
                 }
                 if (sharesIcon != null)
                     Image(
@@ -367,7 +379,7 @@ fun NodeListViewItem(
                                 visibility = Visibility.Visible
                             }
                             .padding(end = 4.dp)
-                            .size(20.dp),
+                            .size(21.dp),
                         colorFilter = ColorFilter.tint(
                             MaterialTheme.colors.textColorSecondary
                         ),
@@ -397,37 +409,42 @@ fun NodeListViewItem(
 /**
  * Test tag for info text
  */
-const val INFO_TEXT_TEST_TAG = "Info Text"
+const val INFO_TEXT_TEST_TAG = "node_list_view_item:text_info"
 
 /**
  * Text tag for selected item
  */
-const val SELECTED_TEST_TAG = "Selected Tag"
+const val SELECTED_TEST_TAG = "node_list_view_item:image_selected"
 
 /**
  * Test tag for folder item
  */
-const val FOLDER_TEST_TAG = "Folder Tag"
+const val FOLDER_TEST_TAG = "node_list_view_item:image_folder"
 
 /**
  * Test tag for file item
  */
-const val FILE_TEST_TAG = "File Tag"
+const val FILE_TEST_TAG = "node_list_view_item:thumbnail_file"
 
 /**
  * Test tag for favorite item
  */
-const val FAVORITE_TEST_TAG = "favorite Tag"
+const val FAVORITE_TEST_TAG = "node_list_view_item:image_favorite"
 
 /**
  * Test tag for exported item
  */
-const val EXPORTED_TEST_TAG = "exported Tag"
+const val EXPORTED_TEST_TAG = "node_list_view_item:image_exported"
 
 /**
  * Test tag for taken item
  */
-const val TAKEN_TEST_TAG = "taken Tag"
+const val TAKEN_TEST_TAG = "node_list_view_item:image_taken"
+
+/**
+ * Test tag for verified credential badge
+ */
+const val VERIFIED_TEST_TAG = "node_list_view_item:icon_verified"
 
 /**
  * Test tag for the Info Icon

@@ -30,10 +30,12 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.shares.ShareFileNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
@@ -90,6 +92,7 @@ class IncomingSharesComposeViewModelTest {
     private val getOthersSortOrder = mock<GetOthersSortOrder>()
     private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
     private val areCredentialsVerifiedUseCase = mock<AreCredentialsVerifiedUseCase>()
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getIncomingShareParentUserEmailUseCase =
         mock<GetIncomingShareParentUserEmailUseCase>()
 
@@ -122,7 +125,8 @@ class IncomingSharesComposeViewModelTest {
             getOthersSortOrder = getOthersSortOrder,
             getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
             areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
-            getIncomingShareParentUserEmailUseCase = getIncomingShareParentUserEmailUseCase
+            getIncomingShareParentUserEmailUseCase = getIncomingShareParentUserEmailUseCase,
+            getNodeByIdUseCase = getNodeByIdUseCase
         )
     }
 
@@ -170,6 +174,20 @@ class IncomingSharesComposeViewModelTest {
             val expectedHandle = 123456789L
             underTest.setCurrentHandle(expectedHandle)
             assertThat(underTest.getCurrentNodeHandle()).isEqualTo(expectedHandle)
+        }
+
+    @Test
+    fun `test that the node name is updated when current node is updated`() =
+        runTest {
+            val expectedHandle = 123456789L
+            val expectedName = "node name"
+            val node = mock<TypedFolderNode> {
+                on { name }.thenReturn(expectedName)
+            }
+            whenever(getNodeByIdUseCase.invoke(NodeId(expectedHandle))).thenReturn(node)
+            underTest.setCurrentHandle(expectedHandle)
+            assertThat(underTest.getCurrentNodeHandle()).isEqualTo(expectedHandle)
+            assertThat(underTest.state.value.currentNodeName).isEqualTo(expectedName)
         }
 
     @Test
@@ -477,6 +495,7 @@ class IncomingSharesComposeViewModelTest {
         whenever(getContactVerificationWarningUseCase()).thenReturn(true)
         whenever(areCredentialsVerifiedUseCase(any())).thenReturn(true)
         whenever(getIncomingShareParentUserEmailUseCase(NodeId(any()))).thenReturn("")
+        whenever(getNodeByIdUseCase(NodeId(any()))).thenReturn(mock())
     }
 
     @AfterEach
@@ -499,7 +518,8 @@ class IncomingSharesComposeViewModelTest {
             durationInSecondsTextMapper,
             getContactVerificationWarningUseCase,
             areCredentialsVerifiedUseCase,
-            getIncomingShareParentUserEmailUseCase
+            getIncomingShareParentUserEmailUseCase,
+            getNodeByIdUseCase
         )
     }
 }

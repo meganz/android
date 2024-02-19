@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  *
  * @property currentViewType serves as the original view type
  * @property currentHandle current incoming shares or file browser handle
+ * @property currentNodeName current incoming node's name
  * @property isLoading true if loading
  * @property accessedFolderHandle The Folder Handle set when Cloud Drive is opened and
  * there's a Node that immediately needs to be opened
@@ -46,6 +47,7 @@ data class IncomingSharesState(
     val currentViewType: ViewType = ViewType.LIST,
     val isLoading: Boolean = true,
     val currentHandle: Long = -1L,
+    val currentNodeName: String? = null,
     val accessedFolderHandle: Long? = null,
     val isAccessedFolderExited: Boolean = false,
     val isPendingRefresh: Boolean = false,

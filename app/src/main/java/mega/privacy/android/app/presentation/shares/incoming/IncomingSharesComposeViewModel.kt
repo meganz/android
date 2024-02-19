@@ -30,6 +30,7 @@ import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
@@ -76,6 +77,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class IncomingSharesComposeViewModel @Inject constructor(
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorContactUpdatesUseCase: MonitorContactUpdates,
@@ -111,8 +113,8 @@ class IncomingSharesComposeViewModel @Inject constructor(
     private val handleStack = Stack<Long>()
 
     init {
-        refreshNodes()
         checkContactVerification()
+        refreshNodes()
         monitorChildrenNodes()
         monitorContactUpdates()
         checkViewType()
@@ -257,6 +259,7 @@ class IncomingSharesComposeViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     currentHandle = handle,
+                    currentNodeName = getNodeByIdUseCase(NodeId(handle))?.name,
                     updateToolbarTitleEvent = triggered
                 )
             }
@@ -299,9 +302,9 @@ class IncomingSharesComposeViewModel @Inject constructor(
         }
 
         val childrenNodes = getIncomingSharesChildrenNodeUseCase(currentHandle)
-        val nodeUIItems = getNodeUiItems(childrenNodes)
         val sortOrder = if (isRootNode) getOthersSortOrder() else getCloudSortOrder()
         checkIfSelectedFolderIsSharedByVerifiedContact()
+        val nodeUIItems = getNodeUiItems(childrenNodes)
         _state.update {
             it.copy(
                 nodesList = nodeUIItems,
@@ -321,19 +324,19 @@ class IncomingSharesComposeViewModel @Inject constructor(
      * This will map list of [Node] to [NodeUIItem]
      */
     private fun getNodeUiItems(nodeList: List<ShareNode>): List<NodeUIItem<ShareNode>> {
-        val existingNodeList = state.value.nodesList
-        return nodeList.mapIndexed { index, node ->
-            val isSelected =
-                state.value.selectedNodes.find { it.id.longValue == node.id.longValue } != null
-            val fileDuration = if (node is FileNode) {
-                fileDurationMapper(node.type)?.let { durationInSecondsTextMapper(it) }
-            } else null
-            NodeUIItem(
-                node = node,
-                isSelected = if (existingNodeList.size > index) isSelected else false,
-                isInvisible = if (existingNodeList.size > index) existingNodeList[index].isInvisible else false,
-                fileDuration = fileDuration
-            )
+        with(state.value) {
+            return nodeList.mapIndexed { index, node ->
+                val isSelected = selectedNodes.find { it.id.longValue == node.id.longValue } != null
+                val fileDuration = if (node is FileNode) {
+                    fileDurationMapper(node.type)?.let { durationInSecondsTextMapper(it) }
+                } else null
+                NodeUIItem(
+                    node = node,
+                    isSelected = if (nodesList.size > index) isSelected else false,
+                    isInvisible = if (nodesList.size > index) nodesList[index].isInvisible else false,
+                    fileDuration = fileDuration,
+                )
+            }
         }
     }
 
