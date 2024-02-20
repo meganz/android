@@ -11,6 +11,7 @@ import mega.privacy.android.data.database.dao.TypedMessageDao
 import mega.privacy.android.data.database.entity.chat.ChatGeolocationEntity
 import mega.privacy.android.data.database.entity.chat.ChatNodeEntity
 import mega.privacy.android.data.database.entity.chat.GiphyEntity
+import mega.privacy.android.data.database.entity.chat.NodeMessageCrossRef
 import mega.privacy.android.data.database.entity.chat.PendingMessageEntity
 import mega.privacy.android.data.database.entity.chat.RichPreviewEntity
 import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
@@ -28,17 +29,30 @@ import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
         ChatGeolocationEntity::class,
         ChatNodeEntity::class,
         PendingMessageEntity::class,
+        NodeMessageCrossRef::class,
     ],
     version = 1,
 )
 abstract class InMemoryChatDatabase : RoomDatabase() {
 
+    /**
+     * Typed message dao
+     */
     abstract fun typedMessageDao(): TypedMessageDao
 
+    /**
+     * Chat message meta dao
+     */
     abstract fun chatMessageMetaDao(): ChatMessageMetaDao
 
+    /**
+     * Chat node dao
+     */
     abstract fun chatNodeDao(): ChatNodeDao
 
+    /**
+     * Pending message dao
+     */
     abstract fun pendingMessageDao(): PendingMessageDao
 
     companion object {

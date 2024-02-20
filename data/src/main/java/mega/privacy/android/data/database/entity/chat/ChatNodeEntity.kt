@@ -2,6 +2,7 @@ package mega.privacy.android.data.database.entity.chat
 
 import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import kotlinx.serialization.SerialName
@@ -36,7 +37,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 @Serializable
 data class ChatNodeEntity(
     @PrimaryKey override val id: NodeId,
-    val messageId: Long,
+    @Ignore val messageId: Long?,
     override val name: String,
     override val parentId: NodeId,
     override val base64Id: String,
@@ -61,5 +62,60 @@ data class ChatNodeEntity(
     override val originalFingerprint: String?,
     override val hasThumbnail: Boolean,
     override val hasPreview: Boolean,
-) : FileNode
+) : FileNode {
+    constructor(
+        id: NodeId,
+        name: String,
+        parentId: NodeId,
+        base64Id: String,
+        restoreId: NodeId?,
+        label: Int,
+        isFavourite: Boolean,
+        exportedData: ExportedData?,
+        isTakenDown: Boolean,
+        isIncomingShare: Boolean,
+        isNodeKeyDecrypted: Boolean,
+        creationTime: Long,
+        serializedData: String?,
+        isAvailableOffline: Boolean,
+        versionCount: Int,
+        size: Long,
+        modificationTime: Long,
+        type: FileTypeInfo,
+        thumbnailPath: String?,
+        previewPath: String?,
+        fullSizePath: String?,
+        fingerprint: String?,
+        originalFingerprint: String?,
+        hasThumbnail: Boolean,
+        hasPreview: Boolean,
+    ) : this(
+        id = id,
+        messageId = null,
+        name = name,
+        parentId = parentId,
+        base64Id = base64Id,
+        restoreId = restoreId,
+        label = label,
+        isFavourite = isFavourite,
+        exportedData = exportedData,
+        isTakenDown = isTakenDown,
+        isIncomingShare = isIncomingShare,
+        isNodeKeyDecrypted = isNodeKeyDecrypted,
+        creationTime = creationTime,
+        serializedData = serializedData,
+        isAvailableOffline = isAvailableOffline,
+        versionCount = versionCount,
+        size = size,
+        modificationTime = modificationTime,
+        type = type,
+        thumbnailPath = thumbnailPath,
+        previewPath = previewPath,
+        fullSizePath = fullSizePath,
+        fingerprint = fingerprint,
+        originalFingerprint = originalFingerprint,
+        hasThumbnail = hasThumbnail,
+        hasPreview = hasPreview,
+    )
+}
 

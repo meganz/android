@@ -1,6 +1,7 @@
 package mega.privacy.android.data.database.entity.chat
 
 import androidx.room.Embedded
+import androidx.room.Junction
 import androidx.room.Relation
 
 /**
@@ -16,8 +17,8 @@ data class MetaTypedMessageEntity(
     @Embedded val typedMessageEntity: TypedMessageEntity,
     @Relation(
         parentColumn = "messageId",
-        entityColumn = "messageId",
-        entity = ChatNodeEntity::class
+        entityColumn = "id",
+        associateBy = Junction(NodeMessageCrossRef::class)
     )
     val nodeList: List<ChatNodeEntity>,
     @Relation(
