@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.GiphyMessageView
-import mega.privacy.android.app.utils.GiphyUtil
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
@@ -27,9 +26,7 @@ class ChatGiphyUiMessage(
     override fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit) {
         message.chatGifInfo?.let { giphy ->
             GiphyMessageView(
-                url = giphy.webpSrc?.let { GiphyUtil.getOriginalGiphySrc(it) }?.toString() ?: "",
-                width = giphy.width,
-                height = giphy.height,
+                gifInfo = giphy,
                 title = giphy.title,
                 autoPlayGif = if (autoPlay) true else giphy.webpSize < MAX_SIZE_FOR_AUTO_PLAY,
                 onLoaded = { autoPlay = true },

@@ -16,6 +16,7 @@ class GiphyUtil {
          * @return The final src with real endpoint.
          */
         @JvmStatic
+        @Deprecated("Use GiphyMessageView String.toUri fun instead")
         fun getOriginalGiphySrc(giphyUri: String?): Uri? {
             if (!TextUtil.isTextEmpty(giphyUri) && giphyUri?.contains(GIPHY_URL) == true) {
                 return Uri.parse(giphyUri.replace(GIPHY_URL, BASE_URL))
