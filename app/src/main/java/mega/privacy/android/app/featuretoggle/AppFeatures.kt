@@ -75,22 +75,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables subfolder media discovery setting
-     */
-    SubFolderMediaDiscoverySetting(
-        "Enables subfolder media discovery  setting",
-        true,
-    ),
-
-    /**
-     * Enables new media discovery fab
-     */
-    NewMediaDiscoveryFab(
-        "Enables new media discovery fab",
-        true,
-    ),
-
-    /**
      * Enables prefetch timeline photos as soon initialization screen completed
      */
     PrefetchTimeline(

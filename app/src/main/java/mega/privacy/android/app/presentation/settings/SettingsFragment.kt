@@ -216,11 +216,9 @@ class SettingsFragment :
         }
     }
 
-    private suspend fun updateSubFolderMediaDiscovery(checked: Boolean) {
-        val isDiscoverySettingEnable =
-            getFeatureFlagUseCase(AppFeatures.SubFolderMediaDiscoverySetting)
+    private fun updateSubFolderMediaDiscovery(checked: Boolean) {
         findPreference<SwitchPreferenceCompat>(KEY_SUB_FOLDER_MEDIA_DISCOVERY)?.apply {
-            isVisible = isDiscoverySettingEnable
+            isVisible = true
             isChecked = checked
         }
     }

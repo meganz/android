@@ -98,7 +98,6 @@ fun MediaDiscoveryView(
     onStartModalSheetShow: () -> Unit,
     onEndModalSheetHide: () -> Unit,
     onModalSheetVisibilityChange: (Boolean) -> Unit,
-    isNewMediaDiscoveryFabEnabled: Boolean,
     mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel = viewModel(),
     mediaDiscoveryViewModel: MediaDiscoveryViewModel = viewModel(),
     showSettingDialog: Boolean = false,
@@ -179,7 +178,7 @@ fun MediaDiscoveryView(
                 onTimeBarTabSelected = onTimeBarTabSelected,
                 onSwitchListView = onSwitchListView,
                 addFabButton = {
-                    if (isNewMediaDiscoveryFabEnabled && shouldShowFabButton) {
+                    if (shouldShowFabButton) {
                         AddFabButton(
                             onFabClick = {
                                 coroutineScope.launch {
@@ -195,7 +194,7 @@ fun MediaDiscoveryView(
             )
         } else {
             Box(modifier = Modifier.fillMaxSize()) {
-                if (isNewMediaDiscoveryFabEnabled && shouldShowFabButton) {
+                if (shouldShowFabButton) {
                     AddFabButton(
                         modifier = Modifier
                             .align(Alignment.BottomEnd)

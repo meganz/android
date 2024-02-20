@@ -182,15 +182,11 @@ class MediaDiscoveryViewModel @Inject constructor(
 
         fetchPhotosJob = currentFolderId?.let { folderId ->
             viewModelScope.launch {
-                if (getFeatureFlagUseCase(AppFeatures.SubFolderMediaDiscoverySetting)) {
-                    monitorSubFolderMediaDiscoverySettingsUseCase()
-                        .catch { Timber.e(it) }
-                        .collectLatest { isRecursive ->
-                            getPhotos(folderId, isRecursive)
-                        }
-                } else {
-                    getPhotos(folderId, true)
-                }
+                monitorSubFolderMediaDiscoverySettingsUseCase()
+                    .catch { Timber.e(it) }
+                    .collectLatest { isRecursive ->
+                        getPhotos(folderId, isRecursive)
+                    }
             }
         }
     }

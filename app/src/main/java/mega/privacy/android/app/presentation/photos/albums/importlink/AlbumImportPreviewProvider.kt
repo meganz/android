@@ -103,25 +103,13 @@ class AlbumImportPreviewProvider @Inject constructor(
         (activity as LifecycleOwner).lifecycleScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
                 folderNodeId?.let { parentID ->
-                    if (getFeatureFlagValueUseCase(AppFeatures.SubFolderMediaDiscoverySetting)) {
-                        monitorSubFolderMediaDiscoverySettingsUseCase().collectLatest { recursive ->
-                            ImagePreviewActivity.createIntent(
-                                context = activity,
-                                imageSource = ImagePreviewFetcherSource.MEDIA_DISCOVERY,
-                                menuOptionsSource = ImagePreviewMenuSource.MEDIA_DISCOVERY,
-                                anchorImageNodeId = NodeId(photo.id),
-                                params = mapOf(PARENT_ID to parentID, IS_RECURSIVE to recursive),
-                            ).run {
-                                activity.startActivity(this)
-                            }
-                        }
-                    } else {
+                    monitorSubFolderMediaDiscoverySettingsUseCase().collectLatest { recursive ->
                         ImagePreviewActivity.createIntent(
                             context = activity,
                             imageSource = ImagePreviewFetcherSource.MEDIA_DISCOVERY,
                             menuOptionsSource = ImagePreviewMenuSource.MEDIA_DISCOVERY,
                             anchorImageNodeId = NodeId(photo.id),
-                            params = mapOf(PARENT_ID to parentID, IS_RECURSIVE to true),
+                            params = mapOf(PARENT_ID to parentID, IS_RECURSIVE to recursive),
                         ).run {
                             activity.startActivity(this)
                         }
