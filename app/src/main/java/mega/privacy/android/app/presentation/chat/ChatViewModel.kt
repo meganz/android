@@ -601,8 +601,13 @@ class ChatViewModel @Inject constructor(
                                 -> ScheduledMeetingStatus.Joined(call.duration)
 
                                 ChatCallStatus.TerminatingUserParticipation -> {
+                                    Timber.d("Terminating user participation and call code ${call.termCode}")
                                     when (call.termCode) {
                                         ChatCallTermCodeType.TooManyParticipants -> {
+                                            ScheduledMeetingStatus.NotJoined(call.duration)
+                                        }
+
+                                        ChatCallTermCodeType.CallUsersLimit -> {
                                             _state.update {
                                                 it.copy(snackbarMessage = R.string.call_error_too_many_participants)
                                             }
