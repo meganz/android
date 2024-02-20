@@ -8,9 +8,8 @@ import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMa
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
-import mega.privacy.android.domain.usecase.node.chat.AddChatFileTypeUseCase
+import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -29,7 +28,6 @@ class NodeAttachmentMessageViewModelTest {
     lateinit var underTest: NodeAttachmentMessageViewModel
 
     private val getPreviewUseCase = mock<GetPreviewUseCase>()
-    private val addChatFileTypeUseCase = mock<AddChatFileTypeUseCase>()
     private val fileSizeStringMapper = mock<FileSizeStringMapper>()
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
 
@@ -38,7 +36,6 @@ class NodeAttachmentMessageViewModelTest {
         resetMocks()
         underTest = NodeAttachmentMessageViewModel(
             getPreviewUseCase,
-            addChatFileTypeUseCase,
             fileSizeStringMapper,
             durationInSecondsTextMapper,
         )
@@ -47,7 +44,6 @@ class NodeAttachmentMessageViewModelTest {
     fun resetMocks() {
         reset(
             getPreviewUseCase,
-            addChatFileTypeUseCase,
             fileSizeStringMapper,
             durationInSecondsTextMapper,
         )
@@ -59,20 +55,18 @@ class NodeAttachmentMessageViewModelTest {
             mimeType = "application/jpg",
             extension = "jpg"
         )
-        val fileNode = mock<FileNode> {
+        val fileNode = mock<ChatDefaultFile> {
             on { hasPreview } doReturn true
             on { name } doReturn "name"
             on { size } doReturn 123L
             on { type } doReturn expectedType
         }
         whenever(fileSizeStringMapper(any())).thenReturn("size")
-        val chatFile = mock<ChatDefaultFile>()
         val expected = "file://image.jpg"
         val previewFile = mock<File> {
             on { toString() } doReturn expected
         }
-        whenever(addChatFileTypeUseCase(fileNode, CHAT_ID, MSG_ID)).thenReturn(chatFile)
-        whenever(getPreviewUseCase(chatFile)).thenReturn(previewFile)
+        whenever(getPreviewUseCase(fileNode)).thenReturn(previewFile)
         val msg = buildNodeAttachmentMessage(fileNode)
         underTest.getOrPutUiStateFlow(msg, CHAT_ID).test {
             val actual = awaitItem().previewUri
@@ -88,7 +82,7 @@ class NodeAttachmentMessageViewModelTest {
             mimeType = "application/jpg",
             extension = "jpg"
         )
-        val fileNode = mock<FileNode> {
+        val fileNode = mock<ChatDefaultFile> {
             on { name } doReturn expectedName
             on { size } doReturn 123L
             on { hasPreview } doReturn false
@@ -104,7 +98,7 @@ class NodeAttachmentMessageViewModelTest {
         }
     }
 
-    private fun buildNodeAttachmentMessage(fileNode: FileNode) =
+    private fun buildNodeAttachmentMessage(fileNode: ChatFile) =
         NodeAttachmentMessage(
             chatId = CHAT_ID,
             msgId = MSG_ID,

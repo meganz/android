@@ -15,7 +15,7 @@ class CreateNormalChatMessageUseCase @Inject constructor(
     private val getLinkTypesUseCase: GetLinkTypesUseCase,
 ) : CreateTypedMessageUseCase {
     //To be implemented the different type of normal messages. Check [NormalMessage].
-    override fun invoke(request: CreateTypedMessageInfo): NormalMessage {
+    override suspend fun invoke(request: CreateTypedMessageInfo): NormalMessage {
         with(request) {
             val allLinks = getLinkTypesUseCase(content.orEmpty())
             val hasSupportedLink = allLinks.any { it.type in supportedTypes }

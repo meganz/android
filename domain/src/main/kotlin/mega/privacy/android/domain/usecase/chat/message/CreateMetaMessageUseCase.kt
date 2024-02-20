@@ -13,7 +13,7 @@ import javax.inject.Inject
  */
 class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase {
 
-    override fun invoke(request: CreateTypedMessageInfo) = with(request) {
+    override suspend fun invoke(request: CreateTypedMessageInfo) = with(request) {
         when (metaType) {
             ContainsMetaType.RICH_PREVIEW -> RichPreviewMessage(
                 chatId = chatId,

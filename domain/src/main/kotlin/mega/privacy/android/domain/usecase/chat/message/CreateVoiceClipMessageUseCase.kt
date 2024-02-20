@@ -11,7 +11,7 @@ import kotlin.time.Duration.Companion.seconds
 
 internal class CreateVoiceClipMessageUseCase @Inject constructor() : CreateTypedMessageUseCase {
 
-    override fun invoke(request: CreateTypedMessageInfo): TypedMessage = with(request) {
+    override suspend fun invoke(request: CreateTypedMessageInfo): TypedMessage = with(request) {
         val fileNode = nodeList.firstOrNull() as? FileNode
         return VoiceClipMessage(
             chatId = chatId,

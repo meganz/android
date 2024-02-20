@@ -1,12 +1,11 @@
 package mega.privacy.android.domain.usecase.chat
 
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetLocalFileForNode
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
-import mega.privacy.android.domain.usecase.node.chat.AddChatFileTypeUseCase
 import javax.inject.Inject
 
 /**
@@ -15,7 +14,6 @@ import javax.inject.Inject
  */
 class GetChatNodeContentUriUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
-    private val addChatFileTypeUseCase: AddChatFileTypeUseCase,
     private val getLocalFileForNode: GetLocalFileForNode,
     private val httpServerStart: MegaApiHttpServerStartUseCase,
     private val httpServerIsRunning: MegaApiHttpServerIsRunningUseCase,
@@ -25,9 +23,7 @@ class GetChatNodeContentUriUseCase @Inject constructor(
      *
      */
     suspend operator fun invoke(
-        chatId: Long,
-        msgId: Long,
-        fileNode: FileNode,
+        fileNode: ChatFile,
     ): NodeContentUri = getLocalFileForNode(fileNode)?.let {
         NodeContentUri.LocalContentUri(it)
     } ?: run {
@@ -35,8 +31,7 @@ class GetChatNodeContentUriUseCase @Inject constructor(
             httpServerStart()
             true
         } else false
-        val typedNode = addChatFileTypeUseCase(fileNode, chatId, msgId)
-        val link = nodeRepository.getLocalLink(typedNode)
+        val link = nodeRepository.getLocalLink(fileNode)
         NodeContentUri.RemoteContentUri(link, shouldStopHttpSever)
     }
 }

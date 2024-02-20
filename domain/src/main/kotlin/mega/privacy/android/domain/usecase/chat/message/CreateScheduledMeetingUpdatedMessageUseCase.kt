@@ -8,7 +8,7 @@ import javax.inject.Inject
 internal class CreateScheduledMeetingUpdatedMessageUseCase @Inject constructor() :
     CreateTypedMessageUseCase {
 
-    override fun invoke(request: CreateTypedMessageInfo) = with(request) {
+    override suspend fun invoke(request: CreateTypedMessageInfo) = with(request) {
         ScheduledMeetingUpdatedMessage(
             chatId = chatId,
             msgId = messageId,

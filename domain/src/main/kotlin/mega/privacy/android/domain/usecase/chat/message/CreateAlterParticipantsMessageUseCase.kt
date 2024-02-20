@@ -7,7 +7,7 @@ import javax.inject.Inject
 internal class CreateAlterParticipantsMessageUseCase @Inject constructor() :
     CreateTypedMessageUseCase {
 
-    override fun invoke(request: CreateTypedMessageInfo) = with(request) {
+    override suspend fun invoke(request: CreateTypedMessageInfo) = with(request) {
         AlterParticipantsMessage(
             chatId = chatId,
             msgId = messageId,

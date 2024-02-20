@@ -8,7 +8,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
-import mega.privacy.android.domain.usecase.node.chat.AddChatFileTypeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -21,7 +20,6 @@ import javax.inject.Inject
 @HiltViewModel
 class NodeAttachmentMessageViewModel @Inject constructor(
     private val getPreviewUseCase: GetPreviewUseCase,
-    private val addChatFileTypeUseCase: AddChatFileTypeUseCase,
     fileSizeStringMapper: FileSizeStringMapper,
     durationInSecondsTextMapper: DurationInSecondsTextMapper,
 ) : AbstractAttachmentMessageViewModel<NodeAttachmentMessage>(
@@ -42,11 +40,9 @@ class NodeAttachmentMessageViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             val node = nodeAttachmentMessage.fileNode
-            val msgId = nodeAttachmentMessage.msgId
             if (node.hasPreview && mutableStateFlow.value.previewUri == null) {
                 runCatching {
-                    val typedNode = addChatFileTypeUseCase(node, chatId, msgId)
-                    getPreviewUseCase(typedNode)
+                    getPreviewUseCase(node)
                 }.onSuccess { previewFile ->
                     mutableStateFlow.update {
                         it.copy(

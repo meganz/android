@@ -1,12 +1,15 @@
 package mega.privacy.android.domain.usecase.chat.message
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.chat.ChatImageFile
+import mega.privacy.android.domain.usecase.node.chat.AddChatFileTypeUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -22,17 +25,19 @@ class CreateNodeAttachmentMessageUseCaseTest {
     private lateinit var underTest: CreateNodeAttachmentMessageUseCase
 
     private val createInvalidMessageUseCase = mock<CreateInvalidMessageUseCase>()
+    private val addChatFileTypeUseCase = mock<AddChatFileTypeUseCase>()
 
     @BeforeAll
     internal fun setUp() {
-        underTest = CreateNodeAttachmentMessageUseCase(createInvalidMessageUseCase)
+        underTest =
+            CreateNodeAttachmentMessageUseCase(createInvalidMessageUseCase, addChatFileTypeUseCase)
     }
 
     @BeforeEach
-    internal fun resetMocks() = reset(createInvalidMessageUseCase)
+    internal fun resetMocks() = reset(createInvalidMessageUseCase, addChatFileTypeUseCase)
 
     @Test
-    fun `test that if message has no nodes it returns an invalid message`() {
+    fun `test that if message has no nodes it returns an invalid message`() = runTest {
         val message = mock<ChatMessage> {
             on { nodeList } doReturn emptyList()
         }
@@ -43,7 +48,7 @@ class CreateNodeAttachmentMessageUseCaseTest {
     }
 
     @Test
-    fun `test that if message has no File nodes it returns an invalid message`() {
+    fun `test that if message has no File nodes it returns an invalid message`() = runTest {
         val message = mock<ChatMessage> {
             on { nodeList } doReturn listOf(mock<FolderNode>())
         }
@@ -54,11 +59,12 @@ class CreateNodeAttachmentMessageUseCaseTest {
     }
 
     @Test
-    fun `test that the use case returns the correctly mapped message`() {
+    fun `test that the use case returns the correctly mapped message`() = runTest {
         val fileNode = mock<FileNode>()
         val message = mock<ChatMessage> {
             on { nodeList } doReturn listOf(fileNode)
         }
+        val typedNode = mock<ChatImageFile>()
         val request = buildRequest(message)
         val expected = with(request) {
             NodeAttachmentMessage(
@@ -69,10 +75,11 @@ class CreateNodeAttachmentMessageUseCaseTest {
                 userHandle = userHandle,
                 shouldShowAvatar = shouldShowAvatar,
                 shouldShowTime = shouldShowTime,
-                fileNode = fileNode,
+                fileNode = typedNode,
                 reactions = emptyList(),
             )
         }
+        whenever(addChatFileTypeUseCase(fileNode, request.chatId, request.messageId)).thenReturn(typedNode)
         val actual = underTest(request)
         assertThat(actual).isEqualTo(expected)
     }

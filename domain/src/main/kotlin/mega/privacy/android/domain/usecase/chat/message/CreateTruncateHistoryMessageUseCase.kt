@@ -7,7 +7,7 @@ import javax.inject.Inject
 internal class CreateTruncateHistoryMessageUseCase @Inject constructor() :
     CreateTypedMessageUseCase {
 
-    override fun invoke(request: CreateTypedMessageInfo) = with(request) {
+    override suspend fun invoke(request: CreateTypedMessageInfo) = with(request) {
         TruncateHistoryMessage(
             chatId = chatId,
             msgId = messageId,

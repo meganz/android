@@ -8,7 +8,7 @@ import javax.inject.Inject
 internal class CreatePermissionChangeMessageUseCase @Inject constructor() :
     CreateTypedMessageUseCase {
 
-    override fun invoke(request: CreateTypedMessageInfo) = with(request) {
+    override suspend fun invoke(request: CreateTypedMessageInfo) = with(request) {
         PermissionChangeMessage(
             chatId = chatId,
             msgId = messageId,

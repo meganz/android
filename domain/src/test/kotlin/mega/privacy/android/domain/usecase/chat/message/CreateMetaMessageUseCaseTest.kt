@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.chat.message
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ContainsMeta
 import mega.privacy.android.domain.entity.chat.ContainsMetaType
@@ -30,7 +31,7 @@ class CreateMetaMessageUseCaseTest {
     }
 
     @Test
-    fun `test that InvalidMetaMessage is mapped when meta is null`() {
+    fun `test that InvalidMetaMessage is mapped when meta is null`() = runTest {
 
         val message = mock<ChatMessage> {
             on { containsMeta }.thenReturn(null)
@@ -58,7 +59,7 @@ class CreateMetaMessageUseCaseTest {
     fun `test that `(
         metaType: ContainsMetaType,
         clazz: Class<MetaMessage>,
-    ) {
+    ) = runTest {
         val mockContainsMeta = mock<ContainsMeta> {
             on { type }.thenReturn(metaType)
         }

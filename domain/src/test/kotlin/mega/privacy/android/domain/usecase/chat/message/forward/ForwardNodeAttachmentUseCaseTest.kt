@@ -5,7 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.messages.ForwardResult
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
-import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.chat.ChatImageFile
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.forward.ForwardNodeAttachmentUseCase.Companion.API_ENOENT
@@ -27,7 +27,7 @@ class ForwardNodeAttachmentUseCaseTest {
     private val attachNodeUseCase = mock<AttachNodeUseCase>()
 
     private val targetChatId = 789L
-    private val node = mock<FileNode>()
+    private val node = mock<ChatImageFile>()
     private val message = mock<NodeAttachmentMessage> {
         on { fileNode } doReturn node
     }

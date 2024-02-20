@@ -7,7 +7,7 @@ import javax.inject.Inject
 internal class CreateChatLinkRemovedMessageUseCase @Inject constructor() :
     CreateTypedMessageUseCase {
 
-    override fun invoke(request: CreateTypedMessageInfo) = with(request) {
+    override suspend fun invoke(request: CreateTypedMessageInfo) = with(request) {
         ChatLinkRemovedMessage(
             chatId = chatId,
             msgId = messageId,

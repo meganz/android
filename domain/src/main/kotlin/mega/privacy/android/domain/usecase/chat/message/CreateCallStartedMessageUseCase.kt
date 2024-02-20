@@ -6,7 +6,7 @@ import javax.inject.Inject
 
 internal class CreateCallStartedMessageUseCase @Inject constructor() : CreateTypedMessageUseCase {
 
-    override fun invoke(request: CreateTypedMessageInfo) =
+    override suspend fun invoke(request: CreateTypedMessageInfo) =
         with(request) {
             CallStartedMessage(
                 chatId = chatId,

@@ -1,5 +1,6 @@
 package mega.privacy.android.data.mapper.chat.paging
 
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.entity.chat.ChatGeolocationEntity
 import mega.privacy.android.data.database.entity.chat.ChatNodeEntity
 import mega.privacy.android.data.database.entity.chat.GiphyEntity
@@ -18,8 +19,8 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argForWhich
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -46,11 +47,9 @@ class MetaTypedEntityTypedMessageMapperTest {
         isMineParam: Boolean,
         shouldShowAvatarParam: Boolean,
         shouldShowTimeParam: Boolean,
-    ) {
+    ) = runTest {
         val mock = mock<TypedMessage>()
-        createTypedMessageUseCase.stub {
-            on { invoke(any()) } doReturn mock
-        }
+        whenever(createTypedMessageUseCase.invoke(any())).thenReturn(mock)
         val expectedNodeList = listOf(mock<ChatNodeEntity>())
         val expectedRichPreviewEntity = mock<RichPreviewEntity>()
         val expectedChatGeolocationEntity = mock<ChatGeolocationEntity>()

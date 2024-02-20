@@ -14,6 +14,6 @@ interface CreateTypedMessageUseCase {
      * @param request [CreateTypedMessageInfo]
      * @return [TypedMessage]
      */
-    operator fun invoke(request: CreateTypedMessageInfo): TypedMessage
+    suspend operator fun invoke(request: CreateTypedMessageInfo): TypedMessage
 }
 
