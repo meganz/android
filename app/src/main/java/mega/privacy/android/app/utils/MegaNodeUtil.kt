@@ -320,15 +320,18 @@ object MegaNodeUtil {
                 notExportedNodes++
             }
         }
-
+        val title = nodes.singleOrNull()?.name
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            putExtra(Intent.EXTRA_SUBJECT, title)
+        }
         if (notExportedNodes == 0) {
-            startShareIntent(context, Intent(Intent.ACTION_SEND), links.toString(), null)
+            startShareIntent(context, intent, links.toString(), null)
             return
         }
 
         val megaApi = MegaApplication.getInstance().megaApi
         val exportListener =
-            ExportListener(context, notExportedNodes, links, Intent(Intent.ACTION_SEND))
+            ExportListener(context, notExportedNodes, links, intent)
 
         for (node in nodes) {
             if (!node.isExported) {
