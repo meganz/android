@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.chat.message
 
-import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
@@ -23,9 +23,9 @@ class AttachNodeUseCase @Inject constructor(
      * Invoke
      *
      * @param chatId Chat identifier.
-     * @param fileNode [FileNode].
+     * @param fileNode [TypedFileNode].
      */
-    suspend operator fun invoke(chatId: Long, fileNode: FileNode) {
+    suspend operator fun invoke(chatId: Long, fileNode: TypedFileNode) {
         val attachableNodeId = getAttachableNodeIdUseCase(fileNode)
         chatMessageRepository.attachNode(chatId, attachableNodeId.longValue)?.let {
             getChatMessageUseCase(chatId, it)?.let { message ->

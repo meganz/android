@@ -3,9 +3,9 @@ package mega.privacy.android.domain.usecase.chat.message
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
@@ -36,7 +36,7 @@ class AttachVoiceClipMessageUseCaseTest {
     private val chatId = 123L
     private val nodeHandle = 456L
     private val msgId = 789L
-    private val fileNode = mock<FileNode> {
+    private val fileNode = mock<TypedFileNode> {
         on { id }.thenReturn(NodeId(nodeHandle))
     }
     private val message = mock<ChatMessage> {

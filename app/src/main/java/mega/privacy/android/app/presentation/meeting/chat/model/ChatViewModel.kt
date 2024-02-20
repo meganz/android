@@ -47,12 +47,14 @@ import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.chat.CreateChatException
 import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatException
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
@@ -212,6 +214,7 @@ class ChatViewModel @Inject constructor(
     private val forwardMessagesResultMapper: ForwardMessagesResultMapper,
     private val attachNodeUseCase: AttachNodeUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val addNodeType: AddNodeType,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -230,7 +233,6 @@ class ChatViewModel @Inject constructor(
 
     private var monitorAllContactParticipantsInChatJob: Job? = null
     private var monitorChatRoomUpdatesJob: Job? = null
-    private var monitorHasAnyContactJob: Job? = null
     private var monitorCallInChatJob: Job? = null
     private var monitorParticipatingInACallInOtherChatsJob: Job? = null
     private var monitorChatConnectionStateJob: Job? = null
@@ -1099,15 +1101,15 @@ class ChatViewModel @Inject constructor(
      */
     fun onAttachNodes(nodes: List<NodeId>) {
         viewModelScope.launch {
-            val sended = nodes
+            val sent = nodes
                 .mapNotNull { runCatching { getNodeByIdUseCase(it) }.getOrNull() }
                 .filterIsInstance<FileNode>()
                 .map {
                     runCatching {
-                        attachNodeUseCase(chatId, it)
+                        attachNodeUseCase(chatId, addNodeType(it) as TypedFileNode)
                     }.isSuccess
                 }.count { it }
-            if (sended != nodes.size) {
+            if (sent != nodes.size) {
                 _state.update { state ->
                     state.copy(infoToShowEvent = triggered(InfoToShow.SimpleString(R.string.files_send_to_chat_error)))
                 }

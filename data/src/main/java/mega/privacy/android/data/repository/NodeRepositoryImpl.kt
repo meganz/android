@@ -583,6 +583,29 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun copyNode(
+        nodeToCopy: TypedNode,
+        newNodeParent: NodeId,
+        newNodeName: String?,
+    ): NodeId = withContext(ioDispatcher) {
+        val node = megaNodeMapper(nodeToCopy)
+        val parent = getMegaNodeByHandle(newNodeParent, true)
+        requireNotNull(node) { "Node to copy $nodeToCopy not found" }
+        requireNotNull(parent) { "Destination node with handle $newNodeParent not found" }
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("copyNode") { NodeId(it.nodeHandle) }
+            megaApiGateway.copyNode(
+                nodeToCopy = node,
+                newNodeParent = parent,
+                newNodeName = newNodeName,
+                listener = listener
+            )
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
     override suspend fun copyPublicNode(
         publicNodeToCopy: Node,
         newNodeParent: NodeId,

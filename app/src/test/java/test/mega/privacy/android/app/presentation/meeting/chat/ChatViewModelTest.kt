@@ -62,6 +62,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.chat.CreateChatException
 import mega.privacy.android.domain.exception.chat.ParticipantAlreadyExistsException
 import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatException
+import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
@@ -269,6 +270,7 @@ internal class ChatViewModelTest {
     private val forwardMessagesResultMapper = mock<ForwardMessagesResultMapper>()
     private val attachNodeUseCase = mock<AttachNodeUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
+    private val addNodeType = mock<AddNodeType>()
 
     @BeforeEach
     fun resetMocks() {
@@ -323,6 +325,7 @@ internal class ChatViewModelTest {
             getUserUseCase,
             forwardMessagesUseCase,
             forwardMessagesResultMapper,
+            addNodeType,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -420,6 +423,7 @@ internal class ChatViewModelTest {
             forwardMessagesResultMapper = forwardMessagesResultMapper,
             attachNodeUseCase = attachNodeUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
+            addNodeType = addNodeType
         )
     }
 
@@ -2643,7 +2647,9 @@ internal class ChatViewModelTest {
         val nodeIds = (1L..5L).map { NodeId(it) }
         val files = nodeIds.map { mock<TypedFileNode>() }
         nodeIds.forEachIndexed { index, nodeId ->
-            whenever(getNodeByIdUseCase(nodeId)).thenReturn(files[index])
+            val file = files[index]
+            whenever(getNodeByIdUseCase(nodeId)).thenReturn(file)
+            whenever(addNodeType(file)).thenReturn(file)
         }
         underTest.onAttachNodes(nodeIds)
         files.forEach {
@@ -2659,6 +2665,7 @@ internal class ChatViewModelTest {
         nodeIds.forEachIndexed { index, nodeId ->
             val file = files[index]
             whenever(getNodeByIdUseCase(nodeId)).thenReturn(file)
+            whenever(addNodeType(file)).thenReturn(file)
             if (index == indexWithError) {
                 whenever(attachNodeUseCase(chatId, file)).thenThrow(RuntimeException())
             } else {

@@ -212,7 +212,6 @@ private fun StartDownloadComponent(
         )
     }
     showConfirmLargeTransfer.value?.let {
-        // texts of this dialog will be updated in TRAN-280
         ConfirmationDialog(
             title = stringResource(id = R.string.transfers_confirm_large_download_title),
             text = stringResource(id = R.string.alert_larger_file, it.sizeString),
