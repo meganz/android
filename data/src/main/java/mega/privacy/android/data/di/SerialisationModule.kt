@@ -8,7 +8,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.plus
 import mega.privacy.android.data.database.entity.chat.serialisation.messageInfoSerialisationModule
 import mega.privacy.android.domain.entity.chat.messages.serialisation.typedMessageSerialisationModule
-import mega.privacy.android.domain.entity.node.serialisation.fileTypeInfoSerialisationModule
+import mega.privacy.android.domain.entity.node.serialisation.nodeSerialisationModule
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -29,7 +29,9 @@ internal abstract class SerialisationModule {
         fun provideJson(): Json {
             return Json {
                 serializersModule =
-                    typedMessageSerialisationModule + messageInfoSerialisationModule + fileTypeInfoSerialisationModule
+                    typedMessageSerialisationModule +
+                            messageInfoSerialisationModule +
+                            nodeSerialisationModule
             }
         }
     }

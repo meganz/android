@@ -1,11 +1,13 @@
 package mega.privacy.android.domain.entity.node.chat
 
+import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.TypedImageNode
 
 /**
  * Chat file representing an image
  * @property typedImageNode, the node containing the image node
  */
+@Serializable
 data class ChatImageFile(
     val typedImageNode: TypedImageNode,
     override val chatId: Long,

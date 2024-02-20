@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.node.chat
 
+import kotlinx.serialization.Polymorphic
 import mega.privacy.android.domain.entity.node.TypedFileNode
 
 /**
@@ -9,6 +10,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
  * @property messageId: The id of the message that contains this file
  * @property messageIndex: The index of the file in message attachments, usually 0 since there's usually only one file. Keeping this because the SDK, in theory, allows for multiple files per message.
  */
+@Polymorphic
 sealed interface ChatFile : TypedFileNode {
     val chatId: Long
     val messageId: Long

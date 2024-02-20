@@ -1,10 +1,12 @@
 package mega.privacy.android.domain.entity.node.chat
 
+import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.TypedFileNode
 
 /**
  * Chat file with no specific file type
  */
+@Serializable
 data class ChatDefaultFile(
     private val typedFileNode: TypedFileNode,
     override val chatId: Long,

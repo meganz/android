@@ -16,11 +16,15 @@ import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
+import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
+import mega.privacy.android.domain.entity.node.chat.ChatFile
 
 /**
- * TypedNodeSerialisationModule
+ * NodeSerialisationModule
  */
-val fileTypeInfoSerialisationModule = SerializersModule {
+val nodeSerialisationModule = SerializersModule {
     polymorphic(FileTypeInfo::class) {
         subclass(UnknownFileTypeInfo::class)
         subclass(PdfFileTypeInfo::class)
@@ -34,5 +38,11 @@ val fileTypeInfoSerialisationModule = SerializersModule {
         subclass(TextFileTypeInfo::class)
         subclass(UnMappedFileTypeInfo::class)
         subclass(VideoFileTypeInfo::class)
+    }
+    polymorphic(ChatFile::class) {
+        subclass(ChatDefaultFile::class)
+    }
+    polymorphic(TypedFileNode::class) {
+        subclass(DefaultTypedFileNode::class)
     }
 }
