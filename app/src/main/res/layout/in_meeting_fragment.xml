@@ -45,13 +45,13 @@
         android:background="@android:color/transparent"
         android:orientation="vertical" />
 
-    <include
-        android:id="@+id/bottom_floating_panel"
-        layout="@layout/meeting_bottom_floating_panel" />
-
     <androidx.compose.ui.platform.ComposeView
         android:id="@+id/host_leave_call_dialog_compose_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <include
+        android:id="@+id/bottom_floating_panel"
+        layout="@layout/meeting_bottom_floating_panel" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

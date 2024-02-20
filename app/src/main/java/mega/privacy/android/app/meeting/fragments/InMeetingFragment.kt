@@ -25,7 +25,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -685,7 +684,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         binding.hostLeaveCallDialogComposeView.apply {
-            isVisible = true
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 val state by inMeetingViewModel.state.collectAsStateWithLifecycle()
@@ -1022,6 +1020,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private fun collectFlows() {
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state) { state: InMeetingUiState ->
+
+            floatingBottomSheet.isVisible = !state.showEndMeetingAsOnlyHostBottomPanel
+
             if (state.error != null) {
                 sharedModel.showSnackBar(getString(state.error))
             }
