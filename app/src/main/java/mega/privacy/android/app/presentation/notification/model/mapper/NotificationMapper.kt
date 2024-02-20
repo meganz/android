@@ -13,27 +13,31 @@ import mega.privacy.android.app.presentation.notification.model.extensions.separ
 import mega.privacy.android.app.presentation.notification.model.extensions.title
 import mega.privacy.android.app.presentation.notification.model.extensions.titleTextSize
 import mega.privacy.android.domain.entity.UserAlert
+import javax.inject.Inject
 
 /**
  * Mapper to convert [UserAlert] to [Notification].
  */
-typealias NotificationMapper = (@JvmSuppressWildcards UserAlert) -> @JvmSuppressWildcards Notification
+class NotificationMapper @Inject constructor() {
 
-/**
- * Get notification
- *
- */
-internal fun getNotification(alert: UserAlert) = Notification(
-    sectionTitle = alert.sectionTitle(),
-    sectionColour = alert.sectionColour(),
-    sectionIcon = alert.sectionIcon(),
-    title = alert.title(),
-    titleTextSize = alert.titleTextSize(),
-    description = alert.description(),
-    schedMeetingNotification = alert.schedMeetingNotification(),
-    dateText = alert.dateText(),
-    isNew = !alert.seen,
-    backgroundColor = alert.backgroundColor(),
-    separatorMargin = alert.separatorMargin(),
-    onClick = alert.onClick(),
-)
+    /**
+     * Invoke
+     * Convert [UserAlert] to [Notification]
+     * @param alert [UserAlert]
+     * @return [Notification]
+     */
+    operator fun invoke(alert: UserAlert) = Notification(
+        sectionTitle = alert.sectionTitle(),
+        sectionColour = alert.sectionColour(),
+        sectionIcon = alert.sectionIcon(),
+        title = alert.title(),
+        titleTextSize = alert.titleTextSize(),
+        description = alert.description(),
+        schedMeetingNotification = alert.schedMeetingNotification(),
+        dateText = alert.dateText(),
+        isNew = !alert.seen,
+        backgroundColor = alert.backgroundColor(),
+        separatorMargin = alert.separatorMargin(),
+        onClick = alert.onClick(),
+    )
+}

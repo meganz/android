@@ -11,10 +11,10 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.notification.NotificationViewModel
 import mega.privacy.android.app.presentation.notification.model.Notification
+import mega.privacy.android.app.presentation.notification.model.mapper.NotificationMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
 import mega.privacy.android.domain.entity.IncomingPendingContactRequestAlert
-import mega.privacy.android.domain.entity.UserAlert
 import mega.privacy.android.domain.usecase.AcknowledgeUserAlertsUseCase
 import mega.privacy.android.domain.usecase.MonitorUserAlertsUseCase
 import org.junit.jupiter.api.BeforeEach
@@ -37,7 +37,7 @@ class NotificationViewModelTest {
 
     private val acknowledgeUserAlertsUseCase = mock<AcknowledgeUserAlertsUseCase>()
 
-    private val notificationMapper = mock<(UserAlert) -> Notification>()
+    private val notificationMapper = mock<NotificationMapper>()
 
     @BeforeEach
     fun setUp() {

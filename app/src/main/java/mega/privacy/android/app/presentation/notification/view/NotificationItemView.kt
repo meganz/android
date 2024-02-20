@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.notification.model.Notification
-import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.grey_500_grey_400
@@ -44,6 +43,7 @@ import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.core.ui.theme.white_alpha_087
 import mega.privacy.android.core.ui.utils.intToDp
+import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 
 @Composable
 internal fun NotificationItemView(
@@ -114,23 +114,19 @@ private fun getHorizontalPaddingForDivider(
 private fun NotificationSectionRow(
     notification: Notification,
 ) {
-    Row(modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
-        verticalAlignment = Alignment.CenterVertically) {
-/*        notification.sectionIcon?.let {
-            Icon(painter = painterResource(id = notification.sectionIcon),
-                contentDescription = "Section icon",
-                modifier = Modifier
-                    .padding(end = 4.dp)
-                    .testTag("SectionIcon"),
-                tint = if (MaterialTheme.colors.isLight) orange_400 else orange_300)
-        }*/
-        Text(modifier = Modifier.testTag("SectionTitle"),
+    Row(
+        modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = Modifier.testTag("SectionTitle"),
             color = colorResource(id = notification.sectionColour),
             text = notification.sectionTitle(LocalContext.current),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             fontWeight = FontWeight.Bold,
-            fontSize = 13.sp)
+            fontSize = 13.sp
+        )
     }
 }
 
@@ -216,14 +212,16 @@ private fun NotificationDescription(description: String) {
 private fun NotificationDate(
     notification: Notification,
 ) {
-    Text(text = notification.dateText(LocalContext.current),
+    Text(
+        text = notification.dateText(LocalContext.current),
         modifier = Modifier
             .padding(start = 16.dp, top = 5.dp, bottom = 12.dp)
             .testTag("DateText"),
         color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
         style = MaterialTheme.typography.caption,
         maxLines = 1,
-        overflow = TextOverflow.Ellipsis)
+        overflow = TextOverflow.Ellipsis
+    )
 }
 
 @Composable
@@ -232,9 +230,11 @@ private fun NotificationDivider(horizontalPadding: Int) {
     if (horizontalPadding != 0) {
         modifier = modifier.padding(horizontal = intToDp(px = horizontalPadding))
     }
-    Divider(modifier = modifier,
+    Divider(
+        modifier = modifier,
         color = if (MaterialTheme.colors.isLight) grey_alpha_012 else white_alpha_012,
-        thickness = 1.dp)
+        thickness = 1.dp
+    )
 }
 
 @Preview

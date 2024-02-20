@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.TextUnit
  * @property onClick
  * @constructor Create empty Notification
  */
-data class Notification constructor(
+data class Notification(
     val sectionTitle: (Context) -> String,
     @ColorRes val sectionColour: Int,
     @DrawableRes val sectionIcon: Int?,

@@ -39,7 +39,7 @@ class NotificationViewModel @Inject constructor(
         viewModelScope.launch {
             monitorUserAlertsUseCase().mapLatest { list ->
                 list.map { notificationMapper(it) }
-            }.collect() {
+            }.collect {
                 _state.update { (notifications) ->
                     NotificationState(
                         notifications = it,
