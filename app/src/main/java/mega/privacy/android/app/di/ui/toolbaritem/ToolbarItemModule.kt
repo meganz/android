@@ -11,7 +11,7 @@ import mega.privacy.android.app.di.ui.toolbaritem.qualifier.IncomingShares
 import mega.privacy.android.app.di.ui.toolbaritem.qualifier.Links
 import mega.privacy.android.app.di.ui.toolbaritem.qualifier.OutgoingShares
 import mega.privacy.android.app.di.ui.toolbaritem.qualifier.RubbishBin
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ClearSelection
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ClearSelectionToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.CopyToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DisputeTakeDownMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DownloadToolbarMenuItem
@@ -29,7 +29,7 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveS
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameDropdownMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RestoreToolbarMenuItem
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SelectAll
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SelectAllToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SendToChatToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Share
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareFolderToolbarMenuItem
@@ -53,8 +53,8 @@ abstract class ToolbarItemModule {
         @ElementsIntoSet
         @OutgoingShares
         fun provideOutgoingSharesToolbarItems(
-            selectAll: SelectAll,
-            clearSelection: ClearSelection,
+            selectAllToolbarMenuItem: SelectAllToolbarMenuItem,
+            clearSelectionToolbarMenuItem: ClearSelectionToolbarMenuItem,
             download: DownloadToolbarMenuItem,
             removeShareToolbarMenuItem: RemoveShareToolbarMenuItem,
             getLinkToolbarMenuItem: GetLinkToolbarMenuItem,
@@ -68,8 +68,8 @@ abstract class ToolbarItemModule {
             trashToolbarMenuItem: TrashToolbarMenuItem,
         ): Set<NodeToolbarMenuItem<*>> {
             return setOf(
-                selectAll,
-                clearSelection,
+                selectAllToolbarMenuItem,
+                clearSelectionToolbarMenuItem,
                 download,
                 removeShareToolbarMenuItem,
                 getLinkToolbarMenuItem,
@@ -91,8 +91,8 @@ abstract class ToolbarItemModule {
         @ElementsIntoSet
         @IncomingShares
         fun provideIncomingSharesToolbarItems(
-            selectAll: SelectAll,
-            clearSelection: ClearSelection,
+            selectAll: SelectAllToolbarMenuItem,
+            clearSelection: ClearSelectionToolbarMenuItem,
             leaveShareToolBarMenuItem: LeaveShareToolBarMenuItem,
             download: DownloadToolbarMenuItem,
             copyToolbarMenuItem: CopyToolbarMenuItem,
@@ -121,8 +121,8 @@ abstract class ToolbarItemModule {
         @ElementsIntoSet
         @Links
         fun provideSharedLinksToolbarItems(
-            selectAll: SelectAll,
-            clearSelection: ClearSelection,
+            selectAll: SelectAllToolbarMenuItem,
+            clearSelection: ClearSelectionToolbarMenuItem,
             download: DownloadToolbarMenuItem,
             getLinkToolbarMenuItem: GetLinkToolbarMenuItem,
             manageLinkToolbarMenuItem: ManageLinkToolbarMenuItem,
@@ -157,8 +157,8 @@ abstract class ToolbarItemModule {
         @ElementsIntoSet
         @CloudDrive
         fun provideCloudDriveToolbarItems(
-            selectAll: SelectAll,
-            clearSelection: ClearSelection,
+            selectAllToolbarMenuItem: SelectAllToolbarMenuItem,
+            clearSelectionToolbarMenuItem: ClearSelectionToolbarMenuItem,
             renameToolbarMenuItem: RenameToolbarMenuItem,
             manageLink: MultiSelectManageLinkToolbarMenuItem,
             getLinkToolbarMenuItem: GetLinkToolbarMenuItem,
@@ -174,8 +174,8 @@ abstract class ToolbarItemModule {
             share: Share,
         ): Set<NodeToolbarMenuItem<*>> {
             return setOf(
-                selectAll,
-                clearSelection,
+                selectAllToolbarMenuItem,
+                clearSelectionToolbarMenuItem,
                 download,
                 disputeTakeDownMenuItem,
                 moveToolbarMenuItem,
@@ -199,14 +199,14 @@ abstract class ToolbarItemModule {
         @ElementsIntoSet
         @Backups
         fun provideBackupsToolbarItems(
-            selectAll: SelectAll,
-            clearSelection: ClearSelection,
+            selectAllToolbarMenuItem: SelectAllToolbarMenuItem,
+            clearSelectionToolbarMenuItem: ClearSelectionToolbarMenuItem,
             removeToolbarMenuItem: RemoveToolbarMenuItem,
             restoreToolbarMenuItem: RestoreToolbarMenuItem,
         ): Set<NodeToolbarMenuItem<*>> {
             return setOf(
-                selectAll,
-                clearSelection,
+                selectAllToolbarMenuItem,
+                clearSelectionToolbarMenuItem,
                 removeToolbarMenuItem,
                 restoreToolbarMenuItem
             )
@@ -219,14 +219,14 @@ abstract class ToolbarItemModule {
         @ElementsIntoSet
         @RubbishBin
         fun provideRubbishBinToolbarItems(
-            selectAll: SelectAll,
-            clearSelection: ClearSelection,
+            selectAllToolbarMenuItem: SelectAllToolbarMenuItem,
+            clearSelectionToolbarMenuItem: ClearSelectionToolbarMenuItem,
             removeToolbarMenuItem: RemoveToolbarMenuItem,
             restoreToolbarMenuItem: RestoreToolbarMenuItem,
         ): Set<NodeToolbarMenuItem<*>> {
             return setOf(
-                selectAll,
-                clearSelection,
+                selectAllToolbarMenuItem,
+                clearSelectionToolbarMenuItem,
                 removeToolbarMenuItem,
                 restoreToolbarMenuItem
             )

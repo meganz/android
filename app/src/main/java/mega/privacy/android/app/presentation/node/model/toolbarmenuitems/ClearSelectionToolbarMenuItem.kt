@@ -11,7 +11,7 @@ import javax.inject.Inject
  * This item will always be placed on the extras/more option
  * @property menuAction [ClearSelectionMenuAction]
  */
-class ClearSelection @Inject constructor(
+class ClearSelectionToolbarMenuItem @Inject constructor(
     override val menuAction: ClearSelectionMenuAction,
 ) : NodeToolbarMenuItem<MenuAction> {
 

@@ -289,6 +289,16 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                     onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
                     snackBarHostState = snackbarHostState,
                 )
+                EventEffect(
+                    event = nodeActionState.selectAll,
+                    onConsumed = nodeActionsViewModel::selectAllConsumed,
+                    action = viewModel::selectAll
+                )
+                EventEffect(
+                    event = nodeActionState.clearAll,
+                    onConsumed = nodeActionsViewModel::clearAllConsumed,
+                    action = viewModel::clearSelection
+                )
             }
         }
 

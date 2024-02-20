@@ -21,6 +21,8 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @property outgoingShares Outgoing shares
  * @property contactsData Contacts data
  * @property downloadEvent Download event
+ * @property selectAll Select All event
+ * @property clearAll clear All Event
  */
 data class NodeActionState(
     val selectedNodes: List<TypedNode> = emptyList(),
@@ -33,4 +35,6 @@ data class NodeActionState(
     val outgoingShares: List<ShareData> = emptyList(),
     val contactsData: StateEventWithContent<Triple<List<String>, Boolean, String>> = consumed(),
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
+    val selectAll: StateEvent = consumed,
+    val clearAll: StateEvent = consumed,
 )

@@ -20,7 +20,7 @@ import mega.privacy.android.app.presentation.node.model.menuaction.SendToChatMen
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.TrashMenuAction
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ClearSelection
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ClearSelectionToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.CopyToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DisputeTakeDownMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.DownloadToolbarMenuItem
@@ -36,7 +36,7 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RemoveT
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameDropdownMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RestoreToolbarMenuItem
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SelectAll
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SelectAllToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SendToChatToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Share
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareFolderToolbarMenuItem
@@ -51,8 +51,8 @@ import org.mockito.kotlin.mock
 class NodeToolbarActionMapperTest {
     val underTest = NodeToolbarActionMapper()
     private val toolbarList = setOf(
-        SelectAll(SelectAllMenuAction()),
-        ClearSelection(ClearSelectionMenuAction()),
+        SelectAllToolbarMenuItem(SelectAllMenuAction()),
+        ClearSelectionToolbarMenuItem(ClearSelectionMenuAction()),
         DownloadToolbarMenuItem(DownloadMenuAction()),
         RestoreToolbarMenuItem(
             scope = CoroutineScope(UnconfinedTestDispatcher()),

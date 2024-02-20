@@ -345,4 +345,39 @@ class NodeActionsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Update select All
+     */
+    fun selectAllClicked() {
+        _state.update {
+            it.copy(selectAll = triggered)
+        }
+    }
+
+    /**
+     * Consume select All
+     */
+    fun selectAllConsumed() {
+        _state.update {
+            it.copy(selectAll = consumed)
+        }
+    }
+
+    /**
+     * Update clear All
+     */
+    fun clearAllClicked() {
+        _state.update {
+            it.copy(clearAll = triggered)
+        }
+    }
+
+    /**
+     * Consume clear All
+     */
+    fun clearAllConsumed() {
+        _state.update {
+            it.copy(clearAll = consumed)
+        }
+    }
 }

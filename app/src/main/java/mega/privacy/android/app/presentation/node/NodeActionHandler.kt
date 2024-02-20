@@ -7,12 +7,15 @@ import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityCo
 import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.activities.contract.ShareFolderActivityContract
 import mega.privacy.android.app.activities.contract.VersionsFileActivityContract
+import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.AvailableOfflineMenuAction
+import mega.privacy.android.app.presentation.node.model.menuaction.ClearSelectionMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.CopyMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.DownloadMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.MoveMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.OpenWithMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.RestoreMenuAction
+import mega.privacy.android.app.presentation.node.model.menuaction.SelectAllMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.SendToChatMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.VersionsMenuAction
@@ -159,6 +162,14 @@ class NodeActionHandler(
             is SendToChatMenuAction -> {
                 val nodeHandleArray = nodes.map { it.id.longValue }.toLongArray()
                 sendToChatLauncher?.launch(nodeHandleArray)
+            }
+
+            is SelectAllMenuAction -> {
+                nodeActionsViewModel.selectAllClicked()
+            }
+
+            is ClearSelectionMenuAction -> {
+                nodeActionsViewModel.clearAllClicked()
             }
 
             else -> throw NotImplementedError("Action $action does not have a handler.")

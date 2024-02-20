@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import mega.privacy.android.app.presentation.node.model.menuaction.SelectAllMenuAction
 import mega.privacy.android.core.ui.model.MenuAction
-import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedNode
 import javax.inject.Inject
 
@@ -12,7 +11,7 @@ import javax.inject.Inject
  * This item will always be placed on the extras/more option
  * @property menuAction [SelectAllMenuAction]
  */
-class SelectAll @Inject constructor(
+class SelectAllToolbarMenuItem @Inject constructor(
     override val menuAction: SelectAllMenuAction,
 ) : NodeToolbarMenuItem<MenuAction> {
 
