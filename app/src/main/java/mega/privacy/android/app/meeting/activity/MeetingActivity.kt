@@ -249,9 +249,7 @@ class MeetingActivity : PasscodeActivity() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 val state by meetingViewModel.state.collectAsStateWithLifecycle()
-                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                val isDark = themeMode.isDarkMode()
-                MegaAppTheme(isDark = isDark) {
+                MegaAppTheme(isDark = true) {
                     ParticipantsFullListView(
                         state = state,
                         onScrollChange = { scrolled ->
@@ -332,7 +330,8 @@ class MeetingActivity : PasscodeActivity() {
                             meetingViewModel.ringAllAbsentsParticipants()
                         },
                         onMuteParticipantClick = meetingViewModel::muteParticipant,
-                        onMuteAllParticipantsClick = meetingViewModel::muteAllParticipants
+                        onMuteAllParticipantsClick = meetingViewModel::muteAllParticipants,
+                        onResetStateSnackbarMessage = meetingViewModel::onSnackbarMessageConsumed
                     )
                 }
             }

@@ -54,6 +54,7 @@ import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
 import mega.privacy.android.app.presentation.chat.model.AnswerCallResult
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoState
 import mega.privacy.android.app.presentation.extensions.getState
+import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.mapper.ChatParticipantMapper
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.usecase.call.GetCallUseCase
@@ -168,6 +169,7 @@ import javax.inject.Inject
  * @property allowUsersJoinCallUseCase                      [AllowUsersJoinCallUseCase]
  * @property mutePeersUseCase                               [MutePeersUseCase]
  * @property muteAllPeersUseCase                            [MuteAllPeersUseCase]
+ * @property getStringFromStringResMapper                   [GetStringFromStringResMapper]
  * @property getCurrentSubscriptionPlanUseCase              [GetCurrentSubscriptionPlanUseCase]
  * @property state                                          Current view state as [MeetingState]
  */
@@ -214,6 +216,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val allowUsersJoinCallUseCase: AllowUsersJoinCallUseCase,
     private val mutePeersUseCase: MutePeersUseCase,
     private val muteAllPeersUseCase: MuteAllPeersUseCase,
+    private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val getCurrentSubscriptionPlanUseCase: GetCurrentSubscriptionPlanUseCase,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
@@ -1986,6 +1989,7 @@ class MeetingActivityViewModel @Inject constructor(
                         R.string.meetings_muted_all_participants_snackbar_message,
                     )
                 )
+                triggerSnackbarMessage(getStringFromStringResMapper(R.string.meetings_muted_all_participants_snackbar_message))
             }.onFailure { exception ->
                 Timber.e(exception)
             }
@@ -2020,6 +2024,12 @@ class MeetingActivityViewModel @Inject constructor(
                             it.name
                         )
                     )
+                    triggerSnackbarMessage(
+                        getStringFromStringResMapper(
+                            R.string.meetings_muted_a_participant_snackbar_message,
+                            it.name
+                        )
+                    )
                 }
             }.onFailure { exception ->
                 Timber.e(exception)
@@ -2049,6 +2059,22 @@ class MeetingActivityViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Trigger event to show Snackbar message
+     *
+     * @param message     Content for snack bar
+     */
+    fun triggerSnackbarMessage(message: String) =
+        _state.update { it.copy(snackbarMsg = triggered(message)) }
+
+    /**
+     * Reset and notify that snackbarMessage is consumed
+     */
+    fun onSnackbarMessageConsumed() =
+        _state.update {
+            it.copy(snackbarMsg = consumed())
+        }
 
     companion object {
         private const val INVALID_CHAT_HANDLE = -1L

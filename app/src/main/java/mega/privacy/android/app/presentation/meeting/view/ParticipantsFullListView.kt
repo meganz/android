@@ -15,10 +15,12 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -79,9 +81,10 @@ fun ParticipantsFullListView(
     onBottomPanelHiddenClicked: () -> Unit,
     onRemoveParticipant: () -> Unit,
     onDismissRemoveParticipantDialog: () -> Unit,
+    onMuteAllParticipantsClick: () -> Unit,
     onRingParticipantClicked: (ChatParticipant) -> Unit = {},
     onRingAllParticipantsClicked: () -> Unit = {},
-    onMuteAllParticipantsClick: () -> Unit,
+    onResetStateSnackbarMessage: () -> Unit = {},
 ) {
     if ((state.participantsSection == ParticipantsSection.WaitingRoomSection &&
                 state.shouldWaitingRoomListBeShown &&
@@ -96,6 +99,7 @@ fun ParticipantsFullListView(
         val listState = rememberLazyListState()
         val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
         val scaffoldState = rememberScaffoldState()
+        val snackbarHostState = remember { SnackbarHostState() }
         val coroutineScope = rememberCoroutineScope()
         val modalSheetState = rememberModalBottomSheetState(
             initialValue = ModalBottomSheetValue.Hidden,
@@ -258,7 +262,15 @@ fun ParticipantsFullListView(
                     )
                 }
             }
+
+            EventEffect(
+                event = state.snackbarMsg, onConsumed = onResetStateSnackbarMessage
+            ) {
+                scaffoldState.snackbarHostState.showSnackbar(it)
+            }
         }
+
+        SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
 
         onScrollChange(!firstItemVisible)
 
@@ -361,7 +373,7 @@ private fun ParticipantsFullListAppBar(
         navigationIcon = {
             IconButton(onClick = onBackPressed) {
                 Icon(
-                    imageVector = Icons.Filled.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back button",
                     tint = iconColor
                 )
@@ -404,7 +416,8 @@ fun PreviewUsersListViewWaitingRoom() {
             onRemoveParticipant = {},
             onMuteParticipantClick = {},
             onMuteAllParticipantsClick = {},
-            onSendMessageClicked = {})
+            onSendMessageClicked = {},
+            onResetStateSnackbarMessage = {})
     }
 }
 
@@ -440,7 +453,8 @@ fun PreviewUsersListViewInCall() {
             onRemoveParticipant = {},
             onMuteParticipantClick = {},
             onMuteAllParticipantsClick = {},
-            onSendMessageClicked = {})
+            onSendMessageClicked = {},
+            onResetStateSnackbarMessage = {})
     }
 }
 
@@ -476,7 +490,8 @@ fun PreviewUsersListViewNotInCall() {
             onRemoveParticipant = {},
             onMuteParticipantClick = {},
             onMuteAllParticipantsClick = {},
-            onSendMessageClicked = {})
+            onSendMessageClicked = {},
+            onResetStateSnackbarMessage = {})
     }
 }
 
