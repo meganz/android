@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.shares.outgoing
+package mega.privacy.android.app.presentation.shares.incoming
 
 import android.content.Context
 import android.content.Intent
@@ -46,7 +46,6 @@ import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDi
 import mega.privacy.android.app.main.dialog.shares.RemoveAllSharingContactDialogFragment
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.clouddrive.OptionItems
-import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.manager.model.SharesTab
@@ -54,7 +53,7 @@ import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.shares.SharesActionListener
-import mega.privacy.android.app.presentation.shares.outgoing.ui.OutgoingSharesView
+import mega.privacy.android.app.presentation.shares.incoming.ui.IncomingSharesView
 import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
@@ -67,23 +66,24 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.shares.ShareNode
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * A Fragment for Out going shares
+ * A Fragment for incoming shares
  */
 @AndroidEntryPoint
-class OutgoingSharesComposeFragment : Fragment() {
+class IncomingSharesComposeFragment : Fragment() {
 
     companion object {
         /**
-         * Returns the instance of OutgoingSharesComposeFragment
+         * Returns the instance of IncomingSharesComposeFragment
          */
         @JvmStatic
-        fun newInstance() = OutgoingSharesComposeFragment()
+        fun newInstance() = IncomingSharesComposeFragment()
     }
 
     private var fileBackupManager: FileBackupManager? = null
@@ -93,7 +93,7 @@ class OutgoingSharesComposeFragment : Fragment() {
     /**
      * Interface that notifies the attached Activity to execute specific functions
      */
-    private var outgoingSharesActionListener: SharesActionListener? = null
+    private var sharesActionListener: SharesActionListener? = null
 
     /**
      * Application Theme Mode
@@ -113,7 +113,7 @@ class OutgoingSharesComposeFragment : Fragment() {
     @Inject
     lateinit var getOptionsForToolbarMapper: GetOptionsForToolbarMapper
 
-    private val viewModel: OutgoingSharesComposeViewModel by activityViewModels()
+    private val viewModel: IncomingSharesComposeViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
 
     /**
@@ -129,7 +129,7 @@ class OutgoingSharesComposeFragment : Fragment() {
         Timber.d("onAttach")
         super.onAttach(context)
 
-        outgoingSharesActionListener = requireActivity() as? SharesActionListener
+        sharesActionListener = requireActivity() as? SharesActionListener
         fileBackupManager = FileBackupManager(
             activity = requireActivity(),
             actionBackupListener = object : ActionBackupListener {
@@ -162,13 +162,13 @@ class OutgoingSharesComposeFragment : Fragment() {
                 val snackbarHostState = remember { SnackbarHostState() }
                 val coroutineScope = rememberCoroutineScope()
                 MegaAppTheme(isDark = themeMode.isDarkMode()) {
-                    OutgoingSharesView(
+                    IncomingSharesView(
                         uiState = uiState,
-                        emptyState = getEmptyFolderDrawable(uiState.isOutgoingSharesEmpty),
+                        emptyState = getEmptyFolderDrawable(uiState.isIncomingSharesEmpty),
                         onItemClick = viewModel::onItemClicked,
                         onLongClick = {
-                            val clicked = viewModel.onLongItemClicked(it)
-                            if (clicked && actionMode == null) {
+                            viewModel.onLongItemClicked(it)
+                            if (actionMode == null) {
                                 actionMode =
                                     (activity as? AppCompatActivity)?.startSupportActionMode(
                                         ActionBarCallBack()
@@ -193,7 +193,6 @@ class OutgoingSharesComposeFragment : Fragment() {
                         onSortOrderClick = { showSortByPanel() },
                         onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
                         onLinkClicked = ::navigateToLink,
-                        onVerifyContactDialogDismissed = viewModel::dismissVerifyContactDialog,
                         onToggleAppBarElevation = ::toggleAppBarElevation,
                     )
 
@@ -219,7 +218,7 @@ class OutgoingSharesComposeFragment : Fragment() {
                     hideTabs(!uiState.isInRootLevel)
                 }
                 LaunchedEffect(uiState.nodesList.isEmpty()) {
-                    outgoingSharesActionListener?.updateSharesPageToolbarTitleAndFAB(
+                    sharesActionListener?.updateSharesPageToolbarTitleAndFAB(
                         invalidateOptionsMenu = true
                     )
                 }
@@ -238,14 +237,9 @@ class OutgoingSharesComposeFragment : Fragment() {
                 ToolbarTitleUpdateEffect(uiState.updateToolbarTitleEvent) {
                     viewModel.consumeUpdateToolbarTitleEvent()
                 }
-                OutgoingSharesExitEffect(uiState.exitOutgoingSharesEvent) {
-                    viewModel.consumeExitOutgoingSharesEvent()
+                IncomingSharesExitEffect(uiState.exitIncomingSharesEvent) {
+                    viewModel.consumeExitIncomingSharesEvent()
                 }
-                EventEffect(
-                    event = uiState.openAuthenticityCredentials,
-                    onConsumed = viewModel::consumeOpenAuthenticityCredentials,
-                    action = { email -> openAuthenticityCredentials(email) },
-                )
             }
         }
     }
@@ -264,7 +258,7 @@ class OutgoingSharesComposeFragment : Fragment() {
      * @param hide true if needs to hide shares tabs
      */
     private fun hideTabs(hide: Boolean) {
-        (activity as ManagerActivity?)?.hideTabs(hide, SharesTab.OUTGOING_TAB)
+        (activity as ManagerActivity?)?.hideTabs(hide, SharesTab.INCOMING_TAB)
     }
 
     /**
@@ -297,7 +291,7 @@ class OutgoingSharesComposeFragment : Fragment() {
             event = event,
             onConsumed = onConsumeEvent,
             action = {
-                outgoingSharesActionListener?.updateSharesPageToolbarTitleAndFAB(
+                sharesActionListener?.updateSharesPageToolbarTitleAndFAB(
                     invalidateOptionsMenu = true
                 )
             },
@@ -305,25 +299,25 @@ class OutgoingSharesComposeFragment : Fragment() {
     }
 
     /**
-     * A Composable [EventEffect] to exit the Outgoing Shares
+     * A Composable [EventEffect] to exit the Incoming Shares
      *
      * @param event The State Event
      * @param onConsumeEvent Executes specific action if [event] has been consumed
      */
     @Composable
-    private fun OutgoingSharesExitEffect(
+    private fun IncomingSharesExitEffect(
         event: StateEvent,
         onConsumeEvent: () -> Unit,
     ) {
         EventEffect(
             event = event,
             onConsumed = onConsumeEvent,
-            action = { outgoingSharesActionListener?.exitSharesPage() },
+            action = { sharesActionListener?.exitSharesPage() },
         )
     }
 
     /**
-     * On Item click event received from [OutgoingSharesComposeViewModel]
+     * On Item click event received from [IncomingSharesComposeViewModel]
      *
      * @param currentFileNode [FileNode]
      */
@@ -332,7 +326,7 @@ class OutgoingSharesComposeFragment : Fragment() {
             openFile(fileNode = it)
             viewModel.onItemPerformedClicked()
         } ?: run {
-            outgoingSharesActionListener?.updateSharesPageToolbarTitleAndFAB(
+            sharesActionListener?.updateSharesPageToolbarTitleAndFAB(
                 invalidateOptionsMenu = false
             )
         }
@@ -384,17 +378,17 @@ class OutgoingSharesComposeFragment : Fragment() {
     }
 
     /**
-     * Get empty state for Outgoing Shares
-     * @param isPageEmpty true when there's no outgoing shares
+     * Get empty state for Incoming Shares
+     * @param isPageEmpty true when there's no incoming shares
      */
     private fun getEmptyFolderDrawable(isPageEmpty: Boolean): Pair<Int, Int> {
         return if (isPageEmpty) {
             Pair(
                 if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    R.drawable.outgoing_shares_empty
+                    R.drawable.incoming_shares_empty
                 } else {
-                    R.drawable.outgoing_empty_landscape
-                }, R.string.context_empty_outgoing
+                    R.drawable.incoming_empty_landscape
+                }, R.string.context_empty_incoming
             )
         } else {
             Pair(
@@ -439,7 +433,7 @@ class OutgoingSharesComposeFragment : Fragment() {
             (requireActivity() as ManagerActivity).let {
                 it.hideFabButton()
                 it.showHideBottomNavigationView(true)
-                it.hideTabs(true, SharesTab.OUTGOING_TAB)
+                it.hideTabs(true, SharesTab.INCOMING_TAB)
             }
             return true
         }
@@ -455,30 +449,40 @@ class OutgoingSharesComposeFragment : Fragment() {
                     selectedNodeHandleList = viewModel.state.value.selectedNodeHandles,
                     totalNodes = viewModel.state.value.nodesList.size
                 )
-                // Slight customization for outgoing shares page
-                control.move().isVisible = false
-                val areAllNotTakenDown = selected.any { it.isTakenDown.not() }
-                if (areAllNotTakenDown) {
-                    if (viewModel.state.value.isInRootLevel) {
-                        control.removeShare().setVisible(true).showAsAction =
-                            MenuItem.SHOW_AS_ACTION_ALWAYS
-                    }
-                    control.shareOut().setVisible(true).showAsAction =
+                // Slight customization for incoming shares page
+                control.shareFolder().isVisible = false
+                control.shareOut().isVisible = false
+                if (viewModel.state.value.isInRootLevel)
+                    control.leaveShare().setVisible(true).showAsAction =
                         MenuItem.SHOW_AS_ACTION_ALWAYS
-
-                    if (selected.size > 1) {
-                        control.manageLink().setVisible(false)
-                        control.removeLink().setVisible(false)
-                        control.link.setVisible(false)
-                    }
-                    control.copy().isVisible = true
+                if (selected.size == 1 && selected.first().shareData?.access == AccessPermission.FULL) {
+                    control.rename().isVisible = true
                     if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
-                        control.copy().showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+                        control.rename().showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
                     } else {
-                        control.copy().showAsAction = MenuItem.SHOW_AS_ACTION_NEVER
+                        control.rename().showAsAction = MenuItem.SHOW_AS_ACTION_NEVER
                     }
                 }
 
+                val nonRootNodesPermission =
+                    !viewModel.state.value.isInRootLevel && selected.isNotEmpty() && selected.all { it.shareData?.access == AccessPermission.FULL }
+                if (nonRootNodesPermission) {
+                    control.move().isVisible = true
+                    if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+                        control.move().showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+                    } else {
+                        control.move().showAsAction = MenuItem.SHOW_AS_ACTION_NEVER
+                    }
+                } else
+                    control.move().isVisible = false
+
+                val areAllNotTakenDown = selected.any { it.isTakenDown.not() }
+                if (areAllNotTakenDown) {
+                    control.copy().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+                } else {
+                    control.saveToDevice().isVisible = false
+                }
+                control.trash().isVisible = nonRootNodesPermission
                 CloudStorageOptionControlUtil.applyControl(menu, control)
             }
             return true
@@ -495,7 +499,7 @@ class OutgoingSharesComposeFragment : Fragment() {
             (activity as? ManagerActivity)?.let {
                 it.showFabButton()
                 it.showHideBottomNavigationView(false)
-                it.hideTabs(false, SharesTab.OUTGOING_TAB)
+                it.hideTabs(false, SharesTab.INCOMING_TAB)
                 actionMode = null
             }
         }
@@ -658,24 +662,11 @@ class OutgoingSharesComposeFragment : Fragment() {
     }
 
     /**
-     * Disable select mode in OutgoingSharesComposeFragment
+     * Disable select mode in IncomingSharesComposeFragment
      */
     fun disableSelectMode() {
         viewModel.clearAllNodes()
         actionMode?.finish()
     }
 
-    /**
-     * Open authenticityCredentials screen to verify user
-     * @param email : Email of the user
-     */
-    private fun openAuthenticityCredentials(email: String?) {
-        Intent(
-            requireActivity(),
-            AuthenticityCredentialsActivity::class.java
-        ).apply {
-            putExtra(Constants.EMAIL, email)
-            requireActivity().startActivity(this)
-        }
-    }
 }
