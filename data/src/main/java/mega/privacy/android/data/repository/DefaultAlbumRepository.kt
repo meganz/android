@@ -555,18 +555,10 @@ internal class DefaultAlbumRepository @Inject constructor(
         photoIds: List<NodeId>,
     ): Int = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val progressFlow = getAlbumPhotosAddingProgressFlow(albumId)
-
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->
                     if (error.errorCode == MegaError.API_OK) {
                         val success = request.megaSetElementList?.size()?.toInt() ?: 0
-                        progressFlow.tryEmit(
-                            AlbumPhotosAddingProgress(
-                                isProgressing = false,
-                                totalAddedPhotos = success,
-                            )
-                        )
                         continuation.resume(success)
                     } else {
                         continuation.failWithError(error, "addBulkPhotosToAlbum")
@@ -580,12 +572,6 @@ internal class DefaultAlbumRepository @Inject constructor(
                         addMegaHandle(photoId.longValue)
                     }
                 }
-                progressFlow.tryEmit(
-                    AlbumPhotosAddingProgress(
-                        isProgressing = true,
-                        totalAddedPhotos = 0,
-                    )
-                )
                 megaApiGateway.createSetElements(albumId.id, handleList, null, listener)
             } else {
                 continuation.resume(0)

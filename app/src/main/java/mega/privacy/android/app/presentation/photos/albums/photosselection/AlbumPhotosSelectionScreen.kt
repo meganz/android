@@ -46,6 +46,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionViewModel.Companion.MAX_SELECTION_NUM
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
@@ -132,7 +133,7 @@ fun AlbumPhotosSelectionScreen(
                 numSelectedPhotos = state.selectedPhotoIds.size,
                 showFilterMenu = state.showFilterMenu,
                 showMoreMenu = showMoreMenu,
-                showSelectAllMenu = state.selectedPhotoIds.size < state.photos.size,
+                showSelectAllMenu = false,
                 onBackClicked = {
                     if (state.selectedPhotoIds.isEmpty()) {
                         onBackClicked()
@@ -204,7 +205,11 @@ fun AlbumPhotosSelectionScreen(
                     if (photo.id in state.selectedPhotoIds) {
                         viewModel.unselectPhoto(photo)
                     } else {
-                        viewModel.selectPhoto(photo)
+                        if (state.selectedPhotoIds.size < MAX_SELECTION_NUM) {
+                            viewModel.selectPhoto(photo)
+                        } else {
+                            showMaxSelectionDialog = true
+                        }
                     }
                 },
             )
@@ -329,6 +334,7 @@ private fun AlbumPhotosSelectionContent(
         onLongPress = onPhotoSelection,
         selectedPhotoIds = selectedPhotoIds,
         uiPhotoList = uiPhotos,
+        isBlurUnselectItem = selectedPhotoIds.size >= MAX_SELECTION_NUM
     )
 }
 
