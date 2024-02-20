@@ -1,10 +1,16 @@
 package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import com.google.common.truth.Truth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareMenuAction
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Share
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareToolBarMenuItem
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
+import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
+import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -12,10 +18,21 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ShareTest {
+class ShareToolBarMenuItemTest {
 
-    private val underTest = Share(ShareMenuAction())
+    private val getLocalFilePathUseCase: GetLocalFilePathUseCase = mock()
+    private val exportNodesUseCase: ExportNodeUseCase = mock()
+    private val getFileUriUseCase: GetFileUriUseCase = mock()
+
+    private val underTest = ShareToolBarMenuItem(
+        menuAction = ShareMenuAction(),
+        scope = CoroutineScope(UnconfinedTestDispatcher()),
+        getLocalFilePathUseCase = getLocalFilePathUseCase,
+        exportNodesUseCase = exportNodesUseCase,
+        getFileUriUseCase = getFileUriUseCase
+    )
 
     private val oneFileNodeSelected = mock<TypedFolderNode> {
         on { isTakenDown }.thenReturn(false)

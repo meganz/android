@@ -38,7 +38,7 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameT
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RestoreToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SelectAllToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SendToChatToolbarMenuItem
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.Share
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareToolBarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareFolderToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.TrashToolbarMenuItem
 import mega.privacy.android.core.ui.model.MenuAction
@@ -84,7 +84,13 @@ class NodeToolbarActionMapperTest {
             listToStringWithDelimitersMapper = mock(),
             menuAction = ShareFolderMenuAction()
         ),
-        Share(ShareMenuAction()),
+        ShareToolBarMenuItem(
+            menuAction = ShareMenuAction(),
+            scope = CoroutineScope(UnconfinedTestDispatcher()),
+            exportNodesUseCase = mock(),
+            getFileUriUseCase = mock(),
+            getLocalFilePathUseCase = mock()
+        ),
         LeaveShareToolBarMenuItem(
             stringWithDelimitersMapper = mock(),
             menuAction = LeaveShareMenuAction()

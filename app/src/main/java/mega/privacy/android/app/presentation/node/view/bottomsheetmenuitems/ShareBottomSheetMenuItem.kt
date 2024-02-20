@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -12,13 +13,16 @@ import mega.privacy.android.app.presentation.node.model.menuaction.ShareMenuActi
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
-import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
+import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.mobile.analytics.event.SearchResultShareMenuItemEvent
+import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -31,7 +35,7 @@ class ShareBottomSheetMenuItem @Inject constructor(
     @ApplicationScope private val scope: CoroutineScope,
     private val getLocalFilePathUseCase: GetLocalFilePathUseCase,
     private val exportNodesUseCase: ExportNodeUseCase,
-    private val getFileByPathUseCase: GetFileByPathUseCase,
+    private val getFileUriUseCase: GetFileUriUseCase,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -43,51 +47,59 @@ class ShareBottomSheetMenuItem @Inject constructor(
             && accessPermission == AccessPermission.OWNER
             && isNodeInRubbish.not()
 
+    override val groupId = 7
+
     override fun getOnClickFunction(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
         navController: NavHostController,
     ): () -> Unit = {
+        val context = navController.context
         scope.launch {
             Analytics.tracker.trackEvent(SearchResultShareMenuItemEvent)
-            getLocalFilePathUseCase(node)?.let {
-                if (it.isNotBlank()) {
-                    getFileByPathUseCase(it)?.let { file ->
-                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                            type = MimeTypeList.typeForName(file.name).type + "/*"
-                            putExtra(Intent.EXTRA_STREAM, it)
-                            putExtra(Intent.EXTRA_SUBJECT, file.name)
-                            flags =
-                                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                        }
-                        navController.context.startActivity(
-                            Intent.createChooser(
-                                shareIntent, navController.context.getString(
-                                    R.string.context_share
-                                )
-                            )
+            val path = runCatching {
+                getLocalFilePathUseCase(node)
+            }.getOrElse {
+                Timber.e(it)
+                null
+            }
+            if (node is TypedFileNode && path != null) {
+                getLocalFileUri(path)?.let {
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "${node.type.mimeType}/*"
+                        putExtra(Intent.EXTRA_STREAM, Uri.parse(it))
+                        putExtra(Intent.EXTRA_SUBJECT, node.name)
+                        addFlags(
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                         )
                     }
+                    context.startActivity(
+                        Intent.createChooser(
+                            shareIntent,
+                            context.getString(R.string.context_share)
+                        )
+                    )
                 }
-            } ?: run {
+            } else {
                 val publicLink = node.exportedData?.publicLink
                 if (publicLink != null) {
                     startShareIntent(
-                        context = navController.context,
+                        context = context,
                         path = publicLink,
                         name = node.name
                     )
                 } else {
                     val exportPath = exportNodesUseCase(node.id)
                     startShareIntent(
-                        context = navController.context,
+                        context = context,
                         path = exportPath,
                         name = node.name
                     )
                 }
             }
         }
+        onDismiss()
     }
 
 
@@ -105,5 +117,7 @@ class ShareBottomSheetMenuItem @Inject constructor(
         )
     }
 
-    override val groupId = 7
+    private suspend fun getLocalFileUri(filePath: String) = runCatching {
+        getFileUriUseCase(File(filePath), Constants.AUTHORITY_STRING_FILE_PROVIDER)
+    }.onFailure { Timber.e("Error getting local file uri: ${it.message}") }.getOrNull()
 }

@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
-import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
+import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.TestInstance
@@ -30,13 +30,13 @@ class ShareBottomSheetMenuItemTest {
 
     private val getLocalFilePathUseCase: GetLocalFilePathUseCase = mock()
     private val exportNodesUseCase: ExportNodeUseCase = mock()
-    private val getFileByPathUseCase: GetFileByPathUseCase = mock()
+    private val getFileUriUseCase: GetFileUriUseCase = mock()
     private val shareBottomSheetMenuItem = ShareBottomSheetMenuItem(
         menuAction = ShareMenuAction(),
         scope = applicationScope,
         getLocalFilePathUseCase = getLocalFilePathUseCase,
         exportNodesUseCase = exportNodesUseCase,
-        getFileByPathUseCase = getFileByPathUseCase
+        getFileUriUseCase = getFileUriUseCase
     )
 
     @ParameterizedTest(name = "isNodeInRubbish {0} - accessPermission {1} - isInBackups {2} - node {3} - isConnected {4} - expected {5}")
