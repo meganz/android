@@ -84,7 +84,9 @@ internal class ManagerDrawerFragment : Fragment() {
 
         override fun onDrawerStateChanged(newState: Int) {}
 
-        override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
+        override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+            managerViewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE)
+        }
     }
 
     override fun onAttach(context: Context) {
