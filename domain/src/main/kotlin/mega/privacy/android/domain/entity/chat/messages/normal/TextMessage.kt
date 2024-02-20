@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
  * Text message
  *
  * @param hasOtherLink Whether the message contains other links. (Not contact link, file link, folder link)
+ * @param isEdited Whether the message has been edited
  */
 @Serializable
 data class TextMessage(
@@ -20,4 +21,5 @@ data class TextMessage(
     override val reactions: List<Reaction>,
     override val content: String,
     val hasOtherLink: Boolean,
+    val isEdited: Boolean,
 ) : NormalMessage

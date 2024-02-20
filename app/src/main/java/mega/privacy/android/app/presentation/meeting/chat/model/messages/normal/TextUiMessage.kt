@@ -29,6 +29,7 @@ data class TextUiMessage(
                 onClick = {},
                 onLongClick = { onLongClick(message) }
             ),
+            isEdited = message.isEdited,
         )
     }
 

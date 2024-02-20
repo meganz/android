@@ -45,6 +45,7 @@ class CreateNormalChatMessageUseCase @Inject constructor(
                     shouldShowAvatar = shouldShowAvatar,
                     shouldShowTime = shouldShowTime,
                     reactions = reactions,
+                    isEdited = isEdited,
                 )
             }
         }

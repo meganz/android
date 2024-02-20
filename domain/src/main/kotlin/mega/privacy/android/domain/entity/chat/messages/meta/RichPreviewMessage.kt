@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
  *
  * @property content Message content
  * @property chatRichPreviewInfo [ChatRichPreviewInfo]
+ * @property isEdited Whether the message has been edited
  */
 @Serializable
 data class RichPreviewMessage(
@@ -21,4 +22,5 @@ data class RichPreviewMessage(
     override val reactions: List<Reaction>,
     val content: String,
     val chatRichPreviewInfo: ChatRichPreviewInfo?,
+    val isEdited: Boolean,
 ) : MetaMessage

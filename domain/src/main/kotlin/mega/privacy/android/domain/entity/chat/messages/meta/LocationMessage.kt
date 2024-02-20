@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
  * Location message
  *
  * @property chatGeolocationInfo [ChatGeolocation]
+ * @property isEdited Whether the message has been edited
  */
 @Serializable
 data class LocationMessage(
@@ -20,4 +21,5 @@ data class LocationMessage(
     override val shouldShowTime: Boolean,
     override val reactions: List<Reaction>,
     val chatGeolocationInfo: ChatGeolocationInfo?,
+    val isEdited: Boolean,
 ) : MetaMessage

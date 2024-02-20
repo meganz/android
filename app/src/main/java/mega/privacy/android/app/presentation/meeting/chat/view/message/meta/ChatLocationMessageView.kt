@@ -23,6 +23,7 @@ fun ChatLocationMessageView(
     message: LocationMessage,
     modifier: Modifier = Modifier,
     viewModel: MetaViewModel = hiltViewModel(),
+    isEdited: Boolean,
 ) {
     message.chatGeolocationInfo?.let { geolocation ->
         val locationPreview = produceState<Bitmap?>(initialValue = null) {

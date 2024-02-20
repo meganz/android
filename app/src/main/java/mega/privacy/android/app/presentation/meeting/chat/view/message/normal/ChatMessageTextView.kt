@@ -26,6 +26,7 @@ fun ChatMessageTextView(
     message: TextMessage,
     modifier: Modifier = Modifier,
     viewModel: ChatMessageTextViewModel = hiltViewModel(),
+    isEdited: Boolean,
 ) {
     val richLinkConfig by viewModel.richLinkConfig.collectAsStateWithLifecycle()
     val parentViewModel = hiltViewModel<MessageListViewModel>()

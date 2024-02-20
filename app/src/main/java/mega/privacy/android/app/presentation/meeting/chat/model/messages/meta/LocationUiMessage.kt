@@ -37,6 +37,7 @@ class LocationUiMessage(
         val coroutineScope = rememberCoroutineScope()
         ChatLocationMessageView(
             message = message,
+            isEdited = message.isEdited,
             modifier = Modifier
                 .weight(weight = 1f, fill = false)
                 .combinedClickable(

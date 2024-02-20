@@ -26,6 +26,7 @@ class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase
                 shouldShowTime = shouldShowTime,
                 reactions = reactions,
                 content = content.orEmpty(),
+                isEdited = isEdited,
             )
 
             ContainsMetaType.GEOLOCATION -> LocationMessage(
@@ -38,6 +39,7 @@ class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase
                 shouldShowAvatar = shouldShowAvatar,
                 shouldShowTime = shouldShowTime,
                 reactions = reactions,
+                isEdited = isEdited,
             )
 
             ContainsMetaType.GIPHY -> GiphyMessage(
