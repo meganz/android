@@ -79,4 +79,24 @@ interface TypedMessageDao {
      */
     @Query("SELECT messageId FROM typed_messages WHERE chatId = :chatId AND type = :type ORDER BY timestamp DESC")
     suspend fun getMessageIdsByType(chatId: Long, type: ChatMessageType): List<Long>
+
+    /**
+     * Get message reactions
+     *
+     * @param chatId
+     * @param msgId
+     * @return List of Reaction
+     */
+    @Query("SELECT reactions FROM typed_messages WHERE chatId = :chatId AND messageId = :msgId")
+    suspend fun getMessageReactions(chatId: Long, msgId: Long): String
+
+    /**
+     * Insert message
+     *
+     * @param chatId Chat ID
+     * @param msgId Message ID
+     * @param reactions Updated reactions
+     */
+    @Query("UPDATE typed_messages SET reactions = :reactions WHERE chatId = :chatId AND messageId = :msgId")
+    suspend fun updateMessageReactions(chatId: Long, msgId: Long, reactions: String)
 }

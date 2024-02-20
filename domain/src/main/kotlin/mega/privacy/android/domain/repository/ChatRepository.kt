@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.RichLinkConfig
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.paging.MessagePagingInfo
+import mega.privacy.android.domain.entity.chat.messages.reactions.ReactionUpdate
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.chat.notification.ChatMessageNotification
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
@@ -335,6 +336,24 @@ interface ChatRepository {
      * @return          A flow of [ChatMessage]
      */
     fun monitorOnMessageLoaded(chatId: Long): Flow<ChatMessage?>
+
+    /**
+     * Monitor chat room message updates
+     *
+     * @param chatId
+     * @return A flow of all messages received from the various updates.
+     * These could be new messages or updates to existing messages.
+     */
+    fun monitorMessageUpdates(chatId: Long): Flow<ChatMessage>
+
+    /**
+     * Monitor reaction updates on a chat room
+     *
+     * @param chatId    Chat ID.
+     * @return          A flow of [ReactionUpdate]
+     */
+
+    fun monitorReactionUpdates(chatId: Long): Flow<ReactionUpdate>
 
     /**
      * Monitor updates on chat list item.
@@ -966,14 +985,4 @@ interface ChatRepository {
      * @return flow of chat messages received
      */
     fun monitorChatMessages(): Flow<ChatMessageNotification?>
-
-
-    /**
-     * Monitor chat room message updates
-     *
-     * @param chatId
-     * @return A flow of all messages received from the various updates.
-     * These could be new messages or updates to existing messages.
-     */
-    fun monitorMessageUpdates(chatId: Long): Flow<ChatMessage>
 }

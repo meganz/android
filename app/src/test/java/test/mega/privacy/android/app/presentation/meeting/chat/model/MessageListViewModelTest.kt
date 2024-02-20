@@ -66,6 +66,7 @@ internal class MessageListViewModelTest {
             getLastMessageSeenIdUseCase = getLastMessageSeenIdUseCase,
             setMessageSeenUseCase = setMessageSeenUseCase,
             monitorChatRoomMessageUpdatesUseCase = mock(),
+            monitorReactionUpdatesUseCase = mock(),
         )
     }
 

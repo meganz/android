@@ -34,6 +34,7 @@ import mega.privacy.android.data.mapper.chat.ChatRoomMapper
 import mega.privacy.android.data.mapper.chat.CombinedChatRoomMapper
 import mega.privacy.android.data.mapper.chat.ConnectionStateMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
+import mega.privacy.android.data.mapper.chat.messages.reactions.ReactionUpdateMapper
 import mega.privacy.android.data.mapper.notification.ChatMessageNotificationBehaviourMapper
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.chat.NonContactInfo
@@ -44,6 +45,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.chat.ChatPreview
 import mega.privacy.android.domain.entity.chat.ConnectionState
+import mega.privacy.android.domain.entity.chat.messages.reactions.ReactionUpdate
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.ChatRepository
@@ -65,6 +67,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -115,6 +118,7 @@ class ChatRepositoryImplTest {
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
     private val context = mock<Context>()
     private val chatStorageGateway = mock<ChatStorageGateway>()
+    private val reactionUpdateMapper = mock<ReactionUpdateMapper>()
 
     @BeforeEach
     fun setUp() {
@@ -150,6 +154,7 @@ class ChatRepositoryImplTest {
             giphyEntityMapper = mock(),
             chatGeolocationEntityMapper = mock(),
             chatNodeEntityListMapper = mock(),
+            reactionUpdateMapper = reactionUpdateMapper,
             context = context,
         )
 
@@ -172,6 +177,7 @@ class ChatRepositoryImplTest {
             megaChatApiGateway,
             megaLocalRoomGateway,
             chatMessageMapper,
+            reactionUpdateMapper
         )
     }
 
@@ -1072,4 +1078,47 @@ class ChatRepositoryImplTest {
                 assertThat(actual?.message).isEqualTo(chatMessage)
             }
         }
+
+    @Test
+    fun `test that reaction updates are returned from the monitor function`() = runTest {
+        val msgId = 345L
+        val reaction = "reaction"
+        val onReactionUpdate1 = mock<ChatRoomUpdate.OnReactionUpdate> {
+            on { this.msgId } doReturn msgId
+            on { this.reaction } doReturn reaction
+            on { count } doReturn 1
+        }
+        val onReactionUpdate2 = mock<ChatRoomUpdate.OnReactionUpdate> {
+            on { this.msgId } doReturn msgId
+            on { this.reaction } doReturn reaction
+            on { count } doReturn 2
+        }
+        val reactionUpdate1 = with(onReactionUpdate1) {
+            ReactionUpdate(
+                msgId,
+                reaction,
+                count
+            )
+        }
+        val reactionUpdate2 = with(onReactionUpdate2) {
+            ReactionUpdate(
+                msgId,
+                reaction,
+                count
+            )
+        }
+        whenever(reactionUpdateMapper(onReactionUpdate1)).thenReturn(reactionUpdate1)
+        whenever(reactionUpdateMapper(onReactionUpdate2)).thenReturn(reactionUpdate2)
+
+        whenever(megaChatApiGateway.openChatRoom(chatId)).thenReturn(flow {
+            emit(onReactionUpdate1)
+            emit(onReactionUpdate2)
+            awaitCancellation()
+        })
+
+        underTest.monitorReactionUpdates(chatId).test {
+            assertThat(awaitItem()).isEqualTo(reactionUpdate1)
+            assertThat(awaitItem()).isEqualTo(reactionUpdate2)
+        }
+    }
 }

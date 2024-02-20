@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
+import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 
 /**
  * Chat message repository
@@ -320,4 +321,22 @@ interface ChatMessageRepository {
      * @return list of message ids
      */
     suspend fun getMessageIdsByType(chatId: Long, type: ChatMessageType): List<Long>
+
+    /**
+     * Get message
+     *
+     * @param chatId Chat ID
+     * @param msgId Message ID
+     * @return Message reactions
+     */
+    suspend fun getReactionsFromMessage(chatId: Long, msgId: Long): List<Reaction>
+
+    /**
+     * Update message reactions.
+     *
+     * @param chatId Chat ID
+     * @param msgId Message ID
+     * @param reactions Updated reactions
+     */
+    suspend fun updateReactionsInMessage(chatId: Long, msgId: Long, reactions: List<Reaction>)
 }

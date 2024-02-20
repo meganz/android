@@ -105,4 +105,22 @@ interface ChatStorageGateway {
      * @return list of message ids
      */
     suspend fun getMessageIdsByType(chatId: Long, type: ChatMessageType): List<Long>
+
+    /**
+     * Get message reactions
+     *
+     * @param chatId Chat ID
+     * @param msgId Message ID
+     * @return List of Reaction
+     */
+    suspend fun getMessageReactions(chatId: Long, msgId: Long): String
+
+    /**
+     * Update message reactions.
+     *
+     * @param chatId Chat ID
+     * @param msgId Message ID
+     * @param reactions Reactions
+     */
+    suspend fun updateMessageReactions(chatId: Long, msgId: Long, reactions: String)
 }

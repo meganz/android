@@ -4,13 +4,14 @@ import androidx.room.TypeConverter
 import com.google.gson.Gson
 import mega.privacy.android.domain.entity.chat.ChatMessageChange
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
+import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
  * Converters for the typed message entity.
  */
-class TypedMessageEntityConverters {
+class TypedMessageEntityConverters @Inject constructor() {
 
     /**
      * Convert a list of longs to a string.

@@ -54,6 +54,7 @@ import mega.privacy.android.data.mapper.chat.CombinedChatRoomMapper
 import mega.privacy.android.data.mapper.chat.ConnectionStateMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.chat.PendingMessageListMapper
+import mega.privacy.android.data.mapper.chat.messages.reactions.ReactionUpdateMapper
 import mega.privacy.android.data.mapper.chat.paging.ChatGeolocationEntityMapper
 import mega.privacy.android.data.mapper.chat.paging.ChatNodeEntityListMapper
 import mega.privacy.android.data.mapper.chat.paging.GiphyEntityMapper
@@ -167,6 +168,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val giphyEntityMapper: GiphyEntityMapper,
     private val chatGeolocationEntityMapper: ChatGeolocationEntityMapper,
     private val chatNodeEntityListMapper: ChatNodeEntityListMapper,
+    private val reactionUpdateMapper: ReactionUpdateMapper,
     @ApplicationContext private val context: Context,
 ) : ChatRepository {
     private val richLinkConfig = MutableStateFlow(RichLinkConfig())
@@ -718,6 +720,14 @@ internal class ChatRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun monitorReactionUpdates(chatId: Long) = flow {
+        getChatRoomUpdates(chatId)?.let { updates ->
+            emitAll(updates.filterIsInstance<ChatRoomUpdate.OnReactionUpdate>()
+                .map { reactionUpdateMapper(it) }
+                .flowOn(ioDispatcher))
+        }
+    }
+
     override fun monitorChatListItemUpdates(): Flow<ChatListItem> =
         megaChatApiGateway.chatUpdates
             .filterIsInstance<ChatUpdate.OnChatListItemUpdate>()
@@ -1078,7 +1088,7 @@ internal class ChatRepositoryImpl @Inject constructor(
             ?: databaseHandler.findNonContactByHandle(handle.toString())?.fullName?.takeIf { it.isNotBlank() }
             ?: megaChatApiGateway.getUserAliasFromCache(handle)?.takeIf { it.isNotBlank() }
             ?: megaChatApiGateway.getUserFullNameFromCache(handle)?.takeIf { it.isNotBlank() }
-            ?:megaChatApiGateway.getUserFirstnameFromCache(handle)?.takeIf { it.isNotBlank() }
+            ?: megaChatApiGateway.getUserFirstnameFromCache(handle)?.takeIf { it.isNotBlank() }
             ?: megaChatApiGateway.getUserLastnameFromCache(handle)?.takeIf { it.isNotBlank() }
             ?: megaChatApiGateway.getUserEmailFromCache(handle)?.takeIf { it.isNotBlank() }
     }

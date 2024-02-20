@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.chat.message.GetLastMessageSeenIdUseC
 import mega.privacy.android.domain.usecase.chat.message.MonitorChatRoomMessageUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.message.SetMessageSeenUseCase
 import mega.privacy.android.domain.usecase.chat.message.paging.GetChatPagingSourceUseCase
+import mega.privacy.android.domain.usecase.chat.message.reactions.MonitorReactionUpdatesUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -59,6 +60,7 @@ class MessageListViewModel @Inject constructor(
     private val getLastMessageSeenIdUseCase: GetLastMessageSeenIdUseCase,
     private val setMessageSeenUseCase: SetMessageSeenUseCase,
     private val monitorChatRoomMessageUpdatesUseCase: MonitorChatRoomMessageUpdatesUseCase,
+    private val monitorReactionUpdatesUseCase: MonitorReactionUpdatesUseCase,
 ) : ViewModel() {
 
     private val chatId = savedStateHandle.get<Long?>(Constants.CHAT_ID) ?: -1
@@ -97,6 +99,13 @@ class MessageListViewModel @Inject constructor(
             runCatching { monitorChatRoomMessageUpdatesUseCase(chatId) }
                 .onFailure {
                     Timber.e(it, "Monitor message updates threw an exception")
+                }
+        }
+
+        viewModelScope.launch {
+            runCatching { monitorReactionUpdatesUseCase(chatId) }
+                .onFailure {
+                    Timber.e(it, "Monitor reaction updates threw an exception")
                 }
         }
     }

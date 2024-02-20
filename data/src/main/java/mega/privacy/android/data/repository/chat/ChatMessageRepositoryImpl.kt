@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.database.converter.TypedMessageEntityConverters
 import mega.privacy.android.data.extensions.getChatRequestListener
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -19,6 +20,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
+import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import javax.inject.Inject
@@ -34,6 +36,7 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
     private val megaHandleListMapper: MegaHandleListMapper,
     private val pendingMessageEntityMapper: PendingMessageEntityMapper,
     private val pendingMessageMapper: PendingMessageMapper,
+    private val typedMessageEntityConverters: TypedMessageEntityConverters,
 ) : ChatMessageRepository {
     override suspend fun setMessageSeen(chatId: Long, messageId: Long) = withContext(ioDispatcher) {
         megaChatApiGateway.setMessageSeen(chatId, messageId)
@@ -200,4 +203,23 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             chatStorageGateway.getMessageIdsByType(chatId, type)
         }
+
+    override suspend fun getReactionsFromMessage(chatId: Long, msgId: Long): List<Reaction> =
+        withContext(ioDispatcher) {
+            chatStorageGateway.getMessageReactions(chatId, msgId).let { reactions ->
+                typedMessageEntityConverters.convertToMessageReactionList(reactions)
+            }
+        }
+
+    override suspend fun updateReactionsInMessage(
+        chatId: Long,
+        msgId: Long,
+        reactions: List<Reaction>,
+    ) {
+        withContext(ioDispatcher) {
+            val reactionsString =
+                typedMessageEntityConverters.convertFromMessageReactionList(reactions)
+            chatStorageGateway.updateMessageReactions(chatId, msgId, reactionsString)
+        }
+    }
 }

@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.database.converter.TypedMessageEntityConverters
 import mega.privacy.android.data.database.entity.chat.PendingMessageEntity
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -19,6 +20,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
+import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatRequest
@@ -53,6 +55,7 @@ class ChatMessageRepositoryImplTest {
     private val chatStorageGateway = mock<ChatStorageGateway>()
     private val pendingMessageEntityMapper = mock<PendingMessageEntityMapper>()
     private val pendingMessageMapper = mock<PendingMessageMapper>()
+    private val typedMessageEntityConverters = mock<TypedMessageEntityConverters>()
 
     private val megaChatErrorSuccess = mock<MegaChatError> {
         on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
@@ -73,7 +76,8 @@ class ChatMessageRepositoryImplTest {
             chatMessageMapper = chatMessageMapper,
             megaHandleListMapper = megaHandleListMapper,
             pendingMessageEntityMapper = pendingMessageEntityMapper,
-            pendingMessageMapper = pendingMessageMapper
+            pendingMessageMapper = pendingMessageMapper,
+            typedMessageEntityConverters = typedMessageEntityConverters,
         )
     }
 
@@ -82,7 +86,13 @@ class ChatMessageRepositoryImplTest {
         reset(
             megaChatApiGateway,
             chatStorageGateway,
+            stringListMapper,
+            handleListMapper,
+            chatMessageMapper,
+            megaHandleListMapper,
             pendingMessageEntityMapper,
+            pendingMessageMapper,
+            typedMessageEntityConverters,
         )
     }
 
@@ -323,5 +333,30 @@ class ChatMessageRepositoryImplTest {
         val type = ChatMessageType.NODE_ATTACHMENT
         underTest.getMessageIdsByType(chatId, type)
         verify(chatStorageGateway).getMessageIdsByType(chatId, type)
+    }
+
+    @Test
+    fun `test that get reactions invokes and returns correctly`() = runTest {
+        val reactions = "reactions"
+        val reactionsList = emptyList<Reaction>()
+        whenever(chatStorageGateway.getMessageReactions(chatId, msgId)).thenReturn(reactions)
+        whenever(typedMessageEntityConverters.convertToMessageReactionList(reactions))
+            .thenReturn(reactionsList)
+        assertThat(underTest.getReactionsFromMessage(chatId, msgId)).isEqualTo(reactionsList)
+        verify(chatStorageGateway).getMessageReactions(chatId, msgId)
+        verify(typedMessageEntityConverters).convertToMessageReactionList(reactions)
+    }
+
+    @Test
+    fun `test that update reactions invokes correctly`() = runTest {
+        val reactions = listOf<Reaction>()
+        val reactionsString = "reactions"
+        whenever(typedMessageEntityConverters.convertFromMessageReactionList(reactions))
+            .thenReturn(reactionsString)
+        whenever(chatStorageGateway.updateMessageReactions(chatId, msgId, reactionsString))
+            .thenReturn(Unit)
+        underTest.updateReactionsInMessage(chatId, msgId, reactions)
+        verify(typedMessageEntityConverters).convertFromMessageReactionList(reactions)
+        verify(chatStorageGateway).updateMessageReactions(chatId, msgId, reactionsString)
     }
 }
