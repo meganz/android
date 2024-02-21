@@ -97,7 +97,7 @@ internal class DeviceFolderUINodeErrorMessageMapperTest {
         ),
         Arguments.of(
             BackupInfoSubState.LOCAL_FILESYSTEM_MISMATCH,
-            R.string.device_center_list_view_item_sub_state_message_something_went_wrong,
+            R.string.device_center_list_view_item_sub_state_local_filesystem_mismatch,
         ),
         Arguments.of(
             BackupInfoSubState.PUT_NODES_ERROR,
@@ -142,10 +142,6 @@ internal class DeviceFolderUINodeErrorMessageMapperTest {
         Arguments.of(
             BackupInfoSubState.LOGGED_OUT,
             R.string.device_center_list_view_item_sub_state_logged_out,
-        ),
-        Arguments.of(
-            BackupInfoSubState.MISSING_PARENT_NODE,
-            R.string.device_center_list_view_item_sub_state_missing_parent_node,
         ),
         Arguments.of(
             BackupInfoSubState.BACKUP_MODIFIED,
@@ -197,7 +193,7 @@ internal class DeviceFolderUINodeErrorMessageMapperTest {
         ),
         Arguments.of(
             BackupInfoSubState.UNABLE_TO_OPEN_DATABASE,
-            R.string.device_center_list_view_item_sub_state_unable_to_open_database,
+            R.string.device_center_list_view_item_sub_state_message_folder_backup_issue,
         ),
         Arguments.of(
             BackupInfoSubState.INSUFFICIENT_DISK_SPACE,
@@ -209,15 +205,15 @@ internal class DeviceFolderUINodeErrorMessageMapperTest {
         ),
         Arguments.of(
             BackupInfoSubState.MISMATCH_OF_ROOT_FSID,
-            R.string.device_center_list_view_item_sub_state_message_something_went_wrong,
+            R.string.device_center_list_view_item_sub_state_message_folder_backup_issue,
         ),
         Arguments.of(
             BackupInfoSubState.FILESYSTEM_FILE_IDS_ARE_UNSTABLE,
-            R.string.device_center_list_view_item_sub_state_message_something_went_wrong,
+            R.string.device_center_list_view_item_sub_state_message_folder_backup_issue,
         ),
         Arguments.of(
             BackupInfoSubState.FILESYSTEM_ID_UNAVAILABLE,
-            R.string.device_center_list_view_item_sub_state_message_something_went_wrong,
+            R.string.device_center_list_view_item_sub_state_message_folder_backup_issue,
         ),
     )
 }

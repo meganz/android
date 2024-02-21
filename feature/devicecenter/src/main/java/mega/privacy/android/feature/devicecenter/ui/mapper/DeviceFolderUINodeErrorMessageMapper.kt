@@ -32,6 +32,7 @@ internal class DeviceFolderUINodeErrorMessageMapper @Inject constructor() {
         BackupInfoSubState.FOREIGN_TARGET_OVERSTORAGE -> R.string.device_center_list_view_item_sub_state_foreign_target_overshare
         BackupInfoSubState.REMOTE_PATH_HAS_CHANGED -> R.string.device_center_list_view_item_sub_state_remote_path_has_changed
         BackupInfoSubState.SHARE_NON_FULL_ACCESS -> R.string.device_center_list_view_item_sub_state_share_non_full_access
+        BackupInfoSubState.LOCAL_FILESYSTEM_MISMATCH -> R.string.device_center_list_view_item_sub_state_local_filesystem_mismatch
         BackupInfoSubState.PUT_NODES_ERROR -> R.string.device_center_list_view_item_sub_state_put_nodes_error
         BackupInfoSubState.ACTIVE_SYNC_BELOW_PATH -> R.string.device_center_list_view_item_sub_state_active_sync_below_path
         BackupInfoSubState.VBOXSHAREDFOLDER_UNSUPPORTED -> R.string.device_center_list_view_item_sub_state_vboxsharedfolder_unsupported
@@ -39,7 +40,6 @@ internal class DeviceFolderUINodeErrorMessageMapper @Inject constructor() {
         BackupInfoSubState.UNKNOWN_TEMPORARY_ERROR -> R.string.device_center_list_view_item_sub_state_unknown_temporary_error
         BackupInfoSubState.TOO_MANY_ACTION_PACKETS -> R.string.device_center_list_view_item_sub_state_too_many_action_packets
         BackupInfoSubState.LOGGED_OUT -> R.string.device_center_list_view_item_sub_state_logged_out
-        BackupInfoSubState.MISSING_PARENT_NODE -> R.string.device_center_list_view_item_sub_state_missing_parent_node
         BackupInfoSubState.BACKUP_MODIFIED -> R.string.device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes
         BackupInfoSubState.BACKUP_SOURCE_NOT_BELOW_DRIVE -> R.string.device_center_list_view_item_sub_state_backup_source_not_below_drive
         BackupInfoSubState.SYNC_CONFIG_WRITE_FAILURE -> R.string.device_center_list_view_item_sub_state_message_folder_backup_issue
@@ -52,15 +52,14 @@ internal class DeviceFolderUINodeErrorMessageMapper @Inject constructor() {
         BackupInfoSubState.NOTIFICATION_SYSTEM_UNAVAILABLE -> R.string.device_center_list_view_item_sub_state_notification_system_unavailable
         BackupInfoSubState.UNABLE_TO_ADD_WATCH -> R.string.device_center_list_view_item_sub_state_unable_to_add_watch
         BackupInfoSubState.UNABLE_TO_RETRIEVE_ROOT_FSID -> R.string.device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid
-        BackupInfoSubState.UNABLE_TO_OPEN_DATABASE -> R.string.device_center_list_view_item_sub_state_unable_to_open_database
         BackupInfoSubState.INSUFFICIENT_DISK_SPACE -> R.string.device_center_list_view_item_sub_state_insufficient_disk_space
         BackupInfoSubState.FAILURE_ACCESSING_PERSISTENT_STORAGE -> R.string.device_center_list_view_item_sub_state_failure_accessing_persistent_storage
-        BackupInfoSubState.LOCAL_FILESYSTEM_MISMATCH,
+        BackupInfoSubState.UNABLE_TO_OPEN_DATABASE,
         BackupInfoSubState.MISMATCH_OF_ROOT_FSID,
         BackupInfoSubState.FILESYSTEM_FILE_IDS_ARE_UNSTABLE,
         BackupInfoSubState.FILESYSTEM_ID_UNAVAILABLE,
         -> {
-            R.string.device_center_list_view_item_sub_state_message_something_went_wrong
+            R.string.device_center_list_view_item_sub_state_message_folder_backup_issue
         }
 
         BackupInfoSubState.REMOTE_NODE_MOVED_TO_RUBBISH,
