@@ -3,6 +3,8 @@ package mega.privacy.android.data.facade
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.Bitmap.CompressFormat
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Environment
@@ -27,6 +29,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.domain.exception.FileNotCreatedException
 import mega.privacy.android.domain.exception.NotEnoughStorageException
+import nz.mega.sdk.AndroidGfxProcessor
 import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
@@ -34,6 +37,7 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import javax.inject.Inject
+import kotlin.math.sqrt
 
 /**
  * Intent extra data for node handle
@@ -355,6 +359,69 @@ class FileFacade @Inject constructor(
                 inputStream.copyTo(output)
             }
         }
+    }
+
+    override fun downscaleImage(file: File, destination: File, maxPixels: Long) {
+        val orientation = AndroidGfxProcessor.getExifOrientation(file.absolutePath)
+        val fileRect = AndroidGfxProcessor.getImageDimensions(file.absolutePath, orientation)
+        val fileBitmap = AndroidGfxProcessor.getBitmap(
+            file.absolutePath,
+            fileRect,
+            orientation,
+            fileRect.right,
+            fileRect.bottom
+        )
+        if (fileBitmap == null) {
+            Timber.e("Bitmap NULL when decoding image file for upload it to chat.")
+            return
+        }
+
+        var width = fileBitmap.width
+        var height = fileBitmap.height
+        val totalPixels = width * height
+        if (totalPixels == 0) {
+            Timber.e("Bitmap is not valid, it has 0 pixels")
+            return
+        }
+        val division: Float = maxPixels.toFloat() / totalPixels.toFloat()
+        val factor = sqrt(division.toDouble()).coerceAtMost(1.0).toFloat()
+        if (factor < 1) {
+            width = (width * factor).toInt()
+            height = (height * factor).toInt()
+            Timber.d(
+                "DATA connection factor<1\n" +
+                        "totalPixels: $totalPixels\n" +
+                        "width: $width\n" +
+                        "height: $height\n" +
+                        "DOWNSCALE_IMAGES_PX/totalPixels: $division\n" +
+                        "Math.sqrt(DOWNSCALE_IMAGES_PX/totalPixels): ${sqrt(division)}"
+            )
+            val scaleBitmap =
+                Bitmap.createScaledBitmap(fileBitmap, width, height, true)
+
+            val fOut: FileOutputStream
+            try {
+                fOut = FileOutputStream(destination)
+                scaleBitmap.compress(file.getCompressFormat(), 100, fOut)
+                fOut.flush()
+                fOut.close()
+            } catch (e: java.lang.Exception) {
+                Timber.e(e, "Exception compressing image file for upload it to chat.")
+            } finally {
+                scaleBitmap.recycle()
+            }
+
+        } else {
+            Timber.d("No need to scale the image as it is smaller than the target")
+        }
+        fileBitmap.recycle()
+    }
+
+    private fun File.getCompressFormat(): CompressFormat = when (extension) {
+        "jpeg", "jpg" -> CompressFormat.JPEG
+        "png" -> CompressFormat.PNG
+        "webp" -> CompressFormat.WEBP
+        else -> CompressFormat.JPEG
     }
 
     private companion object {

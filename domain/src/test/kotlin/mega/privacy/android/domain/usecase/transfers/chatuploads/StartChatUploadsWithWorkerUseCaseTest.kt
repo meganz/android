@@ -39,6 +39,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
     private val cancelCancelTokenUseCase = mock<CancelCancelTokenUseCase>()
     private val startChatUploadsWorkerUseCase = mock<StartChatUploadsWorkerUseCase>()
     private val isChatUploadsWorkerStartedUseCase = mock<IsChatUploadsWorkerStartedUseCase>()
+    private val compressFileForChatUseCase = mock<CompressFileForChatUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -47,6 +48,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
             getMyChatsFilesFolderIdUseCase,
             startChatUploadsWorkerUseCase,
             isChatUploadsWorkerStartedUseCase,
+            compressFileForChatUseCase,
             cancelCancelTokenUseCase,
         )
     }
@@ -58,6 +60,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
             getMyChatsFilesFolderIdUseCase,
             startChatUploadsWorkerUseCase,
             isChatUploadsWorkerStartedUseCase,
+            compressFileForChatUseCase,
             cancelCancelTokenUseCase,
         )
         commonStub()
@@ -165,6 +168,20 @@ class StartChatUploadsWithWorkerUseCaseTest {
         }
         verify(isChatUploadsWorkerStartedUseCase).invoke()
     }
+
+    @Test
+    fun `test that files returned by CompressFileForChatUseCase are send to upload files use case`() =
+        runTest {
+            val file = mockFile()
+            val compressed = mockFile()
+            val files: List<File> = listOf(file)
+            whenever(compressFileForChatUseCase(file)).thenReturn(compressed)
+            underTest((files), 1L).test {
+                verify(uploadFilesUseCase)
+                    .invoke(eq(listOf(compressed)), NodeId(any()), any(), any(), any())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     private fun mockFile() = mock<File> {
         on { isFile }.thenReturn(true)

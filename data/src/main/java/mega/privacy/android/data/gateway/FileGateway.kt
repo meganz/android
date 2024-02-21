@@ -280,4 +280,9 @@ interface FileGateway {
      * @param file the destination file where the original file will be copied
      */
     suspend fun copyContentUriToFile(uriString: String, file: File)
+
+    /**
+     * Creates a new image from [file] to [destination] with [maxPixels] pixels if the image has more than [maxPixels] pixels
+     */
+    fun downscaleImage(file: File, destination: File, maxPixels: Long)
 }

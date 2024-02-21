@@ -354,4 +354,9 @@ interface FileSystemRepository {
      * @return the files in same folder
      */
     suspend fun getFileSiblingByUri(uriString: String): List<File>
+
+    /**
+     * Creates a new image from [file] to [destination] with [maxPixels] pixels if the image has more than [maxPixels] pixels
+     */
+    suspend fun downscaleImage(file: File, destination: File, maxPixels: Long)
 }

@@ -23,6 +23,7 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
     private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
     private val startChatUploadsWorkerUseCase: StartChatUploadsWorkerUseCase,
     private val isChatUploadsWorkerStartedUseCase: IsChatUploadsWorkerStartedUseCase,
+    private val compressFileForChatUseCase: CompressFileForChatUseCase,
     cancelCancelTokenUseCase: CancelCancelTokenUseCase,
 ) : AbstractStartTransfersWithWorkerUseCase(cancelCancelTokenUseCase) {
 
@@ -48,8 +49,10 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
                 )
                 false
             }
+        }.map {
+            runCatching { compressFileForChatUseCase(it) }.getOrNull() ?: it
         }
-        //images and videos should be compressed, will be done in AND-17948
+
         val chatFilesFolderId = getMyChatsFilesFolderIdUseCase()
         val appData = TransferAppData.ChatUpload(pendingMessageId)
         startTransfersAndWorker(

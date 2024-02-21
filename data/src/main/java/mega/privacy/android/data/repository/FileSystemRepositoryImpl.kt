@@ -571,4 +571,8 @@ internal class FileSystemRepositoryImpl @Inject constructor(
                 it.isFile && it.exists() && it.canRead()
             } ?: listOf(currentFile)
         }
+
+    override suspend fun downscaleImage(file: File, destination: File, maxPixels: Long) {
+        fileGateway.downscaleImage(file, destination, maxPixels)
+    }
 }
