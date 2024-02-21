@@ -30,7 +30,6 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
@@ -191,34 +190,25 @@ class AlbumContentFragment : Fragment() {
     private fun openPhotoPreview(anchorPhoto: Photo, photos: List<Photo>) {
         albumContentViewModel.state.value.uiAlbum?.id?.let { currentAlbum ->
             lifecycleScope.launch {
-                if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
-                    val params = buildMap {
-                        this[AlbumContentImageNodeFetcher.ALBUM_TYPE] = currentAlbum.getAlbumType()
+                val params = buildMap {
+                    this[AlbumContentImageNodeFetcher.ALBUM_TYPE] = currentAlbum.getAlbumType()
 
-                        if (currentAlbum is UserAlbum) {
-                            this[AlbumContentImageNodeFetcher.CUSTOM_ALBUM_ID] = currentAlbum.id.id
-                        }
-
-                        this[AlbumContentImageNodeFetcher.ALBUM_SORT_TYPE] =
-                            albumContentViewModel.state.value.currentSort
+                    if (currentAlbum is UserAlbum) {
+                        this[AlbumContentImageNodeFetcher.CUSTOM_ALBUM_ID] = currentAlbum.id.id
                     }
-                    val intent = ImagePreviewActivity.createIntent(
-                        context = requireContext(),
-                        imageSource = ImagePreviewFetcherSource.ALBUM_CONTENT,
-                        menuOptionsSource = ImagePreviewMenuSource.ALBUM_CONTENT,
-                        anchorImageNodeId = NodeId(anchorPhoto.id),
-                        params = params,
-                    )
-                    startActivity(intent)
-                } else {
-                    val intent = ImageViewerActivity.getIntentForChildren(
-                        requireContext(),
-                        photos.map { it.id }.toLongArray(),
-                        anchorPhoto.id,
-                    )
-                    startActivity(intent)
-                    managerActivity.overridePendingTransition(0, 0)
+
+                    this[AlbumContentImageNodeFetcher.ALBUM_SORT_TYPE] =
+                        albumContentViewModel.state.value.currentSort
                 }
+                val intent = ImagePreviewActivity.createIntent(
+                    context = requireContext(),
+                    imageSource = ImagePreviewFetcherSource.ALBUM_CONTENT,
+                    menuOptionsSource = ImagePreviewMenuSource.ALBUM_CONTENT,
+                    anchorImageNodeId = NodeId(anchorPhoto.id),
+                    params = params,
+                    showScreenLabel = false,
+                )
+                startActivity(intent)
             }
         }
     }

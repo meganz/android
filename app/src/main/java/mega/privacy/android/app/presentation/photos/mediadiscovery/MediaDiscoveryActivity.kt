@@ -25,8 +25,6 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.components.saver.NodeSaver
-import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.FileExplorerActivity
@@ -266,29 +264,18 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
 
     private fun openPhoto(photo: Photo) {
         lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
-                ImagePreviewActivity.createIntent(
-                    context = this@MediaDiscoveryActivity,
-                    imageSource = ImagePreviewFetcherSource.FOLDER_LINK_MEDIA_DISCOVERY,
-                    menuOptionsSource = ImagePreviewMenuSource.FOLDER_LINK,
-                    anchorImageNodeId = NodeId(photo.id),
-                    isForeign = true,
-                    params = mapOf(
-                        FolderLinkMediaDiscoveryImageNodeFetcher.PARENT_ID to mediaHandle,
-                    ),
-                ).run {
-                    startActivity(this)
-                }
-            } else {
-                ImageViewerActivity.getIntentForChildren(
-                    this@MediaDiscoveryActivity,
-                    mediaDiscoveryViewModel.getAllPhotoIds().toLongArray(),
-                    photo.id,
-                    fromFolderLink = true,
-                ).run {
-                    startActivity(this)
-                }
-                overridePendingTransition(0, 0)
+            ImagePreviewActivity.createIntent(
+                context = this@MediaDiscoveryActivity,
+                imageSource = ImagePreviewFetcherSource.FOLDER_LINK_MEDIA_DISCOVERY,
+                menuOptionsSource = ImagePreviewMenuSource.FOLDER_LINK,
+                anchorImageNodeId = NodeId(photo.id),
+                isForeign = true,
+                params = mapOf(
+                    FolderLinkMediaDiscoveryImageNodeFetcher.PARENT_ID to mediaHandle,
+                ),
+                showScreenLabel = false,
+            ).run {
+                startActivity(this)
             }
         }
     }
