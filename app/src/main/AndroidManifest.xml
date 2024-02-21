@@ -59,16 +59,11 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
-
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-
-    <!-- For apps targeting Android 13 (API level 33) -->
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" /> <!-- For apps targeting Android 13 (API level 33) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
-    <!-- For apps targeting Android 14 (API level 34) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> <!-- For apps targeting Android 14 (API level 34) -->
     <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
@@ -132,19 +127,15 @@
         <meta-data
             android:name="fontProviderRequests"
             android:value="Noto Color Emoji Compat" />
-
         <meta-data
             android:name="google_analytics_default_allow_ad_personalization_signals"
             android:value="false" />
-
         <meta-data
             android:name="google_analytics_ssaid_collection_enabled"
             android:value="false" />
-
         <meta-data
             android:name="firebase_performance_logcat_enabled"
             android:value="false" />
-
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"
             android:value="barcode_ui" />
@@ -186,7 +177,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- Use separate scheme and host data tags entries for this intent-filter definition -->
-                <!-- Please keep this format, otherwise it will cause web intent verification error-->
+                <!-- Please keep this format, otherwise it will cause web intent verification error -->
                 <data android:host="mega.co.nz" />
                 <data android:scheme="https" />
             </intent-filter>
@@ -206,7 +197,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- Use separate scheme and host data tags entries for this intent-filter definition -->
-                <!-- Please keep this format, otherwise it will cause web intent verification error-->
+                <!-- Please keep this format, otherwise it will cause web intent verification error -->
                 <data android:host="mega.nz" />
                 <data android:scheme="https" />
             </intent-filter>
@@ -230,7 +221,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="mega.privacy.android.app.imageviewer.ImageViewerActivity"
+            android:name=".imageviewer.ImageViewerActivity"
             android:label=""
             android:launchMode="singleTop"
             android:theme="@style/Theme.Mega.FullScreen.Viewer"
@@ -431,6 +422,10 @@
             android:label="@string/section_photo_sync"
             android:launchMode="singleTop" />
         <activity
+            android:name=".settings.camerauploads.SettingsCameraUploadsComposeActivity"
+            android:label="@string/section_photo_sync"
+            android:launchMode="singleTop" />
+        <activity
             android:name=".activities.settingsActivities.ChatNotificationsPreferencesActivity"
             android:label="@string/title_properties_chat_notifications_contact"
             android:launchMode="singleTop" />
@@ -492,14 +487,13 @@
         <activity
             android:name=".meeting.activity.MeetingActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
-            android:launchMode="singleTop"
             android:excludeFromRecents="true"
+            android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".meeting.activity.LeftMeetingActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".presentation.search.SearchActivity"
             android:launchMode="singleTop" />
@@ -534,18 +528,21 @@
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:foregroundServiceType="dataSync"
             tools:node="merge" />
-
         <!-- Older devices that run Android 4.4 (API level 19) through Android 10 (API level 29) can install a backported version of the photo picker. -->
         <!-- Trigger Google Play services to install the backported photo picker module. -->
-        <!--suppress AndroidDomInspection -->
-        <service android:name="com.google.android.gms.metadata.ModuleDependencies"
+        <!-- suppress AndroidDomInspection -->
+        <service
+            android:name="com.google.android.gms.metadata.ModuleDependencies"
             android:enabled="false"
             android:exported="false"
             tools:ignore="MissingClass">
             <intent-filter>
                 <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES" />
             </intent-filter>
-            <meta-data android:name="photopicker_activity:0:required" android:value="" />
+
+            <meta-data
+                android:name="photopicker_activity:0:required"
+                android:value="" />
         </service>
 
         <receiver
@@ -566,71 +563,57 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
-
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
             android:exported="false"
             tools:node="merge"
             tools:replace="android:authorities">
-            <!--    remove default WorkManager initializer-->
+
+            <!-- remove default WorkManager initializer -->
             <meta-data
                 android:name="androidx.work.WorkManagerInitializer"
                 android:value="androidx.startup"
                 tools:node="remove" />
-
             <meta-data
                 android:name="mega.privacy.android.app.initializer.WorkManagerInitializer"
                 android:value="androidx.startup" />
-
             <meta-data
                 android:name="mega.privacy.android.app.initializer.EmojiInitializer"
                 android:value="androidx.startup" />
-
             <meta-data
                 android:name="mega.privacy.android.app.initializer.LoggerInitializer"
                 android:value="androidx.startup" />
-
             <meta-data
                 android:name="mega.privacy.android.app.initializer.CheckMegaStandbyBucketInitializer"
                 android:value="androidx.startup" />
-
             <meta-data
                 android:name="mega.privacy.android.app.initializer.GetTombstoneInfoInitializer"
                 android:value="androidx.startup" />
-
             <meta-data
                 android:name="mega.privacy.android.app.initializer.CheckAppUpgradeInitializer"
                 android:value="androidx.startup" />
-
             <meta-data
                 android:name="mega.privacy.android.app.initializer.SetupMegaApiInitializer"
                 android:value="androidx.startup" />
-
             <meta-data
                 android:name="mega.privacy.android.app.initializer.MegaApiFolderInitializer"
                 android:value="androidx.startup" />
-
             <meta-data
                 android:name="mega.privacy.android.app.initializer.fresco.FrescoInitializer"
                 android:value="androidx.startup" />
-
             <meta-data
                 android:name="mega.privacy.android.app.initializer.AnalyticsInitializer"
                 android:value="androidx.startup" />
             <meta-data
                 android:name="mega.privacy.android.app.initializer.PasscodeInitializer"
                 android:value="androidx.startup" />
-
             <meta-data
                 android:name="mega.privacy.android.app.initializer.CameraUploadsWorkerNotificationInitializer"
                 android:value="androidx.startup" />
-
             <meta-data
                 android:name="mega.privacy.android.app.initializer.NotificationChannelsInitializer"
                 android:value="androidx.startup" />
-
-
         </provider>
 
         <activity
@@ -669,85 +652,68 @@
             android:name=".upgradeAccount.ChooseAccountActivity"
             android:label="@string/choose_account_fragment"
             android:launchMode="singleTop" />
-
         <activity
-            android:name="mega.privacy.android.app.upgradeAccount.payment.PaymentActivity"
+            android:name=".upgradeAccount.payment.PaymentActivity"
             android:label="@string/payment"
             android:launchMode="singleTop" />
-
         <activity
-            android:name="mega.privacy.android.app.mediaplayer.SelectSubtitleFileActivity"
+            android:name=".mediaplayer.SelectSubtitleFileActivity"
             android:launchMode="singleTop" />
         <activity
             android:name=".activities.settingsActivities.StartScreenPreferencesActivity"
             android:label="@string/start_screen_setting"
             android:launchMode="singleTop" />
-
         <activity
-            android:name="mega.privacy.android.app.namecollision.NameCollisionActivity"
+            android:name=".namecollision.NameCollisionActivity"
             android:label="@string/title_duplicated_items"
             android:launchMode="singleTop"
             android:theme="@style/Theme.Mega.FullScreen.Viewer" />
-
         <activity
-            android:name="mega.privacy.android.app.presentation.permissions.NotificationsPermissionActivity"
+            android:name=".presentation.permissions.NotificationsPermissionActivity"
             android:launchMode="singleTop" />
-
         <activity
-            android:name="mega.privacy.android.app.uploadFolder.UploadFolderActivity"
+            android:name=".uploadFolder.UploadFolderActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustNothing" />
-
         <activity
-            android:name="mega.privacy.android.app.presentation.startconversation.StartConversationActivity"
+            android:name=".presentation.startconversation.StartConversationActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustNothing" />
-
         <activity
-            android:name="mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity"
+            android:name=".presentation.meeting.ScheduledMeetingInfoActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustNothing" />
-
         <activity
-            android:name="mega.privacy.android.app.presentation.meeting.RecurringMeetingInfoActivity"
+            android:name=".presentation.meeting.RecurringMeetingInfoActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustNothing" />
-
         <activity
-            android:name="mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity"
+            android:name=".presentation.photos.albums.AlbumScreenWrapperActivity"
             android:windowSoftInputMode="adjustNothing" />
-
         <activity
-            android:name="mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity"
+            android:name=".presentation.meeting.CreateScheduledMeetingActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize|stateVisible" />
-
         <activity
-            android:name="mega.privacy.android.app.presentation.meeting.WaitingRoomActivity"
+            android:name=".presentation.meeting.WaitingRoomActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize" />
-
         <activity android:name=".presentation.contactinfo.ComposeContactInfoActivity" />
-
         <activity
-            android:name="mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity"
+            android:name=".presentation.photos.mediadiscovery.MediaDiscoveryActivity"
             android:windowSoftInputMode="adjustNothing" />
-
         <activity
-            android:name="mega.privacy.android.app.presentation.chat.archived.ArchivedChatsActivity"
+            android:name=".presentation.chat.archived.ArchivedChatsActivity"
             android:launchMode="singleTop" />
-
         <activity
-            android:name="mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity"
+            android:name=".presentation.imagepreview.ImagePreviewActivity"
             android:label=""
             android:launchMode="singleTop"
             android:theme="@style/Theme.Mega.FullScreen.Viewer"
             android:windowSoftInputMode="stateHidden|adjustResize" />
-
         <activity
-            android:name="mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowActivity"
+            android:name=".presentation.imagepreview.slideshow.SlideshowActivity"
             android:windowSoftInputMode="stateHidden|adjustResize" />
-
     </application>
 
 </manifest>
