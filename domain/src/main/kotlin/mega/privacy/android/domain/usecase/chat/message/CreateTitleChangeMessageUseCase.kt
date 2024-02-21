@@ -12,6 +12,7 @@ internal class CreateTitleChangeMessageUseCase @Inject constructor() : CreateTyp
             chatId = chatId,
             msgId = messageId,
             time = timestamp,
+            isDeletable = isDeletable,
             isMine = isMine,
             userHandle = userHandle,
             content = content.orEmpty(),

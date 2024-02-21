@@ -17,6 +17,7 @@ internal class CreateVoiceClipMessageUseCase @Inject constructor() : CreateTyped
             chatId = chatId,
             msgId = messageId,
             time = timestamp,
+            isDeletable = isDeletable,
             isMine = isMine,
             userHandle = userHandle,
             status = status,

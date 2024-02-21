@@ -71,6 +71,7 @@ class CreateNodeAttachmentMessageUseCaseTest {
                 chatId = 123L,
                 msgId = messageId,
                 time = timestamp,
+                isDeletable = false,
                 isMine = isMine,
                 userHandle = userHandle,
                 shouldShowAvatar = shouldShowAvatar,

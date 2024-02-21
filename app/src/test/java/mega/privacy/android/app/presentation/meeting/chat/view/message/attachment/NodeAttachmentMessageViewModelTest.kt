@@ -103,6 +103,7 @@ class NodeAttachmentMessageViewModelTest {
             chatId = CHAT_ID,
             msgId = MSG_ID,
             time = 12L,
+            isDeletable = false,
             isMine = true,
             userHandle = 23L,
             shouldShowAvatar = true,

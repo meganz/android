@@ -12,6 +12,7 @@ internal class CreateCallStartedMessageUseCase @Inject constructor() : CreateTyp
                 chatId = chatId,
                 msgId = messageId,
                 time = timestamp,
+                isDeletable = isDeletable,
                 isMine = isMine,
                 userHandle = userHandle,
                 shouldShowAvatar = shouldShowAvatar,

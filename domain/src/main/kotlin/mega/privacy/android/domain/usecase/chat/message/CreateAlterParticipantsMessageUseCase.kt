@@ -12,6 +12,7 @@ internal class CreateAlterParticipantsMessageUseCase @Inject constructor() :
             chatId = chatId,
             msgId = messageId,
             time = timestamp,
+            isDeletable = isDeletable,
             isMine = isMine,
             userHandle = userHandle,
             privilege = privilege,

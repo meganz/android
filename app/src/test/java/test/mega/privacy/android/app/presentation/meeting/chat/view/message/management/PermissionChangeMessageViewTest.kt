@@ -101,6 +101,7 @@ class PermissionChangeMessageViewTest {
                     isMine = false,
                     msgId = 1234567890L,
                     time = System.currentTimeMillis(),
+                    isDeletable = false,
                     shouldShowAvatar = false,
                     shouldShowTime = false,
                     reactions = emptyList(),

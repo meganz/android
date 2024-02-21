@@ -25,6 +25,11 @@ interface Message {
     val time: Long
 
     /**
+     * True if the message is deletable
+     */
+    val isDeletable: Boolean
+
+    /**
      * True if the message is mine
      */
     val isMine: Boolean

@@ -16,6 +16,7 @@ data class UnrecognizableInvalidMessage(
     override val chatId: Long,
     override val msgId: Long,
     override val time: Long,
+    override val isDeletable: Boolean,
     override val isMine: Boolean,
     override val userHandle: Long,
     override val shouldShowAvatar: Boolean,

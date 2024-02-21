@@ -130,6 +130,7 @@ private fun PermissionChangeMessageViewPreview(
             chatId = 1L,
             msgId = 0,
             time = 0,
+            isDeletable = false,
             isMine = true,
             userHandle = 0,
             privilege = permission,
