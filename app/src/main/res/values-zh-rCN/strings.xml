@@ -43,11 +43,11 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">正在加载</string>
     <!-- state while importing the file -->
-    <string name="general_importing">正在导入</string>
+    <string name="general_importing">正在添加</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">正在转发</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="general_import">导入</string>
+    <string name="general_import">添加到云盘</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">错误</string>
     <!-- when trying to download a file that is already downloaded in the device -->
@@ -63,7 +63,7 @@
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">未检测到外部存储</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">登出</string>
+    <string name="action_logout">登&#160;出</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">上传</string>
     <!-- Menu item -->
@@ -125,7 +125,7 @@
     <!-- Press back while login to cancel current login process. -->
     <string name="confirm_cancel_login">您确定要取消当前登录吗？</string>
     <!-- Login button -->
-    <string name="login_text">登录</string>
+    <string name="login_text">登&#160;入</string>
     <!-- email label -->
     <string name="email_text">电子邮件地址</string>
     <!-- password label -->
@@ -159,7 +159,7 @@
     <!-- After login, updating the file list, the file list should be processed before showing it to the user -->
     <string name="login_preparing_filelist">正在准备文件列表</string>
     <!-- when the user tries to share something to MEGA without being logged -->
-    <string name="login_before_share">请先登录MEGA以进行共享</string>
+    <string name="login_before_share">登入以使用MEGA共享</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">您的确认链接已失效。您的帐户可能已被激活或您可能已取消注册。</string>
     <!-- First Name of the user -->
@@ -175,9 +175,9 @@
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">您需要同意您已了解忘记密码后的风险</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
-    <string name="error_enter_username">请输入您的名字</string>
+    <string name="error_enter_username">输入您的名字</string>
     <!-- Warning dialog -->
-    <string name="error_enter_userlastname">请输入您的姓。</string>
+    <string name="error_enter_userlastname">输入您的姓氏</string>
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">密码不匹配</string>
     <!-- when creating the account -->
@@ -381,19 +381,19 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">错误。文件夹未创建</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">已重命名</string>
+    <string name="context_correctly_renamed">已重命名项目</string>
     <!-- error message -->
     <string name="context_no_renamed">错误。未重命名</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">已复制</string>
+    <string name="context_correctly_copied">已复制项目</string>
     <!-- error message -->
     <string name="context_no_copied">错误。未复制</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
-    <string name="context_no_destination_folder">请选择一个目标文件夹</string>
+    <string name="context_no_destination_folder">选择目标文件夹</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">已移动</string>
+    <string name="context_correctly_moved">已移动项目</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">已移至回收站</string>
+    <string name="context_correctly_moved_to_rubbish">项目已移至回收站</string>
     <!-- error message -->
     <string name="context_no_moved">错误。未移动</string>
     <!-- success message when sharing a folder -->
@@ -401,7 +401,7 @@
     <!-- error message -->
     <string name="context_no_removed_shared">发生错误。移除共享失败</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">已删除</string>
+    <string name="context_correctly_removed">已删除项目</string>
     <!-- error message -->
     <string name="context_no_removed">错误。删除失败</string>
     <!-- success message when sending multiple files -->
@@ -421,7 +421,7 @@
     <!-- confirmation cancel subscriptions dialog -->
     <string name="confirmation_cancel_subscriptions">感谢您的反馈。您确定要取消MEGA订阅吗？</string>
     <!-- provide a reason to cancel subscriptions dialog -->
-    <string name="reason_cancel_subscriptions">您的订阅尚未取消。请让我们了解您取消订阅的原因</string>
+    <string name="reason_cancel_subscriptions">您的订阅尚未取消。请提供您取消的原因</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">您的新订阅将在当前订阅到期后生效，届时将向您收取新方案价格。</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -439,7 +439,7 @@
     <!-- Title of the alert to introduce the decryption key -->
     <string name="alert_decryption_key">解密密钥</string>
     <!-- Message of the alert to introduce the decryption key -->
-    <string name="message_decryption_key">请输入此链接的解密密钥</string>
+    <string name="message_decryption_key">输入链接的解密密钥</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">解密密钥无效</string>
     <!-- upload to. Then choose an Audio file -->
@@ -475,7 +475,7 @@
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">链接已复制到剪贴板</string>
     <!-- alert when clicking a newsignup link being logged -->
-    <string name="log_out_warning">请在创建帐户前登出</string>
+    <string name="log_out_warning">在创建帐户之前请先登出</string>
     <!-- menu item -->
     <string name="menu_pause_transfers">暂停传输</string>
     <!-- menu item -->
@@ -509,7 +509,7 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">密码选项</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">视频压缩需要消耗电池电量，若压缩的视频大于%s时，请为您的设备充电。</string>
+    <string name="settings_camera_upload_charging_helper_label">视频压缩需要消耗大量电量。如果要压缩的视频大于%s，请将您的设备接入电源充电。</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
     <string name="settings_camera_upload_include_gps_helper_label">开启后，您的位置信息将包含在您的图片中。请谨慎选择。</string>
     <!-- Settings category title for cache and offline files -->
@@ -714,7 +714,7 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_pro3">Pro&#160;III帐户</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Pro&#160;Lite 帐户</string>
+    <string name="my_account_prolite_feedback_email">Pro&#160;Lite帐户</string>
     <!--  -->
     <string name="backup_title">备份您的恢复密钥</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -730,7 +730,7 @@
     <!-- Action of a button to save something -->
     <string name="save_action">保存</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
-    <string name="copy_MK_confirmation">恢复密钥已付知道剪贴板。请把它保存到一个您之后可以轻松访问的安全地方。</string>
+    <string name="copy_MK_confirmation">恢复密钥已复制到粘贴板。请把它保存在一个安全的地方，以便您以后可以轻松的访问。</string>
     <!-- Button to change the password -->
     <string name="change_pass">更改</string>
     <!-- Positive button to perform a general action -->
@@ -1207,7 +1207,7 @@
     <!-- Menu option -->
     <string name="general_view">查看文件</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="add_to_cloud">导入</string>
+    <string name="add_to_cloud">添加到云盘</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">添加到云盘</string>
     <!-- Menu option -->
@@ -1519,7 +1519,7 @@
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">邀请未发送</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent_text">二维码或联系人链接无效。请尝试扫描有效二维码或打开有效链接。</string>
+    <string name="invite_not_sent_text">二维码或联系人链接无效。尝试扫描有效条码或打开有效链接。</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">邀请尚未发送。%s已在您的联系人列表中。</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
@@ -2276,7 +2276,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">设置MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
+    <string name="setup_mega_explanation">MEGA需要您的授权才能访问您的媒体和文件以进行共享。使用此应用程序时可能还需要授予其它访问权限，才能使用其提供的功能和服务。</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">允许访问照片、媒体内容和文件</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -4994,28 +4994,28 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">给所有人通话</string>
     <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
-    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account.</string>
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">此应用程序已登录到另一个MEGA帐户。\n登出此帐户，然后使用您的MEGA VPN帐户登入。</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
-    <string name="chat_attach_pick_from_camera_deny_permission">MEGA needs access to your camera to capture photos and videos.</string>
+    <string name="chat_attach_pick_from_camera_deny_permission">MEGA需要访问您的相机才能拍摄照片和视频。</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
-    <string name="chat_attach_location_deny_permission">You denied MEGA access to your location. If you’d like to share your location, allow MEGA permission to do so.</string>
+    <string name="chat_attach_location_deny_permission">您拒绝MEGA访问您的位置。如果您想共享您的位置，请授予MEGA权限。</string>
     <!-- Title for the confirmation dialog shown when the user is starting a large download -->
-    <string name="transfers_confirm_large_download_title">Large download</string>
+    <string name="transfers_confirm_large_download_title">大量下载</string>
     <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start -->
-    <string name="transfers_confirm_large_download_button_start">Start download</string>
+    <string name="transfers_confirm_large_download_button_start">开始下载</string>
     <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start and this dialog won't appear anymore in future large downloads-->
-    <string name="transfers_confirm_large_download_button_start_always">Always download and don’t ask again</string>
+    <string name="transfers_confirm_large_download_button_start_always">总是下载并且不再询问</string>
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
-        <item quantity="other"></item>
+        <item quantity="other">已共享%1$d个文件夹</item>
     </plurals>
     <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="other"></item>
+        <item quantity="other">已共享%1$d个文件夹，&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
-        <item quantity="other"></item>
+        <item quantity="other">无法共享%1$d个文件夹</item>
     </plurals>
     <!-- Button text to mute a participant in the info of participant in call screen-->
     <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">静音</string>
@@ -5024,13 +5024,29 @@
     <!-- Label text indicating that all participants are muted -->
     <string name="meetings_bottom_panel_in_call_participants_all_muted_label">已全部静音</string>
     <!-- Message of the snackbar displayed when you have muted a participant. The placeholder is for the name of the participant you muted -->
-    <string name="meetings_muted_a_participant_snackbar_message">You’ve muted %s</string>
+    <string name="meetings_muted_a_participant_snackbar_message">您已将%s静音</string>
     <!-- Message of the snackbar displayed when you have muted all participants -->
     <string name="meetings_muted_all_participants_snackbar_message">您已将所有参与者设为静音</string>
     <!-- Message of the snackbar displayed when you have been muted. The placeholder is for the name of who muted you -->
-    <string name="meetings_muted_by_a_participant_snackbar_message">You’ve been muted by %s</string>
+    <string name="meetings_muted_by_a_participant_snackbar_message">您已被%s静音</string>
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">订阅详情</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
+    <string name="account_upgrade_subscription_details">订阅将自动续订，续订周期与初始选择的周期相同，并且以相同的价格进行续订。您可以在下一次订阅付款到期前24小时以内，通过[A]Google Play[/A]订阅界面关闭MEGA&#160;Pro订阅的自动续订功能。</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">允许访问您的图库</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">授予权限</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_chat_screen_app_update_dialog_title">Update required</string>
+    <string name="meetings_chat_screen_app_update_dialog_message">您使用的不是我们应用程序的最新版本，因此您无法发起或加入通话。立即更新以继续。</string>
+    <string name="meetings_chat_screen_app_update_dialog_update_button">更新</string>
+    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Dismiss</string>
+    <!-- Title of the bottom panel when the only host left the call on meeting screen -->
+    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">指定主持人以离开通话</string>
+    <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">You’re the only host on the call. Assign another host for the group before leaving so someone on the call will have host permissions. You’ll remain a host in the group.</string>
+    <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">指定并离开</string>
+    <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_leave_option">离开</string>
 </resources>

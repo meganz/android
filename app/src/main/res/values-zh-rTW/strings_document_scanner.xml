@@ -43,7 +43,7 @@
     <!-- Error text for invalid characters -->
     <string name="scan_invalid_characters">無效字元</string>
     <!-- Snackbar text for incorrect name -->
-    <string name="scan_snackbar_incorrect_name">在繼續操作前請更正您的檔案名稱</string>
+    <string name="scan_snackbar_incorrect_name">在繼續操作前，請更正您的檔案名稱</string>
     <!-- Dialog message showing file progress -->
     <string name="scan_dialog_progress">正在準備%1$s。請稍等⋯</string>
     <!-- Snackbar text indicating that invalid characters are being used for naming a scanned document. The placeholder is for including the list of invalid characters (hardcoded) -->

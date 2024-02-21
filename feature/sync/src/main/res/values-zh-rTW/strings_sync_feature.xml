@@ -31,21 +31,21 @@
     <!-- Sync options -->
     <string name="sync_menu_sync_options">同步選項</string>
     <!-- Sync text when need to solved stalled issues-->
-    <string name="sync_menu_clear_issues">Clear resolved issues</string>
+    <string name="sync_menu_clear_issues">清除已解決的問題</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">雙向同步</string>
     <!-- Sync conflict message -->
     <string name="sync_stalled_issue_detail_conflict_title">Conflict A</string>
     <!-- Sync when stalled issues, title of the conflict -->
-    <string name="sync_stalled_issue_detail_conflict_message">There are multiple items with the same name on one side of your sync that would all become the same single item on the other side of your sync</string>
+    <string name="sync_stalled_issue_detail_conflict_message">同步的一側有多個具有相同名稱的項目，這些項目在同步的另一側都將成為相同的單一項目</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">重新命名所有項目</string>
     <!-- Sync to resolve conflict Merge folders -->
     <string name="sync_stalled_issue_merge_folders">合併資料夾</string>
     <!-- Sync to resolve conflict Choose local file -->
-    <string name="sync_stalled_issue_choose_local_file">選擇本地檔案</string>
+    <string name="sync_stalled_issue_choose_local_file">Choose the local file</string>
     <!-- Sync to resolve conflict Choose remote file -->
-    <string name="sync_stalled_issue_choose_remote_file">選擇遠端檔案</string>
+    <string name="sync_stalled_issue_choose_remote_file">Choose the file stored in MEGA</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">選擇最後修改的檔案</string>
     <!-- Sync message when conflict resolved -->
@@ -67,7 +67,7 @@
     <!-- Sync dialog battery optimization message -->
     <string name="sync_dialog_battery_optimization_message">Allow MEGA to read, modify or delete all files on this device.</string>
     <!-- Sync state message for No Solved Issues -->
-    <string name="sync_solved_issues_empty_message">No resolved issues</string>
+    <string name="sync_solved_issues_empty_message">沒有已解決的問題</string>
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">沒有問題</string>
     <!-- Sync option to choose folder pair -->
@@ -133,7 +133,7 @@
     <!-- Sync stalled issue reason is Folder Matched Against File-->
     <string name="sync_stalled_issue_folder_matched_against_file">您嘗試同步的檔案沒有副檔名，並且與現有資料夾的名稱相同</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync">自上次同步以來，本地和遠端已更改</string>
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Item changed since last sync</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->
     <string name="sync_stalled_issue_local_and_remote_not_synced">檔案或資料夾衝突</string>
     <!-- Sync stalled issue reason is Name clash-->
@@ -157,7 +157,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">選擇</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">A file or folder has an issue that needs your decision to resolve it</string>
+    <string name="sync_stalled_issue_file_issue_detail">檔案或資料夾存在需要您決策以解決的問題</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">正在等待其它程序完成</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -177,7 +177,7 @@
     <!-- Sync stalled issue reason is Local and remote not synced detailed description-->
     <string name="sync_stalled_issue_local_and_remote_not_synced_detail">此檔案有衝突的副本</string>
     <!-- Sync stalled issue reason is Name clash detailed description-->
-    <string name="sync_stalled_issue_name_clash_detail">There are multiple items with the same name on one side of your sync that would all become the same single item on the other side of your sync</string>
+    <string name="sync_stalled_issue_name_clash_detail">同步的一側有多個具有相同名稱的項目，這些項目在同步的另一側都將成為相同的單一項目</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">在MEGA中偵測到移動或重新命名的變動，但無法在本地複製。</string>
     <!-- Sync notification title description sync monitoring-->

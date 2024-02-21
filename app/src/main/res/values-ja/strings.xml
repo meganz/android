@@ -43,11 +43,11 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">読み込み中</string>
     <!-- state while importing the file -->
-    <string name="general_importing">インポート中</string>
+    <string name="general_importing">追加中</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">転送中</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="general_import">インポート</string>
+    <string name="general_import">クラウドドライブに追加する</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">エラー</string>
     <!-- when trying to download a file that is already downloaded in the device -->
@@ -137,11 +137,11 @@
     <!-- button that allows the user to create an account -->
     <string name="create_account">アカウントを作成する</string>
     <!-- when the user tries to log in MEGA without typing the email -->
-    <string name="error_enter_email">メールアドレスを入力してください</string>
+    <string name="error_enter_email">メールアドレスを入力</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="error_invalid_email">メールアドレスが無効です</string>
     <!-- when the user tries to log in MEGA without typing the password -->
-    <string name="error_enter_password">パスワードを入力してください</string>
+    <string name="error_enter_password">パスワードを入力</string>
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">ネットワーク接続がありません</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
@@ -175,9 +175,9 @@
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">パスワードを失う危険性を理解していることに同意していただく必要がございます</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
-    <string name="error_enter_username">お名前をご入力ください</string>
+    <string name="error_enter_username">名を入力してください</string>
     <!-- Warning dialog -->
-    <string name="error_enter_userlastname">苗字をご入力ください。</string>
+    <string name="error_enter_userlastname">姓を入力してください</string>
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">パスワードが合いません</string>
     <!-- when creating the account -->
@@ -381,19 +381,19 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">エラー。フォルダが作成されていません</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">名前を変更しました</string>
+    <string name="context_correctly_renamed">項目の名前が変更されました</string>
     <!-- error message -->
     <string name="context_no_renamed">エラー。名前が変更されていません</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">コピーしました</string>
+    <string name="context_correctly_copied">項目がコピーされました</string>
     <!-- error message -->
     <string name="context_no_copied">エラー。コピーされていません</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">目的のフォルダを選択してください</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">移動しました</string>
+    <string name="context_correctly_moved">項目を移動しました</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">ごみ箱に移動しました</string>
+    <string name="context_correctly_moved_to_rubbish">項目をごみ箱に移動しました</string>
     <!-- error message -->
     <string name="context_no_moved">エラー。移動されませんでした</string>
     <!-- success message when sharing a folder -->
@@ -401,7 +401,7 @@
     <!-- error message -->
     <string name="context_no_removed_shared">エラー。共有を削除できませんでした</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">削除済み</string>
+    <string name="context_correctly_removed">項目が削除されました</string>
     <!-- error message -->
     <string name="context_no_removed">エラー。削除に失敗しました</string>
     <!-- success message when sending multiple files -->
@@ -421,7 +421,7 @@
     <!-- confirmation cancel subscriptions dialog -->
     <string name="confirmation_cancel_subscriptions">ご意見をお寄せいただきありがとうございます。MEGAサブスクリプションをキャンセルしてもよろしいですか？</string>
     <!-- provide a reason to cancel subscriptions dialog -->
-    <string name="reason_cancel_subscriptions">あなたのサブスクリプションはキャンセルされていません。キャンセルの理由をご入力ください</string>
+    <string name="reason_cancel_subscriptions">お客様のサブスクリプションはキャンセルされていません。キャンセルの理由をご入力ください</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">現在のサブスクリプションの有効期限が切れると、新しいサブスクリプションが有効になり、その時点で新しい価格が請求されます。</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -1207,7 +1207,7 @@
     <!-- Menu option -->
     <string name="general_view">ファイルを表示</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="add_to_cloud">インポート</string>
+    <string name="add_to_cloud">クラウドドライブに追加する</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">クラウドドライブに追加する</string>
     <!-- Menu option -->
@@ -5007,15 +5007,15 @@
     <string name="transfers_confirm_large_download_button_start_always">常にダウンロードし、再度質問しない</string>
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
-        <item quantity="other"></item>
+        <item quantity="other">%1$d個のフォルダが共有されました</item>
     </plurals>
     <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="other"></item>
+        <item quantity="other">%1$d個のフォルダが共有されましたが、&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
-        <item quantity="other"></item>
+        <item quantity="other">%1$d個のフォルダを共有できませんでした</item>
     </plurals>
     <!-- Button text to mute a participant in the info of participant in call screen-->
     <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">ミュート</string>
@@ -5032,5 +5032,21 @@
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">サブスクリプションの詳細</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
+    <string name="account_upgrade_subscription_details">サブスクリプションは、最初に選択した期間と同じ期間および同じ価格で、連続するサブスクリプション期間に対して自動的に更新されます。次のサブスクリプションのお支払い期日の24時間前までに、MEGA&#160;Proサブスクリプションの自動更新をオフに切り替えることができます。これは、[A]Google Play[/A]の「サブスクリプション」から実行できます。</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">ギャラリーへのアクセスを許可する</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">アクセスを許可</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_chat_screen_app_update_dialog_title">アップデートが必要です</string>
+    <string name="meetings_chat_screen_app_update_dialog_message">当社の最新バージョンのアプリを使用されていないため、通話を開始したり、通話に参加したりできません。今すぐアップデートしてから続行してください。</string>
+    <string name="meetings_chat_screen_app_update_dialog_update_button">更新</string>
+    <string name="meetings_chat_screen_app_update_dialog_cancel_button">却下</string>
+    <!-- Title of the bottom panel when the only host left the call on meeting screen -->
+    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">主催者を割り当てて通話を終了する</string>
+    <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">この通話の主催者はあなただけです。通話中の誰かが主催者権限を持つように、離れる前にグループに別の主催者を割り当てます。あなたはグループの主催者のままになります。</string>
+    <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">割り当てて退出する</string>
+    <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_leave_option">とにかく離れる</string>
 </resources>

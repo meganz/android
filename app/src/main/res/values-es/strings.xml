@@ -43,11 +43,11 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">Cargando</string>
     <!-- state while importing the file -->
-    <string name="general_importing">Importando</string>
+    <string name="general_importing">Adding</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">Reenviando</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="general_import">Importar</string>
+    <string name="general_import">Añadir a la Nube</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">Error</string>
     <!-- when trying to download a file that is already downloaded in the device -->
@@ -141,11 +141,11 @@
     <!-- button that allows the user to create an account -->
     <string name="create_account">Crear cuenta</string>
     <!-- when the user tries to log in MEGA without typing the email -->
-    <string name="error_enter_email">Por favor, escribe tu correo electrónico</string>
+    <string name="error_enter_email">Introduce tu email</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="error_invalid_email">Correo electrónico no válido</string>
     <!-- when the user tries to log in MEGA without typing the password -->
-    <string name="error_enter_password">Por favor, introduzca su contraseña</string>
+    <string name="error_enter_password">Introduce tu contraseña</string>
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">No hay conexión de red</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
@@ -181,7 +181,7 @@
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
     <string name="error_enter_username">Introduce tu nombre</string>
     <!-- Warning dialog -->
-    <string name="error_enter_userlastname">Escribe tu(s) apellido(s).</string>
+    <string name="error_enter_userlastname">Introduce tu apellido</string>
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Las contraseñas no coinciden</string>
     <!-- when creating the account -->
@@ -395,19 +395,19 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Error. No se ha podido crear la carpeta</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Renombrado</string>
+    <string name="context_correctly_renamed">Elemento renombrado</string>
     <!-- error message -->
     <string name="context_no_renamed">Error. No se ha podido renombrar</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Copiado</string>
+    <string name="context_correctly_copied">Elemento copiado</string>
     <!-- error message -->
     <string name="context_no_copied">Error. No se ha podido copiar</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
-    <string name="context_no_destination_folder">Elige una carpeta de destino</string>
+    <string name="context_no_destination_folder">Choose a destination folder</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Movido</string>
+    <string name="context_correctly_moved">Elemento movido</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Movido a la Papelera</string>
+    <string name="context_correctly_moved_to_rubbish">Elemento movido a la Papelera</string>
     <!-- error message -->
     <string name="context_no_moved">Error. No se ha podido mover</string>
     <!-- success message when sharing a folder -->
@@ -415,7 +415,7 @@
     <!-- error message -->
     <string name="context_no_removed_shared">Error. No se ha podido eliminar la compartición</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Eliminado</string>
+    <string name="context_correctly_removed">Elemento eliminado</string>
     <!-- error message -->
     <string name="context_no_removed">Error. No se ha podido eliminar de MEGA</string>
     <!-- success message when sending multiple files -->
@@ -525,7 +525,7 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Opciones de bloqueo</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">La compresión de vídeos consume mucha energía. Deja tu dispositivo cargando si los videos a comprimir son superiores a %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">La compresión de vídeo consume una cantidad considerable de energía. Conecta tu dispositivo para cargarlo si los vídeos que vas a comprimir son más grandes que %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
     <string name="settings_camera_upload_include_gps_helper_label">Si activas esta opción, se subirá información sobre dónde se tomaron tus fotos. Ten cuidado al compartirlas.</string>
     <!-- Settings category title for cache and offline files -->
@@ -1263,7 +1263,7 @@
     <!-- Menu option -->
     <string name="general_view">Ver archivos</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="add_to_cloud">Importar</string>
+    <string name="add_to_cloud">Añadir a la Nube</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Añadir a la Nube</string>
     <!-- Menu option -->
@@ -4716,8 +4716,8 @@
     <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
         <item quantity="one">No se ha podido abandonar %1$d carpeta compartida</item>
-        <item quantity="many">No se ha podido abandonar %1$d de carpetas compartidas</item>
-        <item quantity="other">No se ha podido abandonar %1$d carpetas compartidas</item>
+        <item quantity="many">No se han podido abandonar %1$d de carpetas compartidas</item>
+        <item quantity="other">No se han podido abandonar %1$d carpetas compartidas</item>
     </plurals>
     <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
@@ -4728,8 +4728,8 @@
     <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
         <item quantity="one">pero no se ha podido abandonar %1$d carpeta compartida</item>
-        <item quantity="many">pero no se ha podido abandonar %1$d de carpetas compartidas</item>
-        <item quantity="other">pero no se ha podido abandonar %1$d carpetas compartidas</item>
+        <item quantity="many">pero no se han podido abandonar %1$d de carpetas compartidas</item>
+        <item quantity="other">pero no se han podido abandonar %1$d carpetas compartidas</item>
     </plurals>
     <!-- Text shown in the list of meetings when there is a call in progress -->
     <string name="meetings_list_ongoing_call_message">Reunión en curso</string>
@@ -4792,8 +4792,8 @@
     <!-- error message when sharing a folder(s) fails to be completed-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed">
         <item quantity="one">No se ha podido compartir %1$d carpeta compartida</item>
-        <item quantity="many">No se ha podido compartir %1$d de carpetas compartidas</item>
-        <item quantity="other">No se ha podido compartir %1$d carpetas compartidas</item>
+        <item quantity="many">No se han podido compartir %1$d de carpetas compartidas</item>
+        <item quantity="other">No se han podido compartir %1$d carpetas compartidas</item>
     </plurals>
     <!-- error message when removing access of contact(s) to a selected folder -->
     <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
@@ -5378,7 +5378,7 @@
     <!-- Title to display Current plan for user on My account screen. -->
     <string name="account_my_account_home_view_current_plan_title">Plan actual</string>
     <!-- Button title on Storage/Transfer usage screen related to My account screen. When user taps on button he will be redirected to Upgrade account screen. -->
-    <string name="account_my_account_usage_get_more_storage_button">Obtén más almacenamiento</string>
+    <string name="account_my_account_usage_get_more_storage_button">Consigue más almacenamiento</string>
     <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_mega_info_text">MEGA protege tus comunicaciones con cifrado de conocimiento cero, proporcionando sólidas garantías de seguridad:</string>
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
@@ -5458,7 +5458,7 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Llamar a todos</string>
     <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
-    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account.</string>
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">La app está logueada en una cuenta de MEGA diferente. \nCierra sesión en esta cuenta e inicia sesión con la cuenta de la VPN de MEGA.</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
     <string name="chat_attach_pick_from_camera_deny_permission">MEGA necesita acceso a tu cámara para hacer fotos y vídeos.</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
@@ -5471,21 +5471,21 @@
     <string name="transfers_confirm_large_download_button_start_always">Descargar siempre y no volver a preguntar</string>
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Se ha compartido una carpeta</item>
+        <item quantity="many">Se han compartido %1$d carpetas</item>
+        <item quantity="other">Se han compartido %1$d carpetas</item>
     </plurals>
     <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Se ha compartido una carpeta,&#160;</item>
+        <item quantity="many">Se han compartido %1$d carpetas,&#160;</item>
+        <item quantity="other">Se han compartido %1$d carpetas,&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">pero no se ha podido compartir %1$d carpeta</item>
+        <item quantity="many">pero no se han podido compartir %1$d carpetas</item>
+        <item quantity="other">no podía compartir %1$d carpetas</item>
     </plurals>
     <!-- Button text to mute a participant in the info of participant in call screen-->
     <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">Silenciar</string>
@@ -5494,13 +5494,29 @@
     <!-- Label text indicating that all participants are muted -->
     <string name="meetings_bottom_panel_in_call_participants_all_muted_label">Todos silenciados</string>
     <!-- Message of the snackbar displayed when you have muted a participant. The placeholder is for the name of the participant you muted -->
-    <string name="meetings_muted_a_participant_snackbar_message">You’ve muted %s</string>
+    <string name="meetings_muted_a_participant_snackbar_message">Has silenciado a %s</string>
     <!-- Message of the snackbar displayed when you have muted all participants -->
     <string name="meetings_muted_all_participants_snackbar_message">Has silenciado a todos los participantes</string>
     <!-- Message of the snackbar displayed when you have been muted. The placeholder is for the name of who muted you -->
-    <string name="meetings_muted_by_a_participant_snackbar_message">You’ve been muted by %s</string>
+    <string name="meetings_muted_by_a_participant_snackbar_message">%s te ha silenciado</string>
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">Información sobre la suscripción</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
+    <string name="account_upgrade_subscription_details">La suscripción se renueva automáticamente con la misma duración y precio elegidos inicialmente. Puedes desactivar la renovación automática de la suscripción a MEGA&#160;Pro en la página de suscripciones de [A]Google Play[/A] hasta 24 horas antes de la renovación programada.</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Permitir acceso a la galería</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Conceder acceso</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_chat_screen_app_update_dialog_title">Actualización requerida</string>
+    <string name="meetings_chat_screen_app_update_dialog_message">No estás usando la última versión de nuestra aplicación, por lo que no puedes iniciar llamadas ni unirte a ellas. Actualiza ahora para continuar.</string>
+    <string name="meetings_chat_screen_app_update_dialog_update_button">Actualizar</string>
+    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Descartar</string>
+    <!-- Title of the bottom panel when the only host left the call on meeting screen -->
+    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Asignar anfitrión para abandonar la llamada</string>
+    <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">Eres el único anfitrión de la llamada. Asigna otro antes de abandonar para que alguien tenga permisos de anfitrión. Seguirás siendo un anfitrión en el grupo.</string>
+    <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">Asignar y abandonar</string>
+    <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_leave_option">Abandonar de todos modos</string>
 </resources>

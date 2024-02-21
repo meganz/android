@@ -43,11 +43,11 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">불러오는 중</string>
     <!-- state while importing the file -->
-    <string name="general_importing">들여오는 중</string>
+    <string name="general_importing">Adding</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">전달중</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="general_import">들여오기</string>
+    <string name="general_import">클라우드 드라이브에 추가</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">오류</string>
     <!-- when trying to download a file that is already downloaded in the device -->
@@ -137,7 +137,7 @@
     <!-- button that allows the user to create an account -->
     <string name="create_account">계정 생성</string>
     <!-- when the user tries to log in MEGA without typing the email -->
-    <string name="error_enter_email">이메일 주소를 입력하세요</string>
+    <string name="error_enter_email">이메일을 입력하세요</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="error_invalid_email">잘못된 이메일 주소</string>
     <!-- when the user tries to log in MEGA without typing the password -->
@@ -177,7 +177,7 @@
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
     <string name="error_enter_username">이름을 입력하세요</string>
     <!-- Warning dialog -->
-    <string name="error_enter_userlastname">성을 입력하세요.</string>
+    <string name="error_enter_userlastname">성을 입력하세요</string>
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">암호가 일치하지 않습니다</string>
     <!-- when creating the account -->
@@ -381,19 +381,19 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">오류. 폴더가 생성되지 않았습니다</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">이름 변경됨</string>
+    <string name="context_correctly_renamed">Item renamed</string>
     <!-- error message -->
     <string name="context_no_renamed">오류. 이름이 바뀌지 않았습니다</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">복사됨</string>
+    <string name="context_correctly_copied">Item copied</string>
     <!-- error message -->
     <string name="context_no_copied">오류. 복사되지 않았습니다</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">대상 폴더를 선택하세요</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">옮겨짐</string>
+    <string name="context_correctly_moved">Item moved</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">휴지통으로 옮겨짐</string>
+    <string name="context_correctly_moved_to_rubbish">Item moved to Rubbish bin</string>
     <!-- error message -->
     <string name="context_no_moved">오류. 이동되지 않았습니다</string>
     <!-- success message when sharing a folder -->
@@ -401,7 +401,7 @@
     <!-- error message -->
     <string name="context_no_removed_shared">오류. 공유가 제거되지 않았습니다</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">삭제됨</string>
+    <string name="context_correctly_removed">Item deleted</string>
     <!-- error message -->
     <string name="context_no_removed">오류. MEGA에서 삭제되지 않았습니다</string>
     <!-- success message when sending multiple files -->
@@ -421,7 +421,7 @@
     <!-- confirmation cancel subscriptions dialog -->
     <string name="confirmation_cancel_subscriptions">피드백을 보내주셔서 고맙습니다. MEGA 구독을 정말 취소하시겠습니까?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
-    <string name="reason_cancel_subscriptions">당신의 구독권이 취소되지 않았습니다. 취소 사유를 입력해주세요.</string>
+    <string name="reason_cancel_subscriptions">당신의 구독이 취소되지 않았습니다. 취소 사유를 입력해주세요</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">새 구독은 현재 구독이 만료된 후 시작되며, 새 가격도 그 때 결제됩니다.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -509,7 +509,7 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">암호 옵션</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">동영상 압축은 꽤 많은 전력을 소모합니다. 만약 압축할 동영상이 %s보다 크다면 기기를 충전할 수 있도록 연결하세요.</string>
+    <string name="settings_camera_upload_charging_helper_label">동영상 압축은 꽤 많은 전력을 소모합니다. 만약 압축할 동영상이 %s보다 크다면 장치를 충전할 수 있도록 연결하세요.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
     <string name="settings_camera_upload_include_gps_helper_label">활성화하면, 위치 정보가 사진에 포함됩니다. 공유할 때 주의하세요.</string>
     <!-- Settings category title for cache and offline files -->
@@ -1207,7 +1207,7 @@
     <!-- Menu option -->
     <string name="general_view">파일 보기</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="add_to_cloud">들여오기</string>
+    <string name="add_to_cloud">클라우드 드라이브에 추가</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">클라우드 드라이브에 추가</string>
     <!-- Menu option -->
@@ -1519,7 +1519,7 @@
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">초대장 발송되지 않음</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent_text">QR 코드 또는 연락처 링크가 잘못 되었습니다. 올바른 코드를 스캔하거나 올바른 링크를 여세요.</string>
+    <string name="invite_not_sent_text">The QR code or contact link is invalid. Try to scan a valid code or to open a valid link.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">초대가 발송되지 않았습니다. %s님은 이미 연락처 목록에 존재합니다.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
@@ -4994,28 +4994,28 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">모두 통화</string>
     <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
-    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account.</string>
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">이 앱은 다른 MEGA 계정으로 로그인 되어 있습니다. \n이 계정에서 로그아웃 하고 당신의 MEGA VPN 계정으로 로그인 하세요.</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
     <string name="chat_attach_pick_from_camera_deny_permission">MEGA는 사진과 동영상을 촬영하기 위해 당신의 카메라에 접근해야 합니다</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
-    <string name="chat_attach_location_deny_permission">You denied MEGA access to your location. If you’d like to share your location, allow MEGA permission to do so.</string>
+    <string name="chat_attach_location_deny_permission">당신은 MEGA가 당신의 위치에 접근하는 것을 거부하였습니다. 위치를 공유하려면, MEGA가 할 수 있도록 권한을 허용하세요.</string>
     <!-- Title for the confirmation dialog shown when the user is starting a large download -->
-    <string name="transfers_confirm_large_download_title">Large download</string>
+    <string name="transfers_confirm_large_download_title">큰 다운로드</string>
     <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start -->
-    <string name="transfers_confirm_large_download_button_start">Start download</string>
+    <string name="transfers_confirm_large_download_button_start">다운로드 시작</string>
     <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start and this dialog won't appear anymore in future large downloads-->
-    <string name="transfers_confirm_large_download_button_start_always">Always download and don’t ask again</string>
+    <string name="transfers_confirm_large_download_button_start_always">항상 다운로드하고 묻지 않음</string>
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
-        <item quantity="other"></item>
+        <item quantity="other">%1$d개의 폴더를 공유하였습니다</item>
     </plurals>
     <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="other"></item>
+        <item quantity="other">%1$d개의 폴더를 공유하였습니다.&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
-        <item quantity="other"></item>
+        <item quantity="other">%1$d개의 폴더를 공유할 수 없었습니다</item>
     </plurals>
     <!-- Button text to mute a participant in the info of participant in call screen-->
     <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">조용히</string>
@@ -5024,13 +5024,29 @@
     <!-- Label text indicating that all participants are muted -->
     <string name="meetings_bottom_panel_in_call_participants_all_muted_label">모두 음소거됨</string>
     <!-- Message of the snackbar displayed when you have muted a participant. The placeholder is for the name of the participant you muted -->
-    <string name="meetings_muted_a_participant_snackbar_message">You’ve muted %s</string>
+    <string name="meetings_muted_a_participant_snackbar_message">%s 님을 음소거 하였습니다</string>
     <!-- Message of the snackbar displayed when you have muted all participants -->
     <string name="meetings_muted_all_participants_snackbar_message">당신이 모든 참여자를 음소거 하였습니다</string>
     <!-- Message of the snackbar displayed when you have been muted. The placeholder is for the name of who muted you -->
-    <string name="meetings_muted_by_a_participant_snackbar_message">You’ve been muted by %s</string>
+    <string name="meetings_muted_by_a_participant_snackbar_message">%s 님에 의해 음소거 되었습니다</string>
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">구독 세부정보</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
+    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA&#160;Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">갤러리에 접근 허용</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">접근 허가</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_chat_screen_app_update_dialog_title">Update required</string>
+    <string name="meetings_chat_screen_app_update_dialog_message">앱의 최신 버전을 이용하고 있지 않아서 통화를 시작하거나 참여할 수 없습니다. 계속 하려면 지금 업데이트 하세요.</string>
+    <string name="meetings_chat_screen_app_update_dialog_update_button">업데이트</string>
+    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Dismiss</string>
+    <!-- Title of the bottom panel when the only host left the call on meeting screen -->
+    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">통화를 떠나려면 주최자를 할당하세요</string>
+    <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">You’re the only host on the call. Assign another host for the group before leaving so someone on the call will have host permissions. You’ll remain a host in the group.</string>
+    <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">할당하고 떠나기</string>
+    <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_leave_option">어쨌든 떠나기</string>
 </resources>

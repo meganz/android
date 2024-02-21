@@ -17,7 +17,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is Up to Date -->
     <string name="device_center_list_view_item_status_up_to_date">Aggiornato</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently initializing -->
-    <string name="device_center_list_view_item_status_initialising">Inizializzazione\u2026</string>
+    <string name="device_center_list_view_item_status_initialising">Inizializzazione in corso&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently scanning -->
     <string name="device_center_list_view_item_status_scanning">Scansione in corso&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently updating its backup contents -->
@@ -148,4 +148,12 @@
     <string name="device_center_snackbar_message_rename_device_successful">Dispositivo rinominato</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name whose length is greater than 32 characters -->
     <string name="device_center_rename_device_dialog_error_message_maximum_character_length_exceeded">Massimo 32 caratteri</string>
+    <!-- Label of the top app bar menu option of selected device in Device Center which takes the user to the Camera uploads feature settings -->
+    <string name="device_center_device_top_menu_option_camera_uploads">Caricamenti da fotocamera</string>
+    <!-- Label of the top app bar menu option of selected device in Device Center which opens the dialog to rename the selected Device -->
+    <string name="device_center_device_top_menu_option_rename">Rinomina</string>
+    <!-- Label of the top app bar menu option of selected device in Device Center which takes the user to the device info screen -->
+    <string name="device_center_device_top_menu_option_info">Info</string>
+    <!-- Text to show in the Device Center for a No Network State when there is no network connectivity -->
+    <string name="device_center_no_network_state">Nessuna connessione ad Internet</string>
 </resources>

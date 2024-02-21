@@ -43,11 +43,11 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">Carregando</string>
     <!-- state while importing the file -->
-    <string name="general_importing">Importando</string>
+    <string name="general_importing">Adicionando</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">Encaminhando</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="general_import">Importar</string>
+    <string name="general_import">Adicionar à Nuvem de arquivos</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">Erro</string>
     <!-- when trying to download a file that is already downloaded in the device -->
@@ -141,11 +141,11 @@
     <!-- button that allows the user to create an account -->
     <string name="create_account">Criar conta</string>
     <!-- when the user tries to log in MEGA without typing the email -->
-    <string name="error_enter_email">Por favor, digite seu e-mail</string>
+    <string name="error_enter_email">Digite o seu email</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="error_invalid_email">Email inválido</string>
     <!-- when the user tries to log in MEGA without typing the password -->
-    <string name="error_enter_password">Por favor digite sua senha</string>
+    <string name="error_enter_password">Digite a sua senha</string>
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">Não há conexão de rede</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
@@ -179,9 +179,9 @@
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">Você precisa confirmar que entende o perigo de perder a sua senha</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
-    <string name="error_enter_username">Digite o seu nome</string>
+    <string name="error_enter_username">Digite o seu primeiro nome</string>
     <!-- Warning dialog -->
-    <string name="error_enter_userlastname">Digite o seu sobrenome.</string>
+    <string name="error_enter_userlastname">Digite o seu sobrenome</string>
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">As senhas não coincidem</string>
     <!-- when creating the account -->
@@ -395,19 +395,19 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Erro. Pasta não foi criada</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Renomeado</string>
+    <string name="context_correctly_renamed">Item renomeado</string>
     <!-- error message -->
     <string name="context_no_renamed">Erro. Não foi renomeado</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Copiado</string>
+    <string name="context_correctly_copied">Item copiado</string>
     <!-- error message -->
     <string name="context_no_copied">Erro. Não foi copiado</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Escolha a pasta de destino</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Movido</string>
+    <string name="context_correctly_moved">Item movido</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Movido à Lixeira</string>
+    <string name="context_correctly_moved_to_rubbish">Item movido para a lixeira</string>
     <!-- error message -->
     <string name="context_no_moved">Erro. Não foi movido</string>
     <!-- success message when sharing a folder -->
@@ -415,7 +415,7 @@
     <!-- error message -->
     <string name="context_no_removed_shared">Erro. Não foi possível remover o compartilhamento</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Deletado</string>
+    <string name="context_correctly_removed">Item deletado</string>
     <!-- error message -->
     <string name="context_no_removed">Erro. Não foi removido do MEGA</string>
     <!-- success message when sending multiple files -->
@@ -435,7 +435,7 @@
     <!-- confirmation cancel subscriptions dialog -->
     <string name="confirmation_cancel_subscriptions">Obrigado pelo seu comentário. Você tem certeza de que quer cancelar a sua assinatura do MEGA?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
-    <string name="reason_cancel_subscriptions">A sua assinatura não foi cancelada. Por favor, indique um motivo para o cancelamento</string>
+    <string name="reason_cancel_subscriptions">A sua assinatura não foi cancelada. Indique o motivo do cancelamento</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">A sua nova assinatura entrará em vigor assim que o seu plano atual expirar, quando também será cobrado o pagamento correspondente ao novo plano.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -453,7 +453,7 @@
     <!-- Title of the alert to introduce the decryption key -->
     <string name="alert_decryption_key">Chave de decodificação</string>
     <!-- Message of the alert to introduce the decryption key -->
-    <string name="message_decryption_key">Por favor, digite a chave de decodificação deste link</string>
+    <string name="message_decryption_key">Digite a chave de decodificação do link</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">Chave de decodificação inválida</string>
     <!-- upload to. Then choose an Audio file -->
@@ -491,7 +491,7 @@
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">Link copiado para a área de transferência</string>
     <!-- alert when clicking a newsignup link being logged -->
-    <string name="log_out_warning">Por favor, faça logout antes de criar a conta</string>
+    <string name="log_out_warning">Faça logout antes de criar a conta</string>
     <!-- menu item -->
     <string name="menu_pause_transfers">Pausar transferências</string>
     <!-- menu item -->
@@ -525,7 +525,7 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Opções de código de acesso</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">A compressão de vídeos consome bastante bateria. Por favor, coloque o seu dispositivo para carregar se o tamanho dos vídeos para comprimir for superior a %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">A compressão de vídeos consome bastante bateria. Coloque o seu dispositivo para carregar se o tamanho dos vídeos para comprimir for superior a %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
     <string name="settings_camera_upload_include_gps_helper_label">Ao ativar, as informações de localização serão incluídas nas suas fotos. Por favor, tenha cuidado ao compartilhá-los.</string>
     <!-- Settings category title for cache and offline files -->
@@ -1263,7 +1263,7 @@
     <!-- Menu option -->
     <string name="general_view">Ver arquivos</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="add_to_cloud">Importar</string>
+    <string name="add_to_cloud">Adicionar à Nuvem de arquivos</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Adicionar à Nuvem de arquivos</string>
     <!-- Menu option -->
@@ -1587,7 +1587,7 @@
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">Convite não enviado</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent_text">O código QR ou o link de contato é inválido. Por favor, tente escanear um código válido ou acessar um link válido.</string>
+    <string name="invite_not_sent_text">O código QR ou o link de contato é inválido. Tente escanear um código válido ou acessar um link válido.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">O convite não foi enviado. %s já está na sua lista de contatos.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
@@ -4905,9 +4905,9 @@
     <string name="meetings_schedule_meeting_recurrence_monthly_label">Mensal</string>
     <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
     <plurals name="meetings_schedule_meeting_recurrence_monthly_description">
-        <item quantity="one">Alguns meses não têm %1$d dia. Nestes meses, o agendamento será no último dia do mês.</item>
-        <item quantity="many">Alguns meses não têm %1$d dias. Nestes meses, o agendamento será no último dia do mês.</item>
-        <item quantity="other">Alguns meses não têm %1$d dias. Nestes meses, o agendamento será no último dia do mês.</item>
+        <item quantity="one">Alguns meses não têm dia %1$d. Nestes meses, o agendamento será no último dia do mês.</item>
+        <item quantity="many">Alguns meses não têm dia %1$d. Nestes meses, o agendamento será no último dia do mês.</item>
+        <item quantity="other">Alguns meses não têm dia %1$d. Nestes meses, o agendamento será no último dia do mês.</item>
     </plurals>
     <!-- Title of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
     <string name="dialog_taken_down_folder_title">Não foi possível abrir a pasta</string>
@@ -5471,21 +5471,21 @@
     <string name="transfers_confirm_large_download_button_start_always">Sempre fazer o download e não perguntar novamente</string>
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">A pasta foi compartilhada</item>
+        <item quantity="many">%1$d de pastas foram compartilhadas</item>
+        <item quantity="other">%1$d pastas foram compartilhadas</item>
     </plurals>
     <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">1 pasta foi compartilhada,&#160;</item>
+        <item quantity="many">%1$d pastas foram compartilhadas,&#160;</item>
+        <item quantity="other">%1$d pastas foram compartilhadas,&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">não foi possível compartilhar %1$d pasta</item>
+        <item quantity="many">não foi possível compartilhar %1$d de pastas</item>
+        <item quantity="other">não foi possível compartilhar %1$d pastas</item>
     </plurals>
     <!-- Button text to mute a participant in the info of participant in call screen-->
     <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">Silenciar</string>
@@ -5502,5 +5502,21 @@
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">Informações da assinatura</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
+    <string name="account_upgrade_subscription_details">As assinaturas serão renovadas automaticamente por períodos sucessivos com a mesma duração e pelo mesmo preço do período inicial. Você pode desativar a renovação automática da sua assinatura Pro&#160;do&#160;MEGA até 24 horas antes do vencimento do próximo pagamento nas Assinaturas da [A]Google Play[/A].</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Permitir o acesso à sua galeria</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Permitir acesso</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_chat_screen_app_update_dialog_title">Atualização necessária</string>
+    <string name="meetings_chat_screen_app_update_dialog_message">Você não está usando a versão mais recente do nosso aplicativo, e por isso não poderá fazer ou entrar em chamadas. Atualize para poder continuar.</string>
+    <string name="meetings_chat_screen_app_update_dialog_update_button">Atualizar</string>
+    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Fechar</string>
+    <!-- Title of the bottom panel when the only host left the call on meeting screen -->
+    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Designar anfitrião para sair da chamada</string>
+    <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">Você é o único anfitrião na chamada. Designe outro anfitrião para o grupo antes de sair, para que alguém na chamada tenha permissões de anfitrião. Você continuará sendo um anfitrião no grupo.</string>
+    <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">Designar e sair</string>
+    <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_leave_option">Sair mesmo assim</string>
 </resources>

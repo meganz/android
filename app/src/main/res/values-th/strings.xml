@@ -43,11 +43,11 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">กำลังโหลด</string>
     <!-- state while importing the file -->
-    <string name="general_importing">กำลังนำเข้า</string>
+    <string name="general_importing">กำลังเพิ่ม</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">กำลังส่งต่อ</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="general_import">นำเข้า</string>
+    <string name="general_import">เพิ่มไปยังคลาวด์ไดร์ฟ</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">ผิดพลาด</string>
     <!-- when trying to download a file that is already downloaded in the device -->
@@ -137,11 +137,11 @@
     <!-- button that allows the user to create an account -->
     <string name="create_account">สร้างบัญชี</string>
     <!-- when the user tries to log in MEGA without typing the email -->
-    <string name="error_enter_email">กรุณากรอกที่อยู่อีเมลของคุณ</string>
+    <string name="error_enter_email">กรอกอีเมลของคุณ</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="error_invalid_email">ที่อยู่อีเมลไม่ถูกต้อง</string>
     <!-- when the user tries to log in MEGA without typing the password -->
-    <string name="error_enter_password">กรุณากรอกรหัสผ่านของคุณ</string>
+    <string name="error_enter_password">กรอกรหัสผ่านของคุณ</string>
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">ไม่มีการเชื่อมต่อเครือข่าย</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
@@ -159,7 +159,7 @@
     <!-- After login, updating the file list, the file list should be processed before showing it to the user -->
     <string name="login_preparing_filelist">กำลังเตรียมการรายการไฟล์</string>
     <!-- when the user tries to share something to MEGA without being logged -->
-    <string name="login_before_share">กรุณาลงชื่อเข้าใช้เพื่อแชร์กับ MEGA</string>
+    <string name="login_before_share">ลงชื่อเข้าใช้เพื่อแชร์กับ MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">ลิงก์ยืนยันของคุณใช้ไม่ได้อีกต่อไป บัญชีของคุณอาจถูกเปิดใช้งานหรือคุณอาจยกเลิกการลงทะเบียนแล้ว</string>
     <!-- First Name of the user -->
@@ -175,9 +175,9 @@
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">คุณต้องยอมรับว่าคุณเข้าใจถึงอันตราย หากลืมรหัสผ่าน</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
-    <string name="error_enter_username">กรุณากรอกชื่อของคุณ</string>
+    <string name="error_enter_username">กรอกชื่อของคุณ</string>
     <!-- Warning dialog -->
-    <string name="error_enter_userlastname">กรุณาระบุนามสกุลของคุณ</string>
+    <string name="error_enter_userlastname">กรอกนามสกุลของคุณ</string>
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">รหัสผ่านไม่ตรงกัน</string>
     <!-- when creating the account -->
@@ -381,19 +381,19 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">ผิดพลาด โฟลเดอร์ยังไม่ได้ถูกสร้าง</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">เปลี่ยนชื่อแล้ว</string>
+    <string name="context_correctly_renamed">เปลี่ยนชื่อรายการแล้ว</string>
     <!-- error message -->
     <string name="context_no_renamed">ผิดพลาด ยังไม่ได้เปลี่ยนชื่อ</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">คัดลอกแล้ว</string>
+    <string name="context_correctly_copied">คัดลอกรายการแล้ว</string>
     <!-- error message -->
     <string name="context_no_copied">ผิดพลาด ยังไมไ่ด้คัดลอก</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
-    <string name="context_no_destination_folder">กรุณาเลือกโฟลเดอร์ปลายทาง</string>
+    <string name="context_no_destination_folder">เลือกโฟลเดอร์ปลายทาง</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">ย้ายแล้ว</string>
+    <string name="context_correctly_moved">ย้ายรายการแล้ว</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">ย้ายไปถังขยะแล้ว</string>
+    <string name="context_correctly_moved_to_rubbish">ย้ายรายการไปที่ถังขยะแล้ว</string>
     <!-- error message -->
     <string name="context_no_moved">ผิดพลาด ยังไม่ได้ย้าย</string>
     <!-- success message when sharing a folder -->
@@ -401,7 +401,7 @@
     <!-- error message -->
     <string name="context_no_removed_shared">ผิดพลาด ลบการแชร์ไม่สำเร็จ</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">ลบเรียบร้อยแล้ว</string>
+    <string name="context_correctly_removed">ลบรายการออกแล้ว</string>
     <!-- error message -->
     <string name="context_no_removed">ข้อผิดพลาด ลบไม่สำเร็จ</string>
     <!-- success message when sending multiple files -->
@@ -421,7 +421,7 @@
     <!-- confirmation cancel subscriptions dialog -->
     <string name="confirmation_cancel_subscriptions">ขอบคุณสำหรับคำติชมของคุณ คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการสมัครรับ MEGA ของคุณ</string>
     <!-- provide a reason to cancel subscriptions dialog -->
-    <string name="reason_cancel_subscriptions">การสมัครสมาชิกของคุณยังไม่ถูกยกเลิก กรุณาระบุเหตุผลในการยกเลิกของคุณ</string>
+    <string name="reason_cancel_subscriptions">การสมัครใช้งานของคุณยังไม่ถูกยกเลิก ระบุเหตุผลในการยกเลิกของคุณ</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">การสมัครใช้งานใหม่ของคุณจะมีผลก็ต่อเมื่อการสมัครใช้งานปัจจุบันหมดอายุลง ราคาใหม่ถึงจะถูกเรียกเก็บตามรอบเวลาเดิม</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -439,7 +439,7 @@
     <!-- Title of the alert to introduce the decryption key -->
     <string name="alert_decryption_key">คีย์ถอดรหัสลับ</string>
     <!-- Message of the alert to introduce the decryption key -->
-    <string name="message_decryption_key">กรุณากรอกคีย์ถอดรหัสสำหรับลิงก์นี้</string>
+    <string name="message_decryption_key">กรอกคีย์สำหรับถอดรหัสลิงก์นี้</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">คีย์ถอดรหัสลับไม่ถูกต้อง</string>
     <!-- upload to. Then choose an Audio file -->
@@ -475,7 +475,7 @@
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">คัดลอกลิงก์ไปไว้ที่คลิปบอร์ดแล้ว</string>
     <!-- alert when clicking a newsignup link being logged -->
-    <string name="log_out_warning">กรุณาออกจากระบบก่อนที่จะสร้างบัญชีใหม่</string>
+    <string name="log_out_warning">ออกจากระบบก่อนที่จะสร้างบัญชีใหม่</string>
     <!-- menu item -->
     <string name="menu_pause_transfers">หยุดถ่ายโอนชั่วคราว</string>
     <!-- menu item -->
@@ -509,7 +509,7 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">ตัวเลือกรหัสผ่าน</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">การบีบอัดวิดีโอมีการใช้พลังงานจำนวนมาก หากวิดีโอที่จะบีบอัดมีขนาดใหญ่กว่า %s กรุณาเสียบปลั๊กอุปกรณ์เพื่อชาร์จ</string>
+    <string name="settings_camera_upload_charging_helper_label">การบีบอัดวิดีโอจะใช้พลังงานมาก หากวิดีโอที่คุณต้องการบีบอัดมีขนาดมากกว่า %s กรุณาเสียบปลั๊กชาร์จอุปกรณ์ของคุณ</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
     <string name="settings_camera_upload_include_gps_helper_label">หากเปิดใช้งาน ข้อมูลตำแหน่งที่ตั้งจะรวมอยู่ในรูปภาพของคุณด้วย กรุณาแชร์อย่างระมัดระวัง</string>
     <!-- Settings category title for cache and offline files -->
@@ -1207,7 +1207,7 @@
     <!-- Menu option -->
     <string name="general_view">ดูไฟล์</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="add_to_cloud">นำเข้า</string>
+    <string name="add_to_cloud">เพิ่มไปยังคลาวด์ไดร์ฟ</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">เพิ่มไปยังคลาวด์ไดร์ฟ</string>
     <!-- Menu option -->
@@ -5007,15 +5007,15 @@
     <string name="transfers_confirm_large_download_button_start_always">ดาวน์โหลดทันทีและไม่ต้องถามอีก</string>
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
-        <item quantity="other"></item>
+        <item quantity="other">แชร์โฟลเดอร์ %1$d รายการแล้ว</item>
     </plurals>
     <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="other"></item>
+        <item quantity="other">แชร์โฟลเดอร์ %1$d รายการแล้ว&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
-        <item quantity="other"></item>
+        <item quantity="other">มี %1$d โฟลเดอร์ที่ไม่สามารถแชร์ได้</item>
     </plurals>
     <!-- Button text to mute a participant in the info of participant in call screen-->
     <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">ปิดเสียง</string>
@@ -5032,5 +5032,21 @@
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">รายละเอียดการสมัครใช้งาน</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
+    <string name="account_upgrade_subscription_details">เมื่อสมัครใช้งานแล้ว ระบบจะต่ออายุสมาชิกให้อัตโนมัติตามระยะเวลาและราคาเดิมที่เลือกไว้ คุณสามารถยกเลิกการต่ออายุสมาชิก MEGA&#160;Pro อัตโนมัติได้ไม่เกิน 24 ชั่วโมงก่อนวันครบกำหนดชำระค่าสมาชิกครั้งต่อไปผ่านระบบสมาชิกใน [A]Google Play[/A]</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">อนุญาตให้เข้าถึงแกลเลอรี่ของคุณ</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">ให้สิทธิ์เข้าถึง</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_chat_screen_app_update_dialog_title">จำเป็นต้องได้รับการอัปเดต</string>
+    <string name="meetings_chat_screen_app_update_dialog_message">คุณกำลังใช้แอปเวอร์ชันเก่า ไม่สามารถเริ่มหรือเข้าร่วมการโทรได้ กรุณาอัปเดตแอปเป็นเวอร์ชันล่าสุดเพื่อใช้งานต่อไป</string>
+    <string name="meetings_chat_screen_app_update_dialog_update_button">อัปเดต</string>
+    <string name="meetings_chat_screen_app_update_dialog_cancel_button">ปิด</string>
+    <!-- Title of the bottom panel when the only host left the call on meeting screen -->
+    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">มอบหมายให้คนอื่นเป็นผู้จัดการประชุมก่อนที่จะวางสาย</string>
+    <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">คุณเป็นผู้จัดการประชุมเพียงคนเดียวในสาย กรุณาเลือกผู้จัดการประชุมคนอื่นก่อนออกจากการโทร เพื่อให้มีผู้จัดการประชุมในสายต่อไป ส่วนคุณยังเป็นผู้จัดการประชุมในกลุ่มนี้เช่นเดิม</string>
+    <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">มอบหมายและออกจากการเป็นผู้จัดการประชุม</string>
+    <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_leave_option">ยืนยันที่จะออก</string>
 </resources>

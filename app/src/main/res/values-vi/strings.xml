@@ -43,11 +43,11 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">Đang tải</string>
     <!-- state while importing the file -->
-    <string name="general_importing">Đang chuyển nhập</string>
+    <string name="general_importing">Adding</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">Đang chuyển đi</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="general_import">Chuyển nhập</string>
+    <string name="general_import">Lưu vào Ổ Mây</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">Lỗi</string>
     <!-- when trying to download a file that is already downloaded in the device -->
@@ -137,11 +137,11 @@
     <!-- button that allows the user to create an account -->
     <string name="create_account">Tạo tài khoản</string>
     <!-- when the user tries to log in MEGA without typing the email -->
-    <string name="error_enter_email">Xin nhập địa chỉ e-mail</string>
+    <string name="error_enter_email">Nhập địa chỉ email</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="error_invalid_email">Địa chỉ e-mail không phù hợp</string>
     <!-- when the user tries to log in MEGA without typing the password -->
-    <string name="error_enter_password">Xin nhập mật khẩu</string>
+    <string name="error_enter_password">Nhập mật khẩu</string>
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">Không có kết nối mạng</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
@@ -159,7 +159,7 @@
     <!-- After login, updating the file list, the file list should be processed before showing it to the user -->
     <string name="login_preparing_filelist">Đang chuẩn bị danh sách các tệp tin</string>
     <!-- when the user tries to share something to MEGA without being logged -->
-    <string name="login_before_share">Xin đăng&#160;nhập để chia&#160;sẻ với MEGA</string>
+    <string name="login_before_share">Log in to share with MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Liên kết xác nhận không còn hiệu lực. Tài khoản của có thể đã được kích hoạt rồi hoặc việc đăng ký đã bị hủy.</string>
     <!-- First Name of the user -->
@@ -175,9 +175,9 @@
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">Khách hàng cần phải đồng ý rằng là đã hiểu được rủi ro sẽ xáy ra khi mất mật khẩu</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
-    <string name="error_enter_username">Xin điền tên của bạn</string>
+    <string name="error_enter_username">Nhập tên của bạn</string>
     <!-- Warning dialog -->
-    <string name="error_enter_userlastname">Xin nhập họ của bạn.</string>
+    <string name="error_enter_userlastname">Nhập họ của bạn</string>
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Hai mật khẩu này không trùng khớp</string>
     <!-- when creating the account -->
@@ -381,19 +381,19 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Lỗi. Không tạo được thư mục</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Đã đổi tên</string>
+    <string name="context_correctly_renamed">Item renamed</string>
     <!-- error message -->
     <string name="context_no_renamed">Lỗi. Chưa đặt lại tên được</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Đã sao&#160;chép</string>
+    <string name="context_correctly_copied">Item copied</string>
     <!-- error message -->
     <string name="context_no_copied">Lỗi. Chưa sao chép được</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
-    <string name="context_no_destination_folder">Xin chọn thư mục đích</string>
+    <string name="context_no_destination_folder">Choose a destination folder</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Đã di&#160;chuyển</string>
+    <string name="context_correctly_moved">Item moved</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Đã chuyển vào Thùng&#160;Rác</string>
+    <string name="context_correctly_moved_to_rubbish">Item moved to Rubbish bin</string>
     <!-- error message -->
     <string name="context_no_moved">Lỗi. Chưa di chuyển được</string>
     <!-- success message when sharing a folder -->
@@ -401,7 +401,7 @@
     <!-- error message -->
     <string name="context_no_removed_shared">Lỗi. Loại bỏ mục chia&#160;sẻ thất&#160;bại</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Đã xóa</string>
+    <string name="context_correctly_removed">Item deleted</string>
     <!-- error message -->
     <string name="context_no_removed">Lỗi. Chưa xóa được</string>
     <!-- success message when sending multiple files -->
@@ -421,7 +421,7 @@
     <!-- confirmation cancel subscriptions dialog -->
     <string name="confirmation_cancel_subscriptions">Cảm ơn lời nhận xét của quý khách. Quý khách có muốn hủy gói dịch vụ MEGA ngay không?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
-    <string name="reason_cancel_subscriptions">Quá trình hủy bỏ gói đăng ký dịch vụ và ngưng trả phí không thể tiếp tục vì quý khách chưa điền lý do</string>
+    <string name="reason_cancel_subscriptions">Your subscription has not been cancelled. Provide a reason for your cancellation</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Gói dịch vụ mới sẽ bắt đầu có hiệu lực ngay sau khi gói hiện tại hết hạn, giá mới cũng sẽ được tự thanh toán ngay lúc đó.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -439,7 +439,7 @@
     <!-- Title of the alert to introduce the decryption key -->
     <string name="alert_decryption_key">Chìa&#160;Khóa Giải&#160;Mã</string>
     <!-- Message of the alert to introduce the decryption key -->
-    <string name="message_decryption_key">Xin nhập chìa&#160;khóa giải&#160;mã cho đường liên&#160;kết</string>
+    <string name="message_decryption_key">Enter the decryption key for the link</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">Chìa&#160;khóa giải&#160;mã không hợp&#160;lệ</string>
     <!-- upload to. Then choose an Audio file -->
@@ -475,7 +475,7 @@
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">Đã sao&#160;chép đường liên&#160;kết vào bảng&#160;nhớ&#160;tạm</string>
     <!-- alert when clicking a newsignup link being logged -->
-    <string name="log_out_warning">Xin đăng xuất trước khi tạo tài khoản mới</string>
+    <string name="log_out_warning">Log out before creating the account</string>
     <!-- menu item -->
     <string name="menu_pause_transfers">Dừng truyền tải</string>
     <!-- menu item -->
@@ -509,7 +509,7 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Tùy&#160;chọn mã số</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">Việc nén video sử dụng lượng điện năng đáng kể. Xin cắm sạc thiết bị của bạn để có thể nén videos lớn hơn %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">Video compression uses considerable amounts of power. Plug in your device to charge if the videos to be compressed are larger than %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
     <string name="settings_camera_upload_include_gps_helper_label">Nếu được bật. thông tin vị trí đã chụp sẽ được đính kèm với hình ảnh của bạn. Xin xem xét trước mỗi lần chia sẻ.</string>
     <!-- Settings category title for cache and offline files -->
@@ -1207,7 +1207,7 @@
     <!-- Menu option -->
     <string name="general_view">Xem tệp tin</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="add_to_cloud">Chuyển nhập</string>
+    <string name="add_to_cloud">Lưu vào Ổ Mây</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Lưu vào Ổ Mây</string>
     <!-- Menu option -->
@@ -1389,7 +1389,7 @@
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Phần thưởng không gian lưu trữ miễn phí chỉ có áp dụng cho những lời mời mới và khi App MEGA cho Di Động hoặc App MEGA cho Máy Tính được cài đặt.</string>
     <!-- Text shown when the user sends a contact invitation -->
-    <string name="subtitle_confirmation_invite_friends">Invitation sent</string>
+    <string name="subtitle_confirmation_invite_friends">Lời&#160;mời đã gửi đi</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Địa&#160;chỉ email không đúng cú&#160;pháp</string>
     <!-- info paragraph about the achievement install megasync -->
@@ -1503,7 +1503,7 @@
     <!-- Text shown when it has not been delete the QR code successfully -->
     <string name="qrcode_delete_not_successfully">Không xoá được mã ảnh QR vì xảy ra lỗi. Xin thử lại.</string>
     <!-- Title of dialog shown when a contact request has been sent with QR code -->
-    <string name="invite_sent">Invitation sent</string>
+    <string name="invite_sent">Lời&#160;mời đã gửi đi</string>
     <!-- Text of dialog shown when a contact request has been sent. -->
     <string name="invite_sent_text">Đối tượng đã được mời và sẽ xuất hiện trong sổ liên lạc sau khi họ chấp nhận lời mời.</string>
     <!-- Text of dialog shown when multiple contacts request has been sent -->
@@ -1519,7 +1519,7 @@
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">Invitation not sent</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent_text">Mã QR hoặc đường liên kết tên liên lạc không hợp lệ. Xin thử quét mã khác hoặc đường liên kết phù hợp.</string>
+    <string name="invite_not_sent_text">The QR code or contact link is invalid. Try to scan a valid code or to open a valid link.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">Lời mời không gửi đi được. %s đã có tên trong liên lạc.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
@@ -3774,11 +3774,11 @@
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">%s mỗi tuần</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_title">Kiểu quan&#160;sát phương&#160;tiện&#160;số</string>
+    <string name="settings_media_discovery_view_title">Kiểu xem khám&#160;phá đa phương&#160;tiện</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Tự&#160;động mở các thư&#160;mục chỉ chứa hoàn&#160;toàn là hình&#160;ảnh và videos với kiểu quan&#160;sát phương&#160;tiện số. Cái này sẽ cho bạn xem phương&#160;tiện với chế&#160;độ thư&#160;viện và lọc theo ngày&#160;tháng.</string>
+    <string name="settings_media_discovery_view_context">Tự&#160;động mở các thư&#160;mục chỉ chứa hoàn&#160;toàn là hình&#160;ảnh và videos với Kiểu xem khám&#160;phá đa phương&#160;tiện. Cái này sẽ cho bạn xem phương&#160;tiện với chế&#160;độ thư&#160;viện và lọc theo ngày&#160;tháng.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">Vì thư&#160;mục này chỉ có chứa hoàn&#160;toàn là hình&#160;ảnh và videos, chúng&#160;tôi tự&#160;động đặt theo kiểu quan&#160;sát phương&#160;tiện&#160;số. Giúp bạn trải&#160;nghiệm nội&#160;dung hình&#160;ảnh của mình với bố&#160;cục sống&#160;động hơn. Tính&#160;năng này có thể tắt đi trong Thiết&#160;Đặt.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Vì thư&#160;mục này chỉ có chứa hoàn&#160;toàn là hình&#160;ảnh và videos, chúng&#160;tôi tự&#160;động đặt theo Kiểu xem khám&#160;phá đa phương&#160;tiện. Giúp bạn trải&#160;nghiệm nội&#160;dung hình&#160;ảnh của mình với bố&#160;cục sống&#160;động hơn. Tính&#160;năng này có thể tắt đi trong Thiết&#160;Đặt.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Thiết Đặt</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4365,7 +4365,7 @@
     <!-- Title of option to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_label">Tái diễn</string>
     <!-- Title of option to send calendar invite in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_send_calendar_invite_label">Send calendar invitation</string>
+    <string name="meetings_schedule_meeting_send_calendar_invite_label">Gửi thư&#160;mời lịch</string>
     <!-- Title of option to add description in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_add_description_label">Thêm miêu&#160;tả</string>
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
@@ -4769,7 +4769,7 @@
     <!-- Meeting list tooltip description for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_description">Bạn có thể xem qua, hủy bỏ hoặc chỉnh&#160;sửa bất&#160;kỳ thời&#160;điểm tái&#160;diễn nào của cuộc họp định&#160;kỳ bằng cách chạm vào dấu ba chấm ngay bên phải, sau đó chọn [A]Thời&#160;điểm tái&#160;diễn[/A].</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_send_calendar_invite_panel_title">Email a calendar invitation to participants so they can add the meeting to their calendars.</string>
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">Gửi email lời mời lịch hẹn cho những người tham&#160;gia biết và để họ thêm cuộc họp vào lịch của mình.</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">Cuộc họp đã được cập&#160;nhật</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
@@ -4867,9 +4867,9 @@
     <!-- Title of video option of original-->
     <string name="media_player_video_option_original_title">Nguyên gốc</string>
     <!-- In Settings view the title of setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_title">Quan&#160;sát phương&#160;tiện&#160;số trong thư&#160;mục con</string>
+    <string name="settings_media_discovery_sub_folder_title">Khám&#160;phá đa phương&#160;tiện trong các thư&#160;mục con</string>
     <!-- In Settings view the explanation of a setting, which allows to show subfolder media discovery. -->
-    <string name="settings_media_discovery_sub_folder_context">Hình&#160;ảnh và video từ các thư&#160;mục con cũng sẽ có trong kiểu quan&#160;sát phương&#160;tiện&#160;số.</string>
+    <string name="settings_media_discovery_sub_folder_context">Hình&#160;ảnh và video từ bên trong các thư&#160;mục con cũng sẽ có trong kiểu xem khám&#160;phá đa phương&#160;tiện.</string>
     <!-- Description text in empty search screen when no search results found -->
     <string name="search_empty_screen_no_results">Không có kết&#160;quả</string>
     <!-- Description text in empty search screen when images filter selected -->
@@ -4971,7 +4971,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
     <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Không&#160;có quảng&#160;cáo</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
-    <string name="meetings_sharing_meeting_link_meeting_invite_subject">MEGA meeting invitation</string>
+    <string name="meetings_sharing_meeting_link_meeting_invite_subject">Lời mời tham gia cuộc họp MEGA</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
     <string name="meetings_sharing_meeting_link_title">%1$s mời bạn tham&#160;gia một cuộc họp MEGA</string>
     <!-- Text when sharing a meeting link indicating the meeting name. The placeholder is to include the meeting name -->
@@ -5008,15 +5008,18 @@
     <string name="transfers_confirm_large_download_button_start_always">Always download and don’t ask again</string>
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
-        <item quantity="other"></item>
+        <item quantity="one">Folder shared</item>
+        <item quantity="other">%1$d folders shared</item>
     </plurals>
     <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="other"></item>
+        <item quantity="one">Folder shared,&#160;</item>
+        <item quantity="other">%1$d folders shared,&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
-        <item quantity="other"></item>
+        <item quantity="one">couldn’t share %1$d folder</item>
+        <item quantity="other">couldn’t share %1$d folders</item>
     </plurals>
     <!-- Button text to mute a participant in the info of participant in call screen-->
     <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">Tắt Tiếng</string>
@@ -5033,5 +5036,21 @@
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">Chi&#160;tiết gói đăng&#160;ký</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
+    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA&#160;Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Allow access to your gallery</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Cấp quyền</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_chat_screen_app_update_dialog_title">Update required</string>
+    <string name="meetings_chat_screen_app_update_dialog_message">You’re not using the latest version of our app so you can’t start or join calls. Update now to continue.</string>
+    <string name="meetings_chat_screen_app_update_dialog_update_button">Cập nhật</string>
+    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Dismiss</string>
+    <!-- Title of the bottom panel when the only host left the call on meeting screen -->
+    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Giao&#160;chức chủ&#160;trì để rời khỏi cuộc gọi</string>
+    <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">You’re the only host on the call. Assign another host for the group before leaving so someone on the call will have host permissions. You’ll remain a host in the group.</string>
+    <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">Giao&#160;chức và rời khỏi</string>
+    <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_leave_option">Vẫn cứ rời khỏi</string>
 </resources>

@@ -45,7 +45,7 @@
     <!-- Sync to resolve conflict Choose local file -->
     <string name="sync_stalled_issue_choose_local_file">ローカルファイルを選択</string>
     <!-- Sync to resolve conflict Choose remote file -->
-    <string name="sync_stalled_issue_choose_remote_file">リモートファイルを選択</string>
+    <string name="sync_stalled_issue_choose_remote_file">MEGAに保管されているファイルを選択</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">最後に変更されたファイルを選択</string>
     <!-- Sync message when conflict resolved -->
@@ -133,7 +133,7 @@
     <!-- Sync stalled issue reason is Folder Matched Against File-->
     <string name="sync_stalled_issue_folder_matched_against_file">同期しようとしているファイルには拡張子がなく、既存のフォルダと同じ名前が付いています</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync">前回の同期以降にローカルとリモートが変更されました</string>
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync">前回の同期以降に項目が変更されました</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->
     <string name="sync_stalled_issue_local_and_remote_not_synced">ファイルまたはフォルダの競合</string>
     <!-- Sync stalled issue reason is Name clash-->

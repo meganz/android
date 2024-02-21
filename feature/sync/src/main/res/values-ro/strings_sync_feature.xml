@@ -39,7 +39,7 @@
     <!-- Sync options -->
     <string name="sync_menu_sync_options">Opțiuni de sincronizare</string>
     <!-- Sync text when need to solved stalled issues-->
-    <string name="sync_menu_clear_issues">Clear resolved issues</string>
+    <string name="sync_menu_clear_issues">Ștergeți problemele rezolvate</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">Sincronizarea bidirecțională</string>
     <!-- Sync conflict message -->
@@ -53,7 +53,7 @@
     <!-- Sync to resolve conflict Choose local file -->
     <string name="sync_stalled_issue_choose_local_file">Alegeți fișierul local</string>
     <!-- Sync to resolve conflict Choose remote file -->
-    <string name="sync_stalled_issue_choose_remote_file">Alegeți fișierul de la distanță</string>
+    <string name="sync_stalled_issue_choose_remote_file">Alegeți fișierul stocat în MEGA</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">Alegeți ultimul fișier modificat</string>
     <!-- Sync message when conflict resolved -->
@@ -75,7 +75,7 @@
     <!-- Sync dialog battery optimization message -->
     <string name="sync_dialog_battery_optimization_message">Allow MEGA to read, modify or delete all files on this device.</string>
     <!-- Sync state message for No Solved Issues -->
-    <string name="sync_solved_issues_empty_message">No resolved issues</string>
+    <string name="sync_solved_issues_empty_message">Nicio problemă rezolvată</string>
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">Nicio problemă</string>
     <!-- Sync option to choose folder pair -->
@@ -89,7 +89,7 @@
     <!-- Sync state Paused -->
     <string name="sync_list_sync_state_paused">Pus pe pauză</string>
     <!-- Sync state syncing -->
-    <string name="sync_list_sync_state_syncing">Sincronizarea...</string>
+    <string name="sync_list_sync_state_syncing">Sincronizarea&#8230;</string>
     <!-- Sync state failed -->
     <string name="sync_folders_sync_state_failed">Opriță</string>
     <!-- Sync state synced -->
@@ -141,7 +141,7 @@
     <!-- Sync stalled issue reason is Folder Matched Against File-->
     <string name="sync_stalled_issue_folder_matched_against_file">Fișierul pe care încercați să îl sincronizați nu are extensie și are același nume ca un folder existent</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Elemente locale și distante modificate de la ultima sincronizare</string>
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Articol modificat de la ultima sincronizare</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->
     <string name="sync_stalled_issue_local_and_remote_not_synced">Conflict de fișier sau folder</string>
     <!-- Sync stalled issue reason is Name clash-->
@@ -165,7 +165,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Selectează</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">A file or folder has an issue that needs your decision to resolve it</string>
+    <string name="sync_stalled_issue_file_issue_detail">Un fișier sau folder are o problemă care necesită decizia dvs. pentru a o rezolva</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">În așteptarea finalizării altor procese</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->

@@ -43,11 +43,11 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">Загрузка</string>
     <!-- state while importing the file -->
-    <string name="general_importing">Импорт</string>
+    <string name="general_importing">Adding</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">Пересылка</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="general_import">Импортировать</string>
+    <string name="general_import">Добавить на Облачный диск</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">Ошибка</string>
     <!-- when trying to download a file that is already downloaded in the device -->
@@ -143,11 +143,11 @@
     <!-- button that allows the user to create an account -->
     <string name="create_account">Зарегистрироваться</string>
     <!-- when the user tries to log in MEGA without typing the email -->
-    <string name="error_enter_email">Пожалуйста, введите адрес электронной почты</string>
+    <string name="error_enter_email">Введите адрес электронной почты</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="error_invalid_email">Неверный адрес электронной почты</string>
     <!-- when the user tries to log in MEGA without typing the password -->
-    <string name="error_enter_password">Пожалуйста, введите пароль</string>
+    <string name="error_enter_password">Введите пароль</string>
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">Нет интернет-соединения</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
@@ -181,9 +181,9 @@
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">Вы должны согласиться с тем, что понимаете опасность потери пароля</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
-    <string name="error_enter_username">Пожалуйста, введите своё имя</string>
+    <string name="error_enter_username">Введите своё имя</string>
     <!-- Warning dialog -->
-    <string name="error_enter_userlastname">Пожалуйста, введите свою фамилию.</string>
+    <string name="error_enter_userlastname">Введите свою фамилию</string>
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Пароли не совпадают</string>
     <!-- when creating the account -->
@@ -402,19 +402,19 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Ошибка. Папка не создана</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Переименовано</string>
+    <string name="context_correctly_renamed">Item renamed</string>
     <!-- error message -->
     <string name="context_no_renamed">Ошибка. Не перемещено</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Скопировано</string>
+    <string name="context_correctly_copied">Item copied</string>
     <!-- error message -->
     <string name="context_no_copied">Ошибка. Не скопировано</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Выберите папку назначения</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Перемещено</string>
+    <string name="context_correctly_moved">Item moved</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Перемещено в Корзину</string>
+    <string name="context_correctly_moved_to_rubbish">Item moved to Rubbish bin</string>
     <!-- error message -->
     <string name="context_no_moved">Ошибка. Не перемещено</string>
     <!-- success message when sharing a folder -->
@@ -422,7 +422,7 @@
     <!-- error message -->
     <string name="context_no_removed_shared">Ошибка. Не удалось удалить</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Удалено</string>
+    <string name="context_correctly_removed">Item deleted</string>
     <!-- error message -->
     <string name="context_no_removed">Ошибка. Не удалено</string>
     <!-- success message when sending multiple files -->
@@ -442,7 +442,7 @@
     <!-- confirmation cancel subscriptions dialog -->
     <string name="confirmation_cancel_subscriptions">Спасибо за ваш отзыв. Вы действительно хотите отменить подписку на MEGA?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
-    <string name="reason_cancel_subscriptions">Ваша подписка не отменена. Пожалуйста, укажите причину отмены</string>
+    <string name="reason_cancel_subscriptions">Ваша подписка не отменена. Укажите причину отмены</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Ваша новая подписка вступит в силу после истечения срока текущей подписки, и тогда будет взиматься новая цена.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -460,7 +460,7 @@
     <!-- Title of the alert to introduce the decryption key -->
     <string name="alert_decryption_key">Ключ дешифрирования</string>
     <!-- Message of the alert to introduce the decryption key -->
-    <string name="message_decryption_key">Введите ключ дешифрирования для ссылки</string>
+    <string name="message_decryption_key">Введите ключ дешифрования для ссылки</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">Неправильный ключ дешифрования</string>
     <!-- upload to. Then choose an Audio file -->
@@ -533,7 +533,7 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Варианты кода</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">Сжатие видео требует значительного количества энергии. Поставьте устройство на зарядку, если размер сжимаемых видео превышает %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">Сжатие видео очень энергозатратно. Подключите зарядное устройство, если размер сжимаемых видео превышает %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
     <string name="settings_camera_upload_include_gps_helper_label">Если включено, информация о местоположении будет добавлена к вашим фотографиям. Пожалуйста, будьте осторожны, когда делитесь ими.</string>
     <!-- Settings category title for cache and offline files -->
@@ -1291,7 +1291,7 @@
     <!-- Menu option -->
     <string name="general_view">Просмотр файлов</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="add_to_cloud">Импорт</string>
+    <string name="add_to_cloud">Добавить на Облачный диск</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Добавить на Облачный диск</string>
     <!-- Menu option -->
@@ -5703,24 +5703,24 @@
     <string name="transfers_confirm_large_download_button_start_always">Всегда скачивать и больше не спрашивать</string>
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Открыт доступ к папке</item>
+        <item quantity="few">Открыт доступ к %1$d папкам</item>
+        <item quantity="many">Открыт доступ к %1$d папкам</item>
+        <item quantity="other">Открыт доступ к %1$d папки</item>
     </plurals>
     <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Открыт доступ к папке,&#160;</item>
+        <item quantity="few">Открыт доступ к %1$d папкам,&#160;</item>
+        <item quantity="many">Открыт доступ к %1$d папкам,&#160;</item>
+        <item quantity="other">Открыт доступ к %1$d папки,&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">не удалось поделиться %1$d папкой</item>
+        <item quantity="few">не удалось поделиться %1$d папками</item>
+        <item quantity="many">не удалось поделиться %1$d папками</item>
+        <item quantity="other">не удалось поделиться %1$d папки</item>
     </plurals>
     <!-- Button text to mute a participant in the info of participant in call screen-->
     <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">Приглушить</string>
@@ -5729,13 +5729,29 @@
     <!-- Label text indicating that all participants are muted -->
     <string name="meetings_bottom_panel_in_call_participants_all_muted_label">Приглушены все</string>
     <!-- Message of the snackbar displayed when you have muted a participant. The placeholder is for the name of the participant you muted -->
-    <string name="meetings_muted_a_participant_snackbar_message">You’ve muted %s</string>
+    <string name="meetings_muted_a_participant_snackbar_message">Вы приглушили пользователя %s</string>
     <!-- Message of the snackbar displayed when you have muted all participants -->
     <string name="meetings_muted_all_participants_snackbar_message">Вы приглушили всех участников</string>
     <!-- Message of the snackbar displayed when you have been muted. The placeholder is for the name of who muted you -->
-    <string name="meetings_muted_by_a_participant_snackbar_message">You’ve been muted by %s</string>
+    <string name="meetings_muted_by_a_participant_snackbar_message">Пользователь %s пришлушил вас</string>
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">Подробная информация о подписке</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
+    <string name="account_upgrade_subscription_details">Подписки продлеваются автоматически на последующие периоды той же продолжительности и по той же цене, что и первоначально выбранный период. Вы можете отключить автоматическое продление подписки MEGA&#160;Pro не позднее чем за 24 часа до следующего платежа за подписку на странице «Подписки» в [A]Google Play[/A].</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Разрешите доступ к галерее</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Открыть доступ</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_chat_screen_app_update_dialog_title">Update required</string>
+    <string name="meetings_chat_screen_app_update_dialog_message">У вас не последняя версия нашего приложения, поэтому вы не можете начинать звонки или присоединяться к ним. Обновите приложение, чтобы продолжить.</string>
+    <string name="meetings_chat_screen_app_update_dialog_update_button">Изменить</string>
+    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Dismiss</string>
+    <!-- Title of the bottom panel when the only host left the call on meeting screen -->
+    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Назначьте организатора, чтобы покинуть звонок</string>
+    <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">You’re the only host on the call. Assign another host for the group before leaving so someone on the call will have host permissions. You’ll remain a host in the group.</string>
+    <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">Назначить и выйти</string>
+    <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_leave_option">Всё равно выйти</string>
 </resources>

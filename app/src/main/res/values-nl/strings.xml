@@ -43,11 +43,11 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">Laden</string>
     <!-- state while importing the file -->
-    <string name="general_importing">Importeren</string>
+    <string name="general_importing">Toevoegen</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">Doorsturen</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="general_import">Importeren</string>
+    <string name="general_import">Toevoegen aan Cloud schijf</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">Fout</string>
     <!-- when trying to download a file that is already downloaded in the device -->
@@ -139,7 +139,7 @@
     <!-- button that allows the user to create an account -->
     <string name="create_account">Account Creëren</string>
     <!-- when the user tries to log in MEGA without typing the email -->
-    <string name="error_enter_email">Voer uw e-mailadres in</string>
+    <string name="error_enter_email">Vul uw email in</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="error_invalid_email">Ongeldig e-mailadres</string>
     <!-- when the user tries to log in MEGA without typing the password -->
@@ -179,7 +179,7 @@
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
     <string name="error_enter_username">Voer uw voornaam in</string>
     <!-- Warning dialog -->
-    <string name="error_enter_userlastname">Voer uw achternaam in.</string>
+    <string name="error_enter_userlastname">Voer uw achternaam in</string>
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Wachtwoorden komen niet overeen</string>
     <!-- when creating the account -->
@@ -388,19 +388,19 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Fout. Map niet gecreëerd</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Hernoemd</string>
+    <string name="context_correctly_renamed">Item hernoemd</string>
     <!-- error message -->
     <string name="context_no_renamed">Foutmelding. Niet hernoemd</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Gekopieerd</string>
+    <string name="context_correctly_copied">Item gekopieerd</string>
     <!-- error message -->
     <string name="context_no_copied">Foutmelding. Niet gekopieerd</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Kies een bestemmingsmap</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Verplaatst</string>
+    <string name="context_correctly_moved">Item verplaatst</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Verplaatst naar Prullenbak</string>
+    <string name="context_correctly_moved_to_rubbish">Item verplaatst naar Prullenbak</string>
     <!-- error message -->
     <string name="context_no_moved">Foutmelding. Niet verplaatst</string>
     <!-- success message when sharing a folder -->
@@ -408,7 +408,7 @@
     <!-- error message -->
     <string name="context_no_removed_shared">Fout. Deling is mislukt te verwijderen</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Verwijderd</string>
+    <string name="context_correctly_removed">Item verwijderd</string>
     <!-- error message -->
     <string name="context_no_removed">Foutmelding. Verwijdering mislukt</string>
     <!-- success message when sending multiple files -->
@@ -428,7 +428,7 @@
     <!-- confirmation cancel subscriptions dialog -->
     <string name="confirmation_cancel_subscriptions">Bedankt voor uw feedback. Weet u zeker dat u uw MEGA-abonnement wilt opzeggen?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
-    <string name="reason_cancel_subscriptions">Uw abonnement was niet geannuleerd. Geef een reden voor uw annulering</string>
+    <string name="reason_cancel_subscriptions">Uw abonnement is niet opgezegd. Geef een reden op voor uw opzegging</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Uw nieuwe abonnement gaat in zodra het huidige verloopt, de nieuwe prijs wordt op dat moment in rekening gebracht.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -446,7 +446,7 @@
     <!-- Title of the alert to introduce the decryption key -->
     <string name="alert_decryption_key">Decoderingssleutel</string>
     <!-- Message of the alert to introduce the decryption key -->
-    <string name="message_decryption_key">Voer de decodeersleutel in voor de link</string>
+    <string name="message_decryption_key">Voer de decoderingsleutel voor de link in</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">Ongeldige decoderingssleutel</string>
     <!-- upload to. Then choose an Audio file -->
@@ -517,7 +517,7 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Toegangscode-opties</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">Videocompressie gebruikt aanzienlijke hoeveelheden stroom. Sluit uw apparaat aan om op te laden als de te comprimeren video\’s groter zijn dan %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">Videocompressie verbruikt aanzienlijke hoeveelheden stroom. Sluit uw apparaat aan om op te laden als de te comprimeren video\’s groter zijn dan %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
     <string name="settings_camera_upload_include_gps_helper_label">Indien ingeschakeld, wordt locatie-informatie bij uw foto\’s gevoegd. Wees voorzichtig bij het delen ervan.</string>
     <!-- Settings category title for cache and offline files -->
@@ -1235,7 +1235,7 @@
     <!-- Menu option -->
     <string name="general_view">Bestanden weergeven</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="add_to_cloud">Importeren</string>
+    <string name="add_to_cloud">Toevoegen aan Cloud schijf</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Toevoegen aan Cloud schijf</string>
     <!-- Menu option -->
@@ -1553,7 +1553,7 @@
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">Uitnodiging niet verstuurd</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent_text">De QR-code of contact link is ongeldig. Probeer een geldige code te scannen of een geldige link te openen.</string>
+    <string name="invite_not_sent_text">De QR-code of contactlink is ongeldig. Probeer een geldige code te scannen of een geldige link te openen.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">De uitnodiging was niet verstuurd. %s is al in uw contactlijst.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
@@ -5226,7 +5226,7 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Iedereen bellen</string>
     <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
-    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account.</string>
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">Deze applicatie is aangemeld bij een ander MEGA-account. \nLog uit bij dit account en log in met uw MEGA VPN-account.</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
     <string name="chat_attach_pick_from_camera_deny_permission">MEGA heeft toegang tot uw camera nodig om foto\’s en video\’s vast te leggen</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
@@ -5239,18 +5239,18 @@
     <string name="transfers_confirm_large_download_button_start_always">Altijd downloaden en niet nogmaals vragen</string>
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Map gedeeld</item>
+        <item quantity="other">%1$dmappen gedeeld</item>
     </plurals>
     <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Map gedeeld, &#160;</item>
+        <item quantity="other">%1$dmappen gedeeld,&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
+        <item quantity="one">kon %1$d map niet delen</item>
+        <item quantity="other">kon %1$d mappen niet delen</item>
     </plurals>
     <!-- Button text to mute a participant in the info of participant in call screen-->
     <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">Dempen</string>
@@ -5267,5 +5267,21 @@
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">Abonnement details</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
+    <string name="account_upgrade_subscription_details">Abonnementen worden automatisch verlengd voor opeenvolgende abonnementsperioden van dezelfde duur en tegen dezelfde prijs als de gekozen initiële periode. U kunt de automatische verlenging van uw MEGA &#160; Pro-abonnement uiterlijk 24 uur voordat uw volgende abonnementsbetaling verschuldigd is, uitschakelen via Abonnementen in [A]Google Play[/A].</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Geef toegang tot uw gallerij</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Toegang verlenen</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_chat_screen_app_update_dialog_title">Update required</string>
+    <string name="meetings_chat_screen_app_update_dialog_message">U gebruikt niet de laatste versie van onze applicatie, dus u kunt geen oproepen starten of aansluiten. Update nu om door te gaan.</string>
+    <string name="meetings_chat_screen_app_update_dialog_update_button">Updaten</string>
+    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Dismiss</string>
+    <!-- Title of the bottom panel when the only host left the call on meeting screen -->
+    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Gastheer toewijzen om oproep te verlaten</string>
+    <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">You’re the only host on the call. Assign another host for the group before leaving so someone on the call will have host permissions. You’ll remain a host in the group.</string>
+    <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">Toewijzen en verlaten</string>
+    <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_leave_option">Toch verlaten</string>
 </resources>

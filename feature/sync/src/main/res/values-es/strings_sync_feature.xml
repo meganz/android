@@ -51,9 +51,9 @@
     <!-- Sync to resolve conflict Merge folders -->
     <string name="sync_stalled_issue_merge_folders">Combinar carpetas</string>
     <!-- Sync to resolve conflict Choose local file -->
-    <string name="sync_stalled_issue_choose_local_file">Choose local file</string>
+    <string name="sync_stalled_issue_choose_local_file">Choose the local file</string>
     <!-- Sync to resolve conflict Choose remote file -->
-    <string name="sync_stalled_issue_choose_remote_file">Choose remote file</string>
+    <string name="sync_stalled_issue_choose_remote_file">Choose the file stored in MEGA</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">Choose the last modified file</string>
     <!-- Sync message when conflict resolved -->
@@ -141,7 +141,7 @@
     <!-- Sync stalled issue reason is Folder Matched Against File-->
     <string name="sync_stalled_issue_folder_matched_against_file">The file you’re attempting to sync has no extension and has the same name as an existing folder</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Local and remote changed since last sync</string>
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Item changed since last sync</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->
     <string name="sync_stalled_issue_local_and_remote_not_synced">File or folder conflict</string>
     <!-- Sync stalled issue reason is Name clash-->

@@ -43,11 +43,11 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">Chargement</string>
     <!-- state while importing the file -->
-    <string name="general_importing">Importation</string>
+    <string name="general_importing">Ajout</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">Réacheminement</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="general_import">Importer</string>
+    <string name="general_import">Ajouter au Disque nuagique</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">Erreur</string>
     <!-- when trying to download a file that is already downloaded in the device -->
@@ -141,11 +141,11 @@
     <!-- button that allows the user to create an account -->
     <string name="create_account">Créer un compte</string>
     <!-- when the user tries to log in MEGA without typing the email -->
-    <string name="error_enter_email">Veuillez saisir votre adresse courriel</string>
+    <string name="error_enter_email">Saisissez votre adresse courriel</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="error_invalid_email">L’adresse courriel est invalide</string>
     <!-- when the user tries to log in MEGA without typing the password -->
-    <string name="error_enter_password">Veuillez saisir votre mot de passe</string>
+    <string name="error_enter_password">Saisissez votre mot de passe</string>
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">Vous n’êtes pas connecté au réseau</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
@@ -163,7 +163,7 @@
     <!-- After login, updating the file list, the file list should be processed before showing it to the user -->
     <string name="login_preparing_filelist">Préparation de la liste de fichiers</string>
     <!-- when the user tries to share something to MEGA without being logged -->
-    <string name="login_before_share">Veuillez vous connecter pour partager avec MEGA</string>
+    <string name="login_before_share">Connectez-vous pour partager avec MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Votre lien de confirmation n’est plus valide. Votre compte est peut-être déjà activé ou vous avez peut-être annulé votre inscription.</string>
     <!-- First Name of the user -->
@@ -179,9 +179,9 @@
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">Vous devez attester que vous comprenez le danger que représente la perte de votre mot de passe</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
-    <string name="error_enter_username">Veuillez saisir votre prénom</string>
+    <string name="error_enter_username">Saisissez votre prénom</string>
     <!-- Warning dialog -->
-    <string name="error_enter_userlastname">Veuillez saisir votre nom de famille.</string>
+    <string name="error_enter_userlastname">Saisissez votre nom de famille</string>
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Les mots de passe ne correspondent pas</string>
     <!-- when creating the account -->
@@ -395,19 +395,19 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Erreur. Le dossier n’a pas été créé</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">A été renommé</string>
+    <string name="context_correctly_renamed">L’élément a été renommé</string>
     <!-- error message -->
     <string name="context_no_renamed">Erreur. N’a pas été renommé</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">A été copié</string>
+    <string name="context_correctly_copied">L’élément a été copié</string>
     <!-- error message -->
     <string name="context_no_copied">Erreur. N’a pas été copié</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
-    <string name="context_no_destination_folder">Veuillez choisir un dossier de destination</string>
+    <string name="context_no_destination_folder">Choisissez un dossier de destination</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">A été déplacé</string>
+    <string name="context_correctly_moved">L’élément a été déplacé</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Déplacé vers la Corbeille</string>
+    <string name="context_correctly_moved_to_rubbish">L’élément a été déplacé vers la Corbeille</string>
     <!-- error message -->
     <string name="context_no_moved">Erreur. N’a pas été déplacé</string>
     <!-- success message when sharing a folder -->
@@ -415,7 +415,7 @@
     <!-- error message -->
     <string name="context_no_removed_shared">Erreur. Échec de retrait du partage</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Supprimé</string>
+    <string name="context_correctly_removed">L’élément a été supprimé</string>
     <!-- error message -->
     <string name="context_no_removed">Erreur. Échec de suppression</string>
     <!-- success message when sending multiple files -->
@@ -435,7 +435,7 @@
     <!-- confirmation cancel subscriptions dialog -->
     <string name="confirmation_cancel_subscriptions">Nous vous remercions de votre rétroaction. Voulez-vous vraiment annuler votre abonnement&#160;MEGA ?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
-    <string name="reason_cancel_subscriptions">Votre abonnement n’a pas été annulé. Veuillez indiquer le motif de votre annulation.</string>
+    <string name="reason_cancel_subscriptions">Votre abonnement n’a pas été annulé. Indiquez le motif de votre annulation.</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Votre nouvel abonnement prendra effet une fois que l’actuel aura expiré. Le nouveau prix vous sera alors facturé.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -453,7 +453,7 @@
     <!-- Title of the alert to introduce the decryption key -->
     <string name="alert_decryption_key">Clé de déchiffrement</string>
     <!-- Message of the alert to introduce the decryption key -->
-    <string name="message_decryption_key">Veuillez saisir la clé de déchiffrement pour ce lien</string>
+    <string name="message_decryption_key">Saisissez la clé de déchiffrement du lien</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">Clé de déchiffrement invalide</string>
     <!-- upload to. Then choose an Audio file -->
@@ -491,7 +491,7 @@
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">Le lien a été copié dans le presse-papiers</string>
     <!-- alert when clicking a newsignup link being logged -->
-    <string name="log_out_warning">Veuillez vous déconnecter avant de créer le compte</string>
+    <string name="log_out_warning">Déconnectez-vous avant de créer le compte</string>
     <!-- menu item -->
     <string name="menu_pause_transfers">Mettre les transferts en pause</string>
     <!-- menu item -->
@@ -525,7 +525,7 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Options du code d’accès</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">La compression vidéo utilise une grande quantité d’énergie. Veuillez mettre votre appareil en charge si les vidéos à compresser dépassent %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">La compression vidéo utilise une grande quantité d’énergie. Mettez votre appareil en charge si les vidéos à compresser dépassent %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
     <string name="settings_camera_upload_include_gps_helper_label">Si cette option est activée, des renseignements sur le lieu seront ajoutés à vos photos. Veuillez donc faire preuve de prudence en les partageant.</string>
     <!-- Settings category title for cache and offline files -->
@@ -1263,7 +1263,7 @@
     <!-- Menu option -->
     <string name="general_view">Visualiser les fichiers</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="add_to_cloud">Importer</string>
+    <string name="add_to_cloud">Ajouter au Disque nuagique</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Ajouter au Disque nuagique</string>
     <!-- Menu option -->
@@ -1587,7 +1587,7 @@
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">L’invitation n’a pas été envoyée</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent_text">Le code QR ou le lien de contact est invalide. Veuillez essayer de balayer un code valide ou d’ouvrir un lien valide.</string>
+    <string name="invite_not_sent_text">Le code QR ou le lien de contact est invalide. Essayez de balayer un code valide ou d’ouvrir un lien valide.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">L’invitation n’a pas été envoyée. %s est déjà dans votre liste de contacts.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
@@ -4905,7 +4905,7 @@
     <string name="meetings_schedule_meeting_recurrence_monthly_label">Mensuelle</string>
     <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
     <plurals name="meetings_schedule_meeting_recurrence_monthly_description">
-        <item quantity="one">Certains mois ne comportent pas %1$d jour. Pour ces mois, l’occurrence sera programmée le dernier jour du mois.</item>
+        <item quantity="one">Certains mois ne comportent pas %1$d&#160;jour. Pour ces mois, l’occurrence sera programmée le dernier jour du mois.</item>
         <item quantity="many">Certains mois ne comportent pas %1$d&#160;jours. Pour ces mois, l’occurrence sera programmée le dernier jour du mois.</item>
         <item quantity="other">Certains mois ne comportent pas %1$d&#160;jours. Pour ces mois, l’occurrence sera programmée le dernier jour du mois.</item>
     </plurals>
@@ -5471,21 +5471,21 @@
     <string name="transfers_confirm_large_download_button_start_always">Toujours télécharger et ne plus demander</string>
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Le dossier a été partagé</item>
+        <item quantity="many">%1$d de dossiers ont été partagés</item>
+        <item quantity="other">%1$d&#160;dossiers ont été partagés</item>
     </plurals>
     <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Le dossier a été partagé,&#160;</item>
+        <item quantity="many">%1$d de dossiers ont été partagés,&#160;</item>
+        <item quantity="other">%1$d&#160;dossiers ont été partagés,&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">impossible de partager %1$d&#160;dossier</item>
+        <item quantity="many">impossible de partager %1$d de dossiers</item>
+        <item quantity="other">impossible de partager %1$d&#160;dossiers</item>
     </plurals>
     <!-- Button text to mute a participant in the info of participant in call screen-->
     <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">Couper le micro</string>
@@ -5502,5 +5502,21 @@
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">Détails de l’abonnement</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
+    <string name="account_upgrade_subscription_details">Les abonnements sont renouvelés automatiquement pour des périodes d’abonnement successives de même durée et au même prix que la période initiale choisie. Vous pouvez désactiver le renouvellement automatique de votre abonnement MEGA&#160;Pro au plus tard 24 heures avant la date de paiement de votre prochain abonnement dans Abonnements de [A]Google Play[/A].</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Autoriser l’accès à votre galerie</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Accorder l’accès</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_chat_screen_app_update_dialog_title">Une mise à jour est nécessaire</string>
+    <string name="meetings_chat_screen_app_update_dialog_message">Vous n’utilisez pas la version la plus récente de notre appli et ne pouvez donc pas démarrer d’appels ou y participer. Mettez l’appli à jour maintenant afin de poursuivre.</string>
+    <string name="meetings_chat_screen_app_update_dialog_update_button">Mettre à jour</string>
+    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Fermer</string>
+    <!-- Title of the bottom panel when the only host left the call on meeting screen -->
+    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Assigner un hôte avant de quitter l’appel</string>
+    <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">Il n’y a pas d’autres hôtes dans cet appel. Assignez-en un ou une autre pour le groupe avant de le quitter, afin que quelqu’un détienne les droits d’hôte pour cet appel. Vous resterez hôte dans ce groupe.</string>
+    <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">Assigner et quitter</string>
+    <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_leave_option">Le quitter quand même</string>
 </resources>

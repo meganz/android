@@ -59,7 +59,7 @@
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="device_center_list_view_item_sub_state_no_sync_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA can’t sync or backup this folder because the file system on your device is not supported.</string>
+    <string name="device_center_list_view_item_sub_state_unsupported_file_system">因為不支援您裝置上的檔案系統，MEGA無法同步或備份此資料夾。</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_remote_type">The folder you chose can’t be synced</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
@@ -148,4 +148,12 @@
     <string name="device_center_snackbar_message_rename_device_successful">裝置已重新命名</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name whose length is greater than 32 characters -->
     <string name="device_center_rename_device_dialog_error_message_maximum_character_length_exceeded">最多32個字元（16個中文字）</string>
+    <!-- Label of the top app bar menu option of selected device in Device Center which takes the user to the Camera uploads feature settings -->
+    <string name="device_center_device_top_menu_option_camera_uploads">相機上傳</string>
+    <!-- Label of the top app bar menu option of selected device in Device Center which opens the dialog to rename the selected Device -->
+    <string name="device_center_device_top_menu_option_rename">重新命名</string>
+    <!-- Label of the top app bar menu option of selected device in Device Center which takes the user to the device info screen -->
+    <string name="device_center_device_top_menu_option_info">資訊</string>
+    <!-- Text to show in the Device Center for a No Network State when there is no network connectivity -->
+    <string name="device_center_no_network_state">無網路連線</string>
 </resources>

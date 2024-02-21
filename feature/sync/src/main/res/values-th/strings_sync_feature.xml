@@ -45,7 +45,7 @@
     <!-- Sync to resolve conflict Choose local file -->
     <string name="sync_stalled_issue_choose_local_file">เลือกไฟล์จากในเครื่อง</string>
     <!-- Sync to resolve conflict Choose remote file -->
-    <string name="sync_stalled_issue_choose_remote_file">เลือกไฟล์จากระยะไกล</string>
+    <string name="sync_stalled_issue_choose_remote_file">เลือกไฟล์ที่เก็บไว้ใน MEGA</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">เลือกไฟล์ที่แก้ไขล่าสุด</string>
     <!-- Sync message when conflict resolved -->
@@ -133,7 +133,7 @@
     <!-- Sync stalled issue reason is Folder Matched Against File-->
     <string name="sync_stalled_issue_folder_matched_against_file">ไฟล์ที่คุณพยายามซิงค์ไม่มีนามสกุลและชื่อไฟล์ซ้ำกับโฟลเดอร์ที่มีอยู่</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync">ข้อมูลที่อยู่บนเครื่องและข้อมูลจากระยะไกลเปลี่ยนแปลงไปตั้งแต่ซิงค์ครั้งล่าสุด</string>
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync">รายการมีการเปลี่ยนแปลงตั้งแต่การซิงค์ครั้งล่าสุด</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->
     <string name="sync_stalled_issue_local_and_remote_not_synced">ไฟล์หรือโฟลเดอร์ขัดแย้งกัน</string>
     <!-- Sync stalled issue reason is Name clash-->

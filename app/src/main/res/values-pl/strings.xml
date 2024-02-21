@@ -43,11 +43,11 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">Trwa ładowanie</string>
     <!-- state while importing the file -->
-    <string name="general_importing">Importowanie</string>
+    <string name="general_importing">Dodawanie</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">Przekierowanie</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="general_import">Importuj</string>
+    <string name="general_import">Dodaj do dysku w chmurze</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">Błąd</string>
     <!-- when trying to download a file that is already downloaded in the device -->
@@ -147,7 +147,7 @@
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="error_invalid_email">Niepoprawny adres e-mail</string>
     <!-- when the user tries to log in MEGA without typing the password -->
-    <string name="error_enter_password">Wprowadź hasło</string>
+    <string name="error_enter_password">Wprowadz swoje hasło</string>
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">Brak połączenia</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
@@ -165,7 +165,7 @@
     <!-- After login, updating the file list, the file list should be processed before showing it to the user -->
     <string name="login_preparing_filelist">Przygotowywanie listy plików</string>
     <!-- when the user tries to share something to MEGA without being logged -->
-    <string name="login_before_share">Zaloguj się aby móc udostępnić</string>
+    <string name="login_before_share">Zaloguj się, aby udostępnić MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Twój link potwierdzający nie jest już ważny. Twoje konto może już być aktywne lub możesz anulować rejestrację.</string>
     <!-- First Name of the user -->
@@ -181,9 +181,9 @@
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">Musisz zgodzić się, że rozumiesz niebezpieczeństwo utraty hasła</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
-    <string name="error_enter_username">Proszę podaj swoje imię</string>
+    <string name="error_enter_username">Wprowadź swoje imię</string>
     <!-- Warning dialog -->
-    <string name="error_enter_userlastname">Proszę podać swoje nazwisko.</string>
+    <string name="error_enter_userlastname">Wprowadź swoje imię</string>
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Hasła do siebie nie pasują</string>
     <!-- when creating the account -->
@@ -208,7 +208,7 @@
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">Przesyłanie plików</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string name="section_saved_for_offline_new">Niedostępny</string>
+    <string name="section_saved_for_offline_new">Lokalne</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
     <string name="location_label">%1$s (%2$s)</string>
     <!-- title of the screen that shows all the shared items -->
@@ -246,7 +246,7 @@
     <!-- Title of the fragment Choose Account -->
     <string name="choose_account_fragment">WYBIERZ KONTO</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
-    <string name="file_properties_available_offline">Dostępne offline</string>
+    <string name="file_properties_available_offline">Dostępne lokalnie</string>
     <!-- category in sort by action -->
     <string name="file_properties_info_size_file">Rozmiar</string>
     <!-- When the file/folder was last modified -->
@@ -368,7 +368,7 @@
     <!-- Menu option to delete one or multiple selected items. -->
     <string name="context_remove">Usuń</string>
     <!-- Menu option to delete selected items of the offline state -->
-    <string name="context_delete_offline">Usuń z Offline</string>
+    <string name="context_delete_offline">Usuń z lokalnych</string>
     <!-- menu item -->
     <string name="context_share_folder">Udostępnij katalog</string>
     <!-- menu item -->
@@ -402,19 +402,19 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Błąd. Katalog nie został utworzony</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Zmieniono</string>
+    <string name="context_correctly_renamed">Nazwa elementu została zmieniona</string>
     <!-- error message -->
     <string name="context_no_renamed">Błąd. Nie zmieniono nazwy</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Skopiowane</string>
+    <string name="context_correctly_copied">Element skopiowany</string>
     <!-- error message -->
     <string name="context_no_copied">Błąd. Nie skopiowano</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Wybierz katalog docelowy</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Przeniesiono</string>
+    <string name="context_correctly_moved">Element przeniesiony</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Przeniesione do kosza na śmieci</string>
+    <string name="context_correctly_moved_to_rubbish">Element przeniesiony do kosza na śmieci</string>
     <!-- error message -->
     <string name="context_no_moved">Błąd. Nie przeniesiono</string>
     <!-- success message when sharing a folder -->
@@ -422,7 +422,7 @@
     <!-- error message -->
     <string name="context_no_removed_shared">Błąd. Nie usunięte udostępnienia</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Usunięte</string>
+    <string name="context_correctly_removed">Element usunięty</string>
     <!-- error message -->
     <string name="context_no_removed">Błąd. Nie usunięto z MEGA</string>
     <!-- success message when sending multiple files -->
@@ -442,7 +442,7 @@
     <!-- confirmation cancel subscriptions dialog -->
     <string name="confirmation_cancel_subscriptions">Dziękujemy za Twoją opinię. Czy na pewno chcesz zrezygnować z subskrypcji MEGA?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
-    <string name="reason_cancel_subscriptions">Twoja subskrypcja nie została anulowane. Prosimy o podane powodu anulowania</string>
+    <string name="reason_cancel_subscriptions">Twoja subskrypcja nie została anulowana. Podaj powód anulowania</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Twoja nowa subskrypcja wejdzie w życie po wygaśnięciu obecnej, nowa cena zostanie naliczona w tym czasie.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -460,7 +460,7 @@
     <!-- Title of the alert to introduce the decryption key -->
     <string name="alert_decryption_key">Klucz deszyfrujący</string>
     <!-- Message of the alert to introduce the decryption key -->
-    <string name="message_decryption_key">Wprowadź swój klucz do tego linka</string>
+    <string name="message_decryption_key">Wprowadź klucz deszyfrowania dla łącza</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">Nieprawidłowy klucz</string>
     <!-- upload to. Then choose an Audio file -->
@@ -533,7 +533,7 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Opcje kodu dostępu</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">Kompresja wideo zużywa znaczne ilości energii. Proszę podłączyć urządzenie do ładowania, jeśli kompresowane filmy są większe niż %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">Kompresja wideo zużywa znaczne ilości energii. Podłącz urządzenie, aby naładować, jeśli filmy, które mają być skompresowane, są większe niż %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
     <string name="settings_camera_upload_include_gps_helper_label">Jeśli funkcja ta jest włączona, informacje o lokalizacji będą dołączane do zdjęć. Zachowaj ostrożność podczas ich udostępniania.</string>
     <!-- Settings category title for cache and offline files -->
@@ -541,7 +541,7 @@
     <!-- Settings preference title for cache -->
     <string name="settings_advanced_features_cache">Wyczyść pamięć podręczną</string>
     <!-- Settings preference title for offline files -->
-    <string name="settings_advanced_features_offline">Usuń pliki offline</string>
+    <string name="settings_advanced_features_offline">Usuń pliki lokalne</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">Usuń konto</string>
     <!-- Size of files in offline or cache folders -->
@@ -667,7 +667,7 @@
         <item quantity="other">%1$d nieudanych prób wprowadzenia kodu</item>
     </plurals>
     <!-- Error message when not typing the Passcode code correctly -->
-    <string name="pin_lock_alert">Zostaniesz wylogowany, a Twoje pliki offline zostaną usunięte po 10 nieudanych próbach</string>
+    <string name="pin_lock_alert">Zostaniesz wylogowany, a Twoje pliki lokalne zostaną usunięte po 10 nieudanych próbach</string>
     <!-- Error message when not typing the Passcode correctly (two times) -->
     <string name="pin_lock_not_match">Pin jest nie poprawny. Spróbuj ponownie.</string>
     <!-- Title of the screen to unlock screen with Passcode -->
@@ -1012,7 +1012,7 @@
     <!-- Text shown after searching and no results found -->
     <string name="no_results_found">Nic nie znaleziono</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string name="offline_status">Niedostępny</string>
+    <string name="offline_status">Lokalne</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="online_status">Online</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
@@ -1146,7 +1146,7 @@
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
     <string name="storage_space">Powierzchnia</string>
     <!-- Confirmation message before removing something from the Offline section. -->
-    <string name="confirmation_delete_from_save_for_offline">Usunąć z trybu offline?</string>
+    <string name="confirmation_delete_from_save_for_offline">Usunąć z trybu lokalnego?</string>
     <!-- Label for the option of action menu to change the chat status -->
     <string name="set_status_option_label">Ustaw status</string>
     <!-- Label for the option of setting to change the colour theme -->
@@ -1176,7 +1176,7 @@
         <item>Online</item>
         <item>Nieaktywny</item>
         <item>Zajęty</item>
-        <item>Niedostępny</item>
+        <item>Lokalne</item>
     </string-array>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">Odblokuj</string>
@@ -1291,7 +1291,7 @@
     <!-- Menu option -->
     <string name="general_view">Zobacz pliki</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="add_to_cloud">Importuj</string>
+    <string name="add_to_cloud">Dodaj do dysku w chmurze</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Dodaj do dysku w chmurze</string>
     <!-- Menu option -->
@@ -1621,7 +1621,7 @@
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">Zaproszenie nie zostało wysłane</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent_text">Kod QR lub link do kontaktu jest nieprawidłowy. Spróbuj zeskanować prawidłowy kod lub otworzyć prawidłowy link.</string>
+    <string name="invite_not_sent_text">Kod QR lub łącze kontaktowe są nieprawidłowe. Spróbuj zeskanować prawidłowy kod lub otworzyć prawidłowy link.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">Zaproszenie nie zostało wysłane. %s jest już&#160;na liście Twoich kontaktów.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
@@ -1647,7 +1647,7 @@
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Brak plików w twoim [/B][A]Dysku w chmurze[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
-    <string name="context_empty_offline">[B]Brak plików [/B][A]zapisane dla Offline[/A]</string>
+    <string name="context_empty_offline">[B]Brak plików [/B][A]zapisane do lokalnych[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]Brak [/B][A]kontaktów[/A]</string>
     <!-- Message shown when the user has no chats -->
@@ -1987,7 +1987,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">Brak połączenia z siecią. Proszę połączyć się ponownie, aby otworzyć plik.</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">Plik jest już dostępny w trybie offline</string>
+    <string name="file_already_exists">Plik jest już dostępny w trybie lokalnym</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="one">Wiadomość nie została przesłana dalej</item>
@@ -2790,11 +2790,11 @@
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text_2">Skontaktuj się z administratorem konta biznesowego, aby rozwiązać problem i aktywować konto.</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files. -->
-    <string name="logout_warning_offline">Kiedy się wylogujesz, pliki z sekcji Offline zostaną usunięte z Twojego urządzenia.</string>
+    <string name="logout_warning_offline">Kiedy się wylogujesz, pliki z sekcji lokalne zostaną usunięte z Twojego urządzenia.</string>
     <!-- Warning message to alert user about logout in My Account section if has transfers in progress. -->
     <string name="logout_warning_transfers">Po wylogowaniu trwające przelewy zostaną anulowane.</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files and transfers in progress. -->
-    <string name="logout_warning_offline_and_transfers">Po wylogowaniu pliki z sekcji Offline zostaną usunięte z Twojego urządzenia, a trwające transfery zostaną anulowane.</string>
+    <string name="logout_warning_offline_and_transfers">Po wylogowaniu pliki z sekcji lokalne zostaną usunięte z Twojego urządzenia, a trwające transfery zostaną anulowane.</string>
     <!-- Label to indicate that a name has not been possible to obtain for some reason -->
     <string name="unknown_name_label">Nieznana nazwa</string>
     <!-- Error when renaming a chat title and it is too long -->
@@ -3385,7 +3385,7 @@
         <item quantity="other">Pobierz linki</item>
     </plurals>
     <!-- Ask for confirmation before clear offline files -->
-    <string name="clear_offline_confirmation">Wyczyścić wszystkie pliki offline?</string>
+    <string name="clear_offline_confirmation">Wyczyścić wszystkie pliki lokalne?</string>
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">Spotkanie</string>
     <!-- Menu option that allows the user to start/join meeting. -->
@@ -3499,7 +3499,7 @@
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Widok główny</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
-    <string name="offline_warning">Wylogowanie powoduje usunięcie zawartości offline.</string>
+    <string name="offline_warning">Wylogowanie powoduje usunięcie zawartości lokalnej.</string>
     <!-- Settings category which contains all preferences related to user interface. -->
     <string name="user_interface_setting">Interfejs użytkownika</string>
     <!-- Setting which allows to choose the start screen. -->
@@ -3549,9 +3549,9 @@
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">Zaproszenie wysłane. Zobacz Wysłane zaproszenia.</string>
     <!-- Message when file available offline. -->
-    <string name="file_available_offline">Plik dostępny offline</string>
+    <string name="file_available_offline">Plik dostępny lokalnie</string>
     <!-- Message when file removed from offline. -->
-    <string name="file_removed_offline">Plik usunięty z offline</string>
+    <string name="file_removed_offline">Plik usunięty z lokalnych</string>
     <!-- Menu option to open a link. Also title of the dialog to open a link. -->
     <string name="action_open_link">Otwórz link</string>
     <!-- error message shown when a chat link is not well formed. -->
@@ -5703,24 +5703,24 @@
     <string name="transfers_confirm_large_download_button_start_always">Zawsze pobieraj i nie pytaj ponownie</string>
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Katalog udostępniony</item>
+        <item quantity="few">%1$d katalogi udostępnione</item>
+        <item quantity="many">%1$d katalogi udostępnione</item>
+        <item quantity="other">%1$d katalogi udostępnione</item>
     </plurals>
     <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Katalog udostępniony, &#160;</item>
+        <item quantity="few">%1$d katalogi udostępnione, &#160;</item>
+        <item quantity="many">%1$d katalogi udostępnione, &#160;</item>
+        <item quantity="other">%1$d katalogi udostępnione, &#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">nie można było udostępnić %1$d katalog</item>
+        <item quantity="few">nie mogłem się podzielić %1$d katalogi</item>
+        <item quantity="many">nie mogłem się podzielić %1$d katalogi</item>
+        <item quantity="other">nie można było udostępnić %1$d katalogi</item>
     </plurals>
     <!-- Button text to mute a participant in the info of participant in call screen-->
     <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">Wycisz</string>
@@ -5729,13 +5729,29 @@
     <!-- Label text indicating that all participants are muted -->
     <string name="meetings_bottom_panel_in_call_participants_all_muted_label">Wszyscy wyciszeni</string>
     <!-- Message of the snackbar displayed when you have muted a participant. The placeholder is for the name of the participant you muted -->
-    <string name="meetings_muted_a_participant_snackbar_message">You’ve muted %s</string>
+    <string name="meetings_muted_a_participant_snackbar_message">Jesteś wyciszony %s</string>
     <!-- Message of the snackbar displayed when you have muted all participants -->
     <string name="meetings_muted_all_participants_snackbar_message">Wyciszyłeś wszystkich uczestników</string>
     <!-- Message of the snackbar displayed when you have been muted. The placeholder is for the name of who muted you -->
-    <string name="meetings_muted_by_a_participant_snackbar_message">You’ve been muted by %s</string>
+    <string name="meetings_muted_by_a_participant_snackbar_message">Zostałeś wyciszony przez %s</string>
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">Szczegóły subskrypcji</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
+    <string name="account_upgrade_subscription_details">Subskrypcje są odnawiane automatycznie na kolejne okresy subskrypcji o tym samym czasie trwania i w tej samej cenie, co wybrany okres początkowy. Użytkownik może wyłączyć automatyczne odnawianie subskrypcji MEGA&#160;Pro nie później niż 24 godziny przed terminem płatności kolejnej subskrypcji za pośrednictwem Subskrypcji w [A]Google Play[/A].</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Zezwalaj na dostęp do swojej galerii</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Przyznaj dostęp</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_chat_screen_app_update_dialog_title">Update required</string>
+    <string name="meetings_chat_screen_app_update_dialog_message">Nie używasz najnowszej wersji naszej aplikacji, więc nie możesz rozpoczynać połączeń ani dołączać do nich. Zaktualizuj teraz, aby kontynuować.</string>
+    <string name="meetings_chat_screen_app_update_dialog_update_button">Zaktualizuj</string>
+    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Dismiss</string>
+    <!-- Title of the bottom panel when the only host left the call on meeting screen -->
+    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Przypisanie hosta do opuszczenia połączenia</string>
+    <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">Jesteś jedynym hostem w trakcie rozmowy. Przed opuszczeniem grupy przypisz do niej innego hosta, aby ktoś w trakcie rozmowy miał uprawnienia hosta. Pozostaniesz hostem w grupie.</string>
+    <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">Przydziel i opuść</string>
+    <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_leave_option">Opuść</string>
 </resources>

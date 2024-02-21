@@ -43,11 +43,11 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">جاري التحميل</string>
     <!-- state while importing the file -->
-    <string name="general_importing">توريد</string>
+    <string name="general_importing">إضافة</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">إعادة توجيه</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="general_import">استيراد</string>
+    <string name="general_import">الإضافة الي محرك السحابة</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">خطأ</string>
     <!-- when trying to download a file that is already downloaded in the device -->
@@ -147,11 +147,11 @@
     <!-- button that allows the user to create an account -->
     <string name="create_account">إنشاء حساب</string>
     <!-- when the user tries to log in MEGA without typing the email -->
-    <string name="error_enter_email">يرجى إدخال عنوان البريد الإلكتروني الخاص بك</string>
+    <string name="error_enter_email">أدخل بريدك الإلكتروني</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="error_invalid_email">عنوان البريد الإلكتروني غير صالح</string>
     <!-- when the user tries to log in MEGA without typing the password -->
-    <string name="error_enter_password">الرجاء إدخال كلمة المرور</string>
+    <string name="error_enter_password">أدخل كلمة السر الخاصة بك</string>
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">لا يوجد اتصال</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
@@ -169,7 +169,7 @@
     <!-- After login, updating the file list, the file list should be processed before showing it to the user -->
     <string name="login_preparing_filelist">إعداد قائمة الملف</string>
     <!-- when the user tries to share something to MEGA without being logged -->
-    <string name="login_before_share">الرجاء تسجيل الدخول للمشاركة مع ميغا MEGA</string>
+    <string name="login_before_share">قم بتسجيل الدخول للمشاركة مع ميغا MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">رابط التأكيد خاصتك لم يعد صالحاً. قد يكون حسابك مفعلاً مسبقاً أو قد تكون قد ألغيت تسجيل حسابك.</string>
     <!-- First Name of the user -->
@@ -185,9 +185,9 @@
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">عليك أن توافق على أنك تفهم خطر فقدان كلمة المرور الخاصة بك</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
-    <string name="error_enter_username">الرجاء إدخال اسمك الأول</string>
+    <string name="error_enter_username">أدخل اسمك الأول</string>
     <!-- Warning dialog -->
-    <string name="error_enter_userlastname">يرجى إدخال اسم العائلة.</string>
+    <string name="error_enter_userlastname">أدخل اسمك الأخير</string>
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">كلمات المرور غير متطابقة</string>
     <!-- when creating the account -->
@@ -416,19 +416,19 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">خطأ، لم يتم إنشاء المجلد</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">تمت إعادة التسمية</string>
+    <string name="context_correctly_renamed">تمت إعادة تسمية العنصر</string>
     <!-- error message -->
     <string name="context_no_renamed">خطأ. لم يتم إعادة التسمية</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">تم النسخ</string>
+    <string name="context_correctly_copied">تم نسخ العنصر</string>
     <!-- error message -->
     <string name="context_no_copied">خطأ. لم يتم النسخ</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
-    <string name="context_no_destination_folder">الرجاء اختيار وجهة المجلد</string>
+    <string name="context_no_destination_folder">اختر مجلد الوجهة</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">تم النقل</string>
+    <string name="context_correctly_moved">تم نقل العنصر</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">نقل إلى سلة المحذوفات</string>
+    <string name="context_correctly_moved_to_rubbish">تم نقل العنصر إلى سلة المحذوفات</string>
     <!-- error message -->
     <string name="context_no_moved">خطأ. لم يتم النقل</string>
     <!-- success message when sharing a folder -->
@@ -436,7 +436,7 @@
     <!-- error message -->
     <string name="context_no_removed_shared">خطأ. فشل في إزالة المشاركة</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">المحذوف</string>
+    <string name="context_correctly_removed">تم حذف العنصر</string>
     <!-- error message -->
     <string name="context_no_removed">خطأ. لم يتم إزالتها من MEGA</string>
     <!-- success message when sending multiple files -->
@@ -456,7 +456,7 @@
     <!-- confirmation cancel subscriptions dialog -->
     <string name="confirmation_cancel_subscriptions">شكرا لك على ملاحظاتك. هل أنت متأكد أنك تريد إلغاء اشتراك ميغا MEGA الخاص بك؟</string>
     <!-- provide a reason to cancel subscriptions dialog -->
-    <string name="reason_cancel_subscriptions">لم يتم إلغاء اشتراكك. يرجى تقديم سبب لإلغائه</string>
+    <string name="reason_cancel_subscriptions">لم يتم إلغاء اشتراكك. قدم سببًا للإلغاء</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">سيصبح اشتراكك الجديد سارياً بمجرد انتهاء الاشتراك الحالي، وسيتم تحصيل السعر الجديد في ذلك الوقت.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -474,7 +474,7 @@
     <!-- Title of the alert to introduce the decryption key -->
     <string name="alert_decryption_key">مفتاح فك التشفير</string>
     <!-- Message of the alert to introduce the decryption key -->
-    <string name="message_decryption_key">الرجاء إدخال مفتاح فك التشفير للرابط</string>
+    <string name="message_decryption_key">أدخل مفتاح فك التشفير للرابط</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">مفتاح فك التشفير غير صالح</string>
     <!-- upload to. Then choose an Audio file -->
@@ -515,7 +515,7 @@
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">تم النسخ الى حافظة النصوص</string>
     <!-- alert when clicking a newsignup link being logged -->
-    <string name="log_out_warning">يرجى تسجيل الخروج قبل إنشاء الحساب</string>
+    <string name="log_out_warning">قم بتسجيل الخروج قبل إنشاء الحساب</string>
     <!-- menu item -->
     <string name="menu_pause_transfers">تم إيقاف عمليات التراسل مؤقتاً</string>
     <!-- menu item -->
@@ -549,7 +549,7 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">خيارات رمز المرور</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">يستخدم ضغط الفيديو كميات كبيرة من الطاقة. يرجى توصيل جهازك للشحن إذا كانت مقاطع الفيديو المراد ضغطها أكبر من %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">يستخدم الفيديو المضغوط الكثير من الطاقة. قم بتوصيل جهازك إلى الشحن إذا كانت مقاطع الفيديو المراد ضغطها أكبر من %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
     <string name="settings_camera_upload_include_gps_helper_label">في حالة التمكين، سيتم تضمين معلومات الموقع مع صورك. يرجى توخي الحذر عند مشاركتهم.</string>
     <!-- Settings category title for cache and offline files -->
@@ -1347,7 +1347,7 @@
     <!-- Menu option -->
     <string name="general_view">عرض الملفات</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="add_to_cloud">استيراد</string>
+    <string name="add_to_cloud">الإضافة الي محرك السحابة</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">أضف إلى السواقة السحابية</string>
     <!-- Menu option -->
@@ -1357,7 +1357,7 @@
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">جاري الاتصال&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
-    <string name="context_contact_already_invited">%s was already invited. Check your pending requests.</string>
+    <string name="context_contact_already_invited">%s تمت دعوته بالفعل. تحقق من طلباتك قيد الانتظار.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
     <string name="confirm_email_misspelled">اذا أخطأت بكتابة بريدك الالكتروني، قم بتصحيحه ثم اضغط على [A]إعادة الارسال[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
@@ -1514,7 +1514,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">ادع أصدقائك واحصل على مكافآت</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s of storage for each invitation. Valid for 365 days.</string>
+    <string name="figures_achievements_text_referrals">%1$s مساحة تخزين لكل دعوة. صالحة لمدة 365 يومًا.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s من مساحة التخزين. صالحة لمدة 365 يوم.</string>
     <!-- title of the section for unlocked rewards -->
@@ -1544,7 +1544,7 @@
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">تنطبق مكافأة التخزين المجانية على الدعوات الجديدة فقط وحين يتم تثبيت تطبيق ميغا للهاتف المحمول MEGA Mobile أو تطبيق ميغا للحاسب المكتبي MEGA Desktop App.</string>
     <!-- Text shown when the user sends a contact invitation -->
-    <string name="subtitle_confirmation_invite_friends">Invitation sent</string>
+    <string name="subtitle_confirmation_invite_friends">تم إرسال الدعوة</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">عنوان البريد الإلكتروني غير صحيح</string>
     <!-- info paragraph about the achievement install megasync -->
@@ -1673,7 +1673,7 @@
     <!-- Text shown when it has not been delete the QR code successfully -->
     <string name="qrcode_delete_not_successfully">لم يتم حذف رمز الإستجابة السريعة بسبب خطأ. يرجى المحاولة مرة أخرى.</string>
     <!-- Title of dialog shown when a contact request has been sent with QR code -->
-    <string name="invite_sent">Invitation sent</string>
+    <string name="invite_sent">تم إرسال الدعوة</string>
     <!-- Text of dialog shown when a contact request has been sent. -->
     <string name="invite_sent_text">تمت دعوة المستخدم وسيظهر في قائمة جهات الاتصال الخاصة بك بمجرد قبول الدعوة.</string>
     <!-- Text of dialog shown when multiple contacts request has been sent -->
@@ -1687,9 +1687,9 @@
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
     <string name="success_download_qr">تم تنزيل ملف رمز الاستجابة السريعة QR الى %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent">Invitation not sent</string>
+    <string name="invite_not_sent">لم يتم إرسال الدعوة</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent_text">رمز الاستجابة السريعة QR أو رابط جهة الاتصال غير صالح. يرجى إعادة قراءة رمز صالح او ادخال رابط صالح.</string>
+    <string name="invite_not_sent_text">رمز الاستجابة السريعة QR أو رابط جهة الاتصال غير صالح. حاول مسح رمز صالح أو فتح رابط صالح.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">لم يتم ارسال الدعوة. %s موجود بقائمة الاتصال الخاصة بك.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
@@ -3733,7 +3733,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">لقد قمت بالفعل بدعوة %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Invitation sent. See Sent requests.</string>
+    <string name="contact_invited">تم إرسال الدعوة. راجع الطلبات المرسلة.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">الملف متاح بدون اتصال</string>
     <!-- Message when file removed from offline. -->
@@ -5191,8 +5191,12 @@
     <string name="meetings_chat_room_join_scheduled_meeting_option">أنضم إلى الاجتماع</string>
     <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_sent">
-        <item quantity="one">%1$d invitation sent.&#160;</item>
-        <item quantity="other">%1$d invitations sent.&#160;</item>
+        <item quantity="zero">%1$d دعوة تم إرسالها.&#160;</item>
+        <item quantity="one">%1$d دعوة تم إرسالها.&#160;</item>
+        <item quantity="two">%1$d دعوتين تم إرسالهما.&#160;</item>
+        <item quantity="few">%1$d دعوات تم إرسالهم.&#160;</item>
+        <item quantity="many">%1$d دعوة تم إرسالهم,&#160;</item>
+        <item quantity="other">%1$d دعوة تم إرسالهم.&#160;</item>
     </plurals>
     <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_not_sent">
@@ -5355,7 +5359,7 @@
     <!-- Title of option to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_label">التكرار</string>
     <!-- Title of option to send calendar invite in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_send_calendar_invite_label">Send calendar invitation</string>
+    <string name="meetings_schedule_meeting_send_calendar_invite_label">إرسال دعوة إلى التقويم</string>
     <!-- Title of option to add description in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_add_description_label">إضافة وصف</string>
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
@@ -5601,7 +5605,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;نسخ احتياطية تلقائية</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 180 days on Pro&#160;I, II, and III</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160; ترجيع لمدة تصل إلى 90 يومًا على برو لايت Pro&#160;Lite وما يصل إلى 180 يومًا على برو Pro&#160;I و II و III</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;جدولة سلة المحذوفات بين 7 أيام و 10 سنوات</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5899,7 +5903,7 @@
     <!-- Meeting list tooltip description for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_description">يمكنك عرض أو إلغاء أو تعديل أي تكرار لاجتماع متكرر من خلال النقر على النقاط الثلاث على اليمين وتحديد [A]التكرارات[/A].</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_send_calendar_invite_panel_title">Email a calendar invitation to participants so they can add the meeting to their calendars.</string>
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">أرسل دعوة تقويم بالبريد الإلكتروني إلى المشاركين حتى يتمكنوا من إضافة الاجتماع إلى التقويمات الخاصة بهم.</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">تم تحديث الاجتماع</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
@@ -6044,7 +6048,7 @@
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">لا ترفض</string>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA has limited access to your photo library and cannot back up all your photos.</string>
+    <string name="camera_uploads_limited_access">تتمتع ميغا MEGA بوصول محدود إلى مكتبة الصور الخاصة بك ولا يمكنها نسخ جميع صورك احتياطيًا.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">انقر لتغيير الأذونات.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -6124,17 +6128,17 @@
     <!-- Title of the Sync feature in the navigation drawer when Sync feature is enabled -->
     <string name="home_side_menu_sync_title">مزامنة</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This means the user won't see Advertisements if they buy a Pro plan. -->
-    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;Ad&#160;free</string>
+    <string name="account_upgrade_account_description_feature_advertisement">&#8226;&#160;خالي &#160;من الإعلانات</string>
     <!-- Text when sharing a meeting link indicating the subject for the email -->
-    <string name="meetings_sharing_meeting_link_meeting_invite_subject">MEGA meeting invitation</string>
+    <string name="meetings_sharing_meeting_link_meeting_invite_subject">دعوة اجتماع ميغا MEGA</string>
     <!-- Text when sharing a meeting link indicating that a participant is inviting you to the meeting. The placeholder is to include the full name of the invitation sender -->
-    <string name="meetings_sharing_meeting_link_title">%1$s is inviting you to a MEGA meeting</string>
+    <string name="meetings_sharing_meeting_link_title">%1$s يدعوك إلى اجتماع ميغا MEGA</string>
     <!-- Text when sharing a meeting link indicating the meeting name. The placeholder is to include the meeting name -->
-    <string name="meetings_sharing_meeting_link_meeting_name">Meeting name: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_name">اسم الاجتماع: %1$s</string>
     <!-- Text when sharing a meeting link indicating the meeting link. The placeholder is to include the meeting link -->
-    <string name="meetings_sharing_meeting_link_meeting_link">Meeting link: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_link">رابط الاجتماع: %1$s</string>
     <!-- Text when sharing a meeting link indicating the date and time of the meeting. The placeholder is to include the scheduled date and time of the meeting, e.g. "Date and time:  Wed every 2 weeks effective 16/08/2023 from 7:00 PM to 8:00 PM " -->
-    <string name="meetings_sharing_meeting_link_meeting_date_and_time">Date and time: %1$s</string>
+    <string name="meetings_sharing_meeting_link_meeting_date_and_time">التاريخ والوقت: %1$s</string>
     <!-- Text to show when the list of participants who are not in the call is empty -->
     <string name="meetings_bottom_panel_participants_not_in_call_empty">انضم جميع المشاركين المدعوين إلى المكالمة</string>
     <!-- Text to show when the list of participants who are in waiting room is empty -->
@@ -6150,58 +6154,74 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">اتصل بالجميع</string>
     <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
-    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">This app is logged into a different MEGA account. \nLog out of this account, and log in with your MEGA VPN account.</string>
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">يتم تسجيل الدخول إلى هذا التطبيق من حساب ميغا MEGA مختلف. \nقم بتسجيل الخروج من هذا الحساب وتسجيل الدخول باستخدام حساب ميغا في بي إن MEGA VPN الخاص بك.</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
-    <string name="chat_attach_pick_from_camera_deny_permission">MEGA needs access to your camera to capture photos and videos.</string>
+    <string name="chat_attach_pick_from_camera_deny_permission">تحتاج ميغا MEGA إلى الوصول إلى الكاميرا لالتقاط الصور ومقاطع الفيديو.</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
-    <string name="chat_attach_location_deny_permission">You denied MEGA access to your location. If you’d like to share your location, allow MEGA permission to do so.</string>
+    <string name="chat_attach_location_deny_permission">لقد رفضتَ وصول ميغا MEGA إلى موقعك. إذا كنت ترغب في مشاركة موقعك امنح ميغا MEGA إذن للقيام بذلك.</string>
     <!-- Title for the confirmation dialog shown when the user is starting a large download -->
-    <string name="transfers_confirm_large_download_title">Large download</string>
+    <string name="transfers_confirm_large_download_title">تنزيل كبير</string>
     <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start -->
-    <string name="transfers_confirm_large_download_button_start">Start download</string>
+    <string name="transfers_confirm_large_download_button_start">ابدأ التنزيل</string>
     <!-- Confirmation button title for the confirmation dialog shown when the user is starting a large download. When the user clicks this button the download will start and this dialog won't appear anymore in future large downloads-->
-    <string name="transfers_confirm_large_download_button_start_always">Always download and don’t ask again</string>
+    <string name="transfers_confirm_large_download_button_start_always">قم دائمًا بالتنزيل بدون أن تسأل</string>
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
-        <item quantity="zero"></item>
-        <item quantity="one"></item>
-        <item quantity="two"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="zero">%1$d مجلد مشارك</item>
+        <item quantity="one">مجلد مشترك</item>
+        <item quantity="two">%1$d مجلدان مشاركان</item>
+        <item quantity="few">%1$d مجلدات مشاركة</item>
+        <item quantity="many">%1$d مجلداً مشاركاً</item>
+        <item quantity="other">%1$d مجلد مشارك</item>
     </plurals>
     <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="zero"></item>
-        <item quantity="one"></item>
-        <item quantity="two"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="zero">%1$dمجلد مشارك،&#160;</item>
+        <item quantity="one">مجلد مشارك،&#160;</item>
+        <item quantity="two">%1$d مجلدان مشاركان،&#160;</item>
+        <item quantity="few">%1$d مجلدات مشاركة،&#160;</item>
+        <item quantity="many">%1$d مجلداً مشاركاً،&#160;</item>
+        <item quantity="other">%1$d مجلد مشارك،&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
-        <item quantity="zero"></item>
-        <item quantity="one"></item>
-        <item quantity="two"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="zero">تعذرت مشاركة %1$d مجلد</item>
+        <item quantity="one">تعذرت مشاركة %1$d مجلد</item>
+        <item quantity="two">تعذرت مشاركة %1$d مجلدين</item>
+        <item quantity="few">تعذرت مشاركة %1$d مجلدات</item>
+        <item quantity="many">تعذرت مشاركة %1$d مجلداً</item>
+        <item quantity="other">تعذرت مشاركة %1$d مجلد</item>
     </plurals>
     <!-- Button text to mute a participant in the info of participant in call screen-->
     <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">كتم</string>
     <!-- Button text to mute all participant in the call screen-->
-    <string name="meetings_bottom_panel_in_call_participants_mute_all_participants_button">Mute all</string>
+    <string name="meetings_bottom_panel_in_call_participants_mute_all_participants_button">كتم صوت الكل</string>
     <!-- Label text indicating that all participants are muted -->
-    <string name="meetings_bottom_panel_in_call_participants_all_muted_label">All muted</string>
+    <string name="meetings_bottom_panel_in_call_participants_all_muted_label">تم كتم كل شيء</string>
     <!-- Message of the snackbar displayed when you have muted a participant. The placeholder is for the name of the participant you muted -->
-    <string name="meetings_muted_a_participant_snackbar_message">You’ve muted %s</string>
+    <string name="meetings_muted_a_participant_snackbar_message">لقد كتمت صوت %s</string>
     <!-- Message of the snackbar displayed when you have muted all participants -->
-    <string name="meetings_muted_all_participants_snackbar_message">You’ve muted all participants</string>
+    <string name="meetings_muted_all_participants_snackbar_message">لقد كتمت صوت جميع المشاركين</string>
     <!-- Message of the snackbar displayed when you have been muted. The placeholder is for the name of who muted you -->
-    <string name="meetings_muted_by_a_participant_snackbar_message">You’ve been muted by %s</string>
+    <string name="meetings_muted_by_a_participant_snackbar_message">لقد تم كتم صوتك من قِبل %s</string>
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">تفاصيل الاشتراك</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
+    <string name="account_upgrade_subscription_details">يتم تجديد الاشتراكات تلقائيًا لفترات اشتراك متتالية من نفس المدة وبنفس سعر الفترة الأولية المختارة. يمكنك إيقاف التجديد التلقائي لاشتراك ميغا برو MEGA&#160;Pro الخاص بك في موعد لا يتجاوز 24 ساعة قبل استحقاق دفعة الاشتراك التالية عبر الاشتراكات في [A]غوغل بلاي Google Play[/A].</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">السماح بالوصول إلى معرض الصور الخاص بك</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">منح اذن الوصول</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_chat_screen_app_update_dialog_title">التحديث مطلوب</string>
+    <string name="meetings_chat_screen_app_update_dialog_message">انت لا تستخدم أحدث إصدار من تطبيقنا لذا لا يمكنك بدء المكالمات أو الانضمام إليها. قم بالتحديث الآن للمتابعة.</string>
+    <string name="meetings_chat_screen_app_update_dialog_update_button">تحديث</string>
+    <string name="meetings_chat_screen_app_update_dialog_cancel_button">رفض</string>
+    <!-- Title of the bottom panel when the only host left the call on meeting screen -->
+    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">تعيين مضيف لمغادرة المكالمة</string>
+    <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">أنت المضيف الوحيد على المكالمة. قم بتعيين مضيف آخر للمجموعة قبل المغادرة حتى يحصل شخص ما على المكالمة على أذونات المضيف. ستظل مضيفًا في المجموعة.</string>
+    <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">تعيين و مغادرة</string>
+    <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_leave_option">غادر على أي حال</string>
 </resources>

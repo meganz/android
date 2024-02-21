@@ -43,11 +43,11 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">Memuat</string>
     <!-- state while importing the file -->
-    <string name="general_importing">Mengimpor</string>
+    <string name="general_importing">Adding</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">Meneruskan</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="general_import">Impor</string>
+    <string name="general_import">Tambah ke Cloud drive</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">Kesalahan</string>
     <!-- when trying to download a file that is already downloaded in the device -->
@@ -137,11 +137,11 @@
     <!-- button that allows the user to create an account -->
     <string name="create_account">Buat akun</string>
     <!-- when the user tries to log in MEGA without typing the email -->
-    <string name="error_enter_email">Harap masukkan alamat e-mail anda</string>
+    <string name="error_enter_email">Masukkan email anda</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="error_invalid_email">Alamat e-mail anda salah</string>
     <!-- when the user tries to log in MEGA without typing the password -->
-    <string name="error_enter_password">Harap masukkan password anda</string>
+    <string name="error_enter_password">Masukkan password anda</string>
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">Tidak ada koneksi jaringan</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
@@ -159,7 +159,7 @@
     <!-- After login, updating the file list, the file list should be processed before showing it to the user -->
     <string name="login_preparing_filelist">Mempersiapkan daftar file</string>
     <!-- when the user tries to share something to MEGA without being logged -->
-    <string name="login_before_share">Silakan masuk untuk berbagi dengan MEGA</string>
+    <string name="login_before_share">Log in to share with MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Tautan konfirmasi anda tidak lagi valid. Akun anda mungkin sudah diaktifkan atau anda mungkin telah membatalkan pendaftaran anda.</string>
     <!-- First Name of the user -->
@@ -175,9 +175,9 @@
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">Anda harus setuju bahwa anda memahami bahaya kehilangan kata sandi anda</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
-    <string name="error_enter_username">Silahkan masukkan nama anda</string>
+    <string name="error_enter_username">Masukkan nama depan anda</string>
     <!-- Warning dialog -->
-    <string name="error_enter_userlastname">Silakan masukkan nama belakang anda.</string>
+    <string name="error_enter_userlastname">Masukkan nama belakang anda</string>
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Kata sandi berbeda</string>
     <!-- when creating the account -->
@@ -381,19 +381,19 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Terjadi Kesalahan. Folder tidak terbuat</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Nama terganti</string>
+    <string name="context_correctly_renamed">Item renamed</string>
     <!-- error message -->
     <string name="context_no_renamed">Terjadi kesalahan. Belum ubah nama</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Disalin</string>
+    <string name="context_correctly_copied">Item copied</string>
     <!-- error message -->
     <string name="context_no_copied">Terjadi kesalahan. Belum tersalin</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
-    <string name="context_no_destination_folder">Silahkan pilih folder tujuan</string>
+    <string name="context_no_destination_folder">Choose a destination folder</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Dipindahkan</string>
+    <string name="context_correctly_moved">Item moved</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Dipindahkan ke tempat sampah</string>
+    <string name="context_correctly_moved_to_rubbish">Item moved to Rubbish bin</string>
     <!-- error message -->
     <string name="context_no_moved">Terjadi kesalahan. Belum dipindahkan</string>
     <!-- success message when sharing a folder -->
@@ -401,7 +401,7 @@
     <!-- error message -->
     <string name="context_no_removed_shared">Terjadi kesalahan. Gagal menghilangkan berbagi</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Terhapus</string>
+    <string name="context_correctly_removed">Item deleted</string>
     <!-- error message -->
     <string name="context_no_removed">Terjadi kesalahan. Hapus gagal</string>
     <!-- success message when sending multiple files -->
@@ -421,7 +421,7 @@
     <!-- confirmation cancel subscriptions dialog -->
     <string name="confirmation_cancel_subscriptions">Terima kasih atas tanggapan anda. Apakah anda yakin ingin membatalkan langganan MEGA anda?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
-    <string name="reason_cancel_subscriptions">Langganan anda belum dibatalkan. Berikan alasan untuk pembatalan anda</string>
+    <string name="reason_cancel_subscriptions">Your subscription has not been cancelled. Provide a reason for your cancellation</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Langganan baru anda akan mulai berlaku setelah yang sekarang berakhir, harga baru akan dibebankan pada saat itu.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -439,7 +439,7 @@
     <!-- Title of the alert to introduce the decryption key -->
     <string name="alert_decryption_key">Kunci Dekripsi</string>
     <!-- Message of the alert to introduce the decryption key -->
-    <string name="message_decryption_key">Masukkan decryption key untuk link</string>
+    <string name="message_decryption_key">Enter the decryption key for the link</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">Decryption key salah</string>
     <!-- upload to. Then choose an Audio file -->
@@ -475,7 +475,7 @@
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">Tautan disalin ke papan klip</string>
     <!-- alert when clicking a newsignup link being logged -->
-    <string name="log_out_warning">Tolong keluar sebelum membuat akun</string>
+    <string name="log_out_warning">Log out before creating the account</string>
     <!-- menu item -->
     <string name="menu_pause_transfers">Hentikan transfer</string>
     <!-- menu item -->
@@ -509,7 +509,7 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Pilihan kode sandi</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">Kompresi video menggunakan daya yang cukup besar. Harap colokkan perangkat anda untuk mengisi daya jika video yang akan dikompresi lebih besar dari %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">Video compression uses considerable amounts of power. Plug in your device to charge if the videos to be compressed are larger than %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
     <string name="settings_camera_upload_include_gps_helper_label">Jika diaktifkan, informasi lokasi akan disertakan dengan gambar anda. Harap berhati-hati saat membagikannya.</string>
     <!-- Settings category title for cache and offline files -->
@@ -1207,7 +1207,7 @@
     <!-- Menu option -->
     <string name="general_view">Lihat file</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="add_to_cloud">Import</string>
+    <string name="add_to_cloud">Tambah ke Cloud drive</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Tambah ke Cloud drive</string>
     <!-- Menu option -->
@@ -1519,7 +1519,7 @@
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">Undangan tidak terkirim</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent_text">Kode QR atau tautan kontak tidak valid. Coba pindai kode yang valid atau untuk membuka tautan yang valid.</string>
+    <string name="invite_not_sent_text">The QR code or contact link is invalid. Try to scan a valid code or to open a valid link.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">Undangan belum dikirim. %s sudah ada dalam daftar kontak anda.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
@@ -5007,15 +5007,18 @@
     <string name="transfers_confirm_large_download_button_start_always">Always download and don’t ask again</string>
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
-        <item quantity="other"></item>
+        <item quantity="one">Folder shared</item>
+        <item quantity="other">%1$d folders shared</item>
     </plurals>
     <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="other"></item>
+        <item quantity="one">Folder shared,&#160;</item>
+        <item quantity="other">%1$d folders shared,&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
-        <item quantity="other"></item>
+        <item quantity="one">couldn’t share %1$d folder</item>
+        <item quantity="other">couldn’t share %1$d folders</item>
     </plurals>
     <!-- Button text to mute a participant in the info of participant in call screen-->
     <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">Matikan Suara</string>
@@ -5032,5 +5035,21 @@
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">Detail langganan</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
+    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA&#160;Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Allow access to your gallery</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Berikan akses</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_chat_screen_app_update_dialog_title">Update required</string>
+    <string name="meetings_chat_screen_app_update_dialog_message">You’re not using the latest version of our app so you can’t start or join calls. Update now to continue.</string>
+    <string name="meetings_chat_screen_app_update_dialog_update_button">Perbarui</string>
+    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Dismiss</string>
+    <!-- Title of the bottom panel when the only host left the call on meeting screen -->
+    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Tetapkan tuan rumah untuk meninggalkan panggilan</string>
+    <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">You’re the only host on the call. Assign another host for the group before leaving so someone on the call will have host permissions. You’ll remain a host in the group.</string>
+    <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">Tetapkan dan tinggalkan</string>
+    <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_leave_option">Tetap pergi</string>
 </resources>

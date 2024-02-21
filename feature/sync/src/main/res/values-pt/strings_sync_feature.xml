@@ -53,7 +53,7 @@
     <!-- Sync to resolve conflict Choose local file -->
     <string name="sync_stalled_issue_choose_local_file">Selecionar o arquivo local</string>
     <!-- Sync to resolve conflict Choose remote file -->
-    <string name="sync_stalled_issue_choose_remote_file">Selecionar o arquivo remoto</string>
+    <string name="sync_stalled_issue_choose_remote_file">Selecionar o arquivo armazenado no MEGA</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">Escolha o arquivo com a data de modificação mais recente</string>
     <!-- Sync message when conflict resolved -->
@@ -141,7 +141,7 @@
     <!-- Sync stalled issue reason is Folder Matched Against File-->
     <string name="sync_stalled_issue_folder_matched_against_file">O arquivo que você está tentando sincronizar não tem extensão e tem o mesmo nome de uma pasta existente</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Itens locais e remotos alterados desde a última sincronização</string>
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Item alterado desde a última sincronização</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->
     <string name="sync_stalled_issue_local_and_remote_not_synced">Conflito de arquivo ou de pasta</string>
     <!-- Sync stalled issue reason is Name clash-->

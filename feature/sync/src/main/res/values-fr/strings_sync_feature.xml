@@ -39,7 +39,7 @@
     <!-- Sync options -->
     <string name="sync_menu_sync_options">Options de synchronisation</string>
     <!-- Sync text when need to solved stalled issues-->
-    <string name="sync_menu_clear_issues">Clear resolved issues</string>
+    <string name="sync_menu_clear_issues">Effacer les problèmes résolus</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">Synchronisation bidirectionnelle</string>
     <!-- Sync conflict message -->
@@ -53,7 +53,7 @@
     <!-- Sync to resolve conflict Choose local file -->
     <string name="sync_stalled_issue_choose_local_file">Choisir le fichier local</string>
     <!-- Sync to resolve conflict Choose remote file -->
-    <string name="sync_stalled_issue_choose_remote_file">Choisir le fichier distant</string>
+    <string name="sync_stalled_issue_choose_remote_file">Choisir le fichier présent sur MEGA</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">Choisir le dernier fichier modifié</string>
     <!-- Sync message when conflict resolved -->
@@ -75,7 +75,7 @@
     <!-- Sync dialog battery optimization message -->
     <string name="sync_dialog_battery_optimization_message">Allow MEGA to read, modify or delete all files on this device.</string>
     <!-- Sync state message for No Solved Issues -->
-    <string name="sync_solved_issues_empty_message">No resolved issues</string>
+    <string name="sync_solved_issues_empty_message">Aucun problème résolu</string>
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">Aucun blocage</string>
     <!-- Sync option to choose folder pair -->
@@ -141,7 +141,7 @@
     <!-- Sync stalled issue reason is Folder Matched Against File-->
     <string name="sync_stalled_issue_folder_matched_against_file">Le fichier que vous tentez de synchroniser n’a pas d’extension et porte le même nom qu’un dossier existant</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Changements locaux et distants depuis la dernière synchronisation</string>
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync">L’élément a changé depuis la dernière synchronisation</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->
     <string name="sync_stalled_issue_local_and_remote_not_synced">Conflit de fichier ou de dossier</string>
     <!-- Sync stalled issue reason is Name clash-->
@@ -165,7 +165,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Choisir</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">A file or folder has an issue that needs your decision to resolve it</string>
+    <string name="sync_stalled_issue_file_issue_detail">Un fichier ou un dossier présente un problème qui nécessite une décision de votre part pour le résoudre</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">Attente de la fin d’autres processus</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->

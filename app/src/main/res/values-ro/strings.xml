@@ -43,11 +43,11 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">Se încarcă</string>
     <!-- state while importing the file -->
-    <string name="general_importing">Se importă</string>
+    <string name="general_importing">Adăugarea</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">Se redirecționează</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="general_import">Importă</string>
+    <string name="general_import">Adaugă în Unitatea cloud</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">Eroare</string>
     <!-- when trying to download a file that is already downloaded in the device -->
@@ -57,7 +57,7 @@
     <!-- Hint how to cancel the download -->
     <string name="general_show_info">Afișează informații</string>
     <!-- Error getting the root node -->
-    <string name="error_general_nodes">Eroate. Te rugăm să încerci din nou.</string>
+    <string name="error_general_nodes">Eroare. Vă rugăm să încercați din nou.</string>
     <!-- File name (without extension) of file exported with the recovery key -->
     <string name="general_rk">MEGA-CHEIEDERECUPERARE</string>
     <!-- when no external card exists -->
@@ -101,7 +101,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">Abonamentul a fost anulat</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">Nu am putut să îți anulăm abonamentul. Te rugăm să contactezi support&#64;mega.nz pentru asistență.</string>
+    <string name="cancel_subscription_error">Nu am putut să vă anulăm abonamentul. Vă rugăm să contactați support&#64;mega.nz pentru asistență.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Închide celelalte sesiuni</string>
     <!-- Message after kill all opened sessions -->
@@ -141,11 +141,11 @@
     <!-- button that allows the user to create an account -->
     <string name="create_account">Creează un cont</string>
     <!-- when the user tries to log in MEGA without typing the email -->
-    <string name="error_enter_email">Vă rugăm să introduceți adresa dvs. de e-mail</string>
+    <string name="error_enter_email">Introduceți adresa dvs. de e-mail</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="error_invalid_email">Adresă de e-mail nevalidă</string>
     <!-- when the user tries to log in MEGA without typing the password -->
-    <string name="error_enter_password">Vă rugăm să introduceţi parola</string>
+    <string name="error_enter_password">Introduceți parola dvs.</string>
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">Nicio conexiune la rețea</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
@@ -163,7 +163,7 @@
     <!-- After login, updating the file list, the file list should be processed before showing it to the user -->
     <string name="login_preparing_filelist">Se pregătește lista de fișiere</string>
     <!-- when the user tries to share something to MEGA without being logged -->
-    <string name="login_before_share">Te rugăm să te autentifici pentru a partaja cu MEGA</string>
+    <string name="login_before_share">Conectați-vă pentru a partaja cu MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Linkul tău de confirmare nu mai este valid. Este posibil ca contul tău să fie deja activat sau s-ar putea să fi anulat înregistrarea.</string>
     <!-- First Name of the user -->
@@ -179,9 +179,9 @@
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">Trebuie să fii de acord cu faptul că înțelegi pericolul pierderii parolei</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
-    <string name="error_enter_username">Vă rugăm să introduceți prenumele</string>
+    <string name="error_enter_username">Introduceți prenumele dvs.</string>
     <!-- Warning dialog -->
-    <string name="error_enter_userlastname">Vă rugăm să introduceți numele de familie.</string>
+    <string name="error_enter_userlastname">Introduceți numele dvs. de familie</string>
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Parolele nu coincid</string>
     <!-- when creating the account -->
@@ -395,19 +395,19 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Eroare. Folderul nu a fost creat</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Redenumit</string>
+    <string name="context_correctly_renamed">Elementul a fost redenumit</string>
     <!-- error message -->
     <string name="context_no_renamed">Eroare. Nu a fost redenumit</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Copiat</string>
+    <string name="context_correctly_copied">Elementul a fost copiat</string>
     <!-- error message -->
     <string name="context_no_copied">Eroare. Nu a fost copiat</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
-    <string name="context_no_destination_folder">Te rugăm să selectezi un folder de destinație</string>
+    <string name="context_no_destination_folder">Alegeți un folder de destinație</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Mutat</string>
+    <string name="context_correctly_moved">Elementul a fost mutat</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Mutat în Coșul de gunoi</string>
+    <string name="context_correctly_moved_to_rubbish">Elementul a fost mutat în Coșul de gunoi</string>
     <!-- error message -->
     <string name="context_no_moved">Eroare. Nu a fost mutat</string>
     <!-- success message when sharing a folder -->
@@ -415,7 +415,7 @@
     <!-- error message -->
     <string name="context_no_removed_shared">Eroare. Partajarea a eșuat să fie eliminată</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Șters</string>
+    <string name="context_correctly_removed">Elementul a fost șters</string>
     <!-- error message -->
     <string name="context_no_removed">Eroare. Ștergerea a eșuat</string>
     <!-- success message when sending multiple files -->
@@ -427,7 +427,7 @@
     <!-- error message when emptying the RB -->
     <string name="rubbish_bin_no_emptied">A apărut o eroare. Coșul de gunoi nu a fost golit</string>
     <!-- dialog cancel subscriptions -->
-    <string name="dialog_cancel_subscriptions">Ești pe cale să anulezi abonamentul MEGA. Te rugăm să ne spui dacă există ceva ce putem face pentru a te răzgândi.</string>
+    <string name="dialog_cancel_subscriptions">Sunteți pe cale să vă anulați abonamentul MEGA. Vă rugăm să ne anunțați dacă putem face ceva pentru a vă ajuta să vă răzgândiți.</string>
     <!-- hint cancel subscriptions dialog -->
     <string name="hint_cancel_subscriptions">Tastează feedbackul aici</string>
     <!-- send cancel subscriptions dialog -->
@@ -435,7 +435,7 @@
     <!-- confirmation cancel subscriptions dialog -->
     <string name="confirmation_cancel_subscriptions">Îți mulțumim pentru feedback. Sigur vrei să anulezi abonamentul MEGA?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
-    <string name="reason_cancel_subscriptions">Abonamentul tău nu a fost anulat. Te rugăm să oferi un motiv pentru anulare</string>
+    <string name="reason_cancel_subscriptions">Abonamentul dvs. nu a fost anulat. Oferiți un motiv pentru anulare</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Noul tău abonament se va aplica odată ce cel actual expiră, noul preț va fi perceput la acel moment.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -453,7 +453,7 @@
     <!-- Title of the alert to introduce the decryption key -->
     <string name="alert_decryption_key">Cheie de decriptare</string>
     <!-- Message of the alert to introduce the decryption key -->
-    <string name="message_decryption_key">Vă rugăm să introduceți cheia de decriptare pentru link</string>
+    <string name="message_decryption_key">Introduceți cheia de decriptare pentru link</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
     <string name="invalid_decryption_key">Cheie de decriptare nevalidă</string>
     <!-- upload to. Then choose an Audio file -->
@@ -467,7 +467,7 @@
         <item quantity="other">Se procesează fișierele</item>
     </plurals>
     <!-- error message when downloading a file -->
-    <string name="error_temporary_unavaible">Resursă temporar indisponibilă, te rugăm să reîncerci mai târziu</string>
+    <string name="error_temporary_unavaible">Resursa nu este disponibilă temporar, încercați din nou mai târziu</string>
     <!-- Error message when the selected file cannot be opened -->
     <string name="upload_can_not_open">Nu se poate deschide fișierul selectat</string>
     <!-- when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file -->
@@ -491,7 +491,7 @@
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">Link copiat în clipboard</string>
     <!-- alert when clicking a newsignup link being logged -->
-    <string name="log_out_warning">Te rugăm să te deconectezi înainte de a crea contul</string>
+    <string name="log_out_warning">Deconectați-vă înainte de a crea contul</string>
     <!-- menu item -->
     <string name="menu_pause_transfers">Pune pe pauză transferurile</string>
     <!-- menu item -->
@@ -525,9 +525,9 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Opțiuni pentru codul de acces</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">Comprimarea video folosește cantități considerabile de energie. Te rugăm să conectezi dispozitivul la priză pentru încărcare dacă videoclipurile care urmează să fie comprimate sunt mai mari de %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">Comprimarea video folosește cantități considerabile de electricitate. Conectați dispozitivul la priză pentru încărcare dacă videoclipurile care urmează să fie comprimate sunt mai mari de %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">Dacă opțiunea este activată, informațiile privind locația vor fi incluse în fotografii. Te rugăm să fii atent(ă) atunci când le partajezi.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">Dacă este activată, informațiile despre locație vor fi incluse în imaginile dvs. Vă rugăm să aveți grijă când le împărtășiți.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">Avansat</string>
     <!-- Settings preference title for cache -->
@@ -549,7 +549,7 @@
     <!-- enter verification code page title -->
     <string name="verify_account_title">Verifică-ți contul</string>
     <!-- Text to explain to user why to verify phone number (account suspended use case) -->
-    <string name="verify_account_helper_locked">Contul tău a fost blocat temporar din cauza unor posibile abuzuri. Te rugăm să verifici numărul de telefon pentru a-ți debloca contul.</string>
+    <string name="verify_account_helper_locked">Contul dvs. a fost blocat temporar din cauza unui potențial abuz. Vă rugăm să vă confirmați numărul de telefon pentru a vă debloca contul.</string>
     <!-- Hint text of the region edittext for choosing dial code. -->
     <string name="sms_region_label">Regiune</string>
     <!-- place holder for enter mobile number field -->
@@ -561,15 +561,15 @@
     <!-- Button label - confirm some action -->
     <string name="general_confirm_button">Confirmă</string>
     <!-- On “add phone number” page, an error message will be shown if user click next button without select country code. -->
-    <string name="verify_account_invalid_country_code">Te rugăm să selectezi un cod al unei regiuni</string>
+    <string name="verify_account_invalid_country_code">Vă rugăm să selectați un cod de regiune</string>
     <!-- error message if user click next button without enter a valid phone number -->
-    <string name="verify_account_invalid_phone_number">Te rugăm să furnizezi un număr de telefon valid.</string>
+    <string name="verify_account_invalid_phone_number">Vă rugăm să furnizați un număr de telefon valid.</string>
     <!-- Label tell user to enter received txt to below input boxes -->
     <string name="verify_account_enter_txt_label">Vă rugăm să introduceți codul de verificare trimis către</string>
     <!-- enter verification code page title -->
     <string name="verify_account_enter_code_title">Verifică-ți contul</string>
     <!-- error message that will show to user when user entered invalid verification code -->
-    <string name="verify_account_incorrect_code">Cod greșit. Te rugăm să încerci din nou sau să retrimiți.</string>
+    <string name="verify_account_incorrect_code">Cod greșit. Vă rugăm să încercați din nou sau să retrimiteți.</string>
     <!-- text message to remind user to resend verification code -->
     <string name="verify_account_resend_label">Nu ai primit codul?</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
@@ -583,7 +583,7 @@
     <!-- error message that will show to user when code has been verified -->
     <string name="verify_account_error_code_verified">Codul a fost verificat</string>
     <!-- error message that will show to user when user entered invalid verification code -->
-    <string name="verify_account_error_invalid_code">Cod greșit. Te rugăm să încerci din nou sau să retrimiți.</string>
+    <string name="verify_account_error_invalid_code">Cod greșit. Vă rugăm să încercați din nou sau să retrimiteți.</string>
     <!-- verify phone number successfully -->
     <string name="verify_account_successfully">Numărul tău de telefon a fost verificat</string>
     <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
@@ -722,7 +722,7 @@
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">Deschide locația</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
-    <string name="servers_busy">Acest proces durează mai mult decât era de așteptat. Te rugăm să aștepți.</string>
+    <string name="servers_busy">Acest proces durează mai mult decât se aștepta. Vă rugăm să așteptați.</string>
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">Cont gratuit</string>
     <!-- Label in My Account section to show user account type -->
@@ -766,13 +766,13 @@
     <!-- Title of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_title">Verificarea adresei de e-mail</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_text">Te rugăm să verifici e-mailul pentru a continua.</string>
+    <string name="email_verification_text">Vă rugăm să verificați adresa de e-mail pentru a continua.</string>
     <!-- Text to inform the user when an error occurs -->
-    <string name="general_text_error">A apărut o eroare, te rugăm să încerci din nou.</string>
+    <string name="general_text_error">A apărut o eroare, încercați din nou.</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">Trebuie să fii autentificat(ă) pentru a efectua această acțiune.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->
-    <string name="change_email_not_logged_in">Trebuie să fii autentificat(ă) pentru a finaliza modificarea e-mailului. Te rugăm să te autentifici din nou cu adresa de e-mail actuală și apoi atinge linkul de confirmare din nou.</string>
+    <string name="change_email_not_logged_in">Trebuie să fiți autentificat pentru a finaliza modificarea e-mailului. Vă rugăm să vă conectați din nou cu adresa dvs. de e-mail curentă, apoi atingeți din nou linkul de confirmare.</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">Felicitări, noua adresă de e-mail pentru acest cont MEGA este: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
@@ -790,11 +790,11 @@
     <!-- Button to park an account -->
     <string name="park_account_button">Parchează</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">Acesta este ultimul pas pentru a vă parca contul, vă rugăm să introduceți noua parolă. Datele dvs. vor fi păstrate timp de cel puțin 60 de zile. Dacă vă amintiți parola contului dvs. parcat, vă rugăm să contactați support&#64;mega.nz</string>
+    <string name="park_account_text_last_step">Acesta este ultimul pas pentru a vă parca contul, vă rugăm să introduceți noua parolă. Datele dvs. vor fi păstrate timp de cel puțin 60 de zile. Dacă vă amintiți parola contului parcat, vă rugăm să contactați support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">Introduceți o parolă nouă</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
-    <string name="recovery_link_expired">Acest link de recuperare a expirat, te rugăm să încerci din nou.</string>
+    <string name="recovery_link_expired">Acest link de recuperare a expirat, încercați din nou.</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
     <string name="text_reset_pass_logged_in">Cheia de recuperare va fi utilizată pentru a vă reseta parola. Vă rugăm să introduceți noua parolă.</string>
     <!-- Button to upgrade the account to PRO account in My Account Section -->
@@ -804,7 +804,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Crește-ți capacitatea în cloud.[A]Obține cote mai mari de spațiu de stocare și de transfer cu un cont Pro.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">Această adresă de e-mail este deja în uz. Te rugăm să folosești o altă adresă de e-mail.</string>
+    <string name="mail_already_used">Această adresă de e-mail este deja folosită. Vă rugăm să folosiți o altă adresă de e-mail.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
     <string name="mail_changed_confirm_requested">Ați solicitat deja un link de confirmare pentru acea adresă de e-mail.</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
@@ -820,13 +820,13 @@
     <!-- Option of the sliding panel to delete the existing avatar -->
     <string name="delete_avatar_panel">Șterge poza</string>
     <!-- Alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK">Cheia furnizată nu corespunde acestui cont. Te rugăm să te asiguri că folosești cheia de recuperare corectă și să încerci din nou.</string>
+    <string name="incorrect_MK">Cheia pe care ați furnizat-o nu se potrivește cu acest cont. Asigurați-vă că folosiți cheia de recuperare corectă și încercați din nou.</string>
     <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
     <string name="incorrect_MK_title">Cheie de recuperare nevalidă</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Se obțin informații&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
-    <string name="email_verification_text_change_mail">Adresa ta nouă de e-mail trebuie să fie validată. Te rugăm să verifici e-mailul pentru a continua.</string>
+    <string name="email_verification_text_change_mail">Noua dvs. adresă de e-mail trebuie validată. Vă rugăm să verificați adresa de e-mail pentru a continua.</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
     <string name="confirmation_delete_avatar">Îți ștergi poza de profil?</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
@@ -850,13 +850,13 @@
         <item quantity="other">Folderul este partajat cu %1$d de contacte. Elimini toate partajările?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
-    <string name="error_incorrect_email_or_password">E-mail sau parolă nevalide. Te rugăm să încerci din nou.</string>
+    <string name="error_incorrect_email_or_password">Adresă de e-mail sau parolă nevalide. Vă rugăm să încercați din nou.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Contul tău a fost suspendat din cauza încălcărilor Termenilor de utilizare a serviciului. Te rugăm să contactezi support&#64;mega.nz</string>
+    <string name="error_account_suspended">Contul dvs. a fost suspendat din cauza încălcărilor Termenii de utilizare a serviciului. Va rugam sa contactati support&#64;mega.nz</string>
     <!-- Error message when to many attempts to login. -->
-    <string name="too_many_attempts_login">Prea multe încercări eșuate de autentificare, te rugăm să aștepți o oră.</string>
+    <string name="too_many_attempts_login">Prea multe încercări eșuate de autentificare, vă rugăm să așteptați o oră.</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">Acest cont nu a fost validat încă. Te rugăm să îți verifici e-mailul.</string>
+    <string name="account_not_validated_login">Acest cont nu a fost încă validat. Vă rugăm să verificați adresa de e-mail.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Linkul folderului indisponibil</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
@@ -870,7 +870,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">În așteptarea confirmării e-mailului</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Te rugăm să verifici e-mailul și să atingi linkul pentru a confirma contul.</string>
+    <string name="confirm_email_explanation">Vă rugăm să verificați adresa de e-mail și să atingeți linkul pentru a vă confirma contul.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">%1$d element</item>
@@ -990,9 +990,9 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_confidentiality_empty_screen">Confidențialitate</string>
     <!-- Error message shown when opening a cancel link with an account that not corresponds to the link -->
-    <string name="error_not_logged_with_correct_account">Acest link nu are legătură cu acest cont. Te rugăm să te autentifici cu contul corect.</string>
+    <string name="error_not_logged_with_correct_account">Acest link nu are legătură cu acest cont. Vă rugăm să vă conectați cu contul corect.</string>
     <!-- Message when the user tries to open a cancel link and it has expired -->
-    <string name="cancel_link_expired">Acest link de anulare a expirat, te rugăm să încerci din nou.</string>
+    <string name="cancel_link_expired">Acest link de anulare a expirat, încercați din nou.</string>
     <!-- Text shown after searching and no results found -->
     <string name="no_results_found">Niciun rezultat nu a fost găsit</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
@@ -1092,7 +1092,7 @@
         <item quantity="other">%1$d de contacte</item>
     </plurals>
     <!-- Message shown when the folder sharing process fails -->
-    <string name="error_sharing_folder">Eroare la partajarea folderului. Te rugăm să încerci din nou.</string>
+    <string name="error_sharing_folder">Eroare la partajarea folderului. Vă rugăm să încercați din nou.</string>
     <!-- confirmation message before removing a contact, Plural -->
     <plurals name="confirmation_remove_contact">
         <item quantity="one">Toate datele asociate cu contactul selectat vor fi pierdute definitiv.</item>
@@ -1263,7 +1263,7 @@
     <!-- Menu option -->
     <string name="general_view">Vezi fișierele</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="add_to_cloud">Importă</string>
+    <string name="add_to_cloud">Adaugă în Unitatea cloud</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Adaugă în Unitatea cloud</string>
     <!-- Menu option -->
@@ -1294,15 +1294,15 @@
     <string name="download_show_info">Afișează informații</string>
     <!-- Error message when removing public links of nodes. Plural. -->
     <plurals name="context_link_removal_error">
-        <item quantity="one">Eliminarea linkului a eșuat. Te rugăm să încerci din nou mai târziu.</item>
-        <item quantity="few">Eșec la eliminarea unor linkuri. Te rugăm să încerci din nou mai târziu.</item>
-        <item quantity="other">Eșec la eliminarea unor linkuri. Te rugăm să încerci din nou mai târziu.</item>
+        <item quantity="one">Eliminarea legăturii a eșuat. Vă rugăm să încercați din nou mai târziu.</item>
+        <item quantity="few">Nu am reușit să eliminați unele linkuri. Vă rugăm să încercați din nou mai târziu.</item>
+        <item quantity="other">Nu am reușit să eliminați unele linkuri. Vă rugăm să încercați din nou mai târziu.</item>
     </plurals>
     <!-- Error message when creating public links of nodes. Plural. -->
     <plurals name="context_link_export_error">
-        <item quantity="one">Crearea linkului a eșuat. Te rugăm să încerci din nou mai târziu.</item>
-        <item quantity="few">Eșec la crearea unor linkuri. Te rugăm să încerci din nou mai târziu.</item>
-        <item quantity="other">Eșec la crearea unor linkuri. Te rugăm să încerci din nou mai târziu.</item>
+        <item quantity="one">Crearea legăturilor a eșuat. Vă rugăm să încercați din nou mai târziu.</item>
+        <item quantity="few">Nu s-a reușit crearea unor legături. Vă rugăm să încercați din nou mai târziu.</item>
+        <item quantity="other">Nu s-a reușit crearea unor legături. Vă rugăm să încercați din nou mai târziu.</item>
     </plurals>
     <!-- Message when some public links were removed successfully. Plural. -->
     <plurals name="context_link_removal_success">
@@ -1485,7 +1485,7 @@
     <!-- mail subject -->
     <string name="setting_feedback_subject">Feedback pentru Android</string>
     <!-- mail body -->
-    <string name="setting_feedback_body">Te rugăm să furnizezi feedbackul aici:</string>
+    <string name="setting_feedback_body">Vă rugăm să furnizați feedback-ul dvs. aici:</string>
     <!-- mail body -->
     <string name="settings_feedback_body_device_model">Modelul dispozitivului</string>
     <!-- mail body -->
@@ -1507,7 +1507,7 @@
     <!-- Error shown when the user left a name empty -->
     <string name="empty_name">Nume nevalid</string>
     <!-- Error shown when the user left names empty and names typed with not allowed characters -->
-    <string name="general_incorrect_names">Te rugăm să corectezi numele fișierelor înainte de a continua</string>
+    <string name="general_incorrect_names">Vă rugăm să corectați numele fișierelor înainte de a continua</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Caractere nevalide</string>
     <!-- Error message when the user writes a character not allowed for naming a file or folder -->
@@ -1539,7 +1539,7 @@
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
     <string name="download_requires_permission">MEGA are nevoie de permisiuni de citire și scriere în spațiul de stocare extern pentru a descărca fișierele acolo.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
-    <string name="old_sdcard_unavailable">Cardul SD vechi este indisponibil, te rugăm să setezi o nouă locație de descărcare.</string>
+    <string name="old_sdcard_unavailable">Vechiul card SD nu este disponibil, vă rugăm să setați o nouă locație de descărcare.</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">Nu au fost acordate permisiunile pentru contacte</string>
     <!-- Option of the sliding panel to go to QR code section -->
@@ -1567,9 +1567,9 @@
     <!-- Text shown when it has been deleted the QR code successfully -->
     <string name="qrcode_delete_successfully">Codul QR a fost șters</string>
     <!-- Text shown when it has not been reseted the QR code successfully -->
-    <string name="qrcode_reset_not_successfully">Codul QR nu a fost resetat din cauza unei erori. Te rugăm să încerci din nou.</string>
+    <string name="qrcode_reset_not_successfully">Codul QR nu este resetat din cauza unei erori. Vă rugăm să încercați din nou.</string>
     <!-- Text shown when it has not been delete the QR code successfully -->
-    <string name="qrcode_delete_not_successfully">Codul QR nu a fost șters din cauza unei erori. Te rugăm să încerci din nou.</string>
+    <string name="qrcode_delete_not_successfully">Codul QR nu a fost șters din cauza unei erori. Vă rugăm să încercați din nou.</string>
     <!-- Title of dialog shown when a contact request has been sent with QR code -->
     <string name="invite_sent">Invitația a fost trimisă</string>
     <!-- Text of dialog shown when a contact request has been sent. -->
@@ -1577,17 +1577,17 @@
     <!-- Text of dialog shown when multiple contacts request has been sent -->
     <string name="invite_sent_text_multi">Utilizatorii au fost invitați și vor apărea în lista de contacte de îndată ce au acceptat invitația.</string>
     <!-- Text shown when it tries to share the QR and occurs an error to process the action -->
-    <string name="error_share_qr">A apărut o eroare la încercarea de partajare a fișierului QR. Poate fișierul nu există. Te rugăm să încerci din nou mai târziu.</string>
+    <string name="error_share_qr">A apărut o eroare la încercarea de a partajează fișierul QR. Poate că fișierul nu există. Vă rugăm să încercați din nou mai târziu.</string>
     <!-- Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action -->
-    <string name="error_upload_qr">A apărut o eroare la încercarea de încărcare a fișierului QR. Poate fișierul nu există. Te rugăm să încerci din nou mai târziu.</string>
+    <string name="error_upload_qr">A apărut o eroare la încercarea de a încărca fișierul QR. Poate că fișierul nu există. Vă rugăm să încercați din nou mai târziu.</string>
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
-    <string name="error_download_qr">A apărut o eroare la încercarea de descărcare a fișierului QR. Poate fișierul nu există. Te rugăm să încerci din nou mai târziu.</string>
+    <string name="error_download_qr">A apărut o eroare la încercarea de a descărca fișierul QR. Poate că fișierul nu există. Vă rugăm să încercați din nou mai târziu.</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
     <string name="success_download_qr">Codul QR a fost descărcat în %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">Invitația nu a fost trimisă</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent_text">Codul QR sau linkul de contact este nevalid. Te rugăm să încerci să scanezi un cod valid sau să deschizi un link valid.</string>
+    <string name="invite_not_sent_text">Codul QR sau link-ul de contact nu sunt valide. Încercați să digitați un cod valid sau să deschideți un link valid.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">Invitația nu a fost trimisă. %s este deja în lista de contacte.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
@@ -1601,7 +1601,7 @@
     <!-- Create QR code -->
     <string name="button_create_qr">Creează cod QR</string>
     <!-- Text shown in QR code scan fragment to help and guide the user in the action -->
-    <string name="qrcode_scan_help">Aliniază codul QR pentru a-l scana cu camera dispozitivului</string>
+    <string name="qrcode_scan_help">Aliniați codul QR pentru a-l digitaliza cu camera dispozitivului dvs.</string>
     <!-- positive button on dialog to view a contact -->
     <string name="contact_view">Vezi</string>
     <!-- Item menu option to reproduce audio or video in external reproductors -->
@@ -1631,7 +1631,7 @@
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">Cotă de stocare depășită</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Link nevalid, te rugăm să ceri un nou link valid</string>
+    <string name="invalid_link">Link nevalid, vă rugăm să solicitați un nou link valid</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
     <string name="invalid_link_password">Parolă nevalidă a linkului</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
@@ -1643,9 +1643,9 @@
     <!-- Message shown when it is creating an acount and it is been introduced a medium password -->
     <string name="passwd_medium">Parola ta este suficientă de bună pentru a continua, dar este recomandat să o faci mai puternică parola pe viitor.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a good password -->
-    <string name="passwd_good">Această parolă va rezista în fața celor mai tipice atacuri de tip „brute-force”. Te rugăm să te asiguri că o vei reține.</string>
+    <string name="passwd_good">Această parolă va rezista la majoritatea atacurilor tipice de forță brută. Vă rugăm să vă asigurați că vă veți aminti acest lucru.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a strong password -->
-    <string name="passwd_strong">Această parolă va rezista în fața celor mai sofisticate atacuri de tip „brute-force”. Te rugăm să te asiguri că o vei reține.</string>
+    <string name="passwd_strong">Această parolă va rezista celor mai sofisticate atacuri de forță brută. Vă rugăm să vă asigurați că vă veți aminti acest lucru.</string>
     <!-- Password very weak -->
     <string name="pass_very_weak">Foarte slabă</string>
     <!-- Password weak -->
@@ -1721,7 +1721,7 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Calitate video</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">Încărcări cameră are nevoie să îți acceseze fotografiile și alte tipuri media de pe dispozitiv. Te rugăm să mergi la pagina de setări și să acorzi permisiunea.</string>
+    <string name="on_refuse_storage_permission">Încărcări camere trebuie să acceseze fotografiile și alte suporturi media de pe dispozitiv. Accesați pagina de setări și acordați permisiunea.</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>Scăzută</item>
@@ -1784,9 +1784,9 @@
     <!-- Title of the dialog ‘Do you remember your password?’ -->
     <string name="remember_pwd_dialog_title">Îți mai aduci aminte parola?</string>
     <!-- Text of the dialog ‘Recovery Key exported’ when the user wants logout -->
-    <string name="remember_pwd_dialog_text_logout">Ești pe cale să te deconectezi, te rugăm să testezi parola pentru a te asigura că ți-o aduci aminte.\nDacă îți pierzi parola, vei pierde accesul la datele tale MEGA.</string>
+    <string name="remember_pwd_dialog_text_logout">Sunteți pe cale să vă deconectați, vă rugăm să testați parola pentru a vă asigura că o amintiți.\nDacă vă pierdeți parola, veți pierde accesul la datele MEGA.</string>
     <!-- Text of the dialog ‘Do you remember your password?’ -->
-    <string name="remember_pwd_dialog_text">Te rugăm să îți testezi parola pentru a te asigura că ți-o aduci aminte. Dacă îți pierzi parola, vei pierde accesul la datele tale MEGA.</string>
+    <string name="remember_pwd_dialog_text">Vă rugăm să testați parola pentru a vă asigura că o amintiți. Dacă vă pierdeți parola, veți pierde accesul la datele MEGA.</string>
     <!-- Dialog option that permits user do not show it again -->
     <string name="general_do_not_show">Nu afișa din nou</string>
     <!-- Button of the dialog ‘Do you remember your password?’ that permits user test his password -->
@@ -1820,15 +1820,15 @@
     <!-- Summary of the preference Recovery key on Settings section -->
     <string name="settings_recovery_key_summary">Exportarea cheii de recuperare și păstrarea ei într-o locație securizată îți dă posibilitatea să setezi o parolă nouă fără pierderea datelor.</string>
     <!-- message when a temporary error on logging in is due to connectivity issues -->
-    <string name="login_connectivity_issues">Nu se poate accesa MEGA. Te rugăm să verifici conectivitatea sau încearcă din nou mai târziu.</string>
+    <string name="login_connectivity_issues">Nu am putut ajunge la MEGA. Vă rugăm să verificați conectivitatea sau să încercați din nou mai târziu.</string>
     <!-- message when a temporary error on logging in is due to servers busy -->
-    <string name="login_servers_busy">Serverele sunt prea ocupate. Te rugăm să aștepți.</string>
+    <string name="login_servers_busy">Serverele sunt prea ocupate. Vă rugăm să așteptați.</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
-    <string name="login_API_lock">Procesul durează mai mult decât era de așteptat. Te rugăm să aștepți&#8230;</string>
+    <string name="login_API_lock">Acest proces durează mai mult decât se aștepta. Vă rugăm să așteptați.</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit -->
-    <string name="login_API_rate">Prea multe cereri. Te rugăm să aștepți.</string>
+    <string name="login_API_rate">Prea multe cereri. Vă rugăm să așteptați.</string>
     <!-- Message when previous login is being cancelled -->
-    <string name="login_in_progress">Se anulează procesul de autentificare. Te rugăm să aștepți&#8230;</string>
+    <string name="login_in_progress">Anularea procesului de conectare. Vă rugăm să așteptați&#8230;</string>
     <!-- when open audio video player, the file that it try to open is damaged or does not exist -->
     <string name="corrupt_video_dialog_text">Eroare. Fișierul este corupt sau nu există.</string>
     <!-- Menu option to print the recovery key from Offline section -->
@@ -1886,17 +1886,17 @@
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
     <string name="explain_qr_seed_2fa_2">Asigură-te că faci backupul acestei sămânțe într-un loc sigur în cazul în care îți pierzi aparatul.</string>
     <!-- Text that explain how to confirm Two-Factor Authentication -->
-    <string name="explain_confirm_2fa">Vă rugăm să introduceți codul de 6 cifre generat de aplicația dvs. de autentificare.</string>
+    <string name="explain_confirm_2fa">Vă rugăm să introduceți codul din 6 cifre generat de aplicația dvs. de autentificare.</string>
     <!-- Text button -->
     <string name="general_next">Înainte</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
-    <string name="qr_seed_text_error">A apărut o eroare la generarea sămânței sau a codului QR, te rugăm să încerci din nou.</string>
+    <string name="qr_seed_text_error">A apărut o eroare la generarea codului de semințe sau QR, încercați din nou.</string>
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="title_2fa_enabled">Autentificarea cu doi factori activată</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Data viitoare când vă conectați la contul dvs., vi se va cere să introduceți un cod de 6 cifre furnizat de aplicația dvs. de autentificare.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Te rugăm să salvezi <b>cheia de recuperare</b> într-o locație sigură, pentru a evita problemele în cazul în care pierzi accesul la aplicație sau vrei să dezactivezi autentificarea cu doi factori.</string>
+    <string name="recommendation_2fa_enabled">Vă rugăm să salvați <b>cheie de recuperare</b> într-o locație sigură, pentru a evita problemele în cazul în care pierdeți accesul la aplicația dvs. sau dacă doriți să dezactivați autentificarea cu doi factori.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Cod nevalid</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -1912,9 +1912,9 @@
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
     <string name="verify_2fa_subtitle_diable_2fa">Dezactivează</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
-    <string name="error_disable_2fa">A apărut o eroare la încercarea de a dezactiva autentificarea cu doi factori. Te rugăm să încerci din nou.</string>
+    <string name="error_disable_2fa">A apărut o eroare la încercarea de a dezactiva autentificarea cu doi factori. Vă rugăm să încercați din nou.</string>
     <!-- When the user tries to enable Two-Factor Authentication and some error ocurr in the process -->
-    <string name="error_enable_2fa">A apărut o eroare la încercarea de a activa autentificarea cu doi factori. Te rugăm să încerci din nou.</string>
+    <string name="error_enable_2fa">A apărut o eroare la încercarea de a activa autentificarea cu doi factori. Vă rugăm să încercați din nou.</string>
     <!-- Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication -->
     <string name="title_enable_2fa">Activează autentificarea cu doi factori</string>
     <!-- Label shown when it disables the Two-Factor Authentication -->
@@ -1942,7 +1942,7 @@
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">Nu se poate deschide fișierul.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
-    <string name="error_fail_to_open_file_no_network">Nicio conexiune la rețea. Te rugăm să te reconectezi pentru a deschide fișierul.</string>
+    <string name="error_fail_to_open_file_no_network">Fără conexiune la rețea. Vă rugăm să vă reconectați pentru a deschide fișierul.</string>
     <!-- message when trying to save for offline a file that already exists -->
     <string name="file_already_exists">Fișier deja disponibil Offline</string>
     <!-- Error message if forwarding a message failed, many messages -->
@@ -2038,11 +2038,11 @@
     <!-- subtitle of the option in Settings to delete all the versions of the account -->
     <string name="settings_file_management_subtitle_delete_versions">Toate fișierele actuale vor rămâne. Doar versiunile istorice ale fișierelor vor fi șterse.</string>
     <!-- Text of the dialog to delete all the file versions of the account -->
-    <string name="text_confirmation_dialog_delete_versions">Ești pe cale să ștergi istoricul versiunilor tuturor fișierelor. Orice versiune a vreunui fișier partajat ție de la un contact trebuie să fie șters de către acesta.\n\nTe rugăm să reții că fișierele actuale nu vor fi șterse.</string>
+    <string name="text_confirmation_dialog_delete_versions">Sunteți pe cale să ștergeți istoricul versiunilor tuturor fișierelor. Orice versiune de fișier partajată de la un contact va trebui să fie ștearsă de acesta.\n\nRețineți că fișierele curente nu vor fi șterse.</string>
     <!-- success message when deleting all the versions of the account -->
     <string name="success_delete_versions">Versiunile fișierelor au fost șterse</string>
     <!-- error message when deleting all the versions of the account -->
-    <string name="error_delete_versions">A apărut o eroare la încercarea de ștergere a tuturor versiunilor anterioare ale fișierelor, te rugăm să încerci din nou mai târziu.</string>
+    <string name="error_delete_versions">A apărut o eroare la încercarea de a șterge toate versiunile anterioare ale fișierelor dvs., încercați din nou mai târziu.</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_title">Versionarea fișierelor</string>
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
@@ -2064,7 +2064,7 @@
     <!-- Title of the alert when the account have been logged out from another client -->
     <string name="title_alert_logged_out">Deconectat</string>
     <!-- Text shown to indicate user that his account has already been confirmed -->
-    <string name="account_confirmed">Contul tău a fost activat. Te rugăm să te autentifici.</string>
+    <string name="account_confirmed">Contul dvs. a fost activat. Vă rugăm să vă autentificați.</string>
     <!-- Error shown if a user tries to add their own email address as a contact -->
     <string name="error_own_email_as_contact">Nu este nevoie să adaugi adresa de e-mail proprie</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
@@ -2074,13 +2074,13 @@
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
     <string name="text_almost_full_warning_pro_account">Unitatea cloud este aproape plină. Upgradează acum și obține până la %1$s spațiu de stocare și %2$s cotă de transfer.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
-    <string name="text_almost_full_warning_pro3_account">Unitatea cloud este aproape plină. Dacă ai nevoie de mai mult spațiu de stocare, te rugăm să contactezi asistența MEGA pentru a obține un plan personalizat.</string>
+    <string name="text_almost_full_warning_pro3_account">Unitatea cloud este aproape plină. Dacă aveți nevoie de mai mult spațiu de stocare, vă rugăm să contactați asistența MEGA pentru a obține un plan personalizat.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
     <string name="text_storage_full_warning">Unitatea cloud este plină. Upgradează la Pro și obține până la %1$s spațiu de stocare și %2$s cotă de transfer.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
     <string name="text_storage_full_warning_pro_account">Unitatea cloud este plină. Upgradează acum și obține până la %1$s spațiu de stocare și %2$s cotă de transfer.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
-    <string name="text_storage_full_warning_pro3_account">Unitatea cloud este plină. Dacă ai nevoie de mai mult spațiu de stocare, te rugăm să contactezi asistența MEGA pentru a obține un plan personalizat.</string>
+    <string name="text_storage_full_warning_pro3_account">Unitatea cloud este plină. Dacă aveți nevoie de mai mult spațiu de stocare, vă rugăm să contactați asistența MEGA pentru a obține un plan personalizat.</string>
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->
     <string name="button_plans_almost_full_warning">Vezi planurile</string>
     <!-- Button of the dialog shown when the storage is almost full to custom a plan -->
@@ -2144,7 +2144,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Dacă videoclipurile spre comprimare sunt mai mari de</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">Pentru a dezactiva planificatorul de golire a Coșului de gunoi sau pentru a seta o perioadă de păstrare mai lungă, te rugăm să te abonezi la un plan Pro.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Pentru a dezactiva Planificatorul de golire a Coșului de gunoi sau pentru a seta o perioadă mai lungă de păstrare, vă rugăm să vă abonați la un plan Pro.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">zile</string>
     <!-- Title of the option to generate a public chat link -->
@@ -2296,7 +2296,7 @@
     <!-- Capital letters. Text of the label of a new historic notifications -->
     <string name="new_label_notification_item">Nou</string>
     <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
-    <string name="label_custom_plan">Pentru a upgrada abonamentul actual, te rugăm să contactezi echipa noastră de asistență pentru un [A]plan personalizat[/A].</string>
+    <string name="label_custom_plan">Pentru a vă actualiza abonamentul curent, vă rugăm să contactați echipa noastră de asistență pentru un [A]plan personalizat[/A].</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">numele fișierului</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
@@ -2310,7 +2310,7 @@
     <!-- the title of the notification that displays when compression larger than setting -->
     <string name="title_compression_size_over_limit">Dimensiunea comprimării video este prea mare</string>
     <!-- the content message of the notification that displays when compression larger than setting, placeholder: size in MB -->
-    <string name="message_compression_size_over_limit">Dimensiunea totală a videoclipurilor care urmează să fie comprimate depășește %s, te rugăm să pui dispozitivul la încărcare pentru a continua.</string>
+    <string name="message_compression_size_over_limit">Dimensiunea totală a videoclipurilor de comprimat depășește %s, vă rugăm să puneți dispozitivul la taxarea pentru a continua.</string>
     <!-- Message displayed when the user changes the ‘Keep file names as in the device’ setting -->
     <string name="message_keep_device_name">Această setare se va aplica data viitoare când rulează Încărcări cameră</string>
     <!-- Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime. -->
@@ -2386,13 +2386,13 @@
     <!-- Permissions screen explanation -->
     <string name="setup_mega_explanation">MEGA are nevoie de permisiunea dvs. pentru a vă accesa media și fișierele pentru partajare. Pot fi necesare alte permisiuni de acces pentru a folosi funcțiile și serviciile pe care le oferă această aplicație.</string>
     <!-- Title of the screen asking permissions for files -->
-    <string name="allow_acces_media_title">Permite accesul la fotografii, conținut media și fișiere</string>
+    <string name="allow_acces_media_title">Permiteți accesul la fotografii, media și fișiere</string>
     <!-- Subtitle of the screen asking permissions for files -->
     <string name="allow_acces_media_subtitle">MEGA are nevoie de permisiunea ta ca să acceseze fișierele pentru partajare.</string>
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">Activează camera</string>
     <!-- Subtitle of the screen asking permissions for camera -->
-    <string name="allow_acces_camera_subtitle">Permite accesul la cameră pentru a scana documente, a realiza fotografii și a efectua apeluri video.</string>
+    <string name="allow_acces_camera_subtitle">Permiteți accesul la camera dvs. pentru a digitaliza documente, a face fotografii și a efectua apeluri video.</string>
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Activează apelurile</string>
     <!-- Title of the screen asking permissions for contacts -->
@@ -2402,7 +2402,7 @@
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
     <string name="allow_access_contact_explanation">MEGA nu va folosi aceste date în alt scop și nu va interacționa niciodată cu contactele tale fără consimțământul tău.</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
-    <string name="allow_acces_calls_subtitle_microphone">Permite accesul la microfon pentru a efectua apeluri criptate.</string>
+    <string name="allow_acces_calls_subtitle_microphone">Permiteți accesul la microfon pentru a efectua apeluri criptate.</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">Fișiere partajate</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
@@ -2514,7 +2514,7 @@
     <!-- Title of the dialog shown when it wants to delete the version history of a file -->
     <string name="title_delete_version_history">Ștergi versiunile anterioare?</string>
     <!-- Text of the dialog shown when it wants to delete the version history of a file -->
-    <string name="text_delete_version_history">Te rugăm să reții că fișierul actual nu va fi șters.</string>
+    <string name="text_delete_version_history">Rețineți că fișierul curent nu va fi șters.</string>
     <!-- Alert shown when the version history was deleted correctly -->
     <string name="version_history_deleted">Versiunile anterioare au fost șterse.</string>
     <!-- Alert shown when the version history was deleted erroneously -->
@@ -2532,7 +2532,7 @@
         <item quantity="other">%d de versiuni nu au fost șterse</item>
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
-    <string name="no_contacts_invite">Nu ai contacte MEGA. Te rugăm să inviți prieteni din secțiunea Contacte.</string>
+    <string name="no_contacts_invite">Nu aveți contacte MEGA. Vă rugăm să invitați prieteni din secțiunea Contacte.</string>
     <!-- Invite button for chat top cell -->
     <string name="invite_more">Invită mai mulți</string>
     <!-- Title of first tour screen -->
@@ -2690,7 +2690,7 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="embed_web_browser_loading_title">Se încarcă</string>
     <!-- The message of progress dialog when loading web content -->
-    <string name="embed_web_browser_loading_message">Te rugăm să astepți&#8230;</string>
+    <string name="embed_web_browser_loading_message">Vă rugăm să așteptați&#8230;</string>
     <!-- Label in My Account section to show user account type -->
     <string name="business_label">Business</string>
     <!-- General label to show the status of something or someone -->
@@ -2708,7 +2708,7 @@
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">Nu poți elimina pe %1$s de la contacte, deoarece face parte din contul tău business.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
-    <string name="grace_period_admin_alert">A apărut o problemă cu ultima plată. Te rugăm să accesezi MEGA folosind un browser desktop pentru mai multe informații.</string>
+    <string name="grace_period_admin_alert">A apărut o problemă cu ultima plată. Vă rugăm să accesați MEGA folosind un browser desktop pentru mai multe informații.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
     <string name="expired_business_title">Cont dezactivat</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
@@ -2732,7 +2732,7 @@
     <!-- Error when renaming a chat title and it is too long -->
     <string name="title_long">Titlu prea lung</string>
     <!-- Alert shown to the user when they is trying to create an empty group for attach a file -->
-    <string name="error_creating_group_and_attaching_file">Te rugăm să selectezi unul sau mai multe contacte.</string>
+    <string name="error_creating_group_and_attaching_file">Vă rugăm să selectați unul sau mai multe contacte.</string>
     <!-- Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts -->
     <string name="contacts_sent">%s contacte trimise.</string>
     <!-- Name by default of the folder where the files sent to the chat are stored in the cloud -->
@@ -2744,7 +2744,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Contul tău a fost blocat temporar pentru siguranța ta.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">Te rugăm să urmezi pașii din [A]e-mailul de verificare[/A] pentru a-ți debloca contul.</string>
+    <string name="verify_email_and_follow_steps">Vă rugăm să urmați pașii din [A]e-mail de confirmare[/A] pentru a vă debloca contul.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">De ce văd asta?</string>
     <!-- Label of a button which action is resend an email -->
@@ -2848,7 +2848,7 @@
     <!-- Button to reset credentials -->
     <string name="action_reset">Resetează</string>
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
-    <string name="already_verifying_credentials">Se actualizează acreditările. Te rugăm să încerci din nou mai târziu.</string>
+    <string name="already_verifying_credentials">Actualizarea acreditărilor. Vă rugăm să încercați din nou mai târziu.</string>
     <!-- Info message displayed when the user is joining a chat conversation -->
     <string name="joining_label">Se alătură&#8230;</string>
     <!-- Info message displayed when the user is leaving a chat conversation -->
@@ -2862,9 +2862,9 @@
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
     <string name="error_reset_account_blocked">Contul pe care încerci să-l resetezi este blocat.</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
-    <string name="error_business_disabled">Contul tău a fost dezactivat de către administrator. Te rugăm să contactezi administratorul contului tău business pentru detalii suplimentare.</string>
+    <string name="error_business_disabled">Contul dvs. a fost dezactivat de administrator. Vă rugăm să contactați administratorul contului dvs. de afaceri pentru mai multe detalii.</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
-    <string name="error_business_removed">Contul tău a fost eliminat de către administrator. Te rugăm să contactezi administratorul contului business pentru detalii suplimentare.</string>
+    <string name="error_business_removed">Contul dvs. a fost șters de către administrator. Vă rugăm să contactați administratorul contului dvs. de afaceri pentru mai multe detalii.</string>
     <!-- Option in bottom sheet dialog for modifying the associated phone number of current account. -->
     <string name="option_modify_phone_number">Modifică</string>
     <!-- Option in bottom sheet dialog for modifying the associated phone number of current account. -->
@@ -2896,7 +2896,7 @@
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
     <string name="empty_search_giphy">Niciun [A]GIF[/A] găsit</string>
     <!-- Label indicating there is not available GIFs due to down server -->
-    <string name="server_down_giphy">Niciun GIF disponibil. Te rugăm să încerci din nou mai târziu</string>
+    <string name="server_down_giphy">Nu există GIF-uri disponibile. Vă rugăm să încercați din nou mai târziu</string>
     <!-- Label indicating the end of Giphy list. The format placeholders are to showing it in different colors. -->
     <string name="end_of_results_giphy">[A]Sfârșitul[/A] rezultatelor</string>
     <!-- Title of a dialog to confirm the action of resume all transfers -->
@@ -3112,11 +3112,11 @@
     <!-- Label indicating a file was created successfully -->
     <string name="file_created">Fișier creat</string>
     <!-- Warning indicating a file was not created successfully -->
-    <string name="file_creation_failed">Crearea fișierului a eșuat. Te rugăm să încerci din nou.</string>
+    <string name="file_creation_failed">Crearea fișierelor a eșuat. Vă rugăm să încercați din nou.</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">Fișier actualizat</string>
     <!-- Warning indicating a file was not updated successfully -->
-    <string name="file_update_failed">Actualizarea fișierului a eșuat. Te rugăm să încerci din nou.</string>
+    <string name="file_update_failed">Actualizarea fișierului a eșuat. Vă rugăm să încercați din nou.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">Fișierul este prea mare și nu poate fi deschis sau previzualizat.</string>
     <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
@@ -3346,7 +3346,7 @@
     <!-- assign moderator option when the moderator leave meeting-->
     <string name="assign_moderator">Desemnează ca gazdă</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
-    <string name="pick_new_moderator_message">Te rugăm să desemnezi una sau mai multe gazde noi.</string>
+    <string name="pick_new_moderator_message">Vă rugăm să alocați una sau mai multe gazde noi.</string>
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">Modifică numele întâlnirii</string>
     <!-- The literal meeting link text-->
@@ -3396,7 +3396,7 @@
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Înscrie-te acum și bucură-te gratuit de funcțiile avansate de colaborare.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
-    <string name="ongoing_call_content">Un alt apel în curs. Te rugăm să închei apelul actual înainte de a efectua altul.</string>
+    <string name="ongoing_call_content">Un alt apel în desfășurare. Vă rugăm să încheiați apelul curent înainte de a efectua altul.</string>
     <!-- The hint text when changing meeting name-->
     <string name="new_meeting_name">Noul nume al întâlnirii</string>
     <!-- The content of dialog when failed for creating meeting-->
@@ -3528,7 +3528,7 @@
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">Mergi la Setări pentru a-i acorda lui MEGA permisiunea de a accesa dispozitivele din apropiere folosind Bluetooth.</string>
     <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
-    <string name="upgrade_billing_warning">Nu putem continua cu facturarea. Dacă folosești o aplicație duală, te rugăm să iei în considerare autentificarea în MEGA fără aceasta. În caz contrar, încearcă să faci upgrade prin intermediul browserului web.</string>
+    <string name="upgrade_billing_warning">Nu putem continua cu facturarea. Dacă utilizați o aplicație duală, vă rugăm să luați în considerare conectarea la MEGA fără ea. Dacă nu, încercați să actualizați prin browserul dvs. web.</string>
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">Abonament %1s</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
@@ -3630,7 +3630,7 @@
     <!-- Resume to paused transfers snack bar description text -->
     <string name="resume_paused_transfers_text">Transferurile au fost puse pe pauză. Reia-le pentru a continua descărcarea.</string>
     <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
-    <string name="warning_scanning_transfers">Te rugăm să nu închizi aplicația.</string>
+    <string name="warning_scanning_transfers">Vă rugăm să nu închideți aplicația.</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
     <string name="scanning_transfers">Se scanează&#8230;</string>
     <!-- Label cancel transfers. -->
@@ -3734,7 +3734,7 @@
     <!-- Report issue setting name-->
     <string name="settings_help_report_issue">Raportează o problemă</string>
     <!-- Report issue fragment instructions-->
-    <string name="settings_help_report_issue_instructions">Feedbackul tău ne ajută să îmbunătățim MEGA. Te rugăm să descrii clar problema pe care ai întâmpinat-o. Cu cât furnizezi mai multe detalii, cu atât mai ușor ne va fi să o rezolvăm.</string>
+    <string name="settings_help_report_issue_instructions">Feedback-ul dvs. ne ajută să îmbunătățim MEGA. Vă rugăm să descrieți clar problema pe care ați experimentat-o. Cu cât furnizați mai multe detalii, cu atât ne va fi mai ușor să le rezolvăm.</string>
     <!-- Hint text for the description field on the report issue screen-->
     <string name="settings_help_report_issue_description_label">Descrie problema</string>
     <!-- Label for the switch to enable attaching logs when reporting an issue-->
@@ -3744,7 +3744,7 @@
     <!-- Accessibility Label for the submit button on the report issue screen-->
     <string name="settings_help_report_issue_submit_menu_action">Trimite</string>
     <!-- Error message when submit issue failed-->
-    <string name="settings_help_report_issue_error">Ceva a mers prost. Te rugăm să încerci din nou mai târziu. Dacă tot nu poți trimite problema, contactează %s pentru asistență.</string>
+    <string name="settings_help_report_issue_error">Ceva nu a mers bine. Vă rugăm să încercați din nou mai târziu. Dacă tot nu puteți trimite problema, contactați %s pentru asistență.</string>
     <!-- Success message when submit issue succeeded-->
     <string name="settings_help_report_issue_success">Am primit raportul dvs.. Vom analiza problema și vom reveni la dvs.</string>
     <!-- Message shown during log file upload-->
@@ -5264,7 +5264,7 @@
     <!-- Action allowing user to restart the app after downloading the update -->
     <string name="general_app_update_action_restart">Repornește</string>
     <!-- Title of the screen asking permissions for Audio files -->
-    <string name="allow_access_audio_title">Permite accesul la fișierele audio</string>
+    <string name="allow_access_audio_title">Permiteți accesul la fișiere audio</string>
     <!-- Photos action menu zoom in -->
     <string name="photos_action_zoom_in">Zoom in</string>
     <!-- Photos action menu zoom out -->
@@ -5471,21 +5471,21 @@
     <string name="transfers_confirm_large_download_button_start_always">Descărcați întotdeauna și nu întrebați din nou</string>
     <!-- Success message when folder is shared when  share clicked -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_success">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Folderul a fost partajat</item>
+        <item quantity="few">%1$d&#160;foldere au fost partajate</item>
+        <item quantity="other">%1$d de foldere au fost partajate</item>
     </plurals>
     <!-- Result message after Success message when folder is shared when  share clicked, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_contact_success">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Folderul a fost partajat&#160;</item>
+        <item quantity="few">%1$d&#160;foldere partajate,&#160;</item>
+        <item quantity="other">%1$d de foldere partajate,&#160;</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed concat-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed_concat">
-        <item quantity="one"></item>
-        <item quantity="few"></item>
-        <item quantity="other"></item>
+        <item quantity="one">nu a putut partaja %1$d&#160;folder</item>
+        <item quantity="few">nu a putut partaja %1$d&#160;foldere</item>
+        <item quantity="other">nu a putut partaja %1$d de foldere</item>
     </plurals>
     <!-- Button text to mute a participant in the info of participant in call screen-->
     <string name="meetings_bottom_panel_in_call_participants_mute_a_participant_button">Pune pe mut</string>
@@ -5502,5 +5502,21 @@
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">Detaliile abonamentului</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen.You can switch off the automatic renewal of your MEGA Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
+    <string name="account_upgrade_subscription_details">Abonamentele sunt reînnoite automat pentru perioade succesive de abonament cu aceeași durată și la același preț ca perioada inițială aleasă. Puteți dezactiva reînnoirea automată a abonamentului MEGA&#160;Pro cu cel mult 24 de ore înainte de scadența următoarei plăți a abonamentului prin Abonamente în [A]Google Play[/A].</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Permiteți accesul la galeria dvs.</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Acordă acces</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_chat_screen_app_update_dialog_title">Actualizarea necesară</string>
+    <string name="meetings_chat_screen_app_update_dialog_message">Nu utilizați cea mai recentă versiune a aplicației noastre, astfel încât să nu puteți începe sau să vă alăturați apelurilor. Actualizați acum pentru a continua.</string>
+    <string name="meetings_chat_screen_app_update_dialog_update_button">Actualizează</string>
+    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Respinge</string>
+    <!-- Title of the bottom panel when the only host left the call on meeting screen -->
+    <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Desemnează o gazdă înainte de a părăsi apelul</string>
+    <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">Ești singura gazdă la apel. Alocați o altă gazdă pentru grup înainte de a pleca, astfel încât cineva din apel să aibă permisiuni de gazdă. Vei rămâne gazdă în grup.</string>
+    <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">Desemnează și părăsesc</string>
+    <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
+    <string name="meeting_call_screen_bottom_panel_leave_option">Părăsește oricum</string>
 </resources>

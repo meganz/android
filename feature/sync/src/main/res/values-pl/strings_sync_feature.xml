@@ -43,21 +43,21 @@
     <!-- Sync options -->
     <string name="sync_menu_sync_options">Opcje synchronizacji</string>
     <!-- Sync text when need to solved stalled issues-->
-    <string name="sync_menu_clear_issues">Clear resolved issues</string>
+    <string name="sync_menu_clear_issues">Wyczyść rozwiązane problemy</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">Synchronizacja dwukierunkowa</string>
     <!-- Sync conflict message -->
     <string name="sync_stalled_issue_detail_conflict_title">Conflict A</string>
     <!-- Sync when stalled issues, title of the conflict -->
-    <string name="sync_stalled_issue_detail_conflict_message">There are multiple items with the same name on one side of your sync that would all become the same single item on the other side of your sync</string>
+    <string name="sync_stalled_issue_detail_conflict_message">Istnieje wiele elementów o tej samej nazwie po jednej stronie synchronizacji, które stały się tym samym pojedynczym elementem po drugiej stronie synchronizacji</string>
     <!-- Sync when stalled issues, message of the conflict -->
     <string name="sync_resolve_rename_all_items">Zmień nazwę wszystkich elementów</string>
     <!-- Sync to resolve conflict Merge folders -->
     <string name="sync_stalled_issue_merge_folders">Scalanie katalogów</string>
     <!-- Sync to resolve conflict Choose local file -->
-    <string name="sync_stalled_issue_choose_local_file">Wybierz plik lokalny</string>
+    <string name="sync_stalled_issue_choose_local_file">Choose the local file</string>
     <!-- Sync to resolve conflict Choose remote file -->
-    <string name="sync_stalled_issue_choose_remote_file">Wybierz plik zdalny</string>
+    <string name="sync_stalled_issue_choose_remote_file">Choose the file stored in MEGA</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">Wybierz ostatnio zmodyfikowany plik</string>
     <!-- Sync message when conflict resolved -->
@@ -79,7 +79,7 @@
     <!-- Sync dialog battery optimization message -->
     <string name="sync_dialog_battery_optimization_message">Allow MEGA to read, modify or delete all files on this device.</string>
     <!-- Sync state message for No Solved Issues -->
-    <string name="sync_solved_issues_empty_message">No resolved issues</string>
+    <string name="sync_solved_issues_empty_message">Brak rozwiązanych problemów</string>
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">Brak problemów</string>
     <!-- Sync option to choose folder pair -->
@@ -145,7 +145,7 @@
     <!-- Sync stalled issue reason is Folder Matched Against File-->
     <string name="sync_stalled_issue_folder_matched_against_file">Plik, który próbujesz zsynchronizować, nie ma rozszerzenia i ma taką samą nazwę jak istniejący katalog</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Zmiany lokalne i zdalne od ostatniej synchronizacji</string>
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Element zmieniony od ostatniej synchronizacji</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->
     <string name="sync_stalled_issue_local_and_remote_not_synced">Konflikt plików lub katalogów</string>
     <!-- Sync stalled issue reason is Name clash-->
@@ -169,7 +169,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Wybierz</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">A file or folder has an issue that needs your decision to resolve it</string>
+    <string name="sync_stalled_issue_file_issue_detail">Plik lub katalog ma problem, który wymaga podjęcia decyzji, aby go rozwiązać</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">Oczekiwanie na zakończenie innych procesów</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -189,7 +189,7 @@
     <!-- Sync stalled issue reason is Local and remote not synced detailed description-->
     <string name="sync_stalled_issue_local_and_remote_not_synced_detail">Ten plik ma sprzeczne kopie</string>
     <!-- Sync stalled issue reason is Name clash detailed description-->
-    <string name="sync_stalled_issue_name_clash_detail">There are multiple items with the same name on one side of your sync that would all become the same single item on the other side of your sync</string>
+    <string name="sync_stalled_issue_name_clash_detail">Istnieje wiele elementów o tej samej nazwie po jednej stronie synchronizacji, które stały się tym samym pojedynczym elementem po drugiej stronie synchronizacji</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">Przeniesienie lub zmiana nazwy zostały wykryte w MEGA, ale nie mogły zostać odtworzone lokalnie.</string>
     <!-- Sync notification title description sync monitoring-->

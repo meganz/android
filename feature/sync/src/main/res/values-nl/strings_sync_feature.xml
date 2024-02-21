@@ -9,7 +9,7 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Synchronisaties [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">We need to access your device storage in order to sync your local folder. Tap here to grant access.</string>
+    <string name="sync_storage_permission_banner">We hebben toegang tot de opslag van uw apparaat nodig om uw lokale map te kunnen synchroniseren. Tik hier om toegang te verlenen.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
     <string name="sync_battery_optimisation_banner">Om uw bestanden en mappen continu te synchroniseren, kunt u MEGA op de achtergrond laten draaien.</string>
     <!-- Sync file counts to show ongoing syncing-->
@@ -35,7 +35,7 @@
     <!-- Sync options -->
     <string name="sync_menu_sync_options">Synchronisatie opties</string>
     <!-- Sync text when need to solved stalled issues-->
-    <string name="sync_menu_clear_issues">Clear resolved issues</string>
+    <string name="sync_menu_clear_issues">Opgeloste problemen oplossen</string>
     <!-- Sync message for two way sync-->
     <string name="sync_two_way">Tweezijdige synchronisatie</string>
     <!-- Sync conflict message -->
@@ -47,9 +47,9 @@
     <!-- Sync to resolve conflict Merge folders -->
     <string name="sync_stalled_issue_merge_folders">Mappen samenvoegen</string>
     <!-- Sync to resolve conflict Choose local file -->
-    <string name="sync_stalled_issue_choose_local_file">Kies lokaal bestand</string>
+    <string name="sync_stalled_issue_choose_local_file">Choose the local file</string>
     <!-- Sync to resolve conflict Choose remote file -->
-    <string name="sync_stalled_issue_choose_remote_file">Kies extern bestand</string>
+    <string name="sync_stalled_issue_choose_remote_file">Choose the file stored in MEGA</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">Kies het laatst gewijzigd bestand</string>
     <!-- Sync message when conflict resolved -->
@@ -71,7 +71,7 @@
     <!-- Sync dialog battery optimization message -->
     <string name="sync_dialog_battery_optimization_message">Allow MEGA to read, modify or delete all files on this device.</string>
     <!-- Sync state message for No Solved Issues -->
-    <string name="sync_solved_issues_empty_message">No resolved issues</string>
+    <string name="sync_solved_issues_empty_message">Geen opgeloste problemen</string>
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">Geen problemen</string>
     <!-- Sync option to choose folder pair -->
@@ -137,7 +137,7 @@
     <!-- Sync stalled issue reason is Folder Matched Against File-->
     <string name="sync_stalled_issue_folder_matched_against_file">Het bestand dat u probeert te synchroniseren heeft geen extensie en heeft dezelfde naam als een bestaande map</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Lokaal en op afstand gewijzigd sinds de laatste synchronisatie</string>
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Item is gewijzigd sinds de laatste synchronisatie</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->
     <string name="sync_stalled_issue_local_and_remote_not_synced">Bestand of map conflict</string>
     <!-- Sync stalled issue reason is Name clash-->
@@ -161,7 +161,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Selecteer</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">A file or folder has an issue that needs your decision to resolve it</string>
+    <string name="sync_stalled_issue_file_issue_detail">Er is een probleem met een bestand of map waarvoor u een beslissing moet nemen om het probleem op te lossen</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">Wachten tot andere processen zijn voltooid</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
