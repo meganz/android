@@ -696,24 +696,14 @@ class PhotosFragment : Fragment() {
 
     private fun openPhoto(photo: Photo) {
         lifecycleScope.launch {
-            if (getFeatureFlagUseCase(AppFeatures.ImagePreview)) {
-                val intent = ImagePreviewActivity.createIntent(
-                    context = requireContext(),
-                    imageSource = ImagePreviewFetcherSource.TIMELINE,
-                    menuOptionsSource = ImagePreviewMenuSource.TIMELINE,
-                    anchorImageNodeId = NodeId(photo.id),
-                    showScreenLabel = true,
-                )
-                startActivity(intent)
-            } else {
-                val intent = ImageViewerActivity.getIntentForTimeline(
-                    requireContext(),
-                    currentNodeHandle = photo.id,
-                )
-
-                startActivity(intent)
-                managerActivity.overridePendingTransition(0, 0)
-            }
+            val intent = ImagePreviewActivity.createIntent(
+                context = requireContext(),
+                imageSource = ImagePreviewFetcherSource.TIMELINE,
+                menuOptionsSource = ImagePreviewMenuSource.TIMELINE,
+                anchorImageNodeId = NodeId(photo.id),
+                showScreenLabel = false,
+            )
+            startActivity(intent)
         }
     }
 

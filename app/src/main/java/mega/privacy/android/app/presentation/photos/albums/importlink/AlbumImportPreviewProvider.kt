@@ -10,8 +10,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.MediaDiscoveryImageNodeFetcher.Companion.IS_RECURSIVE
 import mega.privacy.android.app.presentation.imagepreview.fetcher.MediaDiscoveryImageNodeFetcher.Companion.PARENT_ID
@@ -101,29 +99,19 @@ class AlbumImportPreviewProvider @Inject constructor(
         folderNodeId: Long?,
     ) {
         (activity as LifecycleOwner).lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
-                folderNodeId?.let { parentID ->
-                    monitorSubFolderMediaDiscoverySettingsUseCase().collectLatest { recursive ->
-                        ImagePreviewActivity.createIntent(
-                            context = activity,
-                            imageSource = ImagePreviewFetcherSource.MEDIA_DISCOVERY,
-                            menuOptionsSource = ImagePreviewMenuSource.MEDIA_DISCOVERY,
-                            anchorImageNodeId = NodeId(photo.id),
-                            params = mapOf(PARENT_ID to parentID, IS_RECURSIVE to recursive),
-                        ).run {
-                            activity.startActivity(this)
-                        }
+            folderNodeId?.let { parentID ->
+                monitorSubFolderMediaDiscoverySettingsUseCase().collectLatest { recursive ->
+                    ImagePreviewActivity.createIntent(
+                        context = activity,
+                        imageSource = ImagePreviewFetcherSource.MEDIA_DISCOVERY,
+                        menuOptionsSource = ImagePreviewMenuSource.MEDIA_DISCOVERY,
+                        anchorImageNodeId = NodeId(photo.id),
+                        params = mapOf(PARENT_ID to parentID, IS_RECURSIVE to recursive),
+                        showScreenLabel = false,
+                    ).run {
+                        activity.startActivity(this)
                     }
                 }
-            } else {
-                ImageViewerActivity.getIntentForChildren(
-                    activity,
-                    photoIds.toLongArray(),
-                    photo.id,
-                ).run {
-                    activity.startActivity(this)
-                }
-                activity.overridePendingTransition(0, 0)
             }
         }
     }
@@ -132,23 +120,14 @@ class AlbumImportPreviewProvider @Inject constructor(
         activity: Activity,
         photo: Photo,
     ) = (activity as LifecycleOwner).lifecycleScope.launch {
-        if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
-            val intent = ImagePreviewActivity.createIntent(
-                context = activity,
-                imageSource = ImagePreviewFetcherSource.ALBUM_SHARING,
-                menuOptionsSource = ImagePreviewMenuSource.ALBUM_SHARING,
-                anchorImageNodeId = NodeId(photo.id),
-            )
-            activity.startActivity(intent)
-        } else {
-            ImageViewerActivity.getIntentForAlbumSharing(
-                activity,
-                photo.id,
-            ).run {
-                activity.startActivity(this)
-            }
-            activity.overridePendingTransition(0, 0)
-        }
+        val intent = ImagePreviewActivity.createIntent(
+            context = activity,
+            imageSource = ImagePreviewFetcherSource.ALBUM_SHARING,
+            menuOptionsSource = ImagePreviewMenuSource.ALBUM_SHARING,
+            anchorImageNodeId = NodeId(photo.id),
+            showScreenLabel = false,
+        )
+        activity.startActivity(intent)
     }
 
     /**
