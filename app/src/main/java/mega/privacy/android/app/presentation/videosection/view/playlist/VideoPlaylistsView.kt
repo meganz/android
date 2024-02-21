@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.videosection.view.playlist
 
-import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -11,32 +11,44 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
+import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.white_black
 import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.shared.theme.MegaAppTheme
@@ -52,6 +64,16 @@ const val FAB_BUTTON_TEST_TAG = "fab_button_test_tag"
 const val CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG = "create_video_playlist_dialog_test_tag"
 
 /**
+ * Test tag for RenameVideoPlaylistDialog
+ */
+const val RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG = "rename_video_playlist_dialog_test_tag"
+
+/**
+ * Test tag for DeleteVideoPlaylistDialog
+ */
+const val DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG = "delete_video_playlist_dialog_test_tag"
+
+/**
  * Test tag for progressBar
  */
 const val PROGRESS_BAR_TEST_TAG = "progress_bar_test_tag"
@@ -61,7 +83,7 @@ const val PROGRESS_BAR_TEST_TAG = "progress_bar_test_tag"
  */
 const val VIDEO_PLAYLISTS_EMPTY_VIEW_TEST_TAG = "video_playlists_empty_view_test_tag"
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun VideoPlaylistsView(
     items: List<VideoPlaylistUIEntity>,
@@ -71,16 +93,23 @@ internal fun VideoPlaylistsView(
     lazyListState: LazyListState,
     sortOrder: String,
     isInputTitleValid: Boolean,
-    showCreateVideoPlaylistDialog: Boolean,
+    shouldCreateVideoPlaylistDialog: Boolean,
+    shouldDeleteVideoPlaylistDialog: Boolean,
+    shouldRenameVideoPlaylistDialog: Boolean,
     inputPlaceHolderText: String,
     modifier: Modifier,
-    setShowCreateVideoPlaylistDialog: (Boolean) -> Unit,
+    setShouldCreateVideoPlaylist: (Boolean) -> Unit,
+    setShouldDeleteVideoPlaylist: (Boolean) -> Unit,
+    setShouldRenameVideoPlaylist: (Boolean) -> Unit,
     setDialogInputPlaceholder: (String) -> Unit,
-    onDialogPositiveButtonClicked: (title: String) -> Unit,
+    onCreateDialogPositiveButtonClicked: (String) -> Unit,
+    onRenameDialogPositiveButtonClicked: (playlistID: NodeId, newTitle: String) -> Unit,
+    onDeleteDialogPositiveButtonClicked: (VideoPlaylistUIEntity) -> Unit,
     setInputValidity: (Boolean) -> Unit,
     onClick: (item: VideoPlaylistUIEntity, index: Int) -> Unit,
-    onMenuClick: (VideoPlaylistUIEntity) -> Unit,
     onSortOrderClick: () -> Unit,
+    onDeletedMessageShown: () -> Unit,
+    deletedVideoPlaylistTitles: List<String> = emptyList(),
     errorMessage: Int? = null,
     onLongClick: ((item: VideoPlaylistUIEntity, index: Int) -> Unit) = { _, _ -> },
 ) {
@@ -90,17 +119,42 @@ internal fun VideoPlaylistsView(
         }
     }
 
-    val scaffoldState = rememberScaffoldState()
+    val snackBarHostState = remember { SnackbarHostState() }
     val isLight = MaterialTheme.colors.isLight
 
+    val coroutineScope = rememberCoroutineScope()
+    val modalSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        skipHalfExpanded = false,
+    )
+    var clickedItem: Int by rememberSaveable { mutableIntStateOf(-1) }
+
+    LaunchedEffect(deletedVideoPlaylistTitles) {
+        if (deletedVideoPlaylistTitles.isNotEmpty()) {
+            val deletedMessage = if (deletedVideoPlaylistTitles.size == 1) {
+                "\"${deletedVideoPlaylistTitles[0]}\" deleted"
+            } else {
+                "Deleted ${deletedVideoPlaylistTitles.size} playlists"
+            }
+            snackBarHostState.showSnackbar(deletedMessage)
+            onDeletedMessageShown()
+        }
+    }
+
+    BackHandler(enabled = modalSheetState.isVisible) {
+        coroutineScope.launch {
+            modalSheetState.hide()
+        }
+    }
+
     Scaffold(
-        scaffoldState = scaffoldState,
-        snackbarHost = { snackbarHostState ->
+        scaffoldState = rememberScaffoldState(),
+        snackbarHost = {
             SnackbarHost(
-                hostState = snackbarHostState,
-                snackbar = { snackbarData ->
+                hostState = snackBarHostState,
+                snackbar = { data ->
                     Snackbar(
-                        snackbarData = snackbarData,
+                        snackbarData = data,
                         backgroundColor = black.takeIf { isLight } ?: white,
                     )
                 }
@@ -114,31 +168,78 @@ internal fun VideoPlaylistsView(
             CreateVideoPlaylistFabButton(
                 showFabButton = scrollNotInProgress,
                 onCreateVideoPlaylistClick = {
-                    setShowCreateVideoPlaylistDialog(true)
+                    setShouldCreateVideoPlaylist(true)
                     setDialogInputPlaceholder(placeholderText)
                 }
             )
         }
-    ) {
-        Box(modifier = modifier.fillMaxSize()) {
-            if (showCreateVideoPlaylistDialog) {
+    ) { paddingValue ->
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(paddingValue)
+        ) {
+            if (shouldCreateVideoPlaylistDialog) {
                 CreateVideoPlaylistDialog(
                     modifier = Modifier.testTag(CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
                     title = "Enter playlist name",
-                    positiveButtonTextResID = R.string.general_create,
+                    positiveButtonText = stringResource(id = R.string.general_create),
                     inputPlaceHolderText = { inputPlaceHolderText },
                     errorMessage = errorMessage,
                     onDialogInputChange = setInputValidity,
                     onDismissRequest = {
-                        setShowCreateVideoPlaylistDialog(false)
+                        setShouldCreateVideoPlaylist(false)
                         setInputValidity(true)
                     },
                     onDialogPositiveButtonClicked = { titleOfNewVideoPlaylist ->
-                        onDialogPositiveButtonClicked(titleOfNewVideoPlaylist)
+                        onCreateDialogPositiveButtonClicked(titleOfNewVideoPlaylist)
                     },
                 ) {
                     isInputTitleValid
                 }
+            }
+
+            if (shouldRenameVideoPlaylistDialog) {
+                CreateVideoPlaylistDialog(
+                    modifier = Modifier.testTag(RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
+                    title = "Rename",
+                    positiveButtonText = "Rename",
+                    inputPlaceHolderText = { inputPlaceHolderText },
+                    errorMessage = errorMessage,
+                    onDialogInputChange = setInputValidity,
+                    onDismissRequest = {
+                        setShouldRenameVideoPlaylist(false)
+                        setInputValidity(true)
+                    },
+                    initialInputText = {
+                        if (clickedItem != -1) {
+                            items[clickedItem].title
+                        } else {
+                            ""
+                        }
+                    },
+                    onDialogPositiveButtonClicked = { newTitle ->
+                        if (clickedItem != -1) {
+                            onRenameDialogPositiveButtonClicked(items[clickedItem].id, newTitle)
+                        }
+                    },
+                ) {
+                    isInputTitleValid
+                }
+            }
+
+            if (shouldDeleteVideoPlaylistDialog) {
+                DeleteVideoPlaylistDialog(
+                    modifier = Modifier.testTag(DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
+                    onDeleteButtonClicked = {
+                        if (clickedItem != -1) {
+                            onDeleteDialogPositiveButtonClicked(items[clickedItem])
+                        }
+                    },
+                    onDismiss = {
+                        setShouldDeleteVideoPlaylist(false)
+                    }
+                )
             }
 
             when {
@@ -197,7 +298,11 @@ internal fun VideoPlaylistsView(
                                 thumbnailList = videoPlaylistItem.thumbnailList,
                                 totalDuration = videoPlaylistItem.totalDuration,
                                 onClick = { onClick(videoPlaylistItem, it) },
-                                onMenuClick = { onMenuClick(videoPlaylistItem) },
+                                onMenuClick = {
+                                    clickedItem = it
+                                    coroutineScope.launch { modalSheetState.show() }
+
+                                },
                                 onLongClick = { onLongClick(videoPlaylistItem, it) }
                             )
                         }
@@ -205,11 +310,21 @@ internal fun VideoPlaylistsView(
                 }
             }
         }
+        VideoPlaylistBottomSheet(
+            modalSheetState = modalSheetState,
+            coroutineScope = coroutineScope,
+            onRenameVideoPlaylistClicked = {
+                setShouldRenameVideoPlaylist(true)
+            },
+            onDeleteVideoPlaylistClicked = {
+                setShouldDeleteVideoPlaylist(true)
+            }
+        )
     }
 }
 
 @Composable
-private fun CreateVideoPlaylistFabButton(
+internal fun CreateVideoPlaylistFabButton(
     onCreateVideoPlaylistClick: () -> Unit,
     modifier: Modifier = Modifier,
     showFabButton: Boolean = true,
@@ -233,6 +348,34 @@ private fun CreateVideoPlaylistFabButton(
     }
 }
 
+@Composable
+internal fun DeleteVideoPlaylistDialog(
+    modifier: Modifier = Modifier,
+    onDeleteButtonClicked: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    MegaAlertDialog(
+        modifier = modifier,
+        title = "Delete playlist?",
+        text = "Do we need additional explanation to delete playlists?",
+        confirmButtonText = "Delete",
+        cancelButtonText = stringResource(id = R.string.button_cancel),
+        onConfirm = onDeleteButtonClicked,
+        onDismiss = onDismiss
+    )
+}
+
+@CombinedThemePreviews
+@Composable
+private fun DeleteVideoPlaylistDialogPreview() {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        DeleteVideoPlaylistDialog(
+            onDeleteButtonClicked = {},
+            onDismiss = {}
+        )
+    }
+}
+
 @CombinedThemePreviews
 @Composable
 private fun VideoPlaylistsViewPreview() {
@@ -245,15 +388,21 @@ private fun VideoPlaylistsViewPreview() {
             lazyListState = LazyListState(),
             sortOrder = "Sort by name",
             isInputTitleValid = true,
-            showCreateVideoPlaylistDialog = false,
+            shouldDeleteVideoPlaylistDialog = false,
+            shouldCreateVideoPlaylistDialog = false,
+            shouldRenameVideoPlaylistDialog = false,
             modifier = Modifier.fillMaxSize(),
             onClick = { _, _ -> },
-            onMenuClick = {},
             onSortOrderClick = {},
             inputPlaceHolderText = "New playlist",
             setDialogInputPlaceholder = {},
-            setShowCreateVideoPlaylistDialog = {},
-            onDialogPositiveButtonClicked = {},
+            setShouldCreateVideoPlaylist = {},
+            setShouldDeleteVideoPlaylist = {},
+            setShouldRenameVideoPlaylist = {},
+            onCreateDialogPositiveButtonClicked = {},
+            onRenameDialogPositiveButtonClicked = { _, _ -> },
+            onDeleteDialogPositiveButtonClicked = {},
+            onDeletedMessageShown = {},
             setInputValidity = {},
         )
     }
@@ -271,16 +420,22 @@ private fun VideoPlaylistsViewCreateDialogShownPreview() {
             lazyListState = LazyListState(),
             sortOrder = "Sort by name",
             isInputTitleValid = true,
-            showCreateVideoPlaylistDialog = true,
+            shouldDeleteVideoPlaylistDialog = true,
+            shouldCreateVideoPlaylistDialog = true,
+            shouldRenameVideoPlaylistDialog = true,
             modifier = Modifier.fillMaxSize(),
             onClick = { _, _ -> },
-            onMenuClick = {},
             onSortOrderClick = {},
             inputPlaceHolderText = "New playlist",
             setDialogInputPlaceholder = {},
-            setShowCreateVideoPlaylistDialog = {},
-            onDialogPositiveButtonClicked = {},
+            setShouldCreateVideoPlaylist = {},
+            setShouldDeleteVideoPlaylist = {},
+            setShouldRenameVideoPlaylist = {},
+            onCreateDialogPositiveButtonClicked = {},
+            onRenameDialogPositiveButtonClicked = { _, _ -> },
+            onDeleteDialogPositiveButtonClicked = {},
             setInputValidity = {},
+            onDeletedMessageShown = {}
         )
     }
 }

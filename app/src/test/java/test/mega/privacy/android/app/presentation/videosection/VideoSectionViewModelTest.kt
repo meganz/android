@@ -461,14 +461,14 @@ class VideoSectionViewModelTest {
     }
 
     @Test
-    fun `test that the showCreateVideoPlaylistDialog is correctly updated`() = runTest {
+    fun `test that the showCreateVideoPlaylist is correctly updated`() = runTest {
         initUnderTest()
 
         underTest.state.test {
             assertThat(awaitItem().shouldCreateVideoPlaylist).isFalse()
-            underTest.setShowCreateVideoPlaylist(true)
+            underTest.setShouldCreateVideoPlaylist(true)
             assertThat(awaitItem().shouldCreateVideoPlaylist).isTrue()
-            underTest.setShowCreateVideoPlaylist(false)
+            underTest.setShouldCreateVideoPlaylist(false)
             assertThat(awaitItem().shouldCreateVideoPlaylist).isFalse()
         }
     }
@@ -519,6 +519,19 @@ class VideoSectionViewModelTest {
     }
 
     @Test
+    fun `test that the setShouldDeleteVideoPlaylist is correctly updated`() = runTest {
+        initUnderTest()
+
+        underTest.state.test {
+            assertThat(awaitItem().shouldDeleteVideoPlaylist).isFalse()
+            underTest.setShouldDeleteVideoPlaylist(true)
+            assertThat(awaitItem().shouldDeleteVideoPlaylist).isTrue()
+            underTest.setShouldDeleteVideoPlaylist(false)
+            assertThat(awaitItem().shouldDeleteVideoPlaylist).isFalse()
+        }
+    }
+
+    @Test
     fun `test that the removeVideoPlaylists is correctly updated`() = runTest {
         val videoPlaylistTitles = listOf("new playlist", "new playlist1", "new playlist2")
         val playlistIDs = listOf(NodeId(1L), NodeId(2L), NodeId(3L))
@@ -542,11 +555,12 @@ class VideoSectionViewModelTest {
             val actual = awaitItem()
             assertThat(actual.deletedVideoPlaylistTitles.size).isEqualTo(2)
             assertThat(actual.deletedVideoPlaylistTitles[0]).isEqualTo(videoPlaylistTitles[0])
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `test that shouldRenameVideoPlaylistDialog is correctly updated after updated video playlist title`() =
+    fun `test that shouldRenameVideoPlaylist is correctly updated after updated video playlist title`() =
         runTest {
             val newTitle = "newTitle"
             val playlistID = NodeId(1L)
@@ -566,7 +580,7 @@ class VideoSectionViewModelTest {
         }
 
     @Test
-    fun `test that shouldRenameVideoPlaylistDialog is correctly updated when throw exception`() =
+    fun `test that shouldRenameVideoPlaylist is correctly updated when throw exception`() =
         runTest {
             val newTitle = "newTitle"
             val playlistID = NodeId(1L)

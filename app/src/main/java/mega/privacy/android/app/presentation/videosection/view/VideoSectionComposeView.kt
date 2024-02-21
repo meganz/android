@@ -98,14 +98,25 @@ internal fun VideoSectionComposeView(
                 onSortOrderClick = onSortOrderClick,
                 onClick = onPlaylistItemClick,
                 onLongClick = onPlaylistItemLongClick,
-                onMenuClick = onPlaylistItemMenuClick,
                 setDialogInputPlaceholder = videoSectionViewModel::setPlaceholderTitle,
                 isInputTitleValid = uiState.isInputTitleValid,
-                showCreateVideoPlaylistDialog = uiState.shouldCreateVideoPlaylist,
                 inputPlaceHolderText = uiState.createVideoPlaylistPlaceholderTitle,
-                setShowCreateVideoPlaylistDialog = videoSectionViewModel::setShowCreateVideoPlaylist,
                 setInputValidity = videoSectionViewModel::setNewPlaylistTitleValidity,
-                onDialogPositiveButtonClicked = videoSectionViewModel::createNewPlaylist
+                shouldCreateVideoPlaylistDialog = uiState.shouldCreateVideoPlaylist,
+                setShouldCreateVideoPlaylist = videoSectionViewModel::setShouldCreateVideoPlaylist,
+                onCreateDialogPositiveButtonClicked = videoSectionViewModel::createNewPlaylist,
+                shouldRenameVideoPlaylistDialog = uiState.shouldRenameVideoPlaylist,
+                setShouldRenameVideoPlaylist = videoSectionViewModel::setShouldRenameVideoPlaylist,
+                onRenameDialogPositiveButtonClicked = videoSectionViewModel::updateVideoPlaylistTitle,
+                shouldDeleteVideoPlaylistDialog = uiState.shouldDeleteVideoPlaylist,
+                setShouldDeleteVideoPlaylist = videoSectionViewModel::setShouldDeleteVideoPlaylist,
+                onDeleteDialogPositiveButtonClicked = { playlist ->
+                    videoSectionViewModel.removeVideoPlaylists(
+                        listOf(playlist)
+                    )
+                },
+                onDeletedMessageShown = videoSectionViewModel::clearDeletedVideoPlaylistTitles,
+                deletedVideoPlaylistTitles = uiState.deletedVideoPlaylistTitles
             )
         },
         selectedTab = tabState.selectedTab,

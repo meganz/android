@@ -401,7 +401,7 @@ class VideoSectionViewModel @Inject constructor(
             .takeIf { it.isNotEmpty() && checkVideoPlaylistTitleValidity(it) }
             ?.let { playlistTitle ->
                 createVideoPlaylistJob = viewModelScope.launch {
-                    setShowCreateVideoPlaylist(false)
+                    setShouldCreateVideoPlaylist(false)
                     runCatching {
                         createVideoPlaylistUseCase(playlistTitle)
                     }.onSuccess { videoPlaylist ->
@@ -435,9 +435,19 @@ class VideoSectionViewModel @Inject constructor(
                         playlistIDs = deletedPlaylistIDs,
                         deletedPlaylist = deletedList
                     )
+                Timber.d("removeVideoPlaylists deletedPlaylistTitles: $deletedPlaylistTitles")
                 _state.update {
                     it.copy(
-                        deletedVideoPlaylistTitles = deletedPlaylistTitles
+                        deletedVideoPlaylistTitles = deletedPlaylistTitles,
+                        shouldDeleteVideoPlaylist = false
+                    )
+                }
+                loadVideoPlaylists()
+            }.onFailure { exception ->
+                Timber.e(exception)
+                _state.update {
+                    it.copy(
+                        shouldDeleteVideoPlaylist = false
                     )
                 }
             }
@@ -484,6 +494,7 @@ class VideoSectionViewModel @Inject constructor(
                             )
                         }
                         loadVideoPlaylists()
+                        updateCurrentVideoPlaylistAfterUpdatedTitle()
                     }.onFailure { exception ->
                         Timber.e(exception)
                         _state.update {
@@ -495,6 +506,19 @@ class VideoSectionViewModel @Inject constructor(
                 }
             }
 
+    private fun updateCurrentVideoPlaylistAfterUpdatedTitle() {
+        val currentVideoPlaylistID = _state.value.currentVideoPlaylist?.id
+        currentVideoPlaylistID?.let {
+            _state.update {
+                it.copy(
+                    currentVideoPlaylist = it.videoPlaylists.firstOrNull { playlist ->
+                        playlist.id == currentVideoPlaylistID
+                    }
+                )
+            }
+        }
+    }
+
     internal fun setShouldRenameVideoPlaylist(value: Boolean) = _state.update {
         it.copy(shouldRenameVideoPlaylist = value)
     }
@@ -505,7 +529,7 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
-    internal fun setShowCreateVideoPlaylist(value: Boolean) = _state.update {
+    internal fun setShouldCreateVideoPlaylist(value: Boolean) = _state.update {
         it.copy(shouldCreateVideoPlaylist = value)
     }
 
@@ -556,6 +580,14 @@ class VideoSectionViewModel @Inject constructor(
 
     internal fun setIsVideoPlaylistCreatedSuccessfully(value: Boolean) = _state.update {
         it.copy(isVideoPlaylistCreatedSuccessfully = value)
+    }
+
+    internal fun setShouldDeleteVideoPlaylist(value: Boolean) = _state.update {
+        it.copy(shouldDeleteVideoPlaylist = value)
+    }
+
+    internal fun clearDeletedVideoPlaylistTitles() = _state.update {
+        it.copy(deletedVideoPlaylistTitles = emptyList())
     }
 
     companion object {

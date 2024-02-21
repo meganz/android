@@ -12,6 +12,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.StringsConstants
 import mega.privacy.android.app.presentation.videosection.view.playlist.CreateVideoPlaylistDialog
 import mega.privacy.android.app.presentation.videosection.view.playlist.ERROR_MESSAGE_TEST_TAG
+import mega.privacy.android.app.presentation.videosection.view.playlist.POSITIVE_BUTTON_TEST_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.*
@@ -27,7 +28,7 @@ class CreateVideoPlaylistDialogKtTest {
     val composeTestRule = createComposeRule()
     private fun setComposeContent(
         title: String = "",
-        positiveButtonTextResID: Int = R.string.general_create,
+        positiveButtonText: String = "",
         onDialogPositiveButtonClicked: (title: String) -> Unit = { },
         onDismissRequest: () -> Unit = {},
         onDialogInputChange: (Boolean) -> Unit = {},
@@ -39,7 +40,7 @@ class CreateVideoPlaylistDialogKtTest {
         composeTestRule.setContent {
             CreateVideoPlaylistDialog(
                 title = title,
-                positiveButtonTextResID = positiveButtonTextResID,
+                positiveButtonText = positiveButtonText,
                 onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
                 onDismissRequest = onDismissRequest,
                 onDialogInputChange = onDialogInputChange,
@@ -132,7 +133,7 @@ class CreateVideoPlaylistDialogKtTest {
             onDialogPositiveButtonClicked = onDialogPositiveButtonClicked
         )
 
-        composeTestRule.onNodeWithText(R.string.general_create).performClick()
+        composeTestRule.onNodeWithTag(POSITIVE_BUTTON_TEST_TAG).performClick()
 
         verify(onDialogPositiveButtonClicked).invoke("")
     }
@@ -150,7 +151,7 @@ class CreateVideoPlaylistDialogKtTest {
 
         composeTestRule.onNodeWithText(inputPlaceholderText)
             .performTextInput(expectedTitle)
-        composeTestRule.onNodeWithText(R.string.general_create).performClick()
+        composeTestRule.onNodeWithTag(POSITIVE_BUTTON_TEST_TAG).performClick()
 
         verify(onDialogPositiveButtonClicked).invoke(expectedTitle)
     }

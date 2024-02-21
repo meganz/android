@@ -57,11 +57,17 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  */
 const val ERROR_MESSAGE_TEST_TAG = "error_message_test_tag"
 
+/**
+ * Test tag for error message
+ */
+const val POSITIVE_BUTTON_TEST_TAG = "positive_button_test_tag"
+
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun CreateVideoPlaylistDialog(
     title: String,
-    positiveButtonTextResID: Int,
+    positiveButtonText: String,
     onDialogPositiveButtonClicked: (title: String) -> Unit,
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit = {},
@@ -208,7 +214,7 @@ internal fun CreateVideoPlaylistDialog(
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.Transparent,
                 ),
-                modifier = Modifier.padding(all = 0.dp),
+                modifier = Modifier.padding(all = 0.dp).testTag(POSITIVE_BUTTON_TEST_TAG),
                 elevation = ButtonDefaults.elevation(
                     defaultElevation = 0.dp,
                     pressedElevation = 0.dp,
@@ -218,7 +224,7 @@ internal fun CreateVideoPlaylistDialog(
                 ),
             ) {
                 Text(
-                    text = stringResource(id = positiveButtonTextResID),
+                    text = positiveButtonText,
                     color = teal_300
                 )
             }
@@ -253,7 +259,7 @@ private fun CreateVideoPlaylistDialogPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         CreateVideoPlaylistDialog(
             title = "Enter playlist name",
-            positiveButtonTextResID = R.string.general_create,
+            positiveButtonText = stringResource(id = R.string.general_create),
             onDismissRequest = {},
             onDialogPositiveButtonClicked = {},
             onDialogInputChange = {},
@@ -271,7 +277,7 @@ private fun CreateVideoPlaylistDialogWithErrorPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         CreateVideoPlaylistDialog(
             title = "Enter playlist name",
-            positiveButtonTextResID = R.string.general_create,
+            positiveButtonText = stringResource(id = R.string.general_create),
             onDismissRequest = {},
             onDialogPositiveButtonClicked = {},
             onDialogInputChange = {},
@@ -289,7 +295,7 @@ private fun CreateVideoPlaylistDialogWithSameNamePreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         CreateVideoPlaylistDialog(
             title = "Enter playlist name",
-            positiveButtonTextResID = R.string.general_create,
+            positiveButtonText = stringResource(id = R.string.general_create),
             onDismissRequest = {},
             onDialogPositiveButtonClicked = {},
             onDialogInputChange = {},
