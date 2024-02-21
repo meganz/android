@@ -46,24 +46,23 @@ class RestoreBottomSheetMenuItem @Inject constructor(
         actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
         navController: NavHostController,
     ): () -> Unit = {
-        node.restoreId?.let {
-            onDismiss()
-            val restoreMap = mapOf(Pair(node.id.longValue, it.longValue))
-            scope.launch {
-                runCatching {
-                    checkNodesNameCollisionUseCase(restoreMap, NodeNameCollisionType.RESTORE)
-                }.onSuccess { result ->
-                    if (result.conflictNodes.isNotEmpty()) {
-                        actionHandler(menuAction, node)
-                    }
-                    if (result.noConflictNodes.isNotEmpty()) {
-                        val restoreResult = restoreNodesUseCase(result.noConflictNodes)
-                        val message = restoreNodeResultMapper(restoreResult)
-                        snackBarHandler.postSnackbarMessage(message)
-                    }
-                }.onFailure { throwable ->
-                    Timber.e(throwable)
+        val restoreHandle = node.restoreId?.longValue ?: -1L
+        onDismiss()
+        val restoreMap = mapOf(Pair(node.id.longValue, restoreHandle))
+        scope.launch {
+            runCatching {
+                checkNodesNameCollisionUseCase(restoreMap, NodeNameCollisionType.RESTORE)
+            }.onSuccess { result ->
+                if (result.conflictNodes.isNotEmpty()) {
+                    actionHandler(menuAction, node)
                 }
+                if (result.noConflictNodes.isNotEmpty()) {
+                    val restoreResult = restoreNodesUseCase(result.noConflictNodes)
+                    val message = restoreNodeResultMapper(restoreResult)
+                    snackBarHandler.postSnackbarMessage(message)
+                }
+            }.onFailure { throwable ->
+                Timber.e(throwable)
             }
         }
     }

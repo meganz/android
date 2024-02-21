@@ -54,9 +54,7 @@ class RestoreToolbarMenuItem @Inject constructor(
     ): () -> Unit = {
         val restoreMap = mutableMapOf<Long, Long>()
         selectedNodes.forEach { node ->
-            node.restoreId?.let {
-                restoreMap[node.id.longValue] = it.longValue
-            }
+            restoreMap[node.id.longValue] = node.restoreId?.longValue ?: -1L
         }
         scope.launch {
             runCatching {
