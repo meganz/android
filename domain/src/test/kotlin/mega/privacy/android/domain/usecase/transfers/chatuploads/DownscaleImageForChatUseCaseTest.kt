@@ -7,7 +7,6 @@ import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.SettingsRepository
-import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.DownscaleImageForChatUseCase.Companion.DOWNSCALE_IMAGES_PX
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -29,7 +28,8 @@ class DownscaleImageForChatUseCaseTest {
     private val defaultSettingsRepository = mock<SettingsRepository>()
     private val networkRepository = mock<NetworkRepository>()
     private val fileSystemRepository = mock<FileSystemRepository>()
-    private val getCacheFileUseCase = mock<GetCacheFileUseCase>()
+    private val getCacheFileForChatFileModificationUseCase =
+        mock<GetCacheFileForChatFileModificationUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -37,7 +37,7 @@ class DownscaleImageForChatUseCaseTest {
             defaultSettingsRepository,
             networkRepository,
             fileSystemRepository,
-            getCacheFileUseCase,
+            getCacheFileForChatFileModificationUseCase,
         )
     }
 
@@ -47,7 +47,7 @@ class DownscaleImageForChatUseCaseTest {
             defaultSettingsRepository,
             networkRepository,
             fileSystemRepository,
-            getCacheFileUseCase,
+            getCacheFileForChatFileModificationUseCase,
         )
 
     @Test
@@ -116,12 +116,12 @@ class DownscaleImageForChatUseCaseTest {
             verify(fileSystemRepository).downscaleImage(file, expected, DOWNSCALE_IMAGES_PX)
         }
 
-    private fun stubDestination(): File {
+    private suspend fun stubDestination(): File {
         val destination = mock<File> {
             on { it.name } doReturn "destination"
             on { it.exists() } doReturn true
         }
-        whenever(getCacheFileUseCase(any(), any())) doReturn destination
+        whenever(getCacheFileForChatFileModificationUseCase(any())) doReturn destination
         return destination
     }
 }

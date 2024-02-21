@@ -2,6 +2,7 @@ package mega.privacy.android.data.gateway.preferences
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ChatImageQuality
+import mega.privacy.android.domain.entity.VideoQuality
 
 interface ChatPreferencesGateway {
     /**
@@ -10,6 +11,13 @@ interface ChatPreferencesGateway {
      * @return Chat image quality.
      */
     fun getChatImageQualityPreference(): Flow<ChatImageQuality>
+
+    /**
+     * Gets the current chat video quality.
+     *
+     * @return Chat video quality.
+     */
+    suspend fun getChatVideoQualityPreference(): VideoQuality
 
     /**
      * Sets chat image quality.

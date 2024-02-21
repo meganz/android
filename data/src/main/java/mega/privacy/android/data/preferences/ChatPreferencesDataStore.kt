@@ -14,8 +14,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.domain.entity.ChatImageQuality
+import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import java.io.IOException
 import javax.inject.Inject
@@ -34,6 +37,8 @@ private val Context.chatDataStore: DataStore<Preferences> by preferencesDataStor
 internal class ChatPreferencesDataStore @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val videoQualityMapper: VideoQualityMapper,
+    private val dbH: DatabaseHandler
 ) : ChatPreferencesGateway {
     private val chatImageQualityPreferenceKey = stringPreferencesKey("CHAT_IMAGE_QUALITY")
     private val lastContactPermissionRequestedTimePreferenceKey =
@@ -52,6 +57,9 @@ internal class ChatPreferencesDataStore @Inject constructor(
                     preferences[chatImageQualityPreferenceKey] ?: ChatImageQuality.DEFAULT.name
                 )
             }
+
+    override suspend fun getChatVideoQualityPreference(): VideoQuality =
+        videoQualityMapper(dbH.chatVideoQuality) ?: VideoQuality.ORIGINAL
 
 
     override suspend fun setChatImageQualityPreference(quality: ChatImageQuality) {

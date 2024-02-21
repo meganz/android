@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
 import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
+import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.preference.StartScreen
 import java.io.File
@@ -160,6 +161,13 @@ interface SettingsRepository {
      * @return Chat image quality.
      */
     fun getChatImageQuality(): Flow<ChatImageQuality>
+
+    /**
+     * Gets the current chat video quality.
+     *
+     * @return Chat video quality.
+     */
+    suspend fun getChatVideoQualityPreference(): VideoQuality
 
     /**
      * Sets chat image quality.

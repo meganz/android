@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.entity
 
 /**
- * Enum class that specifies all available Video Quality options for Camera Uploads
+ * Enum class that specifies all available Video Quality options for Camera Uploads or Chat Uploads
  *
  * @property value [Int] representation of the enum
  */

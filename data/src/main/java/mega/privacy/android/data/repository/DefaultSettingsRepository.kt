@@ -29,6 +29,7 @@ import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
 import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
+import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
@@ -244,6 +245,9 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     override fun getChatImageQuality(): Flow<ChatImageQuality> =
         chatPreferencesGateway.getChatImageQualityPreference()
+
+    override suspend fun getChatVideoQualityPreference(): VideoQuality =
+        chatPreferencesGateway.getChatVideoQualityPreference()
 
     override suspend fun setChatImageQuality(quality: ChatImageQuality) =
         withContext(ioDispatcher) { chatPreferencesGateway.setChatImageQualityPreference(quality) }
