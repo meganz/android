@@ -90,7 +90,7 @@ fun MegaSpannedClickableText(
     ClickableText(
         modifier = modifier,
         text = annotatedLinkString,
-        style = baseStyle.copy(color = MegaTheme.textColor(textColor = color)),
+        style = megaTextStyle(baseStyle = baseStyle, color = color),
         onClick = { position ->
             annotatedLinkString.getStringAnnotations(ANNOTATION_TAG, position, position + 1)
                 .firstOrNull()?.let { onAnnotationClick(it.item) }

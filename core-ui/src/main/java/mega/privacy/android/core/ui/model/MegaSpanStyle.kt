@@ -2,7 +2,7 @@ package mega.privacy.android.core.ui.model
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.SpanStyle
-import mega.privacy.android.core.ui.theme.MegaTheme
+import mega.privacy.android.core.ui.controls.text.megaSpanStyle
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 
 /**
@@ -19,9 +19,9 @@ data class MegaSpanStyle(val spanStyle: SpanStyle, val color: TextColor?) {
      * Converts MegaSpanStyle to SpanStyle
      */
     @Composable
-    fun toSpanStyle(): SpanStyle {
+    internal fun toSpanStyle(): SpanStyle {
         return color?.let {
-            spanStyle.copy(color = MegaTheme.textColor(textColor = color))
+            megaSpanStyle(base = spanStyle, color = it)
         } ?: spanStyle
     }
 }
