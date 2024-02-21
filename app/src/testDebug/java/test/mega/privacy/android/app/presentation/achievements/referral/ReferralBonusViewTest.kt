@@ -1,14 +1,19 @@
 package test.mega.privacy.android.app.presentation.achievements.referral
 
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasText
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import coil.Coil
+import coil.ImageLoader
+import coil.annotation.ExperimentalCoilApi
+import coil.test.FakeImageLoaderEngine
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.achievements.referral.model.ReferralBonusesUIState
@@ -20,22 +25,33 @@ import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import test.mega.privacy.android.app.fromId
 import kotlin.random.Random
 
+@OptIn(ExperimentalCoilApi::class)
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class ReferralBonusViewTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     private val oneHundredMbInBytes = 104857600L
     private val name = "Qwerty Uiop"
     private val email = "qwerty@uiop.com"
     private val expirationInDays = Random.nextInt(from = 1, until = 200).toLong()
+
+    @Before
+    fun setUp() {
+        val engine = FakeImageLoaderEngine.Builder().build()
+        val imageLoader = ImageLoader.Builder(composeTestRule.activity)
+            .components { add(engine) }
+            .build()
+        Coil.setImageLoader(imageLoader)
+    }
 
     @Test
     fun `test that toolbar should render with correct title`() {

@@ -18,6 +18,7 @@ turbine = "1.0.0"
 roboelectric = "4.7.3"
 room-test = "2.6.1"
 runner = "1.5.2"
+coil = "2.5.0"
 
 [libraries]
 androidx-compose-ui-test = { group = "androidx.compose.ui", name = "ui-test" }
@@ -53,6 +54,7 @@ turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 roboelectric = { module = "org.robolectric:robolectric", version.ref = "roboelectric" }
 room-test = { module = "androidx.room:room-testing", version.ref = "room-test" }
 runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
+coil-test = { module = "io.coil-kt:coil-test", version.ref = "coil" }
 
 [bundles]
 unit-test = ["junit", "truth", "hamcrest", "mockito", "mockito-inline", "mockito-kotlin", "turbine"]
