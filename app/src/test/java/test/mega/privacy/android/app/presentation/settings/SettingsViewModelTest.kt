@@ -50,6 +50,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -223,12 +224,12 @@ class SettingsViewModelTest {
                     assertThat(awaitItem()).isFalse()
                 }
         }
+    }
 
-        @Test
-        fun `test that logging out of chat disables chat settings`() = runTest {
-            isMultiFactorAuthEnabledUseCase.stub {
-                onBlocking { invoke() }.thenReturn(false)
-            }
+    @Test
+    fun `test that logging out of chat disables chat settings`() = runTest {
+        isMultiFactorAuthEnabledUseCase.stub {
+            onBlocking { invoke() }.thenReturn(false)
         }
         monitorHideRecentActivityUseCase.stub {
             on { invoke() }.thenReturn(false.asHotFlow())
@@ -513,6 +514,22 @@ class SettingsViewModelTest {
             Arguments.of(true, null, null),
             Arguments.of(false, null, COOKIES_URI)
         )
+    }
+
+    @ParameterizedTest(name = "is settings camera uploads compose enabled: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that the settings camera uploads compose feature flag state is retrieved`(
+        isSettingsCameraUploadsComposeEnabled: Boolean,
+    ) = runTest {
+        whenever(getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsCompose)).thenReturn(
+            isSettingsCameraUploadsComposeEnabled
+        )
+        initViewModel()
+        advanceUntilIdle()
+        underTest.uiState.map { it.enableSettingsCameraUploadsCompose }.distinctUntilChanged()
+            .test {
+                assertThat(awaitItem()).isEqualTo(isSettingsCameraUploadsComposeEnabled)
+            }
     }
 
     companion object {

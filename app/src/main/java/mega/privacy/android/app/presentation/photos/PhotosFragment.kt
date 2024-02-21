@@ -77,6 +77,7 @@ import mega.privacy.android.app.presentation.photos.timeline.viewmodel.updateFil
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.zoomIn
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.zoomOut
 import mega.privacy.android.app.presentation.photos.view.showSortByDialog
+import mega.privacy.android.app.settings.camerauploads.SettingsCameraUploadsComposeActivity
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
@@ -472,8 +473,13 @@ class PhotosFragment : Fragment() {
     private fun openCameraUploadsSettings() {
         val context = context ?: return
 
-        val intent = Intent(context, CameraUploadsPreferencesActivity::class.java)
-        startActivity(intent)
+        val settingsCameraUploadsClass =
+            if (photosViewModel.state.value.enableSettingsCameraUploadsCompose) {
+                SettingsCameraUploadsComposeActivity::class.java
+            } else {
+                CameraUploadsPreferencesActivity::class.java
+            }
+        startActivity(Intent(context, settingsCameraUploadsClass))
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {

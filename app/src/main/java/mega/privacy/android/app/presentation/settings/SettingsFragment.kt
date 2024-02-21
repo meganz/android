@@ -81,6 +81,7 @@ import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSe
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
+import mega.privacy.android.app.settings.camerauploads.SettingsCameraUploadsComposeActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
@@ -277,15 +278,21 @@ class SettingsFragment :
         super.onPause()
     }
 
+    /**
+     * Specifies action when clicking an entry
+     */
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
         val key = preference.key
         when (key) {
-            KEY_FEATURES_CAMERA_UPLOAD -> startActivity(
-                Intent(
-                    context,
-                    CameraUploadsPreferencesActivity::class.java
-                )
-            )
+            KEY_FEATURES_CAMERA_UPLOAD -> {
+                val settingsCameraUploadsClass =
+                    if (viewModel.uiState.value.enableSettingsCameraUploadsCompose) {
+                        SettingsCameraUploadsComposeActivity::class.java
+                    } else {
+                        CameraUploadsPreferencesActivity::class.java
+                    }
+                startActivity(Intent(context, settingsCameraUploadsClass))
+            }
 
             KEY_FEATURES_CHAT ->
                 startActivity(

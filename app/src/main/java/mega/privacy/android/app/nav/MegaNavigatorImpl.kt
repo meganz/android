@@ -7,6 +7,7 @@ import android.net.Uri
 import androidx.annotation.DrawableRes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
@@ -14,6 +15,7 @@ import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterI
 import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
+import mega.privacy.android.app.settings.camerauploads.SettingsCameraUploadsComposeActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -31,6 +33,17 @@ internal class MegaNavigatorImpl @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : MegaNavigator,
     AppNavigatorImpl {
+    override fun openSettingsCameraUploads(activity: Activity) {
+        applicationScope.launch {
+            val settingsCameraUploadsClass =
+                if (getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsCompose)) {
+                    SettingsCameraUploadsComposeActivity::class.java
+                } else {
+                    CameraUploadsPreferencesActivity::class.java
+                }
+            activity.startActivity(Intent(activity, settingsCameraUploadsClass))
+        }
+    }
 
     override fun openChat(
         context: Context,

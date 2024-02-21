@@ -22,6 +22,8 @@ package mega.privacy.android.app.presentation.settings.model
  * @property passcodeLock
  * @property subFolderMediaDiscoveryChecked
  * @property cookiePolicyLink
+ * @property enableSettingsCameraUploadsCompose true if the Compose version of Settings Camera
+ * Uploads should be shown
  */
 data class SettingsState(
     val autoAcceptEnabled: Boolean,
@@ -43,4 +45,5 @@ data class SettingsState(
     val passcodeLock: Boolean,
     val subFolderMediaDiscoveryChecked: Boolean,
     val cookiePolicyLink: String?,
+    val enableSettingsCameraUploadsCompose: Boolean = false,
 )
