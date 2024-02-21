@@ -25,11 +25,11 @@ data class TextUiMessage(
     override fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit) {
         ChatMessageTextView(
             message = message,
+            isEdited = message.isEdited,
             modifier = Modifier.combinedClickable(
                 onClick = {},
                 onLongClick = { onLongClick(message) }
             ),
-            isEdited = message.isEdited,
         )
     }
 

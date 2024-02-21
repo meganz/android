@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.core.R
 import org.junit.Rule
@@ -34,7 +35,7 @@ class LocationMessageViewTest {
     private fun initComposeRuleContent() {
         composeRule.setContent {
             LocationMessageView(
-                title = title,
+                title = buildAnnotatedString { append(title) },
                 geolocation = geolocation,
                 map = ImageBitmap.imageResource(R.drawable.ic_folder_incoming),
                 isMe = true,

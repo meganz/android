@@ -18,6 +18,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -39,7 +41,7 @@ import mega.privacy.android.core.ui.theme.MegaTheme
 @Composable
 fun LocationMessageView(
     isMe: Boolean,
-    title: String,
+    title: AnnotatedString,
     geolocation: String,
     map: ImageBitmap?,
     modifier: Modifier = Modifier,
@@ -97,7 +99,7 @@ private fun LocationMessagePreview(
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         LocationMessageView(
             isMe = isMe,
-            title = "Pinned location",
+            title = buildAnnotatedString { append("Pinned location") },
             geolocation = "41.1472° N, 8.6179° W",
             map = ImageBitmap.imageResource(R.drawable.ic_folder_incoming),
         )

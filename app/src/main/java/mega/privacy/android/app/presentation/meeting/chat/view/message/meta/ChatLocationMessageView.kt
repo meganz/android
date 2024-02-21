@@ -2,15 +2,24 @@ package mega.privacy.android.app.presentation.meeting.chat.view.message.meta
 
 import android.graphics.Bitmap
 import android.location.Location
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.meeting.chat.view.message.getMessageText
 import mega.privacy.android.core.ui.controls.chat.messages.LocationMessageView
+import mega.privacy.android.core.ui.controls.text.megaSpanStyle
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
+import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -21,9 +30,9 @@ import kotlin.math.roundToInt
 @Composable
 fun ChatLocationMessageView(
     message: LocationMessage,
+    isEdited: Boolean,
     modifier: Modifier = Modifier,
     viewModel: MetaViewModel = hiltViewModel(),
-    isEdited: Boolean,
 ) {
     message.chatGeolocationInfo?.let { geolocation ->
         val locationPreview = produceState<Bitmap?>(initialValue = null) {
@@ -32,14 +41,38 @@ fun ChatLocationMessageView(
             }
         }
 
-        LocationMessageView(
-            isMe = message.isMine,
-            title = stringResource(id = R.string.title_geolocation_message),
+        ChatLocationMessageView(
+            isMine = message.isMine,
+            isEdited = isEdited,
             geolocation = getGPSCoordinates(geolocation.latitude, geolocation.longitude),
-            map = locationPreview.value?.asImageBitmap(),
+            locationPreview = locationPreview.value?.asImageBitmap(),
             modifier = modifier
         )
     }
+}
+
+@Composable
+private fun ChatLocationMessageView(
+    isMine: Boolean,
+    isEdited: Boolean,
+    geolocation: String,
+    locationPreview: ImageBitmap?,
+    modifier: Modifier,
+) {
+    LocationMessageView(
+        isMe = isMine,
+        title = getMessageText(
+            message = stringResource(id = R.string.title_geolocation_message),
+            isEdited = isEdited,
+            spansStyle = megaSpanStyle(
+                fontStyle = FontStyle.Italic,
+                color = TextColor.Disabled
+            )
+        ),
+        geolocation = geolocation,
+        map = locationPreview,
+        modifier = modifier
+    )
 }
 
 /**
@@ -76,4 +109,35 @@ private fun formatCoordinate(builder: StringBuilder, coordinate: Float) = with(b
             append(degreesSplit[2])
         }
     append("''")
+}
+
+@CombinedThemePreviews
+@Composable
+private fun NotMyLocationMessagePreview() {
+    Preview(isMine = false, isEdited = false)
+}
+
+@CombinedThemePreviews
+@Composable
+private fun MyLocationMessagePreview() {
+    Preview(isMine = true, isEdited = false)
+}
+
+@CombinedThemePreviews
+@Composable
+private fun EditedLocationMessagePreview() {
+    Preview(isMine = true, isEdited = true)
+}
+
+@Composable
+private fun Preview(isMine: Boolean, isEdited: Boolean) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        ChatLocationMessageView(
+            isMine = isMine,
+            isEdited = isEdited,
+            geolocation = "41.1472° N, 8.6179° W",
+            locationPreview = ImageBitmap.imageResource(id = R.drawable.avatar_qr_background),
+            modifier = Modifier,
+        )
+    }
 }

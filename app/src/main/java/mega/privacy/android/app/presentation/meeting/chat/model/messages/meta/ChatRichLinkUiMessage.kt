@@ -31,16 +31,15 @@ data class ChatRichLinkUiMessage(
     override fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit) {
         val uriHandler = LocalUriHandler.current
         ChatRichLinkMessageView(
+            isMe = message.isMine,
+            preview = message.chatRichPreviewInfo,
+            content = message.content,
             modifier = Modifier
                 .weight(1f)
                 .combinedClickable(
                     onClick = { message.chatRichPreviewInfo?.url?.let { uriHandler.openUri(it) } },
                     onLongClick = { onLongClick(message) }
                 ),
-            isMe = message.isMine,
-            preview = message.chatRichPreviewInfo,
-            content = message.content,
-            isEdited = message.isEdited,
         )
     }
 

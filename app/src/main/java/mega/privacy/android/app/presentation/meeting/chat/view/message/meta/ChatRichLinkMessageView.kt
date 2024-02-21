@@ -25,7 +25,6 @@ fun ChatRichLinkMessageView(
     content: String,
     modifier: Modifier = Modifier,
     viewModel: MetaViewModel = hiltViewModel(),
-    isEdited: Boolean,
 ) {
     preview?.let {
         val image = produceState<Bitmap?>(initialValue = null) {
