@@ -12,4 +12,6 @@
         <item quantity="one">%1$s unread message</item>
         <item quantity="other">%1$s unread messages</item>
     </plurals>
+    <string name="slide_to_cancel">Slide to cancel</string>
+    <string name="general_cancel">Cancel</string>
 </resources>

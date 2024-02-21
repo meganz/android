@@ -103,6 +103,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
 import mega.privacy.android.core.ui.controls.chat.ChatObserverIndicator
 import mega.privacy.android.core.ui.controls.chat.ScrollToBottomFab
+import mega.privacy.android.core.ui.controls.chat.VoiceClipRecordEvent
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
@@ -117,9 +118,9 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable
 internal fun ChatView(
-    viewModel: ChatViewModel = hiltViewModel(),
     actionsFactories: Set<(ChatViewModel) -> MessageAction>,
     savers: ChatSavers,
+    viewModel: ChatViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -269,7 +270,9 @@ internal fun ChatView(
         onEmojiClick: () -> Unit,
         onCloseEditing: () -> Unit,
         interactionSourceTextInput: MutableInteractionSource,
-    ) -> Unit = { state, showEmojiPicker, onSendClicked, onAttachmentClick, onEmojiClick, onCloseEditingClick, interactionSourceTextInput ->
+        (VoiceClipRecordEvent) -> Unit,
+    ) -> Unit = { state, showEmojiPicker, onSendClicked, onAttachmentClick, onEmojiClick, onCloseEditingClick, interactionSourceTextInput, onVoiceClipEvent ->
+
         ChatBottomBar(
             uiState = state,
             showEmojiPicker = showEmojiPicker,
@@ -277,7 +280,8 @@ internal fun ChatView(
             onAttachmentClick = onAttachmentClick,
             onEmojiClick = onEmojiClick,
             interactionSourceTextInput = interactionSourceTextInput,
-            onCloseEditing = onCloseEditingClick
+            onCloseEditing = onCloseEditingClick,
+            onVoiceClipEvent = onVoiceClipEvent
         )
     },
     onSendClick: (String) -> Unit = {},
@@ -733,6 +737,9 @@ internal fun ChatView(
                             },
                             onCloseEditing,
                             interactionSourceTextInput,
+                            { voiceClipRecordEvent ->
+                                println("call view model to handle voice clip record event $voiceClipRecordEvent")
+                            }
                         )
                     }
                     JoinChatButton(isPreviewMode = isPreviewMode, isJoining = isJoining) {

@@ -20,6 +20,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.UserTypingView
 import mega.privacy.android.core.ui.controls.chat.ChatInputTextToolbar
+import mega.privacy.android.core.ui.controls.chat.VoiceClipRecordEvent
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.theme.MegaAppTheme
 
@@ -42,6 +43,7 @@ fun ChatBottomBar(
     onEmojiClick: () -> Unit,
     interactionSourceTextInput: MutableInteractionSource,
     onCloseEditing: () -> Unit,
+    onVoiceClipEvent: (VoiceClipRecordEvent) -> Unit = {},
     viewModel: ChatBottomBarViewModel = hiltViewModel(),
 ) {
     var textFieldValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
@@ -67,6 +69,7 @@ fun ChatBottomBar(
             textFieldValue = it
         },
         onCloseEditing = onCloseEditing,
+        onVoiceClipEvent = onVoiceClipEvent,
     )
 }
 
@@ -93,6 +96,7 @@ fun ChatBottomBarContent(
     onTextChange: (TextFieldValue) -> Unit,
     interactionSourceTextInput: MutableInteractionSource,
     onCloseEditing: () -> Unit = {},
+    onVoiceClipEvent: (VoiceClipRecordEvent) -> Unit = {},
 ) {
     Column {
         UserTypingView(
@@ -117,7 +121,8 @@ fun ChatBottomBarContent(
             onTextChange = onTextChange,
             editingMessageId = uiState.editingMessageId,
             editMessageContent = uiState.editingMessageContent,
-            onCloseEditing = onCloseEditing
+            onCloseEditing = onCloseEditing,
+            onVoiceClipEvent = onVoiceClipEvent,
         )
     }
 }
