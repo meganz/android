@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.CreateSetElementListenerInterface
@@ -187,6 +188,24 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                         listener = listener
                     )
                 }
+                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+            }
+        }
+
+    override suspend fun updateVideoPlaylistTitle(
+        playlistID: NodeId,
+        newTitle: String
+    ): String =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("updateVideoPlaylistTitle") {
+                    it.text
+                }
+                megaApiGateway.updateSetName(
+                    sid = playlistID.longValue,
+                    name = newTitle,
+                    listener = listener
+                )
                 continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }

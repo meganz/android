@@ -44,6 +44,7 @@ import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCa
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
+import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
@@ -71,6 +72,7 @@ class VideoSectionViewModel @Inject constructor(
     private val addVideosToPlaylistUseCase: AddVideosToPlaylistUseCase,
     private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase,
     private val removeVideoPlaylistsUseCase: RemoveVideoPlaylistsUseCase,
+    private val updateVideoPlaylistTitleUseCase: UpdateVideoPlaylistTitleUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VideoSectionState())
 
@@ -399,7 +401,7 @@ class VideoSectionViewModel @Inject constructor(
             .takeIf { it.isNotEmpty() && checkVideoPlaylistTitleValidity(it) }
             ?.let { playlistTitle ->
                 createVideoPlaylistJob = viewModelScope.launch {
-                    setShowCreateVideoPlaylistDialog(false)
+                    setShowCreateVideoPlaylist(false)
                     runCatching {
                         createVideoPlaylistUseCase(playlistTitle)
                     }.onSuccess { videoPlaylist ->
@@ -467,14 +469,44 @@ class VideoSectionViewModel @Inject constructor(
             }
         }
 
+    internal fun updateVideoPlaylistTitle(playlistID: NodeId, newTitle: String) =
+        newTitle.trim()
+            .takeIf { it.isNotEmpty() && checkVideoPlaylistTitleValidity(it) }
+            ?.let { title ->
+                viewModelScope.launch {
+                    runCatching {
+                        updateVideoPlaylistTitleUseCase(playlistID, title)
+                    }.onSuccess { title ->
+                        Timber.d("Updated video playlist title: $title")
+                        _state.update {
+                            it.copy(
+                                shouldRenameVideoPlaylist = false
+                            )
+                        }
+                        loadVideoPlaylists()
+                    }.onFailure { exception ->
+                        Timber.e(exception)
+                        _state.update {
+                            it.copy(
+                                shouldRenameVideoPlaylist = false
+                            )
+                        }
+                    }
+                }
+            }
+
+    internal fun setShouldRenameVideoPlaylist(value: Boolean) = _state.update {
+        it.copy(shouldRenameVideoPlaylist = value)
+    }
+
     internal fun updateCurrentVideoPlaylist(playlist: VideoPlaylistUIEntity?) {
         _state.update {
             it.copy(currentVideoPlaylist = playlist)
         }
     }
 
-    internal fun setShowCreateVideoPlaylistDialog(showCreateDialog: Boolean) = _state.update {
-        it.copy(shouldCreateVideoPlaylistDialog = showCreateDialog)
+    internal fun setShowCreateVideoPlaylist(value: Boolean) = _state.update {
+        it.copy(shouldCreateVideoPlaylist = value)
     }
 
     internal fun setPlaceholderTitle(placeholderTitle: String) {

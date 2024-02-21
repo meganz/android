@@ -101,9 +101,9 @@ internal fun VideoSectionComposeView(
                 onMenuClick = onPlaylistItemMenuClick,
                 setDialogInputPlaceholder = videoSectionViewModel::setPlaceholderTitle,
                 isInputTitleValid = uiState.isInputTitleValid,
-                showCreateVideoPlaylistDialog = uiState.shouldCreateVideoPlaylistDialog,
+                showCreateVideoPlaylistDialog = uiState.shouldCreateVideoPlaylist,
                 inputPlaceHolderText = uiState.createVideoPlaylistPlaceholderTitle,
-                setShowCreateVideoPlaylistDialog = videoSectionViewModel::setShowCreateVideoPlaylistDialog,
+                setShowCreateVideoPlaylistDialog = videoSectionViewModel::setShowCreateVideoPlaylist,
                 setInputValidity = videoSectionViewModel::setNewPlaylistTitleValidity,
                 onDialogPositiveButtonClicked = videoSectionViewModel::createNewPlaylist
             )

@@ -19,7 +19,8 @@ import mega.privacy.android.domain.entity.SortOrder
  * @property numberOfAddedVideos the number of added videos
  * @property isPlaylistProgressBarShown true if the playlist progress bar is being shown
  * @property isInputTitleValid true if the input title is valid
- * @property shouldCreateVideoPlaylistDialog true if there is a need to create a video playlist
+ * @property shouldCreateVideoPlaylist true if there is a need to create a video playlist
+ * @property shouldRenameVideoPlaylist true if there is a need to rename a video playlist
  * @property createVideoPlaylistPlaceholderTitle the create video playlist placeholder title
  * @property createDialogErrorMessage the create dialog error message
  * @property deletedVideoPlaylistTitles the deleted video playlist titles
@@ -39,7 +40,8 @@ data class VideoSectionState(
     val numberOfAddedVideos: Int = 0,
     val isPlaylistProgressBarShown: Boolean = true,
     val isInputTitleValid: Boolean = true,
-    val shouldCreateVideoPlaylistDialog: Boolean = false,
+    val shouldCreateVideoPlaylist: Boolean = false,
+    val shouldRenameVideoPlaylist: Boolean = false,
     val createVideoPlaylistPlaceholderTitle: String = "",
     val createDialogErrorMessage: Int? = null,
     val deletedVideoPlaylistTitles: List<String> = emptyList()

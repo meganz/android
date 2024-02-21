@@ -14,13 +14,13 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RemoveVideoPlaylistsUseCaseTest {
-    private lateinit var underTest: RemoveVideoPlaylistsUseCase
+class UpdateVideoPlaylistTitleUseCaseTest {
+    private lateinit var underTest: UpdateVideoPlaylistTitleUseCase
     private val videoSectionRepository = mock<VideoSectionRepository>()
 
     @BeforeAll
     fun setUp() {
-        underTest = RemoveVideoPlaylistsUseCase(
+        underTest = UpdateVideoPlaylistTitleUseCase(
             videoSectionRepository = videoSectionRepository
         )
     }
@@ -34,16 +34,11 @@ class RemoveVideoPlaylistsUseCaseTest {
 
     @Test
     fun `test that use case returns correct result`() = runTest {
-        val videoPlaylistIDs = listOf(
-            NodeId(1L),
-            NodeId(2L),
-            NodeId(3L),
-        )
-        whenever(videoSectionRepository.removeVideoPlaylists(videoPlaylistIDs)).thenReturn(
-            videoPlaylistIDs.map { it.longValue }
-        )
+        val newTitle = "newTitle"
+        whenever(videoSectionRepository.updateVideoPlaylistTitle(NodeId(1L), newTitle))
+            .thenReturn(newTitle)
 
-        val actual = underTest(videoPlaylistIDs)
-        assertThat(actual).isEqualTo(videoPlaylistIDs.map { it.longValue })
+        val actual = underTest(NodeId(1L), newTitle)
+        assertThat(actual).isEqualTo(newTitle)
     }
 }

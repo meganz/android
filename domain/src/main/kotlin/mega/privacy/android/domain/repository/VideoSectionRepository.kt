@@ -48,4 +48,13 @@ interface VideoSectionRepository {
      * @param playlistIDs removed playlist ids
      */
     suspend fun removeVideoPlaylists(playlistIDs: List<NodeId>): List<Long>
+
+    /**
+     * Update video playlist title
+     *
+     * @param playlistID playlist id
+     * @param newTitle new title
+     * @return updated title
+     */
+    suspend fun updateVideoPlaylistTitle(playlistID: NodeId, newTitle: String): String
 }

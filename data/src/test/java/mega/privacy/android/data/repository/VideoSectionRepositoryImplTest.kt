@@ -354,4 +354,29 @@ class VideoSectionRepositoryImplTest {
             assertThat(it).isEqualTo(1L)
         }
     }
+
+    @Test
+    fun `test that updating the video playlist title returns the new title`() = runTest {
+        val newTitle = "new title"
+
+        val megaRequestError = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+        val megaRequest = mock<MegaRequest> {
+            on { text }.thenReturn(newTitle)
+        }
+
+        whenever(megaApiGateway.updateSetName(any(), any(), any())).thenAnswer {
+            (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                megaRequest,
+                megaRequestError,
+            )
+        }
+
+        initUnderTest()
+
+        val actual = underTest.updateVideoPlaylistTitle(NodeId(1L), newTitle)
+        assertThat(actual).isEqualTo(newTitle)
+    }
 }

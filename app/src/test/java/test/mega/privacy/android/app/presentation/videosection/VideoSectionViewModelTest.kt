@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCa
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
+import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -72,6 +73,7 @@ class VideoSectionViewModelTest {
     private val addVideosToPlaylistUseCase = mock<AddVideosToPlaylistUseCase>()
     private val getNextDefaultAlbumNameUseCase = mock<GetNextDefaultAlbumNameUseCase>()
     private val removeVideoPlaylistsUseCase = mock<RemoveVideoPlaylistsUseCase>()
+    private val updateVideoPlaylistTitleUseCase = mock<UpdateVideoPlaylistTitleUseCase>()
 
     private val expectedVideo = mock<VideoUIEntity> { on { name }.thenReturn("video name") }
 
@@ -103,7 +105,8 @@ class VideoSectionViewModelTest {
             createVideoPlaylistUseCase = createVideoPlaylistUseCase,
             addVideosToPlaylistUseCase = addVideosToPlaylistUseCase,
             getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
-            removeVideoPlaylistsUseCase = removeVideoPlaylistsUseCase
+            removeVideoPlaylistsUseCase = removeVideoPlaylistsUseCase,
+            updateVideoPlaylistTitleUseCase = updateVideoPlaylistTitleUseCase
         )
     }
 
@@ -123,7 +126,8 @@ class VideoSectionViewModelTest {
             videoPlaylistUIEntityMapper,
             createVideoPlaylistUseCase,
             addVideosToPlaylistUseCase,
-            getNextDefaultAlbumNameUseCase
+            getNextDefaultAlbumNameUseCase,
+            updateVideoPlaylistTitleUseCase
         )
     }
 
@@ -461,11 +465,11 @@ class VideoSectionViewModelTest {
         initUnderTest()
 
         underTest.state.test {
-            assertThat(awaitItem().shouldCreateVideoPlaylistDialog).isFalse()
-            underTest.setShowCreateVideoPlaylistDialog(true)
-            assertThat(awaitItem().shouldCreateVideoPlaylistDialog).isTrue()
-            underTest.setShowCreateVideoPlaylistDialog(false)
-            assertThat(awaitItem().shouldCreateVideoPlaylistDialog).isFalse()
+            assertThat(awaitItem().shouldCreateVideoPlaylist).isFalse()
+            underTest.setShowCreateVideoPlaylist(true)
+            assertThat(awaitItem().shouldCreateVideoPlaylist).isTrue()
+            underTest.setShowCreateVideoPlaylist(false)
+            assertThat(awaitItem().shouldCreateVideoPlaylist).isFalse()
         }
     }
 
@@ -540,6 +544,47 @@ class VideoSectionViewModelTest {
             assertThat(actual.deletedVideoPlaylistTitles[0]).isEqualTo(videoPlaylistTitles[0])
         }
     }
+
+    @Test
+    fun `test that shouldRenameVideoPlaylistDialog is correctly updated after updated video playlist title`() =
+        runTest {
+            val newTitle = "newTitle"
+            val playlistID = NodeId(1L)
+
+            whenever(updateVideoPlaylistTitleUseCase(playlistID, newTitle)).thenReturn(
+                newTitle
+            )
+
+            underTest.state.test {
+                assertThat(awaitItem().shouldRenameVideoPlaylist).isFalse()
+                underTest.setShouldRenameVideoPlaylist(true)
+                assertThat(awaitItem().shouldRenameVideoPlaylist).isTrue()
+                underTest.updateVideoPlaylistTitle(playlistID, newTitle)
+                assertThat(awaitItem().shouldRenameVideoPlaylist).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that shouldRenameVideoPlaylistDialog is correctly updated when throw exception`() =
+        runTest {
+            val newTitle = "newTitle"
+            val playlistID = NodeId(1L)
+            whenever(
+                updateVideoPlaylistTitleUseCase(
+                    playlistID,
+                    newTitle
+                )
+            ).thenAnswer { throw Exception() }
+
+            underTest.state.test {
+                assertThat(awaitItem().shouldRenameVideoPlaylist).isFalse()
+                underTest.setShouldRenameVideoPlaylist(true)
+                assertThat(awaitItem().shouldRenameVideoPlaylist).isTrue()
+                underTest.updateVideoPlaylistTitle(playlistID, newTitle)
+                assertThat(awaitItem().shouldRenameVideoPlaylist).isFalse()
+            }
+        }
 
     companion object {
         @JvmField
