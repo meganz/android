@@ -549,9 +549,12 @@ internal fun ChatView(
                             }.map {
                                 it.bottomSheetMenuItem(
                                     messages = selectedMessages,
-                                    chatId = chatId,
                                     context = context
-                                )
+                                ) {
+                                    coroutineScope.launch {
+                                        messageOptionsModalSheetState.hide()
+                                    }
+                                }
                             },
                             sheetState = messageOptionsModalSheetState,
                         )

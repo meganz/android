@@ -11,19 +11,21 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openCh
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.options.ForwardBottomSheetOption
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.management.ManagementMessage
+import mega.privacy.android.domain.entity.chat.messages.meta.InvalidMetaMessage
 
 internal class ForwardMessageAction(
     private val chatViewModel: ChatViewModel,
     private val launchChatPicker: (Context, Long, ActivityResultLauncher<Intent>) -> Unit = ::openChatPicker,
 ) : MessageAction {
-    override fun appliesTo(messages: List<TypedMessage>) = messages.none { it is ManagementMessage }
-
+    override fun appliesTo(messages: List<TypedMessage>) = messages
+        .none { it is ManagementMessage || it is InvalidMessage || it is InvalidMetaMessage }
 
     override fun bottomSheetMenuItem(
         messages: List<TypedMessage>,
-        chatId: Long,
         context: Context,
+        hideBottomSheet: () -> Unit,
     ): @Composable () -> Unit =
         {
             val chatPickerLauncher =
@@ -38,9 +40,10 @@ internal class ForwardMessageAction(
                     }
                 }
             ForwardBottomSheetOption {
+                hideBottomSheet()
                 launchChatPicker(
                     context,
-                    chatId,
+                    messages.first().chatId,
                     chatPickerLauncher
                 )
             }

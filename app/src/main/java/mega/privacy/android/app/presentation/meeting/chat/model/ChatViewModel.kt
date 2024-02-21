@@ -1311,6 +1311,21 @@ class ChatViewModel @Inject constructor(
     }
 
     /**
+     * Delete messages.
+     *
+     * @param messages list of [TypedMessage].
+     */
+    fun onDeletedMessages(messages: List<TypedMessage>) {
+        viewModelScope.launch {
+            runCatching {
+                TODO("Not yet implemented")
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
      * called when viewmodel is cleared
      */
     override fun onCleared() {

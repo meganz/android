@@ -10,13 +10,16 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.options.CHAT_BOTTOM_SHEET_OPTION_FORWARD_TAG
+import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.management.ManagementMessage
+import mega.privacy.android.domain.entity.chat.messages.meta.InvalidMetaMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -50,12 +53,22 @@ class ForwardMessageActionTest() {
     }
 
     @Test
+    fun `test that action does not apply to invalid messages`() {
+        assertThat(underTest.appliesTo(listOf(mock<InvalidMessage>()))).isFalse()
+    }
+
+    @Test
+    fun `test that action does not apply to invalid meta messages`() {
+        assertThat(underTest.appliesTo(listOf(mock<InvalidMetaMessage>()))).isFalse()
+    }
+
+    @Test
     fun `test that composable contains forward bottom action`() {
         composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
                 messages = emptyList(),
-                chatId = 123L,
                 context = mock(),
+                hideBottomSheet = {},
             )
         )
 
@@ -66,11 +79,15 @@ class ForwardMessageActionTest() {
     fun `test that clicking the menu option launches the chat picker`() {
         val chatId = 123L
         val context = mock<Context>()
+        val message = mock<NormalMessage> {
+            on { this.chatId } doReturn chatId
+        }
+        val messages = listOf(message)
         composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
-                messages = emptyList(),
-                chatId = chatId,
+                messages = messages,
                 context = context,
+                hideBottomSheet = {},
             )
         )
 

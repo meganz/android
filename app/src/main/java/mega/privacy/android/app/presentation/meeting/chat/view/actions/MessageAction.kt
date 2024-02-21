@@ -20,15 +20,13 @@ interface MessageAction {
      * In column
      *
      * @param messages
-     * @param chatId
      * @param context
+     * @param hideBottomSheet
      * @return
      */
     fun bottomSheetMenuItem(
         messages: List<TypedMessage>,
-        chatId: Long,
         context: Context,
+        hideBottomSheet: () -> Unit,
     ): @Composable () -> Unit
-
-
 }
