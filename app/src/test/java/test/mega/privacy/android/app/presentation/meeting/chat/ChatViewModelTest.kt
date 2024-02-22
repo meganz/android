@@ -31,6 +31,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.chat.model.ForwardMessagesToChatsResult
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.meeting.chat.model.InviteContactToChatResult
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
@@ -55,6 +56,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -2684,6 +2686,30 @@ internal class ChatViewModelTest {
         }
         files.filterIndexed { index, _ -> index != indexWithError }.forEach {
             verify(attachNodeUseCase)(chatId, it)
+        }
+    }
+
+    @Test
+    fun `test that consumeDownloadEvent update state correctly`() = runTest {
+        initTestClass()
+        underTest.consumeDownloadEvent()
+        underTest.state.test {
+            assertThat(awaitItem().downloadEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
+        }
+    }
+
+    @Test
+    fun `test that onDownloadChatNode updates state correctly`() = runTest {
+        val node = mock<ChatDefaultFile>()
+        initTestClass()
+        underTest.onDownloadForPreviewChatNode(node)
+        underTest.state.test {
+            val actual = awaitItem()
+            assertThat(actual.downloadEvent)
+                .isInstanceOf(StateEventWithContentTriggered::class.java)
+            val content = (actual.downloadEvent as StateEventWithContentTriggered).content
+            assertThat(content).isInstanceOf(TransferTriggerEvent.StartDownloadForPreview::class.java)
         }
     }
 

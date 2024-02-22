@@ -97,6 +97,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatToolbar
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.MessageOptionsBottomSheet
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ReactionsInfoBottomSheet
 import mega.privacy.android.app.presentation.qrcode.findActivity
+import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils
@@ -165,6 +166,7 @@ internal fun ChatView(
         onForwardMessages = viewModel::onForwardMessages,
         actions = actionsFactories.map { it(viewModel) }.toSet(),
         messageListSaver = savers.messageListSaver,
+        consumeDownloadEvent = viewModel::consumeDownloadEvent,
     )
 }
 
@@ -305,6 +307,7 @@ internal fun ChatView(
     messageListSaver: Saver<List<TypedMessage>, String> = Saver(
         save = { "" },
         restore = { emptyList() }),
+    consumeDownloadEvent: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -962,6 +965,12 @@ internal fun ChatView(
                 showMutePushNotificationDialog = true
             }
         }
+
+        StartDownloadComponent(
+            event = uiState.downloadEvent,
+            onConsumeEvent = consumeDownloadEvent,
+            snackBarHostState = scaffoldState.snackbarHostState,
+        )
 
         if (isStartingCall && callInThisChat != null) {
             onCallStarted()

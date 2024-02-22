@@ -33,6 +33,7 @@ import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ParticipantNameMapper
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReactionUser
@@ -48,6 +49,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.user.UserId
@@ -1339,6 +1341,25 @@ class ChatViewModel @Inject constructor(
             }
         }
         super.onCleared()
+    }
+
+    /**
+     * Consume download event
+     *
+     */
+    fun consumeDownloadEvent() {
+        _state.update { state -> state.copy(downloadEvent = consumed()) }
+    }
+
+    /**
+     * On download chat node
+     *
+     * @param file [ChatFile]
+     */
+    fun onDownloadForPreviewChatNode(file: ChatFile) {
+        _state.update {
+            it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadForPreview(file)))
+        }
     }
 
     companion object {

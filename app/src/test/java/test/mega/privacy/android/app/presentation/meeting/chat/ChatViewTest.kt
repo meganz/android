@@ -27,6 +27,8 @@ import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_E
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatGalleryState
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatGalleryViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_LOCATION
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadComponentViewModel
+import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferViewState
 import mega.privacy.android.core.ui.controls.chat.TEST_TAG_ATTACHMENT_ICON
 import mega.privacy.android.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -51,8 +53,13 @@ class ChatViewTest {
         on { state } doReturn MutableStateFlow(ChatGalleryState())
     }
 
+    private val startDownloadComponentViewModel = mock<StartDownloadComponentViewModel> {
+        on { uiState } doReturn MutableStateFlow(StartDownloadTransferViewState())
+    }
+
     private val viewModelStore = mock<ViewModelStore> {
         on { get(argThat<String> { contains(ChatGalleryViewModel::class.java.canonicalName.orEmpty()) }) } doReturn chatGalleryViewModel
+        on { get(argThat<String> { contains(StartDownloadComponentViewModel::class.java.canonicalName.orEmpty()) }) } doReturn startDownloadComponentViewModel
     }
     private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
         on { viewModelStore } doReturn viewModelStore

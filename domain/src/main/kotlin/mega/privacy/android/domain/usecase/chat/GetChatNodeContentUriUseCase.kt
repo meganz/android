@@ -32,6 +32,7 @@ class GetChatNodeContentUriUseCase @Inject constructor(
             true
         } else false
         val link = nodeRepository.getLocalLink(fileNode)
+            ?: throw IllegalStateException("Local link is null")
         NodeContentUri.RemoteContentUri(link, shouldStopHttpSever)
     }
 }

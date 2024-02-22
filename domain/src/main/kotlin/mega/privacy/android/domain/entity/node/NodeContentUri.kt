@@ -20,5 +20,5 @@ sealed interface NodeContentUri {
      * @property url remote url
      * @property shouldStopHttpSever should stop http server
      */
-    data class RemoteContentUri(val url: String?, val shouldStopHttpSever: Boolean) : NodeContentUri
+    data class RemoteContentUri(val url: String, val shouldStopHttpSever: Boolean) : NodeContentUri
 }

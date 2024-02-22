@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.meeting.chat.model
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatCall
@@ -50,6 +51,7 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion
  * @property editingMessageId Id of the message being edited.
  * @property editingMessageContent Content of the message being edited.
  * @property myUserHandle User handle of current logged in user.
+ * @property downloadEvent Event to start a download.
  */
 data class ChatUiState(
     val chat: ChatRoom? = null,
@@ -84,6 +86,7 @@ data class ChatUiState(
     val editingMessageId: Long? = null,
     val editingMessageContent: String? = null,
     val myUserHandle: Long? = null,
+    val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
 ) {
 
     /**

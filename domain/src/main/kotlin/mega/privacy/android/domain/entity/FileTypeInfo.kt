@@ -22,6 +22,11 @@ sealed interface FileTypeInfo {
      * file extension
      */
     val extension: String
+
+    /**
+     * Is supported
+     */
+    val isSupported: Boolean get() = true
 }
 
 /**
@@ -110,7 +115,10 @@ data class AudioFileTypeInfo(
      * Duration
      */
     val duration: Duration,
-) : FileTypeInfo
+) : FileTypeInfo {
+    override val isSupported = extension != "wma" && extension != "aif" && extension != "aiff"
+            && extension != "iff" && extension == "oga" || extension == "3ga"
+}
 
 /**
  * Gif file type info
@@ -159,7 +167,14 @@ data class SvgFileTypeInfo(
 data class TextFileTypeInfo(
     override val mimeType: String,
     override val extension: String,
-) : TextEditorFileTypeInfo
+) : TextEditorFileTypeInfo {
+    companion object {
+        /**
+         * Max Size Openable Text File
+         */
+        const val MAX_SIZE_OPENABLE_TEXT_FILE = 20971520
+    }
+}
 
 /**
  * Un mapped file type info
@@ -188,4 +203,9 @@ data class VideoFileTypeInfo(
      * Duration
      */
     val duration: Duration,
-) : FileTypeInfo
+) : FileTypeInfo {
+    /**
+     * Is supported
+     */
+    override val isSupported: Boolean = extension != "mpg" && extension != "wmv"
+}
