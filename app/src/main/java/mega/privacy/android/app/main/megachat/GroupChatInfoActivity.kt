@@ -2,8 +2,6 @@ package mega.privacy.android.app.main.megachat
 
 import android.Manifest
 import android.content.BroadcastReceiver
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -62,7 +60,6 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.Participan
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
 import mega.privacy.android.app.presentation.chat.groupInfo.GroupChatInfoViewModel
-import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
@@ -108,7 +105,6 @@ import javax.inject.Inject
  * Activity which shows group chat room information.
  *
  * @property getChatChangesUseCase [GetChatChangesUseCase]
- * @property endCallUseCase [EndCallUseCase]
  * @property getCallUseCase [GetCallUseCase]
  * @property binding [ActivityGroupChatPropertiesBinding]
  * @property isChatOpen True when the megaChatApi.openChatRoom() method has already been called from ChatActivity. False, otherwise
@@ -126,9 +122,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
     @Inject
     lateinit var getChatChangesUseCase: GetChatChangesUseCase
-
-    @Inject
-    lateinit var endCallUseCase: EndCallUseCase
 
     @Inject
     lateinit var getCallUseCase: GetCallUseCase
@@ -591,11 +584,13 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 memberCheck.isChecked = true
                 observerCheck.isChecked = false
             }
+
             MegaChatRoom.PRIV_MODERATOR -> {
                 administratorCheck.isChecked = true
                 memberCheck.isChecked = false
                 observerCheck.isChecked = false
             }
+
             else -> {
                 administratorCheck.isChecked = false
                 memberCheck.isChecked = false
@@ -609,6 +604,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 R.id.change_permissions_dialog_administrator_layout -> changePermissions(
                     MegaChatRoom.PRIV_MODERATOR
                 )
+
                 R.id.change_permissions_dialog_member_layout -> changePermissions(MegaChatRoom.PRIV_STANDARD)
                 R.id.change_permissions_dialog_observer_layout -> changePermissions(MegaChatRoom.PRIV_RO)
             }
@@ -657,21 +653,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         )
 
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
-    }
-
-    /**
-     * Copy current chat link
-     */
-    fun copyLink() {
-        Timber.d("copyLink")
-        if (chatLink != null) {
-            val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = ClipData.newPlainText("Copied Text", chatLink)
-            clipboard.setPrimaryClip(clip)
-            showSnackbar(getString(R.string.chat_link_copied_clipboard))
-        } else {
-            showSnackbar(getString(R.string.general_text_error))
-        }
     }
 
     /**
@@ -814,11 +795,13 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 input.error = getString(R.string.invalid_string)
                 input.requestFocus()
             }
+
             !ChatUtil.isAllowedTitle(title) -> {
                 Timber.w("Title is too long")
                 input.error = getString(R.string.title_long)
                 input.requestFocus()
             }
+
             else -> {
                 Timber.d("Positive button pressed - change title")
                 chatC?.changeTitle(chatHandle, title)
@@ -909,6 +892,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                     adapter?.updateParticipant(index, participants)
                 }
             }
+
             MegaChatRequest.TYPE_ARCHIVE_CHATROOM -> {
                 val chatHandle = request.chatHandle
                 val chat = megaChatApi.getChatRoom(chatHandle)
@@ -942,6 +926,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
                 updateAdapterHeader()
             }
+
             MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM -> {
                 Timber.d("Remove participant: %s", request.userHandle)
                 Timber.d("My user handle: %s", megaChatApi.myUserHandle)
@@ -967,6 +952,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                     showSnackbar(getString(R.string.remove_participant_error))
                 }
             }
+
             MegaChatRequest.TYPE_EDIT_CHATROOM_NAME -> {
                 Timber.d("Change title")
                 if (e.errorCode == MegaChatError.ERROR_OK) {
@@ -977,6 +963,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                     Timber.e("ERROR WHEN TYPE_EDIT_CHATROOM_NAME %s", e.errorString)
                 }
             }
+
             MegaChatRequest.TYPE_CREATE_CHATROOM -> {
                 Timber.d("Create chat request finish!!!")
                 if (e.errorCode == MegaChatError.ERROR_OK) {
@@ -991,6 +978,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                     showSnackbar(getString(R.string.create_chat_error))
                 }
             }
+
             MegaChatRequest.TYPE_CHAT_LINK_HANDLE -> {
                 Timber.d("MegaChatRequest.TYPE_CHAT_LINK_HANDLE finished!!!")
                 if (!request.flag) {
@@ -1001,15 +989,19 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                                 showGetChatLinkPanel()
                                 return
                             }
+
                             MegaChatError.ERROR_ARGS -> {
                                 Timber.e("The chatroom isn't group or public")
                             }
+
                             MegaChatError.ERROR_NOENT -> {
                                 Timber.e("The chatroom doesn't exist or the chatId is invalid")
                             }
+
                             MegaChatError.ERROR_ACCESS -> {
                                 Timber.e("The chatroom doesn't have a topic or the caller isn't an operator")
                             }
+
                             else -> {
                                 Timber.e("Error TYPE_CHAT_LINK_HANDLE %s", e.errorCode)
                             }
@@ -1046,12 +1038,15 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                                 MegaChatError.ERROR_ARGS -> {
                                     Timber.e("The chatroom isn't group or public")
                                 }
+
                                 MegaChatError.ERROR_NOENT -> {
                                     Timber.e("The chatroom doesn't exist or the chatId is invalid")
                                 }
+
                                 MegaChatError.ERROR_ACCESS -> {
                                     Timber.e("The chatroom doesn't have a topic or the caller isn't an operator")
                                 }
+
                                 else -> {
                                     Timber.e("Error TYPE_CHAT_LINK_HANDLE %s", e.errorCode)
                                 }
@@ -1064,6 +1059,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
                 updateAdapterHeader()
             }
+
             MegaChatRequest.TYPE_SET_PRIVATE_MODE -> {
                 Timber.d("MegaChatRequest.TYPE_SET_PRIVATE_MODE finished!!!")
                 when (e.errorCode) {
@@ -1073,12 +1069,15 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                         updateAdapterHeader()
                         return
                     }
+
                     MegaChatError.ERROR_ARGS -> {
                         Timber.e("NOT public chatroom")
                     }
+
                     MegaChatError.ERROR_NOENT -> {
                         Timber.e("Chatroom not FOUND")
                     }
+
                     MegaChatError.ERROR_ACCESS -> {
                         Timber.e("NOT privileges or private chatroom")
                     }
@@ -1129,12 +1128,14 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                             }
                             return
                         }
+
                         MegaError.API_EEXIST -> showSnackbar(
                             getString(
                                 R.string.context_contact_already_invited,
                                 request.email
                             )
                         )
+
                         else -> {
                             if (request.number == MegaContactRequest.INVITE_ACTION_ADD.toLong() && e.errorCode == MegaError.API_EARGS) {
                                 showSnackbar(getString(R.string.error_own_email_as_contact))
@@ -1306,6 +1307,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             Constants.REQUEST_RECORD_AUDIO -> if (CallUtil.checkCameraPermission(this)) {
                 startCall()
             }
+
             Constants.REQUEST_CAMERA -> startCall()
         }
     }

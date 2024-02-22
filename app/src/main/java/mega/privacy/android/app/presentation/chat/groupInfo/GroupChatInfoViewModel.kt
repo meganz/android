@@ -22,7 +22,6 @@ import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.groupInfo.model.GroupInfoState
-import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.CallUtil.openMeetingWithAudioOrVideo
@@ -32,6 +31,7 @@ import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastLeaveChatUseCase
+import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -225,19 +225,12 @@ class GroupChatInfoViewModel @Inject constructor(
     /**
      * End for all the current call
      */
-    fun endCallForAll() {
-        endCallUseCase.endCallForAllWithChatId(_state.value.chatId)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onError = { error ->
-                Timber.e(error.stackTraceToString())
-            })
-            .addTo(composite)
-
-        viewModelScope.launch {
-            kotlin.runCatching {
-                sendStatisticsMeetingsUseCase(EndCallForAll())
-            }
+    fun endCallForAll() = viewModelScope.launch {
+        runCatching {
+            endCallUseCase(_state.value.chatId)
+            sendStatisticsMeetingsUseCase(EndCallForAll())
+        }.onFailure {
+            Timber.e(it.stackTraceToString())
         }
     }
 

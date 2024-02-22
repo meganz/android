@@ -42,7 +42,6 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
-import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.call.GetNetworkChangesUseCase
@@ -68,9 +67,11 @@ import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
+import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableAudioLevelMonitorUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.IsAudioLevelMonitorEnabledUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 
@@ -149,6 +150,7 @@ class InMeetingViewModel @Inject constructor(
     private val getChatCallUseCase: GetChatCallUseCase,
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val broadcastCallEndedUseCase: BroadcastCallEndedUseCase,
+    private val hangChatCallUseCase: HangChatCallUseCase,
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -2759,19 +2761,15 @@ class InMeetingViewModel @Inject constructor(
      *
      * @param chatId Chat ID
      */
-    private fun endCallForAll(chatId: Long) {
+    private fun endCallForAll(chatId: Long) = viewModelScope.launch {
         Timber.d("End for all. Chat id $chatId")
-        endCallUseCase.endCallForAllWithChatId(chatId)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onComplete = {
-                viewModelScope.launch {
-                    broadcastCallEndedUseCase(chatId)
-                }
-            }, onError = { error ->
-                Timber.e(error.stackTraceToString())
-            })
-            .addTo(composite)
+        runCatching {
+            endCallUseCase(chatId)
+        }.onSuccess {
+            broadcastCallEndedUseCase(chatId)
+        }.onFailure {
+            Timber.e(it.stackTraceToString())
+        }
     }
 
     /**
@@ -2794,19 +2792,15 @@ class InMeetingViewModel @Inject constructor(
      *
      * @param callId Call ID
      */
-    private fun hangCall(callId: Long) {
+    private fun hangCall(callId: Long) = viewModelScope.launch {
         Timber.d("Hang up call. Call id $callId")
-        endCallUseCase.hangCall(callId)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onComplete = {
-                viewModelScope.launch {
-                    broadcastCallEndedUseCase(state.value.currentChatId)
-                }
-            }, onError = { error ->
-                Timber.e(error.stackTraceToString())
-            })
-            .addTo(composite)
+        runCatching {
+            hangChatCallUseCase(callId)
+        }.onSuccess {
+            broadcastCallEndedUseCase(state.value.currentChatId)
+        }.onFailure {
+            Timber.e(it.stackTraceToString())
+        }
     }
 
     /**

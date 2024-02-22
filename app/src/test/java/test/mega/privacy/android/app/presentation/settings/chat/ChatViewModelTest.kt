@@ -13,7 +13,6 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.ChatViewModel
 import mega.privacy.android.app.presentation.chat.ContactInvitation
-import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.DeviceGateway
@@ -23,6 +22,7 @@ import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
+import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.LoadPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
@@ -373,6 +373,18 @@ class ChatViewModelTest {
             underTest.setRichLinkWarningCounter(counter)
             advanceUntilIdle()
             verify(setRichLinkWarningCounterUseCase).invoke(counter)
+        }
+
+    @Test
+    fun `test that the end call use case is executed, and the meeting's statistics are sent when the user ends the call for all`() =
+        runTest {
+            // When
+            underTest.endCallForAll()
+            advanceUntilIdle()
+
+            // Then
+            verify(endCallUseCase).invoke(underTest.state.value.chatId)
+            verify(sendStatisticsMeetingsUseCase).invoke(any())
         }
 
     companion object {

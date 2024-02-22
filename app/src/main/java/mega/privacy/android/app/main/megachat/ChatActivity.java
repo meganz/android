@@ -205,7 +205,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -304,7 +303,6 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
-import mega.privacy.android.app.BuildConfig;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -370,7 +368,6 @@ import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.objects.PasscodeManagement;
-import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel;
 import mega.privacy.android.app.presentation.chat.ChatViewModel;
 import mega.privacy.android.app.presentation.chat.ContactInvitation;
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment;
@@ -387,13 +384,13 @@ import mega.privacy.android.app.presentation.meeting.UsersInWaitingRoomDialogFra
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity;
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel;
 import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.GetPublicNodeUseCase;
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase;
 import mega.privacy.android.app.usecase.LegacyGetPublicLinkInformationUseCase;
-import mega.privacy.android.app.usecase.call.EndCallUseCase;
 import mega.privacy.android.app.usecase.call.GetCallStatusChangesUseCase;
 import mega.privacy.android.app.usecase.call.GetCallUseCase;
 import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase;
@@ -413,7 +410,6 @@ import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import mega.privacy.android.data.model.chat.AndroidMegaRichLinkMessage;
-import mega.privacy.android.domain.entity.ChatRoomPermission;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting;
 import mega.privacy.android.domain.entity.chat.FileGalleryItem;
@@ -422,7 +418,6 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState;
 import mega.privacy.android.domain.entity.contacts.ContactLink;
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus;
 import mega.privacy.android.domain.usecase.GetPushToken;
-import mega.privacy.android.domain.usecase.GetThemeMode;
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiAndroid;
@@ -514,8 +509,6 @@ public class ChatActivity extends PasscodeActivity
 
     private final static int PADDING_BUBBLE = 25;
     private final static int CORNER_RADIUS_BUBBLE = 30;
-    private final static int MARGIN_BUTTON_DEACTIVATED = 20;
-    private final static int MARGIN_BUTTON_ACTIVATED = 24;
     private final static int DURATION_BUBBLE = 4000;
     private int MIN_FIRST_AMPLITUDE = 2;
     private int MIN_SECOND_AMPLITUDE;
@@ -532,9 +525,6 @@ public class ChatActivity extends PasscodeActivity
     private final static int SIXTH_RANGE = 6;
 
     @Inject
-    GetThemeMode getThemeMode;
-
-    @Inject
     FilePrepareUseCase filePrepareUseCase;
     @Inject
     PasscodeManagement passcodeManagement;
@@ -546,8 +536,6 @@ public class ChatActivity extends PasscodeActivity
     GetPublicNodeUseCase getPublicNodeUseCase;
     @Inject
     GetChatChangesUseCase getChatChangesUseCase;
-    @Inject
-    EndCallUseCase endCallUseCase;
     @Inject
     GetCallStatusChangesUseCase getCallStatusChangesUseCase;
     @Inject
@@ -2551,11 +2539,6 @@ public class ChatActivity extends PasscodeActivity
         chatRelativeLayout.setVisibility(View.GONE);
     }
 
-    public void removeChatLink() {
-        Timber.d("removeChatLink");
-        megaChatApi.removeChatLink(idChat, this);
-    }
-
     /**
      * Requests to load for first time chat messages.
      * It controls if it is the real first time, or the device was rotated with the "isTurn" flag.
@@ -3832,22 +3815,6 @@ public class ChatActivity extends PasscodeActivity
                 && checkPermissions(REQUEST_WRITE_STORAGE_TAKE_PICTURE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
-    private boolean checkPermissionsReadStorage() {
-        Timber.d("checkPermissionsReadStorage");
-        String[] PERMISSIONS = new String[]{
-                PermissionUtils.getImagePermissionByVersion(),
-                PermissionUtils.getAudioPermissionByVersion(),
-                PermissionUtils.getVideoPermissionByVersion(),
-                PermissionUtils.getReadExternalStoragePermission()
-        };
-        return checkPermissions(REQUEST_READ_STORAGE, PERMISSIONS);
-    }
-
-    private boolean checkPermissionWriteStorage(int code) {
-        Timber.d("checkPermissionsWriteStorage :%s", code);
-        return checkPermissions(code, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         Timber.d("onRequestPermissionsResult");
@@ -3917,30 +3884,6 @@ public class ChatActivity extends PasscodeActivity
                 in.putExtra("chatId", idChat);
                 in.putExtra("aBtitle", getString(R.string.add_participants_menu_item));
                 startActivityForResult(in, REQUEST_ADD_PARTICIPANTS);
-            }
-        } else {
-            Timber.w("Online but not megaApi");
-            showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
-        }
-    }
-
-    public void chooseContactsDialog() {
-        Timber.d("chooseContactsDialog");
-
-        if (megaApi != null && megaApi.getRootNode() != null) {
-            ArrayList<MegaUser> contacts = megaApi.getContacts();
-            if (contacts == null) {
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.no_contacts_invite), -1);
-            } else {
-                if (contacts.isEmpty()) {
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.no_contacts_invite), -1);
-                } else {
-                    Intent in = new Intent(this, AddContactActivity.class);
-                    in.putExtra("contactType", CONTACT_TYPE_MEGA);
-                    in.putExtra("chat", true);
-                    in.putExtra("aBtitle", getString(R.string.send_contacts));
-                    startActivityForResult(in, REQUEST_SEND_CONTACTS);
-                }
             }
         } else {
             Timber.w("Online but not megaApi");
@@ -8584,11 +8527,6 @@ public class ChatActivity extends PasscodeActivity
         this.chatRoom = chatRoom;
     }
 
-    public void revoke() {
-        Timber.d("revoke");
-        megaChatApi.revokeAttachmentMessage(idChat, selectedMessageId);
-    }
-
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
 
@@ -9472,27 +9410,6 @@ public class ChatActivity extends PasscodeActivity
             unreadBadgeLayout.setVisibility(View.GONE);
         }
 
-    }
-
-    public MegaApiAndroid getLocalMegaApiFolder() {
-
-        PackageManager m = getPackageManager();
-        String s = getPackageName();
-        PackageInfo p;
-        String path = null;
-        try {
-            p = m.getPackageInfo(s, 0);
-            path = p.applicationInfo.dataDir + "/";
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        MegaApiAndroid megaApiFolder = new MegaApiAndroid(MegaApplication.APP_KEY, BuildConfig.USER_AGENT, path);
-
-        megaApiFolder.setDownloadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
-        megaApiFolder.setUploadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);
-
-        return megaApiFolder;
     }
 
     public File createImageFile() {

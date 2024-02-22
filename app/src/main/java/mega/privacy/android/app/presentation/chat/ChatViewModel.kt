@@ -5,11 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,7 +26,6 @@ import mega.privacy.android.app.presentation.chat.model.ChatStateLegacy
 import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.isPast
-import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
@@ -58,6 +53,7 @@ import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
+import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.LoadPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
@@ -861,13 +857,11 @@ class ChatViewModel @Inject constructor(
             }.onSuccess { call ->
                 Timber.d("Call exists")
                 call?.apply {
-                    endCallUseCase.hangCall(call.callId)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeBy(onError = { error ->
-                            Timber.e(error.stackTraceToString())
-                        })
-                        .addTo(rxSubscriptions)
+                    runCatching {
+                        hangChatCallUseCase(call.callId)
+                    }.onFailure {
+                        Timber.e(it.stackTraceToString())
+                    }
                 }
             }
         }
@@ -882,21 +876,12 @@ class ChatViewModel @Inject constructor(
     /**
      * End for all the current call
      */
-    fun endCallForAll() {
-        endCallUseCase.run {
-            endCallForAllWithChatId(_state.value.chatId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(onError = { error ->
-                    Timber.e(error.stackTraceToString())
-                })
-                .addTo(rxSubscriptions)
-        }
-
-        viewModelScope.launch {
-            kotlin.runCatching {
-                sendStatisticsMeetingsUseCase(EndCallForAll())
-            }
+    fun endCallForAll() = viewModelScope.launch {
+        runCatching {
+            endCallUseCase(_state.value.chatId)
+            sendStatisticsMeetingsUseCase(EndCallForAll())
+        }.onFailure {
+            Timber.e(it.stackTraceToString())
         }
     }
 

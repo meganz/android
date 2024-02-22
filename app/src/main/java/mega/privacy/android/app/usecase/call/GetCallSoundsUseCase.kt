@@ -30,6 +30,7 @@ import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiAndroid
@@ -49,10 +50,10 @@ class GetCallSoundsUseCase @Inject constructor(
     private val getParticipantsChangesUseCase: GetParticipantsChangesUseCase,
     private val getSessionStatusChangesUseCase: GetSessionStatusChangesUseCase,
     private val getCallStatusChangesUseCase: GetCallStatusChangesUseCase,
-    private val endCallUseCase: EndCallUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val callsPreferencesGateway: CallsPreferencesGateway,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
+    private val hangChatCallUseCase: HangChatCallUseCase,
     @ApplicationScope private val sharingScope: CoroutineScope,
 ) {
 
@@ -91,11 +92,13 @@ class GetCallSoundsUseCase @Inject constructor(
                 if (MegaApplication.getChatManagement()
                         .isRequestSent(call.callId) && call.numParticipants == ONE_PARTICIPANT
                 ) {
-                    endCallUseCase.hangCall(call.callId)
-                        .subscribeBy(
-                            onError = { error ->
-                                Timber.e(error.stackTraceToString())
-                            })
+                    sharingScope.launch {
+                        runCatching {
+                            hangChatCallUseCase(call.callId)
+                        }.onFailure {
+                            Timber.e(it.stackTraceToString())
+                        }
+                    }
                 }
             }
 
@@ -310,15 +313,15 @@ class GetCallSoundsUseCase @Inject constructor(
                         counterState?.let { isFinished ->
                             if (isFinished) {
                                 Timber.d("Count down timer ends. Hang call")
-                                endCallUseCase.hangCall(call.callId)
-                                    .subscribeBy(
-                                        onComplete = {
-                                            removeFinishCallCountDownTimer()
-                                        },
-                                        onError = { error ->
-                                            Timber.e(error.stackTraceToString())
-                                        })
-                                    .addTo(disposable)
+                                sharingScope.launch {
+                                    runCatching {
+                                        hangChatCallUseCase(call.callId)
+                                    }.onSuccess {
+                                        removeFinishCallCountDownTimer()
+                                    }.onFailure {
+                                        Timber.e(it.stackTraceToString())
+                                    }
+                                }
                             }
                         }
                     }
