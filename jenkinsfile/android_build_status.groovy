@@ -517,6 +517,7 @@ String buildCodeComparisonResults() {
     def currentModuleTestCases = []
     def currentModuleCoverage = ""
     def currentModuleTestResultsLink = ""
+    def isCoverageReduced = false
 
     for (def latestDevelopModuleResults in latestDevelopResults) {
         // Compare the name from moduleResult with a static module name
@@ -542,7 +543,20 @@ String buildCodeComparisonResults() {
         // Build the Columns
         String testCasesColumn = buildTestCasesColumn(currentModuleTestCases, currentModuleTestResultsLink, latestDevelopModuleResults)
         String coverageColumn = buildCoverageColumn(currentModuleCoverage, latestDevelopModuleResults)
-        String coverageChangeColumn = buildCoverageChangeColumn(currentModuleCoverage, latestDevelopModuleResults)
+
+        def currentModuleLinePercentage = currentModuleCoverage.split("%")[0]
+        def currentModuleBigDecimal = new BigDecimal(currentModuleLinePercentage).setScale(2, RoundingMode.HALF_UP)
+
+        def latestDevelopTotalLines = Float.parseFloat(latestDevelopModuleResults.totalLines)
+        def latestDevelopCoveredLines = Float.parseFloat(latestDevelopModuleResults.coveredLines)
+        def latestDevelopLinePercentage = (latestDevelopCoveredLines / latestDevelopTotalLines) * 100
+        def latestDevelopBigDecimal = new BigDecimal(latestDevelopLinePercentage).setScale(2, RoundingMode.HALF_UP)
+
+        if (currentModuleBigDecimal < latestDevelopBigDecimal) {
+            isCoverageReduced = true
+        }
+
+        String coverageChangeColumn = buildCoverageChangeColumn(currentModuleBigDecimal, latestDevelopBigDecimal)
 
         // Add a Column for every item in the list
         tableString = tableString.concat("| ${latestDevelopModuleResults.name} | $testCasesColumn | $coverageColumn | $coverageChangeColumn |").concat("\n")
@@ -551,7 +565,14 @@ String buildCodeComparisonResults() {
         codeComparisonSummary += " ${latestDevelopModuleResults.name.replaceAll('\\*', '')}(${coverageChangeColumn.replaceAll('\\*', '')})"
     }
 
-    return codeComparisonSummary.concat("</summary>").concat(tableString).concat("</details>")
+    def result = ""
+    if (isCoverageReduced) {
+        result = ":warning: This MR has caused a reduction in the test coverage. Please add some unit tests.\n\n".concat(codeComparisonSummary).concat("</b></summary>").concat(tableString).concat("</details>")
+    } else {
+        result = codeComparisonSummary.concat("</b></summary>").concat(tableString).concat("</details>")
+    }
+
+    return result
 }
 
 /**
@@ -665,19 +686,11 @@ String buildCoverageColumn(def currentModuleCoverage, def latestDevelopModuleCov
  * branch and the latest develop branch in Artifactory
  *
  * @param currentModuleCoverage The Module results of the current branch
- * @param latestDevelopModuleCoverage The Module results of the latest develop branch in Artifactory
+ * @param latestDevelopModuleResults The Module results of the latest develop branch in Artifactory
  *
  * @return A String that serves as an entry for the "Coverage Change" column
  */
-String buildCoverageChangeColumn(def currentModuleCoverage, def latestDevelopModuleCoverage) {
-    def currentModuleLinePercentage = currentModuleCoverage.split("%")[0]
-    def currentModuleBigDecimal = new BigDecimal(currentModuleLinePercentage).setScale(2, RoundingMode.HALF_UP)
-
-    def latestDevelopTotalLines = Float.parseFloat(latestDevelopModuleCoverage.totalLines)
-    def latestDevelopCoveredLines = Float.parseFloat(latestDevelopModuleCoverage.coveredLines)
-    def latestDevelopLinePercentage = (latestDevelopCoveredLines / latestDevelopTotalLines) * 100
-    def latestDevelopBigDecimal = new BigDecimal(latestDevelopLinePercentage).setScale(2, RoundingMode.HALF_UP)
-
+String buildCoverageChangeColumn(def currentModuleBigDecimal, def latestDevelopBigDecimal) {
     def result = currentModuleBigDecimal - latestDevelopBigDecimal
 
     if (result > 0) {
