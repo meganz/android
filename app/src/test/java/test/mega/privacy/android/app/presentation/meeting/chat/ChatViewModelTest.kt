@@ -101,6 +101,7 @@ import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCa
 import mega.privacy.android.domain.usecase.chat.message.SendGiphyMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
+import mega.privacy.android.domain.usecase.chat.message.delete.DeleteMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.message.forward.ForwardMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.AddReactionUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.DeleteReactionUseCase
@@ -273,6 +274,7 @@ internal class ChatViewModelTest {
     private val attachNodeUseCase = mock<AttachNodeUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val addNodeType = mock<AddNodeType>()
+    private val deleteMessagesUseCase = mock<DeleteMessagesUseCase>()
 
     @BeforeEach
     fun resetMocks() {
@@ -328,6 +330,7 @@ internal class ChatViewModelTest {
             forwardMessagesUseCase,
             forwardMessagesResultMapper,
             addNodeType,
+            deleteMessagesUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -425,7 +428,8 @@ internal class ChatViewModelTest {
             forwardMessagesResultMapper = forwardMessagesResultMapper,
             attachNodeUseCase = attachNodeUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
-            addNodeType = addNodeType
+            addNodeType = addNodeType,
+            deleteMessagesUseCase = deleteMessagesUseCase,
         )
     }
 
@@ -2711,6 +2715,15 @@ internal class ChatViewModelTest {
             val content = (actual.downloadEvent as StateEventWithContentTriggered).content
             assertThat(content).isInstanceOf(TransferTriggerEvent.StartDownloadForPreview::class.java)
         }
+    }
+
+    @Test
+    fun `test that delete messages invokes use case`() = runTest {
+        val message = mock<TypedMessage>()
+        val messages = listOf(message)
+        whenever(deleteMessagesUseCase(messages)).thenReturn(Unit)
+        underTest.onDeletedMessages(messages)
+        verify(deleteMessagesUseCase).invoke(messages)
     }
 
     private fun ChatRoom.getNumberParticipants() =

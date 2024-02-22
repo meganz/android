@@ -24,6 +24,7 @@ internal class CacheGatewayImpl @Inject constructor(
 
     companion object {
         private const val CHAT_TEMPORARY_FOLDER = "chatTempMEGA"
+        private const val VOICE_CLIP_FOLDER = "voiceClipsMEGA"
     }
 
     override suspend fun getOrCreateCacheFolder(folderName: String): File? =
@@ -91,6 +92,11 @@ internal class CacheGatewayImpl @Inject constructor(
             Timber.e(e)
         }
     }
+
+    override suspend fun getVoiceClipFile(name: String): File? =
+        getCacheFile(VOICE_CLIP_FOLDER, name)?.let {
+            if (it.exists()) it else null
+        }
 
     /**
      * @param dir [File] indicates current directory or file

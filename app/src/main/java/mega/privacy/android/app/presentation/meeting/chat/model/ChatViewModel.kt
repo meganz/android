@@ -92,6 +92,7 @@ import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCa
 import mega.privacy.android.domain.usecase.chat.message.SendGiphyMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
+import mega.privacy.android.domain.usecase.chat.message.delete.DeleteMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.message.forward.ForwardMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.AddReactionUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.DeleteReactionUseCase
@@ -217,6 +218,7 @@ class ChatViewModel @Inject constructor(
     private val attachNodeUseCase: AttachNodeUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val addNodeType: AddNodeType,
+    private val deleteMessagesUseCase: DeleteMessagesUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -1320,7 +1322,7 @@ class ChatViewModel @Inject constructor(
     fun onDeletedMessages(messages: List<TypedMessage>) {
         viewModelScope.launch {
             runCatching {
-                TODO("Not yet implemented")
+                deleteMessagesUseCase(messages)
             }.onFailure {
                 Timber.e(it)
             }

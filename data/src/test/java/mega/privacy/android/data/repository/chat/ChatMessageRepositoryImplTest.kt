@@ -359,4 +359,22 @@ class ChatMessageRepositoryImplTest {
         verify(typedMessageEntityConverters).convertFromMessageReactionList(reactions)
         verify(chatStorageGateway).updateMessageReactions(chatId, msgId, reactionsString)
     }
+
+    @Test
+    fun `test that delete message invokes and returns correctly`() = runTest {
+        val message = mock<MegaChatMessage>()
+        val chatMessage = mock<ChatMessage>()
+        whenever(megaChatApiGateway.deleteMessage(chatId, msgId)).thenReturn(message)
+        whenever(chatMessageMapper(message)).thenReturn(chatMessage)
+        assertThat(underTest.deleteMessage(chatId, msgId)).isEqualTo(chatMessage)
+    }
+
+    @Test
+    fun `test that revoke attachment message invokes and returns correctly`() = runTest {
+        val message = mock<MegaChatMessage>()
+        val chatMessage = mock<ChatMessage>()
+        whenever(megaChatApiGateway.revokeAttachmentMessage(chatId, msgId)).thenReturn(message)
+        whenever(chatMessageMapper(message)).thenReturn(chatMessage)
+        assertThat(underTest.revokeAttachmentMessage(chatId, msgId)).isEqualTo(chatMessage)
+    }
 }

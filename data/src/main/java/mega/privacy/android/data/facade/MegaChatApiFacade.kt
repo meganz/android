@@ -812,4 +812,10 @@ internal class MegaChatApiFacade @Inject constructor(
         msgId: Long,
         targetChatId: Long,
     ): MegaChatMessage? = chatApi.forwardContact(sourceChatId, msgId, targetChatId)
+
+    override suspend fun deleteMessage(chatId: Long, msgId: Long): MegaChatMessage? =
+        chatApi.deleteMessage(chatId, msgId)
+
+    override suspend fun revokeAttachmentMessage(chatId: Long, msgId: Long): MegaChatMessage? =
+        chatApi.revokeAttachmentMessage(chatId, msgId)
 }

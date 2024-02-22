@@ -6,6 +6,7 @@ import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.data.model.meeting.ChatCallUpdate
 import mega.privacy.android.domain.entity.chat.ChatVideoUpdate
+import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatLoggerInterface
@@ -1683,4 +1684,40 @@ interface MegaChatApiGateway {
         msgId: Long,
         targetChatId: Long,
     ): MegaChatMessage?
+
+    /**
+     * Deletes an existing message
+     *
+     * Message's deletions are equivalent to message's edits, but with empty content.
+     * @see \c MegaChatapi::editMessage for more information.
+     *
+     * You take the ownership of the returned value.
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param msgId MegaChatHandle that identifies the message
+     *
+     * @return MegaChatMessage that will be deleted. NULL if the message cannot be deleted (too old)
+     */
+    suspend fun deleteMessage(chatId: Long, msgId: Long): MegaChatMessage?
+
+    /**
+     * Revoke the access to a node granted by an attachment message
+     *
+     * The attachment message will be deleted as any other message. Therefore,
+     *
+     * The revoke is actually a deletion of the former message. Hence, the behavior is the
+     * same than a regular deletion.
+     * @see MegaChatApi::editMessage or MegaChatApi::deleteMessage for more information.
+     *
+     * If the revoke is rejected because the attachment message is too old, or if the message is
+     * not an attachment message, this function returns NULL.
+     *
+     * You take the ownership of the returned value.
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param msgId MegaChatHandle that identifies the message
+     *
+     * @return MegaChatMessage that will be modified. NULL if the message cannot be edited (too old)
+     */
+    suspend fun revokeAttachmentMessage(chatId: Long, msgId: Long): MegaChatMessage?
 }

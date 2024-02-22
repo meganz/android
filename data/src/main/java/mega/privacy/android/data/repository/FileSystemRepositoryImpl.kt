@@ -575,4 +575,10 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun downscaleImage(file: File, destination: File, maxPixels: Long) {
         fileGateway.downscaleImage(file, destination, maxPixels)
     }
+
+    override suspend fun deleteVoiceClip(name: String): Boolean =
+        withContext(ioDispatcher + NonCancellable) {
+            cacheGateway.getVoiceClipFile(name)?.let { fileGateway.deleteFile(it) } ?: false
+        }
+
 }

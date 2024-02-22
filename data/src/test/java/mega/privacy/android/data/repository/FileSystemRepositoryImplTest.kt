@@ -506,4 +506,13 @@ internal class FileSystemRepositoryImplTest {
             }
         }
     }
+
+    @ParameterizedTest(name = "delete voice clip: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that voice clip can be deleted`(deleteVoiceClip: Boolean) =
+        runTest {
+            whenever(cacheGateway.getVoiceClipFile(any())).thenReturn(mock())
+            whenever(fileGateway.deleteFile(any())).thenReturn(deleteVoiceClip)
+            assertThat(underTest.deleteVoiceClip("name")).isEqualTo(deleteVoiceClip)
+        }
 }

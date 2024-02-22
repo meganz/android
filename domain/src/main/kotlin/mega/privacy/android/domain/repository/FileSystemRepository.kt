@@ -359,4 +359,11 @@ interface FileSystemRepository {
      * Creates a new image from [file] to [destination] with [maxPixels] pixels if the image has more than [maxPixels] pixels
      */
     suspend fun downscaleImage(file: File, destination: File, maxPixels: Long)
+
+    /**
+     * Deletes a voice clip file.
+     *
+     * @return True if file has been removed, false otherwise
+     */
+    suspend fun deleteVoiceClip(name: String): Boolean
 }

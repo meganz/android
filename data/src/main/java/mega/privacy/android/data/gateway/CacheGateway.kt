@@ -84,4 +84,11 @@ interface CacheGateway {
      */
     suspend fun clearSdkCache()
 
+    /**
+     * Get voice clip file.
+     *
+     * @param name the name of the file.
+     */
+    suspend fun getVoiceClipFile(name: String): File?
+
 }
