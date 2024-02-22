@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
-import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity
+import mega.privacy.android.app.activities.settingsActivities.LegacyCameraUploadsPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.DownloadPreferencesActivity
@@ -289,7 +289,7 @@ class SettingsFragment :
                     if (viewModel.uiState.value.enableSettingsCameraUploadsCompose) {
                         SettingsCameraUploadsComposeActivity::class.java
                     } else {
-                        CameraUploadsPreferencesActivity::class.java
+                        LegacyCameraUploadsPreferencesActivity::class.java
                     }
                 startActivity(Intent(context, settingsCameraUploadsClass))
             }

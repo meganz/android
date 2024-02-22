@@ -7,7 +7,7 @@ import android.net.Uri
 import androidx.annotation.DrawableRes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity
+import mega.privacy.android.app.activities.settingsActivities.LegacyCameraUploadsPreferencesActivity
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
@@ -39,7 +39,7 @@ internal class MegaNavigatorImpl @Inject constructor(
                 if (getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsCompose)) {
                     SettingsCameraUploadsComposeActivity::class.java
                 } else {
-                    CameraUploadsPreferencesActivity::class.java
+                    LegacyCameraUploadsPreferencesActivity::class.java
                 }
             activity.startActivity(Intent(activity, settingsCameraUploadsClass))
         }

@@ -41,10 +41,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity
+import mega.privacy.android.app.activities.settingsActivities.LegacyCameraUploadsPreferencesActivity
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_PHOTOS_SLOT_ID
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -475,7 +474,7 @@ class PhotosFragment : Fragment() {
             if (photosViewModel.state.value.enableSettingsCameraUploadsCompose) {
                 SettingsCameraUploadsComposeActivity::class.java
             } else {
-                CameraUploadsPreferencesActivity::class.java
+                LegacyCameraUploadsPreferencesActivity::class.java
             }
         startActivity(Intent(context, settingsCameraUploadsClass))
     }

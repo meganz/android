@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsState
+import mega.privacy.android.app.presentation.settings.camerauploads.model.LegacySettingsCameraUploadsState
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
@@ -108,7 +108,8 @@ import javax.inject.Inject
  * @property snackBarHandler Handler used to display a Snackbar
  */
 @HiltViewModel
-class SettingsCameraUploadsViewModel @Inject constructor(
+@Deprecated(message = "This is a legacy class that will be replaced by a ViewModel for [SettingsCameraUploadsComposeActivity] once the migration to Jetpack Compose has been finished")
+class LegacySettingsCameraUploadsViewModel @Inject constructor(
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val areLocationTagsEnabledUseCase: AreLocationTagsEnabledUseCase,
     private val areUploadFileNamesKeptUseCase: AreUploadFileNamesKeptUseCase,
@@ -160,12 +161,12 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val snackBarHandler: SnackBarHandler,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(SettingsCameraUploadsState())
+    private val _state = MutableStateFlow(LegacySettingsCameraUploadsState())
 
     /**
      * State of Settings Camera Uploads
      */
-    val state: StateFlow<SettingsCameraUploadsState> = _state.asStateFlow()
+    val state: StateFlow<LegacySettingsCameraUploadsState> = _state.asStateFlow()
 
     /**
      * Monitor connectivity event
@@ -233,7 +234,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Resets the value of [SettingsCameraUploadsState.shouldShowBusinessAccountPrompt] to False
+     * Resets the value of [LegacySettingsCameraUploadsState.shouldShowBusinessAccountPrompt] to False
      */
     fun resetBusinessAccountPromptState() =
         _state.update { it.copy(shouldShowBusinessAccountPrompt = false) }
@@ -314,7 +315,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Sets the value of [SettingsCameraUploadsState.shouldShowMediaPermissionsRationale]
+     * Sets the value of [LegacySettingsCameraUploadsState.shouldShowMediaPermissionsRationale]
      * @param shouldShow The new state value
      */
     fun setMediaPermissionsRationaleState(shouldShow: Boolean) {
@@ -537,7 +538,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * When [SettingsCameraUploadsViewModel] is instantiated, initialize the UI Elements
+     * When [LegacySettingsCameraUploadsViewModel] is instantiated, initialize the UI Elements
      */
     private fun initializeSettings() {
         viewModelScope.launch {
@@ -641,7 +642,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Updates the value of [SettingsCameraUploadsState.uploadConnectionType] whenever a new Upload
+     * Updates the value of [LegacySettingsCameraUploadsState.uploadConnectionType] whenever a new Upload
      * Connection type is set
      */
     private suspend fun refreshUploadConnectionType() {
@@ -650,7 +651,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Updates the value of [SettingsCameraUploadsState.uploadOption] whenever a new
+     * Updates the value of [LegacySettingsCameraUploadsState.uploadOption] whenever a new
      * Upload Connection type is set
      */
     private suspend fun refreshUploadOption() {
@@ -659,7 +660,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Updates the value of [SettingsCameraUploadsState.areLocationTagsIncluded] whenever changes
+     * Updates the value of [LegacySettingsCameraUploadsState.areLocationTagsIncluded] whenever changes
      * to include / exclude Location Tags for Photo uploads are found
      */
     private suspend fun refreshLocationTags() {
@@ -668,7 +669,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Updates the value of [SettingsCameraUploadsState.videoQuality] whenever a new upload
+     * Updates the value of [LegacySettingsCameraUploadsState.videoQuality] whenever a new upload
      * Video Quality has been set
      */
     private suspend fun refreshUploadVideoQuality() {
@@ -677,7 +678,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Updates the value of [SettingsCameraUploadsState.isChargingRequiredForVideoCompression] whenever
+     * Updates the value of [LegacySettingsCameraUploadsState.isChargingRequiredForVideoCompression] whenever
      * a change to require charging for video compression is found
      */
     private suspend fun refreshChargingRequiredForVideoCompression() {
@@ -688,7 +689,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Updates the value of [SettingsCameraUploadsState.videoCompressionSizeLimit] whenever the
+     * Updates the value of [LegacySettingsCameraUploadsState.videoCompressionSizeLimit] whenever the
      * maximum video compression size limit changes
      */
     private suspend fun refreshVideoCompressionSizeLimit() {
@@ -697,7 +698,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Updates the value of [SettingsCameraUploadsState.areUploadFileNamesKept] whenever File Name
+     * Updates the value of [LegacySettingsCameraUploadsState.areUploadFileNamesKept] whenever File Name
      * changes for uploads are found
      */
     private suspend fun refreshUploadFilesNamesKept() {
@@ -706,7 +707,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Updates the value of [SettingsCameraUploadsState.primaryFolderPath] whenever a valid Primary
+     * Updates the value of [LegacySettingsCameraUploadsState.primaryFolderPath] whenever a valid Primary
      * Folder path is set
      */
     private suspend fun refreshPrimaryFolderPath() {
@@ -877,7 +878,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Updates [SettingsCameraUploadsState.showNewVideoCompressionSizePrompt] to determine whether
+     * Updates [LegacySettingsCameraUploadsState.showNewVideoCompressionSizePrompt] to determine whether
      * to show the New Video Compression Size Dialog or not
      *
      * @param showDialog true if the New Video Compression Size Dialog should be shown
@@ -930,7 +931,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Notifies [SettingsCameraUploadsState.clearNewVideoCompressionSizeInput] that the Event has
+     * Notifies [LegacySettingsCameraUploadsState.clearNewVideoCompressionSizeInput] that the Event has
      * been performed
      */
     fun onClearNewVideoCompressionSizeInputConsumed() {

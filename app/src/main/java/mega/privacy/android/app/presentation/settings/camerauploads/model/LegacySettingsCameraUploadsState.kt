@@ -29,7 +29,8 @@ import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
  * @property videoQuality Determines the Video Quality of videos to be uploaded
  * @property shouldTriggerPermissionDialog Checks whether the Permissions Dialog should be shown or not
  */
-data class SettingsCameraUploadsState(
+@Deprecated(message = "This is a legacy class that will be replaced by a UI State class for [SettingsCameraUploadsComposeActivity] once the migration to Jetpack Compose has been finished")
+data class LegacySettingsCameraUploadsState(
     val areLocationTagsIncluded: Boolean = false,
     val areUploadFileNamesKept: Boolean = false,
     val isCameraUploadsEnabled: Boolean = false,

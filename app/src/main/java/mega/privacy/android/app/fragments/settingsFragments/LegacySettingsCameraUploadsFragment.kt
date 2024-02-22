@@ -60,7 +60,7 @@ import mega.privacy.android.app.constants.SettingsConstants.SELECTED_MEGA_FOLDER
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.FileStorageActivity
-import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
+import mega.privacy.android.app.presentation.settings.camerauploads.LegacySettingsCameraUploadsViewModel
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Util
@@ -84,7 +84,8 @@ import javax.inject.Inject
  * [SettingsBaseFragment] that enables or disables Camera Uploads in Settings
  */
 @AndroidEntryPoint
-class SettingsCameraUploadsFragment : SettingsBaseFragment(),
+@Deprecated(message = "This is a legacy class that will be replaced by [SettingsCameraUploadsComposeActivity] once the migration to Jetpack Compose has been finished")
+class LegacySettingsCameraUploadsFragment : SettingsBaseFragment(),
     Preference.OnPreferenceClickListener,
     Preference.OnPreferenceChangeListener {
     private var cameraUploadOnOff: SwitchPreferenceCompat? = null
@@ -133,7 +134,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
      */
     private var canStartCameraUploads = true
 
-    private val viewModel by viewModels<SettingsCameraUploadsViewModel>()
+    private val viewModel by viewModels<LegacySettingsCameraUploadsViewModel>()
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
@@ -425,7 +426,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment(),
     }
 
     /**
-     * Setup [SettingsCameraUploadsViewModel] Observers
+     * Setup [LegacySettingsCameraUploadsViewModel] Observers
      */
     private fun setupObservers() {
         viewLifecycleOwner.run {

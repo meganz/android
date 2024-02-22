@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
+import mega.privacy.android.app.presentation.settings.camerauploads.LegacySettingsCameraUploadsViewModel
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
@@ -81,13 +81,14 @@ import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
 /**
- * Test class for [SettingsCameraUploadsViewModel]
+ * Test class for [LegacySettingsCameraUploadsViewModel]
  */
+@Deprecated(message = "This is a legacy class that will be replaced by a ViewModel Test Class for [SettingsCameraUploadsComposeActivity] once the migration to Jetpack Compose has been finished")
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class SettingsCameraUploadsViewModelTest {
-    private lateinit var underTest: SettingsCameraUploadsViewModel
+internal class LegacySettingsCameraUploadsViewModelTest {
+    private lateinit var underTest: LegacySettingsCameraUploadsViewModel
 
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val areLocationTagsEnabledUseCase = mock<AreLocationTagsEnabledUseCase>()
@@ -192,11 +193,11 @@ internal class SettingsCameraUploadsViewModelTest {
     }
 
     /**
-     * Initializes [SettingsCameraUploadsViewModel] for testing
+     * Initializes [LegacySettingsCameraUploadsViewModel] for testing
      */
     private suspend fun setupUnderTest() {
         stubCommon()
-        underTest = SettingsCameraUploadsViewModel(
+        underTest = LegacySettingsCameraUploadsViewModel(
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             areLocationTagsEnabledUseCase = areLocationTagsEnabledUseCase,
             areUploadFileNamesKeptUseCase = areUploadFileNamesKeptUseCase,
