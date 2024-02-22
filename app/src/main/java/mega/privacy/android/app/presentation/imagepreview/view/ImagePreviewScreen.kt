@@ -1,4 +1,7 @@
-@file:OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
+@file:OptIn(
+    ExperimentalFoundationApi::class, ExperimentalMaterialApi::class,
+    ExperimentalComposeUiApi::class
+)
 
 package mega.privacy.android.app.presentation.imagepreview.view
 
@@ -44,13 +47,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -235,6 +242,8 @@ internal fun ImagePreviewScreen(
         }
 
         Scaffold(
+            modifier = Modifier
+                .semantics { testTagsAsResourceId = true },
             scaffoldState = scaffoldState,
             snackbarHost = { snackBarHostState ->
                 SnackbarHost(
@@ -599,6 +608,7 @@ private fun ImagePreviewTopBar(
                     painter = painterResource(id = R.drawable.ic_arrow_back_white),
                     contentDescription = "Image Preview Back",
                     tint = MaterialTheme.colors.black_white,
+                    modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_BACK),
                 )
             }
         },
@@ -629,6 +639,7 @@ private fun ImagePreviewTopBar(
                         painter = painterResource(id = R.drawable.ic_slideshow),
                         contentDescription = null,
                         tint = MaterialTheme.colors.black_white,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SLIDESHOW),
                     )
                 }
             }
@@ -639,6 +650,7 @@ private fun ImagePreviewTopBar(
                         painter = painterResource(id = R.drawable.ic_download_white),
                         contentDescription = null,
                         tint = MaterialTheme.colors.black_white,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SAVE_TO_DEVICE),
                     )
                 }
             }
@@ -649,6 +661,7 @@ private fun ImagePreviewTopBar(
                         painter = painterResource(id = R.drawable.ic_link),
                         contentDescription = null,
                         tint = MaterialTheme.colors.black_white,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_MANAGE_LINK),
                     )
                 }
             }
@@ -659,6 +672,7 @@ private fun ImagePreviewTopBar(
                         painter = painterResource(id = R.drawable.ic_send_to_contact),
                         contentDescription = null,
                         tint = MaterialTheme.colors.black_white,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SEND_TO),
                     )
                 }
             }
@@ -669,6 +683,7 @@ private fun ImagePreviewTopBar(
                         painter = painterResource(id = R.drawable.ic_dots_vertical_white),
                         contentDescription = null,
                         tint = MaterialTheme.colors.black_white,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_MORE),
                     )
                 }
             }
@@ -695,10 +710,12 @@ private fun ImagePreviewBottomBar(
             MiddleEllipsisText(
                 text = imageName,
                 color = TextColor.Secondary,
+                modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_BAR_TEXT_IMAGE_NAME),
             )
             MiddleEllipsisText(
                 text = imageIndex,
                 color = TextColor.Secondary,
+                modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_BAR_TEXT_IMAGE_COUNT),
             )
         }
     }

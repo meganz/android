@@ -13,7 +13,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -37,13 +37,12 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
 import mega.privacy.android.core.R.drawable.link_ic
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
-import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.core.ui.controls.text.MiddleEllipsisText
+import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
-import mega.privacy.android.legacy.core.ui.controls.text.MiddleEllipsisText
 import nz.mega.sdk.MegaNode
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -198,6 +197,7 @@ internal fun ImagePreviewBottomSheet(
                         text = stringResource(id = R.string.general_info),
                         onActionClicked = onClickInfo,
                         addSeparator = false,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_INFO),
                     )
                 }
                 if (isFavouriteMenuVisible) {
@@ -216,6 +216,7 @@ internal fun ImagePreviewBottomSheet(
                         },
                         onActionClicked = onClickFavourite,
                         addSeparator = false,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_FAVOURITE),
                     )
                 }
 
@@ -245,6 +246,7 @@ internal fun ImagePreviewBottomSheet(
                                 }
                             }
                         },
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_LABEL),
                     )
                 }
 
@@ -256,6 +258,7 @@ internal fun ImagePreviewBottomSheet(
                         text = stringResource(id = R.string.dispute_takendown_file),
                         onActionClicked = onClickDispute,
                         addSeparator = false,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_DISPUTE),
                     )
                 }
 
@@ -265,6 +268,7 @@ internal fun ImagePreviewBottomSheet(
                         text = stringResource(id = R.string.external_play),
                         onActionClicked = onClickOpenWith,
                         addSeparator = false,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_OPEN_WITH),
                     )
                 }
 
@@ -276,6 +280,7 @@ internal fun ImagePreviewBottomSheet(
                         text = stringResource(id = R.string.forward_menu_item),
                         onActionClicked = onClickForward,
                         addSeparator = false,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_FORWARD),
                     )
                 }
 
@@ -285,6 +290,7 @@ internal fun ImagePreviewBottomSheet(
                         text = stringResource(id = R.string.general_save_to_device),
                         onActionClicked = onClickSaveToDevice,
                         addSeparator = false,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_SAVE_TO_DEVICE),
                     )
                 }
 
@@ -294,6 +300,7 @@ internal fun ImagePreviewBottomSheet(
                         text = stringResource(id = R.string.general_import),
                         onActionClicked = onClickImport,
                         addSeparator = false,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_IMPORT),
                     )
                 }
 
@@ -302,6 +309,9 @@ internal fun ImagePreviewBottomSheet(
                         text = stringResource(id = R.string.file_properties_available_offline),
                         icon = painterResource(id = R.drawable.ic_save_offline),
                         addSeparator = false,
+                        modifier = Modifier.testTag(
+                            IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_AVAILABLE_OFFLINE
+                        ),
                     ) {
                         MegaSwitch(
                             checked = isAvailableOffline,
@@ -325,6 +335,7 @@ internal fun ImagePreviewBottomSheet(
                         },
                         onActionClicked = onClickGetLink,
                         addSeparator = false,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_GET_LINK),
                     )
                 }
 
@@ -334,6 +345,7 @@ internal fun ImagePreviewBottomSheet(
                         text = stringResource(id = R.string.context_remove_link_menu),
                         onActionClicked = onClickRemoveLink,
                         addSeparator = false,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_REMOVE_LINK),
                     )
                 }
 
@@ -343,6 +355,7 @@ internal fun ImagePreviewBottomSheet(
                         text = stringResource(id = R.string.context_send_file_to_chat),
                         onActionClicked = onClickSendToChat,
                         addSeparator = false,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_SEND_TO_CHAT),
                     )
                 }
 
@@ -352,6 +365,7 @@ internal fun ImagePreviewBottomSheet(
                         text = stringResource(id = R.string.general_share),
                         onActionClicked = onClickShare,
                         addSeparator = false,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_SHARE),
                     )
                 }
 
@@ -363,6 +377,7 @@ internal fun ImagePreviewBottomSheet(
                         text = stringResource(id = R.string.context_rename),
                         onActionClicked = onClickRename,
                         addSeparator = false,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_RENAME),
                     )
                 }
 
@@ -372,6 +387,7 @@ internal fun ImagePreviewBottomSheet(
                         text = stringResource(id = R.string.general_move),
                         onActionClicked = onClickMove,
                         addSeparator = false,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_MOVE),
                     )
                 }
 
@@ -383,6 +399,7 @@ internal fun ImagePreviewBottomSheet(
                         text = stringResource(id = R.string.context_copy),
                         onActionClicked = onClickCopy,
                         addSeparator = false,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_COPY),
                     )
                 }
 
@@ -392,6 +409,7 @@ internal fun ImagePreviewBottomSheet(
                         text = stringResource(id = R.string.context_restore),
                         onActionClicked = onClickRestore,
                         addSeparator = false,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_RESTORE),
                     )
                 }
 
@@ -402,6 +420,7 @@ internal fun ImagePreviewBottomSheet(
                         isDestructive = true,
                         onActionClicked = onClickRemove,
                         addSeparator = false,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_REMOVE),
                     )
                 }
 
@@ -412,6 +431,7 @@ internal fun ImagePreviewBottomSheet(
                         onActionClicked = { onSwitchAvailableOffline(false) },
                         isDestructive = true,
                         addSeparator = false,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_REMOVE_OFFLINE),
                     )
                 }
 
@@ -422,6 +442,9 @@ internal fun ImagePreviewBottomSheet(
                         onActionClicked = onClickMoveToRubbishBin,
                         addSeparator = false,
                         isDestructive = true,
+                        modifier = Modifier.testTag(
+                            IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_MOVE_TO_RUBBISH_BIN
+                        ),
                     )
                 }
             }
@@ -464,11 +487,13 @@ private fun ImagePreviewMenuActionHeader(
         ) {
             MiddleEllipsisText(
                 text = imageNode.name,
-                color = MaterialTheme.colors.textColorPrimary,
+                color = TextColor.Primary,
+                modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_HEADER_TEXT_NAME),
             )
             MiddleEllipsisText(
                 text = imageInfo.orEmpty(),
-                color = MaterialTheme.colors.textColorSecondary,
+                color = TextColor.Secondary,
+                modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_HEADER_TEXT_INFO),
             )
         }
     }
