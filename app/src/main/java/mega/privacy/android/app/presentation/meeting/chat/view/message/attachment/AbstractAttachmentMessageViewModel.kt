@@ -29,7 +29,6 @@ abstract class AbstractAttachmentMessageViewModel<T : AttachmentMessage>(
      */
     internal fun getOrPutUiStateFlow(
         attachmentMessage: T,
-        chatId: Long,
     ): MutableStateFlow<AttachmentMessageUiState> =
         _uiStateFlowMap.getOrPut(attachmentMessage.msgId) {
             MutableStateFlow(
@@ -40,7 +39,7 @@ abstract class AbstractAttachmentMessageViewModel<T : AttachmentMessage>(
                     fileTypeResId = getFileIconChat(attachmentMessage.fileType),
                 )
             ).also {
-                onMessageAdded(it, attachmentMessage, chatId)
+                onMessageAdded(it, attachmentMessage)
             }
         }
 
@@ -50,6 +49,5 @@ abstract class AbstractAttachmentMessageViewModel<T : AttachmentMessage>(
     abstract fun onMessageAdded(
         mutableStateFlow: MutableStateFlow<AttachmentMessageUiState>,
         attachmentMessage: T,
-        chatId: Long,
     )
 }

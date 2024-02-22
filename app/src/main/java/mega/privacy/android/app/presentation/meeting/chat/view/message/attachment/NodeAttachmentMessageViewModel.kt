@@ -45,14 +45,13 @@ class NodeAttachmentMessageViewModel @Inject constructor(
     override fun onMessageAdded(
         mutableStateFlow: MutableStateFlow<AttachmentMessageUiState>,
         attachmentMessage: NodeAttachmentMessage,
-        chatId: Long,
     ) {
-        updatePreview(mutableStateFlow, attachmentMessage, chatId)
+        updatePreview(mutableStateFlow, attachmentMessage)
     }
 
     private fun updatePreview(
         mutableStateFlow: MutableStateFlow<AttachmentMessageUiState>,
-        nodeAttachmentMessage: NodeAttachmentMessage, chatId: Long,
+        nodeAttachmentMessage: NodeAttachmentMessage,
     ) {
         viewModelScope.launch {
             val node = nodeAttachmentMessage.fileNode
@@ -76,14 +75,13 @@ class NodeAttachmentMessageViewModel @Inject constructor(
     /**
      * Handle file node
      *
-     * @param chatId chat id
      * @param message node attachment message
      */
-    suspend fun handleFileNode(chatId: Long, message: NodeAttachmentMessage): FileNodeContent {
+    suspend fun handleFileNode(message: NodeAttachmentMessage): FileNodeContent {
         val fileNode = message.fileNode
         return when {
             fileNode.type is ImageFileTypeInfo -> FileNodeContent.Image(
-                allAttachmentMessageIds = getNodeAttachmentMessageIds(chatId)
+                allAttachmentMessageIds = getNodeAttachmentMessageIds(message.chatId)
             )
 
             fileNode.type is TextFileTypeInfo && fileNode.size <= TextFileTypeInfo.MAX_SIZE_OPENABLE_TEXT_FILE -> FileNodeContent.TextContent
@@ -106,7 +104,6 @@ class NodeAttachmentMessageViewModel @Inject constructor(
      * Get message ids by type
      *
      * @param chatId chat id
-     * @param type message type
      */
     suspend fun getNodeAttachmentMessageIds(chatId: Long) =
         getMessageIdsByTypeUseCase(chatId, ChatMessageType.NODE_ATTACHMENT)

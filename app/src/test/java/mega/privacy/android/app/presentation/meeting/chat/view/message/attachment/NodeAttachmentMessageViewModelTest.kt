@@ -91,7 +91,7 @@ class NodeAttachmentMessageViewModelTest {
         }
         whenever(getPreviewUseCase(fileNode)).thenReturn(previewFile)
         val msg = buildNodeAttachmentMessage(fileNode)
-        underTest.getOrPutUiStateFlow(msg, CHAT_ID).test {
+        underTest.getOrPutUiStateFlow(msg).test {
             val actual = awaitItem().previewUri
             assertThat(actual).isEqualTo(expected)
         }
@@ -114,7 +114,7 @@ class NodeAttachmentMessageViewModelTest {
         whenever(fileSizeStringMapper(any())).thenReturn(expectedSize)
 
         val msg = buildNodeAttachmentMessage(fileNode)
-        underTest.getOrPutUiStateFlow(msg, CHAT_ID).test {
+        underTest.getOrPutUiStateFlow(msg).test {
             val actual = awaitItem()
             assertThat(actual.fileName).isEqualTo(expectedName)
             assertThat(actual.fileSize).isEqualTo(expectedSize)
@@ -164,7 +164,7 @@ class NodeAttachmentMessageViewModelTest {
         whenever(getMessageIdsByTypeUseCase(CHAT_ID, ChatMessageType.NODE_ATTACHMENT)).thenReturn(
             messageIds
         )
-        val actual = underTest.handleFileNode(CHAT_ID, msg)
+        val actual = underTest.handleFileNode(msg)
         assertThat(actual).isEqualTo(FileNodeContent.Image(messageIds))
     }
 
@@ -178,7 +178,7 @@ class NodeAttachmentMessageViewModelTest {
             on { size } doReturn 123L
         }
         val msg = buildNodeAttachmentMessage(fileNode)
-        val actual = underTest.handleFileNode(CHAT_ID, msg)
+        val actual = underTest.handleFileNode(msg)
         assertThat(actual).isEqualTo(FileNodeContent.TextContent)
     }
 
@@ -190,7 +190,7 @@ class NodeAttachmentMessageViewModelTest {
         val msg = buildNodeAttachmentMessage(fileNode)
         val uri = mock<NodeContentUri.LocalContentUri>()
         whenever(getChatNodeContentUriUseCase(fileNode)).thenReturn(uri)
-        val actual = underTest.handleFileNode(CHAT_ID, msg)
+        val actual = underTest.handleFileNode(msg)
         assertThat(actual).isEqualTo(FileNodeContent.Pdf(uri))
     }
 

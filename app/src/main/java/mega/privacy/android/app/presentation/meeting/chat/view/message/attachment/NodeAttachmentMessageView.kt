@@ -43,13 +43,12 @@ import java.io.File
 @Composable
 fun NodeAttachmentMessageView(
     message: NodeAttachmentMessage,
-    chatId: Long,
     onLongClick: (NodeAttachmentMessage) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: NodeAttachmentMessageViewModel = hiltViewModel(),
     chatViewModel: ChatViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.getOrPutUiStateFlow(message, chatId).collectAsStateWithLifecycle()
+    val uiState by viewModel.getOrPutUiStateFlow(message).collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val snackbarHostState = LocalSnackBarHostState.current
@@ -65,12 +64,12 @@ fun NodeAttachmentMessageView(
             onClick = {
                 coroutineScope.launch {
                     runCatching {
-                        viewModel.handleFileNode(chatId, message)
+                        viewModel.handleFileNode(message)
                     }.onSuccess { content ->
                         when (content) {
                             is FileNodeContent.Image -> openImageViewer(
                                 context,
-                                chatId,
+                                message.chatId,
                                 content.allAttachmentMessageIds.toLongArray(),
                                 message.fileNode.id.longValue
                             )
@@ -95,14 +94,14 @@ fun NodeAttachmentMessageView(
                                 viewModel = viewModel,
                                 context = context,
                                 message = message,
-                                chatId = chatId,
+                                chatId = message.chatId,
                                 content = content.uri
                             )
 
                             FileNodeContent.TextContent -> handleTextEditor(
                                 context,
                                 message.msgId,
-                                chatId
+                                message.chatId
                             )
                         }
                     }.onFailure {
