@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.chat.messages.normal
 
 import kotlinx.serialization.Serializable
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 
 /**
@@ -21,6 +22,7 @@ data class TextMessage(
     override val shouldShowTime: Boolean,
     override val reactions: List<Reaction>,
     override val content: String,
+    override val status: ChatMessageStatus,
     val hasOtherLink: Boolean,
     val isEdited: Boolean,
 ) : NormalMessage

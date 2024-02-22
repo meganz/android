@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageCode
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.invalid.FormatInvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.SignatureInvalidMessage
@@ -11,6 +12,7 @@ import mega.privacy.android.domain.entity.chat.messages.invalid.UnrecognizableIn
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 
 class CreateInvalidMessageUseCaseTest {
@@ -28,6 +30,7 @@ class CreateInvalidMessageUseCaseTest {
             on { timestamp }.thenReturn(123L)
             on { userHandle }.thenReturn(123L)
             on { type }.thenReturn(ChatMessageType.INVALID)
+            on { status } doReturn ChatMessageStatus.UNKNOWN
         }
         assertThat(
             underTest.invoke(
@@ -51,6 +54,7 @@ class CreateInvalidMessageUseCaseTest {
             on { userHandle }.thenReturn(123L)
             on { type }.thenReturn(ChatMessageType.NORMAL)
             on { code }.thenReturn(ChatMessageCode.INVALID_FORMAT)
+            on { status } doReturn ChatMessageStatus.UNKNOWN
         }
         assertThat(
             underTest.invoke(
@@ -74,6 +78,7 @@ class CreateInvalidMessageUseCaseTest {
             on { userHandle }.thenReturn(123L)
             on { type }.thenReturn(ChatMessageType.NORMAL)
             on { code }.thenReturn(ChatMessageCode.INVALID_SIGNATURE)
+            on { status } doReturn ChatMessageStatus.UNKNOWN
         }
         assertThat(
             underTest.invoke(
@@ -97,6 +102,7 @@ class CreateInvalidMessageUseCaseTest {
             on { userHandle }.thenReturn(123L)
             on { type }.thenReturn(ChatMessageType.NORMAL)
             on { code }.thenReturn(ChatMessageCode.INVALID_KEY)
+            on { status } doReturn ChatMessageStatus.UNKNOWN
         }
         assertThat(
             underTest.invoke(

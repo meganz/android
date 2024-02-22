@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.NodeContentUri
@@ -205,6 +206,7 @@ class NodeAttachmentMessageViewModelTest {
             shouldShowTime = true,
             fileNode = fileNode,
             reactions = emptyList(),
+            status = ChatMessageStatus.UNKNOWN,
         )
 }
 

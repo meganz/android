@@ -29,6 +29,7 @@ internal class CreateNodeAttachmentMessageUseCase @Inject constructor(
             shouldShowTime = shouldShowTime,
             fileNode = typedNode,
             reactions = reactions,
+            status = status,
         )
     }
 }

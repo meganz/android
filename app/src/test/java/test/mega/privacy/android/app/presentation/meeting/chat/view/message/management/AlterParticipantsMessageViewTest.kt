@@ -8,6 +8,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.AlterParticipantsMessageView
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.management.AlterParticipantsMessage
 import org.junit.Rule
 import org.junit.Test
@@ -125,6 +126,7 @@ class AlterParticipantsMessageViewTest {
                     shouldShowAvatar = false,
                     shouldShowTime = false,
                     reactions = emptyList(),
+                    status = ChatMessageStatus.UNKNOWN,
                 ),
                 ownerActionFullName = ownerActionFullName,
                 targetActionFullName = targetActionFullName,

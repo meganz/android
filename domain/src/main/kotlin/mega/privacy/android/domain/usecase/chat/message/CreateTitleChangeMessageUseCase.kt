@@ -19,6 +19,7 @@ internal class CreateTitleChangeMessageUseCase @Inject constructor() : CreateTyp
             shouldShowAvatar = shouldShowAvatar,
             shouldShowTime = shouldShowTime,
             reactions = reactions,
+            status = status,
         )
     }
 }

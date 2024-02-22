@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.chat.message
 
 import mega.privacy.android.domain.entity.chat.ChatMessageCode
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.invalid.FormatInvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
@@ -27,6 +28,7 @@ class CreateInvalidMessageUseCase @Inject constructor() : CreateTypedMessageUseC
                 Boolean,
                 Boolean,
                 List<Reaction>,
+                ChatMessageStatus,
             ) -> InvalidMessage = when {
                 type == ChatMessageType.INVALID -> {
                     ::UnrecognizableInvalidMessage
@@ -55,6 +57,7 @@ class CreateInvalidMessageUseCase @Inject constructor() : CreateTypedMessageUseC
                 shouldShowAvatar,
                 shouldShowTime,
                 reactions,
+                status,
             )
         }
 }

@@ -19,6 +19,7 @@ internal class CreateScheduledMeetingUpdatedMessageUseCase @Inject constructor()
             shouldShowAvatar = shouldShowAvatar,
             shouldShowTime = shouldShowTime,
             reactions = reactions,
+            status = status,
         )
     }
 }

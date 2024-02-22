@@ -41,7 +41,7 @@ enum class ChatMessageStatus {
     /**
      * Not sent status.
      */
-    NOT_SENT,
+    NOT_SEEN,
 
     /**
      * Seen status.

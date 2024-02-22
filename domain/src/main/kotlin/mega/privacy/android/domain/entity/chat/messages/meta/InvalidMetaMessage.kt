@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.chat.messages.meta
 
 import kotlinx.serialization.Serializable
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 
 /**
@@ -17,4 +18,5 @@ data class InvalidMetaMessage(
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,
     override val reactions: List<Reaction>,
+    override val status: ChatMessageStatus,
 ) : MetaMessage

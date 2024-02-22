@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.message.management.permission
 
 import android.content.Context
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,7 +23,9 @@ import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.management.PermissionChangeMessage
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
  * Permission change message view
@@ -125,23 +128,26 @@ fun PermissionChangeMessageView(
 private fun PermissionChangeMessageViewPreview(
     @PreviewParameter(ChatRoomPermissionProvider::class) permission: ChatRoomPermission,
 ) {
-    PermissionChangeMessageView(
-        message = PermissionChangeMessage(
-            chatId = 1L,
-            msgId = 0,
-            time = 0,
-            isDeletable = false,
-            isMine = true,
-            userHandle = 0,
-            privilege = permission,
-            handleOfAction = 0,
-            shouldShowAvatar = false,
-            shouldShowTime = false,
-            reactions = emptyList(),
-        ),
-        ownerActionFullName = "Owner",
-        targetActionFullName = "Target",
-    )
+    MegaAppTheme(isDark = isSystemInDarkTheme()){
+        PermissionChangeMessageView(
+            message = PermissionChangeMessage(
+                chatId = 1L,
+                msgId = 0,
+                time = 0,
+                isDeletable = false,
+                isMine = true,
+                userHandle = 0,
+                privilege = permission,
+                handleOfAction = 0,
+                shouldShowAvatar = false,
+                shouldShowTime = false,
+                reactions = emptyList(),
+                status = ChatMessageStatus.UNKNOWN,
+            ),
+            ownerActionFullName = "Owner",
+            targetActionFullName = "Target",
+        )
+    }
 }
 
 private class ChatRoomPermissionProvider :

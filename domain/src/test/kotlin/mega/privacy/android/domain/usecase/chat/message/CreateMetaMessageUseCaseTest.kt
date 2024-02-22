@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.chat.message
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatMessage
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ContainsMeta
 import mega.privacy.android.domain.entity.chat.ContainsMetaType
 import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
@@ -35,6 +37,7 @@ class CreateMetaMessageUseCaseTest {
 
         val message = mock<ChatMessage> {
             on { containsMeta }.thenReturn(null)
+            on { status } doReturn ChatMessageStatus.UNKNOWN
         }
         val isMine = true
 
@@ -65,6 +68,7 @@ class CreateMetaMessageUseCaseTest {
         }
         val message = mock<ChatMessage> {
             on { containsMeta }.thenReturn(mockContainsMeta)
+            on { status } doReturn ChatMessageStatus.UNKNOWN
         }
 
         val isMine = true

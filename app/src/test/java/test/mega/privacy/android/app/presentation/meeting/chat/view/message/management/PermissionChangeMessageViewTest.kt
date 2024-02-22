@@ -8,6 +8,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.permission.PermissionChangeMessageView
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.management.PermissionChangeMessage
 import org.junit.Rule
 import org.junit.Test
@@ -105,6 +106,7 @@ class PermissionChangeMessageViewTest {
                     shouldShowAvatar = false,
                     shouldShowTime = false,
                     reactions = emptyList(),
+                    status = ChatMessageStatus.UNKNOWN,
                 ),
                 ownerActionFullName = ownerActionFullName,
                 targetActionFullName = targetActionFullName,

@@ -4,6 +4,7 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.chat.ChatMessage
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.LinkDetail
 import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
@@ -13,8 +14,9 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
@@ -36,7 +38,9 @@ class CreateNormalChatMessageUseCaseTest {
     @Test
     fun `test that normal message is returned`() = runTest {
         whenever(getLinkTypesUseCase(any())).thenReturn(emptyList())
-        val message = mock(ChatMessage::class.java)
+        val message = mock<ChatMessage>{
+            on { status } doReturn ChatMessageStatus.UNKNOWN
+        }
         Truth.assertThat(
             underTest.invoke(
                 CreateTypedMessageRequest(
@@ -62,7 +66,9 @@ class CreateNormalChatMessageUseCaseTest {
                 )
             )
         )
-        val message = mock(ChatMessage::class.java)
+        val message = mock<ChatMessage>{
+            on { status } doReturn ChatMessageStatus.UNKNOWN
+        }
         Truth.assertThat(
             underTest.invoke(
                 CreateTypedMessageRequest(

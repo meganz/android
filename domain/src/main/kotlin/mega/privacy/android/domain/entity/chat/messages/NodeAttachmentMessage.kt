@@ -2,6 +2,7 @@ package mega.privacy.android.domain.entity.chat.messages
 
 import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import mega.privacy.android.domain.entity.node.chat.ChatFile
 
@@ -20,6 +21,7 @@ data class NodeAttachmentMessage(
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,
     override val reactions: List<Reaction>,
+    override val status: ChatMessageStatus,
     val fileNode: ChatFile,
 ) : AttachmentMessage {
     override val fileSize = fileNode.size

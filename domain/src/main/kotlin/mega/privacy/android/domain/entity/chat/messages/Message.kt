@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.chat.messages
 
 import kotlinx.serialization.Polymorphic
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 
 /**
@@ -53,4 +54,9 @@ interface Message {
      * List of reactions
      */
     val reactions: List<Reaction>
+
+    /**
+     * Status
+     */
+    val status: ChatMessageStatus
 }

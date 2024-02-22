@@ -1,13 +1,25 @@
 package mega.privacy.android.domain.entity.chat.messages.normal
 
 import kotlinx.serialization.Serializable
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.LinkDetail
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 
 /**
- * Contact link message
+ * Text link message
  *
- * @property links all links in the message
+ * @property chatId
+ * @property msgId
+ * @property time
+ * @property isDeletable
+ * @property isMine
+ * @property userHandle
+ * @property shouldShowAvatar
+ * @property shouldShowTime
+ * @property reactions
+ * @property content
+ * @property links
+ * @property status
  */
 @Serializable
 data class TextLinkMessage(
@@ -21,5 +33,6 @@ data class TextLinkMessage(
     override val shouldShowTime: Boolean,
     override val reactions: List<Reaction>,
     override val content: String,
+    override val status: ChatMessageStatus,
     val links: List<LinkDetail>,
 ) : NormalMessage

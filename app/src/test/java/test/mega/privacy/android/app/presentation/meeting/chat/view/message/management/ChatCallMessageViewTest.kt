@@ -9,6 +9,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.ChatCallMessageView
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.core.ui.controls.chat.messages.TEST_TAG_MANAGEMENT_MESSAGE_ICON
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
 import mega.privacy.android.domain.entity.chat.messages.management.CallEndedMessage
 import mega.privacy.android.domain.entity.chat.messages.management.CallMessage
@@ -38,6 +39,7 @@ class ChatCallMessageViewTest {
                 shouldShowAvatar = false,
                 shouldShowTime = false,
                 reactions = emptyList(),
+                status = ChatMessageStatus.UNKNOWN,
             ),
             isOneToOneChat = true
         )
@@ -61,6 +63,7 @@ class ChatCallMessageViewTest {
                 shouldShowAvatar = false,
                 shouldShowTime = false,
                 reactions = emptyList(),
+                status = ChatMessageStatus.UNKNOWN,
             ),
             isOneToOneChat = true
         )
@@ -84,6 +87,7 @@ class ChatCallMessageViewTest {
                 shouldShowAvatar = false,
                 shouldShowTime = false,
                 reactions = emptyList(),
+                status = ChatMessageStatus.UNKNOWN,
             ),
             isOneToOneChat = false
         )
@@ -111,6 +115,7 @@ class ChatCallMessageViewTest {
                 shouldShowAvatar = false,
                 shouldShowTime = false,
                 reactions = emptyList(),
+                status = ChatMessageStatus.UNKNOWN,
             ),
             isOneToOneChat = true
         )
@@ -138,6 +143,7 @@ class ChatCallMessageViewTest {
                 shouldShowAvatar = false,
                 shouldShowTime = false,
                 reactions = emptyList(),
+                status = ChatMessageStatus.UNKNOWN,
             ),
             isOneToOneChat = true
         )
@@ -165,6 +171,7 @@ class ChatCallMessageViewTest {
                 shouldShowAvatar = false,
                 shouldShowTime = false,
                 reactions = emptyList(),
+                status = ChatMessageStatus.UNKNOWN,
             ),
             isOneToOneChat = true
         )
@@ -192,6 +199,7 @@ class ChatCallMessageViewTest {
                 shouldShowAvatar = false,
                 shouldShowTime = false,
                 reactions = emptyList(),
+                status = ChatMessageStatus.UNKNOWN,
             ),
             isOneToOneChat = true
         )
@@ -219,6 +227,7 @@ class ChatCallMessageViewTest {
                 shouldShowAvatar = false,
                 shouldShowTime = false,
                 reactions = emptyList(),
+                status = ChatMessageStatus.UNKNOWN,
             ),
             isOneToOneChat = true
         )
@@ -246,6 +255,7 @@ class ChatCallMessageViewTest {
                 shouldShowAvatar = false,
                 shouldShowTime = false,
                 reactions = emptyList(),
+                status = ChatMessageStatus.UNKNOWN,
             ),
             isOneToOneChat = true
         )

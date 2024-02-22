@@ -58,7 +58,7 @@ internal class ChatMessageMapper @Inject constructor(
         MegaChatMessage.STATUS_SERVER_RECEIVED -> ChatMessageStatus.SERVER_RECEIVED
         MegaChatMessage.STATUS_SERVER_REJECTED -> ChatMessageStatus.SERVER_REJECTED
         MegaChatMessage.STATUS_DELIVERED -> ChatMessageStatus.DELIVERED
-        MegaChatMessage.STATUS_NOT_SEEN -> ChatMessageStatus.NOT_SENT
+        MegaChatMessage.STATUS_NOT_SEEN -> ChatMessageStatus.NOT_SEEN
         MegaChatMessage.STATUS_SEEN -> ChatMessageStatus.SEEN
         else -> ChatMessageStatus.UNKNOWN
     }

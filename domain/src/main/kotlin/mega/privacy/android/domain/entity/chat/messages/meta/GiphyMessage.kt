@@ -1,12 +1,23 @@
 package mega.privacy.android.domain.entity.chat.messages.meta
 
 import kotlinx.serialization.Serializable
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 
 /**
  * Giphy message
  *
- * @property chatGifInfo [ChatGifInfo]
+ * @property chatId
+ * @property msgId
+ * @property time
+ * @property isDeletable
+ * @property isMine
+ * @property userHandle
+ * @property shouldShowAvatar
+ * @property shouldShowTime
+ * @property reactions
+ * @property chatGifInfo
+ * @property status
  */
 @Serializable
 data class GiphyMessage(
@@ -19,5 +30,6 @@ data class GiphyMessage(
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,
     override val reactions: List<Reaction>,
+    override val status: ChatMessageStatus,
     val chatGifInfo: ChatGifInfo?,
 ) : MetaMessage
