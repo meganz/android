@@ -26,8 +26,8 @@ class CompressVideoForChatUseCaseTest {
     private lateinit var underTest: CompressVideoForChatUseCase
 
     private val defaultSettingsRepository = mock<SettingsRepository>()
-    private val getCacheFileForChatFileModificationUseCase =
-        mock<GetCacheFileForChatFileModificationUseCase>()
+    private val getCacheFileForChatUploadUseCase =
+        mock<GetCacheFileForChatUploadUseCase>()
     private val compressVideoUseCase = mock<CompressVideoUseCase>()
 
 
@@ -35,7 +35,7 @@ class CompressVideoForChatUseCaseTest {
     fun setup() {
         underTest = CompressVideoForChatUseCase(
             defaultSettingsRepository,
-            getCacheFileForChatFileModificationUseCase,
+            getCacheFileForChatUploadUseCase,
             compressVideoUseCase,
         )
     }
@@ -44,7 +44,7 @@ class CompressVideoForChatUseCaseTest {
     fun resetMocks() =
         reset(
             defaultSettingsRepository,
-            getCacheFileForChatFileModificationUseCase,
+            getCacheFileForChatUploadUseCase,
             compressVideoUseCase,
         )
 
@@ -101,7 +101,7 @@ class CompressVideoForChatUseCaseTest {
             on { it.parent } doReturn "root"
             on { it.exists() } doReturn true
         }
-        whenever(getCacheFileForChatFileModificationUseCase(any())) doReturn destination
+        whenever(getCacheFileForChatUploadUseCase(any())) doReturn destination
         return destination
     }
 }

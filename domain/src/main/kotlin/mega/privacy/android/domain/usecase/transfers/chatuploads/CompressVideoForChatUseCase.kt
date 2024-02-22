@@ -15,7 +15,7 @@ import javax.inject.Inject
  */
 class CompressVideoForChatUseCase @Inject constructor(
     private val defaultSettingsRepository: SettingsRepository,
-    private val getCacheFileForChatFileModificationUseCase: GetCacheFileForChatFileModificationUseCase,
+    private val getCacheFileForChatUploadUseCase: GetCacheFileForChatUploadUseCase,
     private val compressVideoUseCase: CompressVideoUseCase,
 ) {
 
@@ -28,7 +28,7 @@ class CompressVideoForChatUseCase @Inject constructor(
         if (file.extension != "mp4") return null
         val videoQuality = defaultSettingsRepository.getChatVideoQualityPreference()
         if (videoQuality == VideoQuality.ORIGINAL) return null
-        return getCacheFileForChatFileModificationUseCase(file)?.also { destination ->
+        return getCacheFileForChatUploadUseCase(file)?.also { destination ->
             compressVideoUseCase(
                 rootPath = destination.parent,
                 filePath = file.absolutePath,

@@ -19,7 +19,7 @@ class DownscaleImageForChatUseCase @Inject constructor(
     private val defaultSettingsRepository: SettingsRepository,
     private val networkRepository: NetworkRepository,
     private val fileSystemRepository: FileSystemRepository,
-    private val getCacheFileForChatFileModificationUseCase: GetCacheFileForChatFileModificationUseCase,
+    private val getCacheFileForChatUploadUseCase: GetCacheFileForChatUploadUseCase,
 ) {
     /**
      * Invoke
@@ -32,7 +32,7 @@ class DownscaleImageForChatUseCase @Inject constructor(
         if (imageQuality == ChatImageQuality.Original
             || (imageQuality == ChatImageQuality.Automatic && networkRepository.isOnWifi())
         ) return null
-        return getCacheFileForChatFileModificationUseCase(file)
+        return getCacheFileForChatUploadUseCase(file)
             ?.also { destination ->
                 fileSystemRepository.downscaleImage(
                     file = file,

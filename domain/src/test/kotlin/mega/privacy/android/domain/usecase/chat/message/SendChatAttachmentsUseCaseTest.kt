@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
-import mega.privacy.android.domain.usecase.file.GetFileFromUriUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.GetFileForChatUploadUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWithWorkerUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -28,7 +28,7 @@ class SendChatAttachmentsUseCaseTest {
     private lateinit var underTest: SendChatAttachmentsUseCase
 
     private val startChatUploadsWithWorkerUseCase = mock<StartChatUploadsWithWorkerUseCase>()
-    private val getFileFromUriUseCase = mock<GetFileFromUriUseCase>()
+    private val getFileForChatUploadUseCase = mock<GetFileForChatUploadUseCase>()
     private val chatMessageRepository = mock<ChatMessageRepository>()
     private val deviceCurrentTimeUseCase = mock<GetDeviceCurrentTimeUseCase>()
 
@@ -41,7 +41,7 @@ class SendChatAttachmentsUseCaseTest {
     fun setup() {
         underTest = SendChatAttachmentsUseCase(
             startChatUploadsWithWorkerUseCase,
-            getFileFromUriUseCase,
+            getFileForChatUploadUseCase,
             chatMessageRepository,
             deviceCurrentTimeUseCase,
         )
@@ -51,7 +51,7 @@ class SendChatAttachmentsUseCaseTest {
     fun resetMocks() = runTest {
         reset(
             startChatUploadsWithWorkerUseCase,
-            getFileFromUriUseCase,
+            getFileForChatUploadUseCase,
             chatMessageRepository,
             deviceCurrentTimeUseCase,
         )
@@ -100,6 +100,6 @@ class SendChatAttachmentsUseCaseTest {
         whenever(startChatUploadsWithWorkerUseCase(any(), any())).thenReturn(
             flowOf(MultiTransferEvent.ScanningFoldersFinished)
         )
-        whenever(getFileFromUriUseCase(any(), any())).thenReturn(file)
+        whenever(getFileForChatUploadUseCase(any())).thenReturn(file)
     }
 }

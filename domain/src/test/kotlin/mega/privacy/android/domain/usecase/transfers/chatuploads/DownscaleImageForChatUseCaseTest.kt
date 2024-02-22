@@ -28,8 +28,8 @@ class DownscaleImageForChatUseCaseTest {
     private val defaultSettingsRepository = mock<SettingsRepository>()
     private val networkRepository = mock<NetworkRepository>()
     private val fileSystemRepository = mock<FileSystemRepository>()
-    private val getCacheFileForChatFileModificationUseCase =
-        mock<GetCacheFileForChatFileModificationUseCase>()
+    private val getCacheFileForChatUploadUseCase =
+        mock<GetCacheFileForChatUploadUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -37,7 +37,7 @@ class DownscaleImageForChatUseCaseTest {
             defaultSettingsRepository,
             networkRepository,
             fileSystemRepository,
-            getCacheFileForChatFileModificationUseCase,
+            getCacheFileForChatUploadUseCase,
         )
     }
 
@@ -47,7 +47,7 @@ class DownscaleImageForChatUseCaseTest {
             defaultSettingsRepository,
             networkRepository,
             fileSystemRepository,
-            getCacheFileForChatFileModificationUseCase,
+            getCacheFileForChatUploadUseCase,
         )
 
     @Test
@@ -121,7 +121,7 @@ class DownscaleImageForChatUseCaseTest {
             on { it.name } doReturn "destination"
             on { it.exists() } doReturn true
         }
-        whenever(getCacheFileForChatFileModificationUseCase(any())) doReturn destination
+        whenever(getCacheFileForChatUploadUseCase(any())) doReturn destination
         return destination
     }
 }

@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
-import mega.privacy.android.domain.usecase.file.GetFileFromUriUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.GetFileForChatUploadUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWithWorkerUseCase
 import javax.inject.Inject
 
@@ -16,7 +16,7 @@ import javax.inject.Inject
  */
 class SendChatAttachmentsUseCase @Inject constructor(
     private val startChatUploadsWithWorkerUseCase: StartChatUploadsWithWorkerUseCase,
-    private val getFileFromUriUseCase: GetFileFromUriUseCase,
+    private val getFileForChatUploadUseCase: GetFileForChatUploadUseCase,
     private val chatMessageRepository: ChatMessageRepository,
     private val deviceCurrentTimeUseCase: GetDeviceCurrentTimeUseCase
 ) {
@@ -32,7 +32,7 @@ class SendChatAttachmentsUseCase @Inject constructor(
                 //each file is sent as a single message in parallel
                 uris
                     .mapNotNull { uriString ->
-                        getFileFromUriUseCase(uriString, CHAT_TEMPORARY_FOLDER)
+                        getFileForChatUploadUseCase(uriString)
                     }
                     .map { file ->
                         val pendingMessageId = chatMessageRepository.savePendingMessage(
@@ -55,5 +55,3 @@ class SendChatAttachmentsUseCase @Inject constructor(
             )
         }
 }
-
-private const val CHAT_TEMPORARY_FOLDER = "chatTempMEGA"

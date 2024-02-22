@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.transfers.chatuploads
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
-import mega.privacy.android.domain.usecase.transfers.chatuploads.GetCacheFileForChatFileModificationUseCase.Companion.CHAT_TEMPORARY_FOLDER
+import mega.privacy.android.domain.usecase.transfers.chatuploads.GetCacheFileForChatUploadUseCase.Companion.CHAT_TEMPORARY_FOLDER
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -15,14 +15,14 @@ import org.mockito.kotlin.whenever
 import java.io.File
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GetCacheFileForChatFileModificationUseCaseTest {
-    private lateinit var underTest: GetCacheFileForChatFileModificationUseCase
+class GetCacheFileForChatUploadUseCaseTest {
+    private lateinit var underTest: GetCacheFileForChatUploadUseCase
 
     private val getCacheFileUseCase = mock<GetCacheFileUseCase>()
 
     @BeforeAll
     fun setup() {
-        underTest = GetCacheFileForChatFileModificationUseCase(
+        underTest = GetCacheFileForChatUploadUseCase(
             getCacheFileUseCase,
         )
     }

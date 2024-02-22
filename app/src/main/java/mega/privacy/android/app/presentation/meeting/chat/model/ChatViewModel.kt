@@ -1115,7 +1115,7 @@ class ChatViewModel @Inject constructor(
     suspend fun createNewImageUri(): Uri? {
         Timber.d("createNewImageUri")
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val imageFileName = "picture${timeStamp}_.jpg"
+        val imageFileName = "picture${timeStamp}.jpg"
         return createNewImageUriUseCase(imageFileName)?.let { Uri.parse(it) }
     }
 

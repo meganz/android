@@ -397,14 +397,6 @@ internal class FileSystemRepositoryImplTest {
     }
 
     @Test
-    fun `test that getFileExtensionFromUri returns correct value`() = runTest {
-        val uri = "uri//:example.txt"
-        val expected = "txt"
-        whenever(fileGateway.getFileExtensionFromUri(any())).thenReturn(expected)
-        assertThat(underTest.getFileExtensionFromUri(uri)).isEqualTo(expected)
-    }
-
-    @Test
     fun `test that copyContentUriToFile calls gateway method`() = runTest {
         val uri = "uri//:example.txt"
         val file = mock<File>()

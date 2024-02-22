@@ -270,11 +270,6 @@ interface FileGateway {
     suspend fun getFileNameFromUri(uriString: String): String?
 
     /**
-     * @return the extension of the file represented by [uriString]
-     */
-    suspend fun getFileExtensionFromUri(uriString: String): String?
-
-    /**
      * Copies the file represented by a content [uriString] to the destination File. Usually, it is to make a content file returned by a share intent usable by the SDK.
      * @param uriString the string representing the file, it must be a "content" uri
      * @param file the destination file where the original file will be copied

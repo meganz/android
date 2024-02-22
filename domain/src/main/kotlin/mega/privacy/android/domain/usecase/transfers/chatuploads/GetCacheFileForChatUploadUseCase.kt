@@ -5,9 +5,9 @@ import java.io.File
 import javax.inject.Inject
 
 /**
- * Returns a file in cache chat temporary folder to save modifications to the original file. As the original file can be already in this folder a number suffix is added until the file doesn't exist
+ * Returns a file in cache chat temporary folder to save files or file modifications to the original file. As the original file can be already in this folder a number suffix is added until the file doesn't exist
  */
-class GetCacheFileForChatFileModificationUseCase @Inject constructor(
+class GetCacheFileForChatUploadUseCase @Inject constructor(
     private val getCacheFileUseCase: GetCacheFileUseCase,
 ) {
     /**

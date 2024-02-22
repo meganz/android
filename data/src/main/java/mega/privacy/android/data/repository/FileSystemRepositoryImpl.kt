@@ -553,11 +553,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             fileGateway.getFileNameFromUri(uriString)
         }
 
-    override suspend fun getFileExtensionFromUri(uriString: String) =
-        withContext(ioDispatcher) {
-            fileGateway.getFileExtensionFromUri(uriString)
-        }
-
     override suspend fun copyContentUriToFile(uriString: String, file: File) {
         withContext(ioDispatcher) {
             fileGateway.copyContentUriToFile(uriString, file)
