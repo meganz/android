@@ -464,6 +464,7 @@ class BottomFloatingPanelViewHolder(
                         },
                         onAdmitAllClick = { waitingRoomManagementViewModel.admitUsersClick() },
                         onSeeAllClick = {
+                            meetingViewModel.onSnackbarMessageConsumed()
                             meetingViewModel.onSeeAllClick()
                             if (meetingViewModel.state.value.participantsSection == ParticipantsSection.WaitingRoomSection) {
                                 waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed()
