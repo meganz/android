@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.presentation.meeting.chat.extension.isSelectable
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
 import mega.privacy.android.core.ui.controls.chat.ChatMessageContainer
@@ -21,16 +20,13 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 abstract class AvatarMessage : UiChatMessage {
 
     /**
-     * Message
-     */
-    internal abstract val message: TypedMessage
-
-    /**
      * Content composable
      */
     @Composable
     abstract fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit)
 
+    abstract override val message: TypedMessage
+    
     /**
      * Avatar composable
      */
@@ -85,8 +81,9 @@ abstract class AvatarMessage : UiChatMessage {
         )
     }
 
-    override val isSelectable: Boolean
-        get() = message.isSelectable
+    override val isSelectable = true
+
+    override var isSelected = false
 
     override fun key() = super.key() + "_${showAvatar}"
 }

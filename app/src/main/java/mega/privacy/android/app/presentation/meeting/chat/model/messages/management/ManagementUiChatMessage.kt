@@ -18,13 +18,17 @@ abstract class ManagementUiChatMessage : UiChatMessage {
     /**
      * Message
      */
-    abstract val message: ManagementMessage
+    abstract override val message: ManagementMessage
 
     override val showTime: Boolean = true
 
     override val displayAsMine = false
 
     override val isSelectable: Boolean = false
+
+    override var isSelected: Boolean
+        get() = false
+        set(_) {}
 
     /**
      * Content composable
