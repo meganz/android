@@ -710,6 +710,7 @@ class NodeRepositoryImplTest {
             on { creationTime }.thenReturn(123456789)
             on { modificationTime }.thenReturn(1234567890)
             on { isFavourite }.thenReturn(true)
+            on { isMarkedSensitive }.thenReturn(false)
             on { isExported }.thenReturn(true)
             on { publicLink }.thenReturn("public_link")
             on { publicLinkCreationTime }.thenReturn(1234567)

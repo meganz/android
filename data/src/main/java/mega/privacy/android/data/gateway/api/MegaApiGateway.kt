@@ -490,6 +490,19 @@ interface MegaApiGateway {
     fun setNodeFavourite(node: MegaNode?, favourite: Boolean)
 
     /**
+     * Mark a node as sensitive
+     *
+     * @param node      Node that will receive the information.
+     * @param sensitive if true set node as sensitive, otherwise remove the attribute
+     * @param listener  MegaRequestListener to track this request
+     */
+    fun setNodeSensitive(
+        node: MegaNode?,
+        sensitive: Boolean,
+        listener: MegaRequestListenerInterface? = null
+    )
+
+    /**
      * Add logger
      *
      * @param logger

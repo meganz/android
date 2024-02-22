@@ -409,6 +409,14 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.setNodeFavourite(node, favourite)
     }
 
+    override fun setNodeSensitive(
+        node: MegaNode?,
+        sensitive: Boolean,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        megaApi.setNodeSensitive(node, sensitive, listener)
+    }
+
     override fun addLogger(logger: MegaLoggerInterface) = MegaApiAndroid.addLoggerObject(logger)
 
     override fun removeLogger(logger: MegaLoggerInterface) =

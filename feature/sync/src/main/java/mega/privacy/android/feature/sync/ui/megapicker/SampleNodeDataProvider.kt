@@ -29,6 +29,7 @@ internal class SampleNodeDataProvider {
             override val restoreId: NodeId? = null
             override val label = 1
             override val isFavourite = false
+            override val isMarkedSensitive = false
             override val exportedData = null
             override val isTakenDown = false
             override val isIncomingShare = false
@@ -55,6 +56,7 @@ internal class SampleNodeDataProvider {
             override val restoreId: NodeId? = null
             override val label = 1
             override val isFavourite = true
+            override val isMarkedSensitive = false
             override val exportedData = null
             override val isTakenDown = false
             override val isIncomingShare = false
@@ -81,6 +83,7 @@ internal class SampleNodeDataProvider {
             override val restoreId: NodeId? = null
             override val label = 1
             override val isFavourite = false
+            override val isMarkedSensitive = false
             override val exportedData = null
             override val isTakenDown = false
             override val isIncomingShare = false
@@ -99,6 +102,7 @@ internal class SampleNodeDataProvider {
             override val restoreId: NodeId? = null
             override val label = 1
             override val isFavourite = false
+            override val isMarkedSensitive = false
             override val exportedData = null
             override val isTakenDown = false
             override val isIncomingShare = false

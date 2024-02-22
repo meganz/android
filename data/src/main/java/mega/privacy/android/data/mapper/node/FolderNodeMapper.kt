@@ -51,6 +51,7 @@ internal class FolderNodeMapper @Inject constructor(
         else
             megaApiGateway.getNumChildFiles(megaNode),
         isFavourite = megaNode.isFavourite,
+        isMarkedSensitive = megaNode.isMarkedSensitive,
         exportedData = megaNode.takeIf { megaNode.isExported }?.let {
             ExportedData(it.publicLink, it.publicLinkCreationTime)
         },

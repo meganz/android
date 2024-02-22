@@ -69,6 +69,7 @@ internal class FileNodeMapper @Inject constructor(
         ),
         type = fileTypeInfoMapper(megaNode),
         isFavourite = megaNode.isFavourite,
+        isMarkedSensitive = megaNode.isMarkedSensitive,
         exportedData = megaNode.takeIf { megaNode.isExported }?.let {
             ExportedData(it.publicLink, it.publicLinkCreationTime)
         },

@@ -431,6 +431,12 @@
             "notNull": true
           },
           {
+            "fieldPath": "isMarkedSensitive",
+            "columnName": "isMarkedSensitive",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
             "fieldPath": "isTakenDown",
             "columnName": "isTakenDown",
             "affinity": "INTEGER",

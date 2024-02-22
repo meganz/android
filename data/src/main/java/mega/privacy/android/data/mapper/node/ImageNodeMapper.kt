@@ -46,6 +46,7 @@ internal class ImageNodeMapper @Inject constructor(
             override val fullSizePath = null
             override val type = fileTypeInfoMapper(megaNode)
             override val isFavourite = megaNode.isFavourite
+            override val isMarkedSensitive = megaNode.isMarkedSensitive
             override val exportedData = megaNode.takeIf { megaNode.isExported }?.let {
                 ExportedData(it.publicLink, it.publicLinkCreationTime)
             }

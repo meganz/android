@@ -942,6 +942,14 @@ internal class NodeRepositoryImpl @Inject constructor(
             )
         }
 
+    override suspend fun updateNodeSensitive(nodeId: NodeId, isSensitive: Boolean) =
+        withContext(ioDispatcher) {
+            megaApiGateway.setNodeSensitive(
+                node = megaApiGateway.getMegaNodeByHandle(nodeId.longValue),
+                sensitive = isSensitive,
+            )
+        }
+
     override suspend fun clearOffline() =
         withContext(ioDispatcher) { megaLocalRoomGateway.clearOffline() }
 

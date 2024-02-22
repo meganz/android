@@ -35,6 +35,7 @@ internal class ImageNodeFileMapper @Inject constructor(
             duration = 0,
         )
         override val isFavourite = false
+        override val isMarkedSensitive = false
         override val exportedData = null
         override val isTakenDown = false
         override val isIncomingShare = false

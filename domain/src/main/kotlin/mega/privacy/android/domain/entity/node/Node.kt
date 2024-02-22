@@ -45,6 +45,11 @@ interface Node {
     val isFavourite: Boolean
 
     /**
+     * Is sensitive
+     */
+    val isMarkedSensitive: Boolean
+
+    /**
      * Exported data if the node is exported (shared with public link), null otherwise
      */
     val exportedData: ExportedData?

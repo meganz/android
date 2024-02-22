@@ -651,6 +651,11 @@ interface NodeRepository {
     suspend fun updateFavoriteNode(nodeId: NodeId, isFavorite: Boolean)
 
     /**
+     * Update Node to sensitive
+     */
+    suspend fun updateNodeSensitive(nodeId: NodeId, isSensitive: Boolean)
+
+    /**
      * Clear offline
      */
     suspend fun clearOffline()
