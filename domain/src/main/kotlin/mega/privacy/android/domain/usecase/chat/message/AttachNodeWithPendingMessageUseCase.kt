@@ -62,7 +62,7 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
         state: PendingMessageState,
         nodeHandle: Long = this.nodeHandle,
     ) {
-        chatMessageRepository.savePendingMessage(
+        chatMessageRepository.updatePendingMessage(
             SavePendingMessageRequest(
                 chatId = this.chatId,
                 type = this.type,

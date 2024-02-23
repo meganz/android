@@ -114,7 +114,7 @@ internal class ChatStorageFacade @Inject constructor(
     ) = database.pendingMessageDao().insert(pendingMessageEntity)
 
     override suspend fun updatePendingMessage(pendingMessage: PendingMessageEntity) {
-        database.pendingMessageDao().insert(pendingMessage)
+        database.pendingMessageDao().update(pendingMessage)
     }
 
     override suspend fun deletePendingMessage(pendingMessageId: Long) {

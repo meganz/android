@@ -270,6 +270,19 @@ class ChatMessageRepositoryImplTest {
     }
 
     @Test
+    fun `test that updatePendingMessage saves the mapped entities`() = runTest {
+        val savePendingMessageRequest = mock<SavePendingMessageRequest> {
+            on { state } doReturn mock()
+            on { filePath } doReturn "file"
+        }
+        val pendingMessageEntity = mock<PendingMessageEntity>()
+        whenever(pendingMessageEntityMapper(savePendingMessageRequest))
+            .thenReturn(pendingMessageEntity)
+        underTest.updatePendingMessage(savePendingMessageRequest)
+        verify(chatStorageGateway).updatePendingMessage(pendingMessageEntity)
+    }
+
+    @Test
     fun `test that forward contact invokes api and returns the message`() = runTest {
         val chatMessage = mock<MegaChatMessage>()
         val message = mock<ChatMessage>()

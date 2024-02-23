@@ -64,7 +64,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
 
         underTest(pendingMsgId, NodeId(1L))
         verify(chatMessageRepository)
-            .savePendingMessage(
+            .updatePendingMessage(
                 eq(pendingMessage.createRequest(PendingMessageState.ATTACHING))
             )
     }
@@ -80,7 +80,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
 
             underTest(pendingMsgId, NodeId(1L))
             verify(chatMessageRepository)
-                .savePendingMessage(
+                .updatePendingMessage(
                     eq(pendingMessage.createRequest(PendingMessageState.ERROR_ATTACHING))
                 )
         }

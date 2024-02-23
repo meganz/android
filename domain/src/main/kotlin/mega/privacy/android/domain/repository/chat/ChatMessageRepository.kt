@@ -200,6 +200,14 @@ interface ChatMessageRepository {
     suspend fun savePendingMessage(savePendingMessageRequest: SavePendingMessageRequest): PendingMessage
 
     /**
+     * Save pending message
+     *
+     * @param savePendingMessageRequest
+     * @return saved PendingMessage
+     */
+    suspend fun updatePendingMessage(savePendingMessageRequest: SavePendingMessageRequest)
+
+    /**
      * Monitor pending messages
      *
      * @param chatId
