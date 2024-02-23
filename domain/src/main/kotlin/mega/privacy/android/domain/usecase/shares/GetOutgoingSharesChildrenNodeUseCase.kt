@@ -34,7 +34,9 @@ class GetOutgoingSharesChildrenNodeUseCase @Inject constructor(
         return if (parentHandle == -1L) {
             nodeRepository.getAllOutgoingShares(getOthersSortOrder()).mapNotNull { shareData ->
                 getNodeByHandle(NodeId(shareData.nodeHandle))?.let { node ->
-                    mapNodeToShareUseCase(node, shareData)
+                    runCatching {
+                        mapNodeToShareUseCase(node, shareData)
+                    }.getOrNull()
                 }
             }
         } else {

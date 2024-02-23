@@ -1038,8 +1038,12 @@ internal class NodeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getLocalLink(node: TypedNode): String? = withContext(ioDispatcher) {
-        megaNodeMapper(node)?.let { node ->
-            megaApiGateway.httpServerGetLocalLink(node)
-        }
+        runCatching {
+            megaNodeMapper(node)?.let { node ->
+                megaApiGateway.httpServerGetLocalLink(node)
+            }
+        }.onFailure {
+            Timber.e(it)
+        }.getOrNull()
     }
 }

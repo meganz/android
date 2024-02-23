@@ -33,8 +33,8 @@ import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
-import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
@@ -270,7 +270,11 @@ class FileLinkViewModel @Inject constructor(
             if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
                 val linkNodes = listOfNotNull(
                     (_state.value.fileNode as? UnTypedNode)?.let {
-                        mapNodeToPublicLinkUseCase(it, null) as? TypedNode
+                        runCatching {
+                            mapNodeToPublicLinkUseCase(it, null) as? TypedNode
+                        }.onFailure {
+                            Timber.e(it)
+                        }.getOrNull()
                     })
                 _state.update {
                     it.copy(

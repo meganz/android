@@ -206,15 +206,19 @@ class FavouritesViewModel @Inject constructor(
             val node =
                 this@FavouritesViewModel.fetchNodeWrapper(nodeId.longValue)
                     ?: return@mapNotNull null
-            this@FavouritesViewModel.favouriteMapper(
-                node,
-                favouriteInfo,
-                isAvailableOfflineUseCase(favouriteInfo),
-                stringUtilWrapper,
-                selectedNodes.contains(nodeId),
-            ) { name ->
-                MimeTypeList.typeForName(name).iconResourceId
-            }
+            runCatching {
+                this@FavouritesViewModel.favouriteMapper(
+                    node,
+                    favouriteInfo,
+                    isAvailableOfflineUseCase(favouriteInfo),
+                    stringUtilWrapper,
+                    selectedNodes.contains(nodeId),
+                ) { name ->
+                    MimeTypeList.typeForName(name).iconResourceId
+                }
+            }.onFailure {
+                Timber.e(it)
+            }.getOrNull()
         }
 
     /**
@@ -235,7 +239,7 @@ class FavouritesViewModel @Inject constructor(
         return when (this) {
             is TypedFileNode -> this.compareToFile(other, order)
             is TypedFolderNode -> this.compareToFolder(other, order)
-            else -> throw IllegalStateException("Invalid type")
+            else -> 0
         }
     }
 

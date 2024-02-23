@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.fileinfo.model
 
 import mega.privacy.android.core.R as CoreUiR
 import androidx.annotation.DrawableRes
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.node.model.mapper.getDefaultFolderIcon
 import mega.privacy.android.app.presentation.node.model.mapper.getFileIcon
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -31,5 +32,5 @@ fun getNodeIcon(typedNode: TypedNode, originShares: Boolean) = when (typedNode) 
         }
     }
 
-    else -> throw IllegalStateException("Invalid type")
+    else -> R.drawable.ic_generic_thumbnail
 }

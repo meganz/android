@@ -18,6 +18,8 @@ class GetPublicNodeFromSerializedDataUseCase @Inject constructor(
      */
     suspend operator fun invoke(serializedData: String): PublicLinkNode? =
         nodeRepository.getNodeFromSerializedData(serializedData)?.let {
-            mapNodeToPublicLinkUseCase(it, null)
+            runCatching {
+                mapNodeToPublicLinkUseCase(it, null)
+            }.getOrNull()
         }
 }

@@ -42,11 +42,15 @@ class GetIncomingSharesChildrenNodeUseCase @Inject constructor(
             val isContactVerificationOn = getContactVerificationWarningUseCase()
             nodeRepository.getAllIncomingShares(getOthersSortOrder()).mapNotNull { shareData ->
                 getNodeByHandle(NodeId(shareData.nodeHandle))?.let { node ->
-                    mapNodeToShareUseCase(node, shareData.let {
-                        if (isContactVerificationOn && it.user != null)
-                            it.copy(isContactCredentialsVerified = areCredentialsVerifiedUseCase(it.user))
-                        else it
-                    })
+                    runCatching {
+                        mapNodeToShareUseCase(node, shareData.let {
+                            if (isContactVerificationOn && it.user != null)
+                                it.copy(
+                                    isContactCredentialsVerified = areCredentialsVerifiedUseCase(it.user)
+                                )
+                            else it
+                        })
+                    }.getOrNull()
                 }
             }
         } else {

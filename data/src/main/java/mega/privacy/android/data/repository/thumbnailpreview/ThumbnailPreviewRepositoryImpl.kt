@@ -19,6 +19,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -97,26 +98,36 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
 
     override suspend fun getPreviewFromLocal(typedNode: TypedNode): File? =
         withContext(ioDispatcher) {
-            megaNodeMapper(typedNode)?.run {
-                getPreviewFile(this).takeIf {
-                    it?.exists() ?: false
+            runCatching {
+                megaNodeMapper(typedNode)?.run {
+                    getPreviewFile(this).takeIf {
+                        it?.exists() ?: false
+                    }
                 }
-            }
+            }.onFailure {
+                Timber.e(it)
+            }.getOrNull()
         }
 
     override suspend fun getPreviewFromServer(typedNode: TypedNode): File? =
         withContext(ioDispatcher) {
-            megaNodeMapper(typedNode)?.let { node ->
-                getPreviewFile(node)?.let { preview ->
-                    suspendCancellableCoroutine { continuation ->
-                        val listener = continuation.getRequestListener("getPreviewFromServer") {
-                            preview
+            runCatching {
+                megaNodeMapper(typedNode)?.let { node ->
+                    getPreviewFile(node)?.let { preview ->
+                        suspendCancellableCoroutine { continuation ->
+                            val listener = continuation.getRequestListener("getPreviewFromServer") {
+                                preview
+                            }
+                            megaApi.getPreview(node, preview.absolutePath, listener)
+                            continuation.invokeOnCancellation {
+                                megaApi.removeRequestListener(listener)
+                            }
                         }
-                        megaApi.getPreview(node, preview.absolutePath, listener)
-                        continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
                     }
                 }
-            }
+            }.onFailure {
+                Timber.e(it)
+            }.getOrNull()
         }
 
     override suspend fun downloadThumbnail(

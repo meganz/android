@@ -63,10 +63,10 @@ import mega.privacy.android.domain.usecase.GetLocalFileForNode
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetPricing
+import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
-import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
@@ -694,7 +694,11 @@ class FolderLinkViewModel @Inject constructor(
                         ?: state.value.rootNode
                     listOfNotNull(node)
                 }.mapNotNull {
-                    mapNodeToPublicLinkUseCase(it as UnTypedNode, null) as? TypedNode
+                    runCatching {
+                        mapNodeToPublicLinkUseCase(it as UnTypedNode, null) as? TypedNode
+                    }.onFailure {
+                        Timber.e(it)
+                    }.getOrNull()
                 }
                 _state.update {
                     it.copy(
@@ -842,7 +846,11 @@ class FolderLinkViewModel @Inject constructor(
         viewModelScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
                 val linkNodes = nodes.mapNotNull {
-                    mapNodeToPublicLinkUseCase(it as UnTypedNode, null) as? TypedNode
+                    runCatching {
+                        mapNodeToPublicLinkUseCase(it as UnTypedNode, null) as? TypedNode
+                    }.onFailure {
+                        Timber.e(it)
+                    }.getOrNull()
                 }
                 _state.update {
                     it.copy(

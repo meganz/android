@@ -53,6 +53,10 @@ class MonitorPublicLinksUseCase @Inject constructor(
         val publicLinks = shareRepository.getPublicLinks(getLinksSortOrder())
         nodeIds = publicLinks.mapTo(mutableSetOf()) { it.id }
         return publicLinks
-            .map { mapNodeToPublicLinkUseCase(it, null) }
+            .mapNotNull {
+                runCatching {
+                    mapNodeToPublicLinkUseCase(it, null)
+                }.getOrNull()
+            }
     }
 }

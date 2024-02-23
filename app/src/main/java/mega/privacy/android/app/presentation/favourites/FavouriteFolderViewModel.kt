@@ -31,6 +31,7 @@ import mega.privacy.android.domain.entity.FavouriteFolderInfo
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.favourites.GetFavouriteFolderInfoUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -123,20 +124,24 @@ class FavouriteFolderViewModel @Inject constructor(
                 children = children.mapNotNull { favouriteInfo ->
                     val node =
                         fetchNodeWrapper(favouriteInfo.id.longValue) ?: return@mapNotNull null
-                    FavouriteListItem(
-                        favourite = favouriteMapper(
-                            node,
-                            favouriteInfo,
-                            megaUtilWrapper.availableOffline(
-                                context,
-                                favouriteInfo.id.longValue
-                            ),
-                            stringUtilWrapper,
-                            false
-                        ) { name ->
-                            MimeTypeList.typeForName(name).iconResourceId
-                        }
-                    )
+                    runCatching {
+                        FavouriteListItem(
+                            favourite = favouriteMapper(
+                                node,
+                                favouriteInfo,
+                                megaUtilWrapper.availableOffline(
+                                    context,
+                                    favouriteInfo.id.longValue
+                                ),
+                                stringUtilWrapper,
+                                false
+                            ) { name ->
+                                MimeTypeList.typeForName(name).iconResourceId
+                            }
+                        )
+                    }.onFailure {
+                        Timber.e(it)
+                    }.getOrNull()
                 },
                 // If current handle is not current root handle, enable onBackPressedCallback
                 isBackPressedEnable = folderInfo.currentHandle != currentRootHandle
