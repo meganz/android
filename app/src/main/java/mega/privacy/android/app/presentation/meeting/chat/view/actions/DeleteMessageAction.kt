@@ -14,11 +14,11 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 internal class DeleteMessageAction(
     private val chatViewModel: ChatViewModel,
 ) : MessageAction {
-    override fun appliesTo(messages: List<TypedMessage>) = messages
+    override fun appliesTo(messages: Set<TypedMessage>) = messages
         .all { it.isDeletable && it.isMine }
 
     override fun bottomSheetMenuItem(
-        messages: List<TypedMessage>,
+        messages: Set<TypedMessage>,
         context: Context,
         hideBottomSheet: () -> Unit,
     ): @Composable () -> Unit =

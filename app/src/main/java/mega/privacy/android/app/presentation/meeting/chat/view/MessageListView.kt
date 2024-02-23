@@ -3,10 +3,13 @@ package mega.privacy.android.app.presentation.meeting.chat.view
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material.Checkbox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -33,6 +37,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.managem
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.core.ui.controls.chat.messages.LoadingMessagesHeader
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import timber.log.Timber
 
@@ -50,6 +55,10 @@ internal fun MessageListView(
         onMessageLongClick = parameter.onMessageLongClick,
         onForwardClicked = parameter.onForwardClicked,
         onCanSelectChanged = parameter.onCanSelectChanged,
+        selectMode = parameter.selectMode,
+        selectedItems = parameter.selectedItems,
+        selectItem = parameter.selectItem,
+        deselectItem = parameter.deselectItem,
     )
 }
 
@@ -61,15 +70,18 @@ internal fun MessageListView(
     onMoreReactionsClicked: (Long) -> Unit,
     onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
     onReactionLongClick: (String, List<UIReaction>) -> Unit,
+    onMessageLongClick: (TypedMessage) -> Unit,
+    onForwardClicked: (TypedMessage) -> Unit,
+    onCanSelectChanged: (Boolean) -> Unit,
+    selectMode: Boolean,
+    selectedItems: Set<Long>,
+    selectItem: (TypedMessage) -> Unit,
+    deselectItem: (TypedMessage) -> Unit,
     viewModel: MessageListViewModel = hiltViewModel(),
-    onMessageLongClick: (TypedMessage) -> Unit = {},
-    onForwardClicked: (TypedMessage) -> Unit = {},
-    onCanSelectChanged: (Boolean) -> Unit = {},
 ) {
     val pagingItems = viewModel.pagedMessages.collectAsLazyPagingItems()
     Timber.d("Paging pagingItems load state: \n ${pagingItems.printLoadStates()}")
     Timber.d("Paging pagingItems count ${pagingItems.itemCount}")
-    
     val state by viewModel.state.collectAsStateWithLifecycle()
     onCanSelectChanged(pagingItems.itemSnapshotList.any { it?.isSelectable == true })
 
@@ -142,6 +154,7 @@ internal fun MessageListView(
         reverseLayout = true,
     ) {
 
+
         if (!isDataLoaded) {
             item {
                 LoadingMessagesHeader()
@@ -165,27 +178,57 @@ internal fun MessageListView(
                 },
                 contentType = pagingItems.itemContentType()
             ) { index ->
-                Box(modifier = Modifier.sizeIn(minHeight = 42.dp)) {
-                    pagingItems[index]?.MessageListItem(
-                        uiState = uiState,
-                        lastUpdatedCache = lastCacheUpdateTime[pagingItems[index]?.userHandle]
-                            ?: 0L,
-                        timeFormatter = TimeUtils::formatTime,
-                        dateFormatter = {
-                            TimeUtils.formatDate(
-                                it,
-                                TimeUtils.DATE_SHORT_FORMAT,
-                                context
+                pagingItems[index]?.let { currentItem ->
+                    val isInSelectMode = selectMode && currentItem.isSelectable
+                    val isChecked = isInSelectMode && currentItem.id in selectedItems
+                    val onSelectedChanged: (Boolean) -> Unit = { selected ->
+                        if (selected) {
+                            currentItem.message?.let { selectItem(it) }
+                        } else {
+                            currentItem.message?.let { deselectItem(it) }
+                        }
+                    }
+                    Row(
+                        modifier = Modifier.conditional(
+                            condition = isInSelectMode
+                        ) {
+                            toggleable(
+                                value = isChecked,
+                                enabled = true,
+                                role = Role.Checkbox,
+                                onValueChange = onSelectedChanged
                             )
-                        },
-                        onLongClick = {
-                            if (uiState.haveWritePermission) onMessageLongClick(it)
-                        },
-                        onForwardClicked = onForwardClicked,
-                        onMoreReactionsClicked = onMoreReactionsClicked,
-                        onReactionClicked = onReactionClicked,
-                        onReactionLongClick = onReactionLongClick,
-                    )
+                        }
+                    ) {
+                        if (isInSelectMode) {
+                            Checkbox(
+                                checked = isChecked,
+                                onCheckedChange = onSelectedChanged
+                            )
+                        }
+                        Box(modifier = Modifier.sizeIn(minHeight = 42.dp)) {
+                            currentItem.MessageListItem(
+                                uiState = uiState,
+                                lastUpdatedCache = lastCacheUpdateTime[currentItem.userHandle]
+                                    ?: 0L,
+                                timeFormatter = TimeUtils::formatTime,
+                                dateFormatter = {
+                                    TimeUtils.formatDate(
+                                        it,
+                                        TimeUtils.DATE_SHORT_FORMAT,
+                                        context
+                                    )
+                                },
+                                onLongClick = {
+                                    if (uiState.haveWritePermission) onMessageLongClick(it)
+                                },
+                                onForwardClicked = onForwardClicked,
+                                onMoreReactionsClicked = onMoreReactionsClicked,
+                                onReactionClicked = onReactionClicked,
+                                onReactionLongClick = onReactionLongClick,
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -205,7 +248,10 @@ internal fun MessageListView(
  * @property onReactionLongClick
  * @property onForwardClicked
  * @property onCanSelectChanged
- * @constructor Create empty Message list parameter
+ * @property selectMode
+ * @property selectedItems
+ * @property selectItem
+ * @property deselectItem
  */
 internal data class MessageListParameter(
     val uiState: ChatUiState,
@@ -217,5 +263,10 @@ internal data class MessageListParameter(
     val onReactionLongClick: (String, List<UIReaction>) -> Unit,
     val onForwardClicked: (TypedMessage) -> Unit,
     val onCanSelectChanged: (Boolean) -> Unit,
-)
+    val selectMode: Boolean,
+    val selectedItems: Set<Long>,
+    val selectItem: (TypedMessage) -> Unit,
+    val deselectItem: (TypedMessage) -> Unit,
+) {
+}
 

@@ -163,7 +163,7 @@ internal fun ChatView(
         getUser = viewModel::getUser,
         onForwardMessages = viewModel::onForwardMessages,
         actions = actionsFactories.map { it(viewModel) }.toSet(),
-        messageListSaver = savers.messageListSaver,
+        messageSetSaver = savers.messageSetSaver,
         consumeDownloadEvent = viewModel::consumeDownloadEvent,
     )
 }
@@ -258,11 +258,11 @@ internal fun ChatView(
     onAttachContacts: (List<String>) -> Unit = { _ -> },
     getUserInfoIntoReactionList: suspend (List<UIReaction>) -> List<UIReaction> = { emptyList() },
     getUser: suspend (UserId) -> User? = { null },
-    onForwardMessages: (List<TypedMessage>, List<Long>?, List<Long>?) -> Unit = { _, _, _ -> },
+    onForwardMessages: (Set<TypedMessage>, List<Long>?, List<Long>?) -> Unit = { _, _, _ -> },
     actions: Set<MessageAction> = setOf(),
-    messageListSaver: Saver<List<TypedMessage>, String> = Saver(
+    messageSetSaver: Saver<Set<TypedMessage>, String> = Saver(
         save = { "" },
-        restore = { emptyList() }),
+        restore = { emptySet() }),
     consumeDownloadEvent: () -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -276,17 +276,22 @@ internal fun ChatView(
     var showMutePushNotificationDialog by rememberSaveable { mutableStateOf(false) }
     var muteNotificationDialogOptions by rememberSaveable { mutableStateOf(emptyList<ChatPushNotificationMuteOption>()) }
     var isSelectMode by rememberSaveable { mutableStateOf(false) }
+    var selectedMessages by rememberSaveable(stateSaver = messageSetSaver) {
+        mutableStateOf(
+            emptySet()
+        )
+    }
+    val exitSelectMode = {
+        isSelectMode = false
+        selectedMessages = emptySet()
+    }
+
     var showJoinAnswerCallDialog by rememberSaveable { mutableStateOf(false) }
     var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
     var showReactionPicker by rememberSaveable { mutableStateOf(false) }
     var addingReactionTo by rememberSaveable { mutableStateOf<Long?>(null) }
     var selectedReaction by rememberSaveable { mutableStateOf("") }
     var reactionList by rememberSaveable { mutableStateOf(emptyList<UIReaction>()) }
-    var selectedMessages by rememberSaveable(stateSaver = messageListSaver) {
-        mutableStateOf(
-            emptyList()
-        )
-    }
     val audioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
     val keyboardController = LocalSoftwareKeyboardController.current
     val toolbarModalSheetState =
@@ -317,7 +322,7 @@ internal fun ChatView(
                 keyboardController?.hide()
                 showEmojiPicker = false
             } else {
-                selectedMessages = emptyList()
+                selectedMessages = emptySet()
                 addingReactionTo = null
             }
             true
@@ -422,7 +427,7 @@ internal fun ChatView(
                 }
             }
 
-            selectedMessages = emptyList()
+            selectedMessages = emptySet()
         }
 
     with(uiState) {
@@ -619,9 +624,7 @@ internal fun ChatView(
                     if (isSelectMode) {
                         SelectModeAppBar(
                             title = "",
-                            onNavigationPressed = {
-                                isSelectMode = false
-                            },
+                            onNavigationPressed = exitSelectMode,
                         )
                     } else {
                         Column {
@@ -754,7 +757,7 @@ internal fun ChatView(
                         },
                         listView = { bottomPadding ->
                             val onMessageLongClick: (TypedMessage) -> Unit = { message ->
-                                selectedMessages = listOf(message)
+                                selectedMessages = setOf(message)
                                 // Use message for showing correct available options
                                 coroutineScope.launch {
                                     messageOptionsModalSheetState.show()
@@ -789,11 +792,17 @@ internal fun ChatView(
                                     }
                                 }
                             val onForwardClicked: (TypedMessage) -> Unit = { message ->
-                                selectedMessages = listOf(message)
+                                selectedMessages = setOf(message)
                                 openChatPicker(context, chatId, chatPickerLauncher)
                             }
                             val onCanSelectChanged: (Boolean) -> Unit = { hasSelectableMessage ->
                                 canSelect = hasSelectableMessage
+                            }
+                            val selectItem = { message: TypedMessage ->
+                                selectedMessages = selectedMessages + message
+                            }
+                            val deselectItem = { message: TypedMessage ->
+                                selectedMessages = selectedMessages - message
                             }
                             messageListView(
                                 MessageListParameter(
@@ -806,6 +815,10 @@ internal fun ChatView(
                                     onReactionLongClick = onReactionLongClick,
                                     onForwardClicked = onForwardClicked,
                                     onCanSelectChanged = onCanSelectChanged,
+                                    selectedItems = selectedMessages.map { it.msgId }.toSet(),
+                                    selectItem = selectItem,
+                                    deselectItem = deselectItem,
+                                    selectMode = isSelectMode,
                                 )
                             )
 

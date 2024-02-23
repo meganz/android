@@ -2568,7 +2568,7 @@ internal class ChatViewModelTest {
     @Test
     fun `test that forward messages invokes use case and updates state`() = runTest {
         val message = mock<TypedMessage>()
-        val messages = listOf(message)
+        val messages = setOf(message)
         val chatId1 = 123L
         val chatId2 = 456L
         val contactId = 789L
@@ -2579,11 +2579,11 @@ internal class ChatViewModelTest {
         val result3 = ForwardResult.Success(contactId)
         val results = listOf(result1, result2, result3)
         val forwardResult = ForwardMessagesToChatsResult.AllSucceeded(null, messages.size)
-        whenever(forwardMessagesUseCase(messages, chatHandles, contactHandles))
+        whenever(forwardMessagesUseCase(messages.toList(), chatHandles, contactHandles))
             .thenReturn(results)
         whenever(forwardMessagesResultMapper(results, messages.size)).thenReturn(forwardResult)
         underTest.onForwardMessages(messages, chatHandles, contactHandles)
-        verify(forwardMessagesUseCase).invoke(messages, chatHandles, contactHandles)
+        verify(forwardMessagesUseCase).invoke(messages.toList(), chatHandles, contactHandles)
         underTest.state.test {
             val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered)
                 .content as InfoToShow.ForwardMessagesResult).result
@@ -2594,13 +2594,13 @@ internal class ChatViewModelTest {
     @Test
     fun `test that forward messages updates state if CreateChatException is thrown`() = runTest {
         val message = mock<TypedMessage>()
-        val messages = listOf(message)
+        val messages = setOf(message)
         val chatId1 = 123L
         val chatId2 = 456L
         val contactId = 789L
         val chatHandles = listOf(chatId1, chatId2)
         val contactHandles = listOf(contactId)
-        whenever(forwardMessagesUseCase(messages, chatHandles, contactHandles))
+        whenever(forwardMessagesUseCase(messages.toList(), chatHandles, contactHandles))
             .thenThrow(CreateChatException::class.java)
         underTest.onForwardMessages(messages, chatHandles, contactHandles)
         underTest.state.test {
@@ -2682,10 +2682,10 @@ internal class ChatViewModelTest {
     @Test
     fun `test that delete messages invokes use case`() = runTest {
         val message = mock<TypedMessage>()
-        val messages = listOf(message)
-        whenever(deleteMessagesUseCase(messages)).thenReturn(Unit)
+        val messages = setOf(message)
+        whenever(deleteMessagesUseCase(messages.toList())).thenReturn(Unit)
         underTest.onDeletedMessages(messages)
-        verify(deleteMessagesUseCase).invoke(messages)
+        verify(deleteMessagesUseCase).invoke(messages.toList())
     }
 
     private fun ChatRoom.getNumberParticipants() =

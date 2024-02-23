@@ -44,32 +44,31 @@ class ForwardMessageActionTest() {
 
     @Test
     fun `test that action applies to non management messages`() {
-        assertThat(underTest.appliesTo(listOf(mock<NormalMessage>()))).isTrue()
+        assertThat(underTest.appliesTo(setOf(mock<NormalMessage>()))).isTrue()
     }
 
     @Test
     fun `test that action does not apply to management messages`() {
-        assertThat(underTest.appliesTo(listOf(mock<ManagementMessage>()))).isFalse()
+        assertThat(underTest.appliesTo(setOf(mock<ManagementMessage>()))).isFalse()
     }
 
     @Test
     fun `test that action does not apply to invalid messages`() {
-        assertThat(underTest.appliesTo(listOf(mock<InvalidMessage>()))).isFalse()
+        assertThat(underTest.appliesTo(setOf(mock<InvalidMessage>()))).isFalse()
     }
 
     @Test
     fun `test that action does not apply to invalid meta messages`() {
-        assertThat(underTest.appliesTo(listOf(mock<InvalidMetaMessage>()))).isFalse()
+        assertThat(underTest.appliesTo(setOf(mock<InvalidMetaMessage>()))).isFalse()
     }
 
     @Test
     fun `test that composable contains forward bottom action`() {
         composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
-                messages = emptyList(),
+                messages = emptySet(),
                 context = mock(),
-                hideBottomSheet = {},
-            )
+            ) {}
         )
 
         composeTestRule.onNodeWithTag(CHAT_BOTTOM_SHEET_OPTION_FORWARD_TAG).assertExists()
@@ -82,7 +81,7 @@ class ForwardMessageActionTest() {
         val message = mock<NormalMessage> {
             on { this.chatId } doReturn chatId
         }
-        val messages = listOf(message)
+        val messages = setOf(message)
         composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
                 messages = messages,

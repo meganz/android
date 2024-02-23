@@ -18,8 +18,8 @@ class ChatSavers @Inject constructor(
     /**
      * Message list saver
      */
-    val messageListSaver: Saver<List<TypedMessage>, String> = Saver(
-        save = { messages -> json.encodeToString<List<TypedMessage>>(messages) },
+    val messageSetSaver: Saver<Set<TypedMessage>, String> = Saver(
+        save = { messages -> json.encodeToString<Set<TypedMessage>>(messages) },
         restore = { jsonString -> json.decodeFromString(jsonString) }
     )
 }

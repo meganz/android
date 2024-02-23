@@ -14,7 +14,7 @@ interface MessageAction {
      * @param messages
      * @return
      */
-    fun appliesTo(messages: List<TypedMessage>): Boolean
+    fun appliesTo(messages: Set<TypedMessage>): Boolean
 
     /**
      * In column
@@ -25,7 +25,7 @@ interface MessageAction {
      * @return
      */
     fun bottomSheetMenuItem(
-        messages: List<TypedMessage>,
+        messages: Set<TypedMessage>,
         context: Context,
         hideBottomSheet: () -> Unit,
     ): @Composable () -> Unit

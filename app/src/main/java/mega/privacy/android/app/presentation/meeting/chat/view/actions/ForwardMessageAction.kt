@@ -19,11 +19,11 @@ internal class ForwardMessageAction(
     private val chatViewModel: ChatViewModel,
     private val launchChatPicker: (Context, Long, ActivityResultLauncher<Intent>) -> Unit = ::openChatPicker,
 ) : MessageAction {
-    override fun appliesTo(messages: List<TypedMessage>) = messages
+    override fun appliesTo(messages: Set<TypedMessage>) = messages
         .none { it is ManagementMessage || it is InvalidMessage || it is InvalidMetaMessage }
 
     override fun bottomSheetMenuItem(
-        messages: List<TypedMessage>,
+        messages: Set<TypedMessage>,
         context: Context,
         hideBottomSheet: () -> Unit,
     ): @Composable () -> Unit =

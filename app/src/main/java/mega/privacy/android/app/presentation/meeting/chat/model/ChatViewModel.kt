@@ -1251,12 +1251,12 @@ class ChatViewModel @Inject constructor(
      * Forward messages.
      */
     fun onForwardMessages(
-        messages: List<TypedMessage>,
+        messages: Set<TypedMessage>,
         chatHandles: List<Long>?,
         contactHandles: List<Long>?,
     ) {
         viewModelScope.launch {
-            runCatching { forwardMessagesUseCase(messages, chatHandles, contactHandles) }
+            runCatching { forwardMessagesUseCase(messages.toList(), chatHandles, contactHandles) }
                 .onSuccess { results ->
                     val result = forwardMessagesResultMapper(results, messages.size)
                     val infoToShow = InfoToShow.ForwardMessagesResult(result)
@@ -1294,10 +1294,10 @@ class ChatViewModel @Inject constructor(
      *
      * @param messages list of [TypedMessage].
      */
-    fun onDeletedMessages(messages: List<TypedMessage>) {
+    fun onDeletedMessages(messages: Set<TypedMessage>) {
         viewModelScope.launch {
             runCatching {
-                deleteMessagesUseCase(messages)
+                deleteMessagesUseCase(messages.toList())
             }.onFailure {
                 Timber.e(it)
             }

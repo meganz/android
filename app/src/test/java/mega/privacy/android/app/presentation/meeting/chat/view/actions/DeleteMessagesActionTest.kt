@@ -42,7 +42,7 @@ class DeleteMessagesActionTest {
 
     @Test
     fun `test that action applies to deletable messages which are mine`() {
-        assertThat(underTest.appliesTo(listOf(mock<NormalMessage> {
+        assertThat(underTest.appliesTo(setOf(mock<NormalMessage> {
             on { isDeletable } doReturn true
             on { isMine } doReturn true
         }))).isTrue()
@@ -50,7 +50,7 @@ class DeleteMessagesActionTest {
 
     @Test
     fun `test that action does not apply to deletable messages which are not mine`() {
-        assertThat(underTest.appliesTo(listOf(mock<NormalMessage> {
+        assertThat(underTest.appliesTo(setOf(mock<NormalMessage> {
             on { isDeletable } doReturn true
             on { isMine } doReturn false
         }))).isFalse()
@@ -58,7 +58,7 @@ class DeleteMessagesActionTest {
 
     @Test
     fun `test that action does not apply to non deletable messages even if they are mine`() {
-        assertThat(underTest.appliesTo(listOf(mock<NormalMessage> {
+        assertThat(underTest.appliesTo(setOf(mock<NormalMessage> {
             on { isDeletable } doReturn false
             on { isMine } doReturn true
         }))).isFalse()
@@ -66,7 +66,7 @@ class DeleteMessagesActionTest {
 
     @Test
     fun `test that action does not apply to non deletable messages which are not mine`() {
-        assertThat(underTest.appliesTo(listOf(mock<NormalMessage> {
+        assertThat(underTest.appliesTo(setOf(mock<NormalMessage> {
             on { isDeletable } doReturn false
             on { isMine } doReturn false
         }))).isFalse()
@@ -76,7 +76,7 @@ class DeleteMessagesActionTest {
     fun `test that composable contains delete bottom action`() {
         composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
-                messages = emptyList(),
+                messages = emptySet(),
                 context = mock(),
                 hideBottomSheet = {},
             )
@@ -90,7 +90,7 @@ class DeleteMessagesActionTest {
         val context = mock<Context>()
         composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
-                messages = emptyList(),
+                messages = emptySet(),
                 context = context,
                 hideBottomSheet = {},
             )
@@ -107,7 +107,7 @@ class DeleteMessagesActionTest {
         with(composeTestRule) {
             setContent(
                 underTest.bottomSheetMenuItem(
-                    messages = emptyList(),
+                    messages = emptySet(),
                     context = context,
                     hideBottomSheet = {},
                 )
@@ -123,7 +123,7 @@ class DeleteMessagesActionTest {
     @Test
     fun `test that clicking the remove option in the confirmation dialog invokes view model`() {
         val context = mock<Context>()
-        val messages = listOf(mock<NormalMessage>())
+        val messages = setOf(mock<NormalMessage>())
         with(composeTestRule) {
             setContent(
                 underTest.bottomSheetMenuItem(
