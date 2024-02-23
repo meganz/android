@@ -51,28 +51,25 @@ internal class DeviceFolderUINodeErrorMessageMapper @Inject constructor() {
         BackupInfoSubState.INVALID_SCAN_INTERVAL -> R.string.device_center_list_view_item_sub_state_invalid_scan_interval
         BackupInfoSubState.NOTIFICATION_SYSTEM_UNAVAILABLE -> R.string.device_center_list_view_item_sub_state_notification_system_unavailable
         BackupInfoSubState.UNABLE_TO_ADD_WATCH -> R.string.device_center_list_view_item_sub_state_unable_to_add_watch
-        BackupInfoSubState.UNABLE_TO_RETRIEVE_ROOT_FSID -> R.string.device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid
         BackupInfoSubState.INSUFFICIENT_DISK_SPACE -> R.string.device_center_list_view_item_sub_state_insufficient_disk_space
-        BackupInfoSubState.FAILURE_ACCESSING_PERSISTENT_STORAGE -> R.string.device_center_list_view_item_sub_state_failure_accessing_persistent_storage
+
+        BackupInfoSubState.UNABLE_TO_RETRIEVE_ROOT_FSID,
+        BackupInfoSubState.FAILURE_ACCESSING_PERSISTENT_STORAGE,
+        -> R.string.device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid
+
         BackupInfoSubState.UNABLE_TO_OPEN_DATABASE,
         BackupInfoSubState.MISMATCH_OF_ROOT_FSID,
         BackupInfoSubState.FILESYSTEM_FILE_IDS_ARE_UNSTABLE,
         BackupInfoSubState.FILESYSTEM_ID_UNAVAILABLE,
-        -> {
-            R.string.device_center_list_view_item_sub_state_message_folder_backup_issue
-        }
+        -> R.string.device_center_list_view_item_sub_state_message_folder_backup_issue
 
         BackupInfoSubState.REMOTE_NODE_MOVED_TO_RUBBISH,
         BackupInfoSubState.REMOTE_NODE_INSIDE_RUBBISH,
-        -> {
-            R.string.device_center_list_view_item_sub_state_message_node_in_rubbish_bin
-        }
+        -> R.string.device_center_list_view_item_sub_state_message_node_in_rubbish_bin
 
         BackupInfoSubState.ACTIVE_SYNC_ABOVE_PATH,
         BackupInfoSubState.LOCAL_PATH_SYNC_COLLISION,
-        -> {
-            R.string.device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder
-        }
+        -> R.string.device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder
 
         else -> R.string.device_center_list_view_item_sub_state_message_unknown_error
     }

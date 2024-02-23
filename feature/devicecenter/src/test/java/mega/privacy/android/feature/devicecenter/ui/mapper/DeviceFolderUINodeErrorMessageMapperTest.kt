@@ -201,7 +201,7 @@ internal class DeviceFolderUINodeErrorMessageMapperTest {
         ),
         Arguments.of(
             BackupInfoSubState.FAILURE_ACCESSING_PERSISTENT_STORAGE,
-            R.string.device_center_list_view_item_sub_state_failure_accessing_persistent_storage,
+            R.string.device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid,
         ),
         Arguments.of(
             BackupInfoSubState.MISMATCH_OF_ROOT_FSID,
