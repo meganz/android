@@ -7,6 +7,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_ENABLE_GEOLOCATION_DIALOG
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.INVALID_LOCATION_MESSAGE_ID
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,17 +41,14 @@ class ChatLocationViewTest {
         composeRule.onNodeWithTag(TEST_TAG_ENABLE_GEOLOCATION_DIALOG).assertDoesNotExist()
     }
 
-    private fun initComposeRule(
-        isGeolocationEnabled: Boolean = true,
-        isEditingMessage: Boolean = false,
-    ) {
+    private fun initComposeRule(isGeolocationEnabled: Boolean = true) {
         composeRule.setContent {
             ChatLocationView(
                 isGeolocationEnabled = isGeolocationEnabled,
                 onEnableGeolocation = onEnableGeolocation,
                 onSendLocationMessage = onSendLocationMessage,
                 onDismissView = onDismissView,
-                isEditingMessage = isEditingMessage,
+                msgId = INVALID_LOCATION_MESSAGE_ID,
             )
         }
     }

@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.chat.message.edit
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
 /**
- * Delete messages use case.
+ * Get content from messages.
  */
 abstract class GetContentFromMessageUseCase {
 

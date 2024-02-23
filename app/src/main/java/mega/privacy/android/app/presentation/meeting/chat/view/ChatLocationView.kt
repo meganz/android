@@ -21,6 +21,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.EnableGeolocationDialog
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.INVALID_LOCATION_MESSAGE_ID
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openLocationPicker
 
 /**
@@ -33,7 +34,7 @@ fun ChatLocationView(
     onEnableGeolocation: () -> Unit,
     onSendLocationMessage: (Intent?) -> Unit,
     onDismissView: () -> Unit,
-    isEditingMessage: Boolean = false,
+    msgId: Long = INVALID_LOCATION_MESSAGE_ID,
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -52,7 +53,7 @@ fun ChatLocationView(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            openLocationPicker(context, locationPickerLauncher, isEditingMessage)
+            openLocationPicker(context, locationPickerLauncher, msgId)
         } else {
             showPermissionNotAllowedSnackbar(
                 context,
@@ -79,7 +80,7 @@ fun ChatLocationView(
 
         else -> {
             SideEffect {
-                openLocationPicker(context, locationPickerLauncher, isEditingMessage)
+                openLocationPicker(context, locationPickerLauncher, msgId)
             }
         }
     }
@@ -100,7 +101,7 @@ fun ChatLocationView(
     if (waitingForPickLocation && isGeolocationEnabled) {
         waitingForPickLocation = false
         SideEffect {
-            openLocationPicker(context, locationPickerLauncher, isEditingMessage)
+            openLocationPicker(context, locationPickerLauncher, msgId)
         }
     }
 }

@@ -40,7 +40,9 @@ internal class EditLocationMessageAction(
                 onDismissView = {
                     showLocationView = false
                     hideBottomSheet()
-                })
+                },
+                msgId = messages.first().msgId
+            )
         }
     }
 }

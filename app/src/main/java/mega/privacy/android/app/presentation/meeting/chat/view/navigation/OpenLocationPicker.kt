@@ -9,10 +9,16 @@ import mega.privacy.android.app.main.megachat.MapsActivity
 internal fun openLocationPicker(
     context: Context,
     locationLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>,
-    isEditingMessage: Boolean,
+    msgId: Long = INVALID_LOCATION_MESSAGE_ID,
 ) {
     Intent(context, MapsActivity::class.java).also {
-        it.putExtra(MapsActivity.EDITING_MESSAGE, isEditingMessage)
+        msgId.takeIf { id -> id != INVALID_LOCATION_MESSAGE_ID }?.let { id ->
+            it.putExtra(MapsActivity.EDITING_MESSAGE, true)
+            it.putExtra(MapsActivity.MSG_ID, id)
+        }
+        it.putExtra(MapsActivity.MSG_ID, msgId)
         locationLauncher.launch(it)
     }
 }
+
+internal const val INVALID_LOCATION_MESSAGE_ID = -1L
