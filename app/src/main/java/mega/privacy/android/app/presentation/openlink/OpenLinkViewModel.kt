@@ -14,6 +14,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
+import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -25,6 +26,7 @@ class OpenLinkViewModel @Inject constructor(
     private val localLogoutAppUseCase: LocalLogoutAppUseCase,
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
     private val logoutUseCase: LogoutUseCase,
+    private val querySignupLinkUseCase: QuerySignupLinkUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -75,4 +77,19 @@ class OpenLinkViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Get information about a new signup link
+     */
+    fun getAccountInvitationEmail(link: String) = viewModelScope.launch {
+        runCatching {
+            querySignupLinkUseCase(link)
+        }.onSuccess { email ->
+            Timber.d("Valid signup link")
+            _state.update {
+                it.copy(accountInvitationEmail = email)
+            }
+        }.onFailure {
+            Timber.e(it)
+        }
+    }
 }

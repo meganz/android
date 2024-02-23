@@ -30,7 +30,7 @@ import org.junit.jupiter.api.extension.ExtensionContext
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class CoroutineMainDispatcherExtension(
-    private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher(),
+    val testDispatcher: TestDispatcher = UnconfinedTestDispatcher(),
 ) : BeforeAllCallback, AfterAllCallback {
 
     /**

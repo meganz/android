@@ -12,9 +12,6 @@ import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.OpenPasswordLinkActivity
@@ -33,7 +30,6 @@ import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivit
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity.Companion.IS_CROSS_ACCOUNT_MATCH
-import mega.privacy.android.app.usecase.QuerySignupLinkUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.CallUtil.participatingInACall
 import mega.privacy.android.app.utils.CallUtil.showConfirmationInACall
@@ -109,14 +105,12 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
     LoadPreviewListener.OnPreviewLoadedCallback {
-    @Inject
-    lateinit var navigator: MegaNavigator
 
     /**
-     * QuerySignupLinkUseCase injection
+     * MegaNavigator injection
      */
     @Inject
-    lateinit var querySignupLinkUseCase: QuerySignupLinkUseCase
+    lateinit var navigator: MegaNavigator
 
     /**
      * MegaChatRequestHandler injection
@@ -297,24 +291,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     setError(getString(R.string.log_out_warning))
                 } else {
                     url?.let {
-                        querySignupLinkUseCase.query(it)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(
-                                { result ->
-                                    Timber.d("Not logged")
-                                    startActivity(
-                                        Intent(this, LoginActivity::class.java)
-                                            .putExtra(VISIBLE_FRAGMENT, CREATE_ACCOUNT_FRAGMENT)
-                                            .putExtra(EMAIL, result)
-                                    )
-                                    finish()
-                                },
-                                { throwable ->
-                                    Timber.e(throwable)
-                                }
-                            )
-                            .addTo(composite)
+                        viewModel.getAccountInvitationEmail(it)
                     }
                 }
             }
@@ -528,18 +505,46 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private fun collectFlows() {
         collectFlow(viewModel.state) { openLinkState: OpenLinkState ->
-            when {
-                openLinkState.isLoggedOut -> {
-                    startActivity(
-                        Intent(this@OpenLinkActivity, LoginActivity::class.java)
-                            .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-                            .putExtra(EXTRA_CONFIRMATION, urlConfirmationLink)
-                            .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
-                            .setAction(ACTION_CONFIRM)
-                    )
-                    finish()
-                }
+            with(openLinkState) {
+                handleLoggedOutState(isLoggedOut)
+
+                handleAccountInvitationEmailState(accountInvitationEmail)
             }
+        }
+    }
+
+    /**
+     * Handle the isLoggedOut state from [OpenLinkState]
+     *
+     * Navigates to [LoginActivity] if the user logged out
+     */
+    private fun handleLoggedOutState(isLoggedOut: Boolean) {
+        if (!isLoggedOut) return
+
+        startActivity(
+            Intent(this@OpenLinkActivity, LoginActivity::class.java)
+                .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
+                .putExtra(EXTRA_CONFIRMATION, urlConfirmationLink)
+                .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+                .setAction(ACTION_CONFIRM)
+        )
+        finish()
+    }
+
+    /**
+     * Navigates to [LoginActivity] if the user navigated from the new signup link
+     *
+     * Need to check if the email is NULL as the base case which indicates that the user
+     * is not from the new signup link, because NULL is the default state in [OpenLinkState]
+     */
+    private fun handleAccountInvitationEmailState(email: String?) {
+        email?.let {
+            startActivity(
+                Intent(this, LoginActivity::class.java)
+                    .putExtra(VISIBLE_FRAGMENT, CREATE_ACCOUNT_FRAGMENT)
+                    .putExtra(EMAIL, it)
+            )
+            finish()
         }
     }
 
