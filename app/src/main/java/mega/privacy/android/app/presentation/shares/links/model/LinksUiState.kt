@@ -31,7 +31,7 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
  * @property downloadEvent download event
  * @property updateToolbarTitleEvent State Event that refreshes the Toolbar Title
  * @property exitLinksPageEvent State Event that exits the File Browser
- * @property isFirstPage true if current page is the first page
+ * @property isInRootLevel true if current page is the first page
  * @property openedFolderNodeHandles Set of opened folder node handles
  * @property currentFolderNodeHandle current folder node handle
  */
@@ -53,7 +53,7 @@ data class LinksUiState(
     val exitLinksPageEvent: StateEvent = consumed,
     val openedFolderNodeHandles: Set<Long> = emptySet(),
 ) {
-    val isFirstPage = parentNode == null
-    val isLinksEmpty = nodesList.isEmpty() && isFirstPage && !isLoading
+    val isInRootLevel = parentNode == null
+    val isLinksEmpty = nodesList.isEmpty() && isInRootLevel && !isLoading
     val currentFolderNodeHandle = parentNode?.id?.longValue ?: -1L
 }

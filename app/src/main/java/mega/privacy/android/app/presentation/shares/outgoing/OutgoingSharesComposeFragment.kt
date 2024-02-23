@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -115,7 +116,7 @@ class OutgoingSharesComposeFragment : Fragment() {
     lateinit var getOptionsForToolbarMapper: GetOptionsForToolbarMapper
 
     private val viewModel: OutgoingSharesComposeViewModel by activityViewModels()
-    private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
+    private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
 
     /**
      * Flag to restore elevation when checkScroll() is called

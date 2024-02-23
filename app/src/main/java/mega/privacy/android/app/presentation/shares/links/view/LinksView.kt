@@ -98,7 +98,7 @@ fun LinksView(
                 onDisputeTakeDownClicked = { },
                 showMediaDiscoveryButton = false,
                 onEnterMediaDiscoveryClick = { },
-                showPublicLinkCreationTime = uiState.isFirstPage
+                showPublicLinkCreationTime = uiState.isInRootLevel
             )
         } else {
             LegacyMegaEmptyView(

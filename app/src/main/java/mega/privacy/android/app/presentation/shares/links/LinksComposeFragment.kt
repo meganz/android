@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -79,7 +80,7 @@ import javax.inject.Inject
 class LinksComposeFragment : Fragment() {
 
     private val viewModel: LinksViewModel by activityViewModels()
-    private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
+    private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
 
     /**
      * Mapper to open file
@@ -273,7 +274,7 @@ class LinksComposeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            viewModel.refreshLinkNodes()
+            viewModel.refreshLinkNodes(false)
         })
 
         viewLifecycleOwner.collectFlow(viewModel.state

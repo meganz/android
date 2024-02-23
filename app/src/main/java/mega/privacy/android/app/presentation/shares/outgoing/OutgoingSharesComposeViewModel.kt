@@ -115,7 +115,8 @@ class OutgoingSharesComposeViewModel @Inject constructor(
         val changesToObserve = setOf(
             UserChanges.AuthenticationInformation,
             UserChanges.Firstname,
-            UserChanges.Lastname
+            UserChanges.Lastname,
+            UserChanges.Alias
         )
         viewModelScope.launch {
             monitorContactUpdatesUseCase().collectLatest { updates ->

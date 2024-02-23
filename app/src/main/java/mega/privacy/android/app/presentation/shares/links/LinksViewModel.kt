@@ -297,15 +297,22 @@ class LinksViewModel @Inject constructor(
     /**
      * This will refresh link nodes and update [LinksUiState.nodesList]
      */
-    fun refreshLinkNodes() {
-        viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    isLoading = true
-                )
+    fun refreshLinkNodes(showLoading: Boolean = true) {
+        if (showLoading)
+            viewModelScope.launch {
+                _state.update {
+                    it.copy(
+                        isLoading = true
+                    )
+                }
+            }
+        if (state.value.isInRootLevel) {
+            observeFlow(publicLinks())
+        } else {
+            _state.value.parentNode?.let {
+                observeFlow(childLinks(it))
             }
         }
-        observeFlow(publicLinks())
     }
 
     /**
