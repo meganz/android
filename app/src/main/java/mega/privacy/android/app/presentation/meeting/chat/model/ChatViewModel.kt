@@ -1003,7 +1003,15 @@ class ChatViewModel @Inject constructor(
      */
     fun sendTextMessage(message: String) {
         viewModelScope.launch {
-            sendTextMessageUseCase(chatId, message)
+            if (state.value.editingMessageId != null) {
+                runCatching {
+                    TODO("Not implemented yet")
+                }.onFailure {
+                    Timber.e(it)
+                }
+            } else {
+                sendTextMessageUseCase(chatId, message)
+            }
         }
     }
 
@@ -1127,15 +1135,20 @@ class ChatViewModel @Inject constructor(
             val byteArray = data.getByteArrayExtra(MapsActivity.SNAPSHOT) ?: return
             val latitude = data.getDoubleExtra(MapsActivity.LATITUDE, 0.0).toFloat()
             val longitude = data.getDoubleExtra(MapsActivity.LONGITUDE, 0.0).toFloat()
+            val isEditing = data.getBooleanExtra(MapsActivity.EDITING_MESSAGE, false)
 
             viewModelScope.launch {
                 val encodedSnapshot = Base64.encodeToString(byteArray, Base64.DEFAULT)
-                sendLocationMessageUseCase(
-                    chatId = chatId,
-                    latitude = latitude,
-                    longitude = longitude,
-                    image = encodedSnapshot
-                )
+                if (isEditing) {
+                    TODO("Not implemented yet")
+                } else {
+                    sendLocationMessageUseCase(
+                        chatId = chatId,
+                        latitude = latitude,
+                        longitude = longitude,
+                        image = encodedSnapshot
+                    )
+                }
             }
         }
     }
@@ -1336,6 +1349,22 @@ class ChatViewModel @Inject constructor(
     fun onDownloadForPreviewChatNode(file: ChatFile) {
         _state.update {
             it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadForPreview(file)))
+        }
+    }
+
+    /**
+     * Edit message.
+     *
+     * @param message [TypedMessage].
+     */
+    fun onEditMessage(message: TypedMessage) {
+        // Create a new use case for getting message content.
+        _state.update { state ->
+            state.copy(
+                editingMessageId = message.msgId,
+                editingMessageContent = "Content",
+                sendingText = "Content"
+            )
         }
     }
 

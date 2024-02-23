@@ -75,7 +75,6 @@ import mega.privacy.android.app.presentation.meeting.chat.view.bottombar.ChatBot
 import mega.privacy.android.app.presentation.meeting.chat.view.bottombar.ChatBottomBarParameter
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.AllContactsAddedDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ClearChatConfirmationDialog
-import mega.privacy.android.app.presentation.meeting.chat.view.dialog.EnableGeolocationDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.EndCallForAllDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.JoinAnswerCallDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.MutePushNotificationDialog
@@ -86,7 +85,6 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAt
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatFragment
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatPicker
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openContactInfoActivity
-import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openLocationPicker
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.showGroupOrContactInfoActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startLoginActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startMeetingActivity
@@ -341,31 +339,7 @@ internal fun ChatView(
             true
         }
     )
-    var showEnableGeolocationDialog by rememberSaveable { mutableStateOf(false) }
-    var waitingForPickLocation by rememberSaveable { mutableStateOf(false) }
-    val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
-    val locationPickerLauncher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.StartActivityForResult()
-        ) {
-            onSendLocationMessage(it.data)
-            coroutineScope.launch { toolbarModalSheetState.hide() }
-        }
-    val locationPermissionsLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            openLocationPicker(context, locationPickerLauncher)
-        } else {
-            coroutineScope.launch { toolbarModalSheetState.hide() }
-            showPermissionNotAllowedSnackbar(
-                context,
-                coroutineScope,
-                scaffoldState.snackbarHostState,
-                R.string.chat_attach_location_deny_permission
-            )
-        }
-    }
+    var showLocationView by rememberSaveable { mutableStateOf(false) }
     val scrollState = rememberLazyListState()
     val showScrollToBottomFab by remember {
         derivedStateOf {
@@ -574,19 +548,8 @@ internal fun ChatView(
                                 }
                             },
                             onPickLocation = {
-                                checkLocationPicker(
-                                    isGeolocationEnabled = isGeolocationEnabled,
-                                    isPermissionGranted = locationPermissionState.status.isGranted,
-                                    onShowEnableGeolocationDialog = {
-                                        showEnableGeolocationDialog = true
-                                    },
-                                    onAskForLocationPermission = {
-                                        locationPermissionsLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                                    },
-                                    onPickLocation = {
-                                        openLocationPicker(context, locationPickerLauncher)
-                                    }
-                                )
+                                coroutineScope.launch { toolbarModalSheetState.hide() }
+                                showLocationView = true
                             },
                             onSendGiphyMessage = onSendGiphyMessage,
                             onTakePicture = {
@@ -890,19 +853,13 @@ internal fun ChatView(
                     )
                 }
 
-                if (showEnableGeolocationDialog) {
-                    EnableGeolocationDialog(
-                        onConfirm = {
-                            waitingForPickLocation = true
-                            onEnableGeolocation()
-                        },
-                        onDismiss = { showEnableGeolocationDialog = false },
+                if (showLocationView) {
+                    ChatLocationView(
+                        isGeolocationEnabled = isGeolocationEnabled,
+                        onEnableGeolocation = onEnableGeolocation,
+                        onSendLocationMessage = onSendLocationMessage,
+                        onDismissView = { showLocationView = false },
                     )
-                }
-
-                if (waitingForPickLocation && isGeolocationEnabled) {
-                    waitingForPickLocation = false
-                    openLocationPicker(context, locationPickerLauncher)
                 }
 
                 if (showJoinAnswerCallDialog) {
@@ -980,31 +937,9 @@ internal fun ChatView(
 }
 
 /**
- * Checks if location picker can be shown depending on permissions.
+ * Shows a permission not allowed warning.
  */
-private fun checkLocationPicker(
-    isGeolocationEnabled: Boolean,
-    isPermissionGranted: Boolean,
-    onShowEnableGeolocationDialog: () -> Unit,
-    onAskForLocationPermission: () -> Unit,
-    onPickLocation: () -> Unit,
-) {
-    when {
-        !isGeolocationEnabled -> {
-            onShowEnableGeolocationDialog()
-        }
-
-        !isPermissionGranted -> {
-            onAskForLocationPermission()
-        }
-
-        else -> {
-            onPickLocation()
-        }
-    }
-}
-
-private fun showPermissionNotAllowedSnackbar(
+fun showPermissionNotAllowedSnackbar(
     context: Context,
     coroutineScope: CoroutineScope,
     snackBarHostState: SnackbarHostState,
