@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import android.content.Intent
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.getLink.GetLinkActivity
 import mega.privacy.android.app.presentation.node.model.menuaction.ManageLinkMenuAction
 import mega.privacy.android.app.utils.Constants
@@ -32,6 +33,7 @@ class ManageLinkBottomSheetMenuItem @Inject constructor() :
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
         navController: NavHostController,
+        parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
         navController.context.startActivity(

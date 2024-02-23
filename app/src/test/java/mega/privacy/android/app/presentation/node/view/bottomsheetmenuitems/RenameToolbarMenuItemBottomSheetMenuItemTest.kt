@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.search.navigation.searchRenameDialog
 import mega.privacy.android.core.ui.model.MenuAction
@@ -47,17 +48,19 @@ class RenameToolbarMenuItemBottomSheetMenuItemTest {
 
     @Test
     fun `test that rename bottom sheet menu item onClick function opens dialog`() = runTest {
-        val node: TypedFileNode = mock{
+        val node: TypedFileNode = mock {
             whenever(it.id).thenReturn(NodeId(1234L))
         }
         val onDismiss = mock<() -> Unit>()
         val actionHandler = mock<(menuAction: MenuAction, node: TypedNode) -> Unit>()
         val navController = mock<NavHostController>()
+        val parentScope = mock<CoroutineScope>()
         val onClickFunction = renameBottomSheetMenuItem.getOnClickFunction(
             node,
             onDismiss,
             actionHandler,
-            navController
+            navController,
+            parentScope
         )
         onClickFunction()
         verify(onDismiss).invoke()

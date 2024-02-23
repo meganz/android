@@ -44,6 +44,7 @@ class SendToChatBottomSheetMenuItem @Inject constructor(
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
         navController: NavHostController,
+        parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         if (node is TypedFileNode) {
             scope.launch {

@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import androidx.navigation.NavHostController
 import com.google.common.truth.Truth
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.node.model.menuaction.VerifyMenuAction
@@ -104,6 +105,7 @@ class VerifyBottomSheetMenuItemTest {
         val onDismiss = mock<() -> Unit>()
         val actionHandler = mock<(menuAction: MenuAction, node: TypedNode) -> Unit>()
         val navController = mock<NavHostController>()
+        val parentScope = mock<CoroutineScope>()
         underTest.shouldDisplay(
             isNodeInRubbish = false,
             accessPermission = null,
@@ -115,7 +117,8 @@ class VerifyBottomSheetMenuItemTest {
             node,
             onDismiss,
             actionHandler,
-            navController
+            navController,
+            parentScope
         )
         onClickFunction()
         verify(onDismiss).invoke()

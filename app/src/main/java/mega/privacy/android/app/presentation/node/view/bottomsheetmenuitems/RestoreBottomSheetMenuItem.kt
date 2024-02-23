@@ -45,6 +45,7 @@ class RestoreBottomSheetMenuItem @Inject constructor(
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
         navController: NavHostController,
+        parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         val restoreHandle = node.restoreId?.longValue ?: -1L
         onDismiss()

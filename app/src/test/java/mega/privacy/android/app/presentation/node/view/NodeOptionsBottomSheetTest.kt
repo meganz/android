@@ -42,7 +42,7 @@ class NodeOptionsBottomSheetTest {
                         BottomSheetMenuItem(
                             group = 1,
                             orderInGroup = 1,
-                            control = { _, _, _ -> }
+                            control = { _, _, _, _ -> }
                         )
                     ),
                 ),
@@ -76,12 +76,12 @@ class NodeOptionsBottomSheetTest {
                         BottomSheetMenuItem(
                             group = 1,
                             orderInGroup = 1,
-                            control = { _, _, _ -> }
+                            control = { _, _, _, _ -> }
                         ),
                         BottomSheetMenuItem(
                             group = 2,
                             orderInGroup = 1,
-                            control = { _, _, _ -> }
+                            control = { _, _, _, _ -> }
                         )
                     ),
                 ),

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.node.model.menuaction.VerifyMenuAction
@@ -31,7 +32,7 @@ class VerifyBottomSheetMenuItem @Inject constructor(
     override fun buildComposeControl(
         selectedNode: TypedNode,
     ): BottomSheetClickHandler =
-        { onDismiss, handler, navController ->
+        { onDismiss, handler, navController, scope ->
             MenuActionListTile(
                 text = menuAction.getDescription().format(shareData?.user.orEmpty()),
                 icon = menuAction.getIconPainter(),
@@ -41,6 +42,7 @@ class VerifyBottomSheetMenuItem @Inject constructor(
                     onDismiss = onDismiss,
                     actionHandler = handler,
                     navController = navController,
+                    parentCoroutineScope = scope,
                 ),
                 addSeparator = false,
             )
@@ -76,6 +78,7 @@ class VerifyBottomSheetMenuItem @Inject constructor(
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
         navController: NavHostController,
+        parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
         shareData?.let {

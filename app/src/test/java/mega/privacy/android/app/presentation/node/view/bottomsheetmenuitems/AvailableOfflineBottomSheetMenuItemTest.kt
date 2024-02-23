@@ -139,7 +139,9 @@ class AvailableOfflineBottomSheetMenuItemTest {
         val onDismiss = mock<() -> Unit>()
         val actionHandler = mock<(MenuAction, TypedNode) -> Unit>()
         val navController = mock<NavHostController>()
-        val onClick = underTest.getOnClickFunction(node, onDismiss, actionHandler, navController)
+        val parentScope = mock<CoroutineScope>()
+        val onClick =
+            underTest.getOnClickFunction(node, onDismiss, actionHandler, navController, parentScope)
 
         onClick()
         verify(removeOfflineNodeUseCase).invoke(node.id)
@@ -155,7 +157,9 @@ class AvailableOfflineBottomSheetMenuItemTest {
         val onDismiss = mock<() -> Unit>()
         val actionHandler = mock<(MenuAction, TypedNode) -> Unit>()
         val navController = mock<NavHostController>()
-        val onClick = underTest.getOnClickFunction(node, onDismiss, actionHandler, navController)
+        val parentScope = mock<CoroutineScope>()
+        val onClick =
+            underTest.getOnClickFunction(node, onDismiss, actionHandler, navController, parentScope)
 
         onClick()
         verifyNoInteractions(removeOfflineNodeUseCase)

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.main.FileContactListActivity
 import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.node.model.menuaction.ManageShareFolderMenuAction
@@ -33,7 +34,8 @@ class ManageShareFolderBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
-        navController: NavHostController
+        navController: NavHostController,
+        parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
         val context = navController.context

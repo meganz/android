@@ -39,6 +39,7 @@ class RemoveFavouriteBottomSheetMenuItem @Inject constructor(
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
         navController: NavHostController,
+        parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
         coroutineScope.launch {

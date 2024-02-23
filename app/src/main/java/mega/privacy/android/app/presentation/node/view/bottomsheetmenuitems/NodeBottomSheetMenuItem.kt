@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -12,7 +13,7 @@ import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
 /**
  * Bottom sheet click handler
  */
-typealias BottomSheetClickHandler = @Composable (onDismiss: () -> Unit, actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit, navController: NavHostController) -> Unit
+typealias BottomSheetClickHandler = @Composable (onDismiss: () -> Unit, actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit, navController: NavHostController, coroutineScope: CoroutineScope) -> Unit
 
 /**
  * Node bottom sheet menu item
@@ -25,7 +26,7 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
     fun buildComposeControl(
         selectedNode: TypedNode,
     ): BottomSheetClickHandler =
-        { onDismiss, handler, navController ->
+        { onDismiss, handler, navController, coroutineScope ->
             MenuActionListTile(
                 text = menuAction.getDescription(),
                 icon = menuAction.getIconPainter(),
@@ -36,6 +37,7 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
                     onDismiss = onDismiss,
                     actionHandler = handler,
                     navController = navController,
+                    parentCoroutineScope = coroutineScope
                 ),
             )
         }
@@ -63,6 +65,7 @@ interface NodeBottomSheetMenuItem<T : MenuActionWithIcon> {
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
         navController: NavHostController,
+        parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         actionHandler(menuAction, node)
         onDismiss()

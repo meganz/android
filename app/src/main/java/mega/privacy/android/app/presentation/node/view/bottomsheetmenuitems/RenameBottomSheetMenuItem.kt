@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.presentation.node.model.menuaction.RenameMenuAction
 import mega.privacy.android.app.presentation.search.navigation.searchRenameDialog
 import mega.privacy.android.core.ui.model.MenuAction
@@ -30,6 +31,7 @@ class RenameBottomSheetMenuItem @Inject constructor() :
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
         navController: NavHostController,
+        parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
         navController.navigate(searchRenameDialog.plus("/${node.id.longValue}"))

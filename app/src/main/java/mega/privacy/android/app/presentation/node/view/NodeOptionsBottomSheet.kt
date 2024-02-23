@@ -7,6 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
@@ -49,6 +50,7 @@ internal fun NodeOptionsBottomSheetContent(
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val node: TypedNode? = uiState.node
     val keyboardController = LocalSoftwareKeyboardController.current
+    val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         keyboardController?.hide()
         viewModel.getBottomSheetOptions(nodeId)
@@ -103,7 +105,12 @@ internal fun NodeOptionsBottomSheetContent(
         sortedMap.value
             .forEachIndexed { index, actions ->
                 items(actions) { item: BottomSheetMenuItem ->
-                    item.control(onDismiss, handler::handleAction, navHostController)
+                    item.control(
+                        onDismiss,
+                        handler::handleAction,
+                        navHostController,
+                        coroutineScope
+                    )
                 }
 
                 if (index < uiState.actions.size - 1 && index != sortedMap.value.size - 1) {

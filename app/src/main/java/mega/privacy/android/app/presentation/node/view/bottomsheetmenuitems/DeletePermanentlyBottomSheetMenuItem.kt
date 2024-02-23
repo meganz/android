@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.presentation.node.model.menuaction.DeletePermanentlyMenuAction
 import mega.privacy.android.app.presentation.search.navigation.moveToRubbishOrDelete
 import mega.privacy.android.core.ui.model.MenuAction
@@ -34,6 +35,7 @@ class DeletePermanentlyBottomSheetMenuItem @Inject constructor(
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
         navController: NavHostController,
+        parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
         val handles = listOf(node.id.longValue)

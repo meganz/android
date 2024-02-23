@@ -7,7 +7,6 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareMenuAction
 import mega.privacy.android.app.utils.Constants
@@ -54,6 +53,7 @@ class ShareBottomSheetMenuItem @Inject constructor(
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
         navController: NavHostController,
+        parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         val context = navController.context
         scope.launch {

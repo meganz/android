@@ -121,8 +121,9 @@ class OpenWithBottomSheetMenuItemTest {
         val onDismiss = mock<() -> Unit>()
         val actionHandler = { _: MenuAction, _: TypedNode -> }
         val navController = mock<NavHostController>()
+        val parentScope = mock<CoroutineScope>()
         val onClickFunction =
-            underTest.getOnClickFunction(node, onDismiss, actionHandler, navController)
+            underTest.getOnClickFunction(node, onDismiss, actionHandler, navController, parentScope)
         onClickFunction.invoke()
         verify(onDismiss).invoke()
         verifyNoInteractions(getLocalFilePathUseCase)

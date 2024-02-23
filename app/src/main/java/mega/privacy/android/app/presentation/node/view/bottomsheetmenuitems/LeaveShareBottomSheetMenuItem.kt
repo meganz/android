@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.presentation.node.model.menuaction.LeaveShareMenuAction
 import mega.privacy.android.app.presentation.search.navigation.searchLeaveShareFolderDialog
 import mega.privacy.android.core.ui.model.MenuAction
@@ -35,6 +36,7 @@ class LeaveShareBottomSheetMenuItem @Inject constructor(
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
         navController: NavHostController,
+        parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
         val nodeHandleList = listOf(node.id.longValue)

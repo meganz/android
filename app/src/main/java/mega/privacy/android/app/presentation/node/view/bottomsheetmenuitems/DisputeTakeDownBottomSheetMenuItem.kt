@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 import android.content.Intent
 import android.net.Uri
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.presentation.node.model.menuaction.DisputeTakeDownMenuAction
 import mega.privacy.android.app.utils.Constants
@@ -34,6 +35,7 @@ class DisputeTakeDownBottomSheetMenuItem @Inject constructor(
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
         navController: NavHostController,
+        parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
         navController.context.startActivity(

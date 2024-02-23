@@ -31,12 +31,13 @@ class AvailableOfflineBottomSheetMenuItem @Inject constructor(
     override fun buildComposeControl(
         selectedNode: TypedNode,
     ): BottomSheetClickHandler =
-        { onDismiss, handler, navController ->
+        { onDismiss, handler, navController, coroutineScope ->
             val onClick = getOnClickFunction(
                 node = selectedNode,
                 onDismiss = onDismiss,
                 actionHandler = handler,
                 navController = navController,
+                parentCoroutineScope = coroutineScope
             )
             MenuActionListTile(
                 text = menuAction.getDescription(),
@@ -66,6 +67,7 @@ class AvailableOfflineBottomSheetMenuItem @Inject constructor(
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
         navController: NavHostController,
+        parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
         if (node.isAvailableOffline) {

@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import android.content.Intent
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.presentation.node.model.menuaction.EditMenuAction
 import mega.privacy.android.app.textEditor.TextEditorActivity
@@ -46,6 +47,7 @@ class EditBottomSheetMenuItem @Inject constructor(
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
         navController: NavHostController,
+        parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         val textFileIntent = Intent(navController.context, TextEditorActivity::class.java)
             .apply {

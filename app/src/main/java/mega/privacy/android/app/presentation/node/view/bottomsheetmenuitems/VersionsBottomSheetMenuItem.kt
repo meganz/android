@@ -22,12 +22,13 @@ class VersionsBottomSheetMenuItem @Inject constructor(
     override fun buildComposeControl(
         selectedNode: TypedNode,
     ): BottomSheetClickHandler =
-        { onDismiss, handler, navController ->
+        { onDismiss, handler, navController, scope ->
             val onClick = getOnClickFunction(
                 node = selectedNode,
                 onDismiss = onDismiss,
                 actionHandler = handler,
                 navController = navController,
+                parentCoroutineScope = scope
             )
             MenuActionListTile(
                 text = menuAction.getDescription(),

@@ -72,12 +72,14 @@ class SendToChatBottomSheetMenuItemTest {
         val onDismiss = mock<() -> Unit>()
         val actionHandler = mock<(menuAction: MenuAction, node: TypedNode) -> Unit>()
         val navController = mock<NavHostController>()
+        val coroutineScope = mock<CoroutineScope>()
         whenever(getNodeToAttachUseCase(node)).thenReturn(node)
         val onClick = sendToChatBottomSheetMenuItem.getOnClickFunction(
             node = node,
             onDismiss = onDismiss,
             actionHandler = actionHandler,
-            navController = navController
+            navController = navController,
+            parentCoroutineScope = coroutineScope
         )
         onClick()
         verify(getNodeToAttachUseCase).invoke(node)

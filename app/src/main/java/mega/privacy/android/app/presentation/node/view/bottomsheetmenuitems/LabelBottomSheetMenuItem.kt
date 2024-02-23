@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.presentation.node.model.mapper.NodeLabelResourceMapper
 import mega.privacy.android.app.presentation.node.model.menuaction.LabelMenuAction
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.components.LabelAccessoryView
@@ -30,7 +31,7 @@ class LabelBottomSheetMenuItem @Inject constructor(
     override fun buildComposeControl(
         selectedNode: TypedNode,
     ): BottomSheetClickHandler =
-        { onDismiss, handler, navController ->
+        { onDismiss, handler, navController, scope ->
             MenuActionListTile(
                 text = menuAction.getDescription(),
                 icon = menuAction.getIconPainter(),
@@ -40,6 +41,7 @@ class LabelBottomSheetMenuItem @Inject constructor(
                     onDismiss = onDismiss,
                     actionHandler = handler,
                     navController = navController,
+                    parentCoroutineScope = scope
                 ),
                 addSeparator = false,
                 trailingItem = {
@@ -76,6 +78,7 @@ class LabelBottomSheetMenuItem @Inject constructor(
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, node: TypedNode) -> Unit,
         navController: NavHostController,
+        parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
         navController.navigate(
