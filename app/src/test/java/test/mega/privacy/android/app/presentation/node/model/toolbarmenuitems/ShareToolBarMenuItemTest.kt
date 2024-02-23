@@ -1,9 +1,6 @@
 package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import com.google.common.truth.Truth
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareMenuAction
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareToolBarMenuItem
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -18,7 +15,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ShareToolBarMenuItemTest {
 
@@ -28,7 +24,6 @@ class ShareToolBarMenuItemTest {
 
     private val underTest = ShareToolBarMenuItem(
         menuAction = ShareMenuAction(),
-        scope = CoroutineScope(UnconfinedTestDispatcher()),
         getLocalFilePathUseCase = getLocalFilePathUseCase,
         exportNodesUseCase = exportNodesUseCase,
         getFileUriUseCase = getFileUriUseCase

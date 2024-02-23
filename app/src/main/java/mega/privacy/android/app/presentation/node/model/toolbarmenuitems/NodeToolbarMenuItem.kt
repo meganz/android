@@ -2,13 +2,14 @@ package mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.node.TypedNode
 
 /**
  * Toolbar click handler
  */
-typealias ToolbarClickHandler = @Composable (onDismiss: () -> Unit, actionHandler: (menuAction: MenuAction, nodes: List<TypedNode>) -> Unit, navController: NavHostController) -> () -> Unit
+typealias ToolbarClickHandler = @Composable (onDismiss: () -> Unit, actionHandler: (menuAction: MenuAction, nodes: List<TypedNode>) -> Unit, navController: NavHostController, coroutineScope: CoroutineScope) -> () -> Unit
 
 /**
  * Node toolbar menu item
@@ -44,8 +45,8 @@ interface NodeToolbarMenuItem<T : MenuAction> {
      * Build control
      */
     fun setControl(selectedNodes: List<TypedNode>): ToolbarClickHandler =
-        { onDismiss, actionHandler, navController ->
-            getOnClick(selectedNodes, onDismiss, actionHandler, navController)
+        { onDismiss, actionHandler, navController, scope ->
+            getOnClick(selectedNodes, onDismiss, actionHandler, navController, scope)
         }
 
 
@@ -57,6 +58,7 @@ interface NodeToolbarMenuItem<T : MenuAction> {
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, nodes: List<TypedNode>) -> Unit,
         navController: NavHostController,
+        parentScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
         actionHandler(menuAction, selectedNodes)

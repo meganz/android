@@ -5,7 +5,10 @@ import android.content.Intent
 import android.net.Uri
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareMenuAction
 import mega.privacy.android.app.utils.Constants
@@ -13,13 +16,11 @@ import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import timber.log.Timber
 import java.io.File
-import java.util.ArrayList
 import java.util.UUID
 import javax.inject.Inject
 
@@ -28,7 +29,6 @@ import javax.inject.Inject
  */
 class ShareToolBarMenuItem @Inject constructor(
     override val menuAction: ShareMenuAction,
-    @ApplicationScope private val scope: CoroutineScope,
     private val getLocalFilePathUseCase: GetLocalFilePathUseCase,
     private val exportNodesUseCase: ExportNodeUseCase,
     private val getFileUriUseCase: GetFileUriUseCase,
@@ -49,72 +49,78 @@ class ShareToolBarMenuItem @Inject constructor(
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, nodes: List<TypedNode>) -> Unit,
         navController: NavHostController,
+        parentScope: CoroutineScope,
     ): () -> Unit = {
         val context = navController.context
-        scope.launch {
-            val fileNodeList = selectedNodes.filterIsInstance<TypedFileNode>()
-            val localFiles = fileNodeList.mapNotNull {
-                runCatching {
-                    getLocalFilePathUseCase(it)
-                }.getOrElse {
-                    Timber.e(it)
-                    null
-                }
-            }
-            if (localFiles.size == selectedNodes.size) {
-                val filesUri = localFiles.mapNotNull {
+        parentScope.launch {
+            withContext(NonCancellable) {
+                val fileNodeList = selectedNodes.filterIsInstance<TypedFileNode>()
+                val localFiles = fileNodeList.mapNotNull {
                     runCatching {
-                        getLocalFileUri(it)?.let { filePath ->
-                            Uri.parse(filePath)
-                        }
+                        getLocalFilePathUseCase(it)
                     }.getOrElse {
                         Timber.e(it)
                         null
                     }
                 }
-                val similarTypes = fileNodeList.groupBy {
-                    it.type.mimeType
-                }
-                val intentType = if (similarTypes.size == 1) {
-                    "${similarTypes.keys}"
-                } else {
-                    "*"
-                }
-                val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
-                    type = "$intentType/*"
-                    putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(filesUri))
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                }
-                context.startActivity(
-                    Intent.createChooser(
-                        shareIntent,
-                        context.getString(R.string.context_share)
-                    )
-                )
-            } else {
-                val allExportedNodes = selectedNodes.all { it.exportedData != null }
-                if (allExportedNodes) {
-                    val uris = selectedNodes.mapNotNull {
-                        it.exportedData?.publicLink
-                    }
-                    shareLinks(
-                        context = context,
-                        links = uris,
-                        selectedNodes = selectedNodes
-                    )
-                } else {
-                    val uris = selectedNodes.mapNotNull {
-                        runCatching { exportNodesUseCase(nodeToExport = it.id) }
-                            .getOrElse {
-                                Timber.e(it)
-                                null
+                if (localFiles.size == selectedNodes.size) {
+                    val filesUri = localFiles.mapNotNull {
+                        runCatching {
+                            getLocalFileUri(it)?.let { filePath ->
+                                Uri.parse(filePath)
                             }
+                        }.getOrElse {
+                            Timber.e(it)
+                            null
+                        }
                     }
-                    shareLinks(
-                        context = context,
-                        links = uris,
-                        selectedNodes = selectedNodes
+                    val similarTypes = fileNodeList.groupBy {
+                        it.type.mimeType
+                    }
+                    val intentType = if (similarTypes.size == 1) {
+                        "${similarTypes.keys}"
+                    } else {
+                        "*"
+                    }
+                    val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+                        type = "$intentType/*"
+                        putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(filesUri))
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                    }
+                    parentScope.ensureActive()
+                    context.startActivity(
+                        Intent.createChooser(
+                            shareIntent,
+                            context.getString(R.string.context_share)
+                        )
                     )
+                } else {
+                    val allExportedNodes = selectedNodes.all { it.exportedData != null }
+                    if (allExportedNodes) {
+                        val uris = selectedNodes.mapNotNull {
+                            it.exportedData?.publicLink
+                        }
+                        parentScope.ensureActive()
+                        shareLinks(
+                            context = context,
+                            links = uris,
+                            selectedNodes = selectedNodes
+                        )
+                    } else {
+                        val uris = selectedNodes.mapNotNull {
+                            runCatching { exportNodesUseCase(nodeToExport = it.id) }
+                                .getOrElse {
+                                    Timber.e(it)
+                                    null
+                                }
+                        }
+                        parentScope.ensureActive()
+                        shareLinks(
+                            context = context,
+                            links = uris,
+                            selectedNodes = selectedNodes
+                        )
+                    }
                 }
             }
             onDismiss()

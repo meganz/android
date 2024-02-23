@@ -1,10 +1,6 @@
 package test.mega.privacy.android.app.presentation.node.model.mapper
 
 import com.google.common.truth.Truth
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import mega.privacy.android.app.presentation.node.model.mapper.NodeToolbarActionMapper
 import mega.privacy.android.app.presentation.node.model.menuaction.ClearSelectionMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.CopyMenuAction
@@ -38,8 +34,8 @@ import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RenameT
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.RestoreToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SelectAllToolbarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.SendToChatToolbarMenuItem
-import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareToolBarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareFolderToolbarMenuItem
+import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareToolBarMenuItem
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.TrashToolbarMenuItem
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -47,7 +43,6 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class NodeToolbarActionMapperTest {
     val underTest = NodeToolbarActionMapper()
     private val toolbarList = setOf(
@@ -55,7 +50,6 @@ class NodeToolbarActionMapperTest {
         ClearSelectionToolbarMenuItem(ClearSelectionMenuAction()),
         DownloadToolbarMenuItem(DownloadMenuAction()),
         RestoreToolbarMenuItem(
-            scope = CoroutineScope(UnconfinedTestDispatcher()),
             menuAction = RestoreMenuAction(),
             checkNodesNameCollisionUseCase = mock(),
             restoreNodesUseCase = mock(),
@@ -75,18 +69,14 @@ class NodeToolbarActionMapperTest {
         SendToChatToolbarMenuItem(
             menuAction = SendToChatMenuAction(),
             getNodeToAttachUseCase = mock(),
-            scope = CoroutineScope(UnconfinedTestDispatcher())
         ),
         ShareFolderToolbarMenuItem(
-            scope = CoroutineScope(UnconfinedTestDispatcher()),
-            mainDispatcher = Dispatchers.Main,
             checkBackupNodeTypeByHandleUseCase = mock(),
             listToStringWithDelimitersMapper = mock(),
             menuAction = ShareFolderMenuAction()
         ),
         ShareToolBarMenuItem(
             menuAction = ShareMenuAction(),
-            scope = CoroutineScope(UnconfinedTestDispatcher()),
             exportNodesUseCase = mock(),
             getFileUriUseCase = mock(),
             getLocalFilePathUseCase = mock()

@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 import android.content.Intent
 import android.net.Uri
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.presentation.node.model.menuaction.DisputeTakeDownMenuAction
 import mega.privacy.android.app.utils.Constants
@@ -36,6 +37,7 @@ class DisputeTakeDownMenuItem @Inject constructor(
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, nodes: List<TypedNode>) -> Unit,
         navController: NavHostController,
+        parentScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
         val disputeTakeDownIntent = Intent(navController.context, WebViewActivity::class.java)

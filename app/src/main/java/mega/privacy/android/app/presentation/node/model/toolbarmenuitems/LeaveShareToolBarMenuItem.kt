@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.presentation.node.model.menuaction.LeaveShareMenuAction
 import mega.privacy.android.app.presentation.search.navigation.searchLeaveShareFolderDialog
 import mega.privacy.android.core.ui.model.MenuAction
@@ -39,6 +40,7 @@ class LeaveShareToolBarMenuItem @Inject constructor(
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, nodes: List<TypedNode>) -> Unit,
         navController: NavHostController,
+        parentScope: CoroutineScope,
     ): () -> Unit = {
 
         val nodeHandleList = selectedNodes.map {

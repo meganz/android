@@ -2,7 +2,10 @@ package mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.presentation.mapper.RestoreNodeResultMapper
 import mega.privacy.android.app.presentation.node.model.menuaction.RestoreMenuAction
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
@@ -10,7 +13,6 @@ import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import timber.log.Timber
@@ -20,7 +22,6 @@ import javax.inject.Inject
  * Restore menu item
  *
  * @property menuAction [RestoreMenuAction]
- * @property scope [CoroutineScope]
  * @property checkNodesNameCollisionUseCase [CheckNodesNameCollisionUseCase]
  * @property restoreNodesUseCase [RestoreNodesUseCase]
  * @property restoreNodeResultMapper [RestoreNodeResultMapper]
@@ -28,7 +29,6 @@ import javax.inject.Inject
  */
 class RestoreToolbarMenuItem @Inject constructor(
     override val menuAction: RestoreMenuAction,
-    @ApplicationScope private val scope: CoroutineScope,
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
     private val restoreNodesUseCase: RestoreNodesUseCase,
     private val restoreNodeResultMapper: RestoreNodeResultMapper,
@@ -51,25 +51,28 @@ class RestoreToolbarMenuItem @Inject constructor(
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, nodes: List<TypedNode>) -> Unit,
         navController: NavHostController,
+        parentScope: CoroutineScope,
     ): () -> Unit = {
-        val restoreMap = mutableMapOf<Long, Long>()
-        selectedNodes.forEach { node ->
-            restoreMap[node.id.longValue] = node.restoreId?.longValue ?: -1L
-        }
-        scope.launch {
-            runCatching {
-                checkNodesNameCollisionUseCase(restoreMap, NodeNameCollisionType.RESTORE)
-            }.onSuccess { result ->
-                if (result.conflictNodes.isNotEmpty()) {
-                    actionHandler(menuAction, selectedNodes)
+        parentScope.launch {
+            withContext(NonCancellable) {
+                val restoreMap = selectedNodes.associate { node ->
+                    node.id.longValue to (node.restoreId?.longValue ?: -1L)
                 }
-                if (result.noConflictNodes.isNotEmpty()) {
-                    val restoreResult = restoreNodesUseCase(result.noConflictNodes)
-                    val message = restoreNodeResultMapper(restoreResult)
-                    snackBarHandler.postSnackbarMessage(message)
+                runCatching {
+                    checkNodesNameCollisionUseCase(restoreMap, NodeNameCollisionType.RESTORE)
+                }.onSuccess { result ->
+                    if (result.conflictNodes.isNotEmpty()) {
+                        parentScope.ensureActive()
+                        actionHandler(menuAction, selectedNodes)
+                    }
+                    if (result.noConflictNodes.isNotEmpty()) {
+                        val restoreResult = restoreNodesUseCase(result.noConflictNodes)
+                        val message = restoreNodeResultMapper(restoreResult)
+                        snackBarHandler.postSnackbarMessage(message)
+                    }
+                }.onFailure {
+                    Timber.e(it)
                 }
-            }.onFailure {
-                Timber.e(it)
             }
         }
         onDismiss()

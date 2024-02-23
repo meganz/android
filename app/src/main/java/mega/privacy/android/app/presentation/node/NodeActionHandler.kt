@@ -7,7 +7,6 @@ import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityCo
 import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.activities.contract.ShareFolderActivityContract
 import mega.privacy.android.app.activities.contract.VersionsFileActivityContract
-import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.AvailableOfflineMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.ClearSelectionMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.CopyMenuAction
@@ -170,6 +169,11 @@ class NodeActionHandler(
 
             is ClearSelectionMenuAction -> {
                 nodeActionsViewModel.clearAllClicked()
+            }
+
+            is RestoreMenuAction -> {
+                val nodeHandleArray = nodes.map { it.id.longValue }.toLongArray()
+                restoreFromRubbishLauncher?.launch(nodeHandleArray)
             }
 
             else -> throw NotImplementedError("Action $action does not have a handler.")

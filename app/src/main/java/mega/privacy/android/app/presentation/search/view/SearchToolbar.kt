@@ -4,6 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -78,11 +79,17 @@ private fun SearchToolbarBody(
     handler: NodeActionHandler,
     clearSelection: () -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
     if (selectedNodes.isNotEmpty()) {
         val actions = menuActions.map {
             MenuActionWithClick(
                 menuAction = it.action,
-                onClick = it.control(clearSelection, handler::handleAction, navHostController)
+                onClick = it.control(
+                    clearSelection,
+                    handler::handleAction,
+                    navHostController,
+                    scope
+                )
             )
         }
         SelectModeAppBar(

@@ -45,9 +45,6 @@ class RestoreToolbarMenuItemTest {
         restoreNodesUseCase = restoreNodesUseCase,
         restoreNodeResultMapper = restoreNodeResultMapper,
         snackBarHandler = snackBarHandler,
-        scope = CoroutineScope(
-            UnconfinedTestDispatcher()
-        )
     )
 
     private val oneFileNodeSelected = mock<TypedFolderNode> {
@@ -105,7 +102,8 @@ class RestoreToolbarMenuItemTest {
             selectedNodes = listOf(node1, node2),
             onDismiss = {},
             actionHandler = { _, _ -> },
-            navController = navController
+            navController = navController,
+            parentScope = CoroutineScope(UnconfinedTestDispatcher())
         )
         onClickFunction()
         verify(checkNodesNameCollisionUseCase).invoke(nodeMap, NodeNameCollisionType.RESTORE)

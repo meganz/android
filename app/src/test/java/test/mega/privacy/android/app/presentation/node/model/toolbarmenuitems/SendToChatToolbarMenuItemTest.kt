@@ -18,14 +18,12 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SendToChatToolbarMenuItemTest {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private val underTest = SendToChatToolbarMenuItem(
-        SendToChatMenuAction(), mock(), CoroutineScope(
-            UnconfinedTestDispatcher()
-        )
+        SendToChatMenuAction(), mock()
     )
 
     private val oneFileNodeSelected = mock<TypedFolderNode> {
@@ -63,7 +61,8 @@ class SendToChatToolbarMenuItemTest {
             selectedNodes = multipleNodes,
             onDismiss = onDismiss,
             actionHandler = actionHandler,
-            navController = navController
+            navController = navController,
+            parentScope = CoroutineScope(UnconfinedTestDispatcher())
         )
         onClick.invoke()
     }

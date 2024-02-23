@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import android.content.Intent
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.getLink.GetLinkActivity
 import mega.privacy.android.app.presentation.node.model.menuaction.ManageLinkMenuAction
 import mega.privacy.android.app.utils.Constants
@@ -35,6 +36,7 @@ class ManageLinkToolbarMenuItem @Inject constructor() : NodeToolbarMenuItem<Menu
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, nodes: List<TypedNode>) -> Unit,
         navController: NavHostController,
+        parentScope: CoroutineScope,
     ): () -> Unit = {
         onDismiss()
         val nodeList = selectedNodes.map { it.id.longValue }.toLongArray()

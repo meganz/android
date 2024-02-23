@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.presentation.node.model.menuaction.RenameMenuAction
 import mega.privacy.android.app.presentation.search.navigation.searchRenameDialog
 import mega.privacy.android.core.ui.model.MenuAction
@@ -28,7 +29,8 @@ class RenameToolbarMenuItem @Inject constructor() : NodeToolbarMenuItem<MenuActi
         selectedNodes: List<TypedNode>,
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, nodes: List<TypedNode>) -> Unit,
-        navController: NavHostController
+        navController: NavHostController,
+        parentScope: CoroutineScope,
     ): () -> Unit = {
         val typedNode = selectedNodes.firstOrNull()
         typedNode?.let {

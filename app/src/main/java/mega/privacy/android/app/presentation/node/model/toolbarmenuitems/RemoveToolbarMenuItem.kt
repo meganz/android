@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.presentation.node.model.menuaction.RemoveMenuAction
 import mega.privacy.android.app.presentation.search.navigation.moveToRubbishOrDelete
 import mega.privacy.android.core.ui.model.MenuAction
@@ -36,6 +37,7 @@ class RemoveToolbarMenuItem @Inject constructor(
         onDismiss: () -> Unit,
         actionHandler: (menuAction: MenuAction, nodes: List<TypedNode>) -> Unit,
         navController: NavHostController,
+        parentScope: CoroutineScope,
     ): () -> Unit = {
         val nodeHandles = selectedNodes.map { it.id.longValue }
         runCatching {
