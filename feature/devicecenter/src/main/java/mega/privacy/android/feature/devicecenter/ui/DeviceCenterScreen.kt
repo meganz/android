@@ -2,6 +2,8 @@ package mega.privacy.android.feature.devicecenter.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +19,6 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -27,7 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
@@ -37,7 +38,6 @@ import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.DeviceBottomSheet
@@ -68,6 +68,7 @@ internal const val DEVICE_CENTER_THIS_DEVICE_HEADER =
 internal const val DEVICE_CENTER_OTHER_DEVICES_HEADER =
     "device_center_content:menu_action_header_other_devices"
 internal const val DEVICE_CENTER_NO_NETWORK_STATE = "device_center_content:no_network_state"
+internal const val DEVICE_CENTER_NOTHING_SETUP_STATE = "device_center_content:nothing_setup_state"
 
 /**
  * A [Composable] that serves as the main View for the Device Center
@@ -169,11 +170,17 @@ internal fun DeviceCenterScreen(
                     }
                 },
                 actions = selectedDevice?.let {
-                    val list =
-                        mutableListOf<MenuAction>(DeviceMenuAction.Rename, DeviceMenuAction.Info)
+                    val list = mutableListOf<MenuAction>(DeviceMenuAction.Rename)
 
-                    if (uiState.selectedDevice is OwnDeviceUINode) {
-                        list.add(DeviceMenuAction.CameraUploads)
+                    when (uiState.selectedDevice) {
+                        is OwnDeviceUINode -> {
+                            if (uiState.isCameraUploadsEnabled) {
+                                list.add(DeviceMenuAction.Info)
+                            }
+                            list.add(DeviceMenuAction.CameraUploads)
+                        }
+
+                        else -> list.add(DeviceMenuAction.Info)
                     }
 
                     return@let list
@@ -243,22 +250,62 @@ internal fun DeviceCenterScreen(
  */
 @Composable
 private fun DeviceCenterNoNetworkState() {
+    DeviceCenterEmptyState(
+        iconId = R.drawable.ic_device_center_no_network_state,
+        iconSize = 144.dp,
+        iconDescription = "No network connectivity state",
+        textId = R.string.device_center_no_network_state,
+        testTag = DEVICE_CENTER_NO_NETWORK_STATE
+    )
+}
+
+/**
+ * A [Composable] which displays a Nothing setup state
+ */
+@Composable
+private fun DeviceCenterNothingSetupState() {
+    DeviceCenterEmptyState(
+        iconId = R.drawable.ic_folder_sync_empty,
+        iconSize = 128.dp,
+        iconDescription = "No setup state",
+        textId = R.string.device_center_nothing_setup_state,
+        testTag = DEVICE_CENTER_NOTHING_SETUP_STATE
+    )
+}
+
+/**
+ * A [Composable] which displays an empty state
+ *
+ * @param iconId            [DrawableRes] ID to query the image file from.
+ * @param iconSize          Size of the icon square in [Dp].
+ * @param iconDescription   [String] used by accessibility services to describe what this image represents.
+ * @param textId            [StringRes] ID of the text to display.
+ * @param testTag           Tag to allow modified element to be found in tests.
+ */
+@Composable
+private fun DeviceCenterEmptyState(
+    @DrawableRes iconId: Int,
+    iconSize: Dp,
+    iconDescription: String,
+    @StringRes textId: Int,
+    testTag: String,
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .testTag(DEVICE_CENTER_NO_NETWORK_STATE),
+            .testTag(testTag),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_device_center_no_network_state),
-            contentDescription = "No network connectivity state",
+            painter = painterResource(id = iconId),
+            contentDescription = iconDescription,
             modifier = Modifier
-                .size(size = 144.dp)
-                .padding(bottom = 11.dp)
+                .size(size = iconSize)
+                .padding(bottom = 8.dp)
         )
         MegaText(
-            text = stringResource(id = R.string.device_center_no_network_state),
+            text = stringResource(id = textId),
             textColor = TextColor.Primary,
             style = MaterialTheme.typography.subtitle2,
         )
@@ -350,6 +397,8 @@ private fun DeviceCenterContent(
                 }
             }
         }
+    } else {
+        DeviceCenterNothingSetupState()
     }
 }
 
@@ -421,6 +470,40 @@ private fun DeviceCenterInDeviceViewPreview() {
             otherDeviceUINodeThree,
         ),
         isInitialLoadingFinished = true,
+        isNetworkConnected = true,
+    )
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        DeviceCenterScreen(
+            uiState = uiState,
+            snackbarHostState = SnackbarHostState(),
+            onDeviceClicked = {},
+            onDeviceMenuClicked = {},
+            onBackupFolderClicked = {},
+            onBackupFolderMenuClicked = {},
+            onNonBackupFolderClicked = {},
+            onNonBackupFolderMenuClicked = {},
+            onCameraUploadsClicked = {},
+            onRenameDeviceOptionClicked = {},
+            onRenameDeviceCancelled = {},
+            onRenameDeviceSuccessful = {},
+            onRenameDeviceSuccessfulSnackbarShown = {},
+            onBackPressHandled = {},
+            onFeatureExited = {},
+        )
+    }
+}
+
+/**
+ * A Preview Composable that shows the Device Center in Folder View (when the user selects a Device)
+ * and there i nothing setup yet (empty state)
+ */
+@CombinedThemePreviews
+@Composable
+private fun DeviceCenterInFolderViewEmptyStatePreview() {
+    val uiState = DeviceCenterState(
+        devices = listOf(ownDeviceUINode),
+        isInitialLoadingFinished = true,
+        selectedDevice = ownDeviceUINode,
         isNetworkConnected = true,
     )
     MegaAppTheme(isDark = isSystemInDarkTheme()) {

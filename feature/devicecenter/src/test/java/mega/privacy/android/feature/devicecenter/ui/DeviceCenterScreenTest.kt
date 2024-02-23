@@ -337,4 +337,42 @@ internal class DeviceCenterScreenTest {
         }
         composeTestRule.onNodeWithTag(DEVICE_CENTER_NO_NETWORK_STATE).assertIsDisplayed()
     }
+
+    @Test
+    fun `test that the nothing setup state is shown`() {
+        val ownDeviceUINode = OwnDeviceUINode(
+            id = "1234-5678",
+            name = "Own Device",
+            icon = DeviceIconType.Android,
+            status = DeviceCenterUINodeStatus.CameraUploadsDisabled,
+            folders = emptyList(),
+        )
+        val uiState = DeviceCenterState(
+            devices = listOf(ownDeviceUINode),
+            isCameraUploadsEnabled = false,
+            isInitialLoadingFinished = true,
+            selectedDevice = ownDeviceUINode,
+            isNetworkConnected = true,
+        )
+        composeTestRule.setContent {
+            DeviceCenterScreen(
+                uiState = uiState,
+                snackbarHostState = SnackbarHostState(),
+                onDeviceClicked = {},
+                onDeviceMenuClicked = {},
+                onBackupFolderClicked = {},
+                onBackupFolderMenuClicked = {},
+                onNonBackupFolderClicked = {},
+                onNonBackupFolderMenuClicked = {},
+                onCameraUploadsClicked = {},
+                onRenameDeviceOptionClicked = {},
+                onRenameDeviceCancelled = {},
+                onRenameDeviceSuccessful = {},
+                onRenameDeviceSuccessfulSnackbarShown = {},
+                onBackPressHandled = {},
+                onFeatureExited = {},
+            )
+        }
+        composeTestRule.onNodeWithTag(DEVICE_CENTER_NOTHING_SETUP_STATE).assertIsDisplayed()
+    }
 }
