@@ -51,6 +51,11 @@ enum class OptionItems {
     REMOVE_SHARE_CLICKED,
 
     /**
+     * Option item Leave from incoming share Clicked
+     */
+    LEAVE_SHARE_CLICKED,
+
+    /**
      * Option item select all clicked
      */
     SELECT_ALL_CLICKED,

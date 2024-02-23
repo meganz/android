@@ -64,7 +64,7 @@ data class IncomingSharesState(
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val updateToolbarTitleEvent: StateEvent = consumed,
     val exitIncomingSharesEvent: StateEvent = consumed,
-    val openedFolderNodeHandles: Set<Long> = emptySet(),
+    val openedFolderNodeHandles: List<Long> = emptyList(),
     val isContactVerificationOn: Boolean = false,
     val showContactNotVerifiedBanner: Boolean = false,
 ) {

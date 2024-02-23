@@ -39,6 +39,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionBackupListener
+import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFragment
@@ -452,9 +453,6 @@ class IncomingSharesComposeFragment : Fragment() {
                 // Slight customization for incoming shares page
                 control.shareFolder().isVisible = false
                 control.shareOut().isVisible = false
-                if (viewModel.state.value.isInRootLevel)
-                    control.leaveShare().setVisible(true).showAsAction =
-                        MenuItem.SHOW_AS_ACTION_ALWAYS
                 if (selected.size == 1 && selected.first().shareData?.access == AccessPermission.FULL) {
                     control.rename().isVisible = true
                     if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
@@ -608,6 +606,16 @@ class IncomingSharesComposeFragment : Fragment() {
                         Intent(requireContext(), WebViewActivity::class.java)
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                             .setData(Uri.parse(Constants.DISPUTE_URL))
+                    )
+                    disableSelectMode()
+                }
+
+                OptionItems.LEAVE_SHARE_CLICKED -> {
+                    val handleList =
+                        ArrayList<Long>().apply { addAll(it.selectedNode.map { node -> node.id.longValue }) }
+                    MegaNodeUtil.showConfirmationLeaveIncomingShares(
+                        requireActivity(),
+                        (requireActivity() as SnackbarShower), handleList
                     )
                     disableSelectMode()
                 }

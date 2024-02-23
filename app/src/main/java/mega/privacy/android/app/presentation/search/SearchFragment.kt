@@ -147,7 +147,6 @@ class SearchFragment : RotatableFragment() {
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
     private val managerViewModel: ManagerViewModel by activityViewModels()
     private val fileBrowserViewModel: FileBrowserViewModel by activityViewModels()
-    private val incomingSharesViewModel: IncomingSharesViewModel by activityViewModels()
     private val backupsViewModel: BackupsViewModel by activityViewModels()
     private val rubbishBinViewModel: RubbishBinViewModel by activityViewModels()
     private val searchViewModel: SearchViewModel by activityViewModels()
@@ -713,7 +712,7 @@ class SearchFragment : RotatableFragment() {
             browserParentHandle = fileBrowserViewModel.state.value.fileBrowserHandle,
             rubbishBinParentHandle = rubbishBinViewModel.state.value.rubbishBinHandle,
             backupsParentHandle = backupsViewModel.state.value.currentBackupsFolderNodeId.longValue,
-            incomingParentHandle = incomingSharesViewModel.state.value.incomingHandle,
+            incomingParentHandle = managerActivity.getHandleFromIncomingSharesViewModel(),
             outgoingParentHandle = managerActivity.getHandleFromOutgoingSharesViewModel(),
             linksParentHandle = managerActivity.getHandleFromLinksViewModel(),
             isFirstNavigationLevel = managerViewModel.state.value.isFirstNavigationLevel,

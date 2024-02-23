@@ -26,6 +26,15 @@ enum class AppFeatures(override val description: String, private val defaultValu
 
 
     /**
+     * Enables new incoming shares compose page
+     */
+    IncomingSharesCompose(
+        "Enable new Incoming Shares Compose page (requires app restart)",
+        false
+    ),
+
+
+    /**
      * Enables new outgoing shares compose page
      */
     OutgoingSharesCompose(

@@ -20,6 +20,9 @@ import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
+import mega.privacy.android.core.ui.utils.pop
+import mega.privacy.android.core.ui.utils.push
+import mega.privacy.android.core.ui.utils.toMutableArrayDeque
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -48,7 +51,6 @@ import mega.privacy.android.domain.usecase.shares.GetIncomingSharesChildrenNodeU
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import timber.log.Timber
-import java.util.Stack
 import javax.inject.Inject
 
 /**
@@ -106,11 +108,6 @@ class IncomingSharesComposeViewModel @Inject constructor(
      * Immutable State flow
      */
     val state = _state.asStateFlow()
-
-    /**
-     * Stack to maintain folder navigation clicks
-     */
-    private val handleStack = Stack<Long>()
 
     init {
         checkContactVerification()
@@ -176,7 +173,8 @@ class IncomingSharesComposeViewModel @Inject constructor(
                 monitorNodeUpdatesUseCase().catch {
                     Timber.e(it)
                 }.collect {
-                    checkForNodeIsInRubbish(it.changes)
+                    checkIfNodeIsDeleted(it.changes)
+                    checkIfLeftFromShare(it.changes)
                 }
             }.onFailure {
                 Timber.e(it)
@@ -203,37 +201,70 @@ class IncomingSharesComposeViewModel @Inject constructor(
 
     private fun checkIfSelectedFolderIsSharedByVerifiedContact() =
         viewModelScope.launch {
-            if (_state.value.isContactVerificationOn) {
-                val showBanner = if (_state.value.isInRootLevel) {
-                    false
-                } else {
-                    val email =
-                        getIncomingShareParentUserEmailUseCase(NodeId(_state.value.currentHandle))
-                    val verified = email?.let { areCredentialsVerifiedUseCase(it) } ?: run { false }
-                    !verified
+            runCatching {
+                if (_state.value.isContactVerificationOn) {
+                    val showBanner = if (_state.value.isInRootLevel) {
+                        false
+                    } else {
+                        val email =
+                            getIncomingShareParentUserEmailUseCase(NodeId(_state.value.currentHandle))
+                        val verified =
+                            email?.let { areCredentialsVerifiedUseCase(it) } ?: run { false }
+                        !verified
+                    }
+                    _state.update { it.copy(showContactNotVerifiedBanner = showBanner) }
                 }
-                _state.update { it.copy(showContactNotVerifiedBanner = showBanner) }
+            }.onFailure {
+                Timber.e(it)
             }
         }
 
-    /**
-     * This will update current handle if any node is deleted from browser and
-     * moved to rubbish bin
-     * we are in same screen else will simply refresh nodes with parentID
-     * @param changes [Map] of [Node], list of [NodeChanges]
-     */
-    private suspend fun checkForNodeIsInRubbish(changes: Map<Node, List<NodeChanges>>) {
+    private fun checkIfLeftFromShare(changes: Map<Node, List<NodeChanges>>) {
         changes.forEach { (node, _) ->
             if (node is FolderNode) {
-                if (node.isInRubbishBin && _state.value.currentHandle == node.id.longValue) {
-                    while (handleStack.isNotEmpty() && getIsNodeInRubbish(handleStack.peek())) {
-                        handleStack.pop()
-                    }
-                    handleStack.takeIf { stack -> stack.isNotEmpty() }?.peek()?.let { parent ->
-                        setCurrentHandle(parent)
-                        return
-                    }
+                val isLeftFromShare =
+                    !node.isIncomingShare && state.value.openedFolderNodeHandles.size == 1
+                if (isLeftFromShare && _state.value.currentHandle == node.id.longValue) {
+                    performBackNavigation()
                 }
+            }
+        }
+        setPendingRefreshNodes()
+    }
+
+    /**
+     * This will check if node is deleted from incoming share by the owner
+     * @param handle [Long] of node
+     * @return [Boolean] true if node is deleted
+     */
+    private suspend fun isNodeDeleted(handle: Long) =
+        getIsNodeInRubbish(handle) || getNodeByIdUseCase(NodeId(handle)) == null
+
+    /**
+     * This will update current handle if any node is deleted from incoming share and
+     * moved to rubbish bin
+     * we are in same screen else will simply refresh nodes with parentID
+     * @param changesMap [Map] of [Node], list of [NodeChanges]
+     */
+    private suspend fun checkIfNodeIsDeleted(changesMap: Map<Node, List<NodeChanges>>) {
+        changesMap.forEach { (node, changes) ->
+            if (node is FolderNode
+                && (node.isInRubbishBin || NodeChanges.Remove in changes)
+                && state.value.currentHandle == node.id.longValue
+            ) {
+                val handleStack = state.value.openedFolderNodeHandles.toMutableArrayDeque()
+                while (handleStack.isNotEmpty() && isNodeDeleted(handleStack.last())) {
+                    handleStack.pop()
+                }
+                _state.update {
+                    it.copy(openedFolderNodeHandles = handleStack)
+                }
+                handleStack.lastOrNull()?.let { parent ->
+                    setCurrentHandle(parent)
+                } ?: run {
+                    goBackToRootLevel()
+                }
+                return
             }
         }
         setPendingRefreshNodes()
@@ -253,17 +284,28 @@ class IncomingSharesComposeViewModel @Inject constructor(
      *
      * @param handle The new node handle to be set
      */
-    fun setCurrentHandle(handle: Long) =
+    fun setCurrentHandle(
+        handle: Long,
+        updateLoadingState: Boolean = false,
+        refreshNodes: Boolean = true,
+    ) =
         viewModelScope.launch {
-            handleStack.push(handle)
+            val handleStack =
+                _state.value.openedFolderNodeHandles
+                    .toMutableArrayDeque()
+                    .apply {
+                        push(state.value.currentHandle)
+                    }
             _state.update {
                 it.copy(
                     currentHandle = handle,
-                    currentNodeName = getNodeByIdUseCase(NodeId(handle))?.name,
+                    isLoading = if (updateLoadingState) true else it.isLoading,
+                    openedFolderNodeHandles = handleStack,
                     updateToolbarTitleEvent = triggered
                 )
             }
-            refreshNodesState()
+            if (refreshNodes)
+                refreshNodesState()
         }
 
     /**
@@ -292,11 +334,10 @@ class IncomingSharesComposeViewModel @Inject constructor(
          * When a folder is opened, and user clicks on Shares bottom drawer item, clear the openedFolderNodeHandles
          */
         if (isRootNode && state.value.openedFolderNodeHandles.isNotEmpty()) {
-            handleStack.clear()
             _state.update {
                 it.copy(
                     isLoading = true,
-                    openedFolderNodeHandles = emptySet()
+                    openedFolderNodeHandles = emptyList(),
                 )
             }
         }
@@ -310,6 +351,7 @@ class IncomingSharesComposeViewModel @Inject constructor(
                 nodesList = nodeUIItems,
                 isLoading = false,
                 sortOrder = sortOrder,
+                currentNodeName = getNodeByIdUseCase(NodeId(currentHandle))?.name,
                 updateToolbarTitleEvent = triggered
             )
         }
@@ -318,7 +360,8 @@ class IncomingSharesComposeViewModel @Inject constructor(
     /**
      * Get current tree depth
      */
-    fun incomingTreeDepth() = if (_state.value.isInRootLevel) 0 else handleStack.size
+    fun incomingTreeDepth() =
+        if (_state.value.isInRootLevel) 0 else _state.value.openedFolderNodeHandles.size
 
     /**
      * This will map list of [Node] to [NodeUIItem]
@@ -358,12 +401,14 @@ class IncomingSharesComposeViewModel @Inject constructor(
      * Removes the current Node from the Set of opened Folder Nodes in UiState
      */
     private fun removeCurrentNodeFromUiStateSet() {
-        val updatedOpenedFolderNodeHandles = _state.value.openedFolderNodeHandles.toMutableSet()
-            .apply { remove(_state.value.currentHandle) }
+        val handleStack =
+            _state.value.openedFolderNodeHandles
+                .toMutableArrayDeque()
+                .apply { pop() }
         _state.update {
             it.copy(
                 isLoading = true,
-                openedFolderNodeHandles = updatedOpenedFolderNodeHandles,
+                openedFolderNodeHandles = handleStack,
             )
         }
     }
@@ -377,22 +422,20 @@ class IncomingSharesComposeViewModel @Inject constructor(
                 handleAccessedFolderOnBackPress()
                 getParentNodeUseCase(NodeId(_state.value.currentHandle))?.id?.longValue?.let { parentHandle ->
                     removeCurrentNodeFromUiStateSet()
-                    val rootNode = getRootNodeUseCase()?.id?.longValue
-                    if (rootNode == parentHandle) {
-                        goBackToRootLevel()
-                    } else {
-                        setCurrentHandle(parentHandle)
-                        handleStack.takeIf { stack -> stack.isNotEmpty() }?.pop()
-                        // Update the Toolbar Title
-                        _state.update { it.copy(updateToolbarTitleEvent = triggered) }
-                    }
+                    setCurrentHandle(parentHandle)
+                    // Update the Toolbar Title
+                    _state.update { it.copy(updateToolbarTitleEvent = triggered) }
                 } ?: run {
-                    // Exit Incoming Shares if there is nothing left in the Back Stack
-                    _state.update {
-                        it.copy(
-                            openedFolderNodeHandles = emptySet(),
-                            exitIncomingSharesEvent = triggered
-                        )
+                    if (state.value.openedFolderNodeHandles.isEmpty()) {
+                        // Exit Incoming Shares if there is nothing left in the Back Stack
+                        _state.update {
+                            it.copy(
+                                openedFolderNodeHandles = emptyList(),
+                                exitIncomingSharesEvent = triggered
+                            )
+                        }
+                    } else {
+                        goBackToRootLevel()
                     }
                 }
             }.onFailure {
@@ -422,16 +465,8 @@ class IncomingSharesComposeViewModel @Inject constructor(
      * @param folderHandle The Folder Handle
      */
     private fun onFolderItemClicked(folderHandle: Long) {
-        val updatedOpenedFolderNodeHandles = _state.value.openedFolderNodeHandles.toMutableSet()
-            .apply { add(_state.value.currentHandle) }
         viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    isLoading = true,
-                    openedFolderNodeHandles = updatedOpenedFolderNodeHandles
-                )
-            }
-            setCurrentHandle(folderHandle)
+            setCurrentHandle(folderHandle, true)
         }
     }
 

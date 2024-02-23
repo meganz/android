@@ -180,7 +180,7 @@ fun <T : TypedNode> NodeListView(
                 showMenuButton = true,
                 showLinkIcon = showLinkIcon,
                 isTakenDown = nodeEntity.isTakenDown,
-                isFavourite = nodeEntity.isFavourite,
+                isFavourite = nodeEntity.isFavourite && !nodeEntity.isIncomingShare,
                 isSharedWithPublicLink = nodeEntity.exportedData != null,
                 thumbnailData = ThumbnailRequest(nodeEntity.id, isPublicNode),
                 onClick = { onItemClicked(nodeUIItemList[it]) },
