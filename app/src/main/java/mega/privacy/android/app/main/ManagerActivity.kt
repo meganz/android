@@ -3675,6 +3675,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
 
                 R.id.videoSectionFragment -> {
+                    homepageScreen = HomepageScreen.VIDEO_SECTION
                     hideAdsView()
                 }
 

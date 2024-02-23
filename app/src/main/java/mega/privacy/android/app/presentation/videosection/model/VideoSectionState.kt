@@ -25,6 +25,7 @@ import mega.privacy.android.domain.entity.SortOrder
  * @property createVideoPlaylistPlaceholderTitle the create video playlist placeholder title
  * @property createDialogErrorMessage the create dialog error message
  * @property deletedVideoPlaylistTitles the deleted video playlist titles
+ * @property currentDestinationRoute the current destination route
  */
 data class VideoSectionState(
     val allVideos: List<VideoUIEntity> = emptyList(),
@@ -47,4 +48,5 @@ data class VideoSectionState(
     val shouldRenameVideoPlaylist: Boolean = false,
     val shouldDeleteVideoPlaylist: Boolean = false,
     val deletedVideoPlaylistTitles: List<String> = emptyList(),
+    val currentDestinationRoute: String? = null
 )

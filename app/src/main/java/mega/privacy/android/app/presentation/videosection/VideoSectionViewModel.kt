@@ -590,6 +590,10 @@ class VideoSectionViewModel @Inject constructor(
         it.copy(deletedVideoPlaylistTitles = emptyList())
     }
 
+    internal fun setCurrentDestinationRoute(route: String?) = _state.update {
+        it.copy(currentDestinationRoute = route)
+    }
+
     companion object {
         private const val ERROR_MESSAGE_REPEATED_TITLE = 0
     }

@@ -600,6 +600,20 @@ class VideoSectionViewModelTest {
             }
         }
 
+    @Test
+    fun `test that the setCurrentDestinationRoute is correctly updated`() = runTest {
+        val route = "route"
+        initUnderTest()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentDestinationRoute).isNull()
+            underTest.setCurrentDestinationRoute(route)
+            assertThat(awaitItem().currentDestinationRoute).isEqualTo(route)
+            underTest.setCurrentDestinationRoute(null)
+            assertThat(awaitItem().currentDestinationRoute).isNull()
+        }
+    }
+
     companion object {
         @JvmField
         @RegisterExtension

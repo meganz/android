@@ -143,6 +143,12 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                 (activity as? ManagerActivity)?.closeSearchView()
             }
         }
+
+        viewLifecycleOwner.collectFlow(
+            videoSectionViewModel.state.map { it.currentDestinationRoute }.distinctUntilChanged()
+        ) { route ->
+            route?.let { updateToolbarWhenDestinationChanged(it) }
+        }
     }
 
     private fun initVideoSectionComposeView() {
@@ -173,9 +179,6 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                         },
                         onMenuClick = { item ->
                             showOptionsMenuForItem(item)
-                        },
-                        onDestinationChanged = { route ->
-                            route?.let { updateToolbarWhenDestinationChanged(it) }
                         }
                     )
                 }
