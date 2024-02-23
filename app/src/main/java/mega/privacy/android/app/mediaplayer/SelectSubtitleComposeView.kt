@@ -182,7 +182,7 @@ internal fun SelectSubtitleView(
                     onBackPressed = onBackPressed,
                     onSearchClicked = onSearchClicked,
                     elevation = false,
-                    titleId = R.string.media_player_video_select_subtitle_file_title,
+                    title = stringResource(R.string.media_player_video_select_subtitle_file_title),
                     hintId = R.string.hint_action_search,
                     isHideAfterSearch = true
                 )

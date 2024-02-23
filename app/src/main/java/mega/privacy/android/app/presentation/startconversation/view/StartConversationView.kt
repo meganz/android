@@ -96,7 +96,7 @@ fun StartConversationView(
                     onBackPressed = onBackPressed,
                     onSearchClicked = onSearchClicked,
                     elevation = !firstItemVisible,
-                    titleId = R.string.group_chat_start_conversation_label,
+                    title = stringResource(R.string.group_chat_start_conversation_label),
                     hintId = R.string.hint_action_search
                 )
             }

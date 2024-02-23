@@ -80,6 +80,7 @@ dependencies {
     implementation(project(":core-ui"))
     implementation(project(":shared:theme"))
     implementation(project(":legacy-core-ui"))
+    implementation(project(":icon-pack"))
 
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))

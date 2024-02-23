@@ -21,6 +21,8 @@ import mega.privacy.android.feature.devicecenter.domain.usecase.GetDevicesUseCas
 import mega.privacy.android.feature.devicecenter.ui.mapper.DeviceUINodeListMapper
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterState
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
+import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -121,14 +123,26 @@ internal class DeviceCenterViewModel @Inject constructor(
      * @param deviceUINode The corresponding Device UI Node
      */
     fun showDeviceFolders(deviceUINode: DeviceUINode) = _state.update {
-        it.copy(selectedDevice = deviceUINode)
+        it.copy(
+            selectedDevice = deviceUINode,
+            searchWidgetState = SearchWidgetState.COLLAPSED,
+            searchQuery = "",
+            filteredUiItems = null
+        )
     }
 
     /**
      * Handles specific Back Press behavior
      */
     fun handleBackPress() {
-        _state.update { it.copy(menuClickedDevice = null) }
+        _state.update {
+            it.copy(
+                menuClickedDevice = null,
+                searchWidgetState = SearchWidgetState.COLLAPSED,
+                searchQuery = "",
+                filteredUiItems = null
+            )
+        }
         if (_state.value.deviceToRename != null) {
             // The Rename Device feature is shown. Mark deviceToRename as null to dismiss the feature
             _state.update { it.copy(deviceToRename = null) }
@@ -187,6 +201,44 @@ internal class DeviceCenterViewModel @Inject constructor(
      */
     fun resetRenameDeviceSuccessEvent() =
         _state.update { it.copy(renameDeviceSuccess = consumed) }
+
+    fun onSearchQueryChanged(query: String) {
+        _state.update { it.copy(searchQuery = query) }
+        query.takeIf(String::isNotBlank)?.let { searchQuery ->
+            _state.update {
+                it.copy(
+                    filteredUiItems = it.itemsToDisplay.filter { item ->
+                        item.name.contains(
+                            searchQuery,
+                            true
+                        ) || (item is NonBackupDeviceFolderUINode && item.localFolderPath.contains(
+                            searchQuery,
+                            true
+                        ))
+                    }
+                )
+            }
+        } ?: run {
+            _state.update {
+                it.copy(
+                    filteredUiItems = null
+                )
+            }
+        }
+    }
+
+    fun onSearchCloseClicked() {
+        _state.update {
+            it.copy(
+                filteredUiItems = null,
+                searchWidgetState = SearchWidgetState.COLLAPSED
+            )
+        }
+    }
+
+    fun onSearchClicked() {
+        _state.update { it.copy(searchWidgetState = SearchWidgetState.EXPANDED) }
+    }
 
     companion object {
         /**

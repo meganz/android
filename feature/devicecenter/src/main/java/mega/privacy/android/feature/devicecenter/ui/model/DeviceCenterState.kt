@@ -2,6 +2,7 @@ package mega.privacy.android.feature.devicecenter.ui.model
 
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 
 /**
  * Data class representing the state of the Device Center Screen
@@ -19,6 +20,9 @@ import de.palm.composestateevents.consumed
  * @property exitFeature State Event that will cause the User to leave Device Center if it is triggered
  * @property renameDeviceSuccess State Event which notifies that renaming the Device is successful
  * @property isNetworkConnected True if has network connectivity or False otherwise
+ * @property searchQuery The search query
+ * @property filteredUiItems The list of [DeviceCenterUINode] objects that are filtered based on the search query
+ * @property searchWidgetState The state of the search widget
  */
 data class DeviceCenterState(
     val devices: List<DeviceCenterUINode> = emptyList(),
@@ -30,6 +34,9 @@ data class DeviceCenterState(
     val exitFeature: StateEvent = consumed,
     val renameDeviceSuccess: StateEvent = consumed,
     val isNetworkConnected: Boolean = false,
+    val searchQuery: String = "",
+    val filteredUiItems: List<DeviceCenterUINode>? = null,
+    val searchWidgetState: SearchWidgetState = SearchWidgetState.COLLAPSED,
 ) {
     val itemsToDisplay: List<DeviceCenterUINode> = selectedDevice?.folders ?: devices
 }

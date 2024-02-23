@@ -128,6 +128,9 @@ class DeviceCenterFragment : Fragment() {
                         onRenameDeviceSuccessfulSnackbarShown = viewModel::resetRenameDeviceSuccessEvent,
                         onBackPressHandled = viewModel::handleBackPress,
                         onFeatureExited = viewModel::resetExitFeature,
+                        onSearchQueryChanged = viewModel::onSearchQueryChanged,
+                        onSearchCloseClicked = viewModel::onSearchCloseClicked,
+                        onSearchClicked = viewModel::onSearchClicked,
                         onActionPressed = { menuAction ->
                             when (menuAction) {
                                 is DeviceMenuAction.Rename -> {

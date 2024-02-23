@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.changepassword.view.Constants
@@ -95,7 +96,7 @@ fun ArchivedChatsView(
                     onSearchClicked = { searchState = SearchWidgetState.EXPANDED },
                     onBackPressed = onBackPressed,
                     elevation = showElevation,
-                    titleId = R.string.archived_chat,
+                    title = stringResource(R.string.archived_chat),
                     hintId = R.string.hint_action_search
                 )
             }

@@ -160,4 +160,10 @@
     <string name="device_center_list_view_item_sub_state_local_filesystem_mismatch">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the Desktop app.</string>
     <!-- Text to display in Device Center for an empty state when inspecting a device where no sync or backup has been configured -->
     <string name="device_center_nothing_setup_state">Nothing setup yet</string>
+    <!-- The hint text for the search bar in the Device Center feature when the User is searching for Devices -->
+    <string name="device_center_top_app_bar_search_devices_hint">Search devices</string>
+    <!-- The hint text for the search bar in the Device Center feature when the User is searching for Syncs -->
+    <string name="device_center_top_app_bar_search_syncs_hint">Search syncs</string>
+    <!-- Text to show in the Device Center when no search results are found -->
+    <string name="device_center_empty_screen_no_results">No results</string>
 </resources>

@@ -39,6 +39,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.core.ui.controls.menus.MenuActions
+import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.legacy.core.ui.R
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 
@@ -60,16 +62,23 @@ fun LegacySearchAppBar(
     onBackPressed: () -> Unit,
     onSearchClicked: () -> Unit,
     elevation: Boolean,
-    titleId: Int,
+    title: String,
     hintId: Int,
+    modifier: Modifier = Modifier,
     isHideAfterSearch: Boolean = false,
+    actions: List<MenuAction>? = null,
+    onActionPressed: ((MenuAction) -> Unit)? = null,
 ) {
     when (searchWidgetState) {
         SearchWidgetState.COLLAPSED -> {
             CollapsedSearchAppBar(
                 onBackPressed = onBackPressed,
                 onSearchClicked = onSearchClicked,
-                elevation = elevation, titleId = titleId
+                elevation = elevation,
+                title = title,
+                actions = actions,
+                onActionPressed = onActionPressed,
+                modifier = modifier,
             )
         }
 
@@ -80,6 +89,7 @@ fun LegacySearchAppBar(
                 onSearchTextChange = onSearchTextChange,
                 onCloseClicked = onCloseClicked,
                 elevation = elevation,
+                modifier = modifier,
                 isHideAfterSearch = isHideAfterSearch
             )
         }
@@ -94,14 +104,19 @@ fun CollapsedSearchAppBar(
     onBackPressed: () -> Unit,
     onSearchClicked: () -> Unit,
     elevation: Boolean,
-    titleId: Int,
+    title: String,
+    modifier: Modifier = Modifier,
+    actions: List<MenuAction>? = null,
+    onActionPressed: ((MenuAction) -> Unit)? = null,
+    maxActionsToShow: Int = 3,
+    enabled: Boolean = true,
 ) {
     val iconColor = if (MaterialTheme.colors.isLight) Color.Black else Color.White
 
     TopAppBar(
         title = {
             Text(
-                text = stringResource(id = titleId),
+                text = title,
                 style = MaterialTheme.typography.subtitle1,
                 fontWeight = FontWeight.Medium
             )
@@ -123,9 +138,18 @@ fun CollapsedSearchAppBar(
                     tint = iconColor
                 )
             }
+            actions?.let {
+                MenuActions(
+                    actions = actions,
+                    maxActionsToShow = maxActionsToShow,
+                    enabled = enabled,
+                    onActionClick = { action -> onActionPressed?.invoke(action) }
+                )
+            }
         },
         backgroundColor = MaterialTheme.colors.surface,
-        elevation = if (elevation) AppBarDefaults.TopAppBarElevation else 0.dp
+        elevation = if (elevation) AppBarDefaults.TopAppBarElevation else 0.dp,
+        modifier = modifier
     )
 }
 
@@ -140,10 +164,11 @@ fun ExpandedSearchAppBar(
     onSearchTextChange: (String) -> Unit,
     onCloseClicked: () -> Unit,
     elevation: Boolean,
+    modifier: Modifier = Modifier,
     isHideAfterSearch: Boolean = false,
 ) {
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(56.dp),
         elevation = if (elevation) AppBarDefaults.TopAppBarElevation else 0.dp,
@@ -228,7 +253,7 @@ fun AppBarPreview() {
         onBackPressed = {},
         onSearchClicked = {},
         elevation = false,
-        0
+        "Screen Title"
     )
 }
 

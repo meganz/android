@@ -10,14 +10,17 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.feature.devicecenter.domain.entity.DeviceNode
 import mega.privacy.android.feature.devicecenter.domain.entity.OwnDeviceNode
 import mega.privacy.android.feature.devicecenter.domain.usecase.GetDevicesUseCase
 import mega.privacy.android.feature.devicecenter.ui.mapper.DeviceUINodeListMapper
+import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.icon.FolderIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -342,5 +345,78 @@ internal class DeviceCenterViewModelTest {
             val state = awaitItem()
             assertThat(state.renameDeviceSuccess).isEqualTo(consumed)
         }
+    }
+
+    @Test
+    fun `test that onSearchQueryChanged updates the search query and filters results`() = runTest {
+        val query = "Galaxy S24"
+        val deviceEntities: List<DeviceNode> = mock()
+        val firstItem = mock<DeviceUINode> {
+            on { it.id } doReturn "1234-5678"
+            on { it.name } doReturn "Samsung Galaxy S24"
+        }
+        val secondItem = mock<DeviceUINode> {
+            on { it.id } doReturn "9012-3456"
+            on { it.name } doReturn "Samsung Galaxy S24 Ultra"
+        }
+        val thirdItem = mock<DeviceUINode> {
+            on { it.id } doReturn "ABCD-EFGH"
+            on { it.name } doReturn "Samsung Galaxy S22"
+        }
+        val itemsToDisplay = listOf(
+            firstItem,
+            secondItem,
+            thirdItem
+        )
+        whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
+        whenever(getDevicesUseCase(false)).thenReturn(deviceEntities)
+        whenever(deviceUINodeListMapper(deviceEntities)).thenReturn(itemsToDisplay)
+
+        underTest.getBackupInfo()
+        underTest.onSearchQueryChanged(query)
+
+        assertThat(underTest.state.value.searchQuery).isEqualTo(query)
+        assertThat(underTest.state.value.filteredUiItems).isEqualTo(listOf(firstItem, secondItem))
+    }
+
+    @Test
+    fun `test that on search close clicked resets the filtered items and collapses the search`() =
+        runTest {
+            val query = "Galaxy S24"
+            val deviceEntities: List<DeviceNode> = mock()
+            val firstItem = mock<DeviceUINode> {
+                on { it.id } doReturn "1234-5678"
+                on { it.name } doReturn "Samsung Galaxy S24"
+            }
+            val secondItem = mock<DeviceUINode> {
+                on { it.id } doReturn "9012-3456"
+                on { it.name } doReturn "Samsung Galaxy S24 Ultra"
+            }
+            val thirdItem = mock<DeviceUINode> {
+                on { it.id } doReturn "ABCD-EFGH"
+                on { it.name } doReturn "Samsung Galaxy S22"
+            }
+            val itemsToDisplay = listOf(
+                firstItem,
+                secondItem,
+                thirdItem
+            )
+            whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
+            whenever(getDevicesUseCase(false)).thenReturn(deviceEntities)
+            whenever(deviceUINodeListMapper(deviceEntities)).thenReturn(itemsToDisplay)
+
+            underTest.getBackupInfo()
+            underTest.onSearchQueryChanged(query)
+            underTest.onSearchCloseClicked()
+
+            assertThat(underTest.state.value.searchWidgetState).isEqualTo(SearchWidgetState.COLLAPSED)
+            assertThat(underTest.state.value.filteredUiItems).isNull()
+        }
+
+    @Test
+    fun `test that onSearchClicked expands the searchWidgetState`() = runTest {
+        underTest.onSearchClicked()
+
+        assertThat(underTest.state.value.searchWidgetState).isEqualTo(SearchWidgetState.EXPANDED)
     }
 }
