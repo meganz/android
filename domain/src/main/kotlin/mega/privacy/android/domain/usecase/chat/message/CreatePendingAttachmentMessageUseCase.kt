@@ -26,6 +26,7 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
             msgId = id,
             time = uploadTimestamp,
             isDeletable = false,
+            isEditable = false,
             userHandle = getMyUserHandleUseCase(),
             shouldShowAvatar = true,
             shouldShowTime = true,

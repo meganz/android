@@ -200,6 +200,7 @@ class NodeAttachmentMessageViewModelTest {
             msgId = MSG_ID,
             time = 12L,
             isDeletable = false,
+            isEditable = false,
             isMine = true,
             userHandle = 23L,
             shouldShowAvatar = true,

@@ -17,6 +17,7 @@ data class TextMessage(
     override val time: Long,
     override val isMine: Boolean,
     override val isDeletable: Boolean,
+    override val isEditable: Boolean,
     override val userHandle: Long,
     override val shouldShowAvatar: Boolean,
     override val shouldShowTime: Boolean,

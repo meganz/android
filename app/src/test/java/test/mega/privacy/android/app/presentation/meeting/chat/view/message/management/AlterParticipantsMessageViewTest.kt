@@ -119,6 +119,7 @@ class AlterParticipantsMessageViewTest {
                     msgId = 123L,
                     time = System.currentTimeMillis(),
                     isDeletable = false,
+                    isEditable = false,
                     isMine = true,
                     userHandle = userHandle,
                     privilege = privilege,

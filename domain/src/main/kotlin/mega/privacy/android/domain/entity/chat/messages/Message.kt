@@ -31,6 +31,11 @@ interface Message {
     val isDeletable: Boolean
 
     /**
+     * True if the message is editable
+     */
+    val isEditable: Boolean
+
+    /**
      * True if the message is mine
      */
     val isMine: Boolean

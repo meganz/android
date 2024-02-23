@@ -14,6 +14,7 @@ internal class CreateChatLinkCreatedMessageUseCase @Inject constructor() :
                 msgId = messageId,
                 time = timestamp,
                 isDeletable = isDeletable,
+                isEditable = isEditable,
                 isMine = isMine,
                 userHandle = userHandle,
                 shouldShowAvatar = shouldShowAvatar,

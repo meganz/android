@@ -13,6 +13,7 @@ data class ChatLinkCreatedMessage(
     override val msgId: Long,
     override val time: Long,
     override val isDeletable: Boolean,
+    override val isEditable: Boolean,
     override val isMine: Boolean,
     override val userHandle: Long,
     override val shouldShowAvatar: Boolean,

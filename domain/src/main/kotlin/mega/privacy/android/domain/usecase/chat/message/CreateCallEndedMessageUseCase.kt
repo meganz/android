@@ -13,6 +13,7 @@ internal class CreateCallEndedMessageUseCase @Inject constructor() : CreateTyped
                 msgId = messageId,
                 time = timestamp,
                 isDeletable = isDeletable,
+                isEditable = isEditable,
                 isMine = isMine,
                 userHandle = userHandle,
                 termCode = termCode,

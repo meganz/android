@@ -135,6 +135,7 @@ private fun PermissionChangeMessageViewPreview(
                 msgId = 0,
                 time = 0,
                 isDeletable = false,
+                isEditable = false,
                 isMine = true,
                 userHandle = 0,
                 privilege = permission,

@@ -57,6 +57,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
             msgId = msgId,
             time = time,
             isDeletable = false,
+            isEditable = false,
             userHandle = userHandle,
             shouldShowAvatar = true,
             shouldShowTime = true,
