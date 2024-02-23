@@ -24,10 +24,9 @@ interface PendingMessageDao {
     suspend fun insert(pendingMessageEntity: PendingMessageEntity): Long
 
     /**
-     * Insert
+     * Update
      *
      * @param pendingMessageEntity
-     * @return id of the inserted row
      */
     @Update
     suspend fun update(pendingMessageEntity: PendingMessageEntity)
