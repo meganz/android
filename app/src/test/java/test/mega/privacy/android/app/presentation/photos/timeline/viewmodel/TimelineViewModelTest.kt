@@ -25,6 +25,7 @@ import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
+import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
@@ -51,6 +52,7 @@ import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -124,6 +126,11 @@ class TimelineViewModelTest {
             enableCameraUploadsInPhotosUseCase
         )
         initViewModel()
+    }
+
+    @AfterEach
+    fun tearDownEach() {
+        reset(startCameraUploadUseCase)
     }
 
     fun initViewModel() {
@@ -435,6 +442,75 @@ class TimelineViewModelTest {
         underTest.enableCU()
         advanceUntilIdle()
         verify(startCameraUploadUseCase).invoke()
+    }
+
+    @Test
+    fun `test that first time sync CU call start process`() = runTest {
+        // when
+        underTest.syncCameraUploadsStatus()
+        advanceUntilIdle()
+
+        // then
+        verify(startCameraUploadUseCase).invoke()
+    }
+
+    @Test
+    fun `test that CU status check files for upload is handled properly`() = runTest {
+        // given
+        cameraUploadsStatusInfoFlow.emit(CameraUploadsStatusInfo.CheckFilesForUpload)
+
+        // then
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.cameraUploadsStatus).isEqualTo(CameraUploadsStatus.Sync)
+        }
+    }
+
+    @Test
+    fun `test that CU status upload progress is handled properly`() = runTest {
+        // given
+        val progress = CameraUploadsStatusInfo.UploadProgress(
+            totalToUpload = 0,
+            totalUploaded = 1,
+            totalUploadedBytes = 1L,
+            progress = Progress(1f),
+            totalUploadBytes = 1L,
+            areUploadsPaused = false,
+        )
+        cameraUploadsStatusInfoFlow.emit(progress)
+
+        // then
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.cameraUploadsStatus).isEqualTo(CameraUploadsStatus.Uploading)
+        }
+    }
+
+    @Test
+    fun `test that CU status finished is handled properly`() = runTest {
+        // given
+        val info = CameraUploadsStatusInfo.Finished(
+            reason = CameraUploadsFinishedReason.COMPLETED,
+        )
+        cameraUploadsStatusInfoFlow.emit(info)
+
+        // then
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.showCameraUploadsComplete).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that CU completed message is set properly`() = runTest {
+        // when
+        underTest.setCameraUploadsCompletedMessage(true)
+
+        // then
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.showCameraUploadsCompletedMessage).isTrue()
+        }
     }
 
     @Test

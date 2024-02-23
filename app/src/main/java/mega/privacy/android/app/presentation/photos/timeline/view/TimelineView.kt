@@ -107,6 +107,7 @@ fun TimelineView(
     onCloseCameraUploadsLimitedAccess: () -> Unit,
     clearCameraUploadsMessage: () -> Unit = {},
     clearCameraUploadsChangePermissionsMessage: () -> Unit,
+    clearCameraUploadsCompletedMessage: () -> Unit,
 ) {
     val context = LocalContext.current
     val isBarVisible by remember {
@@ -124,12 +125,25 @@ fun TimelineView(
     }
 
     LaunchedEffect(timelineViewState.cameraUploadsMessage) {
-        if (timelineViewState.cameraUploadsMessage.isNotEmpty()) {
+        if (timelineViewState.cameraUploadsMessage.isNotEmpty() && isNewCUEnabled) {
             scaffoldState.snackbarHostState.showSnackbar(
                 message = timelineViewState.cameraUploadsMessage,
             )
             clearCameraUploadsMessage()
         }
+    }
+
+    LaunchedEffect(timelineViewState.showCameraUploadsCompletedMessage) {
+        if (timelineViewState.showCameraUploadsCompletedMessage && isNewCUEnabled) {
+            scaffoldState.snackbarHostState.showSnackbar(
+                message = context.resources.getQuantityString(
+                    R.plurals.photos_camera_uploads_completed,
+                    timelineViewState.cameraUploadsTotalUploaded,
+                    timelineViewState.cameraUploadsTotalUploaded,
+                )
+            )
+        }
+        clearCameraUploadsCompletedMessage()
     }
 
     LaunchedEffect(timelineViewState.showCameraUploadsChangePermissionsMessage) {
@@ -316,8 +330,10 @@ private fun HandlePhotosGridView(
                     }
 
                     if (timelineViewState.progressBarShowing) {
-                        CameraUploadProgressBar(timelineViewState = timelineViewState) {
-                            isBarVisible || (!isScrollingDown && !isScrolledToEnd)
+                        if (!isNewCUEnabled) {
+                            CameraUploadProgressBar(timelineViewState = timelineViewState) {
+                                isBarVisible || (!isScrollingDown && !isScrolledToEnd)
+                            }
                         }
                     }
 

@@ -6,11 +6,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -38,6 +38,7 @@ import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.photos.Photo
@@ -64,6 +65,7 @@ import nz.mega.sdk.MegaNode
 import org.jetbrains.anko.collections.forEachWithIndex
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * View Model for Timeline
@@ -114,6 +116,8 @@ class TimelineViewModel @Inject constructor(
     internal val selectedPhotosIds = mutableSetOf<Long>()
 
     private var job: Job? = null
+    private var isCameraUploadsFirstSyncTriggered = false
+    private var isCameraUploadsUploading = false
 
     init {
         job = viewModelScope.launch {
@@ -124,23 +128,70 @@ class TimelineViewModel @Inject constructor(
         }
         viewModelScope.launch {
             monitorCameraUploadsStatusInfoUseCase()
-                .filter { it is CameraUploadsStatusInfo.UploadProgress || it is CameraUploadsStatusInfo.Finished }
                 .collect {
                     when (it) {
+                        is CameraUploadsStatusInfo.CheckFilesForUpload -> {
+                            setCameraUploadsSyncFab(isVisible = true)
+
+                            setCameraUploadsCompleteMenu(isVisible = false)
+                            setCameraUploadsWarningMenu(isVisible = false)
+                        }
+
                         is CameraUploadsStatusInfo.UploadProgress -> {
                             updateCameraUploadProgressIfNeeded(
                                 progress = it.progress,
                                 pending = it.totalToUpload - it.totalUploaded,
                             )
+
+                            setCameraUploadsUploadingFab(
+                                isVisible = true,
+                                progress = it.progress.floatValue,
+                            )
+                            setCameraUploadsTotalUploaded(it.totalToUpload)
+
+                            isCameraUploadsUploading = true
                         }
 
                         is CameraUploadsStatusInfo.Finished -> {
                             updateCameraUploadProgressIfNeeded(progress = Progress(1f), pending = 0)
+
+                            hideCameraUploadsFab()
+                            setCameraUploadsFinishedReason(reason = it.reason)
+
+                            if (it.reason == CameraUploadsFinishedReason.COMPLETED) {
+                                if (isCameraUploadsUploading) {
+                                    setCameraUploadsCompleteFab(isVisible = true)
+                                    setCameraUploadsCompletedMessage(show = true)
+
+                                    isCameraUploadsUploading = false
+                                    delay(4.seconds)
+                                }
+
+                                setCameraUploadsCompleteMenu(isVisible = true)
+                                setCameraUploadsCompleteFab(isVisible = false)
+                            } else {
+                                setCameraUploadsWarningFab(isVisible = true, progress = 0.5f)
+                            }
                         }
 
                         else -> Unit
                     }
                 }
+        }
+    }
+
+    fun syncCameraUploadsStatus() {
+        if (isCameraUploadsFirstSyncTriggered) return
+        isCameraUploadsFirstSyncTriggered = true
+
+        viewModelScope.launch {
+            startCameraUploadUseCase()
+        }
+    }
+
+    fun setCameraUploadsCompletedMessage(show: Boolean) {
+        _state.update {
+            it.copy(showCameraUploadsCompletedMessage = show)
         }
     }
 
@@ -616,7 +667,7 @@ class TimelineViewModel @Inject constructor(
                 cameraUploadsStatus = CameraUploadsStatus.Uploading.takeIf {
                     isVisible
                 } ?: CameraUploadsStatus.None,
-                progress = progress,
+                cameraUploadsProgress = progress,
             )
         }
     }
@@ -676,6 +727,18 @@ class TimelineViewModel @Inject constructor(
     fun setCameraUploadsMessage(message: String) {
         _state.update {
             it.copy(cameraUploadsMessage = message)
+        }
+    }
+
+    private fun setCameraUploadsTotalUploaded(totalUploaded: Int) {
+        _state.update { state ->
+            state.copy(cameraUploadsTotalUploaded = totalUploaded)
+        }
+    }
+
+    private fun setCameraUploadsFinishedReason(reason: CameraUploadsFinishedReason) {
+        _state.update {
+            it.copy(cameraUploadsFinishedReason = reason)
         }
     }
 }

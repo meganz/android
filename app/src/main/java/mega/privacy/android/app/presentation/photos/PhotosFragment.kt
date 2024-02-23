@@ -177,6 +177,7 @@ class PhotosFragment : Fragment() {
             if (isNewCUEnabled) {
                 activity?.invalidateMenu()
                 initializeCameraUploads()
+                timelineViewModel.syncCameraUploadsStatus()
             }
         }
     }
@@ -314,10 +315,7 @@ class PhotosFragment : Fragment() {
         }
     }
 
-    private fun handleCameraUploadsMenu(
-        state: TimelineViewState,
-        isMenuVisible: Boolean = photosViewModel.state.value.isMenuShowing,
-    ) {
+    private fun handleCameraUploadsMenu(state: TimelineViewState) {
         if (!isNewCUEnabled) return
 
         // CU warning menu
@@ -333,7 +331,7 @@ class PhotosFragment : Fragment() {
         // CU complete menu
         val showCameraUploadsComplete = state.showCameraUploadsComplete
         this.menu?.findItem(R.id.action_cu_status_complete)?.isVisible =
-            showCameraUploadsComplete && isMenuVisible
+            showCameraUploadsComplete && !showCameraUploadsWarning && photosViewModel.state.value.selectedTab != PhotosTab.Albums
     }
 
     private fun handleFilterIcons(timelineViewState: TimelineViewState) {
@@ -458,7 +456,7 @@ class PhotosFragment : Fragment() {
     }
 
     internal fun handleMenuIcons(isShowing: Boolean) {
-        handleCameraUploadsMenu(timelineViewModel.state.value, isShowing)
+        handleCameraUploadsMenu(timelineViewModel.state.value)
 
         this.menu?.findItem(R.id.action_zoom_in)?.isVisible = isShowing && !isNewCUEnabled
         this.menu?.findItem(R.id.action_zoom_out)?.isVisible = isShowing && !isNewCUEnabled
@@ -602,7 +600,9 @@ class PhotosFragment : Fragment() {
             }
 
             R.id.action_cu_status_complete -> {
-                /* TODO */
+                timelineViewModel.setCameraUploadsMessage(
+                    message = getString(R.string.photos_camera_uploads_updated),
+                )
                 true
             }
 
