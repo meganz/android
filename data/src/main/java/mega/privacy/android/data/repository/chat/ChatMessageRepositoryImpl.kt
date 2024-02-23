@@ -238,4 +238,20 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             megaChatApiGateway.revokeAttachmentMessage(chatId, msgId)?.let { chatMessageMapper(it) }
         }
+
+    override suspend fun editMessage(chatId: Long, msgId: Long, msg: String) =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.editMessage(chatId, msgId, msg)?.let { chatMessageMapper(it) }
+        }
+
+    override suspend fun editGeolocation(
+        chatId: Long,
+        msgId: Long,
+        longitude: Float,
+        latitude: Float,
+        img: String,
+    ) = withContext(ioDispatcher) {
+        megaChatApiGateway.editGeolocation(chatId, msgId, longitude, latitude, img)
+            ?.let { chatMessageMapper(it) }
+    }
 }

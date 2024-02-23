@@ -390,4 +390,28 @@ class ChatMessageRepositoryImplTest {
         whenever(chatMessageMapper(message)).thenReturn(chatMessage)
         assertThat(underTest.revokeAttachmentMessage(chatId, msgId)).isEqualTo(chatMessage)
     }
+
+    @Test
+    fun `test that edit message invokes and returns correctly`() = runTest {
+        val message = mock<MegaChatMessage>()
+        val chatMessage = mock<ChatMessage>()
+        val content = "content"
+        whenever(megaChatApiGateway.editMessage(chatId, msgId, content)).thenReturn(message)
+        whenever(chatMessageMapper(message)).thenReturn(chatMessage)
+        assertThat(underTest.editMessage(chatId, msgId, content)).isEqualTo(chatMessage)
+    }
+
+    @Test
+    fun `test that edit geolocation invokes and returns correctly`() = runTest {
+        val message = mock<MegaChatMessage>()
+        val chatMessage = mock<ChatMessage>()
+        val latitude = 1F
+        val longitude = 2F
+        val img = "img"
+        whenever(megaChatApiGateway.editGeolocation(chatId, msgId, longitude, latitude, img))
+            .thenReturn(message)
+        whenever(chatMessageMapper(message)).thenReturn(chatMessage)
+        assertThat(underTest.editGeolocation(chatId, msgId, longitude, latitude, img))
+            .isEqualTo(chatMessage)
+    }
 }

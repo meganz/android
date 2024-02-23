@@ -818,4 +818,15 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override suspend fun revokeAttachmentMessage(chatId: Long, msgId: Long): MegaChatMessage? =
         chatApi.revokeAttachmentMessage(chatId, msgId)
+
+    override suspend fun editMessage(chatId: Long, msgId: Long, msg: String): MegaChatMessage? =
+        chatApi.editMessage(chatId, msgId, msg)
+
+    override suspend fun editGeolocation(
+        chatId: Long,
+        msgId: Long,
+        longitude: Float,
+        latitude: Float,
+        img: String,
+    ): MegaChatMessage? = chatApi.editGeolocation(chatId, msgId, longitude, latitude, img)
 }
