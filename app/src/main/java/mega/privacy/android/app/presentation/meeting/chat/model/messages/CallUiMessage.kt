@@ -60,7 +60,4 @@ data class CallUiMessage(
     override val userHandle = message.userHandle
     override val id = message.msgId
     override val isSelectable = false
-    override var isSelected: Boolean
-        get() = false
-        set(_) {}
 }

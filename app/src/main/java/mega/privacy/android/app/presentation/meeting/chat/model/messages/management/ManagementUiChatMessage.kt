@@ -26,10 +26,6 @@ abstract class ManagementUiChatMessage : UiChatMessage {
 
     override val isSelectable: Boolean = false
 
-    override var isSelected: Boolean
-        get() = false
-        set(_) {}
-
     /**
      * Content composable
      */

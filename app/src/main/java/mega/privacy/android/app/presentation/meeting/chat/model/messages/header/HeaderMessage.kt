@@ -16,7 +16,4 @@ abstract class HeaderMessage() : UiChatMessage {
     override val reactions = emptyList<UIReaction>()
     override val isSelectable = false
     override val message = null
-    override var isSelected: Boolean
-        get() = false
-        set(_) {}
 }

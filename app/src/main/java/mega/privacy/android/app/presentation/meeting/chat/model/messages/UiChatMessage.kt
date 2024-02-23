@@ -90,11 +90,6 @@ interface UiChatMessage {
     val isSelectable: Boolean
 
     /**
-     * Is selected
-     */
-    var isSelected: Boolean
-
-    /**
      * Message
      */
     val message: TypedMessage?
