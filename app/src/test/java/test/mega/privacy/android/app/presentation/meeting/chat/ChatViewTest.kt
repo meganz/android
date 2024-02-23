@@ -222,19 +222,19 @@ class ChatViewTest {
                     uiState = state,
                     onBackPressed = {},
                     onMenuActionPressed = actionPressed,
-                    messageListView = { _, _, _, _, _, _, _, _, _ -> },
-                    bottomBar = { state, showEmojiPicker, onSendClicked, onAttachmentClick, onEmojiClick, onCloseEditing, interactionSourceTextInput, onVoiceClipEvent ->
+                    messageListView = { _ -> },
+                    bottomBar = { param ->
                         ChatBottomBarContent(
                             uiState = state,
                             textFieldValue = TextFieldValue(state.sendingText),
-                            showEmojiPicker = showEmojiPicker,
-                            onSendClick = onSendClicked,
-                            onAttachmentClick = onAttachmentClick,
-                            onEmojiClick = onEmojiClick,
+                            showEmojiPicker = param.showEmojiPicker,
+                            onSendClick = param.onSendClick,
+                            onAttachmentClick = param.onAttachmentClick,
+                            onEmojiClick = param.onEmojiClick,
                             onTextChange = {},
-                            interactionSourceTextInput = interactionSourceTextInput,
-                            onCloseEditing = onCloseEditing,
-                            onVoiceClipEvent = onVoiceClipEvent,
+                            interactionSourceTextInput = param.interactionSourceTextInput,
+                            onCloseEditing = param.onCloseEditing,
+                            onVoiceClipEvent = param.onVoiceClipEvent,
                         )
                     }
                 )

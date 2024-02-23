@@ -57,9 +57,7 @@ import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
-import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
-import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.chat.CreateChatException
 import mega.privacy.android.domain.exception.chat.ParticipantAlreadyExistsException
@@ -68,7 +66,6 @@ import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
-import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
@@ -246,9 +243,6 @@ internal class ChatViewModelTest {
     private val openChatLinkUseCase = mock<OpenChatLinkUseCase>()
     private val holdChatCallUseCase = mock<HoldChatCallUseCase>()
     private val hangChatCallUseCase = mock<HangChatCallUseCase>()
-    private val monitorContactCacheUpdates: MonitorContactCacheUpdates = mock {
-        onBlocking { invoke() } doReturn emptyFlow()
-    }
     private val joinPublicChatUseCase = mock<JoinPublicChatUseCase>()
     private val isAnonymousModeUseCase = mock<IsAnonymousModeUseCase>()
     private val closeChatPreviewUseCase: CloseChatPreviewUseCase = mock()
@@ -354,7 +348,6 @@ internal class ChatViewModelTest {
         wheneverBlocking { monitorCallInChatUseCase(any()) } doReturn emptyFlow()
         wheneverBlocking { monitorParticipatingInACallInOtherChatsUseCase(any()) } doReturn emptyFlow()
         whenever(monitorAllContactParticipantsInChatUseCase(any())) doReturn emptyFlow()
-        wheneverBlocking { monitorContactCacheUpdates() } doReturn emptyFlow()
         wheneverBlocking { monitorJoiningChatUseCase(any()) } doReturn emptyFlow()
         wheneverBlocking { monitorLeavingChatUseCase(any()) } doReturn emptyFlow()
         whenever(monitorChatPendingChangesUseCase(any())) doReturn emptyFlow()
@@ -405,7 +398,6 @@ internal class ChatViewModelTest {
             openChatLinkUseCase = openChatLinkUseCase,
             holdChatCallUseCase = holdChatCallUseCase,
             hangChatCallUseCase = hangChatCallUseCase,
-            monitorContactCacheUpdates = monitorContactCacheUpdates,
             joinPublicChatUseCase = joinPublicChatUseCase,
             isAnonymousModeUseCase = isAnonymousModeUseCase,
             closeChatPreviewUseCase = closeChatPreviewUseCase,
@@ -2300,36 +2292,6 @@ internal class ChatViewModelTest {
             verify(hangChatCallUseCase).invoke(callId)
             verifyNoInteractions(answerChatCallUseCase)
         }
-
-    @Test
-    fun `test that userUpdates is updated when user updates`() = runTest {
-        val chatRoom = mock<ChatRoom> {
-            on { chatId } doReturn chatId
-            on { isGroup } doReturn true
-            on { ownPrivilege } doReturn ChatRoomPermission.Standard
-            on { peerCount } doReturn 0L
-            on { peerHandlesList } doReturn listOf(1L, 2L, 3L)
-            on { isPreview } doReturn false
-        }
-        val updateFlow = MutableSharedFlow<UserUpdate>()
-        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
-        whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
-        whenever(monitorContactCacheUpdates()).thenReturn(updateFlow)
-        initTestClass()
-        underTest.state.test {
-            val actual = awaitItem()
-            assertThat(actual.userUpdate).isNull()
-        }
-        val userUpdate = mock<UserUpdate> {
-            on { changes } doReturn mapOf(UserId(1L) to listOf(UserChanges.Avatar))
-        }
-        updateFlow.emit(userUpdate)
-        advanceUntilIdle()
-        underTest.state.test {
-            val actual = awaitItem()
-            assertThat(actual.userUpdate).isEqualTo(userUpdate)
-        }
-    }
 
     @Test
     fun `test that isAnonymousMode is updated`() = runTest {

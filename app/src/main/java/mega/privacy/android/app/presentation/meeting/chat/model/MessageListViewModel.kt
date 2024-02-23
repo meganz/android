@@ -16,9 +16,12 @@ import androidx.paging.insertSeparators
 import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -31,6 +34,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatM
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.ChatHeaderMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.ChatUnreadHeaderMessage
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
 import mega.privacy.android.domain.usecase.chat.message.GetLastMessageSeenIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.MonitorChatRoomMessageUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.message.SetMessageSeenUseCase
@@ -38,6 +42,8 @@ import mega.privacy.android.domain.usecase.chat.message.paging.GetChatPagingSour
 import mega.privacy.android.domain.usecase.chat.message.reactions.MonitorReactionUpdatesUseCase
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 /**
  * Message list view model
@@ -49,7 +55,7 @@ import javax.inject.Inject
  * @param remoteMediatorFactory
  * @param savedStateHandle
  */
-@OptIn(ExperimentalPagingApi::class, ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalPagingApi::class, ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class MessageListViewModel @Inject constructor(
     private val uiChatMessageMapper: UiChatMessageMapper,
@@ -61,6 +67,7 @@ class MessageListViewModel @Inject constructor(
     private val setMessageSeenUseCase: SetMessageSeenUseCase,
     private val monitorChatRoomMessageUpdatesUseCase: MonitorChatRoomMessageUpdatesUseCase,
     private val monitorReactionUpdatesUseCase: MonitorReactionUpdatesUseCase,
+    private val monitorContactCacheUpdates: MonitorContactCacheUpdates,
 ) : ViewModel() {
 
     private val chatId = savedStateHandle.get<Long?>(Constants.CHAT_ID) ?: -1
@@ -85,6 +92,44 @@ class MessageListViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     init {
+        monitorContactCacheUpdate()
+        getLastSeenMessageInformation()
+        monitorMessageUpdates()
+        monitorReactionUpdates()
+    }
+
+    private fun monitorContactCacheUpdate() {
+        viewModelScope.launch {
+            monitorContactCacheUpdates()
+                // I don't know why sdk emit 2 the same events, add debounce to optimize
+                .debounce(300L.toDuration(DurationUnit.MILLISECONDS))
+                .catch { Timber.e(it) }
+                .collect {
+                    Timber.d("Contact cache update: $it")
+                    _state.update { state -> state.copy(userUpdate = it) }
+                }
+        }
+    }
+
+    private fun monitorReactionUpdates() {
+        viewModelScope.launch {
+            runCatching { monitorReactionUpdatesUseCase(chatId) }
+                .onFailure {
+                    Timber.e(it, "Monitor reaction updates threw an exception")
+                }
+        }
+    }
+
+    private fun monitorMessageUpdates() {
+        viewModelScope.launch {
+            runCatching { monitorChatRoomMessageUpdatesUseCase(chatId) }
+                .onFailure {
+                    Timber.e(it, "Monitor message updates threw an exception")
+                }
+        }
+    }
+
+    private fun getLastSeenMessageInformation() {
         viewModelScope.launch {
             runCatching {
                 getLastMessageSeenIdUseCase(chatId)
@@ -93,20 +138,6 @@ class MessageListViewModel @Inject constructor(
             }.onFailure {
                 Timber.e(it, "Failed to get last seen message id")
             }
-        }
-
-        viewModelScope.launch {
-            runCatching { monitorChatRoomMessageUpdatesUseCase(chatId) }
-                .onFailure {
-                    Timber.e(it, "Monitor message updates threw an exception")
-                }
-        }
-
-        viewModelScope.launch {
-            runCatching { monitorReactionUpdatesUseCase(chatId) }
-                .onFailure {
-                    Timber.e(it, "Monitor reaction updates threw an exception")
-                }
         }
     }
 
@@ -203,5 +234,12 @@ class MessageListViewModel @Inject constructor(
                 Timber.e(it, "Failed to set message seen")
             }
         }
+    }
+
+    /**
+     * On user update handled.
+     */
+    fun onUserUpdateHandled() {
+        _state.update { state -> state.copy(userUpdate = null) }
     }
 }

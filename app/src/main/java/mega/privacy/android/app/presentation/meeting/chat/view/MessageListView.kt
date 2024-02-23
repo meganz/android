@@ -38,6 +38,23 @@ import timber.log.Timber
 
 @Composable
 internal fun MessageListView(
+    parameter: MessageListParameter,
+) {
+    MessageListView(
+        uiState = parameter.uiState,
+        scrollState = parameter.scrollState,
+        bottomPadding = parameter.bottomPadding,
+        onMoreReactionsClicked = parameter.onMoreReactionsClicked,
+        onReactionClicked = parameter.onReactionClicked,
+        onReactionLongClick = parameter.onReactionLongClick,
+        onMessageLongClick = parameter.onMessageLongClick,
+        onForwardClicked = parameter.onForwardClicked,
+        onCanSelectChanged = parameter.onCanSelectChanged,
+    )
+}
+
+@Composable
+internal fun MessageListView(
     uiState: ChatUiState,
     scrollState: LazyListState,
     bottomPadding: Dp,
@@ -45,7 +62,6 @@ internal fun MessageListView(
     onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
     onReactionLongClick: (String, List<UIReaction>) -> Unit,
     viewModel: MessageListViewModel = hiltViewModel(),
-    onUserUpdateHandled: () -> Unit = {},
     onMessageLongClick: (TypedMessage) -> Unit = {},
     onForwardClicked: (TypedMessage) -> Unit = {},
     onCanSelectChanged: (Boolean) -> Unit = {},
@@ -92,14 +108,14 @@ internal fun MessageListView(
         viewModel.updateLatestMessageId(pagingItems.itemSnapshotList.firstOrNull()?.id ?: -1L)
     }
 
-    LaunchedEffect(uiState.userUpdate) {
-        if (uiState.userUpdate != null) {
+    LaunchedEffect(state.userUpdate) {
+        state.userUpdate?.let { update ->
             val newLastCacheUpdateTime = lastCacheUpdateTime.toMutableMap()
-            uiState.userUpdate.changes.forEach {
+            update.changes.forEach {
                 newLastCacheUpdateTime[it.key.id] = System.currentTimeMillis()
             }
             lastCacheUpdateTime = newLastCacheUpdateTime
-            onUserUpdateHandled()
+            viewModel.onUserUpdateHandled()
         }
     }
 
@@ -176,4 +192,30 @@ internal fun MessageListView(
     }
 }
 
+
+/**
+ * Message list parameter
+ *
+ * @property uiState
+ * @property scrollState
+ * @property bottomPadding
+ * @property onMessageLongClick
+ * @property onMoreReactionsClicked
+ * @property onReactionClicked
+ * @property onReactionLongClick
+ * @property onForwardClicked
+ * @property onCanSelectChanged
+ * @constructor Create empty Message list parameter
+ */
+internal data class MessageListParameter(
+    val uiState: ChatUiState,
+    val scrollState: LazyListState,
+    val bottomPadding: Dp,
+    val onMessageLongClick: (TypedMessage) -> Unit,
+    val onMoreReactionsClicked: (Long) -> Unit,
+    val onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
+    val onReactionLongClick: (String, List<UIReaction>) -> Unit,
+    val onForwardClicked: (TypedMessage) -> Unit,
+    val onCanSelectChanged: (Boolean) -> Unit,
+)
 

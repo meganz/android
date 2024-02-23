@@ -13,7 +13,6 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
-import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion.NUMBER_MESSAGES_TO_LOAD
 
 /**
@@ -45,7 +44,6 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion
  * @property mutePushNotificationDialogEvent Event to show the dialog to mute push notifications.
  * @property openWaitingRoomScreen True if should open waiting room screen, false otherwise.
  * @property isGeolocationEnabled True if geolocation internal permission (not device one) is granted, false otherwise.
- * @property userUpdate [UserUpdate] with the changes in the user.
  * @property isAnonymousMode True if the chat is in anonymous mode, false otherwise.
  * @property chatLink String with the chat link.
  * @property editingMessageId Id of the message being edited.
@@ -80,7 +78,6 @@ data class ChatUiState(
     val mutePushNotificationDialogEvent: StateEventWithContent<List<ChatPushNotificationMuteOption>> = consumed(),
     val openWaitingRoomScreen: Boolean = false,
     val isGeolocationEnabled: Boolean = false,
-    val userUpdate: UserUpdate? = null,
     val isAnonymousMode: Boolean = false,
     val chatLink: String? = null,
     val editingMessageId: Long? = null,

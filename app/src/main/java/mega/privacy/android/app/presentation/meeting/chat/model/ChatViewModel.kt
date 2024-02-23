@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -60,7 +59,6 @@ import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
-import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
@@ -123,8 +121,6 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 
 /**
  * Extra Action
@@ -192,7 +188,6 @@ class ChatViewModel @Inject constructor(
     private val sendTextMessageUseCase: SendTextMessageUseCase,
     private val holdChatCallUseCase: HoldChatCallUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
-    private val monitorContactCacheUpdates: MonitorContactCacheUpdates,
     private val joinPublicChatUseCase: JoinPublicChatUseCase,
     private val isAnonymousModeUseCase: IsAnonymousModeUseCase,
     private val savedStateHandle: SavedStateHandle,
@@ -249,7 +244,6 @@ class ChatViewModel @Inject constructor(
         monitorHasAnyContact()
         loadChatOrPreview()
         checkAnonymousMode()
-        monitorContactCacheUpdate()
         monitorNotificationMute()
         monitorJoiningChat()
         monitorLeavingChat()
@@ -313,19 +307,6 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             val isAnonymousMode = isAnonymousModeUseCase()
             _state.update { state -> state.copy(isAnonymousMode = isAnonymousMode) }
-        }
-    }
-
-    private fun monitorContactCacheUpdate() {
-        viewModelScope.launch {
-            monitorContactCacheUpdates()
-                // I don't know why sdk emit 2 the same events, add debounce to optimize
-                .debounce(300L.toDuration(DurationUnit.MILLISECONDS))
-                .catch { Timber.e(it) }
-                .collect {
-                    Timber.d("Contact cache update: $it")
-                    _state.update { state -> state.copy(userUpdate = it) }
-                }
         }
     }
 
@@ -1069,12 +1050,6 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    /**
-     * On user update handled.
-     */
-    fun onUserUpdateHandled() {
-        _state.update { state -> state.copy(userUpdate = null) }
-    }
 
     /**
      * Sets pending link to join.

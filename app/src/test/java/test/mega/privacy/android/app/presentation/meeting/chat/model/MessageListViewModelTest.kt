@@ -3,6 +3,10 @@ package test.mega.privacy.android.app.presentation.meeting.chat.model
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.di.meeting.chat.paging.PagedChatMessageRemoteMediatorFactory
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ChatMessageDateSeparatorMapper
@@ -10,6 +14,10 @@ import mega.privacy.android.app.presentation.meeting.chat.mapper.UiChatMessageMa
 import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.entity.user.UserUpdate
+import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
 import mega.privacy.android.domain.usecase.chat.message.GetLastMessageSeenIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.SetMessageSeenUseCase
 import mega.privacy.android.domain.usecase.chat.message.paging.GetChatPagingSourceUseCase
@@ -24,6 +32,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class MessageListViewModelTest {
@@ -38,6 +47,9 @@ internal class MessageListViewModelTest {
     }
     private val getLastMessageSeenIdUseCase: GetLastMessageSeenIdUseCase = mock()
     private val setMessageSeenUseCase: SetMessageSeenUseCase = mock()
+    private val monitorContactCacheUpdates: MonitorContactCacheUpdates = mock {
+        onBlocking { invoke() } doReturn emptyFlow()
+    }
 
     @BeforeAll
     fun setup() {
@@ -67,6 +79,7 @@ internal class MessageListViewModelTest {
             setMessageSeenUseCase = setMessageSeenUseCase,
             monitorChatRoomMessageUpdatesUseCase = mock(),
             monitorReactionUpdatesUseCase = mock(),
+            monitorContactCacheUpdates = monitorContactCacheUpdates,
         )
     }
 
@@ -96,5 +109,27 @@ internal class MessageListViewModelTest {
         val lastMessageId = 123L
         underTest.setMessageSeen(lastMessageId)
         verify(setMessageSeenUseCase).invoke(chatId, lastMessageId)
+    }
+
+    @Test
+    fun `test that userUpdates is updated when user updates`() = runTest {
+
+        val updateFlow = MutableSharedFlow<UserUpdate>()
+        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(monitorContactCacheUpdates()).thenReturn(updateFlow)
+        initTestClass()
+        underTest.state.test {
+            val actual = awaitItem()
+            assertThat(actual.userUpdate).isNull()
+        }
+        val userUpdate = mock<UserUpdate> {
+            on { changes } doReturn mapOf(UserId(1L) to listOf(UserChanges.Avatar))
+        }
+        updateFlow.emit(userUpdate)
+        advanceUntilIdle()
+        underTest.state.test {
+            val actual = awaitItem()
+            assertThat(actual.userUpdate).isEqualTo(userUpdate)
+        }
     }
 }

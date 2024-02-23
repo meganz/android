@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
@@ -47,7 +46,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -74,6 +72,7 @@ import mega.privacy.android.app.presentation.meeting.chat.saver.ChatSavers
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.MessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.ChatAppBar
 import mega.privacy.android.app.presentation.meeting.chat.view.bottombar.ChatBottomBar
+import mega.privacy.android.app.presentation.meeting.chat.view.bottombar.ChatBottomBarParameter
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.AllContactsAddedDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ClearChatConfirmationDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.EnableGeolocationDialog
@@ -149,7 +148,6 @@ internal fun ChatView(
         onSendClick = viewModel::sendTextMessage,
         onHoldAndAnswerCall = viewModel::onHoldAndAnswerCall,
         onEndAndAnswerCall = viewModel::onEndAndAnswerCall,
-        onUserUpdateHandled = viewModel::onUserUpdateHandled,
         onJoinChat = viewModel::onJoinChat,
         onSetPendingJoinLink = viewModel::onSetPendingJoinLink,
         createNewImage = viewModel::createNewImageUri,
@@ -238,54 +236,12 @@ internal fun ChatView(
     onStartOrJoinMeeting: (isStarted: Boolean) -> Unit = {},
     onAnswerCall: () -> Unit = {},
     onEnableGeolocation: () -> Unit = {},
-    onUserUpdateHandled: () -> Unit = {},
     messageListView: @Composable (
-        ChatUiState,
-        LazyListState,
-        Dp,
-        (TypedMessage) -> Unit,
-        (Long) -> Unit,
-        (Long, String, List<UIReaction>) -> Unit,
-        (String, List<UIReaction>) -> Unit,
-        (TypedMessage) -> Unit,
-        (Boolean) -> Unit,
-    ) -> Unit =
-        { state, listState, bottomPadding, onMessageLongClick, onMoreReactionsClick, onReactionClick, onReactionLongClick, onForwardClick, onCanSelectChanged ->
-            MessageListView(
-                uiState = state,
-                scrollState = listState,
-                bottomPadding = bottomPadding,
-                onUserUpdateHandled = onUserUpdateHandled,
-                onMessageLongClick = onMessageLongClick,
-                onMoreReactionsClicked = onMoreReactionsClick,
-                onReactionClicked = onReactionClick,
-                onReactionLongClick = onReactionLongClick,
-                onForwardClicked = onForwardClick,
-                onCanSelectChanged = onCanSelectChanged,
-            )
-        },
+        MessageListParameter,
+    ) -> Unit = { param -> MessageListView(param) },
     bottomBar: @Composable (
-        uiState: ChatUiState,
-        showEmojiPicker: Boolean,
-        onSendClick: (String) -> Unit,
-        onAttachmentClick: () -> Unit,
-        onEmojiClick: () -> Unit,
-        onCloseEditing: () -> Unit,
-        interactionSourceTextInput: MutableInteractionSource,
-        (VoiceClipRecordEvent) -> Unit,
-    ) -> Unit = { state, showEmojiPicker, onSendClicked, onAttachmentClick, onEmojiClick, onCloseEditingClick, interactionSourceTextInput, onVoiceClipEvent ->
-
-        ChatBottomBar(
-            uiState = state,
-            showEmojiPicker = showEmojiPicker,
-            onSendClick = onSendClicked,
-            onAttachmentClick = onAttachmentClick,
-            onEmojiClick = onEmojiClick,
-            interactionSourceTextInput = interactionSourceTextInput,
-            onCloseEditing = onCloseEditingClick,
-            onVoiceClipEvent = onVoiceClipEvent
-        )
-    },
+        parameter: ChatBottomBarParameter,
+    ) -> Unit = { parameter -> ChatBottomBar(parameter) },
     onSendClick: (String) -> Unit = {},
     onHoldAndAnswerCall: () -> Unit = {},
     onEndAndAnswerCall: () -> Unit = {},
@@ -720,29 +676,35 @@ internal fun ChatView(
                 },
                 bottomBar = {
                     if (haveWritePermission) {
-                        bottomBar(
-                            uiState,
-                            showEmojiPicker,
-                            onSendClick,
-                            {
-                                coroutineScope.launch {
-                                    toolbarModalSheetState.show()
-                                }
-                            },
-                            {
-                                showEmojiPicker = !showEmojiPicker
+                        val onAttachmentClick: () -> Unit = {
+                            coroutineScope.launch {
+                                toolbarModalSheetState.show()
+                            }
+                        }
+                        val onEmojiClick: () -> Unit = {
+                            showEmojiPicker = !showEmojiPicker
 
-                                if (showEmojiPicker) {
-                                    keyboardController?.hide()
-                                } else {
-                                    keyboardController?.show()
-                                }
-                            },
-                            onCloseEditing,
-                            interactionSourceTextInput,
+                            if (showEmojiPicker) {
+                                keyboardController?.hide()
+                            } else {
+                                keyboardController?.show()
+                            }
+                        }
+                        val onVoiceClipEvent: (VoiceClipRecordEvent) -> Unit =
                             { voiceClipRecordEvent ->
                                 println("call view model to handle voice clip record event $voiceClipRecordEvent")
                             }
+                        bottomBar(
+                            ChatBottomBarParameter(
+                                uiState = uiState,
+                                showEmojiPicker = showEmojiPicker,
+                                onSendClick = onSendClick,
+                                onAttachmentClick = onAttachmentClick,
+                                onEmojiClick = onEmojiClick,
+                                interactionSourceTextInput = interactionSourceTextInput,
+                                onCloseEditing = onCloseEditing,
+                                onVoiceClipEvent = onVoiceClipEvent
+                            )
                         )
                     }
                     JoinChatButton(isPreviewMode = isPreviewMode, isJoining = isJoining) {
@@ -791,24 +753,21 @@ internal fun ChatView(
                             )
                         },
                         listView = { bottomPadding ->
-                            messageListView(
-                                uiState,
-                                scrollState,
-                                bottomPadding,
-                                { message ->
-                                    selectedMessages = listOf(message)
-                                    // Use message for showing correct available options
-                                    coroutineScope.launch {
-                                        messageOptionsModalSheetState.show()
-                                    }
-                                },
-                                { msgId ->
-                                    addingReactionTo = msgId
-                                    showReactionPicker = true
-                                    coroutineScope.launch {
-                                        messageOptionsModalSheetState.show()
-                                    }
-                                },
+                            val onMessageLongClick: (TypedMessage) -> Unit = { message ->
+                                selectedMessages = listOf(message)
+                                // Use message for showing correct available options
+                                coroutineScope.launch {
+                                    messageOptionsModalSheetState.show()
+                                }
+                            }
+                            val onMoreReactionsClicked: (Long) -> Unit = { msgId ->
+                                addingReactionTo = msgId
+                                showReactionPicker = true
+                                coroutineScope.launch {
+                                    messageOptionsModalSheetState.show()
+                                }
+                            }
+                            val onReactionClicked: (Long, String, List<UIReaction>) -> Unit =
                                 { msgId, clickedReaction, reactions ->
                                     reactions.find { reaction -> reaction.reaction == clickedReaction }
                                         ?.let {
@@ -818,7 +777,8 @@ internal fun ChatView(
                                                 onAddReaction(msgId, clickedReaction)
                                             }
                                         }
-                                },
+                                }
+                            val onReactionLongClick: (String, List<UIReaction>) -> Unit =
                                 { clickedReaction, reactions ->
                                     if (clickedReaction.isNotEmpty() && reactions.isNotEmpty()) {
                                         selectedReaction = clickedReaction
@@ -827,13 +787,28 @@ internal fun ChatView(
                                             reactionInfoBottomSheetState.show()
                                         }
                                     }
-                                },
-                                { message ->
-                                    selectedMessages = listOf(message)
-                                    openChatPicker(context, chatId, chatPickerLauncher)
-                                },
-                                { hasSelectableMessage -> canSelect = hasSelectableMessage },
+                                }
+                            val onForwardClicked: (TypedMessage) -> Unit = { message ->
+                                selectedMessages = listOf(message)
+                                openChatPicker(context, chatId, chatPickerLauncher)
+                            }
+                            val onCanSelectChanged: (Boolean) -> Unit = { hasSelectableMessage ->
+                                canSelect = hasSelectableMessage
+                            }
+                            messageListView(
+                                MessageListParameter(
+                                    uiState = uiState,
+                                    scrollState = scrollState,
+                                    bottomPadding = bottomPadding,
+                                    onMessageLongClick = onMessageLongClick,
+                                    onMoreReactionsClicked = onMoreReactionsClicked,
+                                    onReactionClicked = onReactionClicked,
+                                    onReactionLongClick = onReactionLongClick,
+                                    onForwardClicked = onForwardClicked,
+                                    onCanSelectChanged = onCanSelectChanged,
+                                )
                             )
+
                         },
                     )
                 }

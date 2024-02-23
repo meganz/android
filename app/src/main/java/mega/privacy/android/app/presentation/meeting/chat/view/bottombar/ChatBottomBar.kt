@@ -24,6 +24,22 @@ import mega.privacy.android.core.ui.controls.chat.VoiceClipRecordEvent
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.theme.MegaAppTheme
 
+@Composable
+internal fun ChatBottomBar(
+    param: ChatBottomBarParameter,
+) {
+    ChatBottomBar(
+        uiState = param.uiState,
+        showEmojiPicker = param.showEmojiPicker,
+        onSendClick = param.onSendClick,
+        onAttachmentClick = param.onAttachmentClick,
+        onEmojiClick = param.onEmojiClick,
+        interactionSourceTextInput = param.interactionSourceTextInput,
+        onCloseEditing = param.onCloseEditing,
+        onVoiceClipEvent = param.onVoiceClipEvent,
+    )
+}
+
 /**
  * Chat bottom bar
  *
@@ -35,7 +51,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  * @param interactionSourceTextInput interaction source text input
  */
 @Composable
-fun ChatBottomBar(
+internal fun ChatBottomBar(
     uiState: ChatUiState,
     showEmojiPicker: Boolean,
     onSendClick: (String) -> Unit,
@@ -146,3 +162,14 @@ private fun ChatBottomBarPreview() {
         )
     }
 }
+
+internal data class ChatBottomBarParameter(
+    val uiState: ChatUiState,
+    val showEmojiPicker: Boolean,
+    val onSendClick: (String) -> Unit,
+    val onAttachmentClick: () -> Unit,
+    val onEmojiClick: () -> Unit,
+    val interactionSourceTextInput: MutableInteractionSource,
+    val onCloseEditing: () -> Unit,
+    val onVoiceClipEvent: (VoiceClipRecordEvent) -> Unit,
+)
