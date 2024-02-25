@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.meeting.chat.model.messages.header
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.pluralStringResource
-import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.UIMessageState
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.chat.ChatUnreadMessageView
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
@@ -15,8 +15,7 @@ class ChatUnreadHeaderMessage(private val unreadCount: Int) : HeaderMessage() {
 
     @Composable
     override fun MessageListItem(
-        uiState: ChatUiState,
-        lastUpdatedCache: Long,
+        state: UIMessageState,
         timeFormatter: (Long) -> String,
         dateFormatter: (Long) -> String,
         onLongClick: (TypedMessage) -> Unit,

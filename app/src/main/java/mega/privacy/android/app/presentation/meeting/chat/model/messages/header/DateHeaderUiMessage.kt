@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages.header
 
 import androidx.compose.runtime.Composable
-import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.UIMessageState
 import mega.privacy.android.core.ui.controls.chat.messages.DateHeader
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
@@ -15,8 +15,7 @@ class DateHeaderUiMessage(override val timeSent: Long) : HeaderMessage() {
 
     @Composable
     override fun MessageListItem(
-        uiState: ChatUiState,
-        lastUpdatedCache: Long,
+        state: UIMessageState,
         timeFormatter: (Long) -> String,
         dateFormatter: (Long) -> String,
         onLongClick: (TypedMessage) -> Unit,

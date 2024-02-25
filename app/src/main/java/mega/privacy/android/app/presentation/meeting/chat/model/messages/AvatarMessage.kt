@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
 import mega.privacy.android.core.ui.controls.chat.ChatMessageContainer
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
@@ -50,8 +49,7 @@ abstract class AvatarMessage : UiChatMessage {
 
     @Composable
     override fun MessageListItem(
-        uiState: ChatUiState,
-        lastUpdatedCache: Long,
+        state: UIMessageState,
         timeFormatter: (Long) -> String,
         dateFormatter: (Long) -> String,
         onLongClick: (TypedMessage) -> Unit,
@@ -72,7 +70,7 @@ abstract class AvatarMessage : UiChatMessage {
             time = this.getTimeOrNull(timeFormatter),
             avatarOrIcon = {
                 MessageAvatar(
-                    lastUpdatedCache = lastUpdatedCache
+                    lastUpdatedCache = state.lastUpdatedCache
                 )
             },
             content = {

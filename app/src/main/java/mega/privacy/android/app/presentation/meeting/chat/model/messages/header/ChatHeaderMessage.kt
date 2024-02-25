@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages.header
 
 import androidx.compose.runtime.Composable
-import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.UIMessageState
 import mega.privacy.android.app.presentation.meeting.chat.view.message.FirstMessageHeader
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
@@ -13,8 +13,7 @@ class ChatHeaderMessage : HeaderMessage() {
 
     @Composable
     override fun MessageListItem(
-        uiState: ChatUiState,
-        lastUpdatedCache: Long,
+        state: UIMessageState,
         timeFormatter: (Long) -> String,
         dateFormatter: (Long) -> String,
         onLongClick: (TypedMessage) -> Unit,
@@ -23,7 +22,7 @@ class ChatHeaderMessage : HeaderMessage() {
         onReactionLongClick: (String, List<UIReaction>) -> Unit,
         onForwardClicked: (TypedMessage) -> Unit,
     ) {
-        FirstMessageHeader(uiState.title, uiState.scheduledMeeting)
+        FirstMessageHeader(state.chatTitle, state.scheduledMeeting)
     }
 
 }

@@ -33,6 +33,7 @@ import androidx.paging.compose.itemKey
 import mega.privacy.android.app.presentation.extensions.paging.printLoadStates
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewModel
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.UIMessageState
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ParticipantUiMessage
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.core.ui.controls.chat.messages.LoadingMessagesHeader
@@ -181,6 +182,15 @@ internal fun MessageListView(
                 pagingItems[index]?.let { currentItem ->
                     val isInSelectMode = selectMode && currentItem.isSelectable
                     val isChecked = isInSelectMode && currentItem.id in selectedItems
+                    val messageState = UIMessageState(
+                        chatTitle = uiState.title,
+                        isOneToOne = !uiState.isGroup && !uiState.isMeeting,
+                        scheduledMeeting = uiState.scheduledMeeting,
+                        lastUpdatedCache = lastCacheUpdateTime[currentItem.userHandle]
+                            ?: 0L,
+                        isInSelectMode = selectMode && currentItem.isSelectable,
+                        isChecked = isInSelectMode && currentItem.id in selectedItems,
+                    )
                     val onSelectedChanged: (Boolean) -> Unit = { selected ->
                         if (selected) {
                             currentItem.message?.let { selectItem(it) }
@@ -208,9 +218,7 @@ internal fun MessageListView(
                         }
                         Box(modifier = Modifier.sizeIn(minHeight = 42.dp)) {
                             currentItem.MessageListItem(
-                                uiState = uiState,
-                                lastUpdatedCache = lastCacheUpdateTime[currentItem.userHandle]
-                                    ?: 0L,
+                                state = messageState,
                                 timeFormatter = TimeUtils::formatTime,
                                 dateFormatter = {
                                     TimeUtils.formatDate(
