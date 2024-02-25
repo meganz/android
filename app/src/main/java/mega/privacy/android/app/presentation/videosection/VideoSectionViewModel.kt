@@ -439,7 +439,9 @@ class VideoSectionViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         deletedVideoPlaylistTitles = deletedPlaylistTitles,
-                        shouldDeleteVideoPlaylist = false
+                        shouldDeleteVideoPlaylist = false,
+                        shouldDeleteSingleVideoPlaylist = false,
+                        areVideoPlaylistsRemovedSuccessfully = true
                     )
                 }
                 loadVideoPlaylists()
@@ -447,7 +449,9 @@ class VideoSectionViewModel @Inject constructor(
                 Timber.e(exception)
                 _state.update {
                     it.copy(
-                        shouldDeleteVideoPlaylist = false
+                        shouldDeleteVideoPlaylist = false,
+                        shouldDeleteSingleVideoPlaylist = false,
+                        areVideoPlaylistsRemovedSuccessfully = false
                     )
                 }
             }
@@ -494,7 +498,7 @@ class VideoSectionViewModel @Inject constructor(
                             )
                         }
                         loadVideoPlaylists()
-                        updateCurrentVideoPlaylistAfterUpdatedTitle()
+                        updateCurrentVideoPlaylistAfterUpdatedTitle(title)
                     }.onFailure { exception ->
                         Timber.e(exception)
                         _state.update {
@@ -506,18 +510,15 @@ class VideoSectionViewModel @Inject constructor(
                 }
             }
 
-    private fun updateCurrentVideoPlaylistAfterUpdatedTitle() {
-        val currentVideoPlaylistID = _state.value.currentVideoPlaylist?.id
-        currentVideoPlaylistID?.let {
-            _state.update {
-                it.copy(
-                    currentVideoPlaylist = it.videoPlaylists.firstOrNull { playlist ->
-                        playlist.id == currentVideoPlaylistID
-                    }
-                )
+    private fun updateCurrentVideoPlaylistAfterUpdatedTitle(newTitle: String) =
+        _state.value.currentVideoPlaylist?.copy(title = newTitle)
+            ?.let { updatedCurrentVideoPlaylist ->
+                _state.update {
+                    it.copy(
+                        currentVideoPlaylist = updatedCurrentVideoPlaylist
+                    )
+                }
             }
-        }
-    }
 
     internal fun setShouldRenameVideoPlaylist(value: Boolean) = _state.update {
         it.copy(shouldRenameVideoPlaylist = value)
@@ -586,8 +587,20 @@ class VideoSectionViewModel @Inject constructor(
         it.copy(shouldDeleteVideoPlaylist = value)
     }
 
+    internal fun setShouldDeleteSingleVideoPlaylist(value: Boolean) = _state.update {
+        it.copy(shouldDeleteSingleVideoPlaylist = value)
+    }
+
     internal fun clearDeletedVideoPlaylistTitles() = _state.update {
         it.copy(deletedVideoPlaylistTitles = emptyList())
+    }
+
+    internal fun setShouldShowMoreVideoPlaylistOptions(value: Boolean) = _state.update {
+        it.copy(shouldShowMoreVideoPlaylistOptions = value)
+    }
+
+    internal fun setAreVideoPlaylistsRemovedSuccessfully(value: Boolean) = _state.update {
+        it.copy(areVideoPlaylistsRemovedSuccessfully = value)
     }
 
     internal fun setCurrentDestinationRoute(route: String?) = _state.update {

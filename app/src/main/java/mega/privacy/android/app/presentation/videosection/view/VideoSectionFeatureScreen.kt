@@ -68,6 +68,13 @@ internal fun VideoSectionNavHost(
         )
     }
 
+    if (state.areVideoPlaylistsRemovedSuccessfully &&
+        navHostController.currentDestination?.route == videoPlaylistDetailRoute
+    ) {
+        viewModel.setAreVideoPlaylistsRemovedSuccessfully(false)
+        navHostController.popBackStack()
+    }
+
     NavHost(
         modifier = modifier,
         navController = navHostController,
@@ -97,7 +104,25 @@ internal fun VideoSectionNavHost(
         ) {
             VideoPlaylistDetailView(
                 playlist = state.currentVideoPlaylist,
+                isInputTitleValid = state.isInputTitleValid,
+                shouldDeleteVideoPlaylistDialog = state.shouldDeleteSingleVideoPlaylist,
+                shouldRenameVideoPlaylistDialog = state.shouldRenameVideoPlaylist,
+                shouldShowVideoPlaylistBottomSheetDetails = state.shouldShowMoreVideoPlaylistOptions,
+                setShouldDeleteVideoPlaylistDialog = viewModel::setShouldDeleteSingleVideoPlaylist,
+                setShouldRenameVideoPlaylistDialog = viewModel::setShouldRenameVideoPlaylist,
+                setShouldShowVideoPlaylistBottomSheetDetails = viewModel::setShouldShowMoreVideoPlaylistOptions,
+                inputPlaceHolderText = state.createVideoPlaylistPlaceholderTitle,
+                setInputValidity = viewModel::setNewPlaylistTitleValidity,
+                onRenameDialogPositiveButtonClicked = viewModel::updateVideoPlaylistTitle,
+                onDeleteDialogPositiveButtonClicked = { playlist ->
+                    viewModel.removeVideoPlaylists(listOf(playlist))
+                },
+                onAddElementsClicked = {
+                    //TODO navigate to elements selected page
+                },
+                errorMessage = state.createDialogErrorMessage,
                 onClick = onPlaylistDetailItemClick,
+                onMenuClick = onMenuClick
             )
         }
     }

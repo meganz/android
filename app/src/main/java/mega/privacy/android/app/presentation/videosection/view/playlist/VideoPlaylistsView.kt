@@ -350,9 +350,9 @@ internal fun CreateVideoPlaylistFabButton(
 
 @Composable
 internal fun DeleteVideoPlaylistDialog(
-    modifier: Modifier = Modifier,
     onDeleteButtonClicked: () -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     MegaAlertDialog(
         modifier = modifier,

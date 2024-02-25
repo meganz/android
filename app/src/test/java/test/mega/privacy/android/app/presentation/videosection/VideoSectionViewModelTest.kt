@@ -532,6 +532,47 @@ class VideoSectionViewModelTest {
     }
 
     @Test
+    fun `test that the setShouldDeleteSingleVideoPlaylist is correctly updated`() = runTest {
+        initUnderTest()
+
+        underTest.state.test {
+            assertThat(awaitItem().shouldDeleteSingleVideoPlaylist).isFalse()
+            underTest.setShouldDeleteSingleVideoPlaylist(true)
+            assertThat(awaitItem().shouldDeleteSingleVideoPlaylist).isTrue()
+            underTest.setShouldDeleteSingleVideoPlaylist(false)
+            assertThat(awaitItem().shouldDeleteSingleVideoPlaylist).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that the setAreVideoPlaylistsRemovedSuccessfully is correctly updated`() =
+        runTest {
+            initUnderTest()
+
+            underTest.state.test {
+                assertThat(awaitItem().areVideoPlaylistsRemovedSuccessfully).isFalse()
+                underTest.setAreVideoPlaylistsRemovedSuccessfully(true)
+                assertThat(awaitItem().areVideoPlaylistsRemovedSuccessfully).isTrue()
+                underTest.setAreVideoPlaylistsRemovedSuccessfully(false)
+                assertThat(awaitItem().areVideoPlaylistsRemovedSuccessfully).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that the setShouldShowMoreVideoPlaylistOptions is correctly updated`() =
+        runTest {
+            initUnderTest()
+
+            underTest.state.test {
+                assertThat(awaitItem().shouldShowMoreVideoPlaylistOptions).isFalse()
+                underTest.setShouldShowMoreVideoPlaylistOptions(true)
+                assertThat(awaitItem().shouldShowMoreVideoPlaylistOptions).isTrue()
+                underTest.setShouldShowMoreVideoPlaylistOptions(false)
+                assertThat(awaitItem().shouldShowMoreVideoPlaylistOptions).isFalse()
+            }
+        }
+
+    @Test
     fun `test that the removeVideoPlaylists is correctly updated`() = runTest {
         val videoPlaylistTitles = listOf("new playlist", "new playlist1", "new playlist2")
         val playlistIDs = listOf(NodeId(1L), NodeId(2L), NodeId(3L))
@@ -555,6 +596,8 @@ class VideoSectionViewModelTest {
             val actual = awaitItem()
             assertThat(actual.deletedVideoPlaylistTitles.size).isEqualTo(2)
             assertThat(actual.deletedVideoPlaylistTitles[0]).isEqualTo(videoPlaylistTitles[0])
+            assertThat(actual.areVideoPlaylistsRemovedSuccessfully).isTrue()
+            assertThat(actual.shouldDeleteVideoPlaylist).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
     }

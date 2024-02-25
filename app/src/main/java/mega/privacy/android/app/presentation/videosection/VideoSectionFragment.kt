@@ -87,6 +87,10 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
     private val playlistMenuMoreProvider = object : MenuProvider {
         override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
             menuInflater.inflate(R.menu.fragment_playlist_menu_more, menu)
+            menu.findItem(R.id.menu_playlist_more).setOnMenuItemClickListener {
+                videoSectionViewModel.setShouldShowMoreVideoPlaylistOptions(true)
+                true
+            }
         }
 
         override fun onMenuItemSelected(menuItem: MenuItem): Boolean = true
