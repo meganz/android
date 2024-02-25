@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatPicker
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.options.ForwardBottomSheetOption
@@ -24,7 +25,6 @@ internal class ForwardMessageAction(
 
     override fun bottomSheetMenuItem(
         messages: Set<TypedMessage>,
-        context: Context,
         hideBottomSheet: () -> Unit,
     ): @Composable () -> Unit =
         {
@@ -39,6 +39,7 @@ internal class ForwardMessageAction(
                         chatViewModel.onForwardMessages(messages, chatHandles, contactHandles)
                     }
                 }
+            val context = LocalContext.current
             ForwardBottomSheetOption {
                 hideBottomSheet()
                 launchChatPicker(

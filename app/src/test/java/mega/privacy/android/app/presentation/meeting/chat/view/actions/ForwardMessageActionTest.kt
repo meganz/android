@@ -25,7 +25,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
-class ForwardMessageActionTest() {
+class ForwardMessageActionTest {
     @get:Rule
     var composeTestRule = createComposeRule()
 
@@ -67,7 +67,6 @@ class ForwardMessageActionTest() {
         composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
                 messages = emptySet(),
-                context = mock(),
             ) {}
         )
 
@@ -77,7 +76,6 @@ class ForwardMessageActionTest() {
     @Test
     fun `test that clicking the menu option launches the chat picker`() {
         val chatId = 123L
-        val context = mock<Context>()
         val message = mock<NormalMessage> {
             on { this.chatId } doReturn chatId
         }
@@ -85,13 +83,12 @@ class ForwardMessageActionTest() {
         composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
                 messages = messages,
-                context = context,
                 hideBottomSheet = {},
             )
         )
 
         composeTestRule.onNodeWithTag(CHAT_BOTTOM_SHEET_OPTION_FORWARD_TAG).performClick()
 
-        verify(launchPicker).invoke(eq(context), eq(chatId), any())
+        verify(launchPicker).invoke(any(), eq(chatId), any())
     }
 }

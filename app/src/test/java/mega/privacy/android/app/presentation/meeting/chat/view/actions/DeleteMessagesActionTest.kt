@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
-import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -77,7 +76,6 @@ class DeleteMessagesActionTest {
         composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
                 messages = emptySet(),
-                context = mock(),
                 hideBottomSheet = {},
             )
         )
@@ -87,11 +85,9 @@ class DeleteMessagesActionTest {
 
     @Test
     fun `test that clicking the menu option shows the confirmation dialog`() {
-        val context = mock<Context>()
         composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
                 messages = emptySet(),
-                context = context,
                 hideBottomSheet = {},
             )
         )
@@ -103,12 +99,10 @@ class DeleteMessagesActionTest {
 
     @Test
     fun `test that clicking the cancel option in the confirmation dialog does not invoke view model`() {
-        val context = mock<Context>()
         with(composeTestRule) {
             setContent(
                 underTest.bottomSheetMenuItem(
                     messages = emptySet(),
-                    context = context,
                     hideBottomSheet = {},
                 )
             )
@@ -122,13 +116,11 @@ class DeleteMessagesActionTest {
 
     @Test
     fun `test that clicking the remove option in the confirmation dialog invokes view model`() {
-        val context = mock<Context>()
         val messages = setOf(mock<NormalMessage>())
         with(composeTestRule) {
             setContent(
                 underTest.bottomSheetMenuItem(
                     messages = messages,
-                    context = context,
                     hideBottomSheet = {},
                 )
             )

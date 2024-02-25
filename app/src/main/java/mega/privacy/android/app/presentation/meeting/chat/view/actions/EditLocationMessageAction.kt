@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,7 +21,6 @@ internal class EditLocationMessageAction(
 
     override fun bottomSheetMenuItem(
         messages: Set<TypedMessage>,
-        context: Context,
         hideBottomSheet: () -> Unit,
     ): @Composable () -> Unit = {
         var showLocationView by rememberSaveable { mutableStateOf(false) }

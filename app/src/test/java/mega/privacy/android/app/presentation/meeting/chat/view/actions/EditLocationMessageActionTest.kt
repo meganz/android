@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
-import android.content.Context
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -64,11 +63,9 @@ class EditLocationMessageActionTest {
 
     @Test
     fun `test that composable contains edit bottom action`() {
-        val context = mock<Context>()
         composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
                 messages = messages,
-                context = context,
                 hideBottomSheet = {},
             )
         )
@@ -82,11 +79,9 @@ class EditLocationMessageActionTest {
             on { isGeolocationEnabled } doReturn true
         }
         whenever(chatViewModel.state).thenReturn(MutableStateFlow(state).asStateFlow())
-        val context = mock<Context>()
         composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
                 messages = messages,
-                context = context,
                 hideBottomSheet = {},
             )
         )

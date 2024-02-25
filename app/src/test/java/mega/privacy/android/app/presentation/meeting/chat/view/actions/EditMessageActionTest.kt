@@ -1,13 +1,11 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
-import android.content.Context
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
-import mega.privacy.android.app.presentation.meeting.chat.view.CHAT_LOCATION_VIEW_TAG
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.options.CHAT_BOTTOM_SHEET_OPTION_EDIT_TAG
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
@@ -63,7 +61,6 @@ class EditMessageActionTest {
         composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
                 messages = emptySet(),
-                context = mock(),
             ) {}
         )
 
@@ -72,7 +69,6 @@ class EditMessageActionTest {
 
     @Test
     fun `test that clicking the menu option invokes view model`() {
-        val context = mock<Context>()
         val message = mock<LocationMessage> {
             on { isEditable } doReturn true
         }
@@ -80,7 +76,6 @@ class EditMessageActionTest {
         composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
                 messages = messages,
-                context = context,
                 hideBottomSheet = {},
             )
         )

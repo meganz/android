@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.options.EditBottomSheetOption
@@ -17,7 +16,6 @@ internal class EditMessageAction(
 
     override fun bottomSheetMenuItem(
         messages: Set<TypedMessage>,
-        context: Context,
         hideBottomSheet: () -> Unit,
     ): @Composable () -> Unit = {
         EditBottomSheetOption {

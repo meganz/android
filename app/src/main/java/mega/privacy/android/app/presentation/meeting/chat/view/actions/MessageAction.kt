@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
@@ -20,13 +19,11 @@ interface MessageAction {
      * In column
      *
      * @param messages
-     * @param context
      * @param hideBottomSheet
      * @return
      */
     fun bottomSheetMenuItem(
         messages: Set<TypedMessage>,
-        context: Context,
         hideBottomSheet: () -> Unit,
     ): @Composable () -> Unit
 }

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,7 +18,6 @@ internal class DeleteMessageAction(
 
     override fun bottomSheetMenuItem(
         messages: Set<TypedMessage>,
-        context: Context,
         hideBottomSheet: () -> Unit,
     ): @Composable () -> Unit =
         {
