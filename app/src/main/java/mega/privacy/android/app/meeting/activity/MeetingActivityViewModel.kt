@@ -337,16 +337,6 @@ class MeetingActivityViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getFeatureFlagValue(AppFeatures.MuteParticipant).let { flag ->
-                _state.update { state ->
-                    state.copy(
-                        isMuteFeatureFlagEnabled = flag,
-                    )
-                }
-            }
-        }
-
-        viewModelScope.launch {
             getCurrentSubscriptionPlanUseCase()?.let { currentSubscriptionPlan ->
                 _state.update { it.copy(subscriptionPlan = currentSubscriptionPlan) }
             }

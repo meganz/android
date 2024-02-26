@@ -56,7 +56,6 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property chatScheduledMeeting                       [ChatScheduledMeeting]
  * @property isRingingAll                               True if is ringing for all participants or False otherwise.
  * @property newInvitedParticipants                     List of emails of the new invited participants.
- * @property isMuteFeatureFlagEnabled                   True, if Mute feature flag enabled. False, otherwise.
  * @property snackbarMsg                                State to show snackbar message
  * @property subscriptionPlan                           [AccountType]
  */
@@ -101,7 +100,6 @@ data class MeetingState(
     val chatScheduledMeeting: ChatScheduledMeeting? = null,
     val isRingingAll: Boolean = false,
     val newInvitedParticipants: List<String> = emptyList(),
-    val isMuteFeatureFlagEnabled: Boolean = false,
     val snackbarMsg: StateEventWithContent<String> = consumed(),
     val subscriptionPlan: AccountType = AccountType.UNKNOWN,
 ) {
@@ -133,8 +131,7 @@ data class MeetingState(
     /**
      * Check if Mute all item should be shown
      */
-    fun shouldMuteAllItemBeShown() =
-        isMuteFeatureFlagEnabled && hasHostPermission() && participantsSection == ParticipantsSection.InCallSection
+    fun shouldMuteAllItemBeShown() = hasHostPermission() && participantsSection == ParticipantsSection.InCallSection
 
     /**
      * Check if Admit all item should be shown

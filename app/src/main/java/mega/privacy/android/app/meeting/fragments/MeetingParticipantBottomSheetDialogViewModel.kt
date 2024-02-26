@@ -27,7 +27,6 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
     var isModerator = false
     var isSpeakerMode = false
     var participant: Participant? = null
-    private var isEnabledMuteFeatureFlag = false
 
     /**
      * Init value for View Model
@@ -37,13 +36,11 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
         guest: Boolean,
         speakerMode: Boolean,
         info: Participant,
-        muteFeatureFlag: Boolean,
     ) {
         isModerator = moderator
         participant = info
         isGuest = guest
         isSpeakerMode = speakerMode
-        isEnabledMuteFeatureFlag = muteFeatureFlag
     }
 
     /**
@@ -160,7 +157,7 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
      * @return if should show `muted` item, return true, else false
      */
     fun showMuteParticipant(): Boolean =
-        participant?.isMe == false && !isGuest && isModerator && participant?.isAudioOn == true && isEnabledMuteFeatureFlag
+        participant?.isMe == false && !isGuest && isModerator && participant?.isAudioOn == true
 
     /**
      * Determine if show the `Pin to speaker view` item

@@ -231,8 +231,7 @@ fun ParticipantsFullListView(
                             }
 
                             state.participantsSection == ParticipantsSection.InCallSection &&
-                                    state.myPermission == ChatRoomPermission.Moderator &&
-                                    state.isMuteFeatureFlagEnabled -> {
+                                    state.myPermission == ChatRoomPermission.Moderator -> {
                                 when (state.areAllParticipantsMuted()) {
                                     true -> R.string.meetings_bottom_panel_in_call_participants_all_muted_label
                                     false -> R.string.meetings_bottom_panel_in_call_participants_mute_all_participants_button
@@ -246,7 +245,6 @@ fun ParticipantsFullListView(
                             state.participantsSection == ParticipantsSection.NotInCallSection && state.myPermission > ChatRoomPermission.ReadOnly -> onRingAllParticipantsClicked
                             state.participantsSection == ParticipantsSection.InCallSection &&
                                     state.myPermission == ChatRoomPermission.Moderator &&
-                                    state.isMuteFeatureFlagEnabled &&
                                     !state.areAllParticipantsMuted() -> onMuteAllParticipantsClick
 
                             else -> onShareMeetingLink
@@ -255,7 +253,7 @@ fun ParticipantsFullListView(
                             state.participantsSection == ParticipantsSection.NotInCallSection && state.myPermission > ChatRoomPermission.ReadOnly -> !state.isRingingAll
                             state.participantsSection == ParticipantsSection.InCallSection &&
                                     state.myPermission == ChatRoomPermission.Moderator &&
-                                    state.isMuteFeatureFlagEnabled && state.areAllParticipantsMuted() -> false
+                                    state.areAllParticipantsMuted() -> false
 
                             else -> true
                         }

@@ -231,11 +231,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     NewChatActivity("Enable new chat activity", false),
 
     /**
-     * Mute participant
-     */
-    MuteParticipant("Enable Mute participant", false),
-
-    /**
      * Call unlimited for pro users
      */
     CallUnlimitedProPlan("Call to stay unlimited when host with pro plan leaves", false),

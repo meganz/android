@@ -23,7 +23,6 @@ class ParticipantBottomPanelViewTest {
     fun `test that mute all button is shown`() {
         initComposeRuleContent(
             MeetingState(
-                isMuteFeatureFlagEnabled = true,
                 myPermission = ChatRoomPermission.Moderator,
                 participantsSection = ParticipantsSection.InCallSection
             ),
@@ -35,8 +34,7 @@ class ParticipantBottomPanelViewTest {
     fun `test that mute all button is hidden`() {
         initComposeRuleContent(
             MeetingState(
-                isMuteFeatureFlagEnabled = false,
-                myPermission = ChatRoomPermission.Moderator,
+                myPermission = ChatRoomPermission.ReadOnly,
                 participantsSection = ParticipantsSection.InCallSection
             ),
         )

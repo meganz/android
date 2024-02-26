@@ -246,8 +246,7 @@ private fun BottomSheetContent(
                     ChatDivider()
                 }
 
-                val shouldShowMuteOption =
-                    state.isMuteFeatureFlagEnabled && state.hasHostPermission() && !participant.isMe && participant.callParticipantData.isAudioOn
+                val shouldShowMuteOption = state.hasHostPermission() && !participant.isMe && participant.callParticipantData.isAudioOn
 
                 if (shouldShowMuteOption) {
                     BottomSheetMenuItemView(
