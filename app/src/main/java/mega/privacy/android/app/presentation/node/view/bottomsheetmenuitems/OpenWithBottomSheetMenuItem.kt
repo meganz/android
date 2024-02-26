@@ -6,7 +6,10 @@ import android.net.Uri
 import androidx.navigation.NavHostController
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.node.model.menuaction.OpenWithMenuAction
 import mega.privacy.android.app.presentation.search.navigation.cannotOpenFileDialog
@@ -20,7 +23,6 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
@@ -41,7 +43,6 @@ import javax.inject.Inject
  * @param getStreamingUriStringForNode [GetStreamingUriStringForNode]
  * @param snackBarHandler [SnackBarHandler]
  * @param context [Context]
- * @param scope [CoroutineScope]
  */
 class OpenWithBottomSheetMenuItem @Inject constructor(
     override val menuAction: OpenWithMenuAction,
@@ -52,7 +53,6 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
     private val getStreamingUriStringForNode: GetStreamingUriStringForNode,
     private val snackBarHandler: SnackBarHandler,
     @ApplicationContext private val context: Context,
-    @ApplicationScope private val scope: CoroutineScope,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -72,14 +72,21 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         if (node is TypedFileNode) {
-            scope.launch {
-                val localPath = getLocalFilePath(node)
-                if (node.type is AudioFileTypeInfo || node.type is VideoFileTypeInfo) {
-                    openAudioOrVideoFiles(localPath, node, navController)
-                } else {
-                    localPath?.let {
-                        openNotStreamableFiles(navController, it, node.type)
-                    } ?: actionHandler(menuAction, node)
+            parentCoroutineScope.launch {
+                withContext(NonCancellable) {
+                    val localPath = getLocalFilePath(node)
+                    if (node.type is AudioFileTypeInfo || node.type is VideoFileTypeInfo) {
+                        openAudioOrVideoFiles(localPath, node, navController, parentCoroutineScope)
+                    } else {
+                        localPath?.let {
+                            openNotStreamableFiles(
+                                navController,
+                                it,
+                                node.type,
+                                parentCoroutineScope
+                            )
+                        } ?: actionHandler(menuAction, node)
+                    }
                 }
             }
         } else {
@@ -92,6 +99,7 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
         localPath: String?,
         node: TypedFileNode,
         navController: NavHostController,
+        parentCoroutineScope: CoroutineScope,
     ) {
         val fileUri = getAudioOrVideoFileUri(localPath, node)
         Intent(Intent.ACTION_VIEW).apply {
@@ -103,8 +111,10 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
             if (resolveActivity(context.packageManager) != null) {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                parentCoroutineScope.ensureActive()
                 navController.context.startActivity(this)
             } else if (localPath == null) {
+                parentCoroutineScope.ensureActive()
                 navController.navigate(cannotOpenFileDialog)
             } else {
                 snackBarHandler.postSnackbarMessage(R.string.intent_not_available_file)
@@ -116,6 +126,7 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
         navController: NavHostController,
         localPath: String,
         fileTypeInfo: FileTypeInfo,
+        parentCoroutineScope: CoroutineScope,
     ) {
         val localFileUri = getLocalFileUri(localPath)
         Intent(Intent.ACTION_VIEW).apply {
@@ -126,6 +137,7 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
                 }
                 if (resolveActivity(context.packageManager) != null) {
                     flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    parentCoroutineScope.ensureActive()
                     navController.context.startActivity(this@apply)
                 } else {
                     snackBarHandler.postSnackbarMessage(R.string.intent_not_available)

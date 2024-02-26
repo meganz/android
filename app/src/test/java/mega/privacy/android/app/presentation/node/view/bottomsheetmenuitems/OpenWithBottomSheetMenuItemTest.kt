@@ -38,7 +38,6 @@ class OpenWithBottomSheetMenuItemTest {
     private val isHttpServerRunningUseCase = mock<MegaApiHttpServerIsRunningUseCase>()
     private val snackBarHandler = mock<SnackBarHandler>()
     private val context = mock<Context>()
-    private val scope = mock<CoroutineScope>()
     private val underTest = OpenWithBottomSheetMenuItem(
         openWithMenuAction,
         getFileUriUseCase,
@@ -48,7 +47,6 @@ class OpenWithBottomSheetMenuItemTest {
         getStreamingUriStringForNode,
         snackBarHandler,
         context,
-        scope,
     )
 
     @ParameterizedTest(name = "isNodeInRubbish {0} - accessPermission {1} - isInBackups {2} - node {3} - expected {4}")

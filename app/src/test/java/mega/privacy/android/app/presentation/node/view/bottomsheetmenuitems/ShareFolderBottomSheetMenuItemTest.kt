@@ -1,11 +1,6 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import com.google.common.truth.Truth
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -22,14 +17,8 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ShareFolderBottomSheetMenuItemTest {
-
-    private val applicationScope: CoroutineScope = CoroutineScope(
-        UnconfinedTestDispatcher()
-    )
-    private val mainDispatcher: CoroutineDispatcher = Dispatchers.Main
 
     private val createShareKeyUseCase: CreateShareKeyUseCase = mock()
     private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase = mock()
@@ -37,8 +26,6 @@ class ShareFolderBottomSheetMenuItemTest {
 
     private val shareFolderBottomSheetMenuItem = ShareFolderBottomSheetMenuItem(
         menuAction = ShareFolderMenuAction(),
-        scope = applicationScope,
-        mainDispatcher = mainDispatcher,
         createShareKeyUseCase = createShareKeyUseCase,
         checkBackupNodeTypeByHandleUseCase = checkBackupNodeTypeByHandleUseCase,
         listToStringWithDelimitersMapper = listToStringWithDelimitersMapper,

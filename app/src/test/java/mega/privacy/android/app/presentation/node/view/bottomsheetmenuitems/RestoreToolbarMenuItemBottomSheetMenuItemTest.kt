@@ -44,7 +44,6 @@ class RestoreToolbarMenuItemBottomSheetMenuItemTest {
             restoreNodesUseCase = restoreNodesUseCase,
             restoreNodeResultMapper = restoreNodeResultMapper,
             snackBarHandler = snackBarHandler,
-            scope = CoroutineScope(UnconfinedTestDispatcher())
         )
 
     @ParameterizedTest(name = "isNodeInRubbish {0} - expected {1}")
@@ -71,7 +70,7 @@ class RestoreToolbarMenuItemBottomSheetMenuItemTest {
     @Test
     fun `test that restore click without conflicts prints appropriate message`() = runTest {
         val navController = mock<NavHostController>()
-        val parentScope = mock<CoroutineScope>()
+        val parentScope = CoroutineScope(UnconfinedTestDispatcher())
         val node = mock<TypedFolderNode> {
             on(it.id).thenReturn(NodeId(1234L))
             on(it.restoreId).thenReturn(NodeId(2345L))

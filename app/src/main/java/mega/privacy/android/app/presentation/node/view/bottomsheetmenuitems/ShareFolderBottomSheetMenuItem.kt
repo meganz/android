@@ -1,9 +1,11 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import androidx.navigation.NavHostController
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.app.presentation.search.navigation.searchFolderShareDialog
@@ -13,8 +15,6 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
@@ -28,8 +28,6 @@ import javax.inject.Inject
  */
 class ShareFolderBottomSheetMenuItem @Inject constructor(
     override val menuAction: ShareFolderMenuAction,
-    @ApplicationScope private val scope: CoroutineScope,
-    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
     private val createShareKeyUseCase: CreateShareKeyUseCase,
     private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase,
     private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
@@ -54,29 +52,30 @@ class ShareFolderBottomSheetMenuItem @Inject constructor(
         navController: NavHostController,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
-        scope.launch(mainDispatcher) {
-            onDismiss()
-            if (node is TypedFolderNode) {
-                createShareKeyUseCase(node)
-                val backupType =
-                    runCatching { checkBackupNodeTypeByHandleUseCase(node) }
-                        .getOrElse {
+        onDismiss()
+        parentCoroutineScope.launch {
+            withContext(NonCancellable) {
+                if (node is TypedFolderNode) {
+                    runCatching { createShareKeyUseCase(node) }.onFailure { Timber.e(it) }
+                    val backupType =
+                        runCatching { checkBackupNodeTypeByHandleUseCase(node) }
+                            .onFailure { Timber.e(it) }.getOrNull()
+                    if (backupType != BackupNodeType.NonBackupNode) {
+                        val handles = listOf(node.id.longValue)
+                        runCatching {
+                            listToStringWithDelimitersMapper(handles)
+                        }.onSuccess { handle ->
+                            parentCoroutineScope.ensureActive()
+                            navController.navigate(
+                                searchFolderShareDialog.plus("/${handle}")
+                            )
+                        }.onFailure {
                             Timber.e(it)
-                            null
                         }
-                if (backupType != BackupNodeType.NonBackupNode) {
-                    val handles = listOf(node.id.longValue)
-                    runCatching {
-                        listToStringWithDelimitersMapper(handles)
-                    }.onSuccess { handle ->
-                        navController.navigate(
-                            searchFolderShareDialog.plus("/${handle}")
-                        )
-                    }.onFailure {
-                        Timber.e(it)
+                    } else {
+                        parentCoroutineScope.ensureActive()
+                        actionHandler(menuAction, node)
                     }
-                } else {
-                    actionHandler(menuAction, node)
                 }
             }
         }
