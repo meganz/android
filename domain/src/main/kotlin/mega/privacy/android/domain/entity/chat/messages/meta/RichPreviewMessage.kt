@@ -34,6 +34,7 @@ data class RichPreviewMessage(
     override val shouldShowTime: Boolean,
     override val reactions: List<Reaction>,
     override val status: ChatMessageStatus,
+    override val textMessage: String,
     val content: String,
     val chatRichPreviewInfo: ChatRichPreviewInfo?,
     val isEdited: Boolean,

@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.FragmentComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
+import mega.privacy.android.app.presentation.meeting.chat.view.actions.CopyMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.DeleteMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.EditLocationMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.EditMessageAction
@@ -26,11 +27,15 @@ internal class MessageActionModule {
     fun provideEditActionFactory(): (ChatViewModel) -> MessageAction =
         { vm -> EditMessageAction(vm) }
 
-
     @Provides
     @IntoSet
     fun provideEditLocationActionFactory(): (ChatViewModel) -> MessageAction =
         { vm -> EditLocationMessageAction(vm) }
+
+    @Provides
+    @IntoSet
+    fun provideCopyActionFactory(): (ChatViewModel) -> MessageAction =
+        { vm -> CopyMessageAction(vm) }
 
     @Provides
     @IntoSet

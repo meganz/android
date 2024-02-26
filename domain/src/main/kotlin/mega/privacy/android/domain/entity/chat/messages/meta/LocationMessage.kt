@@ -33,6 +33,7 @@ data class LocationMessage(
     override val shouldShowTime: Boolean,
     override val reactions: List<Reaction>,
     override val status: ChatMessageStatus,
+    override val textMessage: String,
     val chatGeolocationInfo: ChatGeolocationInfo?,
     val isEdited: Boolean,
 ) : MetaMessage

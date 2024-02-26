@@ -20,4 +20,5 @@ data class InvalidMetaMessage(
     override val shouldShowTime: Boolean,
     override val reactions: List<Reaction>,
     override val status: ChatMessageStatus,
+    override val textMessage: String,
 ) : MetaMessage
