@@ -1,8 +1,7 @@
 package mega.privacy.android.domain.usecase.createaccount
 
 import app.cash.turbine.test
-import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.Event
@@ -19,7 +18,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
-@OptIn(ExperimentalCoroutinesApi::class)
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MonitorAccountConfirmationUseCaseTest {
 
@@ -54,7 +53,7 @@ class MonitorAccountConfirmationUseCaseTest {
             expectedResult?.let {
                 val result = awaitItem()
                 awaitComplete()
-                Truth.assertThat(result).isEqualTo(it)
+                assertThat(result).isEqualTo(it)
             } ?: awaitComplete()
         }
     }

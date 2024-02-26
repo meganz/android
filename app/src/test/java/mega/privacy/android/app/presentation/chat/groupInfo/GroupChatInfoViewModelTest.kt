@@ -16,6 +16,7 @@ import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -51,6 +52,7 @@ class GroupChatInfoViewModelTest {
         mock()
     private val broadcastChatArchivedUseCase: BroadcastChatArchivedUseCase = mock()
     private val broadcastLeaveChatUseCase: BroadcastLeaveChatUseCase = mock()
+    private val monitorSFUServerUpgradeUseCase: MonitorSFUServerUpgradeUseCase = mock()
 
     private val connectivityFlow = MutableSharedFlow<Boolean>()
     private val updatePushNotificationSettings = MutableSharedFlow<Boolean>()
@@ -83,7 +85,8 @@ class GroupChatInfoViewModelTest {
             sendStatisticsMeetingsUseCase = sendStatisticsMeetingsUseCase,
             monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase,
             broadcastChatArchivedUseCase = broadcastChatArchivedUseCase,
-            broadcastLeaveChatUseCase = broadcastLeaveChatUseCase
+            broadcastLeaveChatUseCase = broadcastLeaveChatUseCase,
+            monitorSFUServerUpgradeUseCase = monitorSFUServerUpgradeUseCase
         )
     }
 

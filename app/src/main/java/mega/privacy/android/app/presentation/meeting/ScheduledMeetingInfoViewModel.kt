@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -54,6 +55,7 @@ import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomRemindersUseCase
@@ -125,7 +127,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val getMyFullNameUseCase: GetMyFullNameUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
-    ) : ViewModel() {
+    private val monitorSFUServerUpgradeUseCase: MonitorSFUServerUpgradeUseCase,
+) : ViewModel() {
 
     private val _state = MutableStateFlow(ScheduledMeetingInfoState())
     val state: StateFlow<ScheduledMeetingInfoState> = _state
@@ -133,6 +136,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     val is24HourFormat by lazy { deviceGateway.is24HourFormat() }
 
     private var scheduledMeetingId: Long = megaChatApiGateway.getChatInvalidHandle()
+
+    private var monitorSFUServerUpgradeJob: Job? = null
 
     /**
      * Monitor connectivity event
@@ -161,6 +166,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 }
             }
         }
+        monitorSFUServerUpgrade()
     }
 
     /**
@@ -1096,7 +1102,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             getMyFullNameUseCase()
         }.onSuccess {
             it?.apply {
-                _state.update {state ->
+                _state.update { state ->
                     state.copy(
                         myFullName = this,
                     )
@@ -1105,6 +1111,35 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         }.onFailure { exception ->
             Timber.e(exception)
         }
+    }
+
+    /**
+     * monitor chat call updates
+     */
+    private fun monitorSFUServerUpgrade() {
+        monitorSFUServerUpgradeJob?.cancel()
+        monitorSFUServerUpgradeJob = viewModelScope.launch {
+            monitorSFUServerUpgradeUseCase()
+                .catch {
+                    Timber.e(it)
+                }
+                .collect { shouldUpgrade ->
+                    if (shouldUpgrade) {
+                        showForceUpdateDialog()
+                    }
+                }
+        }
+    }
+
+    private fun showForceUpdateDialog() {
+        _state.update { it.copy(showForceUpdateDialog = true) }
+    }
+
+    /**
+     * Set to false to hide the dialog
+     */
+    fun onForceUpdateDialogDismissed() {
+        _state.update { it.copy(showForceUpdateDialog = false) }
     }
 
     companion object {

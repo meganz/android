@@ -42,6 +42,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  * @property enabledWaitingRoomOption                   True if is enabled waiting room option, false otherwise.
  * @property snackbarMsg                                State to show snackbar message
  * @property myFullName                                 My full name
+ * @property showForceUpdateDialog                True if the force update dialog should be shown, false if not.
  */
 data class ScheduledMeetingInfoState(
     val chatId: Long = -1L,
@@ -74,6 +75,7 @@ data class ScheduledMeetingInfoState(
     val enabledWaitingRoomOption: Boolean = true,
     val snackbarMsg: StateEventWithContent<String> = consumed(),
     val myFullName: String = "",
+    val showForceUpdateDialog: Boolean = false,
 ) {
 
     /**

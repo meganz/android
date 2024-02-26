@@ -172,6 +172,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         this, this, this,
         showSaveToDeviceConfirmDialog(this)
     )
+    private var forceAppUpdateDialog: AlertDialog? = null
 
     private var drawableShare: Drawable? = null
     private var drawableSend: Drawable? = null
@@ -970,6 +971,9 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             updateBasicInfo(contactInfoState)
             setFoldersButtonText(contactInfoState.inShares)
             updateUI()
+            if (contactInfoState.showForceUpdateDialog) {
+                showForceUpdateAppDialog()
+            }
         }
 
         collectFlow(waitingRoomManagementViewModel.state) { state ->
@@ -987,6 +991,17 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 launchCallScreen()
             }
         }
+    }
+
+    /**
+     * Show Force App Update Dialog
+     */
+    private fun showForceUpdateAppDialog() {
+        if (forceAppUpdateDialog?.isShowing == true) return
+        forceAppUpdateDialog = AlertDialogUtil.createForceAppUpdateDialog(this) {
+            viewModel.onForceUpdateDialogDismissed()
+        }
+        forceAppUpdateDialog?.show()
     }
 
     private fun handleMovementResult(moveRequestResult: Result<MoveRequestResult>) {

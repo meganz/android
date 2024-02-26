@@ -27,11 +27,13 @@ import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.meeting.CallNotificationType
+import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges.OnHold
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges.Status
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
-import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
+import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
@@ -263,9 +265,32 @@ class ContactInfoViewModel @Inject constructor(
             .collectLatest { call ->
                 call.changes?.apply {
                     if (contains(Status)) observeCallStatus(call)
+                    if (shouldShowForceUpdateDialog(call)) showForceUpdateDialog()
                     if (contains(OnHold)) _state.update { it.copy(callStatusChanged = true) }
                 }
             }
+    }
+
+    private fun shouldShowForceUpdateDialog(call: ChatCall): Boolean {
+        Timber.d("Call status: ${call.status}, termCode: ${call.termCode}, notificationType: ${call.notificationType}")
+        return if (call.changes?.contains(Status) == true) {
+            call.status == ChatCallStatus.TerminatingUserParticipation && call.termCode == ChatCallTermCodeType.ProtocolVersion
+        } else if (call.changes?.contains(ChatCallChanges.GenericNotification) == true) {
+            call.notificationType == CallNotificationType.SFUError && call.termCode == ChatCallTermCodeType.ProtocolVersion
+        } else {
+            false
+        }
+    }
+
+    private fun showForceUpdateDialog() {
+        _state.update { it.copy(showForceUpdateDialog = true) }
+    }
+
+    /**
+     * Set to false to hide the dialog
+     */
+    fun onForceUpdateDialogDismissed() {
+        _state.update { it.copy(showForceUpdateDialog = false) }
     }
 
     private fun observeCallStatus(call: ChatCall) {

@@ -62,6 +62,7 @@ import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContac
 import mega.privacy.android.app.presentation.chat.groupInfo.GroupChatInfoViewModel
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
+import mega.privacy.android.app.utils.AlertDialogUtil.createForceAppUpdateDialog
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AvatarUtil
@@ -154,6 +155,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     private var changeTitleDialog: AlertDialog? = null
     private var chatLinkDialog: AlertDialog? = null
     private var endCallForAllDialog: AlertDialog? = null
+    private var forceAppUpdateDialog: AlertDialog? = null
     private var linearLayoutManager: LinearLayoutManager? = null
     private var adapter: MegaParticipantsChatAdapter? = null
     private val participants = ArrayList<MegaChatParticipant?>()
@@ -362,7 +364,21 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 adapter?.checkNotifications(chatHandle)
                 viewModel.onConsumePushNotificationSettingsUpdateEvent()
             }
+            if (groupInfoState.showForceUpdateDialog) {
+                showForceUpdateAppDialog()
+            }
         }
+    }
+
+    /**
+     * Show Force App Update Dialog
+     */
+    private fun showForceUpdateAppDialog() {
+        if (forceAppUpdateDialog?.isShowing == true) return
+        forceAppUpdateDialog = createForceAppUpdateDialog(this) {
+            viewModel.onForceUpdateDialogDismissed()
+        }
+        forceAppUpdateDialog?.show()
     }
 
     override fun onDestroy() {

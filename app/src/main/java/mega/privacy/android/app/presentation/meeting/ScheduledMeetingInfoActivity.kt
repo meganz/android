@@ -46,6 +46,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.view.ScheduledMeetingInfoView
 import mega.privacy.android.app.presentation.security.PasscodeCheck
+import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.ChatUtil.createMuteNotificationsAlertDialogOfAChat
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CHAT_ID
@@ -55,12 +56,12 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_CREATED
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_ID
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.ScheduledMeetingEditMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingSettingEnableMeetingLinkButtonEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingSettingEnableOpenInviteButtonEvent
@@ -83,6 +84,7 @@ import javax.inject.Inject
 class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     @Inject
     lateinit var navigator: MegaNavigator
+
     @Inject
     lateinit var passCodeFacade: PasscodeCheck
 
@@ -100,6 +102,8 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     private var bottomSheetDialogFragment: BaseBottomSheetDialogFragment? = null
 
     private var nodeAttacher: MegaAttacher? = null
+
+    private var forceAppUpdateDialog: AlertDialog? = null
 
     /**
      * Perform Activity initialization
@@ -236,8 +240,21 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                     )
                 }
             }
-
+            if (state.showForceUpdateDialog) {
+                showForceUpdateAppDialog()
+            }
         }
+    }
+
+    /**
+     * Show Force App Update Dialog
+     */
+    private fun showForceUpdateAppDialog() {
+        if (forceAppUpdateDialog?.isShowing == true) return
+        forceAppUpdateDialog = AlertDialogUtil.createForceAppUpdateDialog(this) {
+            viewModel.onForceUpdateDialogDismissed()
+        }
+        forceAppUpdateDialog?.show()
     }
 
     /**

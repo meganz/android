@@ -8,9 +8,11 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -31,6 +33,7 @@ import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastLeaveChatUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
@@ -72,12 +75,15 @@ class GroupChatInfoViewModel @Inject constructor(
     private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     private val broadcastChatArchivedUseCase: BroadcastChatArchivedUseCase,
     private val broadcastLeaveChatUseCase: BroadcastLeaveChatUseCase,
+    private val monitorSFUServerUpgradeUseCase: MonitorSFUServerUpgradeUseCase,
 ) : BaseRxViewModel() {
 
     /**
      * private UI state
      */
     private val _state = MutableStateFlow(GroupInfoState())
+
+    private var monitorSFUServerUpgradeJob: Job? = null
 
     /**
      * UI State GroupChatInfo
@@ -103,6 +109,7 @@ class GroupChatInfoViewModel @Inject constructor(
                 _state.update { it.copy(isPushNotificationSettingsUpdatedEvent = true) }
             }
         }
+        monitorSFUServerUpgrade()
     }
 
     override fun onCleared() {
@@ -197,27 +204,25 @@ class GroupChatInfoViewModel @Inject constructor(
                 Timber.e(exception)
             }.onSuccess { resultStartCall ->
                 val resultChatId = resultStartCall.chatHandle
-                if (resultChatId != null) {
-                    val videoEnable = resultStartCall.flag
-                    val paramType = resultStartCall.paramType
-                    val audioEnable: Boolean = paramType == ChatRequestParamType.Video
+                val videoEnable = resultStartCall.flag
+                val paramType = resultStartCall.paramType
+                val audioEnable: Boolean = paramType == ChatRequestParamType.Video
 
-                    CallUtil.addChecksForACall(resultChatId, videoEnable)
+                CallUtil.addChecksForACall(resultChatId, videoEnable)
 
-                    chatApiGateway.getChatCall(resultChatId)?.let { call ->
-                        if (call.isOutgoing) {
-                            chatManagement.setRequestSentCall(call.callId, true)
-                        }
+                chatApiGateway.getChatCall(resultChatId)?.let { call ->
+                    if (call.isOutgoing) {
+                        chatManagement.setRequestSentCall(call.callId, true)
                     }
-
-                    openMeetingWithAudioOrVideo(
-                        MegaApplication.getInstance().applicationContext,
-                        resultChatId,
-                        audioEnable,
-                        videoEnable,
-                        passcodeManagement
-                    )
                 }
+
+                openMeetingWithAudioOrVideo(
+                    MegaApplication.getInstance().applicationContext,
+                    resultChatId,
+                    audioEnable,
+                    videoEnable,
+                    passcodeManagement
+                )
             }
         }
     }
@@ -259,5 +264,34 @@ class GroupChatInfoViewModel @Inject constructor(
      */
     fun launchBroadcastLeaveChat(chatId: Long) = viewModelScope.launch {
         broadcastLeaveChatUseCase(chatId)
+    }
+
+    /**
+     * monitor SFU Server Upgrade
+     */
+    private fun monitorSFUServerUpgrade() {
+        monitorSFUServerUpgradeJob?.cancel()
+        monitorSFUServerUpgradeJob = viewModelScope.launch {
+            monitorSFUServerUpgradeUseCase()
+                .catch {
+                    Timber.e(it)
+                }
+                .collect { shouldUpgrade ->
+                    if (shouldUpgrade) {
+                        showForceUpdateDialog()
+                    }
+                }
+        }
+    }
+
+    private fun showForceUpdateDialog() {
+        _state.update { it.copy(showForceUpdateDialog = true) }
+    }
+
+    /**
+     * Set to false to hide the dialog
+     */
+    fun onForceUpdateDialogDismissed() {
+        _state.update { it.copy(showForceUpdateDialog = false) }
     }
 }

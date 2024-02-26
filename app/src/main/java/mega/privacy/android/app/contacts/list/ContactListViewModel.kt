@@ -12,6 +12,11 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -20,6 +25,7 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.contacts.list.data.ContactActionItem
 import mega.privacy.android.app.contacts.list.data.ContactActionItem.Type
 import mega.privacy.android.app.contacts.list.data.ContactItem
+import mega.privacy.android.app.contacts.list.data.ContactListState
 import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
@@ -35,6 +41,7 @@ import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import nz.mega.sdk.MegaNode
@@ -70,6 +77,7 @@ class ContactListViewModel @Inject constructor(
     private val chatManagement: ChatManagement,
     private val createShareKeyUseCase: CreateShareKeyUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val monitorSFUServerUpgradeUseCase: MonitorSFUServerUpgradeUseCase,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel() {
 
@@ -80,6 +88,15 @@ class ContactListViewModel @Inject constructor(
     private var queryString: String? = null
     private val contacts: MutableLiveData<List<ContactItem.Data>> = MutableLiveData()
     private val contactActions: MutableLiveData<List<ContactActionItem>> = MutableLiveData()
+    private val _state = MutableStateFlow(ContactListState())
+
+    private var monitorSFUServerUpgradeJob: Job? = null
+
+    /**
+     * State of the UI for the contact list screen.
+     */
+    val state = _state.asStateFlow()
+
 
     init {
         viewModelScope.launch {
@@ -253,28 +270,62 @@ class ContactListViewModel @Inject constructor(
                 Timber.e(exception)
             }.onSuccess { resultStartCall ->
                 val resultChatId = resultStartCall.chatHandle
-                if (resultChatId != null) {
-                    val videoEnable = resultStartCall.flag
-                    val paramType = resultStartCall.paramType
-                    val audioEnable: Boolean = paramType == ChatRequestParamType.Video
-                    CallUtil.addChecksForACall(resultChatId, videoEnable)
+                val videoEnable = resultStartCall.flag
+                val paramType = resultStartCall.paramType
+                val audioEnable: Boolean = paramType == ChatRequestParamType.Video
+                CallUtil.addChecksForACall(resultChatId, videoEnable)
 
-                    chatApiGateway.getChatCall(resultChatId)?.let { call ->
-                        if (call.isOutgoing) {
-                            chatManagement.setRequestSentCall(call.callId, true)
-                        }
+                chatApiGateway.getChatCall(resultChatId)?.let { call ->
+                    if (call.isOutgoing) {
+                        chatManagement.setRequestSentCall(call.callId, true)
                     }
-
-                    CallUtil.openMeetingWithAudioOrVideo(
-                        MegaApplication.getInstance().applicationContext,
-                        resultChatId,
-                        audioEnable,
-                        videoEnable,
-                        passcodeManagement
-                    )
                 }
+
+                CallUtil.openMeetingWithAudioOrVideo(
+                    MegaApplication.getInstance().applicationContext,
+                    resultChatId,
+                    audioEnable,
+                    videoEnable,
+                    passcodeManagement
+                )
             }
         }
+    }
+
+    /**
+     * monitor chat call updates
+     */
+    fun monitorSFUServerUpgrade() {
+        monitorSFUServerUpgradeJob?.cancel()
+        monitorSFUServerUpgradeJob = viewModelScope.launch {
+            monitorSFUServerUpgradeUseCase()
+                .catch {
+                    Timber.e(it)
+                }
+                .collect { shouldUpgrade ->
+                    if (shouldUpgrade) {
+                        showForceUpdateDialog()
+                    }
+                }
+        }
+    }
+
+    /**
+     * Cancel monitor SFUServerUpgrade
+     */
+    fun cancelMonitorSFUServerUpgrade() {
+        monitorSFUServerUpgradeJob?.cancel()
+    }
+
+    private fun showForceUpdateDialog() {
+        _state.update { it.copy(showForceUpdateDialog = true) }
+    }
+
+    /**
+     * Set to false to hide the dialog
+     */
+    fun onForceUpdateDialogDismissed() {
+        _state.update { it.copy(showForceUpdateDialog = false) }
     }
 
     /**

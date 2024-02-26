@@ -41,6 +41,7 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
  * @property hasAlias                                   checks if user has nick name
  * @property showUpdateAliasDialog                      True, shows update nick name dialog to the user
  * @property moveRequestResult
+ * @property showForceUpdateDialog                      True, shows force update dialog to the user
  */
 data class ContactInfoState(
     val error: Int? = null,
@@ -71,6 +72,7 @@ data class ContactInfoState(
     val enableCallLayout: Boolean = true,
     val showUpdateAliasDialog: Boolean = false,
     val moveRequestResult: Result<MoveRequestResult>? = null,
+    val showForceUpdateDialog: Boolean = false,
 ) {
 
     /**

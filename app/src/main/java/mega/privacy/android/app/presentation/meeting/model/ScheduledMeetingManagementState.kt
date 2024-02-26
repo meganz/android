@@ -32,6 +32,7 @@ import java.time.ZonedDateTime
  * @property chatRoomItem                       Selected [ChatRoomItem]
  * @property waitingRoomReminder                [WaitingRoomReminders]
  * @property isCallInProgress                   True, if there is a call in progress. False, if not.
+ * @property showForceUpdateDialog              True, if the force update dialog should be shown. False, if not.
  * @constructor Create empty Scheduled meeting management state
  */
 data class ScheduledMeetingManagementState(
@@ -52,6 +53,7 @@ data class ScheduledMeetingManagementState(
     val editedOccurrenceDate: ZonedDateTime? = null,
     val waitingRoomReminder: WaitingRoomReminders = WaitingRoomReminders.Enabled,
     val isCallInProgress: Boolean = false,
+    val showForceUpdateDialog: Boolean = false,
 ) {
 
     /**

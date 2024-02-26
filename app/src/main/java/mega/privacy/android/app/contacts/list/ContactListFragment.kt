@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -16,12 +17,14 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.list.adapter.ContactActionsListAdapter
 import mega.privacy.android.app.contacts.list.adapter.ContactListAdapter
 import mega.privacy.android.app.contacts.list.dialog.ContactBottomSheetDialogFragment
 import mega.privacy.android.app.databinding.FragmentContactListBinding
 import mega.privacy.android.app.main.InviteContactActivity
+import mega.privacy.android.app.utils.AlertDialogUtil.createForceAppUpdateDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
 import mega.privacy.android.app.utils.ContactUtil
@@ -53,10 +56,12 @@ class ContactListFragment : Fragment() {
         ContactListAdapter(::onContactClick, ::onContactInfoClick, ::onContactMoreClick)
     }
 
+    private var forceAppUpdateDialog: AlertDialog? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentContactListBinding.inflate(inflater, container, false)
         setHasOptionsMenu(true)
@@ -66,6 +71,45 @@ class ContactListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupView()
         setupObservers()
+        collectFlows()
+    }
+
+    /**
+     * on Start
+     */
+    override fun onStart() {
+        super.onStart()
+        viewModel.monitorSFUServerUpgrade()
+    }
+
+    /**
+     * on Stop
+     */
+    override fun onStop() {
+        viewModel.cancelMonitorSFUServerUpgrade()
+        super.onStop()
+    }
+
+
+    private fun collectFlows() {
+        viewLifecycleOwner.collectFlow(viewModel.state) { state ->
+            if (state.showForceUpdateDialog) {
+                showForceUpdateAppDialog()
+            }
+        }
+    }
+
+    /**
+     * Show Force App Update Dialog
+     */
+    private fun showForceUpdateAppDialog() {
+        if (forceAppUpdateDialog?.isShowing == true) return
+        forceAppUpdateDialog = context?.let {
+            createForceAppUpdateDialog(it) {
+                viewModel.onForceUpdateDialogDismissed()
+            }
+        }
+        forceAppUpdateDialog?.show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -90,8 +134,10 @@ class ContactListFragment : Fragment() {
     }
 
     private fun setupView() {
-        val adapterConfig = ConcatAdapter.Config.Builder().setStableIdMode(ConcatAdapter.Config.StableIdMode.ISOLATED_STABLE_IDS).build()
-        binding.list.adapter = ConcatAdapter(adapterConfig, actionsAdapter, recentlyAddedAdapter, contactsAdapter)
+        val adapterConfig = ConcatAdapter.Config.Builder()
+            .setStableIdMode(ConcatAdapter.Config.StableIdMode.ISOLATED_STABLE_IDS).build()
+        binding.list.adapter =
+            ConcatAdapter(adapterConfig, actionsAdapter, recentlyAddedAdapter, contactsAdapter)
         binding.list.setHasFixedSize(true)
         binding.list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
