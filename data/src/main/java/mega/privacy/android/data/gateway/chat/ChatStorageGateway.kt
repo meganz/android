@@ -111,9 +111,9 @@ interface ChatStorageGateway {
      *
      * @param chatId Chat ID
      * @param msgId Message ID
-     * @return List of Reaction
+     * @return String with reactions if any.
      */
-    suspend fun getMessageReactions(chatId: Long, msgId: Long): String
+    suspend fun getMessageReactions(chatId: Long, msgId: Long): String?
 
     /**
      * Update message reactions.

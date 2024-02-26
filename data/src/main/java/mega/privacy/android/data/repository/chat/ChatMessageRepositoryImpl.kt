@@ -213,9 +213,9 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
 
     override suspend fun getReactionsFromMessage(chatId: Long, msgId: Long): List<Reaction> =
         withContext(ioDispatcher) {
-            chatStorageGateway.getMessageReactions(chatId, msgId).let { reactions ->
+            chatStorageGateway.getMessageReactions(chatId, msgId)?.let { reactions ->
                 typedMessageEntityConverters.convertToMessageReactionList(reactions)
-            }
+            } ?: emptyList()
         }
 
     override suspend fun updateReactionsInMessage(

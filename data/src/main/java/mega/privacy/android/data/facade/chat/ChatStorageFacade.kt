@@ -130,7 +130,7 @@ internal class ChatStorageFacade @Inject constructor(
     override suspend fun getMessageIdsByType(chatId: Long, type: ChatMessageType): List<Long> =
         database.typedMessageDao().getMessageIdsByType(chatId, type)
 
-    override suspend fun getMessageReactions(chatId: Long, msgId: Long): String =
+    override suspend fun getMessageReactions(chatId: Long, msgId: Long): String? =
         database.typedMessageDao().getMessageReactions(chatId, msgId)
 
     override suspend fun updateMessageReactions(

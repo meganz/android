@@ -85,10 +85,10 @@ interface TypedMessageDao {
      *
      * @param chatId
      * @param msgId
-     * @return List of Reaction
+     * @return String with Reactions if any.
      */
     @Query("SELECT reactions FROM typed_messages WHERE chatId = :chatId AND messageId = :msgId")
-    suspend fun getMessageReactions(chatId: Long, msgId: Long): String
+    suspend fun getMessageReactions(chatId: Long, msgId: Long): String?
 
     /**
      * Insert message
