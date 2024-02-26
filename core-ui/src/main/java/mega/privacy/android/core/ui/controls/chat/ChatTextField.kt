@@ -22,6 +22,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
@@ -70,6 +72,7 @@ fun ChatTextField(
     maxLines: Int = if (isExpanded) Int.MAX_VALUE else 5,
     onTextLayout: (TextLayoutResult) -> Unit = {},
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    focusRequester: FocusRequester = remember { FocusRequester() },
 ) = Box(modifier = modifier) {
     val colors = TextFieldDefaults.textFieldColors(
         textColor = MegaTheme.colors.text.placeholder,
@@ -97,7 +100,8 @@ fun ChatTextField(
                     interactionSource = interactionSource,
                     colors = colors
                 )
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
             textStyle = MaterialTheme.typography.body1.copy(color = MegaTheme.colors.text.primary),
             cursorBrush = SolidColor(colors.cursorColor(false).value),
             keyboardOptions = KeyboardOptions(

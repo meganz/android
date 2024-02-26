@@ -1012,7 +1012,7 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             state.value.editingMessageId?.let {
                 val editedMessage = editMessageUseCase(chatId, it, message)
-                onCloseEditing()
+                editFinish()
                 if (editedMessage == null) {
                     messageCannotBeEdited()
                 }
@@ -1177,6 +1177,7 @@ class ChatViewModel @Inject constructor(
             state.copy(
                 editingMessageId = null,
                 editingMessageContent = null,
+                sendingText = "",
             )
         }
     }
@@ -1382,7 +1383,7 @@ class ChatViewModel @Inject constructor(
             val content = getMessageContentUseCase(message)
             if (content.isEmpty()) {
                 messageCannotBeEdited()
-                onCloseEditing()
+                editFinish()
             } else {
                 _state.update { state ->
                     state.copy(
@@ -1392,6 +1393,15 @@ class ChatViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    private fun editFinish() {
+        _state.update { state ->
+            state.copy(
+                editingMessageId = null,
+                editingMessageContent = null,
+            )
         }
     }
 

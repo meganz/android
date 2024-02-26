@@ -9,13 +9,18 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.UserTypingView
@@ -62,9 +67,20 @@ internal fun ChatBottomBar(
     onVoiceClipEvent: (VoiceClipRecordEvent) -> Unit = {},
     viewModel: ChatBottomBarViewModel = hiltViewModel(),
 ) {
-    var textFieldValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+    val coroutineScope = rememberCoroutineScope()
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusRequester = remember { FocusRequester() }
+    var textFieldValue by rememberSaveable(
+        inputs = arrayOf(uiState.sendingText, uiState.editingMessageContent),
+        stateSaver = TextFieldValue.Saver
+    ) {
         mutableStateOf(
-            TextFieldValue(uiState.sendingText)
+            uiState.editingMessageContent?.let {
+                val text = uiState.sendingText
+                focusRequester.requestFocus()
+                coroutineScope.launch { keyboardController?.show() }
+                TextFieldValue(text, TextRange(text.length))
+            } ?: TextFieldValue(uiState.sendingText)
         )
     }
     DisposableEffect(Unit) {
@@ -81,11 +97,10 @@ internal fun ChatBottomBar(
         onAttachmentClick = onAttachmentClick,
         onEmojiClick = onEmojiClick,
         interactionSourceTextInput = interactionSourceTextInput,
-        onTextChange = {
-            textFieldValue = it
-        },
+        onTextChange = { textFieldValue = it },
         onCloseEditing = onCloseEditing,
         onVoiceClipEvent = onVoiceClipEvent,
+        focusRequester = focusRequester,
     )
 }
 
@@ -113,6 +128,7 @@ fun ChatBottomBarContent(
     interactionSourceTextInput: MutableInteractionSource,
     onCloseEditing: () -> Unit = {},
     onVoiceClipEvent: (VoiceClipRecordEvent) -> Unit = {},
+    focusRequester: FocusRequester = remember { FocusRequester() },
 ) {
     Column {
         UserTypingView(
@@ -139,6 +155,7 @@ fun ChatBottomBarContent(
             editMessageContent = uiState.editingMessageContent,
             onCloseEditing = onCloseEditing,
             onVoiceClipEvent = onVoiceClipEvent,
+            focusRequester = focusRequester,
         )
     }
 }

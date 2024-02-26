@@ -24,6 +24,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -83,7 +84,8 @@ fun ChatInputTextToolbar(
     editingMessageId: Long? = null,
     editMessageContent: String? = null,
     onCloseEditing: () -> Unit = {},
-    onVoiceClipEvent: (VoiceClipRecordEvent) -> Unit = {}
+    onVoiceClipEvent: (VoiceClipRecordEvent) -> Unit = {},
+    focusRequester: FocusRequester = remember { FocusRequester() },
 ) {
     var isInputExpanded by rememberSaveable { mutableStateOf(false) }
     var showExpandButton by remember { mutableStateOf(false) }
@@ -182,7 +184,8 @@ fun ChatInputTextToolbar(
                             showExpandButton = it.lineCount >= 4
                             isRoundedShape = it.lineCount == 1
                         },
-                        interactionSource = interactionSource
+                        interactionSource = interactionSource,
+                        focusRequester = focusRequester,
                     )
                 }
 
