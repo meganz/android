@@ -11,14 +11,24 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.node.NodeActionHandler
@@ -72,6 +82,14 @@ fun SearchComposeView(
     val scaffoldState = rememberScaffoldState()
     val snackBarHostState = remember { SnackbarHostState() }
 
+    var searchQuery by rememberSaveable {
+        mutableStateOf(state.searchQuery)
+    }
+
+    searchQuery.useDebounce(onChange = {
+        updateSearchQuery(it)
+    })
+
     state.errorMessageId?.let {
         val errorMessage = stringResource(id = it)
         LaunchedEffect(key1 = scaffoldState.snackbarHostState) {
@@ -89,8 +107,10 @@ fun SearchComposeView(
         modifier = modifier,
         topBar = {
             SearchToolBar(
-                searchQuery = state.searchQuery,
-                updateSearchQuery = updateSearchQuery,
+                searchQuery = searchQuery,
+                updateSearchQuery = {
+                    searchQuery = it
+                },
                 onBackPressed = onBackPressed,
                 selectedNodes = state.selectedNodes,
                 totalCount = state.searchItemList.size,
@@ -151,6 +171,26 @@ fun SearchComposeView(
             }
         }
     }
+}
+
+@Composable
+private fun <T> T.useDebounce(
+    delayMillis: Long = 300L,
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    onChange: (T) -> Unit
+): T {
+    val state by rememberUpdatedState(this)
+
+    DisposableEffect(state){
+        val job = coroutineScope.launch {
+            delay(delayMillis)
+            onChange(state)
+        }
+        onDispose {
+            job.cancel()
+        }
+    }
+    return state
 }
 
 @CombinedThemePreviews
