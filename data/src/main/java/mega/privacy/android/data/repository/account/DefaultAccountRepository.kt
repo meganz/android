@@ -1184,6 +1184,39 @@ internal class DefaultAccountRepository @Inject constructor(
             }
         }
 
+    override suspend fun getUserData() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, error ->
+                    when (error.errorCode) {
+                        MegaError.API_OK -> {
+                            continuation.resume(value = Unit)
+                        }
+
+                        else -> {
+                            continuation.failWithError(
+                                error = error,
+                                methodName = "getUserData"
+                            )
+                        }
+                    }
+                }
+            )
+            megaApiGateway.getUserData(listener = listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener = listener)
+            }
+        }
+    }
+
+    override suspend fun broadcastUpdateUserData() {
+        appEventGateway.broadcastUpdateUserData()
+    }
+
+    override fun monitorUpdateUserData(): Flow<Unit> {
+        return appEventGateway.monitorUpdateUserData()
+    }
+
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
         private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"

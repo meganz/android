@@ -294,6 +294,11 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                 alreadyRegistered = state.verifiedPhoneNumber != null,
                 canVerify = state.canVerifyPhoneNumber && state.verifiedPhoneNumber == null,
             )
+
+            if (state.shouldNavigateToSmsVerification) {
+                startActivity(Intent(this, SMSVerificationActivity::class.java))
+                viewModel.onNavigatedToSmsVerification()
+            }
         }
 
         lifecycleScope.launch {
@@ -723,9 +728,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                 .setTitle(title)
                 .setMessage(message)
                 .setPositiveButton(R.string.general_ok) { _, _ ->
-                    viewModel.resetPhoneNumber(isModify, this) {
-                        startActivity(Intent(this, SMSVerificationActivity::class.java))
-                    }
+                    viewModel.resetPhoneNumber(isModify, this)
                 }
                 .setNegativeButton(getString(R.string.general_cancel), null)
                 .show()

@@ -97,4 +97,12 @@ class AppEventFacadeTest {
             assertThat(awaitItem()).isEqualTo(Unit)
         }
     }
+
+    @Test
+    fun `test that update user data fires an event when it broadcast`() = runTest {
+        underTest.monitorUpdateUserData().test {
+            underTest.broadcastUpdateUserData()
+            assertThat(expectMostRecentItem()).isEqualTo(Unit)
+        }
+    }
 }

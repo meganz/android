@@ -45,7 +45,6 @@ import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM_
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ITUNES
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.myAccount.usecase.CancelSubscriptionsUseCase
-import mega.privacy.android.app.myAccount.usecase.GetUserDataUseCase
 import mega.privacy.android.app.myAccount.usecase.QueryRecoveryLinkUseCase
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
@@ -93,6 +92,7 @@ import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.CheckVersionsUseCase
 import mega.privacy.android.domain.usecase.account.ConfirmCancelAccountUseCase
 import mega.privacy.android.domain.usecase.account.ConfirmChangeEmailUseCase
+import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.account.KillOtherSessionsUseCase
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
@@ -556,13 +556,6 @@ class MyAccountViewModel @Inject constructor(
     fun hasExpirableSubscription(): Boolean = myAccountInfo.proExpirationTime > 0
 
     /**
-     * Get last session
-     *
-     * @return
-     */
-    fun getLastSession(): String = myAccountInfo.lastSessionFormattedDate ?: ""
-
-    /**
      * There is no subscription
      *
      * @return
@@ -967,14 +960,13 @@ class MyAccountViewModel @Inject constructor(
      *
      * @param isModify
      * @param snackbarShower
-     * @param action
      * @receiver
      */
-    fun resetPhoneNumber(isModify: Boolean, snackbarShower: SnackbarShower, action: () -> Unit) {
+    fun resetPhoneNumber(isModify: Boolean, snackbarShower: SnackbarShower) {
         resetJob = viewModelScope.launch {
             runCatching { resetSMSVerifiedPhoneNumber() }
                 .onSuccess {
-                    getUserData(isModify, snackbarShower, action)
+                    getUserData(isModify, snackbarShower)
                 }
                 .onFailure {
                     Timber.e(it, "Reset phone number failed")
@@ -988,22 +980,24 @@ class MyAccountViewModel @Inject constructor(
      *
      * @param isModify       True if the action is modify phone number, false if is remove.
      * @param snackbarShower Callback to show the request result if needed.
-     * @param action         Action to perform after reset the phone number if modifying.
      */
-    private fun getUserData(isModify: Boolean, snackbarShower: SnackbarShower, action: () -> Unit) {
-        getUserDataUseCase.get()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = {
-                    if (isModify) action.invoke()
-                    else snackbarShower.showSnackbar(context.getString(R.string.remove_phone_number_success))
-                },
-                onError = { error ->
-                    Timber.w("Reset phone number failed: ${error.message}")
-                    snackbarShower.showSnackbar(context.getString(R.string.remove_phone_number_fail))
-                })
-            .addTo(composite)
+    private fun getUserData(isModify: Boolean, snackbarShower: SnackbarShower) {
+        viewModelScope.launch {
+            runCatching {
+                getUserDataUseCase()
+            }.onSuccess {
+                if (isModify) {
+                    _state.update {
+                        it.copy(shouldNavigateToSmsVerification = true)
+                    }
+                } else {
+                    snackbarShower.showSnackbar(context.getString(R.string.remove_phone_number_success))
+                }
+            }.onFailure {
+                Timber.w("Reset phone number failed: ${it.message}")
+                snackbarShower.showSnackbar(context.getString(R.string.remove_phone_number_fail))
+            }
+        }
     }
 
     /**
@@ -1245,6 +1239,15 @@ class MyAccountViewModel @Inject constructor(
             logoutUseCase()
         }.onFailure {
             Timber.d("Error on logout $it")
+        }
+    }
+
+    /**
+     * Reset shouldNavigateToSmsVerification state
+     */
+    fun onNavigatedToSmsVerification() {
+        _state.update {
+            it.copy(shouldNavigateToSmsVerification = false)
         }
     }
 }

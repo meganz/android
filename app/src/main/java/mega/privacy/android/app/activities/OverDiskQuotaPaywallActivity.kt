@@ -12,9 +12,6 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.core.text.HtmlCompat
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -23,7 +20,6 @@ import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUN
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ASK_PERMISSIONS
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_UPGRADE_ACCOUNT
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.myAccount.usecase.GetUserDataUseCase
 import mega.privacy.android.app.presentation.overdisk.OverDiskQuotaPaywallViewModel
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
@@ -39,9 +35,6 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
-
-    @Inject
-    lateinit var getUserDataUseCase: GetUserDataUseCase
 
     @Inject
     @ApplicationScope
@@ -71,18 +64,10 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
             updateAccountDetailsReceiver,
             IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
         )
-        registerReceiver(
-            updateUserDataReceiver,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_USER_DATA)
-        )
 
         viewModel.requestStorageDetailIfNeeded()
 
-        getUserDataUseCase.get()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe()
-            .addTo(composite)
+        viewModel.getUserData()
 
         setContentView(R.layout.activity_over_disk_quota_paywall)
 
@@ -98,14 +83,22 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
 
         upgradeButton = findViewById(R.id.upgrade_button)
         upgradeButton?.setOnClickListener(this)
+
+        collectFlows()
+    }
+
+    private fun collectFlows() {
         collectFlow(viewModel.pricing) {
             getProPlanNeeded()
+        }
+
+        collectFlow(viewModel.monitorUpdateUserData) {
+            updateStrings()
         }
     }
 
     override fun onDestroy() {
         unregisterReceiver(updateAccountDetailsReceiver)
-        unregisterReceiver(updateUserDataReceiver)
         super.onDestroy()
     }
 
@@ -141,12 +134,6 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
     }
 
     private val updateAccountDetailsReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            updateStrings()
-        }
-    }
-
-    private val updateUserDataReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             updateStrings()
         }

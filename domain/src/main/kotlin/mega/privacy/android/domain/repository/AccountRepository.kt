@@ -595,4 +595,19 @@ interface AccountRepository {
      * @return The new Email Address
      */
     suspend fun confirmChangeEmail(changeEmailLink: String, accountPassword: String): String
+
+    /**
+     * Get the user's data
+     */
+    suspend fun getUserData()
+
+    /**
+     * Broadcasts update user's data.
+     */
+    suspend fun broadcastUpdateUserData()
+
+    /**
+     * Monitors update user's data broadcast.
+     */
+    fun monitorUpdateUserData(): Flow<Unit>
 }

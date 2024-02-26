@@ -69,6 +69,7 @@ internal class AppEventFacade @Inject constructor(
     private val callRecordingConsentEvent = MutableSharedFlow<Boolean>()
     private val callEnded = MutableSharedFlow<Long>()
 
+    private val updateUserData = MutableSharedFlow<Unit>()
 
     override suspend fun broadcastCookieSettings(enabledCookieSettings: Set<CookieType>) {
         _cookieSettings.emit(enabledCookieSettings)
@@ -221,6 +222,14 @@ internal class AppEventFacade @Inject constructor(
     override fun monitorCallEnded() = callEnded.asSharedFlow()
 
     override suspend fun broadcastCallEnded(chatId: Long) = callEnded.emit(chatId)
+
+    override suspend fun broadcastUpdateUserData() {
+        updateUserData.emit(Unit)
+    }
+
+    override fun monitorUpdateUserData(): Flow<Unit> {
+        return updateUserData
+    }
 }
 
 private fun <T> Flow<T>.toSharedFlow(

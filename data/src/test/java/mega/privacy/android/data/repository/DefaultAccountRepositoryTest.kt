@@ -2,14 +2,11 @@ package mega.privacy.android.data.repository
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
@@ -69,7 +66,6 @@ import nz.mega.sdk.MegaPricing
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaUser
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -88,6 +84,7 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
+import java.util.stream.Stream
 import kotlin.contracts.ExperimentalContracts
 import kotlin.test.assertEquals
 
@@ -187,14 +184,8 @@ class DefaultAccountRepositoryTest {
         )
     }
 
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
-
     @BeforeAll
     fun setUp() {
-        Dispatchers.setMain(StandardTestDispatcher())
         underTest = DefaultAccountRepository(
             context = mock(),
             myAccountInfoFacade = accountInfoWrapper,
@@ -1548,6 +1539,121 @@ class DefaultAccountRepositoryTest {
                     changeEmailLink = "change/email/link",
                     accountPassword = "accountPassword",
                 )
+            }
+        }
+
+    @Test
+    fun `test that get user data returns Unit when the sdk is successful`() = runTest {
+        // Given
+        val megaErrorCode = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+        whenever(
+            megaApiGateway.getUserData(
+                listener = any()
+            )
+        ).thenAnswer {
+            ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                api = mock(),
+                request = mock(),
+                error = megaErrorCode
+            )
+        }
+
+        // When
+        val actual = underTest.getUserData()
+
+        // Then
+        verify(megaApiGateway).getUserData(any())
+        assertThat(actual).isEqualTo(Unit)
+    }
+
+    @ParameterizedTest(name = "when the sdk returns {0} error code which is not a success code")
+    @MethodSource("provideMegaError")
+    fun `test that get user data throws an error`(megaError: Int) = runTest {
+        // Given
+        val megaErrorCode = mock<MegaError> {
+            on { errorCode }.thenReturn(megaError)
+        }
+        whenever(
+            megaApiGateway.getUserData(
+                listener = any()
+            )
+        ).thenAnswer {
+            ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                api = mock(),
+                request = mock(),
+                error = megaErrorCode
+            )
+        }
+
+        // Then
+        assertThrows<MegaException> {
+            underTest.getUserData()
+        }
+    }
+
+    private fun provideMegaError() = Stream.of(
+        Arguments.of(MegaError.API_EINTERNAL),
+        Arguments.of(MegaError.API_EARGS),
+        Arguments.of(MegaError.API_EAGAIN),
+        Arguments.of(MegaError.API_ERATELIMIT),
+        Arguments.of(MegaError.API_EFAILED),
+        Arguments.of(MegaError.API_ETOOMANY),
+        Arguments.of(MegaError.API_ERANGE),
+        Arguments.of(MegaError.API_EEXPIRED),
+        Arguments.of(MegaError.API_ENOENT),
+        Arguments.of(MegaError.API_ECIRCULAR),
+        Arguments.of(MegaError.API_EACCESS),
+        Arguments.of(MegaError.API_EEXIST),
+        Arguments.of(MegaError.API_EINCOMPLETE),
+        Arguments.of(MegaError.API_EKEY),
+        Arguments.of(MegaError.API_ESID),
+        Arguments.of(MegaError.API_EBLOCKED),
+        Arguments.of(MegaError.API_EOVERQUOTA),
+        Arguments.of(MegaError.API_ETEMPUNAVAIL),
+        Arguments.of(MegaError.API_ETOOMANYCONNECTIONS),
+        Arguments.of(MegaError.API_EWRITE),
+        Arguments.of(MegaError.API_EREAD),
+        Arguments.of(MegaError.API_EAPPKEY),
+        Arguments.of(MegaError.API_ESSL),
+        Arguments.of(MegaError.API_EGOINGOVERQUOTA),
+        Arguments.of(MegaError.API_EMFAREQUIRED),
+        Arguments.of(MegaError.API_EMASTERONLY),
+        Arguments.of(MegaError.API_EBUSINESSPASTDUE),
+        Arguments.of(MegaError.API_EPAYWALL),
+        Arguments.of(MegaError.PAYMENT_ECARD),
+        Arguments.of(MegaError.PAYMENT_EBILLING),
+        Arguments.of(MegaError.PAYMENT_EFRAUD),
+        Arguments.of(MegaError.PAYMENT_ETOOMANY),
+        Arguments.of(MegaError.PAYMENT_EBALANCE),
+        Arguments.of(MegaError.PAYMENT_EGENERIC),
+        Arguments.of(MegaError.LOCAL_ENOSPC)
+    )
+
+    @Test
+    fun `test that the sdk broadcast the update user data event when execute the broadcast method in repository`() =
+        runTest {
+            // When
+            underTest.broadcastUpdateUserData()
+
+            // Then
+            verify(appEventGateway).broadcastUpdateUserData()
+        }
+
+    @Test
+    fun `test that update user data should receives events when execute the sdk is broadcasting`() =
+        runTest {
+            // Given
+            val updateUserDataEvent = MutableSharedFlow<Unit>()
+            whenever(appEventGateway.monitorUpdateUserData()).thenReturn(updateUserDataEvent)
+
+            underTest.monitorUpdateUserData().test {
+                // When
+                updateUserDataEvent.emit(Unit)
+
+                // Then
+                assertThat(expectMostRecentItem()).isEqualTo(Unit)
             }
         }
 }

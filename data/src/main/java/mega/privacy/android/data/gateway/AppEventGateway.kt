@@ -370,4 +370,8 @@ internal interface AppEventGateway {
      * @return Flow of Boolean. ID of the chat to which the call corresponded.
      */
     fun monitorCallEnded(): Flow<Long>
+
+    suspend fun broadcastUpdateUserData()
+
+    fun monitorUpdateUserData(): Flow<Unit>
 }

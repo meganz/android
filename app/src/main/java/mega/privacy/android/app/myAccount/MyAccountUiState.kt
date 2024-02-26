@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.Feature
  * @property backupStorageSize
  * @property errorMessage The Error Message to be displayed
  * @property errorMessageRes A [StringRes] version of the Error Message to be displayed
+ * @property shouldNavigateToSmsVerification
  */
 data class MyAccountUiState(
     val isFileVersioningEnabled: Boolean = true,
@@ -36,4 +37,5 @@ data class MyAccountUiState(
     val backupStorageSize: Long = 0L,
     val errorMessage: String = "",
     @StringRes val errorMessageRes: Int? = null,
+    val shouldNavigateToSmsVerification: Boolean = false,
 )

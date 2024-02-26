@@ -8,8 +8,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
+import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
+import mega.privacy.android.domain.usecase.account.MonitorUpdateUserDataUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -22,6 +24,8 @@ class OverDiskQuotaPaywallViewModel @Inject constructor(
     private val isDatabaseEntryStale: IsDatabaseEntryStale,
     private val getSpecificAccountDetailUseCase: GetSpecificAccountDetailUseCase,
     private val getPricing: GetPricing,
+    private val getUserDataUseCase: GetUserDataUseCase,
+    monitorUpdateUserDataUseCase: MonitorUpdateUserDataUseCase,
 ) : ViewModel() {
     private val _pricing = MutableStateFlow(Pricing(emptyList()))
 
@@ -29,6 +33,11 @@ class OverDiskQuotaPaywallViewModel @Inject constructor(
      * Pricing
      */
     val pricing = _pricing.asStateFlow()
+
+    /**
+     * Monitor update user data broadcast event
+     */
+    val monitorUpdateUserData = monitorUpdateUserDataUseCase()
 
     init {
         viewModelScope.launch {
@@ -49,6 +58,17 @@ class OverDiskQuotaPaywallViewModel @Inject constructor(
                     Timber.w("Exception getting account detail: $it")
                 }
             }
+        }
+    }
+
+    /**
+     * Request user's data
+     */
+    fun getUserData() = viewModelScope.launch {
+        runCatching {
+            getUserDataUseCase()
+        }.onFailure {
+            Timber.e("Failed to get the user's data: $it")
         }
     }
 }
