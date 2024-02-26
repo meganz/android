@@ -29,6 +29,7 @@ import mega.privacy.android.data.gateway.api.StreamingGateway
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
+import mega.privacy.android.data.mapper.MimeTypeMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
@@ -53,6 +54,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.NullAndEmptySource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -63,6 +65,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 import kotlin.test.assertFailsWith
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Test class for [FileSystemRepositoryImpl]
@@ -91,6 +94,7 @@ internal class FileSystemRepositoryImplTest {
     private val deviceGateway = mock<DeviceGateway>()
     private val sdCardGateway = mock<SDCardGateway>()
     private val fileAttributeGateway = mock<FileAttributeGateway>()
+    private val mimeTypeMapper = mock<MimeTypeMapper>()
 
     @BeforeAll
     fun setUp() {
@@ -126,6 +130,7 @@ internal class FileSystemRepositoryImplTest {
             sdCardGateway = sdCardGateway,
             fileAttributeGateway = fileAttributeGateway,
             sharingScope = TestScope(),
+            mimeTypeMapper = mimeTypeMapper
         )
     }
 
@@ -150,6 +155,7 @@ internal class FileSystemRepositoryImplTest {
             deviceGateway,
             sdCardGateway,
             fileAttributeGateway,
+            mimeTypeMapper,
         )
     }
 
@@ -507,4 +513,17 @@ internal class FileSystemRepositoryImplTest {
             whenever(fileGateway.deleteFile(any())).thenReturn(deleteVoiceClip)
             assertThat(underTest.deleteVoiceClip("name")).isEqualTo(deleteVoiceClip)
         }
+
+    @Test
+    fun `test that fileTypeInfo gets the duration from file attribute gateway`() = runTest {
+        val filePath = "path/video.mp4"
+        val file = File(filePath)
+        val duration = 4567.milliseconds
+        whenever(mimeTypeMapper(any())).thenReturn("mime")
+        whenever(fileAttributeGateway.getVideoDuration(file.absolutePath)) doReturn duration
+        underTest.getFileTypeInfo(file)
+        val argumentCaptor = argumentCaptor<String>()
+        verify(fileAttributeGateway).getVideoDuration(argumentCaptor.capture())
+        assertThat(argumentCaptor.firstValue).endsWith(filePath)
+    }
 }

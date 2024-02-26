@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
+import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -23,15 +24,22 @@ class CreatePendingAttachmentMessageUseCaseTest {
     private lateinit var underTest: CreatePendingAttachmentMessageUseCase
 
     private val getMyUserHandleUseCase = mock<GetMyUserHandleUseCase>()
+    private val fileSystemRepository = mock<FileSystemRepository>()
 
     @BeforeEach
     internal fun setUp() {
-        underTest = CreatePendingAttachmentMessageUseCase(getMyUserHandleUseCase)
+        underTest = CreatePendingAttachmentMessageUseCase(
+            getMyUserHandleUseCase,
+            fileSystemRepository,
+        )
     }
 
     @AfterEach
     internal fun resetMocks() {
-        reset(getMyUserHandleUseCase)
+        reset(
+            getMyUserHandleUseCase,
+            fileSystemRepository,
+        )
     }
 
     @ParameterizedTest
@@ -44,7 +52,10 @@ class CreatePendingAttachmentMessageUseCaseTest {
         val time = 72834578L
         val userHandle = 245L
         val filePath = "filepath"
+        val fileTypeInfo = mock<UnknownFileTypeInfo>()
         whenever(getMyUserHandleUseCase()).thenReturn(userHandle)
+        whenever(fileSystemRepository.getFileTypeInfo(File(filePath)))
+            .thenReturn(fileTypeInfo)
         val pendingMessage = PendingMessage(
             id = msgId,
             chatId = chatId,
@@ -64,7 +75,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
             reactions = emptyList(),
             status = getChatMessageStatus(state),
             file = File(filePath),
-            fileType = UnknownFileTypeInfo("", "")
+            fileType = fileTypeInfo
         )
         val actual = underTest(pendingMessage)
         assertThat(actual).isEqualTo(expected)

@@ -42,7 +42,9 @@ import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
+import mega.privacy.android.data.mapper.MimeTypeMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.getFileTypeInfoForExtension
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.model.GlobalUpdate
@@ -113,6 +115,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     private val sdCardGateway: SDCardGateway,
     private val fileAttributeGateway: FileAttributeGateway,
     @ApplicationScope private val sharingScope: CoroutineScope,
+    private val mimeTypeMapper: MimeTypeMapper,
 ) : FileSystemRepository {
 
     init {
@@ -574,6 +577,16 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun deleteVoiceClip(name: String): Boolean =
         withContext(ioDispatcher + NonCancellable) {
             cacheGateway.getVoiceClipFile(name)?.let { fileGateway.deleteFile(it) } ?: false
+        }
+
+    override suspend fun getFileTypeInfo(file: File) =
+        withContext(ioDispatcher) {
+            val duration = fileAttributeGateway.getVideoDuration(file.absolutePath)
+            getFileTypeInfoForExtension(
+                mimeType = mimeTypeMapper(file.extension),
+                extension = file.extension,
+                duration = duration?.inWholeSeconds?.toInt() ?: 0,
+            )
         }
 
 }

@@ -1,10 +1,10 @@
 package mega.privacy.android.domain.usecase.chat.message
 
-import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
+import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import java.io.File
 import javax.inject.Inject
@@ -15,12 +15,14 @@ import javax.inject.Inject
  */
 class CreatePendingAttachmentMessageUseCase @Inject constructor(
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
+    private val fileSystemRepository: FileSystemRepository,
 ) {
 
     /**
      * Invoke
      */
     suspend operator fun invoke(pendingMessage: PendingMessage) = with(pendingMessage) {
+        val file = File(filePath)
         PendingAttachmentMessage(
             chatId = chatId,
             msgId = id,
@@ -32,8 +34,8 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
             shouldShowTime = true,
             reactions = emptyList(),
             status = this.getChatMessageStatus(),
-            file = File(filePath),
-            fileType = UnknownFileTypeInfo("", "")
+            file = file,
+            fileType = fileSystemRepository.getFileTypeInfo(file)
         )
     }
 

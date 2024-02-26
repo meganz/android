@@ -6,6 +6,8 @@ import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.mapper.ISO6709LocationMapper
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 
 /**
@@ -49,4 +51,14 @@ internal class FileAttributeFacade @Inject constructor(
             Timber.e("getPhotoGPSCoordinates Exception $it")
         }.getOrNull()
     }
+
+    override suspend fun getVideoDuration(filePath: String): Duration? =
+        runCatching {
+            val retriever = MediaMetadataRetriever()
+            retriever.setDataSource(filePath)
+            val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                ?.toLongOrNull()?.milliseconds
+            retriever.release()
+            duration
+        }.getOrNull()
 }

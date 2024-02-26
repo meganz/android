@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.repository
 
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
@@ -361,4 +362,9 @@ interface FileSystemRepository {
      * @return True if file has been removed, false otherwise
      */
     suspend fun deleteVoiceClip(name: String): Boolean
+
+    /**
+     * Get file type info for a given file
+     */
+    suspend fun getFileTypeInfo(file: File): FileTypeInfo
 }

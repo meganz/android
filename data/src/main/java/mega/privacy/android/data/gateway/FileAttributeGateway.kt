@@ -1,5 +1,7 @@
 package mega.privacy.android.data.gateway
 
+import kotlin.time.Duration
+
 /**
  * File Attributes Gateway
  */
@@ -22,4 +24,9 @@ interface FileAttributeGateway {
      * @return a pair with latitude and longitude coordinates
      */
     suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Double, Double>?
+
+    /**
+     * Get the video duration of this file or null if it's not a Video or duration can be known
+     */
+    suspend fun getVideoDuration(filePath: String): Duration?
 }
