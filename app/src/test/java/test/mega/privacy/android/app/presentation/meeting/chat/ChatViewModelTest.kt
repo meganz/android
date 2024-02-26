@@ -52,6 +52,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.messages.ForwardResult
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.node.NodeId
@@ -99,6 +100,9 @@ import mega.privacy.android.domain.usecase.chat.message.SendGiphyMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.delete.DeleteMessagesUseCase
+import mega.privacy.android.domain.usecase.chat.message.edit.EditLocationMessageUseCase
+import mega.privacy.android.domain.usecase.chat.message.edit.EditMessageUseCase
+import mega.privacy.android.domain.usecase.chat.message.edit.GetMessageContentUseCase
 import mega.privacy.android.domain.usecase.chat.message.forward.ForwardMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.AddReactionUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.DeleteReactionUseCase
@@ -269,6 +273,9 @@ internal class ChatViewModelTest {
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val addNodeType = mock<AddNodeType>()
     private val deleteMessagesUseCase = mock<DeleteMessagesUseCase>()
+    private val getMessageContentUseCase = mock<GetMessageContentUseCase>()
+    private val editMessageUseCase = mock<EditMessageUseCase>()
+    private val editLocationMessageUseCase = mock<EditLocationMessageUseCase>()
 
     @BeforeEach
     fun resetMocks() {
@@ -325,6 +332,9 @@ internal class ChatViewModelTest {
             forwardMessagesResultMapper,
             addNodeType,
             deleteMessagesUseCase,
+            getMessageContentUseCase,
+            editMessageUseCase,
+            editLocationMessageUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -422,6 +432,9 @@ internal class ChatViewModelTest {
             getNodeByIdUseCase = getNodeByIdUseCase,
             addNodeType = addNodeType,
             deleteMessagesUseCase = deleteMessagesUseCase,
+            getMessageContentUseCase = getMessageContentUseCase,
+            editMessageUseCase = editMessageUseCase,
+            editLocationMessageUseCase = editLocationMessageUseCase,
         )
     }
 
@@ -2687,6 +2700,90 @@ internal class ChatViewModelTest {
         underTest.onDeletedMessages(messages)
         verify(deleteMessagesUseCase).invoke(messages.toList())
     }
+
+    @Test
+    fun `test that on edit message invokes and updates state correctly`() = runTest {
+        val content = "content"
+        val msgId = 1234L
+        val message = mock<NormalMessage> {
+            on { this.msgId } doReturn msgId
+            on { this.content } doReturn content
+        }
+        whenever(getMessageContentUseCase(message)).thenReturn(content)
+        with(underTest) {
+            onEditMessage(message)
+            state.test {
+                val actual = awaitItem()
+                assertThat(actual.editingMessageId).isEqualTo(msgId)
+                assertThat(actual.editingMessageContent).isEqualTo(content)
+                assertThat(actual.sendingText).isEqualTo(content)
+            }
+        }
+    }
+
+    @Test
+    fun `test that on edit message shows error if cannot be edited`() = runTest {
+        val content = ""
+        val msgId = 1234L
+        val message = mock<NormalMessage> {
+            on { this.msgId } doReturn msgId
+            on { this.content } doReturn content
+        }
+        whenever(getMessageContentUseCase(message)).thenReturn(content)
+        with(underTest) {
+            onEditMessage(message)
+            state.test {
+                val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                    .content as InfoToShow.SimpleString).stringId
+                assertThat(result).isEqualTo(R.string.error_editing_message)
+            }
+        }
+    }
+
+    @Test
+    fun `test that send text message invokes and updates correctly if it is editing`() = runTest {
+        val content = "content"
+        val newContent = "newContent"
+        val msgId = 1234L
+        val message = mock<NormalMessage> {
+            on { this.msgId } doReturn msgId
+            on { this.content } doReturn content
+        }
+        whenever(getMessageContentUseCase(message)).thenReturn(content)
+        whenever(editMessageUseCase(chatId, msgId, newContent)).thenReturn(mock())
+        with(underTest) {
+            onEditMessage(message)
+            sendTextMessage(newContent)
+            state.test {
+                val actual = awaitItem()
+                assertThat(actual.editingMessageId).isNull()
+                assertThat(actual.editingMessageContent).isNull()
+            }
+        }
+    }
+
+    @Test
+    fun `test that send text message invokes and updates correctly if it is editing and the edition fails`() =
+        runTest {
+            val content = "content"
+            val newContent = "newContent"
+            val msgId = 1234L
+            val message = mock<NormalMessage> {
+                on { this.msgId } doReturn msgId
+                on { this.content } doReturn content
+            }
+            whenever(getMessageContentUseCase(message)).thenReturn(content)
+            whenever(editMessageUseCase(chatId, msgId, newContent)).thenReturn(null)
+            with(underTest) {
+                onEditMessage(message)
+                sendTextMessage(newContent)
+                state.test {
+                    val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                        .content as InfoToShow.SimpleString).stringId
+                    assertThat(result).isEqualTo(R.string.error_editing_message)
+                }
+            }
+        }
 
     private fun ChatRoom.getNumberParticipants() =
         (peerCount + if (ownPrivilege != ChatRoomPermission.Unknown

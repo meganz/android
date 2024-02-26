@@ -15,7 +15,6 @@ internal fun CopyBottomSheetOption(onClick: () -> Unit) {
         text = stringResource(id = R.string.context_copy),
         icon = painterResource(id = R.drawable.ic_icon_copy_medium_regular_outline),
         isDestructive = false,
-        addSeparator = false,
         modifier = Modifier
             .testTag(CHAT_BOTTOM_SHEET_OPTION_COPY_TAG)
             .clickable { onClick() }

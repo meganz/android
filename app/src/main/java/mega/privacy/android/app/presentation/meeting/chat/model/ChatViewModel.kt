@@ -32,6 +32,7 @@ import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ParticipantNameMapper
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.INVALID_LOCATION_MESSAGE_ID
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
@@ -91,6 +92,9 @@ import mega.privacy.android.domain.usecase.chat.message.SendGiphyMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.delete.DeleteMessagesUseCase
+import mega.privacy.android.domain.usecase.chat.message.edit.EditLocationMessageUseCase
+import mega.privacy.android.domain.usecase.chat.message.edit.EditMessageUseCase
+import mega.privacy.android.domain.usecase.chat.message.edit.GetMessageContentUseCase
 import mega.privacy.android.domain.usecase.chat.message.forward.ForwardMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.AddReactionUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.DeleteReactionUseCase
@@ -214,6 +218,9 @@ class ChatViewModel @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val addNodeType: AddNodeType,
     private val deleteMessagesUseCase: DeleteMessagesUseCase,
+    private val getMessageContentUseCase: GetMessageContentUseCase,
+    private val editMessageUseCase: EditMessageUseCase,
+    private val editLocationMessageUseCase: EditLocationMessageUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -1003,15 +1010,13 @@ class ChatViewModel @Inject constructor(
      */
     fun sendTextMessage(message: String) {
         viewModelScope.launch {
-            if (state.value.editingMessageId != null) {
-                runCatching {
-                    TODO("Not implemented yet")
-                }.onFailure {
-                    Timber.e(it)
+            state.value.editingMessageId?.let {
+                val editedMessage = editMessageUseCase(chatId, it, message)
+                onCloseEditing()
+                if (editedMessage == null) {
+                    messageCannotBeEdited()
                 }
-            } else {
-                sendTextMessageUseCase(chatId, message)
-            }
+            } ?: sendTextMessageUseCase(chatId, message)
         }
     }
 
@@ -1136,11 +1141,21 @@ class ChatViewModel @Inject constructor(
             val latitude = data.getDoubleExtra(MapsActivity.LATITUDE, 0.0).toFloat()
             val longitude = data.getDoubleExtra(MapsActivity.LONGITUDE, 0.0).toFloat()
             val isEditing = data.getBooleanExtra(MapsActivity.EDITING_MESSAGE, false)
+            val msgId = data.getLongExtra(MapsActivity.MSG_ID, INVALID_LOCATION_MESSAGE_ID)
 
             viewModelScope.launch {
                 val encodedSnapshot = Base64.encodeToString(byteArray, Base64.DEFAULT)
                 if (isEditing) {
-                    TODO("Not implemented yet")
+                    val editedMessage = editLocationMessageUseCase(
+                        chatId = chatId,
+                        msgId = msgId,
+                        longitude = longitude,
+                        latitude = latitude,
+                        image = encodedSnapshot
+                    )
+                    if (editedMessage == null) {
+                        messageCannotBeEdited()
+                    }
                 } else {
                     sendLocationMessageUseCase(
                         chatId = chatId,
@@ -1158,7 +1173,12 @@ class ChatViewModel @Inject constructor(
      *
      */
     fun onCloseEditing() {
-        _state.update { state -> state.copy(editingMessageId = null) }
+        _state.update { state ->
+            state.copy(
+                editingMessageId = null,
+                editingMessageContent = null,
+            )
+        }
     }
 
     /**
@@ -1358,14 +1378,26 @@ class ChatViewModel @Inject constructor(
      * @param message [TypedMessage].
      */
     fun onEditMessage(message: TypedMessage) {
-        // Create a new use case for getting message content.
-        _state.update { state ->
-            state.copy(
-                editingMessageId = message.msgId,
-                editingMessageContent = "Content",
-                sendingText = "Content"
-            )
+        viewModelScope.launch {
+            val content = getMessageContentUseCase(message)
+            if (content.isEmpty()) {
+                messageCannotBeEdited()
+                onCloseEditing()
+            } else {
+                _state.update { state ->
+                    state.copy(
+                        sendingText = content,
+                        editingMessageId = message.msgId,
+                        editingMessageContent = content,
+                    )
+                }
+            }
         }
+    }
+
+    private fun messageCannotBeEdited() {
+        val infoToShow = InfoToShow.SimpleString(R.string.error_editing_message)
+        _state.update { state -> state.copy(infoToShowEvent = triggered(infoToShow)) }
     }
 
     companion object {
