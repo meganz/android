@@ -1,8 +1,5 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareMenuAction
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -23,17 +20,11 @@ import java.util.stream.Stream
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ShareBottomSheetMenuItemTest {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val applicationScope: CoroutineScope = CoroutineScope(
-        UnconfinedTestDispatcher()
-    )
-
     private val getLocalFilePathUseCase: GetLocalFilePathUseCase = mock()
     private val exportNodesUseCase: ExportNodeUseCase = mock()
     private val getFileUriUseCase: GetFileUriUseCase = mock()
     private val shareBottomSheetMenuItem = ShareBottomSheetMenuItem(
         menuAction = ShareMenuAction(),
-        scope = applicationScope,
         getLocalFilePathUseCase = getLocalFilePathUseCase,
         exportNodesUseCase = exportNodesUseCase,
         getFileUriUseCase = getFileUriUseCase

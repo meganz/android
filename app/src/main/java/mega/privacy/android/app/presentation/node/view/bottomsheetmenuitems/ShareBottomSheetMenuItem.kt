@@ -5,7 +5,10 @@ import android.content.Intent
 import android.net.Uri
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareMenuAction
@@ -15,7 +18,6 @@ import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
@@ -31,7 +33,6 @@ import javax.inject.Inject
  */
 class ShareBottomSheetMenuItem @Inject constructor(
     override val menuAction: ShareMenuAction,
-    @ApplicationScope private val scope: CoroutineScope,
     private val getLocalFilePathUseCase: GetLocalFilePathUseCase,
     private val exportNodesUseCase: ExportNodeUseCase,
     private val getFileUriUseCase: GetFileUriUseCase,
@@ -56,46 +57,51 @@ class ShareBottomSheetMenuItem @Inject constructor(
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
         val context = navController.context
-        scope.launch {
-            Analytics.tracker.trackEvent(SearchResultShareMenuItemEvent)
-            val path = runCatching {
-                getLocalFilePathUseCase(node)
-            }.getOrElse {
-                Timber.e(it)
-                null
-            }
-            if (node is TypedFileNode && path != null) {
-                getLocalFileUri(path)?.let {
-                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                        type = "${node.type.mimeType}/*"
-                        putExtra(Intent.EXTRA_STREAM, Uri.parse(it))
-                        putExtra(Intent.EXTRA_SUBJECT, node.name)
-                        addFlags(
-                            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+        parentCoroutineScope.launch {
+            withContext(NonCancellable) {
+                Analytics.tracker.trackEvent(SearchResultShareMenuItemEvent)
+                val path = runCatching {
+                    getLocalFilePathUseCase(node)
+                }.getOrElse {
+                    Timber.e(it)
+                    null
+                }
+                if (node is TypedFileNode && path != null) {
+                    getLocalFileUri(path)?.let {
+                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                            type = "${node.type.mimeType}/*"
+                            putExtra(Intent.EXTRA_STREAM, Uri.parse(it))
+                            putExtra(Intent.EXTRA_SUBJECT, node.name)
+                            addFlags(
+                                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                            )
+                        }
+                        parentCoroutineScope.ensureActive()
+                        context.startActivity(
+                            Intent.createChooser(
+                                shareIntent,
+                                context.getString(R.string.context_share)
+                            )
                         )
                     }
-                    context.startActivity(
-                        Intent.createChooser(
-                            shareIntent,
-                            context.getString(R.string.context_share)
-                        )
-                    )
-                }
-            } else {
-                val publicLink = node.exportedData?.publicLink
-                if (publicLink != null) {
-                    startShareIntent(
-                        context = context,
-                        path = publicLink,
-                        name = node.name
-                    )
                 } else {
-                    val exportPath = exportNodesUseCase(node.id)
-                    startShareIntent(
-                        context = context,
-                        path = exportPath,
-                        name = node.name
-                    )
+                    val publicLink = node.exportedData?.publicLink
+                    if (publicLink != null) {
+                        parentCoroutineScope.ensureActive()
+                        startShareIntent(
+                            context = context,
+                            path = publicLink,
+                            name = node.name
+                        )
+                    } else {
+                        val exportPath = exportNodesUseCase(node.id)
+                        parentCoroutineScope.ensureActive()
+                        startShareIntent(
+                            context = context,
+                            path = exportPath,
+                            name = node.name
+                        )
+                    }
                 }
             }
         }

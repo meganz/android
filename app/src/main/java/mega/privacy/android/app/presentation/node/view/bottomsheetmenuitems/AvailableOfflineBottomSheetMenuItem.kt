@@ -2,13 +2,14 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.presentation.node.model.menuaction.AvailableOfflineMenuAction
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.foldernode.IsFolderEmptyUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
@@ -25,7 +26,6 @@ class AvailableOfflineBottomSheetMenuItem @Inject constructor(
     override val menuAction: AvailableOfflineMenuAction,
     private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
     private val isFolderEmptyUseCase: IsFolderEmptyUseCase,
-    @ApplicationScope private val scope: CoroutineScope,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
 
     override fun buildComposeControl(
@@ -71,10 +71,12 @@ class AvailableOfflineBottomSheetMenuItem @Inject constructor(
     ): () -> Unit = {
         onDismiss()
         if (node.isAvailableOffline) {
-            scope.launch {
-                runCatching {
-                    removeOfflineNodeUseCase(nodeId = node.id)
-                }.onFailure { Timber.e(it) }
+            parentCoroutineScope.launch {
+                withContext(NonCancellable) {
+                    runCatching {
+                        removeOfflineNodeUseCase(nodeId = node.id)
+                    }.onFailure { Timber.e(it) }
+                }
             }
         } else {
             actionHandler(menuAction, node)
