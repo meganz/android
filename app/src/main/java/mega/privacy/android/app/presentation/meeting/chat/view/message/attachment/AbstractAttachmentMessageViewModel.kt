@@ -32,22 +32,30 @@ abstract class AbstractAttachmentMessageViewModel<T : AttachmentMessage>(
     ): MutableStateFlow<AttachmentMessageUiState> =
         _uiStateFlowMap.getOrPut(attachmentMessage.msgId) {
             MutableStateFlow(
-                AttachmentMessageUiState(
-                    fileName = attachmentMessage.fileName,
-                    fileSize = fileSizeStringMapper(attachmentMessage.fileSize),
-                    duration = attachmentMessage.duration?.let { durationInSecondsTextMapper(it) },
-                    fileTypeResId = getFileIconChat(attachmentMessage.fileType),
-                )
+                createFirstUiState(attachmentMessage)
             ).also {
                 onMessageAdded(it, attachmentMessage)
             }
         }
 
+    internal fun getUiStateFlow(messageId: Long): MutableStateFlow<AttachmentMessageUiState>? =
+        _uiStateFlowMap[messageId]
+
     /**
      * Event to handle message added
      */
-    abstract fun onMessageAdded(
+    protected open fun onMessageAdded(
         mutableStateFlow: MutableStateFlow<AttachmentMessageUiState>,
         attachmentMessage: T,
+    ) = Unit
+
+    /**
+     * Creates the initial ui state for this attachment message
+     */
+    internal open fun createFirstUiState(attachmentMessage: T) = AttachmentMessageUiState(
+        fileName = attachmentMessage.fileName,
+        fileSize = fileSizeStringMapper(attachmentMessage.fileSize),
+        duration = attachmentMessage.duration?.let { durationInSecondsTextMapper(it) },
+        fileTypeResId = getFileIconChat(attachmentMessage.fileType),
     )
 }

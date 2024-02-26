@@ -12,6 +12,7 @@ import androidx.paging.PagingData
 import androidx.paging.TerminalSeparatorType
 import androidx.paging.cachedIn
 import androidx.paging.insertFooterItem
+import androidx.paging.insertHeaderItem
 import androidx.paging.insertSeparators
 import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
@@ -37,6 +39,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
 import mega.privacy.android.domain.usecase.chat.message.GetLastMessageSeenIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.MonitorChatRoomMessageUpdatesUseCase
+import mega.privacy.android.domain.usecase.chat.message.MonitorPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.message.SetMessageSeenUseCase
 import mega.privacy.android.domain.usecase.chat.message.paging.GetChatPagingSourceUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.MonitorReactionUpdatesUseCase
@@ -68,6 +71,7 @@ class MessageListViewModel @Inject constructor(
     private val monitorChatRoomMessageUpdatesUseCase: MonitorChatRoomMessageUpdatesUseCase,
     private val monitorReactionUpdatesUseCase: MonitorReactionUpdatesUseCase,
     private val monitorContactCacheUpdates: MonitorContactCacheUpdates,
+    monitorPendingMessagesUseCase: MonitorPendingMessagesUseCase,
 ) : ViewModel() {
 
     private val chatId = savedStateHandle.get<Long?>(Constants.CHAT_ID) ?: -1
@@ -155,7 +159,14 @@ class MessageListViewModel @Inject constructor(
                 ),
             ) {
                 getChatPagingSourceUseCase(chatId)
-            }.flow.map { pagingData ->
+            }.flow.cachedIn(viewModelScope).combine(
+                monitorPendingMessagesUseCase(chatId).map { pendingMessages ->
+                    pendingMessages.map { pendingMessage ->
+                        uiChatMessageMapper(
+                            pendingMessage
+                        )
+                    }
+                }) { pagingData, pendingMessages ->
                 pagingData.map {
                     uiChatMessageMapper(it)
                 }.insertSeparators { before, after: UiChatMessage? ->
@@ -175,9 +186,17 @@ class MessageListViewModel @Inject constructor(
                 }.insertFooterItem(
                     item = ChatHeaderMessage(),
                     terminalSeparatorType = TerminalSeparatorType.SOURCE_COMPLETE
-                )
+                ).let { pagingDataWithoutPending ->
+                    pendingMessages.fold(pagingDataWithoutPending) { pagingData, pendingMessage ->
+                        //pending messages always at the end (header because list is reversed in the ui)
+                        pagingData.insertHeaderItem(
+                            item = pendingMessage,
+                            terminalSeparatorType = TerminalSeparatorType.SOURCE_COMPLETE
+                        )
+                    }
+                }
             }
-        }.cachedIn(viewModelScope)
+        }
 
     /**
      * Paged messages

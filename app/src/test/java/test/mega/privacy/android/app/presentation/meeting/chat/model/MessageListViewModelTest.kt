@@ -80,6 +80,7 @@ internal class MessageListViewModelTest {
             monitorChatRoomMessageUpdatesUseCase = mock(),
             monitorReactionUpdatesUseCase = mock(),
             monitorContactCacheUpdates = monitorContactCacheUpdates,
+            monitorPendingMessagesUseCase = mock(),
         )
     }
 

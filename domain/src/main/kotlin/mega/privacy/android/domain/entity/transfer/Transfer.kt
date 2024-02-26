@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.transfer
 
+import mega.privacy.android.domain.entity.Progress
 import java.math.BigInteger
 
 /**
@@ -78,4 +79,9 @@ data class Transfer(
      * true if represents a transfer initiated by the app false if the transfer was initiated by the sdk for children nodes of a folder transfer
      */
     val isRootTransfer = folderTransferTag == null
+
+    /**
+     * progress of the transfer
+     */
+    val progress = Progress(transferredBytes, totalBytes)
 }

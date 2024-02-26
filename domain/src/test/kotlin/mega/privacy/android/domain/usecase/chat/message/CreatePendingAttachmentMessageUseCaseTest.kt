@@ -59,7 +59,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
             isDeletable = false,
             isEditable = false,
             userHandle = userHandle,
-            shouldShowAvatar = true,
+            shouldShowAvatar = false,
             shouldShowTime = true,
             reactions = emptyList(),
             status = getChatMessageStatus(state),

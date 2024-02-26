@@ -4,6 +4,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.CallUiM
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.ContactAttachmentUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.InvalidUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.NodeAttachmentUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.PendingAttachmentUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.VoiceClipUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.AlterParticipantsUiMessage
@@ -23,6 +24,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
+import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.FormatInvalidMessage
@@ -150,6 +152,11 @@ class UiChatMessageMapper @Inject constructor(
             is NodeAttachmentMessage -> NodeAttachmentUiMessage(
                 message = message,
                 reactions = uiReactionListMapper(message.reactions)
+            )
+
+            is PendingAttachmentMessage -> PendingAttachmentUiMessage(
+                message = message,
+                reactions = uiReactionListMapper(message.reactions),
             )
 
             is InvalidMessage, is InvalidMetaMessage -> mapInvalidMessage(
