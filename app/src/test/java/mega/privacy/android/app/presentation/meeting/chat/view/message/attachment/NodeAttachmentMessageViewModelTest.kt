@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.usecase.chat.GetChatNodeContentUriUseCase
+import mega.privacy.android.domain.usecase.chat.message.GetCachedOriginalPathUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetMessageIdsByTypeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFilePathUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
@@ -41,10 +42,11 @@ class NodeAttachmentMessageViewModelTest {
     private val getPreviewUseCase = mock<GetPreviewUseCase>()
     private val fileSizeStringMapper = mock<FileSizeStringMapper>()
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
-    private val nodeContentUriIntentMapper: NodeContentUriIntentMapper = mock()
-    private val getMessageIdsByTypeUseCase: GetMessageIdsByTypeUseCase = mock()
-    private val getChatNodeContentUriUseCase: GetChatNodeContentUriUseCase = mock()
-    private val getNodePreviewFilePathUseCase: GetNodePreviewFilePathUseCase = mock()
+    private val nodeContentUriIntentMapper = mock<NodeContentUriIntentMapper>()
+    private val getMessageIdsByTypeUseCase = mock<GetMessageIdsByTypeUseCase>()
+    private val getChatNodeContentUriUseCase = mock<GetChatNodeContentUriUseCase>()
+    private val getNodePreviewFilePathUseCase = mock<GetNodePreviewFilePathUseCase>()
+    private val getCachedOriginalPathUseCase = mock<GetCachedOriginalPathUseCase>()
 
     @BeforeEach
     internal fun initTests() {
@@ -57,6 +59,7 @@ class NodeAttachmentMessageViewModelTest {
             getMessageIdsByTypeUseCase = getMessageIdsByTypeUseCase,
             getChatNodeContentUriUseCase = getChatNodeContentUriUseCase,
             getNodePreviewFilePathUseCase = getNodePreviewFilePathUseCase,
+            getCachedOriginalPathUseCase = getCachedOriginalPathUseCase,
         )
     }
 
@@ -68,7 +71,8 @@ class NodeAttachmentMessageViewModelTest {
             nodeContentUriIntentMapper,
             getMessageIdsByTypeUseCase,
             getChatNodeContentUriUseCase,
-            getNodePreviewFilePathUseCase
+            getNodePreviewFilePathUseCase,
+            getCachedOriginalPathUseCase,
         )
     }
 
@@ -118,6 +122,29 @@ class NodeAttachmentMessageViewModelTest {
             val actual = awaitItem()
             assertThat(actual.fileName).isEqualTo(expectedName)
             assertThat(actual.fileSize).isEqualTo(expectedSize)
+        }
+    }
+
+    @Test
+    fun `test that ui state initial state has cached preview`() = runTest {
+        val expected = "cachedPreview"
+        val fileNode = mock<ChatDefaultFile> {
+            on { name } doReturn "name"
+            on { size } doReturn 123L
+            on { hasPreview } doReturn false
+            on { type } doReturn UnknownFileTypeInfo(
+                mimeType = "application/jpg",
+                extension = "jpg"
+            )
+        }
+        whenever(fileSizeStringMapper(any())).thenReturn("1byte")
+
+        whenever(getCachedOriginalPathUseCase(fileNode)).thenReturn(expected)
+
+        val msg = buildNodeAttachmentMessage(fileNode)
+        underTest.getOrPutUiStateFlow(msg).test {
+            val actual = awaitItem()
+            assertThat(actual.previewUri).isEqualTo(expected)
         }
     }
 

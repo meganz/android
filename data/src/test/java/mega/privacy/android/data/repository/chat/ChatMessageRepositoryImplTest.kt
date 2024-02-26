@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.database.converter.TypedMessageEntityConverters
 import mega.privacy.android.data.database.entity.chat.PendingMessageEntity
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -21,6 +22,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatRequest
@@ -56,6 +58,7 @@ class ChatMessageRepositoryImplTest {
     private val pendingMessageEntityMapper = mock<PendingMessageEntityMapper>()
     private val pendingMessageMapper = mock<PendingMessageMapper>()
     private val typedMessageEntityConverters = mock<TypedMessageEntityConverters>()
+    private val originalPathCache = mock<Cache<Map<NodeId, String>>>()
 
     private val megaChatErrorSuccess = mock<MegaChatError> {
         on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
@@ -78,6 +81,7 @@ class ChatMessageRepositoryImplTest {
             pendingMessageEntityMapper = pendingMessageEntityMapper,
             pendingMessageMapper = pendingMessageMapper,
             typedMessageEntityConverters = typedMessageEntityConverters,
+            originalPathCache = originalPathCache,
         )
     }
 
@@ -93,6 +97,7 @@ class ChatMessageRepositoryImplTest {
             pendingMessageEntityMapper,
             pendingMessageMapper,
             typedMessageEntityConverters,
+            originalPathCache,
         )
     }
 
@@ -413,5 +418,26 @@ class ChatMessageRepositoryImplTest {
         whenever(chatMessageMapper(message)).thenReturn(chatMessage)
         assertThat(underTest.editGeolocation(chatId, msgId, longitude, latitude, img))
             .isEqualTo(chatMessage)
+    }
+
+    @Test
+    fun `test that original path is added to the cache`() {
+        val newId = NodeId(2L)
+        val newPath = "someInterestingPath/image.jpg"
+        whenever(originalPathCache.get()).thenReturn(emptyMap())
+        underTest.cacheOriginalPathForNode(newId, newPath)
+        verify(originalPathCache).set(eq(mapOf(newId to newPath)))
+    }
+
+    @Test
+    fun `test that original path is added to the cache when it's not empty`() {
+        val originalId = NodeId(1L)
+        val originalPath = "originalPath/video.mp4"
+        val previousCache = mapOf(originalId to originalPath)
+        val newId = NodeId(2L)
+        val newPath = "someInterestingPath/image.jpg"
+        whenever(originalPathCache.get()).thenReturn(previousCache)
+        underTest.cacheOriginalPathForNode(newId, newPath)
+        verify(originalPathCache).set(eq(previousCache + (newId to newPath)))
     }
 }

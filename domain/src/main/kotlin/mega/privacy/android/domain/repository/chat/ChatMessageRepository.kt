@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
+import mega.privacy.android.domain.entity.node.NodeId
 
 /**
  * Chat message repository
@@ -361,7 +362,7 @@ interface ChatMessageRepository {
      *
      * @return ChatMessage that will be deleted. NULL if the message cannot be deleted (too old)
      */
-    suspend fun deleteMessage(chatId: Long, msgId: Long, ): ChatMessage?
+    suspend fun deleteMessage(chatId: Long, msgId: Long): ChatMessage?
 
     /**
      * Revoke the access to a node granted by an attachment message
@@ -447,4 +448,20 @@ interface ChatMessageRepository {
         latitude: Float,
         img: String,
     ): ChatMessage?
+
+    /**
+     * Gets the original path of this node if it has been cached during the upload before attaching the node.
+     *
+     * @param nodeId The [NodeId] of the node.
+     * @return The cached original path, or null if not cached.
+     */
+    fun getCachedOriginalPathForNode(nodeId: NodeId): String?
+
+    /**
+     * Caches the original path of this node once the original file is uploaded, just before attaching it to the chat.
+     *
+     * @param nodeId The [NodeId] of the node.
+     * @param path The original path to be cached.
+     */
+    fun cacheOriginalPathForNode(nodeId: NodeId, path: String)
 }

@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.database.converter.TypedMessageEntityConverters
 import mega.privacy.android.data.extensions.getChatRequestListener
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -21,6 +22,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import javax.inject.Inject
@@ -37,6 +39,7 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
     private val pendingMessageEntityMapper: PendingMessageEntityMapper,
     private val pendingMessageMapper: PendingMessageMapper,
     private val typedMessageEntityConverters: TypedMessageEntityConverters,
+    private val originalPathCache: Cache<Map<NodeId, String>>,
 ) : ChatMessageRepository {
     override suspend fun setMessageSeen(chatId: Long, messageId: Long) = withContext(ioDispatcher) {
         megaChatApiGateway.setMessageSeen(chatId, messageId)
@@ -253,5 +256,17 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
     ) = withContext(ioDispatcher) {
         megaChatApiGateway.editGeolocation(chatId, msgId, longitude, latitude, img)
             ?.let { chatMessageMapper(it) }
+    }
+
+    override fun getCachedOriginalPathForNode(nodeId: NodeId) = originalPathCache.get()?.get(nodeId)
+
+    override fun cacheOriginalPathForNode(nodeId: NodeId, path: String) {
+        val updated = buildMap {
+            originalPathCache.get()?.let {
+                putAll(it)
+            }
+            put(nodeId, path)
+        }
+        originalPathCache.set(updated)
     }
 }

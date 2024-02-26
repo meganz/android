@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.usecase.chat.GetChatNodeContentUriUseCase
+import mega.privacy.android.domain.usecase.chat.message.GetCachedOriginalPathUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetMessageIdsByTypeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFilePathUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
@@ -36,6 +37,7 @@ class NodeAttachmentMessageViewModel @Inject constructor(
     private val getChatNodeContentUriUseCase: GetChatNodeContentUriUseCase,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getNodePreviewFilePathUseCase: GetNodePreviewFilePathUseCase,
+    private val getCachedOriginalPathUseCase: GetCachedOriginalPathUseCase,
     fileSizeStringMapper: FileSizeStringMapper,
     durationInSecondsTextMapper: DurationInSecondsTextMapper,
 ) : AbstractAttachmentMessageViewModel<NodeAttachmentMessage>(
@@ -70,6 +72,11 @@ class NodeAttachmentMessageViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    override fun createFirstUiState(attachmentMessage: NodeAttachmentMessage): AttachmentMessageUiState {
+        return super.createFirstUiState(attachmentMessage)
+            .copy(previewUri = getCachedOriginalPathUseCase(attachmentMessage.fileNode))
     }
 
     /**

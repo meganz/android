@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.psa.Psa
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
@@ -63,4 +64,8 @@ internal object LocalCacheModule {
     @Provides
     @Singleton
     fun providePsaCache(): Cache<Psa> = PermanentCache()
+
+    @Provides
+    @Singleton
+    fun provideChatOriginalFileCache(): Cache<Map<NodeId, String>> = PermanentCache()
 }

@@ -128,6 +128,17 @@ class AttachNodeWithPendingMessageUseCaseTest {
             inOrder.verify(chatMessageRepository).attachNode(any(), any())
         }
 
+    @Test
+    fun `test that original path is cached`() = runTest {
+        val pendingMessage = createPendingMessageMock()
+        val nodeId = NodeId(1L)
+        whenever(chatMessageRepository.getPendingMessage(pendingMsgId)).thenReturn(pendingMessage)
+
+        underTest(pendingMsgId, nodeId)
+        verify(chatMessageRepository)
+            .cacheOriginalPathForNode(nodeId, filePath)
+    }
+
     private fun createPendingMessageMock() = mock<PendingMessage> {
         on { id } doReturn pendingMsgId
         on { chatId } doReturn chatId

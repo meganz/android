@@ -32,6 +32,7 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
 
         chatMessageRepository.getPendingMessage(pendingMessageId)
             ?.let { pendingMessage ->
+                chatMessageRepository.cacheOriginalPathForNode(nodeId, pendingMessage.filePath)
                 pendingMessage.updateState(
                     PendingMessageState.ATTACHING,
                     nodeId.longValue
