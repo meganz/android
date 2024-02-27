@@ -20,8 +20,6 @@ abstract class ManagementUiChatMessage : UiChatMessage {
      */
     abstract override val message: ManagementMessage
 
-    override val showTime: Boolean = true
-
     override val displayAsMine = false
 
     override val isSelectable: Boolean = false
@@ -34,8 +32,6 @@ abstract class ManagementUiChatMessage : UiChatMessage {
     @Composable
     override fun MessageListItem(
         state: UIMessageState,
-        timeFormatter: (Long) -> String,
-        dateFormatter: (Long) -> String,
         onLongClick: (TypedMessage) -> Unit,
         onMoreReactionsClicked: (Long) -> Unit,
         onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
@@ -52,7 +48,6 @@ abstract class ManagementUiChatMessage : UiChatMessage {
             onReactionClick = { onReactionClicked(id, it, reactions) },
             onForwardClicked = { onForwardClicked(message) },
             onReactionLongClick = { onReactionLongClick(it, reactions) },
-            time = getTimeOrNull(timeFormatter),
             content = { _ -> contentComposable() },
             onSelectionChanged = onSelectedChanged,
         )

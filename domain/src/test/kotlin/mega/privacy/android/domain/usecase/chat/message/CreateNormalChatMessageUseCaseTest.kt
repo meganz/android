@@ -48,7 +48,6 @@ class CreateNormalChatMessageUseCaseTest {
                     chatId = 123L,
                     isMine = true,
                     shouldShowAvatar = true,
-                    shouldShowTime = true,
                     reactions = emptyList(),
                 )
             )
@@ -76,7 +75,6 @@ class CreateNormalChatMessageUseCaseTest {
                     chatId = 123L,
                     isMine = true,
                     shouldShowAvatar = true,
-                    shouldShowTime = true,
                     reactions = emptyList(),
                 )
             )

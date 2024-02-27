@@ -17,7 +17,6 @@ internal class CreateTruncateHistoryMessageUseCase @Inject constructor() :
             isMine = isMine,
             userHandle = userHandle,
             shouldShowAvatar = shouldShowAvatar,
-            shouldShowTime = shouldShowTime,
             reactions = reactions,
             status = status,
         )

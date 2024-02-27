@@ -35,9 +35,6 @@ sealed class InvalidUiMessage : AvatarMessage() {
     override val showAvatar: Boolean
         get() = message.shouldShowAvatar
 
-    override val showTime: Boolean
-        get() = message.shouldShowTime
-
     override val displayAsMine: Boolean
         get() = message.isMine
     override val shouldDisplayForwardIcon = false

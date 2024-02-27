@@ -19,7 +19,6 @@ internal class CreateCallEndedMessageUseCase @Inject constructor() : CreateTyped
                 termCode = termCode,
                 duration = duration,
                 shouldShowAvatar = shouldShowAvatar,
-                shouldShowTime = shouldShowTime,
                 reactions = reactions,
                 status = status,
             )

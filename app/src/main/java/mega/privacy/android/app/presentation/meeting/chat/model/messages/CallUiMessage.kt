@@ -19,15 +19,11 @@ data class CallUiMessage(
     override val reactions: List<UIReaction>,
 ) : UiChatMessage {
 
-    override val showTime: Boolean = true
-
     override val displayAsMine = false
 
     @Composable
     override fun MessageListItem(
         state: UIMessageState,
-        timeFormatter: (Long) -> String,
-        dateFormatter: (Long) -> String,
         onLongClick: (TypedMessage) -> Unit,
         onMoreReactionsClicked: (Long) -> Unit,
         onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
@@ -44,7 +40,6 @@ data class CallUiMessage(
             onReactionClick = { onReactionClicked(id, it, reactions) },
             onReactionLongClick = { onReactionLongClick(it, reactions) },
             onForwardClicked = { onForwardClicked(message) },
-            time = getTimeOrNull(timeFormatter),
             content = {
                 ChatCallMessageView(
                     message = message,

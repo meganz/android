@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.meeting.chat.model.messages.header
 import androidx.compose.runtime.Composable
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UIMessageState
 import mega.privacy.android.app.presentation.meeting.chat.view.message.TimeHeader
+import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
@@ -21,8 +22,6 @@ class TimeHeaderUiMessage(
     @Composable
     override fun MessageListItem(
         state: UIMessageState,
-        timeFormatter: (Long) -> String,
-        dateFormatter: (Long) -> String,
         onLongClick: (TypedMessage) -> Unit,
         onMoreReactionsClicked: (Long) -> Unit,
         onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
@@ -31,7 +30,7 @@ class TimeHeaderUiMessage(
         onSelectedChanged: (Boolean) -> Unit,
     ) {
         TimeHeader(
-            timeString = timeFormatter(timeSent),
+            timeString = TimeUtils.formatTime(timeSent),
             displayAsMine = displayAsMine,
             userHandle = userHandle,
             shouldShowName = !state.isOneToOne && userHandle != -1L && !displayAsMine

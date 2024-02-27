@@ -48,7 +48,6 @@ class CreateMetaMessageUseCaseTest {
                     chatId = 123L,
                     isMine = true,
                     shouldShowAvatar = true,
-                    shouldShowTime = true,
                     reactions = emptyList(),
                 )
             )
@@ -79,7 +78,6 @@ class CreateMetaMessageUseCaseTest {
                     chatId = 123L,
                     isMine = true,
                     shouldShowAvatar = true,
-                    shouldShowTime = true,
                     reactions = emptyList(),
                 )
             )

@@ -56,7 +56,6 @@ class VoiceClipMessageViewModelTest {
         duration = 3000.milliseconds,
         userHandle = 1L,
         shouldShowAvatar = true,
-        shouldShowTime = true,
         reactions = emptyList(),
     )
 

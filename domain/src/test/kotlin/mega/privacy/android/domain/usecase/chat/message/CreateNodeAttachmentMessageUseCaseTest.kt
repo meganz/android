@@ -78,7 +78,6 @@ class CreateNodeAttachmentMessageUseCaseTest {
                 isMine = isMine,
                 userHandle = userHandle,
                 shouldShowAvatar = shouldShowAvatar,
-                shouldShowTime = shouldShowTime,
                 fileNode = typedNode,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
@@ -95,7 +94,6 @@ class CreateNodeAttachmentMessageUseCaseTest {
             chatId = 123L,
             isMine = true,
             shouldShowAvatar = true,
-            shouldShowTime = true,
             reactions = emptyList(),
         )
 }

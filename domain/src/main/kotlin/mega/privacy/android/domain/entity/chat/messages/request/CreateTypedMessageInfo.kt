@@ -27,7 +27,6 @@ interface CreateTypedMessageInfo : ChatMessageInfo {
     val chatId: Long
     val isMine: Boolean
     val shouldShowAvatar: Boolean
-    val shouldShowTime: Boolean
     val metaType: ContainsMetaType?
     val textMessage: String?
     val chatRichPreviewInfo: ChatRichPreviewInfo?

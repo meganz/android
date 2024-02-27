@@ -20,15 +20,11 @@ interface UiChatMessage {
     /**
      * Message list item
      *
-     * @param uiState
-     * @param timeFormatter
-     * @param dateFormatter
+     * @param state
      */
     @Composable
     fun MessageListItem(
         state: UIMessageState,
-        timeFormatter: (Long) -> String,
-        dateFormatter: (Long) -> String,
         onLongClick: (TypedMessage) -> Unit,
         onMoreReactionsClicked: (Long) -> Unit,
         onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
@@ -36,16 +32,6 @@ interface UiChatMessage {
         onForwardClicked: (TypedMessage) -> Unit,
         onSelectedChanged: (Boolean) -> Unit,
     )
-
-    /**
-     * Get time or null
-     *
-     * @param timeFormatter
-     */
-    fun getTimeOrNull(timeFormatter: (Long) -> String) =
-        if (showTime) timeSent?.let {
-            timeFormatter(it)
-        } else null
 
     /**
      * Modifier
@@ -74,11 +60,6 @@ interface UiChatMessage {
     val userHandle: Long
 
     /**
-     * Show time
-     */
-    val showTime: Boolean
-
-    /**
      * Reactions
      */
     val reactions: List<UIReaction>
@@ -96,5 +77,5 @@ interface UiChatMessage {
     /**
      * Key
      */
-    fun key(): String = "${id}_${showTime}"
+    fun key(): String = "$id"
 }

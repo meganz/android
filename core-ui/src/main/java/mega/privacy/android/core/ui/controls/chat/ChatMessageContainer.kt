@@ -68,7 +68,6 @@ fun ChatMessageContainer(
     onReactionLongClick: (String) -> Unit,
     onForwardClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    time: String? = null,
     isSendError: Boolean = false,
     isSelectMode: Boolean = false,
     isSelected: Boolean = false,
@@ -214,7 +213,6 @@ private fun Preview(
                     tint = MegaTheme.colors.icon.secondary
                 )
             },
-            time = "12:00",
             showForwardIcon = true,
             content = {
                 ChatBubble(isMe = parameter.isMe) {

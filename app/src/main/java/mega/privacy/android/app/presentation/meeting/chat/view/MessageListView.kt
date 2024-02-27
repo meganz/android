@@ -31,7 +31,6 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UIMessageState
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ParticipantUiMessage
-import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.core.ui.controls.chat.messages.LoadingMessagesHeader
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
@@ -192,17 +191,9 @@ internal fun MessageListView(
                             currentItem.message?.let { deselectItem(it) }
                         }
                     }
-                    Box(modifier = Modifier.sizeIn(minHeight = 42.dp)) {
+                    Box(modifier = Modifier.sizeIn(minHeight = 10.dp)) {
                         currentItem.MessageListItem(
                             state = messageState,
-                            timeFormatter = TimeUtils::formatTime,
-                            dateFormatter = {
-                                TimeUtils.formatDate(
-                                    it,
-                                    TimeUtils.DATE_SHORT_FORMAT,
-                                    context
-                                )
-                            },
                             onLongClick = {
                                 if (uiState.haveWritePermission) onMessageLongClick(it)
                             },

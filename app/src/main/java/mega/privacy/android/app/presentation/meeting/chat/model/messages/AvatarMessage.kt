@@ -51,8 +51,6 @@ abstract class AvatarMessage : UiChatMessage {
     @Composable
     override fun MessageListItem(
         state: UIMessageState,
-        timeFormatter: (Long) -> String,
-        dateFormatter: (Long) -> String,
         onLongClick: (TypedMessage) -> Unit,
         onMoreReactionsClicked: (Long) -> Unit,
         onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
@@ -69,7 +67,6 @@ abstract class AvatarMessage : UiChatMessage {
             onReactionClick = { onReactionClicked(id, it, reactions) },
             onReactionLongClick = { onReactionLongClick(it, reactions) },
             onForwardClicked = { onForwardClicked(message) },
-            time = this.getTimeOrNull(timeFormatter),
             avatarOrIcon = { avatarModifier ->
                 MessageAvatar(
                     lastUpdatedCache = state.lastUpdatedCache,

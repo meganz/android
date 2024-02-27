@@ -40,7 +40,6 @@ class ChatGiphyUiMessage(
     }
 
     override val showAvatar = message.shouldShowAvatar
-    override val showTime = message.shouldShowTime
     override val displayAsMine = message.isMine
     override val shouldDisplayForwardIcon = true
     override val timeSent = message.time

@@ -125,7 +125,6 @@ class AlterParticipantsMessageViewTest {
                     privilege = privilege,
                     handleOfAction = handleOfAction,
                     shouldShowAvatar = false,
-                    shouldShowTime = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
                 ),

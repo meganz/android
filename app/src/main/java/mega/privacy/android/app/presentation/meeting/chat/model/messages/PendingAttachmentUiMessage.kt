@@ -23,7 +23,6 @@ data class PendingAttachmentUiMessage(
         PendingAttachmentMessageView(message)
     }
 
-    override val showTime = message.shouldShowTime
     override val showAvatar = message.shouldShowAvatar
     override val displayAsMine = message.isMine
     override val shouldDisplayForwardIcon = false

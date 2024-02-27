@@ -31,7 +31,6 @@ class MetaTypedEntityTypedMessageMapper @Inject constructor(
             chatId = entity.typedMessageEntity.chatId,
             isMine = entity.typedMessageEntity.isMine,
             shouldShowAvatar = entity.typedMessageEntity.shouldShowAvatar,
-            shouldShowTime = entity.typedMessageEntity.shouldShowTime,
             metaType = getMetaType(entity),
             textMessage = entity.typedMessageEntity.textMessage,
             chatRichPreviewInfo = entity.richPreviewEntity,

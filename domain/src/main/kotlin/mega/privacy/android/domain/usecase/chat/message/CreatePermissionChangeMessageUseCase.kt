@@ -20,7 +20,6 @@ internal class CreatePermissionChangeMessageUseCase @Inject constructor() :
             privilege = privilege,
             handleOfAction = handleOfAction,
             shouldShowAvatar = shouldShowAvatar,
-            shouldShowTime = shouldShowTime,
             reactions = reactions,
             status = status,
         )

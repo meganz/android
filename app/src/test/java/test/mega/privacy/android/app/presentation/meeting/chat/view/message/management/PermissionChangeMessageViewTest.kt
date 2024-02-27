@@ -105,7 +105,6 @@ class PermissionChangeMessageViewTest {
                     isDeletable = false,
                     isEditable = false,
                     shouldShowAvatar = false,
-                    shouldShowTime = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
                 ),

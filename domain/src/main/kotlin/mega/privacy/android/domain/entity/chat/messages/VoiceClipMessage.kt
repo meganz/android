@@ -23,7 +23,6 @@ data class VoiceClipMessage(
     override val isMine: Boolean,
     override val userHandle: Long,
     override val shouldShowAvatar: Boolean,
-    override val shouldShowTime: Boolean,
     override val reactions: List<Reaction>,
     override val status: ChatMessageStatus,
     val name: String,

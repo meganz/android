@@ -12,7 +12,6 @@ abstract class HeaderMessage() : UiChatMessage {
     override val displayAsMine = false
     override val shouldDisplayForwardIcon = false
     override val userHandle = -1L
-    override val showTime = false
     override val reactions = emptyList<UIReaction>()
     override val isSelectable = false
     override val message = null

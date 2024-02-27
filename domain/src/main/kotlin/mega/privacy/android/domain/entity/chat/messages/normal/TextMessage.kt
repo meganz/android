@@ -20,7 +20,6 @@ data class TextMessage(
     override val isEditable: Boolean,
     override val userHandle: Long,
     override val shouldShowAvatar: Boolean,
-    override val shouldShowTime: Boolean,
     override val reactions: List<Reaction>,
     override val content: String,
     override val status: ChatMessageStatus,

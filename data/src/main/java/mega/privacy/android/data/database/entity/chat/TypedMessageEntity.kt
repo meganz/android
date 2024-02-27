@@ -85,7 +85,6 @@ data class TypedMessageEntity(
     override val changes: List<ChatMessageChange>,
     val isMine: Boolean,
     val shouldShowAvatar: Boolean,
-    val shouldShowTime: Boolean,
     val textMessage: String?,
     val reactions: List<Reaction>
 ) : ChatMessageInfo

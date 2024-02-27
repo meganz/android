@@ -51,11 +51,6 @@ interface Message {
     val shouldShowAvatar: Boolean
 
     /**
-     * Should show time
-     */
-    val shouldShowTime: Boolean
-
-    /**
      * List of reactions
      */
     val reactions: List<Reaction>

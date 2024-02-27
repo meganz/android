@@ -122,7 +122,6 @@ class ChatMessageContainerTest {
                 onMoreReactionsClick = {},
                 onReactionClick = {},
                 onForwardClicked = onForwardClicked,
-                time = time,
                 isSendError = isSendError,
                 avatarOrIcon = {},
                 content = {},

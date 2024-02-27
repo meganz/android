@@ -141,7 +141,6 @@ private fun PermissionChangeMessageViewPreview(
                 privilege = permission,
                 handleOfAction = 0,
                 shouldShowAvatar = false,
-                shouldShowTime = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
             ),

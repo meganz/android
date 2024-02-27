@@ -31,7 +31,6 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
             isEditable = false,
             userHandle = getMyUserHandleUseCase(),
             shouldShowAvatar = false,
-            shouldShowTime = true,
             reactions = emptyList(),
             status = this.getChatMessageStatus(),
             file = file,

@@ -27,7 +27,6 @@ internal class CreateNodeAttachmentMessageUseCase @Inject constructor(
             isMine = isMine,
             userHandle = userHandle,
             shouldShowAvatar = shouldShowAvatar,
-            shouldShowTime = shouldShowTime,
             fileNode = typedNode,
             reactions = reactions,
             status = status,

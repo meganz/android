@@ -71,7 +71,6 @@ class CreatePendingAttachmentMessageUseCaseTest {
             isEditable = false,
             userHandle = userHandle,
             shouldShowAvatar = false,
-            shouldShowTime = true,
             reactions = emptyList(),
             status = getChatMessageStatus(state),
             file = File(filePath),

@@ -3,8 +3,6 @@ package mega.privacy.android.domain.usecase.chat.message.paging
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.usecase.chat.message.reactions.GetReactionsUseCase
-import java.util.Calendar
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -41,10 +39,6 @@ class CreateSaveMessageRequestUseCase @Inject constructor(
                     currentIsMine = isMine
                 )
                 val previous = chatMessages.getOrNull(index - 1)
-                val shouldShowTime = shouldShowTime(
-                    chatMessage,
-                    previous
-                )
                 val reactions = if (chatMessage.hasConfirmedReactions) {
                     getReactionsUseCase(chatId, chatMessage.messageId, currentUserHandle)
                 } else {
@@ -56,7 +50,6 @@ class CreateSaveMessageRequestUseCase @Inject constructor(
                     chatId = chatId,
                     isMine = isMine,
                     shouldShowAvatar = shouldShowAvatar,
-                    shouldShowTime = shouldShowTime,
                     reactions = reactions,
                 )
             }
@@ -74,19 +67,7 @@ class CreateSaveMessageRequestUseCase @Inject constructor(
         currentIsMine: Boolean,
     ) = !currentIsMine && !current.hasSameSender(nextUserHandle)
 
-    private fun shouldShowTime(
-        current: ChatMessage,
-        previous: ChatMessage?,
-    ) = !current.hasSameSender(previous?.userHandle) || current.timestamp.minus(
-        previous?.timestamp ?: 0
-    ) > TimeUnit.MINUTES.toSeconds(3)
-
     private fun ChatMessage.hasSameSender(
         other: Long?,
     ) = userHandle == other
-
-    private fun ChatMessage.getDate() =
-        Calendar.getInstance().apply {
-            timeInMillis = TimeUnit.SECONDS.toMillis(this@getDate.timestamp)
-        }.get(Calendar.DATE)
 }

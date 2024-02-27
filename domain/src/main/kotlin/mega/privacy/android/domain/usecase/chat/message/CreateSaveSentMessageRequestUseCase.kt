@@ -22,7 +22,6 @@ class CreateSaveSentMessageRequestUseCase @Inject constructor() {
         chatId = chatId,
         isMine = true,
         shouldShowAvatar = false,
-        shouldShowTime = true,
         reactions = emptyList(),
     )
 }

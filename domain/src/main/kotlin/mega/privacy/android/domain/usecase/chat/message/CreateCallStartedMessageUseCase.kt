@@ -17,7 +17,6 @@ internal class CreateCallStartedMessageUseCase @Inject constructor() : CreateTyp
                 isMine = isMine,
                 userHandle = userHandle,
                 shouldShowAvatar = shouldShowAvatar,
-                shouldShowTime = shouldShowTime,
                 reactions = reactions,
                 status = status,
             )
