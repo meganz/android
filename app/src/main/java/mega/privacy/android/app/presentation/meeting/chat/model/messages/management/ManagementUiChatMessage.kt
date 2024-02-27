@@ -52,7 +52,7 @@ abstract class ManagementUiChatMessage : UiChatMessage {
             onForwardClicked = { onForwardClicked(message) },
             onReactionLongClick = { onReactionLongClick(it, reactions) },
             time = getTimeOrNull(timeFormatter),
-            content = contentComposable,
+            content = { contentComposable },
         )
     }
 

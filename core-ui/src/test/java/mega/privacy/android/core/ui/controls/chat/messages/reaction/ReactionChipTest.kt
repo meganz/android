@@ -28,6 +28,7 @@ class ReactionChipTest {
                 onClick = callback,
                 onLongClick = {},
                 systemLayoutDirection = LayoutDirection.Ltr,
+                interactionEnabled = true,
             )
         }
 

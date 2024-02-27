@@ -77,6 +77,7 @@ class VoiceClipMessageViewTest {
                 loadProgress = progress,
                 isPlaying = isPlaying,
                 onPlayClicked = onPlayClicked,
+                interactionEnabled = true,
             )
         }
     }

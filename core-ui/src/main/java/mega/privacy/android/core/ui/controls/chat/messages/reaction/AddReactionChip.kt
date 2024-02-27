@@ -20,6 +20,7 @@ import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
+import mega.privacy.android.core.ui.theme.extensions.conditional
 
 
 internal const val TEST_TAG_CHAT_MESSAGE_ADD_REACTION_CHIP =
@@ -33,6 +34,7 @@ internal const val TEST_TAG_CHAT_MESSAGE_ADD_REACTION_CHIP =
 @Composable
 internal fun AddReactionChip(
     onAddClicked: () -> Unit,
+    interactionEnabled: Boolean,
 ) {
     Box(
         modifier = Modifier
@@ -44,7 +46,7 @@ internal fun AddReactionChip(
                 color = MegaTheme.colors.border.disabled,
                 shape = RoundedCornerShape(12.dp)
             )
-            .clickable(onClick = onAddClicked)
+            .conditional(interactionEnabled) { clickable(onClick = onAddClicked) }
             .testTag(TEST_TAG_CHAT_MESSAGE_ADD_REACTION_CHIP),
         contentAlignment = Alignment.Center,
     ) {
@@ -61,7 +63,8 @@ internal fun AddReactionChip(
 private fun AddReactionChipPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         AddReactionChip(
-            onAddClicked = {}
+            onAddClicked = {},
+            interactionEnabled = true
         )
     }
 }

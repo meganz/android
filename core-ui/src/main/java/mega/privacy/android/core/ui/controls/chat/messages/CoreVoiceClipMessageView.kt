@@ -25,15 +25,16 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.core.ui.controls.text.MegaText
-import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
 import mega.privacy.android.core.ui.theme.extensions.body4
+import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 
 internal const val VOICE_CLIP_MESSAGE_VIEW_PLAY_BUTTON_TEST_TAG =
@@ -65,6 +66,7 @@ fun CoreVoiceClipMessageView(
     playProgress: Float? = null,
     isPlaying: Boolean = false,
     onPlayClicked: () -> Unit = {},
+    interactionEnabled: Boolean,
 ) {
     Box(
         modifier = modifier
@@ -83,7 +85,8 @@ fun CoreVoiceClipMessageView(
                 isMe = isMe,
                 enabled = !isError && loadProgress == null,
                 isPlaying = isPlaying,
-                onPlayClicked = onPlayClicked
+                onPlayClicked = onPlayClicked,
+                interactionEnabled = interactionEnabled,
             )
             PlayProgress(
                 isMe = isMe,
@@ -170,6 +173,7 @@ private fun PlayButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     onPlayClicked: () -> Unit = {},
+    interactionEnabled: Boolean,
 ) {
     Box(
         modifier = modifier
@@ -178,7 +182,12 @@ private fun PlayButton(
                 color = MegaTheme.colors.background.blur,
                 shape = CircleShape
             )
-            .clickable(enabled = enabled, onClick = onPlayClicked)
+            .conditional(interactionEnabled) {
+                clickable(
+                    enabled = enabled,
+                    onClick = onPlayClicked
+                )
+            }
             .testTag(VOICE_CLIP_MESSAGE_VIEW_PLAY_BUTTON_TEST_TAG),
         contentAlignment = Alignment.Center,
     ) {
@@ -213,89 +222,49 @@ private fun LoadOverlay(loadProgress: Float?, isError: Boolean) {
 
 @CombinedThemePreviews
 @Composable
-private fun VoiceClipMessageViewPreview(
-    @PreviewParameter(BooleanProvider::class) isMe: Boolean,
+private fun Preview(
+    @PreviewParameter(Provider::class) parameter: VoiceClipMessageViewPreviewParameter,
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         CoreVoiceClipMessageView(
-            isMe = isMe,
-            timestamp = "00:49",
-            loadProgress = null,
+            isMe = parameter.isMe,
+            timestamp = parameter.timestamp,
+            loadProgress = parameter.loadProgress,
+            playProgress = parameter.playProgress,
+            isPlaying = parameter.isPlaying,
+            isError = parameter.hasError,
+            interactionEnabled = true,
         )
     }
 }
 
-@CombinedThemePreviews
-@Composable
-private fun LoadingVoiceClipMessageViewPreview(
-    @PreviewParameter(BooleanProvider::class) isMe: Boolean,
-) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
-        CoreVoiceClipMessageView(
-            isMe = isMe,
-            timestamp = "00:49",
-            loadProgress = .5f,
-        )
-    }
-}
+private class VoiceClipMessageViewPreviewParameter(
+    val isMe: Boolean = true,
+    val timestamp: String = "00:49",
+    val loadProgress: Float? = null,
+    val playProgress: Float? = null,
+    val isPlaying: Boolean = true,
+    val hasError: Boolean = false,
+)
 
-@CombinedThemePreviews
-@Composable
-private fun Playing20VoiceClipMessageViewPreview(
-    @PreviewParameter(BooleanProvider::class) isMe: Boolean,
-) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
-        CoreVoiceClipMessageView(
-            isMe = isMe,
-            timestamp = "00:49",
-            loadProgress = null,
-            isPlaying = true,
-            playProgress = .2f,
+private class Provider : PreviewParameterProvider<VoiceClipMessageViewPreviewParameter> {
+    override val values: Sequence<VoiceClipMessageViewPreviewParameter>
+        get() = sequenceOf(
+            VoiceClipMessageViewPreviewParameter(isPlaying = false),
+            VoiceClipMessageViewPreviewParameter(isMe = false, isPlaying = false),
+            VoiceClipMessageViewPreviewParameter(loadProgress = .5f),
+            VoiceClipMessageViewPreviewParameter(isMe = false, loadProgress = .5f),
+            VoiceClipMessageViewPreviewParameter(playProgress = .2f),
+            VoiceClipMessageViewPreviewParameter(isMe = false, playProgress = .2f),
+            VoiceClipMessageViewPreviewParameter(playProgress = .5f),
+            VoiceClipMessageViewPreviewParameter(isMe = false, playProgress = .5f),
+            VoiceClipMessageViewPreviewParameter(playProgress = .8f),
+            VoiceClipMessageViewPreviewParameter(isMe = false, playProgress = .8f),
+            VoiceClipMessageViewPreviewParameter(
+                timestamp = "--:--",
+                hasError = true,
+                isPlaying = false
+            ),
         )
-    }
-}
-
-@CombinedThemePreviews
-@Composable
-private fun Playing50VoiceClipMessageViewPreview(
-    @PreviewParameter(BooleanProvider::class) isMe: Boolean,
-) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
-        CoreVoiceClipMessageView(
-            isMe = isMe,
-            timestamp = "00:49",
-            loadProgress = null,
-            isPlaying = true,
-            playProgress = .5f,
-        )
-    }
-}
-
-@CombinedThemePreviews
-@Composable
-private fun Playing80VoiceClipMessageViewPreview(
-    @PreviewParameter(BooleanProvider::class) isMe: Boolean,
-) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
-        CoreVoiceClipMessageView(
-            isMe = isMe,
-            timestamp = "00:49",
-            loadProgress = null,
-            isPlaying = true,
-            playProgress = .8f,
-        )
-    }
-}
-
-@CombinedThemePreviews
-@Composable
-private fun LoadingVoiceClipWithErrorPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
-        CoreVoiceClipMessageView(
-            isMe = true,
-            timestamp = "--:--",
-            isError = true,
-        )
-    }
 }
 

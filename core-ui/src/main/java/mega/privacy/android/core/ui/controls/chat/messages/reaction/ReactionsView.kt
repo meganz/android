@@ -35,6 +35,7 @@ fun ReactionsView(
     modifier: Modifier,
     reactions: List<UIReaction> = emptyList(),
     isMine: Boolean = false,
+    interactionEnabled: Boolean = true,
     onMoreReactionsClick: () -> Unit = {},
     onReactionClick: (String) -> Unit = {},
     onReactionLongClick: (String) -> Unit = {},
@@ -55,10 +56,12 @@ fun ReactionsView(
                     onClick = onReactionClick,
                     onLongClick = onReactionLongClick,
                     systemLayoutDirection = systemLayoutDirection,
+                    interactionEnabled = interactionEnabled,
                 )
             }
             AddReactionChip(
                 onAddClicked = onMoreReactionsClick,
+                interactionEnabled = interactionEnabled,
             )
         }
     }

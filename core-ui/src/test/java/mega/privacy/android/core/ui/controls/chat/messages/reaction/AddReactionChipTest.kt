@@ -22,6 +22,7 @@ class AddReactionChipTest {
         composeRule.setContent {
             AddReactionChip(
                 onAddClicked = callback,
+                interactionEnabled = true,
             )
         }
         composeRule.onNodeWithTag(TEST_TAG_CHAT_MESSAGE_ADD_REACTION_CHIP).performClick()

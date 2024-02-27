@@ -122,6 +122,8 @@ class ChatMessageContainerTest {
         time: String?,
         isSendError: Boolean = false,
         reactions: List<UIReaction> = emptyList(),
+        inSelectMode: Boolean = false,
+        onSelectionChange: (Boolean) -> Unit = {},
     ) {
         composeRule.setContent {
             ChatMessageContainer(
@@ -136,6 +138,8 @@ class ChatMessageContainerTest {
                 avatarOrIcon = {},
                 content = {},
                 onReactionLongClick = {},
+                isSelectMode = inSelectMode,
+                onSelectionChanged = onSelectionChange,
             )
         }
     }

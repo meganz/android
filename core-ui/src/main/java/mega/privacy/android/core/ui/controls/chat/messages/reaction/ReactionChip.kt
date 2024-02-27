@@ -28,6 +28,7 @@ import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
+import mega.privacy.android.core.ui.theme.extensions.conditional
 
 
 internal const val TEST_TAG_CHAT_MESSAGE_REACTION_CHIP =
@@ -47,6 +48,7 @@ fun ReactionChip(
     onClick: (String) -> Unit,
     onLongClick: (String) -> Unit,
     systemLayoutDirection: LayoutDirection,
+    interactionEnabled: Boolean,
 ) {
     CompositionLocalProvider(LocalLayoutDirection provides systemLayoutDirection) {
         Row(
@@ -55,10 +57,12 @@ fun ReactionChip(
             modifier = Modifier
                 .size(44.dp, 24.dp)
                 .clip(RoundedCornerShape(12.dp))
-                .combinedClickable(
-                    onClick = { onClick(reaction.reaction) },
-                    onLongClick = { onLongClick(reaction.reaction) }
-                )
+                .conditional(interactionEnabled) {
+                    combinedClickable(
+                        onClick = { onClick(reaction.reaction) },
+                        onLongClick = { onLongClick(reaction.reaction) }
+                    )
+                }
                 .border(
                     width = 1.dp,
                     color = if (reaction.hasMe) MegaTheme.colors.border.strongSelected else MegaTheme.colors.border.disabled,
@@ -102,6 +106,7 @@ private fun ReactionChipWithRtlCountPreview(
             onClick = {},
             onLongClick = {},
             systemLayoutDirection = LayoutDirection.Rtl,
+            interactionEnabled = true,
         )
     }
 }
@@ -122,6 +127,7 @@ private fun ReactionChipWithCountPreview(
             onClick = {},
             onLongClick = {},
             systemLayoutDirection = LayoutDirection.Ltr,
+            interactionEnabled = true,
         )
     }
 }
