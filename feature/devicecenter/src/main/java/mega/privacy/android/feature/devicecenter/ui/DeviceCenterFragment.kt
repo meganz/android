@@ -19,11 +19,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceMenuAction
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.mobile.analytics.event.DeviceCenterDeviceOptionsButtonEvent
+import mega.privacy.mobile.analytics.event.DeviceCenterItemClicked
+import mega.privacy.mobile.analytics.event.DeviceCenterItemClickedEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -72,9 +76,26 @@ class DeviceCenterFragment : Fragment() {
                     DeviceCenterScreen(
                         uiState = uiState,
                         snackbarHostState = snackbarHostState,
-                        onDeviceClicked = viewModel::showDeviceFolders,
-                        onDeviceMenuClicked = viewModel::setMenuClickedDevice,
+                        onDeviceClicked = {
+                            Analytics.tracker.trackEvent(
+                                DeviceCenterItemClickedEvent(
+                                    DeviceCenterItemClicked.ItemType.Device
+                                )
+                            )
+                            viewModel.showDeviceFolders(it)
+                        },
+                        onDeviceMenuClicked = {
+                            Analytics.tracker.trackEvent(
+                                DeviceCenterDeviceOptionsButtonEvent
+                            )
+                            viewModel.setMenuClickedDevice(it)
+                        },
                         onBackupFolderClicked = { backupFolderUINode ->
+                            Analytics.tracker.trackEvent(
+                                DeviceCenterItemClickedEvent(
+                                    DeviceCenterItemClicked.ItemType.Connection
+                                )
+                            )
                             megaNavigator.openNodeInBackups(
                                 activity = this@DeviceCenterFragment.activity
                                     ?: return@DeviceCenterScreen,
@@ -96,6 +117,11 @@ class DeviceCenterFragment : Fragment() {
                             )
                         },
                         onNonBackupFolderClicked = { nonBackupDeviceFolderUINode ->
+                            Analytics.tracker.trackEvent(
+                                DeviceCenterItemClickedEvent(
+                                    DeviceCenterItemClicked.ItemType.Connection
+                                )
+                            )
                             megaNavigator.openNodeInCloudDrive(
                                 activity = this@DeviceCenterFragment.activity
                                     ?: return@DeviceCenterScreen,

@@ -49,6 +49,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.mobile.analytics.event.AndroidSyncNavigationItemEvent
+import mega.privacy.mobile.analytics.event.DeviceCenterEntrypointButtonEvent
 import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
 import javax.inject.Inject
@@ -201,7 +202,10 @@ internal class ManagerDrawerFragment : Fragment() {
         }
         binding.backupsSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.BACKUPS) }
         binding.notificationsSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.NOTIFICATIONS) }
-        binding.deviceCenterSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.DEVICE_CENTER) }
+        binding.deviceCenterSection.setOnClickListener {
+            Analytics.tracker.trackEvent(DeviceCenterEntrypointButtonEvent)
+            drawerManager.drawerItemClicked(DrawerItem.DEVICE_CENTER)
+        }
         binding.transfersSection.setOnClickListener { drawerManager.drawerItemClicked(DrawerItem.TRANSFERS) }
         binding.syncSection.setOnClickListener {
             Analytics.tracker.trackEvent(AndroidSyncNavigationItemEvent)

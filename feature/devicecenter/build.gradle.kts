@@ -74,6 +74,7 @@ tasks.withType<Test> {
 dependencies {
     lintChecks(project(":lint"))
 
+    implementation(project(":analytics"))
     implementation(project(":domain"))
     implementation(project(":navigation"))
     implementation(project(":data"))
@@ -85,6 +86,7 @@ dependencies {
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
 
+    implementation(lib.mega.analytics)
     implementation(lib.kotlin.ktx)
     implementation(lib.logging.timber)
     implementation(androidx.appcompat)
