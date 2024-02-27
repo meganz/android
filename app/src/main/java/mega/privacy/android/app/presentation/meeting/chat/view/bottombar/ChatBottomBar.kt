@@ -5,7 +5,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,6 +19,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
@@ -27,6 +27,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.UserTypingView
 import mega.privacy.android.core.ui.controls.chat.ChatInputTextToolbar
 import mega.privacy.android.core.ui.controls.chat.VoiceClipRecordEvent
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.core.ui.utils.ComposableLifecycle
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable
@@ -83,8 +84,8 @@ internal fun ChatBottomBar(
             } ?: TextFieldValue(uiState.sendingText)
         )
     }
-    DisposableEffect(Unit) {
-        onDispose {
+    ComposableLifecycle(key = textFieldValue.text) {
+        if (it == Lifecycle.Event.ON_PAUSE) {
             viewModel.saveDraftMessage(textFieldValue.text, uiState.editingMessageId)
         }
     }
