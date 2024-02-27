@@ -7,10 +7,18 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AudioFileTypeInfo
+import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.RawFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
+import mega.privacy.android.domain.entity.UrlFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
@@ -26,13 +34,17 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
+import kotlin.time.Duration.Companion.seconds
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -125,17 +137,17 @@ class NodeAttachmentMessageViewModelTest {
         }
     }
 
-    @Test
-    fun `test that ui state initial state has cached preview`() = runTest {
+    @ParameterizedTest
+    @MethodSource("getFileAndVideoTypes")
+    fun `test that initial ui state uses cached original file when file type is image or video`(
+        fileTypeInfo: FileTypeInfo,
+    ) = runTest {
         val expected = "cachedPreview"
         val fileNode = mock<ChatDefaultFile> {
             on { name } doReturn "name"
             on { size } doReturn 123L
             on { hasPreview } doReturn false
-            on { type } doReturn UnknownFileTypeInfo(
-                mimeType = "application/jpg",
-                extension = "jpg"
-            )
+            on { type } doReturn fileTypeInfo
         }
         whenever(fileSizeStringMapper(any())).thenReturn("1byte")
 
@@ -146,6 +158,27 @@ class NodeAttachmentMessageViewModelTest {
             val actual = awaitItem()
             assertThat(actual.previewUri).isEqualTo(expected)
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("getNoFileNorVideoTypes")
+    fun `test that initial ui state does not use cached original file when it is not a video or image`(
+        fileTypeInfo: FileTypeInfo,
+    ) = runTest {
+        val fileNode = mock<ChatDefaultFile> {
+            on { name } doReturn "name"
+            on { size } doReturn 123L
+            on { hasPreview } doReturn false
+            on { type } doReturn fileTypeInfo
+        }
+        whenever(fileSizeStringMapper(any())).thenReturn("1byte")
+
+        val msg = buildNodeAttachmentMessage(fileNode)
+        underTest.getOrPutUiStateFlow(msg).test {
+            val actual = awaitItem()
+            assertThat(actual.previewUri).isNull()
+        }
+        verifyNoInteractions(getCachedOriginalPathUseCase)
     }
 
     @Test
@@ -219,6 +252,31 @@ class NodeAttachmentMessageViewModelTest {
         whenever(getChatNodeContentUriUseCase(fileNode)).thenReturn(uri)
         val actual = underTest.handleFileNode(msg)
         assertThat(actual).isEqualTo(FileNodeContent.Pdf(uri))
+    }
+
+    private fun getFileAndVideoTypes(): List<FileTypeInfo> {
+        val m = "mime/type"
+        val e = "ext"
+        return listOf(
+            VideoFileTypeInfo(m, e, 18.seconds),
+            GifFileTypeInfo(m, e),
+            RawFileTypeInfo(m, e),
+            StaticImageFileTypeInfo(m, e),
+            SvgFileTypeInfo(m, e),
+        )
+    }
+
+    private fun getNoFileNorVideoTypes(): List<FileTypeInfo> {
+        val m = "mime/type"
+        val e = "ext"
+        return listOf(
+            AudioFileTypeInfo(m, e, 18.seconds),
+            PdfFileTypeInfo,
+            TextFileTypeInfo(m, e),
+            UnknownFileTypeInfo(m, e),
+            UnMappedFileTypeInfo(e),
+            UrlFileTypeInfo,
+        )
     }
 
     private fun buildNodeAttachmentMessage(fileNode: ChatFile) =

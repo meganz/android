@@ -74,10 +74,18 @@ class NodeAttachmentMessageViewModel @Inject constructor(
         }
     }
 
-    override fun createFirstUiState(attachmentMessage: NodeAttachmentMessage): AttachmentMessageUiState {
-        return super.createFirstUiState(attachmentMessage)
-            .copy(previewUri = getCachedOriginalPathUseCase(attachmentMessage.fileNode))
-    }
+    override fun createFirstUiState(attachmentMessage: NodeAttachmentMessage): AttachmentMessageUiState =
+        with(super.createFirstUiState(attachmentMessage)) {
+            when (attachmentMessage.fileType) {
+                is ImageFileTypeInfo, is VideoFileTypeInfo -> {
+                    copy(previewUri = getCachedOriginalPathUseCase(attachmentMessage.fileNode))
+                }
+
+                else -> {
+                    this
+                }
+            }
+        }
 
     /**
      * Handle file node
