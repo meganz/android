@@ -29,6 +29,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openGi
 import mega.privacy.android.app.services.GiphyService
 import mega.privacy.android.core.ui.controls.chat.messages.GiphyMessagePlaceHolder
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
+import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.domain.entity.chat.messages.meta.ChatGifInfo
 import timber.log.Timber
 
@@ -50,6 +51,7 @@ fun GiphyMessageView(
     title: String? = null,
     onLoaded: () -> Unit = {},
     onLongClick: () -> Unit = {},
+    interactionEnabled: Boolean = true,
 ) {
     val context = LocalContext.current
     val maxWidth = 256
@@ -65,16 +67,18 @@ fun GiphyMessageView(
             modifier = modifier
                 .size(width = actualWidth.dp, height = actualHeight.dp)
                 .clip(RoundedCornerShape(12.dp))
-                .combinedClickable(
-                    onClick = {
-                        if (!autoPlay) {
-                            autoPlay = true
-                        } else {
-                            openGiphyViewerActivity(context, gifInfo)
-                        }
-                    },
-                    onLongClick = onLongClick
-                )
+                .conditional(interactionEnabled) {
+                    combinedClickable(
+                        onClick = {
+                            if (!autoPlay) {
+                                autoPlay = true
+                            } else {
+                                openGiphyViewerActivity(context, gifInfo)
+                            }
+                        },
+                        onLongClick = onLongClick
+                    )
+                },
         ) {
             if (autoPlay) {
                 val url = webpSrc?.toUri()?.toString()

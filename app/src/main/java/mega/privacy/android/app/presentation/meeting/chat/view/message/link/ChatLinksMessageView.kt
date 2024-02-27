@@ -22,6 +22,7 @@ import mega.privacy.android.core.ui.controls.chat.messages.ChatBubble
 import mega.privacy.android.core.ui.controls.dividers.DividerSpacing
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
@@ -41,6 +42,7 @@ fun ChatLinksMessageView(
     modifier: Modifier = Modifier,
     viewModel: ChatLinksMessageViewModel = hiltViewModel(),
     contactViewModel: ContactMessageViewModel = hiltViewModel(),
+    interactionEnabled: Boolean = true,
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -93,18 +95,22 @@ fun ChatLinksMessageView(
     ChatBubble(
         isMe = message.isMine,
         modifier = modifier
-            .combinedClickable(
-                onClick = { contentLinks.firstOrNull()?.onClick(context) },
-                onLongClick = { onLongClick(message) }
-            ),
+            .conditional(interactionEnabled) {
+                combinedClickable(
+                    onClick = { contentLinks.firstOrNull()?.onClick(context) },
+                    onLongClick = { onLongClick(message) }
+                )
+            },
         subContent = {
             contentLinks.forEachIndexed { index, linkContent ->
                 key(linkContent.link) {
                     linkContent.SubContentComposable(
-                        modifier = Modifier.combinedClickable(
-                            onClick = { linkContent.onClick(context) },
-                            onLongClick = { onLongClick(message) }
-                        ))
+                        modifier = Modifier.conditional(interactionEnabled) {
+                            combinedClickable(
+                                onClick = { linkContent.onClick(context) },
+                                onLongClick = { onLongClick(message) }
+                            )
+                        })
                 }
 
                 if (index != contentLinks.lastIndex) {

@@ -16,6 +16,7 @@ fun VoiceClipMessageView(
     chatId: Long,
     modifier: Modifier = Modifier,
     viewModel: VoiceClipMessageViewModel = hiltViewModel(),
+    interactionEnabled: Boolean = true,
 ) {
     val uiState by viewModel.getUiStateFlow(message.msgId).collectAsStateWithLifecycle()
     LaunchedEffect(message.msgId) {
@@ -34,6 +35,6 @@ fun VoiceClipMessageView(
         playProgress = uiState.playProgress?.floatValue,
         isPlaying = uiState.isPlaying,
         onPlayClicked = { viewModel.onPlayOrPauseClicked(message.msgId) },
-        interactionEnabled = true,
+        interactionEnabled = interactionEnabled,
     )
 }

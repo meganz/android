@@ -25,6 +25,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import mega.privacy.android.core.ui.controls.chat.messages.file.FileMessageView
 import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -47,6 +48,7 @@ fun NodeAttachmentMessageView(
     modifier: Modifier = Modifier,
     viewModel: NodeAttachmentMessageViewModel = hiltViewModel(),
     chatViewModel: ChatViewModel = hiltViewModel(),
+    interactionEnabled: Boolean = true,
 ) {
     val uiState by viewModel.getOrPutUiStateFlow(message).collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
@@ -60,57 +62,59 @@ fun NodeAttachmentMessageView(
         fileName = uiState.fileName,
         fileSize = uiState.fileSize,
         duration = uiState.duration,
-        modifier = modifier.combinedClickable(
-            onClick = {
-                coroutineScope.launch {
-                    runCatching {
-                        viewModel.handleFileNode(message)
-                    }.onSuccess { content ->
-                        when (content) {
-                            is FileNodeContent.Image -> openImageViewer(
-                                context,
-                                message.chatId,
-                                content.allAttachmentMessageIds.toLongArray(),
-                                message.fileNode.id.longValue
-                            )
+        modifier = modifier.conditional(interactionEnabled) {
+            combinedClickable(
+                onClick = {
+                    coroutineScope.launch {
+                        runCatching {
+                            viewModel.handleFileNode(message)
+                        }.onSuccess { content ->
+                            when (content) {
+                                is FileNodeContent.Image -> openImageViewer(
+                                    context,
+                                    message.chatId,
+                                    content.allAttachmentMessageIds.toLongArray(),
+                                    message.fileNode.id.longValue
+                                )
 
-                            is FileNodeContent.AudioOrVideo -> openVideoOrAudioFile(
-                                context,
-                                message,
-                                content.uri,
-                                viewModel
-                            )
+                                is FileNodeContent.AudioOrVideo -> openVideoOrAudioFile(
+                                    context,
+                                    message,
+                                    content.uri,
+                                    viewModel
+                                )
 
-                            is FileNodeContent.Other -> openOtherFiles(
-                                content.localFile,
-                                viewModel,
-                                message,
-                                context,
-                                snackbarHostState,
-                                chatViewModel
-                            )
+                                is FileNodeContent.Other -> openOtherFiles(
+                                    content.localFile,
+                                    viewModel,
+                                    message,
+                                    context,
+                                    snackbarHostState,
+                                    chatViewModel
+                                )
 
-                            is FileNodeContent.Pdf -> openPdfActivity(
-                                viewModel = viewModel,
-                                context = context,
-                                message = message,
-                                chatId = message.chatId,
-                                content = content.uri
-                            )
+                                is FileNodeContent.Pdf -> openPdfActivity(
+                                    viewModel = viewModel,
+                                    context = context,
+                                    message = message,
+                                    chatId = message.chatId,
+                                    content = content.uri
+                                )
 
-                            FileNodeContent.TextContent -> handleTextEditor(
-                                context,
-                                message.msgId,
-                                message.chatId
-                            )
+                                FileNodeContent.TextContent -> handleTextEditor(
+                                    context,
+                                    message.msgId,
+                                    message.chatId
+                                )
+                            }
+                        }.onFailure {
+                            Timber.e(it, "Failed to handle file node")
                         }
-                    }.onFailure {
-                        Timber.e(it, "Failed to handle file node")
                     }
-                }
-            },
-            onLongClick = { onLongClick(message) }
-        ),
+                },
+                onLongClick = { onLongClick(message) }
+            )
+        },
     )
 }
 

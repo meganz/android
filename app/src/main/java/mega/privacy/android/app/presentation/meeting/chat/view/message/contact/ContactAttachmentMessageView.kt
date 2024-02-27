@@ -27,6 +27,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openContactInfoActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openSentRequests
 import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
@@ -45,6 +46,7 @@ fun ContactAttachmentMessageView(
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ContactMessageViewModel = hiltViewModel(),
+    interactionEnabled: Boolean = true,
 ) {
     var status by remember { mutableStateOf<UserChatStatus?>(null) }
     var userName by remember { mutableStateOf(message.contactUserName) }
@@ -61,21 +63,23 @@ fun ContactAttachmentMessageView(
             item?.contactData?.alias ?: item?.contactData?.fullName ?: message.contactUserName
     }
     CoreContactAttachmentMessageView(
-        modifier = modifier.combinedClickable(
-            onClick = {
-                onUserClick(
-                    message.contactHandle,
-                    message.contactEmail,
-                    message.contactUserName,
-                    context,
-                    coroutineScope,
-                    snackbarHostState,
-                    viewModel::checkUser,
-                    viewModel::inviteUser,
-                )
-            },
-            onLongClick = { onLongClick() }
-        ),
+        modifier = modifier.conditional(interactionEnabled) {
+            combinedClickable(
+                onClick = {
+                    onUserClick(
+                        message.contactHandle,
+                        message.contactEmail,
+                        message.contactUserName,
+                        context,
+                        coroutineScope,
+                        snackbarHostState,
+                        viewModel::checkUser,
+                        viewModel::inviteUser,
+                    )
+                },
+                onLongClick = { onLongClick() }
+            )
+        },
         isMe = message.isMine,
         userName = userName,
         email = message.contactEmail,
