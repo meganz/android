@@ -1533,6 +1533,18 @@ interface MegaChatApiGateway {
     fun getReactionUsers(chatId: Long, msgId: Long, reaction: String): MegaHandleList
 
     /**
+     * Change the SFU id
+     *
+     * This function allows to set the SFU server where all chat calls will be started
+     * It's only useful for testing or debugging purposes.
+     *
+     * Note: To restore default behavior (SFU assigned by API), sfuId param must be set to SFU_ID_DEFAULT(-1)
+     *
+     * @param sfuId New SFU id
+     */
+    suspend fun setSFUid(sfuId: Int)
+
+    /**
      * Sets the last-seen-by-us pointer to the specified message
      *
      * The last-seen-by-us pointer is persisted in the account, so every client will

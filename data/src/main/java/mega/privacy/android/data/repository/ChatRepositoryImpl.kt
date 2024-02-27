@@ -1362,4 +1362,8 @@ internal class ChatRepositoryImpl @Inject constructor(
         }.map { (chatId, message) ->
             message?.let { ChatMessageNotification(chatId, chatMessageMapper(it)) }
         }.flowOn(ioDispatcher)
+
+    override suspend fun setSFUid(sfuId: Int) = withContext(ioDispatcher) {
+        megaChatApiGateway.setSFUid(sfuId)
+    }
 }

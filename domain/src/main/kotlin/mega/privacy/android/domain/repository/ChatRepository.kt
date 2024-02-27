@@ -985,4 +985,11 @@ interface ChatRepository {
      * @return flow of chat messages received
      */
     fun monitorChatMessages(): Flow<ChatMessageNotification?>
+
+    /**
+     * Change the SFU id
+     *
+     * @param sfuId New SFU id
+     */
+    suspend fun setSFUid(sfuId: Int)
 }
