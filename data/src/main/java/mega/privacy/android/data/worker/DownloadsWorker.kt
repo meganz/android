@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
@@ -22,6 +23,7 @@ import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTot
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
+import timber.log.Timber
 
 /**
  * Worker that will monitor current active downloads transfers while there are some.
@@ -45,6 +47,7 @@ class DownloadsWorker @AssistedInject constructor(
     private val downloadNotificationMapper: DownloadNotificationMapper,
     private val transfersFinishedNotificationMapper: TransfersFinishedNotificationMapper,
     private val handleSDCardEventUseCase: HandleSDCardEventUseCase,
+    private val scanMediaFileUseCase: ScanMediaFileUseCase,
 ) : AbstractTransfersWorker(
     context,
     workerParams,
@@ -75,6 +78,13 @@ class DownloadsWorker @AssistedInject constructor(
 
     override suspend fun onTransferEventReceived(event: TransferEvent) {
         handleSDCardEventUseCase(event)
+        if (event is TransferEvent.TransferFinishEvent) {
+            runCatching {
+                scanMediaFileUseCase(arrayOf(event.transfer.localPath), arrayOf(""))
+            }.onFailure {
+                Timber.w(it, "Exception scanning file.")
+            }
+        }
     }
 
     companion object {

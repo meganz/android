@@ -35,6 +35,7 @@ import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfers
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
@@ -49,6 +50,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
@@ -84,6 +86,7 @@ class DownloadsWorkerTest {
         mock<ClearActiveTransfersIfFinishedUseCase>()
     private val transfersFinishedNotificationMapper = mock<TransfersFinishedNotificationMapper>()
     private val workProgressUpdater = mock<ProgressUpdater>()
+    private val scanMediaFileUseCase = mock<ScanMediaFileUseCase>()
 
     @Before
     fun setup() {
@@ -125,7 +128,8 @@ class DownloadsWorkerTest {
             correctActiveTransfersUseCase = correctActiveTransfersUseCase,
             clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
             transfersFinishedNotificationMapper = transfersFinishedNotificationMapper,
-            handleSDCardEventUseCase = handleSDCardEventUseCase
+            handleSDCardEventUseCase = handleSDCardEventUseCase,
+            scanMediaFileUseCase = scanMediaFileUseCase,
         )
     }
 
@@ -275,6 +279,34 @@ class DownloadsWorkerTest {
         val expectedData =
             workDataOf(AbstractTransfersWorker.PROGRESS to expectedProgress.floatValue)
         verify(workProgressUpdater).updateProgress(eq(context), any(), eq(expectedData))
+    }
+
+    @Test
+    fun `test that handleSDCardEventUseCase is invoked when start event is received`() = runTest {
+        val event = mock<TransferEvent.TransferStartEvent>()
+        underTest.onTransferEventReceived(event)
+        verify(handleSDCardEventUseCase).invoke(event)
+    }
+
+    @Test
+    fun `test that handleSDCardEventUseCase is invoked when finish event is received`() = runTest {
+        val event = mock<TransferEvent.TransferFinishEvent>()
+        underTest.onTransferEventReceived(event)
+        verify(handleSDCardEventUseCase).invoke(event)
+    }
+
+    @Test
+    fun `test that file is scanned by scanMediaFileUseCase once download is finished`() = runTest {
+        val localPath = "localPath"
+        val transfer = mock<Transfer> {
+            on { this.localPath } doReturn localPath
+        }
+        val finishEvent = mock<TransferEvent.TransferFinishEvent> {
+            on { this.transfer } doReturn transfer
+        }
+
+        underTest.onTransferEventReceived(finishEvent)
+        verify(scanMediaFileUseCase).invoke(arrayOf(localPath), arrayOf(""))
     }
 
     private suspend fun commonStub(
