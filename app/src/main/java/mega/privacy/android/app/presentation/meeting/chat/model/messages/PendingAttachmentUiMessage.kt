@@ -16,7 +16,10 @@ data class PendingAttachmentUiMessage(
 ) : AvatarMessage() {
 
     @Composable
-    override fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit) {
+    override fun RowScope.ContentComposable(
+        onLongClick: (TypedMessage) -> Unit,
+        interactionEnabled: Boolean,
+    ) {
         PendingAttachmentMessageView(message)
     }
 

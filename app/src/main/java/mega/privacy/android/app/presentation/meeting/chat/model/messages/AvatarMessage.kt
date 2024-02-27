@@ -3,11 +3,9 @@ package mega.privacy.android.app.presentation.meeting.chat.model.messages
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
 import mega.privacy.android.core.ui.controls.chat.ChatMessageContainer
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
@@ -22,7 +20,10 @@ abstract class AvatarMessage : UiChatMessage {
      * Content composable
      */
     @Composable
-    abstract fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit)
+    abstract fun RowScope.ContentComposable(
+        onLongClick: (TypedMessage) -> Unit,
+        interactionEnabled: Boolean
+    )
 
     abstract override val message: TypedMessage
     
@@ -30,15 +31,15 @@ abstract class AvatarMessage : UiChatMessage {
      * Avatar composable
      */
     @Composable
-    open fun RowScope.MessageAvatar(lastUpdatedCache: Long) {
+    open fun RowScope.MessageAvatar(lastUpdatedCache: Long, modifier: Modifier) {
         if (showAvatar) {
             ChatAvatar(
-                modifier = Modifier.align(Alignment.Bottom),
+                modifier = modifier.align(Alignment.Bottom),
                 handle = userHandle,
                 lastUpdatedCache = lastUpdatedCache
             )
         } else {
-            Spacer(modifier = Modifier.size(24.dp))
+            Spacer(modifier = modifier)
         }
     }
 
@@ -68,14 +69,18 @@ abstract class AvatarMessage : UiChatMessage {
             onReactionLongClick = { onReactionLongClick(it, reactions) },
             onForwardClicked = { onForwardClicked(message) },
             time = this.getTimeOrNull(timeFormatter),
-            avatarOrIcon = {
+            avatarOrIcon = { avatarModifier ->
                 MessageAvatar(
-                    lastUpdatedCache = state.lastUpdatedCache
+                    lastUpdatedCache = state.lastUpdatedCache,
+                    avatarModifier,
                 )
             },
-            content = {
-                ContentComposable(onLongClick)
+            content = { interactionEnabled ->
+                ContentComposable(onLongClick, interactionEnabled)
             },
+            isSelectMode = state.isInSelectMode,
+            isSelected = state.isChecked,
+            onSelectionChanged = {},
         )
     }
 

@@ -24,11 +24,15 @@ data class ContactAttachmentUiMessage(
 ) : AvatarMessage() {
 
     @Composable
-    override fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit) {
+    override fun RowScope.ContentComposable(
+        onLongClick: (TypedMessage) -> Unit,
+        interactionEnabled: Boolean
+    ) {
         ContactAttachmentMessageView(
             message = message,
             onLongClick = { onLongClick(message) },
             modifier = Modifier.weight(weight = 1f, fill = false),
+            interactionEnabled = interactionEnabled,
         )
     }
 

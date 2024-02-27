@@ -23,14 +23,18 @@ class ChatGiphyUiMessage(
 ) : AvatarMessage() {
 
     @Composable
-    override fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit) {
+    override fun RowScope.ContentComposable(
+        onLongClick: (TypedMessage) -> Unit,
+        interactionEnabled: Boolean
+    ) {
         message.chatGifInfo?.let { giphy ->
             GiphyMessageView(
                 gifInfo = giphy,
                 title = giphy.title,
                 autoPlayGif = if (autoPlay) true else giphy.webpSize < MAX_SIZE_FOR_AUTO_PLAY,
                 onLoaded = { autoPlay = true },
-                onLongClick = { onLongClick(message) }
+                onLongClick = { onLongClick(message) },
+                interactionEnabled = interactionEnabled,
             )
         }
     }

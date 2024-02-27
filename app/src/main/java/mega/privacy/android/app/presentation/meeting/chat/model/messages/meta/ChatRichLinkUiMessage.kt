@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.ChatRichLinkMessageView
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 
@@ -28,7 +29,10 @@ data class ChatRichLinkUiMessage(
 ) : AvatarMessage() {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    override fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit) {
+    override fun RowScope.ContentComposable(
+        onLongClick: (TypedMessage) -> Unit,
+        interactionEnabled: Boolean,
+    ) {
         val uriHandler = LocalUriHandler.current
         ChatRichLinkMessageView(
             isMe = message.isMine,
@@ -36,10 +40,12 @@ data class ChatRichLinkUiMessage(
             content = message.content,
             modifier = Modifier
                 .weight(1f)
-                .combinedClickable(
-                    onClick = { message.chatRichPreviewInfo?.url?.let { uriHandler.openUri(it) } },
-                    onLongClick = { onLongClick(message) }
-                ),
+                .conditional(interactionEnabled) {
+                    combinedClickable(
+                        onClick = { message.chatRichPreviewInfo?.url?.let { uriHandler.openUri(it) } },
+                        onLongClick = { onLongClick(message) }
+                    )
+                },
         )
     }
 

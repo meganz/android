@@ -19,11 +19,15 @@ data class TextLinkUiMessage(
     override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
     @Composable
-    override fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit) {
+    override fun RowScope.ContentComposable(
+        onLongClick: (TypedMessage) -> Unit,
+        interactionEnabled: Boolean
+    ) {
         ChatLinksMessageView(
             modifier = Modifier.weight(1f, fill = false),
             onLongClick = onLongClick,
             message = message,
+            interactionEnabled = interactionEnabled,
         )
     }
 

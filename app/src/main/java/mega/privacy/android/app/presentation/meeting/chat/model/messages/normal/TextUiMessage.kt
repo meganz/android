@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.normal.ChatMessageTextView
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 
@@ -22,14 +23,19 @@ data class TextUiMessage(
 ) : AvatarMessage() {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    override fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit) {
+    override fun RowScope.ContentComposable(
+        onLongClick: (TypedMessage) -> Unit,
+        interactionEnabled: Boolean,
+    ) {
         ChatMessageTextView(
             message = message,
             isEdited = message.isEdited,
-            modifier = Modifier.combinedClickable(
-                onClick = {},
-                onLongClick = { onLongClick(message) }
-            ),
+            modifier = Modifier.conditional(interactionEnabled) {
+                combinedClickable(
+                    onClick = {},
+                    onLongClick = { onLongClick(message) }
+                )
+            },
         )
     }
 

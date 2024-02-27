@@ -25,7 +25,10 @@ sealed class InvalidUiMessage : AvatarMessage() {
     abstract fun getErrorMessage(): String
 
     @Composable
-    override fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit) {
+    override fun RowScope.ContentComposable(
+        onLongClick: (TypedMessage) -> Unit,
+        interactionEnabled: Boolean
+    ) {
         ChatErrorBubble(errorText = getErrorMessage())
     }
 

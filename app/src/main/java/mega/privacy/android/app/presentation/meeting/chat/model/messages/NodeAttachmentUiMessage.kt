@@ -18,10 +18,14 @@ data class NodeAttachmentUiMessage(
 ) : AvatarMessage() {
 
     @Composable
-    override fun RowScope.ContentComposable(onLongClick: (TypedMessage) -> Unit) {
+    override fun RowScope.ContentComposable(
+        onLongClick: (TypedMessage) -> Unit,
+        interactionEnabled: Boolean,
+    ) {
         NodeAttachmentMessageView(
             message = message,
-            onLongClick = onLongClick
+            onLongClick = onLongClick,
+            interactionEnabled = interactionEnabled,
         )
     }
 
