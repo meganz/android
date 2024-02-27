@@ -93,14 +93,6 @@ fun ChatMessageContainer(
         horizontalAlignment = if (isMine) Alignment.End else Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        time?.let {
-            Text(
-                modifier = if (isMine) Modifier.padding(end = 16.dp) else Modifier.padding(start = 48.dp),
-                text = time,
-                style = MaterialTheme.typography.body4,
-                color = MegaTheme.colors.text.secondary
-            )
-        }
         Row(
             modifier = Modifier
                 .padding(if (isMine && !isSelectMode) 48.dp else 16.dp, end = 16.dp)

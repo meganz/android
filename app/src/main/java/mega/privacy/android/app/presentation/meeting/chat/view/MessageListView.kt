@@ -216,7 +216,7 @@ internal fun MessageListView(
                                 onCheckedChange = onSelectedChanged
                             )
                         }
-                        Box(modifier = Modifier.sizeIn(minHeight = 42.dp)) {
+                        Box(modifier = Modifier.sizeIn(minHeight = 10.dp)) {
                             currentItem.MessageListItem(
                                 state = messageState,
                                 timeFormatter = TimeUtils::formatTime,

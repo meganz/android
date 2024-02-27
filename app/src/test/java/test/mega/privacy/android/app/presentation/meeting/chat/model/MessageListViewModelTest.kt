@@ -10,6 +10,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.di.meeting.chat.paging.PagedChatMessageRemoteMediatorFactory
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ChatMessageDateSeparatorMapper
+import mega.privacy.android.app.presentation.meeting.chat.mapper.ChatMessageTimeSeparatorMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.UiChatMessageMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewModel
 import mega.privacy.android.app.utils.Constants
@@ -50,6 +51,7 @@ internal class MessageListViewModelTest {
     private val monitorContactCacheUpdates: MonitorContactCacheUpdates = mock {
         onBlocking { invoke() } doReturn emptyFlow()
     }
+    private val chatMessageTimeSeparatorMapper: ChatMessageTimeSeparatorMapper = mock()
 
     @BeforeAll
     fun setup() {
@@ -81,6 +83,7 @@ internal class MessageListViewModelTest {
             monitorReactionUpdatesUseCase = mock(),
             monitorContactCacheUpdates = monitorContactCacheUpdates,
             monitorPendingMessagesUseCase = mock(),
+            chatMessageTimeSeparatorMapper = chatMessageTimeSeparatorMapper
         )
     }
 

@@ -45,17 +45,6 @@ class ChatMessageContainerTest {
     }
 
     @Test
-    fun `test that time show correctly`() {
-        val time = "12:00"
-        initComposeRuleContent(
-            isMine = false,
-            showForwardIcon = false,
-            time = time,
-        )
-        composeRule.onNodeWithText(time).assertExists()
-    }
-
-    @Test
     fun `test that error text shows correctly when send error`() {
         initComposeRuleContent(
             isMine = false,

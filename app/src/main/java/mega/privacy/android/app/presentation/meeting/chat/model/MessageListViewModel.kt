@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.di.meeting.chat.paging.PagedChatMessageRemoteMediatorFactory
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ChatMessageDateSeparatorMapper
+import mega.privacy.android.app.presentation.meeting.chat.mapper.ChatMessageTimeSeparatorMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.UiChatMessageMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.ChatHeaderMessage
@@ -64,6 +65,7 @@ class MessageListViewModel @Inject constructor(
     private val uiChatMessageMapper: UiChatMessageMapper,
     private val getChatPagingSourceUseCase: GetChatPagingSourceUseCase,
     private val chatMessageDateSeparatorMapper: ChatMessageDateSeparatorMapper,
+    private val chatMessageTimeSeparatorMapper: ChatMessageTimeSeparatorMapper,
     remoteMediatorFactory: PagedChatMessageRemoteMediatorFactory,
     savedStateHandle: SavedStateHandle,
     private val getLastMessageSeenIdUseCase: GetLastMessageSeenIdUseCase,
@@ -169,24 +171,31 @@ class MessageListViewModel @Inject constructor(
                 }) { pagingData, pendingMessages ->
                 pagingData.map {
                     uiChatMessageMapper(it)
-                }.insertSeparators { before, after: UiChatMessage? ->
-                    chatMessageDateSeparatorMapper(
-                        firstMessage = after,
-                        secondMessage = before
-                    ) //Messages are passed in reverse order as the list is reversed in the ui
-
-                    if (unreadCount > 0
-                        && after?.id == state.value.lastSeenMessageId
-                        && state.value.lastSeenMessageId != -1L
-                    ) {
-                        ChatUnreadHeaderMessage(unreadCount)
-                    } else {
-                        null
+                }
+                    .insertSeparators(TerminalSeparatorType.SOURCE_COMPLETE) { before, after: UiChatMessage? ->
+                        chatMessageTimeSeparatorMapper(
+                            firstMessage = after,
+                            secondMessage = before
+                        )
                     }
-                }.insertFooterItem(
-                    item = ChatHeaderMessage(),
-                    terminalSeparatorType = TerminalSeparatorType.SOURCE_COMPLETE
-                ).let { pagingDataWithoutPending ->
+                    .insertSeparators(TerminalSeparatorType.SOURCE_COMPLETE) { before, after: UiChatMessage? ->
+                        chatMessageDateSeparatorMapper(
+                            firstMessage = after,
+                            secondMessage = before
+                        ) //Messages are passed in reverse order as the list is reversed in the ui
+                    }.insertSeparators { _, after: UiChatMessage? ->
+                        if (unreadCount > 0
+                            && after?.id == state.value.lastSeenMessageId
+                            && state.value.lastSeenMessageId != -1L
+                        ) {
+                            ChatUnreadHeaderMessage(unreadCount)
+                        } else {
+                            null
+                        }
+                    }.insertFooterItem(
+                        item = ChatHeaderMessage(),
+                        terminalSeparatorType = TerminalSeparatorType.SOURCE_COMPLETE
+                    ).let { pagingDataWithoutPending ->
                     pendingMessages.fold(pagingDataWithoutPending) { pagingData, pendingMessage ->
                         //pending messages always at the end (header because list is reversed in the ui)
                         pagingData.insertHeaderItem(
