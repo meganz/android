@@ -48,6 +48,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -68,11 +69,16 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.core.ui.controls.textfields.GenericDescriptionTextField
 import mega.privacy.android.core.ui.controls.textfields.GenericTitleTextField
+import mega.privacy.android.core.ui.model.MegaSpanStyle
+import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.core.ui.theme.tokens.TextColor
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
@@ -112,6 +118,7 @@ internal fun CreateScheduledMeetingView(
     onResetSnackbarMessage: () -> Unit,
     onDiscardMeetingDialog: () -> Unit,
     onCloseWarningClicked: () -> Unit,
+    onUpgradeNowClicked: () -> Unit,
     onDescriptionValueChange: (String) -> Unit,
     onTitleValueChange: (String) -> Unit,
     onScrollChange: (Boolean) -> Unit,
@@ -191,6 +198,14 @@ internal fun CreateScheduledMeetingView(
                         onDateClicked = onEndDateClicked,
                         onTimeClicked = onEndTimeClicked
                     )
+                }
+
+                if (state.shouldShowFreePlanLimitWarning()) {
+                    item(key = "Schedule meeting pro plan limit") {
+                        WarningMessage(
+                            onUpgradeNowClicked = onUpgradeNowClicked,
+                        )
+                    }
                 }
 
                 items(state.buttons) { button ->
@@ -301,6 +316,43 @@ private fun ScheduledMeetingDateAndTime(
             style = MaterialTheme.typography.subtitle1.copy(
                 color = MaterialTheme.colors.onPrimary
             ),
+        )
+    }
+}
+
+/**
+ * Scheduled meeting date and time
+ */
+@Composable
+private fun WarningMessage(
+    onUpgradeNowClicked: () -> Unit,
+) {
+    Box(
+        Modifier
+            .testTag(UPGRADE_ACCOUNT_BUTTON_TAG)
+            .fillMaxWidth()
+            .padding(start = 72.dp, end = 20.dp)
+            .height(56.dp)
+    ) {
+        MegaSpannedText(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .clickable { onUpgradeNowClicked() },
+            value = stringResource(id = R.string.meetings_schedule_meeting_free_plan_60_minute_limit_warning),
+            baseStyle = MaterialTheme.typography.caption,
+            styles = mapOf(
+                SpanIndicator('A') to MegaSpanStyle(
+                    SpanStyle(
+                        fontWeight = FontWeight.Normal,
+                    ),
+                    color = TextColor.Primary
+                ),
+                SpanIndicator('B') to MegaSpanStyle(
+                    SpanStyle(fontWeight = FontWeight.Bold),
+                    color = TextColor.Accent
+                ),
+            ),
+            color = TextColor.Primary
         )
     }
 }
@@ -728,6 +780,8 @@ private fun RecurringMeetingDialog(
 
 internal const val DATE_AND_TIME_TAG = "create_scheduled_meeting:date_and_time"
 internal const val ACTION_BUTTON_TAG = "create_scheduled_meeting:action_button"
+internal const val UPGRADE_ACCOUNT_BUTTON_TAG =
+    "create_scheduled_meeting:warning_upgrade_account_button"
 
 /**
  * Discard Meeting Alert Dialog Preview
@@ -741,7 +795,7 @@ fun PreviewDiscardMeetingAlertDialog() {
             meetingTitle = "Title meeting",
             rulesSelected = ChatScheduledRules(),
             participantItemList = emptyList(),
-            buttons = ScheduleMeetingAction.values().asList(),
+            buttons = ScheduleMeetingAction.entries,
             snackbarMessageContent = consumed(),
             discardMeetingDialog = true,
         ),
@@ -762,7 +816,7 @@ fun PreviewRecurringMeetingDialog() {
             meetingTitle = "Title meeting",
             rulesSelected = ChatScheduledRules(),
             participantItemList = emptyList(),
-            buttons = ScheduleMeetingAction.values().asList(),
+            buttons = ScheduleMeetingAction.entries,
             snackbarMessageContent = consumed(),
             discardMeetingDialog = true,
         ),
@@ -784,7 +838,7 @@ private fun PreviewCreateScheduledMeetingView() {
                 meetingTitle = "Title meeting",
                 rulesSelected = ChatScheduledRules(),
                 participantItemList = emptyList(),
-                buttons = ScheduleMeetingAction.values().asList(),
+                buttons = ScheduleMeetingAction.entries,
                 snackbarMessageContent = consumed()
             ),
             managementState = ScheduledMeetingManagementState(),
@@ -803,6 +857,50 @@ private fun PreviewCreateScheduledMeetingView() {
             onTitleValueChange = {},
             onRecurrenceDialogOptionClicked = {},
             onCloseWarningClicked = {},
+            onUpgradeNowClicked = {},
+        )
+    }
+}
+
+
+/**
+ * Create scheduled meeting View Preview
+ */
+@Preview
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "DarkCreateScheduledMeetingViewWithFreePlanLimitWarningPreview"
+)
+@Composable
+private fun CreateScheduledMeetingViewWithFreePlanLimitWarningPreview() {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        CreateScheduledMeetingView(
+            state = CreateScheduledMeetingState(
+                meetingTitle = "Title meeting",
+                rulesSelected = ChatScheduledRules(),
+                participantItemList = emptyList(),
+                buttons = ScheduleMeetingAction.entries,
+                snackbarMessageContent = consumed(),
+                subscriptionPlan = AccountType.FREE,
+                isCallUnlimitedProPlanFeatureFlagEnabled = true
+            ),
+            managementState = ScheduledMeetingManagementState(),
+            onButtonClicked = {},
+            onDiscardClicked = {},
+            onAcceptClicked = {},
+            onStartTimeClicked = {},
+            onStartDateClicked = {},
+            onEndTimeClicked = {},
+            onEndDateClicked = {},
+            onScrollChange = {},
+            onDismiss = {},
+            onResetSnackbarMessage = {},
+            onDiscardMeetingDialog = {},
+            onDescriptionValueChange = {},
+            onTitleValueChange = {},
+            onRecurrenceDialogOptionClicked = {},
+            onCloseWarningClicked = {},
+            onUpgradeNowClicked = {},
         )
     }
 }

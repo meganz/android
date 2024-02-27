@@ -65,7 +65,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_local_type">A file cannot be synced individually. You need to set up the sync from a folder.</string>
     <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
-    <string name="device_center_list_view_item_sub_state_initial_scan_failed">Initial scan failed. You will need to re-enable your sync or backup from the Desktop app.</string>
+    <string name="device_center_list_view_item_sub_state_initial_scan_failed">Initial scan failed. You will need to re-enable your sync or backup from the desktop app.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
     <string name="device_center_list_view_item_sub_state_remote_node_not_found">Folder in MEGA can’t be located as it’s been moved or deleted, or you might not have access.</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
@@ -159,7 +159,7 @@
     <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
     <string name="device_center_list_view_item_sub_state_local_filesystem_mismatch">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the Desktop app.</string>
     <!-- Text to display in Device Center for an empty state when inspecting a device where no sync or backup has been configured -->
-    <string name="device_center_nothing_setup_state">Nothing setup yet</string>
+    <string name="device_center_nothing_setup_state">Nothing set up yet</string>
     <!-- The hint text for the search bar in the Device Center feature when the User is searching for Devices -->
     <string name="device_center_top_app_bar_search_devices_hint">Search devices</string>
     <!-- The hint text for the search bar in the Device Center feature when the User is searching for Syncs -->

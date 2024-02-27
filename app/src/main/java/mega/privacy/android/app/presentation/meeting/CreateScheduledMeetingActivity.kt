@@ -211,6 +211,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                         onDescriptionValueChange = viewModel::onDescriptionChange,
                         onTitleValueChange = viewModel::onTitleChange,
                         onCloseWarningClicked = scheduledMeetingManagementViewModel::closeWaitingRoomWarning,
+                        onUpgradeNowClicked = {},
                         onRecurrenceDialogOptionClicked = { optionSelected ->
                             viewModel.dismissDialog()
                             when {

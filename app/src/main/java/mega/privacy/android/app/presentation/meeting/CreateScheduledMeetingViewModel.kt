@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getZoneEndTime
 import mega.privacy.android.app.presentation.extensions.getZoneStartTime
 import mega.privacy.android.app.presentation.extensions.meeting.DropdownType
@@ -47,11 +48,13 @@ import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.SetOpenInvite
+import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.chat.InviteParticipantToChatUseCase
 import mega.privacy.android.domain.usecase.chat.RemoveParticipantFromChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetOpenInviteUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactItem
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.CreateChatroomAndSchedMeetingUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomRemindersUseCase
@@ -89,6 +92,8 @@ import javax.inject.Inject
  * @property monitorChatRoomUpdates                     [MonitorChatRoomUpdates]
  * @property setWaitingRoomUseCase                      [SetWaitingRoomUseCase]
  * @property setWaitingRoomRemindersUseCase             [SetWaitingRoomRemindersUseCase]
+ * @property getFeatureFlagValue                        [GetFeatureFlagValueUseCase]
+ * @property getCurrentSubscriptionPlanUseCase          [GetCurrentSubscriptionPlanUseCase]
  * @property state                                      Current view state as [CreateScheduledMeetingState]
  */
 @HiltViewModel
@@ -116,6 +121,8 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val setWaitingRoomUseCase: SetWaitingRoomUseCase,
     private val setWaitingRoomRemindersUseCase: SetWaitingRoomRemindersUseCase,
+    private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
+    private val getCurrentSubscriptionPlanUseCase: GetCurrentSubscriptionPlanUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CreateScheduledMeetingState())
@@ -145,6 +152,17 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                     startDate = state.getInitialStartDate(),
                     endDate = state.getInitialEndDate()
                 )
+            }
+            getFeatureFlagValue(AppFeatures.CallUnlimitedProPlan).let { flag ->
+                _state.update { state ->
+                    state.copy(
+                        isCallUnlimitedProPlanFeatureFlagEnabled = flag,
+                    )
+                }
+            }
+
+            getCurrentSubscriptionPlanUseCase()?.let { currentSubscriptionPlan ->
+                _state.update { it.copy(subscriptionPlan = currentSubscriptionPlan) }
             }
         }
     }
