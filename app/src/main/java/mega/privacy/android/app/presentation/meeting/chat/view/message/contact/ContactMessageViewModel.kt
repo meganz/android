@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
+import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
 import mega.privacy.android.domain.usecase.contact.IsContactRequestSentUseCase
@@ -24,6 +25,7 @@ class ContactMessageViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
     private val isContactRequestSentUseCase: IsContactRequestSentUseCase,
     private val inviteContactUseCase: InviteContactUseCase,
+    private val getMyUserHandleUseCase: GetMyUserHandleUseCase,
 ) : ViewModel() {
     /**
      * Load contact info
@@ -52,24 +54,29 @@ class ContactMessageViewModel @Inject constructor(
         onNonContactAlreadyInvitedClicked: () -> Unit,
     ) {
         viewModelScope.launch {
-            runCatching {
-                getUserUseCase(UserId(userHandle))
-            }.onSuccess { it ->
-                it?.takeIf { it.visibility == UserVisibility.Visible }?.let { user ->
-                    onContactClicked(user.email)
-                } ?: run {
-                    runCatching { isContactRequestSentUseCase(email) }
-                        .onSuccess { isSent ->
-                            if (isSent) {
-                                onNonContactAlreadyInvitedClicked()
-                            } else {
-                                onNonContactClicked()
+            val myUserHandle = getMyUserHandleUseCase()
+            if (userHandle == myUserHandle) {
+                return@launch
+            } else {
+                runCatching {
+                    getUserUseCase(UserId(userHandle))
+                }.onSuccess { it ->
+                    it?.takeIf { it.visibility == UserVisibility.Visible }?.let { user ->
+                        onContactClicked(user.email)
+                    } ?: run {
+                        runCatching { isContactRequestSentUseCase(email) }
+                            .onSuccess { isSent ->
+                                if (isSent) {
+                                    onNonContactAlreadyInvitedClicked()
+                                } else {
+                                    onNonContactClicked()
+                                }
                             }
-                        }
-                        .onFailure { Timber.e(it) }
+                            .onFailure { Timber.e(it) }
+                    }
+                }.onFailure {
+                    Timber.d(it)
                 }
-            }.onFailure {
-                Timber.d(it)
             }
         }
     }
