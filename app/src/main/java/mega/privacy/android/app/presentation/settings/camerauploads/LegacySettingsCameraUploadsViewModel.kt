@@ -21,7 +21,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
-import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
+import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -78,7 +78,7 @@ import javax.inject.Inject
  * @property isCameraUploadsEnabledUseCase Retrieves the enable status of Camera Uploads
  * @property areLocationTagsEnabledUseCase When uploading Photos, this checks whether Location Tags should be embedded in each Photo or not
  * @property areUploadFileNamesKeptUseCase Checks whether the File Names are kept or not when uploading content
- * @property checkEnableCameraUploadsStatus Checks the Camera Uploads status before enabling
+ * @property checkEnableCameraUploadsStatusUseCase Checks the Camera Uploads status before enabling
  * @property clearCacheDirectory Clears all the contents of the internal cache directory
  * @property disableMediaUploadSettings Disables Media Uploads by manipulating a certain value in the database
  * @property getPrimaryFolderPathUseCase Retrieves the Primary Folder path
@@ -113,7 +113,7 @@ class LegacySettingsCameraUploadsViewModel @Inject constructor(
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val areLocationTagsEnabledUseCase: AreLocationTagsEnabledUseCase,
     private val areUploadFileNamesKeptUseCase: AreUploadFileNamesKeptUseCase,
-    private val checkEnableCameraUploadsStatus: CheckEnableCameraUploadsStatus,
+    private val checkEnableCameraUploadsStatusUseCase: CheckEnableCameraUploadsStatusUseCase,
     private val clearCacheDirectory: ClearCacheDirectory,
     private val disableMediaUploadSettings: DisableMediaUploadSettings,
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
@@ -212,11 +212,11 @@ class LegacySettingsCameraUploadsViewModel @Inject constructor(
     /**
      *
      * Checks whether Camera Uploads can be enabled and handles the Status accordingly, as
-     * determined by the Use Case [checkEnableCameraUploadsStatus]
+     * determined by the Use Case [checkEnableCameraUploadsStatusUseCase]
      */
     fun handleEnableCameraUploads() = viewModelScope.launch {
-        Timber.d("checkEnableCameraUploadsStatus")
-        runCatching { checkEnableCameraUploadsStatus() }.onSuccess { status ->
+        Timber.d("checkEnableCameraUploadsStatusUseCase")
+        runCatching { checkEnableCameraUploadsStatusUseCase() }.onSuccess { status ->
             when (status) {
                 EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS -> {
                     onCameraUploadsEnabled()
@@ -226,7 +226,9 @@ class LegacySettingsCameraUploadsViewModel @Inject constructor(
                     _state.update { it.copy(shouldShowBusinessAccountPrompt = true) }
                 }
 
-                EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT -> {
+                EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT,
+                EnableCameraUploadsStatus.SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT,
+                -> {
                     broadcastBusinessAccountExpiredUseCase()
                 }
             }

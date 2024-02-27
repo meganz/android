@@ -38,6 +38,7 @@ import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT
+import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
@@ -46,7 +47,7 @@ import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
-import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
+import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
@@ -81,7 +82,7 @@ import kotlin.time.Duration.Companion.seconds
  * @property ioDispatcher
  * @property mainDispatcher
  * @property defaultDispatcher
- * @property checkEnableCameraUploadsStatus
+ * @property checkEnableCameraUploadsStatusUseCase
  * @property stopCameraUploadsUseCase
  * @property broadcastBusinessAccountExpiredUseCase
  * @param monitorCameraUploadsStatusInfoUseCase
@@ -99,7 +100,7 @@ class TimelineViewModel @Inject constructor(
     @IoDispatcher val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher val mainDispatcher: CoroutineDispatcher,
     @DefaultDispatcher val defaultDispatcher: CoroutineDispatcher,
-    private val checkEnableCameraUploadsStatus: CheckEnableCameraUploadsStatus,
+    private val checkEnableCameraUploadsStatusUseCase: CheckEnableCameraUploadsStatusUseCase,
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getTimelineFilterPreferencesUseCase: GetTimelineFilterPreferencesUseCase,
@@ -269,10 +270,10 @@ class TimelineViewModel @Inject constructor(
 
     /**
      * Checks whether Camera Uploads can be enabled and handles the Status accordingly, as
-     * determined by the Use Case [checkEnableCameraUploadsStatus]
+     * determined by the Use Case [checkEnableCameraUploadsStatusUseCase]
      */
     fun handleEnableCameraUploads() = viewModelScope.launch {
-        runCatching { checkEnableCameraUploadsStatus() }.onSuccess { status ->
+        runCatching { checkEnableCameraUploadsStatusUseCase() }.onSuccess { status ->
             when (status) {
                 CAN_ENABLE_CAMERA_UPLOADS -> {
                     setTriggerCameraUploadsState(shouldTrigger = true)
@@ -282,7 +283,9 @@ class TimelineViewModel @Inject constructor(
                     setBusinessAccountPromptState(shouldShow = true)
                 }
 
-                SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT -> {
+                SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT,
+                SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT,
+                -> {
                     broadcastBusinessAccountExpiredUseCase()
                 }
             }

@@ -19,7 +19,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
-import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
+import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -70,6 +70,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
@@ -93,7 +94,8 @@ internal class LegacySettingsCameraUploadsViewModelTest {
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val areLocationTagsEnabledUseCase = mock<AreLocationTagsEnabledUseCase>()
     private val areUploadFileNamesKeptUseCase = mock<AreUploadFileNamesKeptUseCase>()
-    private val checkEnableCameraUploadsStatus = mock<CheckEnableCameraUploadsStatus>()
+    private val checkEnableCameraUploadsStatusUseCase =
+        mock<CheckEnableCameraUploadsStatusUseCase>()
     private val clearCacheDirectory = mock<ClearCacheDirectory>()
     private val disableMediaUploadSettings = mock<DisableMediaUploadSettings>()
     private val getPrimaryFolderPathUseCase = mock<GetPrimaryFolderPathUseCase>()
@@ -147,7 +149,7 @@ internal class LegacySettingsCameraUploadsViewModelTest {
             isCameraUploadsEnabledUseCase,
             areLocationTagsEnabledUseCase,
             areUploadFileNamesKeptUseCase,
-            checkEnableCameraUploadsStatus,
+            checkEnableCameraUploadsStatusUseCase,
             clearCacheDirectory,
             disableMediaUploadSettings,
             getPrimaryFolderPathUseCase,
@@ -201,7 +203,7 @@ internal class LegacySettingsCameraUploadsViewModelTest {
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             areLocationTagsEnabledUseCase = areLocationTagsEnabledUseCase,
             areUploadFileNamesKeptUseCase = areUploadFileNamesKeptUseCase,
-            checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
+            checkEnableCameraUploadsStatusUseCase = checkEnableCameraUploadsStatusUseCase,
             clearCacheDirectory = clearCacheDirectory,
             disableMediaUploadSettings = disableMediaUploadSettings,
             getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
@@ -308,17 +310,17 @@ internal class LegacySettingsCameraUploadsViewModelTest {
     }
 
     /**
-     * Mocks the value of [checkEnableCameraUploadsStatus] and calls the ViewModel method
+     * Mocks the value of [checkEnableCameraUploadsStatusUseCase] and calls the ViewModel method
      *
      * @param status The [EnableCameraUploadsStatus] to mock the Use Case
      */
     private suspend fun handleEnableCameraUploads(status: EnableCameraUploadsStatus) {
-        whenever(checkEnableCameraUploadsStatus()).thenReturn(status)
+        whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(status)
         underTest.handleEnableCameraUploads()
     }
 
     @Test
-    fun `test that shouldShowBusinessAccountPrompt is true when checkEnableCameraUploadsStatus returns SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT`() =
+    fun `test that shouldShowBusinessAccountPrompt is true when checkEnableCameraUploadsStatusUseCase returns SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT`() =
         runTest {
             setupUnderTest()
 
@@ -330,15 +332,21 @@ internal class LegacySettingsCameraUploadsViewModelTest {
             }
         }
 
-    @Test
-    fun `test that broadcastBusinessAccountExpiredUseCase is invoked when checkEnableCameraUploadsStatus returns SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT`() =
-        runTest {
-            setupUnderTest()
+    @ParameterizedTest(name = "camera uploads status: {0}")
+    @EnumSource(
+        value = EnableCameraUploadsStatus::class,
+        names = ["SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT", "SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT"],
+        mode = EnumSource.Mode.INCLUDE,
+    )
+    fun `test that broadcastBusinessAccountExpiredUseCase is invoked when checkEnableCameraUploadsStatusUseCase returns specific camera uploads statuses`(
+        cameraUploadsStatus: EnableCameraUploadsStatus,
+    ) = runTest {
+        setupUnderTest()
 
-            handleEnableCameraUploads(status = EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT)
+        handleEnableCameraUploads(status = cameraUploadsStatus)
 
-            verify(broadcastBusinessAccountExpiredUseCase).invoke()
-        }
+        verify(broadcastBusinessAccountExpiredUseCase).invoke()
+    }
 
     @Test
     fun `test that shouldShowBusinessAccountPrompt is false when calling resetBusinessAccountPromptState`() =
@@ -872,12 +880,12 @@ internal class LegacySettingsCameraUploadsViewModelTest {
             setupUnderTest()
             whenever(isCameraUploadsEnabledUseCase()).thenReturn(isEnabled)
             whenever(hasMediaPermissionUseCase()).thenReturn(!isEnabled)
-            whenever(checkEnableCameraUploadsStatus()).thenReturn(EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS)
+            whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS)
             underTest.toggleCameraUploadsSettings()
             if (isEnabled) {
                 verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.StopAndDisable)
             } else {
-                verify(checkEnableCameraUploadsStatus).invoke()
+                verify(checkEnableCameraUploadsStatusUseCase).invoke()
             }
             underTest.state.test {
                 assertThat(awaitItem().isCameraUploadsEnabled).isEqualTo(!isEnabled)

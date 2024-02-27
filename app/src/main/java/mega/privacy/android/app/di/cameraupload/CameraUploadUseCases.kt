@@ -11,10 +11,8 @@ import mega.privacy.android.app.di.GetNodeModule
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
-import mega.privacy.android.domain.usecase.DefaultCheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.DefaultDisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.DefaultIsChargingRequired
 import mega.privacy.android.domain.usecase.DefaultIsNotEnoughQuota
@@ -72,12 +70,6 @@ abstract class CameraUploadUseCases {
         fun provideCreateCameraUploadFolder(fileSystemRepository: FileSystemRepository): CreateCameraUploadFolder =
             CreateCameraUploadFolder(fileSystemRepository::createFolder)
     }
-
-    /**
-     * Provides the [CheckEnableCameraUploadsStatus] implementation
-     */
-    @Binds
-    abstract fun bindCheckEnableCameraUploadsStatus(useCase: DefaultCheckEnableCameraUploadsStatus): CheckEnableCameraUploadsStatus
 
     /**
      * Provide the [SetPrimarySyncHandle] implementation

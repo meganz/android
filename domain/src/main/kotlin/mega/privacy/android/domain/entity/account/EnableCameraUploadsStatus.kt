@@ -19,4 +19,9 @@ enum class EnableCameraUploadsStatus {
      * Enum entry that indicates the Suspended Business Account prompt should be shown
      */
     SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT,
+
+    /**
+     * Enum entry that indicates the Suspended Master Business Account prompt should be shown
+     */
+    SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT,
 }

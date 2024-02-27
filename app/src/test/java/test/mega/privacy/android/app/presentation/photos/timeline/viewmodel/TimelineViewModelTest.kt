@@ -37,7 +37,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
-import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
+import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
@@ -57,7 +57,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -93,7 +96,8 @@ class TimelineViewModelTest {
 
     private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
 
-    private val checkEnableCameraUploadsStatus = mock<CheckEnableCameraUploadsStatus>()
+    private val checkEnableCameraUploadsStatusUseCase =
+        mock<CheckEnableCameraUploadsStatusUseCase>()
 
     private val cameraUploadsStatusInfoFlow = MutableSharedFlow<CameraUploadsStatusInfo>()
     private val monitorCameraUploadsStatusInfoUseCase =
@@ -146,7 +150,7 @@ class TimelineViewModelTest {
             ioDispatcher = StandardTestDispatcher(),
             mainDispatcher = StandardTestDispatcher(),
             defaultDispatcher = UnconfinedTestDispatcher(),
-            checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
+            checkEnableCameraUploadsStatusUseCase = checkEnableCameraUploadsStatusUseCase,
             monitorCameraUploadsStatusInfoUseCase = monitorCameraUploadsStatusInfoUseCase,
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
@@ -274,17 +278,17 @@ class TimelineViewModelTest {
     }
 
     /**
-     * Mocks the value of [checkEnableCameraUploadsStatus] and calls the ViewModel method
+     * Mocks the value of [checkEnableCameraUploadsStatusUseCase] and calls the ViewModel method
      *
      * @param status The [EnableCameraUploadsStatus] to mock the Use Case
      */
     private suspend fun handleEnableCameraUploads(status: EnableCameraUploadsStatus) {
-        whenever(checkEnableCameraUploadsStatus()).thenReturn(status)
+        whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(status)
         underTest.handleEnableCameraUploads()
     }
 
     @Test
-    fun `test that shouldShowBusinessAccountPrompt is true when checkEnableCameraUploadsStatus returns SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT`() =
+    fun `test that shouldShowBusinessAccountPrompt is true when checkEnableCameraUploadsStatusUseCase returns SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT`() =
         runTest {
             handleEnableCameraUploads(status = EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT)
             advanceUntilIdle()
@@ -295,17 +299,25 @@ class TimelineViewModelTest {
             }
         }
 
-    @Test
-    fun `test that broadcastBusinessAccountExpiredUseCase is invoked when checkEnableCameraUploadsStatus returns SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT`() =
-        runTest {
-            handleEnableCameraUploads(status = EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT)
-            advanceUntilIdle()
+    @ParameterizedTest(name = "camera uploads status: {0}")
+    @EnumSource(
+        value = EnableCameraUploadsStatus::class,
+        names = ["SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT", "SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT"],
+        mode = EnumSource.Mode.INCLUDE,
+    )
+    fun `test that broadcastBusinessAccountExpiredUseCase is invoked when checkEnableCameraUploadsStatusUseCase returns specific camera uploads statuses`(
+        cameraUploadsStatus: EnableCameraUploadsStatus,
+    ) = runTest {
+        handleEnableCameraUploads(status = cameraUploadsStatus)
+        advanceUntilIdle()
 
-            verify(broadcastBusinessAccountExpiredUseCase).invoke()
-        }
+        // Since the ViewModel is not reset on every test, use atLeast(1) just to confirm that
+        // the Use Case has been triggered with a specific camera uploads status
+        verify(broadcastBusinessAccountExpiredUseCase, atLeast(1)).invoke()
+    }
 
     @Test
-    fun `test that shouldTriggerCameraUploads is true when checkEnableCameraUploadsStatus returns CAN_ENABLE_CAMERA_UPLOADS`() =
+    fun `test that shouldTriggerCameraUploads is true when checkEnableCameraUploadsStatusUseCase returns CAN_ENABLE_CAMERA_UPLOADS`() =
         runTest {
             handleEnableCameraUploads(status = EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS)
             advanceUntilIdle()
