@@ -50,11 +50,13 @@ class ContactListFragment : Fragment() {
         ContactActionsListAdapter(::onRequestsClick, ::onGroupsClick)
     }
     private val recentlyAddedAdapter by lazy {
-        ContactListAdapter(::onContactClick, ::onContactInfoClick, ::onContactMoreClick)
+        ContactListAdapter(viewModel::getChatRoomId, ::onContactInfoClick, ::onContactMoreClick)
     }
     private val contactsAdapter by lazy {
-        ContactListAdapter(::onContactClick, ::onContactInfoClick, ::onContactMoreClick)
+        ContactListAdapter(viewModel::getChatRoomId, ::onContactInfoClick, ::onContactMoreClick)
     }
+
+    private var contactSheet: ContactBottomSheetDialogFragment? = null
 
     private var forceAppUpdateDialog: AlertDialog? = null
 
@@ -95,6 +97,18 @@ class ContactListFragment : Fragment() {
         viewLifecycleOwner.collectFlow(viewModel.state) { state ->
             if (state.showForceUpdateDialog) {
                 showForceUpdateAppDialog()
+            }
+
+            state.shouldOpenChatWithId?.let { chatId ->
+                navigator.openChat(
+                    context = requireActivity(),
+                    chatId = chatId,
+                    action = Constants.ACTION_CHAT_SHOW_MESSAGES
+                )
+
+                contactSheet?.dismiss()
+
+                viewModel.onChatOpened()
             }
         }
     }
@@ -175,22 +189,18 @@ class ContactListFragment : Fragment() {
         }
     }
 
-    private fun onContactClick(userHandle: Long) {
-        viewModel.getChatRoomId(userHandle).observe(viewLifecycleOwner) { chatId ->
-            navigator.openChat(
-                context = requireActivity(),
-                chatId = chatId,
-                action = Constants.ACTION_CHAT_SHOW_MESSAGES
-            )
-        }
-    }
-
     private fun onContactInfoClick(userEmail: String) {
         ContactUtil.openContactInfoActivity(context, userEmail)
     }
 
     private fun onContactMoreClick(userHandle: Long) {
-        ContactBottomSheetDialogFragment.newInstance(userHandle).show(childFragmentManager)
+        contactSheet = ContactBottomSheetDialogFragment.newInstance(userHandle).apply {
+            optionSendMessageClick = { handle ->
+                viewModel.getChatRoomId(handle)
+            }
+        }
+
+        contactSheet?.show(childFragmentManager)
     }
 
     private fun onRequestsClick() {

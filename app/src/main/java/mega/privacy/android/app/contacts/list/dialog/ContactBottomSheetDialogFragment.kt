@@ -32,7 +32,6 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.Constants.ACTION_CHAT_SHOW_MESSAGES
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT
 import mega.privacy.android.app.utils.Constants.SELECTED_CONTACTS
 import mega.privacy.android.app.utils.ContactUtil
@@ -76,6 +75,13 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     @Inject
     lateinit var navigator: MegaNavigator
+
+    /**
+     * Send message button click listener
+     *
+     * @param handle mega user's handle from
+     */
+    var optionSendMessageClick: ((handle: Long) -> Unit)? = null
 
     private val viewModel by viewModels<ContactListViewModel>({ requireParentFragment() })
     private val userHandle by lazy {
@@ -225,15 +231,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.optionSendMessage.setOnClickListener {
-            viewModel.getChatRoomId(megaUser.handle).observe(viewLifecycleOwner) { chatId ->
-                navigator.openChat(
-                    context = requireActivity(),
-                    chatId = chatId,
-                    action = ACTION_CHAT_SHOW_MESSAGES
-                )
-
-                dismiss()
-            }
+            optionSendMessageClick?.invoke(megaUser.handle)
         }
 
         binding.optionSendFile.setOnClickListener {

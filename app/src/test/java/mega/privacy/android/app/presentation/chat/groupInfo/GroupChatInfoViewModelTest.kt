@@ -8,7 +8,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -16,6 +15,7 @@ import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
+import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
@@ -41,7 +41,7 @@ class GroupChatInfoViewModelTest {
     private val setOpenInvite: SetOpenInvite = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val startChatCall: StartChatCall = mock()
-    private val getChatRoomUseCase: GetChatRoomUseCase = mock()
+    private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase = mock()
     private val passcodeManagement: PasscodeManagement = mock()
     private val chatApiGateway: MegaChatApiGateway = mock()
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase = mock()
@@ -76,7 +76,7 @@ class GroupChatInfoViewModelTest {
             setOpenInvite = setOpenInvite,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             startChatCall = startChatCall,
-            getChatRoomUseCase = getChatRoomUseCase,
+            get1On1ChatIdUseCase = get1On1ChatIdUseCase,
             passcodeManagement = passcodeManagement,
             chatApiGateway = chatApiGateway,
             setChatVideoInDeviceUseCase = setChatVideoInDeviceUseCase,
@@ -93,13 +93,26 @@ class GroupChatInfoViewModelTest {
     @Test
     fun `test that the end call use case is executed, and the meeting's statistics are sent when the user ends the call for all`() =
         runTest {
-            // When
             underTest.endCallForAll()
 
-            // Then
             verify(endCallUseCase).invoke(underTest.state.value.chatId)
             verify(sendStatisticsMeetingsUseCase).invoke(any())
         }
+
+    @Test
+    fun `test that a call is started when on call button tapped`() = runTest {
+        val chatID = 123L
+        whenever(get1On1ChatIdUseCase(any())).thenReturn(chatID)
+        whenever(setChatVideoInDeviceUseCase()).thenThrow(RuntimeException())
+
+        underTest.onCallTap(
+            userHandle = 456L,
+            video = false,
+            audio = true
+        )
+
+        verify(chatApiGateway).getChatCall(chatID)
+    }
 
     @After
     fun tearDown() {
@@ -108,7 +121,7 @@ class GroupChatInfoViewModelTest {
             setOpenInvite,
             monitorConnectivityUseCase,
             startChatCall,
-            getChatRoomUseCase,
+            get1On1ChatIdUseCase,
             passcodeManagement,
             chatApiGateway,
             setChatVideoInDeviceUseCase,

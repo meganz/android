@@ -26,7 +26,6 @@ import mega.privacy.android.app.contacts.list.data.ContactActionItem
 import mega.privacy.android.app.contacts.list.data.ContactActionItem.Type
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.contacts.list.data.ContactListState
-import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
 import mega.privacy.android.app.contacts.usecase.RemoveContactUseCase
@@ -41,6 +40,7 @@ import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
@@ -56,7 +56,7 @@ import javax.inject.Inject
  *
  * @property getContactsUseCase         Use case to retrieve current contacts
  * @property getContactRequestsUseCase  Use case to retrieve contact requests
- * @property getChatRoomUseCase         Use case to get current chat room for existing user
+ * @property get1On1ChatIdUseCase   Use case to get current chat room for existing user
  * @property removeContactUseCase       Use case to remove existing contact
  * @property passcodeManagement         [PasscodeManagement]
  * @property startChatCall              [StartChatCall]
@@ -68,7 +68,7 @@ import javax.inject.Inject
 class ContactListViewModel @Inject constructor(
     private val getContactsUseCase: GetContactsUseCase,
     private val getContactRequestsUseCase: GetContactRequestsUseCase,
-    private val getChatRoomUseCase: GetChatRoomUseCase,
+    private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val removeContactUseCase: RemoveContactUseCase,
     private val startChatCall: StartChatCall,
     private val passcodeManagement: PasscodeManagement,
@@ -194,19 +194,34 @@ class ContactListViewModel @Inject constructor(
             result
         }
 
-    fun getChatRoomId(userHandle: Long): LiveData<Long> {
-        val result = MutableLiveData<Long>()
-        getChatRoomUseCase.get(userHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { chatId ->
-                    result.value = chatId
-                },
-                onError = Timber::e
+    /**
+     * Get chat room ID
+     *
+     * @param userHandle User handle
+     */
+    fun getChatRoomId(userHandle: Long) = viewModelScope.launch {
+        runCatching {
+            get1On1ChatIdUseCase(userHandle)
+        }.onSuccess { chatId ->
+            _state.update {
+                it.copy(
+                    shouldOpenChatWithId = chatId
+                )
+            }
+        }.onFailure {
+            Timber.e(it)
+        }
+    }
+
+    /**
+     * Reset chat navigation state
+     */
+    fun onChatOpened() {
+        _state.update {
+            it.copy(
+                shouldOpenChatWithId = null
             )
-            .addTo(composite)
-        return result
+        }
     }
 
     fun removeContact(megaUser: MegaUser) {
@@ -228,17 +243,14 @@ class ContactListViewModel @Inject constructor(
      * @param video Start call with video on or off
      * @param audio Start call with audio on or off
      */
-    fun onCallTap(video: Boolean, audio: Boolean) {
-        getChatRoomUseCase.get(MegaApplication.userWaitingForCall)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { chatId ->
-                    startCall(chatId, video, audio)
-                },
-                onError = Timber::e
-            )
-            .addTo(composite)
+    fun onCallTap(video: Boolean, audio: Boolean) = viewModelScope.launch {
+        runCatching {
+            get1On1ChatIdUseCase(MegaApplication.userWaitingForCall)
+        }.onSuccess { chatId ->
+            startCall(chatId, video, audio)
+        }.onFailure {
+            Timber.e(it)
+        }
     }
 
     /**
