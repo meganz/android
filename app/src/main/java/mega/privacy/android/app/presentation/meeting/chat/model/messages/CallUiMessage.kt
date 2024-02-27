@@ -33,6 +33,7 @@ data class CallUiMessage(
         onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
         onReactionLongClick: (String, List<UIReaction>) -> Unit,
         onForwardClicked: (TypedMessage) -> Unit,
+        onSelectedChanged: (Boolean) -> Unit,
     ) {
         ChatMessageContainer(
             modifier = Modifier.fillMaxWidth(),
@@ -50,6 +51,7 @@ data class CallUiMessage(
                     isOneToOneChat = state.isOneToOne
                 )
             },
+            onSelectionChanged = onSelectedChanged,
         )
     }
 

@@ -23,6 +23,7 @@ class ChatUnreadHeaderMessage(private val unreadCount: Int) : HeaderMessage() {
         onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
         onReactionLongClick: (String, List<UIReaction>) -> Unit,
         onForwardClicked: (TypedMessage) -> Unit,
+        onSelectedChanged: (Boolean) -> Unit,
     ) {
         ChatUnreadMessageView(
             content = pluralStringResource(

@@ -41,6 +41,7 @@ abstract class ManagementUiChatMessage : UiChatMessage {
         onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
         onReactionLongClick: (String, List<UIReaction>) -> Unit,
         onForwardClicked: (TypedMessage) -> Unit,
+        onSelectedChanged: (Boolean) -> Unit,
     ) {
         ChatMessageContainer(
             modifier = Modifier.fillMaxWidth(),
@@ -52,7 +53,8 @@ abstract class ManagementUiChatMessage : UiChatMessage {
             onForwardClicked = { onForwardClicked(message) },
             onReactionLongClick = { onReactionLongClick(it, reactions) },
             time = getTimeOrNull(timeFormatter),
-            content = { contentComposable },
+            content = { _ -> contentComposable() },
+            onSelectionChanged = onSelectedChanged,
         )
     }
 

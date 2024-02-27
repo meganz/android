@@ -3,13 +3,10 @@ package mega.privacy.android.app.presentation.meeting.chat.view
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material.Checkbox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -21,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,7 +34,6 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.managem
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.core.ui.controls.chat.messages.LoadingMessagesHeader
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
-import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import timber.log.Timber
 
@@ -181,14 +176,13 @@ internal fun MessageListView(
             ) { index ->
                 pagingItems[index]?.let { currentItem ->
                     val isInSelectMode = selectMode && currentItem.isSelectable
-                    val isChecked = isInSelectMode && currentItem.id in selectedItems
                     val messageState = UIMessageState(
                         chatTitle = uiState.title,
                         isOneToOne = !uiState.isGroup && !uiState.isMeeting,
                         scheduledMeeting = uiState.scheduledMeeting,
                         lastUpdatedCache = lastCacheUpdateTime[currentItem.userHandle]
                             ?: 0L,
-                        isInSelectMode = selectMode && currentItem.isSelectable,
+                        isInSelectMode = isInSelectMode,
                         isChecked = isInSelectMode && currentItem.id in selectedItems,
                     )
                     val onSelectedChanged: (Boolean) -> Unit = { selected ->
@@ -198,44 +192,26 @@ internal fun MessageListView(
                             currentItem.message?.let { deselectItem(it) }
                         }
                     }
-                    Row(
-                        modifier = Modifier.conditional(
-                            condition = isInSelectMode
-                        ) {
-                            toggleable(
-                                value = isChecked,
-                                enabled = true,
-                                role = Role.Checkbox,
-                                onValueChange = onSelectedChanged
-                            )
-                        }
-                    ) {
-                        if (isInSelectMode) {
-                            Checkbox(
-                                checked = isChecked,
-                                onCheckedChange = onSelectedChanged
-                            )
-                        }
-                        Box(modifier = Modifier.sizeIn(minHeight = 10.dp)) {
-                            currentItem.MessageListItem(
-                                state = messageState,
-                                timeFormatter = TimeUtils::formatTime,
-                                dateFormatter = {
-                                    TimeUtils.formatDate(
-                                        it,
-                                        TimeUtils.DATE_SHORT_FORMAT,
-                                        context
-                                    )
-                                },
-                                onLongClick = {
-                                    if (uiState.haveWritePermission) onMessageLongClick(it)
-                                },
-                                onForwardClicked = onForwardClicked,
-                                onMoreReactionsClicked = onMoreReactionsClicked,
-                                onReactionClicked = onReactionClicked,
-                                onReactionLongClick = onReactionLongClick,
-                            )
-                        }
+                    Box(modifier = Modifier.sizeIn(minHeight = 42.dp)) {
+                        currentItem.MessageListItem(
+                            state = messageState,
+                            timeFormatter = TimeUtils::formatTime,
+                            dateFormatter = {
+                                TimeUtils.formatDate(
+                                    it,
+                                    TimeUtils.DATE_SHORT_FORMAT,
+                                    context
+                                )
+                            },
+                            onLongClick = {
+                                if (uiState.haveWritePermission) onMessageLongClick(it)
+                            },
+                            onMoreReactionsClicked = onMoreReactionsClicked,
+                            onReactionClicked = onReactionClicked,
+                            onReactionLongClick = onReactionLongClick,
+                            onForwardClicked = onForwardClicked,
+                            onSelectedChanged = onSelectedChanged,
+                        )
                     }
                 }
             }

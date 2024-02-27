@@ -34,6 +34,7 @@ interface UiChatMessage {
         onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
         onReactionLongClick: (String, List<UIReaction>) -> Unit,
         onForwardClicked: (TypedMessage) -> Unit,
+        onSelectedChanged: (Boolean) -> Unit,
     )
 
     /**

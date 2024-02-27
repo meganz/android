@@ -58,6 +58,7 @@ abstract class AvatarMessage : UiChatMessage {
         onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
         onReactionLongClick: (String, List<UIReaction>) -> Unit,
         onForwardClicked: (TypedMessage) -> Unit,
+        onSelectedChanged: (Boolean) -> Unit,
     ) {
         ChatMessageContainer(
             modifier = Modifier.fillMaxWidth(),
@@ -80,7 +81,7 @@ abstract class AvatarMessage : UiChatMessage {
             },
             isSelectMode = state.isInSelectMode,
             isSelected = state.isChecked,
-            onSelectionChanged = {},
+            onSelectionChanged = onSelectedChanged,
         )
     }
 
