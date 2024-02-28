@@ -2080,7 +2080,9 @@ public class ChatActivity extends PasscodeActivity
 
             ChatScheduledMeeting schedMeet = chatState.getScheduledMeeting();
             if (schedMeet != null) {
-                adapter.notifyItemChanged(0);
+                if(adapter != null){
+                    adapter.notifyItemChanged(0);
+                }
                 updateCallBanner();
             }
 
@@ -10069,23 +10071,36 @@ public class ChatActivity extends PasscodeActivity
 
         dialogBuilder.setTitle(getString(R.string.meetings_chat_screen_app_update_dialog_title))
                 .setMessage(getString(R.string.meetings_chat_screen_app_update_dialog_message))
-                .setNegativeButton(getString(R.string.meetings_chat_screen_app_update_dialog_cancel_button),
+                .setNegativeButton(getString(R.string.general_skip),
                         (dialog, which) -> {
-                            dialog.dismiss();
-                            viewModel.onForceUpdateDialogConsumed();
-                            forceAppUpdateDialog = null;
+                            skipForceUpdateDialog();
                         })
                 .setPositiveButton(getString(R.string.meetings_chat_screen_app_update_dialog_update_button),
                         (dialog, which) -> {
-                            viewModel.onForceUpdateDialogConsumed();
-                            dialog.dismiss();
-                            openPlayStore();
-                            forceAppUpdateDialog = null;
+                            updateApp();
                         });
 
         forceAppUpdateDialog = dialogBuilder.create();
         forceAppUpdateDialog.show();
     }
+
+    private void skipForceUpdateDialog() {
+        if (forceAppUpdateDialog != null && forceAppUpdateDialog.isShowing()) {
+            forceAppUpdateDialog.dismiss();
+            viewModel.onForceUpdateDialogConsumed();
+            forceAppUpdateDialog = null;
+        }
+    }
+
+    private void updateApp(){
+        if (forceAppUpdateDialog != null && forceAppUpdateDialog.isShowing()) {
+            forceAppUpdateDialog.dismiss();
+            viewModel.onForceUpdateDialogConsumed();
+            openPlayStore();
+            forceAppUpdateDialog = null;
+        }
+    }
+
 
     private void openPlayStore() {
         try {

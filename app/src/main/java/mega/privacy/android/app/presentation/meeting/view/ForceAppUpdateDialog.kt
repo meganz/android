@@ -34,7 +34,7 @@ fun ForceAppUpdateDialog(
         confirmButtonText = stringResource(
             R.string.meetings_chat_screen_app_update_dialog_update_button
         ),
-        cancelButtonText = stringResource(id = R.string.meetings_chat_screen_app_update_dialog_cancel_button),
+        cancelButtonText = stringResource(id = R.string.general_skip),
         onConfirm = {
             try {
                 context.startActivity(

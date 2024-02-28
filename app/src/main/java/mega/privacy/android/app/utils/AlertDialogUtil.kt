@@ -93,7 +93,7 @@ object AlertDialogUtil {
         dialogBuilder.setTitle(context.getString(R.string.meetings_chat_screen_app_update_dialog_title))
             .setMessage(context.getString(R.string.meetings_chat_screen_app_update_dialog_message))
             .setNegativeButton(
-                context.getString(R.string.meetings_chat_screen_app_update_dialog_cancel_button)
+                context.getString(R.string.general_skip)
             ) { dialog, _ ->
                 dialog.dismiss()
                 onDismiss()

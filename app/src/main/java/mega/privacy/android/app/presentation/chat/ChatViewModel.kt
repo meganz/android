@@ -585,11 +585,13 @@ class ChatViewModel @Inject constructor(
                 .filter { it.chatId == _state.value.chatId }
                 .collectLatest { call ->
                     call.changes?.apply {
-                        Timber.d("Monitor chat call updated, changes ${call.changes}")
+                        Timber.d("Monitor chat call updated, changes ${call.changes} and status ${call.status}")
                         if (contains(ChatCallChanges.Status) && _state.value.schedIsPending) {
                             val scheduledMeetingStatus = when (call.status) {
                                 ChatCallStatus.UserNoPresent ->
-                                    ScheduledMeetingStatus.NotJoined(call.duration)
+                                    if (call.isIncoming) {
+                                        ScheduledMeetingStatus.NotJoined(call.duration)
+                                    } else ScheduledMeetingStatus.NotStarted
 
                                 ChatCallStatus.Connecting,
                                 ChatCallStatus.Joining,
@@ -612,7 +614,9 @@ class ChatViewModel @Inject constructor(
 
                                         ChatCallTermCodeType.ProtocolVersion -> {
                                             showForceUpdateDialog()
-                                            ScheduledMeetingStatus.NotStarted
+                                            if (call.isIncoming) ScheduledMeetingStatus.NotJoined(
+                                                call.duration
+                                            ) else ScheduledMeetingStatus.NotStarted
                                         }
 
                                         else -> {
@@ -643,7 +647,7 @@ class ChatViewModel @Inject constructor(
     private fun showForceUpdateDialog() {
         _state.update {
             it.copy(
-                showForceUpdateDialog = true
+                showForceUpdateDialog = true,
             )
         }
     }
