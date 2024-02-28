@@ -42,24 +42,24 @@ internal fun NavGraphBuilder.searchNavGraph(
     trackAnalytics: (SearchFilter?) -> Unit,
     showSortOrderBottomSheet: () -> Unit,
     navigateToLink: (String) -> Unit,
-    handleClick: (TypedNode?) -> Unit,
     navHostController: NavHostController,
     nodeActionHandler: NodeActionHandler,
     searchActivityViewModel: SearchActivityViewModel,
     onBackPressed: () -> Unit,
     nodeActionsViewModel: NodeActionsViewModel,
+    handleClick: (TypedNode?) -> Unit,
     listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
 ) {
     composable(searchRoute) {
         SearchScreen(
             trackAnalytics = trackAnalytics,
-            handleClick = handleClick,
             navigateToLink = navigateToLink,
             showSortOrderBottomSheet = showSortOrderBottomSheet,
             navHostController = navHostController,
             searchActivityViewModel = searchActivityViewModel,
             onBackPressed = onBackPressed,
             nodeActionHandler = nodeActionHandler,
+            handleClick = handleClick
         )
     }
     moveToRubbishOrDeleteNavigation(

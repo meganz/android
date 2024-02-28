@@ -40,6 +40,7 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.components.transferWidget.TransfersWidgetView
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.globalmanagement.TransfersManagement
+import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.namecollision.data.NameCollision
@@ -47,6 +48,11 @@ import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.filelink.view.animationScale
 import mega.privacy.android.app.presentation.filelink.view.animationSpecs
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
@@ -181,7 +187,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
 
             val nodeActionState by nodeActionsViewModel.state.collectAsStateWithLifecycle()
             val transferState by transfersManagementViewModel.state.collectAsStateWithLifecycle()
-
+            val state by viewModel.state.collectAsStateWithLifecycle()
             // Remember a SystemUiController
             val systemUiController = rememberSystemUiController()
             val useDarkIcons = themeMode.isDarkMode().not()
@@ -229,6 +235,13 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                             .statusBarsPadding(),
                         viewModel = viewModel,
                         nodeActionsViewModel = nodeActionsViewModel,
+                        navigateToLink = ::navigateToLink,
+                        showSortOrderBottomSheet = ::showSortOrderBottomSheet,
+                        trackAnalytics = ::trackAnalytics,
+                        nodeActionHandler = bottomSheetActionHandler,
+                        navHostController = navHostController,
+                        bottomSheetNavigator = bottomSheetNavigator,
+                        listToStringWithDelimitersMapper = listToStringWithDelimitersMapper,
                         handleClick = {
                             coroutineScope.launch {
                                 when (it) {
@@ -238,13 +251,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                 }
                             }
                         },
-                        navigateToLink = ::navigateToLink,
-                        showSortOrderBottomSheet = ::showSortOrderBottomSheet,
-                        trackAnalytics = ::trackAnalytics,
-                        nodeActionHandler = bottomSheetActionHandler,
-                        navHostController = navHostController,
-                        bottomSheetNavigator = bottomSheetNavigator,
-                        listToStringWithDelimitersMapper = listToStringWithDelimitersMapper,
                         onBackPressed = {
                             if (viewModel.state.value.selectedNodes.isNotEmpty()) {
                                 viewModel.clearSelection()
@@ -353,6 +359,13 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                     currentFileNode = currentFileNode,
                 )
 
+                is FileNodeContent.ImageForNode -> {
+                    openImageViewerActivity(
+                        isImagePreview = content.isImagePreview,
+                        currentFileNode = currentFileNode
+                    )
+                }
+
                 else -> {
 
                 }
@@ -382,6 +395,38 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             mimeType = mimeType,
         )
         startActivity(pdfIntent)
+    }
+
+    private fun openImageViewerActivity(
+        isImagePreview: Boolean,
+        currentFileNode: TypedFileNode,
+    ) {
+        val nodeSourceType = viewModel.state.value.nodeSourceType
+        val intent = if (isImagePreview && nodeSourceType == NodeSourceType.CLOUD_DRIVE) {
+            ImagePreviewActivity.createIntent(
+                context = this,
+                imageSource = ImagePreviewFetcherSource.CLOUD_DRIVE,
+                menuOptionsSource = ImagePreviewMenuSource.CLOUD_DRIVE,
+                anchorImageNodeId = currentFileNode.id,
+                params = mapOf(CloudDriveImageNodeFetcher.PARENT_ID to currentFileNode.parentId.longValue),
+            )
+        } else if (isImagePreview && nodeSourceType == NodeSourceType.RUBBISH_BIN) {
+            ImagePreviewActivity.createIntent(
+                context = this,
+                imageSource = ImagePreviewFetcherSource.RUBBISH_BIN,
+                menuOptionsSource = ImagePreviewMenuSource.RUBBISH_BIN,
+                anchorImageNodeId = currentFileNode.id,
+                params = mapOf(RubbishBinImageNodeFetcher.PARENT_ID to currentFileNode.parentId.longValue),
+            )
+        } else {
+            ImageViewerActivity.getIntentForParentNode(
+                this,
+                currentFileNode.parentId.longValue,
+                viewModel.state.value.sortOrder,
+                currentFileNode.id.longValue
+            )
+        }
+        startActivity(intent)
     }
 
     private fun showSortOrderBottomSheet() {

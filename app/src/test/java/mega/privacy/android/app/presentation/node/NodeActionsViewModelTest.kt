@@ -9,13 +9,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.chat.mapper.ChatRequestMessageMapper
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.node.ChatRequestResult
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeContentUri
@@ -27,6 +30,7 @@ import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
@@ -67,6 +71,7 @@ class NodeActionsViewModelTest {
     private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper = mock()
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper = mock()
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val sampleNode = mock<TypedFileNode>().stub {
         on { id } doReturn NodeId(123)
         on { type } doReturn PdfFileTypeInfo
@@ -90,6 +95,7 @@ class NodeActionsViewModelTest {
             listToStringWithDelimitersMapper = listToStringWithDelimitersMapper,
             getNodeContentUriUseCase = getNodeContentUriUseCase,
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             applicationScope = applicationScope
         )
     }
@@ -242,5 +248,22 @@ class NodeActionsViewModelTest {
             verify(getNodeContentUriUseCase).invoke(sampleNode)
         }
 
+    @Test
+    fun `test that getFeatureFlagValueUseCase is called when file node is image file node`() =
+        runTest {
+            val imageNode = mock<TypedFileNode> {
+                whenever(it.type).thenReturn(
+                    StaticImageFileTypeInfo(
+                        mimeType = "jpeg",
+                        extension = "jpeg"
+                    )
+                )
+            }
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ImagePreview)).thenReturn(true)
+            initViewModel()
+            val fileContent = viewModel.handleFileNodeClicked(imageNode)
+            verify(getFeatureFlagValueUseCase).invoke(AppFeatures.ImagePreview)
+            Truth.assertThat(fileContent).isInstanceOf(FileNodeContent.ImageForNode::class.java)
+        }
 }
 

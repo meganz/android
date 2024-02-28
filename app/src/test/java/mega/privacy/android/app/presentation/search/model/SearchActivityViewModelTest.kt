@@ -209,16 +209,6 @@ class SearchActivityViewModelTest {
         }
 
     @Test
-    fun `test that the current file node and item index have correct values when onItemPerformedClicked is invoked`() =
-        runTest {
-            underTest.onItemPerformedClicked()
-            underTest.state.test {
-                val state = awaitItem()
-                Truth.assertThat(state.lastSelectedNode).isNull()
-            }
-        }
-
-    @Test
     fun `test that the search functionality is performed with an updated filter when update filter is called`() =
         runTest {
             val filter = SearchFilter(name = "Images", filter = SearchCategory.IMAGES)

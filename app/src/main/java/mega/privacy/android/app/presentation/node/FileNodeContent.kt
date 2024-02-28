@@ -9,12 +9,17 @@ import java.io.File
  */
 sealed interface FileNodeContent {
     /**
-     * Image
+     * Image for chat
      *
      * @property allAttachmentMessageIds
      */
-    data class Image(val allAttachmentMessageIds: List<Long>) : FileNodeContent
+    data class ImageForChat(val allAttachmentMessageIds: List<Long>) : FileNodeContent
 
+    /**
+     * Image for node
+     * @param isImagePreview
+     */
+    data class ImageForNode(val isImagePreview: Boolean) : FileNodeContent
     /**
      * Text content
      *

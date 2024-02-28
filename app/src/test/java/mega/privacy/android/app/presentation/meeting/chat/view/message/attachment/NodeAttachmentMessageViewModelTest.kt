@@ -226,7 +226,7 @@ class NodeAttachmentMessageViewModelTest {
             messageIds
         )
         val actual = underTest.handleFileNode(msg)
-        assertThat(actual).isEqualTo(FileNodeContent.Image(messageIds))
+        assertThat(actual).isEqualTo(FileNodeContent.ImageForChat(messageIds))
     }
 
     @Test

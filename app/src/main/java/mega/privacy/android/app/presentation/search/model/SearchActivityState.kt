@@ -26,7 +26,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property emptyState empty state to be shown on UI
  * @property toolbarMenuItems list of [ToolbarMenuItem] to be shown on toolbar
  * @property selectedNodes selected nodes
- * @property lastSelectedNode last selected node
  * @property nodeNameCollisionResult result of node name collision
  * @property moveRequestResult result of move request
  */
@@ -37,7 +36,6 @@ data class SearchActivityState(
     val currentViewType: ViewType = ViewType.LIST,
     val searchQuery: String = "",
     val selectedNodes: Set<TypedNode> = emptySet(),
-    val lastSelectedNode: TypedNode? = null,
     val optionsItemInfo: OptionsItemInfo? = null,
     @StringRes val errorMessageId: Int? = null,
     val filters: List<SearchFilter> = emptyList(),

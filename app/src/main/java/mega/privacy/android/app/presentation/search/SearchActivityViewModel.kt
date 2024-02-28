@@ -216,8 +216,6 @@ class SearchActivityViewModel @Inject constructor(
             _state.value.searchItemList.indexOfFirst { it.node.id.longValue == nodeUIItem.id.longValue }
         if (_state.value.selectedNodes.isNotEmpty()) {
             updateNodeSelection(nodeUIItem = nodeUIItem, index = index)
-        } else {
-            _state.update { it.copy(lastSelectedNode = nodeUIItem.node) }
         }
     }
 
@@ -262,11 +260,11 @@ class SearchActivityViewModel @Inject constructor(
     private fun updateNodeSelection(nodeUIItem: NodeUIItem<TypedNode>, index: Int) =
         viewModelScope.launch {
             nodeUIItem.isSelected = !nodeUIItem.isSelected
-            val selectedNod = state.value.selectedNodes.toMutableSet()
+            val selectedNode = state.value.selectedNodes.toMutableSet()
             if (state.value.selectedNodes.contains(nodeUIItem.node)) {
-                selectedNod.remove(nodeUIItem.node)
+                selectedNode.remove(nodeUIItem.node)
             } else {
-                selectedNod.add(nodeUIItem.node)
+                selectedNode.add(nodeUIItem.node)
             }
             val newNodesList =
                 _state.value.searchItemList.updateItemAt(index = index, item = nodeUIItem)
@@ -274,7 +272,7 @@ class SearchActivityViewModel @Inject constructor(
                 it.copy(
                     searchItemList = newNodesList,
                     optionsItemInfo = null,
-                    selectedNodes = selectedNod,
+                    selectedNodes = selectedNode,
                 )
             }
         }
@@ -299,15 +297,6 @@ class SearchActivityViewModel @Inject constructor(
                 ViewType.LIST -> setViewType(ViewType.GRID)
                 ViewType.GRID -> setViewType(ViewType.LIST)
             }
-        }
-    }
-
-    /**
-     * When item is clicked on activity
-     */
-    fun onItemPerformedClicked() {
-        _state.update {
-            it.copy(lastSelectedNode = null)
         }
     }
 

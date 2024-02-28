@@ -96,7 +96,7 @@ class NodeAttachmentMessageViewModel @Inject constructor(
     suspend fun handleFileNode(message: NodeAttachmentMessage): FileNodeContent {
         val fileNode = message.fileNode
         return when {
-            fileNode.type is ImageFileTypeInfo -> FileNodeContent.Image(
+            fileNode.type is ImageFileTypeInfo -> FileNodeContent.ImageForChat(
                 allAttachmentMessageIds = getNodeAttachmentMessageIds(message.chatId)
             )
 

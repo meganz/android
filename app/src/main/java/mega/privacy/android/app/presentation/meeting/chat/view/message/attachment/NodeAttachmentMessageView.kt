@@ -71,7 +71,7 @@ fun NodeAttachmentMessageView(
                             viewModel.handleFileNode(message)
                         }.onSuccess { content ->
                             when (content) {
-                                is FileNodeContent.Image -> openImageViewer(
+                                is FileNodeContent.ImageForChat -> openImageViewer(
                                     context,
                                     message.chatId,
                                     content.allAttachmentMessageIds.toLongArray(),
@@ -107,6 +107,8 @@ fun NodeAttachmentMessageView(
                                     message.msgId,
                                     message.chatId
                                 )
+
+                                else -> {}
                             }
                         }.onFailure {
                             Timber.e(it, "Failed to handle file node")

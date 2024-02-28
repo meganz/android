@@ -34,11 +34,11 @@ fun SearchScreen(
     trackAnalytics: (SearchFilter?) -> Unit,
     showSortOrderBottomSheet: () -> Unit,
     navigateToLink: (String) -> Unit,
-    handleClick: (TypedNode?) -> Unit,
     navHostController: NavHostController,
     onBackPressed: () -> Unit,
     searchActivityViewModel: SearchActivityViewModel,
     nodeActionHandler: NodeActionHandler,
+    handleClick: (TypedNode?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val uiState by searchActivityViewModel.state.collectAsStateWithLifecycle()
@@ -63,7 +63,13 @@ fun SearchScreen(
             SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
                 ?: R.string.sortby_name
         ),
-        onItemClick = searchActivityViewModel::onItemClicked,
+        onItemClick = {
+            if (searchActivityViewModel.state.value.selectedNodes.isEmpty()) {
+                handleClick(it.node)
+            } else {
+                searchActivityViewModel.onItemClicked(it)
+            }
+        },
         onLongClick = searchActivityViewModel::onLongItemClicked,
         onChangeViewTypeClick = searchActivityViewModel::onChangeViewTypeClicked,
         onSortOrderClick = {
@@ -86,5 +92,4 @@ fun SearchScreen(
         navHostController = navHostController,
         nodeActionHandler = nodeActionHandler,
     )
-    handleClick(uiState.lastSelectedNode)
 }

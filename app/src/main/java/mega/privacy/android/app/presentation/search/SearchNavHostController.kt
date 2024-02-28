@@ -35,7 +35,6 @@ import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersM
 @Composable
 internal fun SearchNavHostController(
     viewModel: SearchActivityViewModel,
-    handleClick: (TypedNode?) -> Unit,
     navigateToLink: (String) -> Unit,
     showSortOrderBottomSheet: () -> Unit,
     trackAnalytics: (SearchFilter?) -> Unit,
@@ -45,6 +44,7 @@ internal fun SearchNavHostController(
     bottomSheetNavigator: BottomSheetNavigator,
     nodeActionsViewModel: NodeActionsViewModel,
     listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
+    handleClick: (TypedNode?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     ModalBottomSheetLayout(
@@ -58,7 +58,6 @@ internal fun SearchNavHostController(
             startDestination = searchRoute
         ) {
             searchNavGraph(
-                handleClick = handleClick,
                 navigateToLink = navigateToLink,
                 showSortOrderBottomSheet = showSortOrderBottomSheet,
                 trackAnalytics = trackAnalytics,
@@ -67,6 +66,7 @@ internal fun SearchNavHostController(
                 nodeActionHandler = nodeActionHandler,
                 onBackPressed = onBackPressed,
                 nodeActionsViewModel = nodeActionsViewModel,
+                handleClick = handleClick,
                 listToStringWithDelimitersMapper = listToStringWithDelimitersMapper
             )
         }

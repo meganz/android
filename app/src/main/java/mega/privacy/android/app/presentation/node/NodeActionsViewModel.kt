@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.chat.mapper.ChatRequestMessageMapper
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
@@ -18,6 +19,7 @@ import mega.privacy.android.app.presentation.node.model.NodeActionState
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
@@ -32,6 +34,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
@@ -79,6 +82,7 @@ class NodeActionsViewModel @Inject constructor(
     private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -390,6 +394,7 @@ class NodeActionsViewModel @Inject constructor(
             uri = getNodeContentUriUseCase(fileNode)
         )
 
+        is ImageFileTypeInfo -> FileNodeContent.ImageForNode(getFeatureFlagValueUseCase(AppFeatures.ImagePreview))
         else -> FileNodeContent.TextContent
 
     }
