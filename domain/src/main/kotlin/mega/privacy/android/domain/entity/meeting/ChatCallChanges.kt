@@ -101,6 +101,11 @@ enum class ChatCallChanges {
     WaitingRoomPushedFromCall,
 
     /**
+     * Notify that call will end due to duration restrictions associated to MEGA account plan
+     */
+    CallWillEnd,
+
+    /**
      * Unknown
      */
     Unknown

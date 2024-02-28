@@ -113,7 +113,7 @@ data class CreateScheduledMeetingState(
             Weekday.Sunday
         ),
     val subscriptionPlan: AccountType = AccountType.UNKNOWN,
-    val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false
+    val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
 ) {
     /**
      * Check if it's valid title
@@ -171,7 +171,13 @@ data class CreateScheduledMeetingState(
      * Should show free plan limit warning
      */
     fun shouldShowFreePlanLimitWarning() = isCallUnlimitedProPlanFeatureFlagEnabled &&
-            hasFreePlan() && Duration.between(startDate, endDate).toMinutes() > 60
+            hasFreePlan() && isDurationExceedingOneHour()
+
+    /**
+     * Check if duration is longer than 60 minutes
+     */
+    private fun isDurationExceedingOneHour() =
+        Duration.between(startDate, endDate).toMinutes() > FREE_PLAN_DURATION_LIMIT_IN_MINUTES
 
     /**
      * Check user free plan
@@ -340,4 +346,11 @@ data class CreateScheduledMeetingState(
             RecurrenceDialogOption.EveryMonth,
             RecurrenceDialogOption.Custom
         )
+
+    companion object {
+        /**
+         * Free plan duration limit in minutes
+         */
+        const val FREE_PLAN_DURATION_LIMIT_IN_MINUTES = 60
+    }
 }

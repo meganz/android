@@ -7,6 +7,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -49,6 +50,7 @@ import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.chat.InviteParticipantToChatUseCase
 import mega.privacy.android.domain.usecase.chat.RemoveParticipantFromChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetOpenInviteUseCase
@@ -94,6 +96,7 @@ import javax.inject.Inject
  * @property setWaitingRoomRemindersUseCase             [SetWaitingRoomRemindersUseCase]
  * @property getFeatureFlagValue                        [GetFeatureFlagValueUseCase]
  * @property getCurrentSubscriptionPlanUseCase          [GetCurrentSubscriptionPlanUseCase]
+ * @property monitorAccountDetailUseCase                [MonitorAccountDetailUseCase]
  * @property state                                      Current view state as [CreateScheduledMeetingState]
  */
 @HiltViewModel
@@ -123,6 +126,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     private val setWaitingRoomRemindersUseCase: SetWaitingRoomRemindersUseCase,
     private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
     private val getCurrentSubscriptionPlanUseCase: GetCurrentSubscriptionPlanUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CreateScheduledMeetingState())
@@ -164,6 +168,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
             getCurrentSubscriptionPlanUseCase()?.let { currentSubscriptionPlan ->
                 _state.update { it.copy(subscriptionPlan = currentSubscriptionPlan) }
             }
+            getAccountDetailUpdates()
         }
     }
 
@@ -827,6 +832,18 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      */
     fun setOnOpenInfoConsumed() = _state.update { state ->
         state.copy(chatIdToOpenInfoScreen = null)
+    }
+
+    /**
+     * Get account detail updates
+     */
+    private fun getAccountDetailUpdates() = viewModelScope.launch {
+        monitorAccountDetailUseCase().catch { Timber.e(it) }
+            .collectLatest { accountDetail ->
+                accountDetail.levelDetail?.accountType?.let { subscriptionPlan ->
+                    _state.update { it.copy(subscriptionPlan = subscriptionPlan) }
+                }
+            }
     }
 
     /**

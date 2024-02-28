@@ -34,6 +34,7 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.app.presentation.meeting.view.CreateScheduledMeetingView
 import mega.privacy.android.app.presentation.meeting.view.CustomRecurrenceView
 import mega.privacy.android.app.presentation.security.PasscodeCheck
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
@@ -211,7 +212,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                         onDescriptionValueChange = viewModel::onDescriptionChange,
                         onTitleValueChange = viewModel::onTitleChange,
                         onCloseWarningClicked = scheduledMeetingManagementViewModel::closeWaitingRoomWarning,
-                        onUpgradeNowClicked = {},
+                        onUpgradeNowClicked = ::openUpgradeAccount,
                         onRecurrenceDialogOptionClicked = { optionSelected ->
                             viewModel.dismissDialog()
                             when {
@@ -285,6 +286,13 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
         }
         finish()
         this.startActivity(intentOpenChat)
+    }
+
+    /**
+     * Open upgrade account screen
+     */
+    private fun openUpgradeAccount() {
+        startActivity(Intent(this, UpgradeAccountActivity::class.java))
     }
 
     /**
