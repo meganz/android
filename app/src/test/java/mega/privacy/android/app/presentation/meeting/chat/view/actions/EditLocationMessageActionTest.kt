@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.CHAT_LOCATION_VIEW_TAG
-import mega.privacy.android.app.presentation.meeting.chat.view.sheet.options.CHAT_BOTTOM_SHEET_OPTION_EDIT_TAG
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 import org.junit.Before
@@ -69,7 +68,7 @@ class EditLocationMessageActionTest {
             )
         )
 
-        composeTestRule.onNodeWithTag(CHAT_BOTTOM_SHEET_OPTION_EDIT_TAG).assertExists()
+        composeTestRule.onNodeWithTag(underTest.bottomSheetItemTestTag).assertExists()
     }
 
     @Test

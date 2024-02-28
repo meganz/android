@@ -3,10 +3,8 @@ package mega.privacy.android.app.presentation.meeting.chat.view.actions
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.presentation.meeting.chat.view.sheet.options.CHAT_BOTTOM_SHEET_OPTION_COPY_TAG
 import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
@@ -15,7 +13,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
@@ -70,7 +67,7 @@ class CopyMessageActionTest {
             hideBottomSheet = {}
         )
         composeTestRule.setContent { bottomSheetMenuItem() }
-        composeTestRule.onNodeWithTag(CHAT_BOTTOM_SHEET_OPTION_COPY_TAG).assertExists()
+        composeTestRule.onNodeWithTag(underTest.bottomSheetItemTestTag).assertExists()
     }
 
     @Test

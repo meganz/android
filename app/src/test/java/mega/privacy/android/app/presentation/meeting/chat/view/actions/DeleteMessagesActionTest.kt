@@ -11,7 +11,6 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_REMOVE_MESSAGES_CONFIRMATION_DIALOG
-import mega.privacy.android.app.presentation.meeting.chat.view.sheet.options.CHAT_BOTTOM_SHEET_OPTION_DELETE_TAG
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 import org.junit.Before
 import org.junit.Rule
@@ -80,7 +79,7 @@ class DeleteMessagesActionTest {
             )
         )
 
-        composeTestRule.onNodeWithTag(CHAT_BOTTOM_SHEET_OPTION_DELETE_TAG).assertExists()
+        composeTestRule.onNodeWithTag(underTest.bottomSheetItemTestTag).assertExists()
     }
 
     @Test
