@@ -374,6 +374,13 @@
                 app:drawableStartCompat="@drawable/ic_rename"/>
 
             <TextView
+                android:id="@+id/hide_option"
+                style="@style/BottomSheetOption"
+                android:text="@string/general_hide_node"
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/ic_menu_hide"/>
+
+            <TextView
                 android:id="@+id/move_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_move_to"

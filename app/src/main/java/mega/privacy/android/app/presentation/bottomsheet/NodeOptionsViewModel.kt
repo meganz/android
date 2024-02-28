@@ -18,6 +18,7 @@ import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformat
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactUserNameFromDatabaseUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
@@ -46,6 +47,7 @@ class NodeOptionsViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
     private val getContactUserNameFromDatabaseUseCase: GetContactUserNameFromDatabaseUseCase,
+    private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -163,6 +165,18 @@ class NodeOptionsViewModel @Inject constructor(
             runCatching { removeOfflineNodeUseCase(NodeId(handle)) }
                 .onFailure {
                     Timber.e(it)
+                }
+        }
+    }
+
+    fun hideOrUnhideNode(handle: Long, hidden: Boolean) {
+        viewModelScope.launch {
+            runCatching { updateNodeSensitiveUseCase(NodeId(handle), hidden) }
+                .onFailure {
+                    Timber.e(it)
+                }
+                .onSuccess {
+                    Timber.d("Node $handle marked sensitive successfully.")
                 }
         }
     }

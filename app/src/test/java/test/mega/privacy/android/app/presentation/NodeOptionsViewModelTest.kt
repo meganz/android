@@ -19,6 +19,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactUserNameFromDatabaseUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
@@ -54,6 +55,7 @@ class NodeOptionsViewModelTest {
     }
 
     private val removeOfflineNodeUseCase = mock<RemoveOfflineNodeUseCase>()
+    private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
     private val getContactUserNameFromDatabaseUseCase =
         mock<GetContactUserNameFromDatabaseUseCase>()
 
@@ -95,6 +97,7 @@ class NodeOptionsViewModelTest {
             savedStateHandle = savedStateHandle,
             removeOfflineNodeUseCase = removeOfflineNodeUseCase,
             getContactUserNameFromDatabaseUseCase = getContactUserNameFromDatabaseUseCase,
+            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
         )
     }
 

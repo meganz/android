@@ -5304,4 +5304,8 @@
     </plurals>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
     <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Your free plan has a 60 minute limit on meetings. Pro users have unlimited calls and up to 1000 participants.[/A] [B]Upgrade now[/B]</string>
+    <!-- Bottom sheet button to hide a node/file -->
+    <string name="general_hide_node">Hide</string>
+    <!-- Bottom sheet button to unhide a node/file -->
+    <string name="general_unhide_node">Unhide</string>
 </resources>

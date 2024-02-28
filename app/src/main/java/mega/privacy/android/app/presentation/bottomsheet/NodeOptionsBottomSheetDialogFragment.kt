@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.bottomsheet
 
+import mega.privacy.android.icon.pack.R as RPack
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -26,12 +27,14 @@ import coil.transform.RoundedCornersTransformation
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.switchmaterial.SwitchMaterial
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForParentNode
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.DrawerItem
@@ -83,6 +86,7 @@ import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.mobile.analytics.event.SearchResultGetLinkMenuItemEvent
 import mega.privacy.mobile.analytics.event.SearchResultOpenWithMenuItemEvent
 import mega.privacy.mobile.analytics.event.SearchResultSaveToDeviceMenuItemEvent
@@ -91,6 +95,7 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.io.File
+import javax.inject.Inject
 
 /**
  * [BaseBottomSheetDialogFragment] used to display actions of a particular Node
@@ -102,10 +107,17 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private var nodeInfo: TextView? = null
     private var drawerItem: DrawerItem? = null
     private var cannotOpenFileDialog: AlertDialog? = null
+    private var isHiddenNodesEnabled: Boolean = false
 
     private val nodeOptionsViewModel: NodeOptionsViewModel by viewModels()
     private val searchViewModel: SearchViewModel by activityViewModels()
     private val startDownloadViewModel: StartDownloadViewModel by activityViewModels()
+
+    /**
+     * Inject [GetFeatureFlagValueUseCase] to the Fragment
+     */
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     /**
      * onCreateView
@@ -142,6 +154,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val versions = contentView.findViewById<TextView>(R.id.versions)
         //      optionFavourite
         val optionFavourite = contentView.findViewById<TextView>(R.id.favorite_option)
+        //      optionHide
+        val optionHide = contentView.findViewById<TextView>(R.id.hide_option)
         //      optionLabel
         val optionLabel = contentView.findViewById<LinearLayout>(R.id.option_label_layout)
         val optionLabelCurrent = contentView.findViewById<TextView>(R.id.option_label_current)
@@ -187,7 +201,9 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         viewLifecycleOwner.collectFlow(
-            nodeOptionsViewModel.state, Lifecycle.State.STARTED
+            nodeOptionsViewModel.state.onStart {
+                isHiddenNodesEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+            }, Lifecycle.State.STARTED
         ) { state: NodeBottomSheetUIState ->
 
             var counterOpen = 2
@@ -237,6 +253,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionEdit.setOnClickListener { onClick { onEditClicked(node) } }
                 optionLabel.setOnClickListener { onClick { onLabelClicked(node) } }
                 optionFavourite.setOnClickListener { onClick { onFavouriteClicked(node) } }
+                optionHide.setOnClickListener { onClick { onHideClicked(node) } }
                 optionDownload.setOnClickListener { onClick { onDownloadClicked(node) } }
                 optionOffline.setOnClickListener {
                     onClick {
@@ -390,6 +407,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 }
                 optionLabel.visibility = if (isTakenDown) View.GONE else View.VISIBLE
                 optionFavourite.visibility = if (isTakenDown) View.GONE else View.VISIBLE
+                optionHide.visibility = if (isHiddenNodesEnabled) View.VISIBLE else View.GONE
                 if (accessLevel != MegaShare.ACCESS_OWNER || isTakenDown) {
                     counterShares--
                     optionShare.visibility = View.GONE
@@ -461,6 +479,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         optionEdit.visibility = View.GONE
                         optionLabel.visibility = View.GONE
                         optionFavourite.visibility = View.GONE
+                        optionHide.visibility = View.GONE
                         if (optionOpenWith.isVisible()) {
                             counterOpen--
                             optionOpenWith.visibility = View.GONE
@@ -566,6 +585,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                                 MegaShare.ACCESS_FULL -> {
                                     Timber.d("access FULL")
                                     optionFavourite.visibility = View.GONE
+                                    optionHide.visibility = View.GONE
                                     if (dBT <= Constants.FIRST_NAVIGATION_LEVEL) {
                                         optionRubbishBin.visibility = View.GONE
                                         counterModify--
@@ -577,6 +597,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                                     Timber.d("access read")
                                     optionLabel.visibility = View.GONE
                                     optionFavourite.visibility = View.GONE
+                                    optionHide.visibility = View.GONE
                                     counterModify--
                                     optionRename.visibility = View.GONE
                                     counterModify--
@@ -588,6 +609,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                                     Timber.d("readwrite")
                                     optionLabel.visibility = View.GONE
                                     optionFavourite.visibility = View.GONE
+                                    optionHide.visibility = View.GONE
                                     counterModify--
                                     optionRename.visibility = View.GONE
                                     counterModify--
@@ -666,6 +688,13 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionFavourite.setCompoundDrawablesWithIntrinsicBounds(
                     if (node.isFavourite) R.drawable.ic_remove_favourite else R.drawable.ic_add_favourite,
                     0, 0, 0
+                )
+                optionHide.setText(if (node.isMarkedSensitive) R.string.general_unhide_node else R.string.general_hide_node)
+                optionHide.setCompoundDrawablesWithIntrinsicBounds(
+                    if (node.isMarkedSensitive) RPack.drawable.ic_menu_unhide else RPack.drawable.ic_menu_hide,
+                    0,
+                    0,
+                    0
                 )
                 if (node.label != MegaNode.NODE_LBL_UNKNOWN) {
                     val color = ResourcesCompat.getColor(
@@ -1045,6 +1074,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     ) {
         val optionEdit = contentView.findViewById<LinearLayout>(R.id.edit_file_option)
         val optionFavourite = contentView.findViewById<TextView>(R.id.favorite_option)
+        val optionHide = contentView.findViewById<TextView>(R.id.hide_option)
         val optionLabel = contentView.findViewById<LinearLayout>(R.id.option_label_layout)
         val optionRename = contentView.findViewById<TextView>(R.id.rename_option)
         val optionMove = contentView.findViewById<TextView>(R.id.move_option)
@@ -1055,6 +1085,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         if (node != null && megaApi.isInInbox(node)) {
             optionEdit.visibility = View.GONE
             optionFavourite.visibility = View.GONE
+            optionHide.visibility = View.GONE
             optionLabel.visibility = View.GONE
             optionRename.visibility = View.GONE
             optionMove.visibility = View.GONE
@@ -1082,6 +1113,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         decrementModify: () -> Unit,
     ) {
         val optionFavourite = contentView.findViewById<TextView>(R.id.favorite_option)
+        val optionHide = contentView.findViewById<TextView>(R.id.hide_option)
         val optionLabel = contentView.findViewById<LinearLayout>(R.id.option_label_layout)
         val optionRename = contentView.findViewById<TextView>(R.id.rename_option)
         val optionMove = contentView.findViewById<TextView>(R.id.move_option)
@@ -1108,6 +1140,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         optionOpenFolder.visibility = View.GONE
         decrementModify()
         optionRestoreFromRubbish.visibility = View.GONE
+        // We don't want to show hide in Recents and Favourites yet
+        optionHide.visibility = View.GONE
         when (accessLevel) {
             MegaShare.ACCESS_READWRITE, MegaShare.ACCESS_READ, MegaShare.ACCESS_UNKNOWN -> {
                 optionLabel.visibility = View.GONE
@@ -1188,6 +1222,14 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private fun onFavouriteClicked(node: MegaNode) {
         megaApi.setNodeFavourite(node, !node.isFavourite)
+        setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun onHideClicked(node: MegaNode) {
+        nodeOptionsViewModel.hideOrUnhideNode(
+            handle = node.handle,
+            hidden = !node.isMarkedSensitive
+        )
         setStateBottomSheetBehaviorHidden()
     }
 

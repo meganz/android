@@ -16,6 +16,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Enables the Hidden Nodes feature
+     */
+    HiddenNodes(
+        "Enables the Hidden Nodes feature",
+        false,
+    ),
+
+    /**
      * Enables the Settings Camera Uploads page in Jetpack Compose
      */
     SettingsCameraUploadsCompose(
