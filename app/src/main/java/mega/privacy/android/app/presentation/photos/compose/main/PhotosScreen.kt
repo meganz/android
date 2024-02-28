@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.presentation.account.CameraUploadsBusinessAlertDialog
 import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.PhotosViewComposeCoordinator
 import mega.privacy.android.app.presentation.photos.PhotosViewModel
@@ -38,6 +37,8 @@ import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUseC
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.shouldEnableCUPage
 import mega.privacy.android.app.presentation.photos.view.PhotosBodyView
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
+import mega.privacy.android.app.settings.camerauploads.dialogs.CameraUploadsBusinessAccountDialog
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -272,14 +273,17 @@ fun PhotosScreen(
         albumsViewState = albumsViewState,
     )
 
-    CameraUploadsBusinessAlertDialog(
-        show = timelineViewState.shouldShowBusinessAccountPrompt,
-        onConfirm = {
-            onEnableCameraUploads()
-            timelineViewModel.setBusinessAccountPromptState(shouldShow = false)
-        },
-        onDeny = { timelineViewModel.setBusinessAccountPromptState(shouldShow = false) },
-    )
+    if (timelineViewState.shouldShowBusinessAccountPrompt) {
+        CameraUploadsBusinessAccountDialog(
+            onAlertAcknowledged = {
+                onEnableCameraUploads()
+                timelineViewModel.setBusinessAccountPromptState(shouldShow = false)
+            },
+            onAlertDismissed = {
+                timelineViewModel.setBusinessAccountPromptState(shouldShow = false)
+            },
+        )
+    }
 }
 
 private fun getSelectedAlbumImageCount(album: UIAlbum): Int? = if (album.id !is Album.UserAlbum) {
