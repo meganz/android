@@ -94,7 +94,6 @@ import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.delete.DeleteMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.message.edit.EditLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.edit.EditMessageUseCase
-import mega.privacy.android.domain.usecase.chat.message.edit.GetMessageContentUseCase
 import mega.privacy.android.domain.usecase.chat.message.forward.ForwardMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.AddReactionUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.DeleteReactionUseCase
@@ -218,7 +217,6 @@ class ChatViewModel @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val addNodeType: AddNodeType,
     private val deleteMessagesUseCase: DeleteMessagesUseCase,
-    private val getMessageContentUseCase: GetMessageContentUseCase,
     private val editMessageUseCase: EditMessageUseCase,
     private val editLocationMessageUseCase: EditLocationMessageUseCase,
 ) : ViewModel() {
@@ -1379,19 +1377,17 @@ class ChatViewModel @Inject constructor(
      * @param message [TypedMessage].
      */
     fun onEditMessage(message: TypedMessage) {
-        viewModelScope.launch {
-            val content = getMessageContentUseCase(message)
-            if (content.isEmpty()) {
-                onCloseEditing()
-                messageCannotBeEdited()
-            } else {
-                _state.update { state ->
-                    state.copy(
-                        sendingText = content,
-                        editingMessageId = message.msgId,
-                        editingMessageContent = content,
-                    )
-                }
+        val content = message.content
+        if (content.isNullOrEmpty()) {
+            onCloseEditing()
+            messageCannotBeEdited()
+        } else {
+            _state.update { state ->
+                state.copy(
+                    sendingText = content,
+                    editingMessageId = message.msgId,
+                    editingMessageContent = content,
+                )
             }
         }
     }

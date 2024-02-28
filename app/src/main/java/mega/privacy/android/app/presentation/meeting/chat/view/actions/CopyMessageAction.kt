@@ -1,12 +1,9 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import mega.privacy.android.app.presentation.extensions.copyToClipboard
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.options.CopyBottomSheetOption
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
@@ -26,22 +23,8 @@ internal class CopyMessageAction : MessageAction() {
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
-        val context = LocalContext.current
-        val text = messages.joinToString(separator = "\n") { getMessageContent(it).toString() }
-        copyToClipboard(context, text)
+        messages.joinToString(separator = "\n") { it.content.orEmpty() }
+            .copyToClipboard(LocalContext.current)
         onHandled()
-    }
-
-    private fun getMessageContent(message: TypedMessage) = when (message) {
-        is NormalMessage -> message.content
-        is LocationMessage -> message.content
-        is RichPreviewMessage -> message.content
-        else -> ""
-    }
-
-    internal fun copyToClipboard(context: Context, text: String?) {
-        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText(Constants.COPIED_TEXT_LABEL, text)
-        clipboard.setPrimaryClip(clip)
     }
 }

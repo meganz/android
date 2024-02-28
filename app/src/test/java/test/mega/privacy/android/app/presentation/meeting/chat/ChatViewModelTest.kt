@@ -102,7 +102,6 @@ import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.delete.DeleteMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.message.edit.EditLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.edit.EditMessageUseCase
-import mega.privacy.android.domain.usecase.chat.message.edit.GetMessageContentUseCase
 import mega.privacy.android.domain.usecase.chat.message.forward.ForwardMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.AddReactionUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.DeleteReactionUseCase
@@ -273,7 +272,6 @@ internal class ChatViewModelTest {
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val addNodeType = mock<AddNodeType>()
     private val deleteMessagesUseCase = mock<DeleteMessagesUseCase>()
-    private val getMessageContentUseCase = mock<GetMessageContentUseCase>()
     private val editMessageUseCase = mock<EditMessageUseCase>()
     private val editLocationMessageUseCase = mock<EditLocationMessageUseCase>()
 
@@ -332,7 +330,6 @@ internal class ChatViewModelTest {
             forwardMessagesResultMapper,
             addNodeType,
             deleteMessagesUseCase,
-            getMessageContentUseCase,
             editMessageUseCase,
             editLocationMessageUseCase,
         )
@@ -432,7 +429,6 @@ internal class ChatViewModelTest {
             getNodeByIdUseCase = getNodeByIdUseCase,
             addNodeType = addNodeType,
             deleteMessagesUseCase = deleteMessagesUseCase,
-            getMessageContentUseCase = getMessageContentUseCase,
             editMessageUseCase = editMessageUseCase,
             editLocationMessageUseCase = editLocationMessageUseCase,
         )
@@ -2709,7 +2705,6 @@ internal class ChatViewModelTest {
             on { this.msgId } doReturn msgId
             on { this.content } doReturn content
         }
-        whenever(getMessageContentUseCase(message)).thenReturn(content)
         with(underTest) {
             onEditMessage(message)
             state.test {
@@ -2729,7 +2724,6 @@ internal class ChatViewModelTest {
             on { this.msgId } doReturn msgId
             on { this.content } doReturn content
         }
-        whenever(getMessageContentUseCase(message)).thenReturn(content)
         with(underTest) {
             onEditMessage(message)
             state.test {
@@ -2749,7 +2743,6 @@ internal class ChatViewModelTest {
             on { this.msgId } doReturn msgId
             on { this.content } doReturn content
         }
-        whenever(getMessageContentUseCase(message)).thenReturn(content)
         whenever(editMessageUseCase(chatId, msgId, newContent)).thenReturn(mock())
         with(underTest) {
             onEditMessage(message)
@@ -2772,7 +2765,6 @@ internal class ChatViewModelTest {
                 on { this.msgId } doReturn msgId
                 on { this.content } doReturn content
             }
-            whenever(getMessageContentUseCase(message)).thenReturn(content)
             whenever(editMessageUseCase(chatId, msgId, newContent)).thenReturn(null)
             with(underTest) {
                 onEditMessage(message)
