@@ -416,7 +416,7 @@ class FileBrowserViewModel @Inject constructor(
      */
     suspend fun exitMediaDiscovery(performBackNavigation: Boolean) {
         if (performBackNavigation) {
-            handleStack.pop()
+            handleStack.takeIf { stack -> stack.isNotEmpty() }?.pop()
             handleAccessedFolderOnBackPress()
             removeCurrentNodeFromUiStateSet()
 
