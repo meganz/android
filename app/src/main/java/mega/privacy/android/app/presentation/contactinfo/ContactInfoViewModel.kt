@@ -247,7 +247,8 @@ class ContactInfoViewModel @Inject constructor(
                         session.changes?.apply {
                             if (contains(ChatSessionChanges.Status) ||
                                 contains(ChatSessionChanges.RemoteAvFlags) ||
-                                contains(ChatSessionChanges.SessionSpeakRequested) ||
+                                contains(ChatSessionChanges.Permissions) ||
+                                contains(ChatSessionChanges.SessionOnRecording) ||
                                 contains(ChatSessionChanges.SessionOnHiRes) ||
                                 contains(ChatSessionChanges.SessionOnLowRes) ||
                                 contains(ChatSessionChanges.SessionOnHold) ||

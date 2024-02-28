@@ -35,7 +35,6 @@ object EventConstants {
     /** Event Keys related to sessions*/
     const val EVENT_SESSION_STATUS_CHANGE = "session_status_change"
     const val EVENT_REMOTE_AVFLAGS_CHANGE = "remote_avflags_change"
-    const val EVENT_SESSION_SPEAK_REQUESTED = "session_speak_requested_change"
     const val EVENT_SESSION_ON_HIRES_CHANGE = "session_on_hires_change"
     const val EVENT_SESSION_ON_LOWRES_CHANGE = "session_on_lowres_change"
     const val EVENT_REMOTE_AUDIO_LEVEL_CHANGE = "remote_audio_level_change"

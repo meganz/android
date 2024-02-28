@@ -19,7 +19,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_RINGING_STATUS_CH
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HIRES_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_LOWRES_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_SPEAK_REQUESTED
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.data.extensions.observeOnce
@@ -140,12 +139,6 @@ class MeetingListener : MegaChatCallListenerInterface {
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_REMOTE_AVFLAGS)) {
             Timber.d("Changes in remote av flags. Client ID  ${session.clientid}")
             sendSessionEvent(EVENT_REMOTE_AVFLAGS_CHANGE, session, callid)
-        }
-
-        // Session speak requested
-        if (session.hasChanged(MegaChatSession.CHANGE_TYPE_SESSION_SPEAK_REQUESTED)) {
-            Timber.d("Changes in speak requested. Client ID  ${session.clientid}")
-            sendSessionEvent(EVENT_SESSION_SPEAK_REQUESTED, session, callid)
         }
 
         // Hi-Res video received

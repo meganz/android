@@ -22,21 +22,22 @@ internal class ChatCallMapper @Inject constructor(
     private val waitingRoomStatusMapper: WaitingRoomStatusMapper,
     private val chatSessionMapper: ChatSessionMapper,
     private val callNotificationMapper: CallNotificationMapper,
-    private val speakerStatusMapper: SpeakerStatusMapper
 ) {
     operator fun invoke(megaChatCall: MegaChatCall): ChatCall = ChatCall(
-        callId = megaChatCall.callId,
         chatId = megaChatCall.chatid,
+        callId = megaChatCall.callId,
         status = chatCallStatusMapper(megaChatCall.status),
         hasLocalAudio = megaChatCall.hasLocalAudio(),
         hasLocalVideo = megaChatCall.hasLocalVideo(),
         changes = chatCallChangesMapper(megaChatCall.changes),
-        hasSpeakPermission = megaChatCall.hasSpeakPermission(),
         isAudioDetected = megaChatCall.isAudioDetected,
+        usersSpeakPermission = megaChatCall.toUserSpeakPermission(),
         duration = megaChatCall.duration.seconds,
         initialTimestamp = megaChatCall.initialTimeStamp,
         finalTimestamp = megaChatCall.finalTimeStamp,
         termCode = chatCallTermCodeMapper(megaChatCall.termCode),
+        num = megaChatCall.num,
+        callDurationLimit = megaChatCall.callDurationLimit,
         endCallReason = endCallReasonMapper(megaChatCall.endCallReason),
         isSpeakRequestEnabled = megaChatCall.isSpeakRequestEnabled,
         notificationType = callNotificationMapper(megaChatCall.notificationType),
@@ -48,21 +49,24 @@ internal class ChatCallMapper @Inject constructor(
         peerIdCallCompositionChange = megaChatCall.peeridCallCompositionChange,
         callCompositionChange = callCompositionChangesMapper(megaChatCall.callCompositionChange),
         peerIdParticipants = handleListMapper(megaChatCall.peeridParticipants),
+        handle = megaChatCall.handle,
+        flag = megaChatCall.flag,
         moderators = handleListMapper(megaChatCall.moderators),
         numParticipants = megaChatCall.numParticipants,
         isIgnored = megaChatCall.isIgnored,
         isIncoming = megaChatCall.isIncoming,
         isOutgoing = megaChatCall.isOutgoing,
         isOwnClientCaller = megaChatCall.isOwnClientCaller,
-        speakerState = speakerStatusMapper(megaChatCall.speakerState.toInt()),
         caller = megaChatCall.caller,
         isOnHold = megaChatCall.isOnHold,
-        genericMsg = megaChatCall.genericMessage,
-        isSpeakAllowed = megaChatCall.isSpeakAllowed,
+        genericMessage = megaChatCall.genericMessage,
         networkQuality = networkQualityMapper(megaChatCall.networkQuality),
-        hasPendingSpeakRequest = megaChatCall.hasPendingSpeakRequest(),
+        usersPendingSpeakRequest = megaChatCall.toUserPendingSpeakRequest(),
         waitingRoomStatus = waitingRoomStatusMapper(megaChatCall.wrJoiningState),
         waitingRoom = chatWaitingRoomMapper(megaChatCall.waitingRoom),
+        handleList = handleListMapper(megaChatCall.handleList),
+        speakersList = handleListMapper(megaChatCall.speakersList),
+        speakRequestsList = handleListMapper(megaChatCall.speakRequestsList),
     )
 
     private fun MegaChatCall.toChatSessionByClientId(): Map<Long, ChatSession> {
@@ -75,5 +79,25 @@ internal class ChatCallMapper @Inject constructor(
             }
         }
         return sessionsMap
+    }
+
+    private fun MegaChatCall.toUserSpeakPermission(): Map<Long, Boolean> {
+        val userSpeakPermissionMap: MutableMap<Long, Boolean> = mutableMapOf()
+        val listOfClientId = handleListMapper(sessionsClientid)
+        for (i in listOfClientId.indices) {
+            val clientId = listOfClientId[i]
+            userSpeakPermissionMap[clientId] = hasUserSpeakPermission(clientId)
+        }
+        return userSpeakPermissionMap
+    }
+
+    private fun MegaChatCall.toUserPendingSpeakRequest(): Map<Long, Boolean> {
+        val userPendingSpeakRequestMap: MutableMap<Long, Boolean> = mutableMapOf()
+        val listOfClientId = handleListMapper(sessionsClientid)
+        for (i in listOfClientId.indices) {
+            val clientId = listOfClientId[i]
+            userPendingSpeakRequestMap[clientId] = hasUserPendingSpeakRequest(clientId)
+        }
+        return userPendingSpeakRequestMap
     }
 }

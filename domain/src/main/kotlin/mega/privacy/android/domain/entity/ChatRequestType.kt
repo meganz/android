@@ -60,14 +60,14 @@ enum class ChatRequestType {
     RemoveFromChatRoom,
 
     /**
-     * Invite to chat request
-     */
-    InviteToChatRoom,
-
-    /**
      * Update peer permissions request
      */
     UpdatePeerPermissions,
+
+    /**
+     * Invite to chat request
+     */
+    InviteToChatRoom,
 
     /**
      * Edit chat room name request
@@ -270,12 +270,77 @@ enum class ChatRequestType {
     RequestSVCLayers,
 
     /**
-     * Invalid request
-     */
-    InvalidRequest,
-
-    /**
      * Set chat room options request
      */
     SetChatRoomOptions,
+
+    /**
+     * Create scheduled meeting request
+     */
+    CreateScheduledMeeting,
+
+    /**
+     * Delete scheduled meeting request
+     */
+    DeleteScheduledMeeting,
+
+    /**
+     * Fetch scheduled meeting occurrences request
+     */
+    FetchScheduledMeetingOccurrences,
+
+    /**
+     * Update scheduled meeting occurrence request
+     */
+    UpdateScheduledMeetingOccurrence,
+
+    /**
+     * Update scheduled meeting request
+     */
+    UpdateScheduledMeeting,
+
+    /**
+     * Waiting room push request
+     */
+    WaitingRoomPush,
+
+    /**
+     * Waiting room allow request
+     */
+    WaitingRoomAllow,
+
+    /**
+     * Waiting room kick request
+     */
+    WaitingRoomKick,
+
+    /**
+     * Ring individual in call request
+     */
+    RingIndividualInCall,
+
+    /**
+     * Mute request
+     */
+    Mute,
+
+    /**
+     * Add/del speaker permissions request
+     */
+    SpeakerAddDel,
+
+    /**
+     * Add/del Speak request
+     */
+    SpeakRequestAddDel,
+
+    /**
+     * Reject call request
+     */
+    RejectCall,
+
+    /**
+     * Invalid request
+     */
+    InvalidRequest,
 }

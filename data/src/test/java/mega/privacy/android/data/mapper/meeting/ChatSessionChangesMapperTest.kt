@@ -31,8 +31,6 @@ class ChatSessionChangesMapperTest {
             .contains(ChatSessionChanges.Status)
         Truth.assertThat(underTest(MegaChatSession.CHANGE_TYPE_REMOTE_AVFLAGS))
             .contains(ChatSessionChanges.RemoteAvFlags)
-        Truth.assertThat(underTest(MegaChatSession.CHANGE_TYPE_SESSION_SPEAK_REQUESTED))
-            .contains(ChatSessionChanges.SessionSpeakRequested)
         Truth.assertThat(underTest(MegaChatSession.CHANGE_TYPE_SESSION_ON_LOWRES))
             .contains(ChatSessionChanges.SessionOnLowRes)
         Truth.assertThat(underTest(MegaChatSession.CHANGE_TYPE_SESSION_ON_HIRES))
@@ -41,8 +39,6 @@ class ChatSessionChangesMapperTest {
             .contains(ChatSessionChanges.SessionOnHold)
         Truth.assertThat(underTest(MegaChatSession.CHANGE_TYPE_AUDIO_LEVEL))
             .contains(ChatSessionChanges.AudioLevel)
-        Truth.assertThat(underTest(MegaChatSession.CHANGE_TYPE_SPEAK_PERMISSION))
-            .contains(ChatSessionChanges.SpeakPermissions)
         Truth.assertThat(underTest(MegaChatSession.CHANGE_TYPE_SESSION_ON_RECORDING))
             .contains(ChatSessionChanges.SessionOnRecording)
     }

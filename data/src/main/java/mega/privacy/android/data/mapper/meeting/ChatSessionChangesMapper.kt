@@ -17,13 +17,11 @@ internal class ChatSessionChangesMapper @Inject constructor() {
             MegaChatSession.CHANGE_TYPE_NO_CHANGES to ChatSessionChanges.NoChanges,
             MegaChatSession.CHANGE_TYPE_STATUS to ChatSessionChanges.Status,
             MegaChatSession.CHANGE_TYPE_REMOTE_AVFLAGS to ChatSessionChanges.RemoteAvFlags,
-            MegaChatSession.CHANGE_TYPE_SESSION_SPEAK_REQUESTED to ChatSessionChanges.SessionSpeakRequested,
             MegaChatSession.CHANGE_TYPE_SESSION_ON_LOWRES to ChatSessionChanges.SessionOnLowRes,
             MegaChatSession.CHANGE_TYPE_SESSION_ON_HIRES to ChatSessionChanges.SessionOnHiRes,
             MegaChatSession.CHANGE_TYPE_SESSION_ON_HOLD to ChatSessionChanges.SessionOnHold,
             MegaChatSession.CHANGE_TYPE_AUDIO_LEVEL to ChatSessionChanges.AudioLevel,
             MegaChatSession.CHANGE_TYPE_PERMISSIONS to ChatSessionChanges.Permissions,
-            MegaChatSession.CHANGE_TYPE_SPEAK_PERMISSION to ChatSessionChanges.SpeakPermissions,
             MegaChatSession.CHANGE_TYPE_SESSION_ON_RECORDING to ChatSessionChanges.SessionOnRecording,
         )
     }

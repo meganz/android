@@ -20,11 +20,6 @@ enum class ChatSessionChanges {
     RemoteAvFlags,
 
     /**
-     * Session speak requested
-     */
-    SessionSpeakRequested,
-
-    /**
      * Session on high resolution
      */
     SessionOnHiRes,
@@ -48,11 +43,6 @@ enum class ChatSessionChanges {
      * Permission changes
      */
     Permissions,
-
-    /**
-     * Speak permission changes
-     */
-    SpeakPermissions,
 
     /**
      * Session on recording

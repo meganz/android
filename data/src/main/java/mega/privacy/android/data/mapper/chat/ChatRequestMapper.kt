@@ -96,6 +96,19 @@ class ChatRequestMapper @Inject constructor() {
         MegaChatRequest.TYPE_DEL_SPEAKER -> ChatRequestType.DeleteSpeaker
         MegaChatRequest.TYPE_REQUEST_SVC_LAYERS -> ChatRequestType.RequestSVCLayers
         MegaChatRequest.TYPE_SET_CHATROOM_OPTIONS -> ChatRequestType.SetChatRoomOptions
+        MegaChatRequest.TYPE_MUTE -> ChatRequestType.Mute
+        MegaChatRequest.TYPE_REJECT_CALL -> ChatRequestType.RejectCall
+        MegaChatRequest.TYPE_SPEAKER_ADD_DEL -> ChatRequestType.SpeakerAddDel
+        MegaChatRequest.TYPE_SPEAKRQ_ADD_DEL -> ChatRequestType.SpeakRequestAddDel
+        MegaChatRequest.TYPE_RING_INDIVIDUAL_IN_CALL -> ChatRequestType.RingIndividualInCall
+        MegaChatRequest.TYPE_WR_ALLOW -> ChatRequestType.WaitingRoomAllow
+        MegaChatRequest.TYPE_WR_KICK -> ChatRequestType.WaitingRoomKick
+        MegaChatRequest.TYPE_WR_PUSH -> ChatRequestType.WaitingRoomPush
+        MegaChatRequest.TYPE_UPDATE_SCHEDULED_MEETING -> ChatRequestType.UpdateScheduledMeeting
+        MegaChatRequest.TYPE_UPDATE_SCHEDULED_MEETING_OCCURRENCE -> ChatRequestType.UpdateScheduledMeetingOccurrence
+        MegaChatRequest.TYPE_FETCH_SCHEDULED_MEETING_OCCURRENCES -> ChatRequestType.FetchScheduledMeetingOccurrences
+        MegaChatRequest.TYPE_DELETE_SCHEDULED_MEETING -> ChatRequestType.DeleteScheduledMeeting
+        MegaChatRequest.TYPE_CREATE_SCHEDULED_MEETING -> ChatRequestType.CreateScheduledMeeting
         else -> ChatRequestType.InvalidRequest
     }
 

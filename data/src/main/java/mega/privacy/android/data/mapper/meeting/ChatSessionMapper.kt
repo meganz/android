@@ -13,7 +13,6 @@ internal class ChatSessionMapper @Inject constructor(
         peerId = session.peerid,
         clientId = session.clientid,
         status = chatSessionStatusMapper(session.status),
-        isSpeakAllowed = session.isSpeakAllowed,
         hasAudio = session.hasAudio(),
         hasVideo = session.hasVideo(),
         isHiResVideo = session.isHiResVideo,
@@ -27,12 +26,10 @@ internal class ChatSessionMapper @Inject constructor(
         isOnHold = session.isOnHold,
         changes = chatSessionChangesMapper(session.changes),
         termCode = chatSessionTermCodeMapper(session.termCode),
-        hasPendingSpeakRequest = session.hasPendingSpeakRequest(),
         isAudioDetected = session.isAudioDetected,
         canReceiveVideoHiRes = session.canRecvVideoHiRes(),
         canReceiveVideoLowRes = session.canRecvVideoLowRes(),
         isModerator = session.isModerator,
         isRecording = session.isRecording,
-        hasSpeakPermission = session.hasSpeakPermission(),
     )
 }

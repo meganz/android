@@ -5,12 +5,11 @@ import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.domain.entity.meeting.CallCompositionChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
-import mega.privacy.android.domain.entity.meeting.ChatSession
 import mega.privacy.android.domain.entity.meeting.EndCallReason
 import mega.privacy.android.domain.entity.meeting.NetworkQualityType
 import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
 import nz.mega.sdk.MegaChatCall
-import nz.mega.sdk.MegaChatSession
+import nz.mega.sdk.MegaChatWaitingRoom
 import nz.mega.sdk.MegaHandleList
 import org.junit.Before
 import org.junit.Test
@@ -26,6 +25,10 @@ class ChatRequestMapperTest {
     private val expectedChatId = 345L
     private val expectedPeerId1 = 456L
     private val expectedPeerId2 = 789L
+    private val expectedMsg = "message to test"
+    private val expectedCallLimit = 3
+    private val expectedNum = 3
+    private val expectedFlag = true
 
     @Before
     fun setUp() {
@@ -49,19 +52,48 @@ class ChatRequestMapperTest {
                     ChatSessionTermCodeMapper()
                 ),
                 callNotificationMapper = CallNotificationMapper(),
-                speakerStatusMapper = SpeakerStatusMapper()
             )
     }
 
     @Test
-    fun `test mapping chat call received contains a valid call Id, chat Id, caller Id, peer Id composition change`() {
+    fun `test mapping chat call received contains a valid call Id, chat Id, caller Id, aux Handle, handle, peer Id composition change`() {
         val chatCall = getMockChatCall()
         val actual = underTest(chatCall)
         Truth.assertThat(actual.callId).isEqualTo(expectedCallId)
         Truth.assertThat(actual.chatId).isEqualTo(expectedChatId)
         Truth.assertThat(actual.caller).isEqualTo(expectedPeerId1)
+        Truth.assertThat(actual.auxHandle).isEqualTo(expectedPeerId1)
+        Truth.assertThat(actual.handle).isEqualTo(expectedPeerId1)
         Truth.assertThat(actual.peerIdCallCompositionChange)
             .isEqualTo(expectedPeerId1)
+    }
+
+    @Test
+    fun `test mapping chat call generic Message`() {
+        val chatCall = getMockChatCall(genericMessage = expectedMsg)
+        val actual = underTest(chatCall)
+        Truth.assertThat(actual.genericMessage).isEqualTo(expectedMsg)
+    }
+
+    @Test
+    fun `test mapping chat call generic num`() {
+        val chatCall = getMockChatCall(num = expectedNum)
+        val actual = underTest(chatCall)
+        Truth.assertThat(actual.num).isEqualTo(expectedNum)
+    }
+
+    @Test
+    fun `test mapping chat call flag`() {
+        val chatCall = getMockChatCall(flag = expectedFlag)
+        val actual = underTest(chatCall)
+        Truth.assertThat(actual.flag).isEqualTo(expectedFlag)
+    }
+
+    @Test
+    fun `test mapping chat call duration limit`() {
+        val chatCall = getMockChatCall()
+        val actual = underTest(chatCall)
+        Truth.assertThat(actual.callDurationLimit).isEqualTo(expectedCallLimit)
     }
 
     @Test
@@ -205,13 +237,6 @@ class ChatRequestMapperTest {
     }
 
     @Test
-    fun `test mapping chat call when isSpeakAllowed is true `() {
-        val chatCall = getMockChatCall(isSpeakAllowed = true)
-        val actual = underTest(chatCall)
-        Truth.assertThat(actual.isSpeakAllowed).isEqualTo(true)
-    }
-
-    @Test
     fun `test mapping chat call when hasLocalAudio is true `() {
         val chatCall = getMockChatCall(hasLocalAudio = true)
         val actual = underTest(chatCall)
@@ -226,50 +251,19 @@ class ChatRequestMapperTest {
     }
 
     @Test
-    fun `test mapping chat call when hasPendingSpeakRequest is false `() {
-        val chatCall = getMockChatCall(hasPendingSpeakRequest = false)
+    fun `test mapping chat call when isSpeakRequestEnabled is false `() {
+        val chatCall = getMockChatCall(isSpeakRequestEnabled = false)
         val actual = underTest(chatCall)
-        Truth.assertThat(actual.hasPendingSpeakRequest).isEqualTo(false)
-    }
-
-    private fun getMockChatSession(peerId: Long, clientId: Long): MegaChatSession {
-        val session = mock<MegaChatSession> {
-            on { peerid }.thenReturn(peerId)
-            on { clientid }.thenReturn(clientId)
-            on { status }.thenReturn(MegaChatSession.SESSION_STATUS_IN_PROGRESS)
-            on { isSpeakAllowed }.thenReturn(true)
-            on { hasAudio() }.thenReturn(true)
-            on { hasVideo() }.thenReturn(true)
-            on { isHiResVideo }.thenReturn(true)
-            on { isLowResVideo }.thenReturn(false)
-            on { hasCamera() }.thenReturn(true)
-            on { isLowResCamera }.thenReturn(false)
-            on { isHiResCamera }.thenReturn(true)
-            on { hasScreenShare() }.thenReturn(false)
-            on { isHiResScreenShare }.thenReturn(false)
-            on { isLowResScreenShare }.thenReturn(false)
-            on { isOnHold }.thenReturn(false)
-            on { termCode }.thenReturn(MegaChatSession.SESS_TERM_CODE_RECOVERABLE)
-            on { hasPendingSpeakRequest() }.thenReturn(false)
-            on { isAudioDetected }.thenReturn(true)
-            on { canRecvVideoHiRes() }.thenReturn(true)
-            on { canRecvVideoLowRes() }.thenReturn(false)
-            on { isModerator }.thenReturn(true)
-            on { isRecording }.thenReturn(true)
-            on { hasSpeakPermission() }.thenReturn(false)
-        }
-
-        return session
+        Truth.assertThat(actual.isSpeakRequestEnabled).isEqualTo(false)
     }
 
     private fun getMockChatCall(
-        status: Int = -1,
         chatId: Long = expectedChatId,
         callId: Long = expectedCallId,
+        status: Int = -1,
         hasLocalAudio: Boolean = false,
         hasLocalVideo: Boolean = false,
         changes: Int = -1,
-        hasSpeakerPermission: Boolean = false,
         isAudioDetected: Boolean = false,
         duration: Duration = 100.seconds,
         initialTimeStamp: Long = 1L,
@@ -277,12 +271,16 @@ class ChatRequestMapperTest {
         termCode: Int = -1,
         endCallReason: Int = -1,
         isSpeakRequestEnabled: Boolean = false,
+        notificationType: Int = -1,
+        auxHandle: Long = expectedPeerId1,
         isRinging: Boolean = false,
         isOwnModerator: Boolean = false,
         sessionsClientId: MegaHandleList = mock(),
         peerIdCallCompositionChange: Long = expectedPeerId1,
         callCompositionChange: Int = -1,
         peerIdParticipants: MegaHandleList = mock(),
+        handle: Long = expectedPeerId1,
+        flag: Boolean = false,
         moderators: MegaHandleList = mock(),
         numParticipants: Int = 2,
         isIgnored: Boolean = false,
@@ -291,45 +289,57 @@ class ChatRequestMapperTest {
         isOwnClientCaller: Boolean = false,
         caller: Long = expectedPeerId1,
         isOnHold: Boolean = false,
-        isSpeakAllowed: Boolean = false,
+        genericMessage: String = "",
+        callDurationLimit: Int = expectedCallLimit,
+        num: Int = 4,
         networkQuality: Int = -1,
-        hasPendingSpeakRequest: Boolean = false,
         waitingRoomStatus: Int? = 0,
-        sessionByClientId: Map<Long, ChatSession> = emptyMap(),
+        waitingRoom: MegaChatWaitingRoom? = null,
+        handleList: MegaHandleList = mock(),
+        speakersList: MegaHandleList = mock(),
+        speakRequestsList: MegaHandleList = mock(),
     ): MegaChatCall {
         val call = mock<MegaChatCall> {
-            on { this.callId }.thenReturn(callId)
             on { this.chatid }.thenReturn(chatId)
+            on { this.callId }.thenReturn(callId)
             on { this.status }.thenReturn(status)
-            on { this.caller }.thenReturn(caller)
-            on { this.isSpeakRequestEnabled }.thenReturn(isSpeakRequestEnabled)
-            on { this.hasSpeakPermission() }.thenReturn(hasSpeakerPermission)
-            on { this.duration }.thenReturn(duration.inWholeSeconds)
-            on { this.numParticipants }.thenReturn(numParticipants)
-            on { this.changes }.thenReturn(changes)
-            on { this.endCallReason }.thenReturn(endCallReason)
-            on { this.callCompositionChange }.thenReturn(callCompositionChange)
-            on { this.peeridCallCompositionChange }.thenReturn(peerIdCallCompositionChange)
-            on { this.peeridParticipants }.thenReturn(peerIdParticipants)
-            on { this.moderators }.thenReturn(moderators)
-            on { this.sessionsClientid }.thenReturn(sessionsClientId)
-            on { this.networkQuality }.thenReturn(networkQuality)
-            on { this.termCode }.thenReturn(termCode)
-            on { this.initialTimeStamp }.thenReturn(initialTimeStamp)
-            on { this.finalTimeStamp }.thenReturn(finalTimeStamp)
-            on { this.isAudioDetected }.thenReturn(isAudioDetected)
-            on { this.isIgnored }.thenReturn(isIgnored)
-            on { this.isIncoming }.thenReturn(isIncoming)
-            on { this.isOnHold }.thenReturn(isOnHold)
-            on { this.isOutgoing }.thenReturn(isOutgoing)
-            on { this.isOwnClientCaller }.thenReturn(isOwnClientCaller)
-            on { this.isOwnModerator }.thenReturn(isOwnModerator)
-            on { this.isRinging }.thenReturn(isRinging)
-            on { this.isSpeakAllowed }.thenReturn(isSpeakAllowed)
             on { this.hasLocalAudio() }.thenReturn(hasLocalAudio)
             on { this.hasLocalVideo() }.thenReturn(hasLocalVideo)
-            on { this.hasPendingSpeakRequest() }.thenReturn(hasPendingSpeakRequest)
+            on { this.changes }.thenReturn(changes)
+            on { this.isAudioDetected }.thenReturn(isAudioDetected)
+            on { this.duration }.thenReturn(duration.inWholeSeconds)
+            on { this.initialTimeStamp }.thenReturn(initialTimeStamp)
+            on { this.finalTimeStamp }.thenReturn(finalTimeStamp)
+            on { this.termCode }.thenReturn(termCode)
+            on { this.num }.thenReturn(num)
+            on { this.callDurationLimit }.thenReturn(callDurationLimit)
+            on { this.endCallReason }.thenReturn(endCallReason)
+            on { this.isSpeakRequestEnabled }.thenReturn(isSpeakRequestEnabled)
+            on { this.notificationType }.thenReturn(notificationType)
+            on { this.auxHandle }.thenReturn(auxHandle)
+            on { this.isRinging }.thenReturn(isRinging)
+            on { this.isOwnModerator }.thenReturn(isOwnModerator)
+            on { this.sessionsClientid }.thenReturn(sessionsClientId)
+            on { this.peeridCallCompositionChange }.thenReturn(peerIdCallCompositionChange)
+            on { this.callCompositionChange }.thenReturn(callCompositionChange)
+            on { this.peeridParticipants }.thenReturn(peerIdParticipants)
+            on { this.handle }.thenReturn(handle)
+            on { this.flag }.thenReturn(flag)
+            on { this.moderators }.thenReturn(moderators)
+            on { this.numParticipants }.thenReturn(numParticipants)
+            on { this.isIgnored }.thenReturn(isIgnored)
+            on { this.isIncoming }.thenReturn(isIncoming)
+            on { this.isOutgoing }.thenReturn(isOutgoing)
+            on { this.isOwnClientCaller }.thenReturn(isOwnClientCaller)
+            on { this.caller }.thenReturn(caller)
+            on { this.isOnHold }.thenReturn(isOnHold)
+            on { this.genericMessage }.thenReturn(genericMessage)
+            on { this.networkQuality }.thenReturn(networkQuality)
             on { this.wrJoiningState }.thenReturn(waitingRoomStatus)
+            on { this.waitingRoom }.thenReturn(waitingRoom)
+            on { this.handleList }.thenReturn(handleList)
+            on { this.speakersList }.thenReturn(speakersList)
+            on { this.speakRequestsList }.thenReturn(speakRequestsList)
         }
 
         return call
