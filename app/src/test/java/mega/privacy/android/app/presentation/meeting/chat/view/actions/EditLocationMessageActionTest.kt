@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -78,14 +77,14 @@ class EditLocationMessageActionTest {
         val state = mock<ChatUiState> {
             on { isGeolocationEnabled } doReturn true
         }
+        val message = mock<LocationMessage> {
+            on { msgId } doReturn 123L
+        }
+        val messages = setOf(message)
         whenever(chatViewModel.state).thenReturn(MutableStateFlow(state).asStateFlow())
-        composeTestRule.setContent(
-            underTest.bottomSheetMenuItem(
-                messages = messages,
-                hideBottomSheet = {},
-            )
-        )
-        composeTestRule.onNodeWithTag(CHAT_BOTTOM_SHEET_OPTION_EDIT_TAG).performClick()
+        composeTestRule.setContent {
+            underTest.OnTrigger(messages) {}
+        }
         composeTestRule.onNodeWithTag(CHAT_LOCATION_VIEW_TAG).assertExists()
     }
 }

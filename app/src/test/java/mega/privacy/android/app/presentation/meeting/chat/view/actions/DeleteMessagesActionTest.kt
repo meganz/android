@@ -84,15 +84,11 @@ class DeleteMessagesActionTest {
     }
 
     @Test
-    fun `test that clicking the menu option shows the confirmation dialog`() {
-        composeTestRule.setContent(
-            underTest.bottomSheetMenuItem(
-                messages = emptySet(),
-                hideBottomSheet = {},
-            )
-        )
+    fun `test that the confirmation dialog is displayed on trigger`() {
+        composeTestRule.setContent {
+            underTest.OnTrigger(messages = emptySet()) {}
+        }
 
-        composeTestRule.onNodeWithTag(CHAT_BOTTOM_SHEET_OPTION_DELETE_TAG).performClick()
         composeTestRule.onNodeWithTag(TEST_TAG_REMOVE_MESSAGES_CONFIRMATION_DIALOG)
             .assertIsDisplayed()
     }
@@ -100,13 +96,9 @@ class DeleteMessagesActionTest {
     @Test
     fun `test that clicking the cancel option in the confirmation dialog does not invoke view model`() {
         with(composeTestRule) {
-            setContent(
-                underTest.bottomSheetMenuItem(
-                    messages = emptySet(),
-                    hideBottomSheet = {},
-                )
-            )
-            onNodeWithTag(CHAT_BOTTOM_SHEET_OPTION_DELETE_TAG).performClick()
+            setContent {
+                underTest.OnTrigger(messages = emptySet()) {}
+            }
             onNodeWithTag(TEST_TAG_REMOVE_MESSAGES_CONFIRMATION_DIALOG)
                 .assertIsDisplayed()
             onNodeWithText(activity.getString(R.string.button_cancel)).performClick()
@@ -118,13 +110,9 @@ class DeleteMessagesActionTest {
     fun `test that clicking the remove option in the confirmation dialog invokes view model`() {
         val messages = setOf(mock<NormalMessage>())
         with(composeTestRule) {
-            setContent(
-                underTest.bottomSheetMenuItem(
-                    messages = messages,
-                    hideBottomSheet = {},
-                )
-            )
-            onNodeWithTag(CHAT_BOTTOM_SHEET_OPTION_DELETE_TAG).performClick()
+            setContent {
+                underTest.OnTrigger(messages = messages) {}
+            }
             onNodeWithTag(TEST_TAG_REMOVE_MESSAGES_CONFIRMATION_DIALOG)
                 .assertIsDisplayed()
             onNodeWithText(activity.getString(R.string.context_remove)).performClick()

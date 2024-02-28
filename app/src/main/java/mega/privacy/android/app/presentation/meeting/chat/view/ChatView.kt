@@ -122,6 +122,9 @@ internal fun ChatView(
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    val actions by remember {
+        mutableStateOf(actionsFactories.map { it(viewModel) }.toSet())
+    }
 
     ChatView(
         uiState = uiState,
@@ -160,7 +163,7 @@ internal fun ChatView(
         getUserInfoIntoReactionList = viewModel::getUserInfoIntoReactionList,
         getUser = viewModel::getUser,
         onForwardMessages = viewModel::onForwardMessages,
-        actions = actionsFactories.map { it(viewModel) }.toSet(),
+        actions = actions,
         messageSetSaver = savers.messageSetSaver,
         consumeDownloadEvent = viewModel::consumeDownloadEvent,
     )
@@ -403,6 +406,10 @@ internal fun ChatView(
 
             selectedMessages = emptySet()
         }
+
+    actions.forEach {
+        it.CallIfTriggered()
+    }
 
     with(uiState) {
         val addContactLauncher =

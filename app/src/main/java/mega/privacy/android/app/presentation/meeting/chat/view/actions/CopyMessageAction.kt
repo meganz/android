@@ -6,7 +6,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.options.CopyBottomSheetOption
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
@@ -14,24 +13,24 @@ import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 
-internal class CopyMessageAction(
-    private val chatViewModel: ChatViewModel,
-) : MessageAction {
+internal class CopyMessageAction() : MessageAction() {
     override fun appliesTo(messages: Set<TypedMessage>) =
         messages.all { it is NormalMessage || it is RichPreviewMessage || it is LocationMessage }
 
-    override fun bottomSheetMenuItem(
-        messages: Set<TypedMessage>,
-        hideBottomSheet: () -> Unit,
-    ): @Composable () -> Unit = {
-        val context = LocalContext.current
+    override fun bottomSheetItem(onClick: () -> Unit): @Composable () -> Unit = {
         CopyBottomSheetOption(
             onClick = {
-                val text = messages.joinToString(separator = "\n") { getMessageContent(it) }
-                copyToClipboard(context, text)
-                hideBottomSheet()
+                onClick()
             }
         )
+    }
+
+    @Composable
+    override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
+        val context = LocalContext.current
+        val text = messages.joinToString(separator = "\n") { getMessageContent(it) }
+        copyToClipboard(context, text)
+        onHandled()
     }
 
     private fun getMessageContent(message: TypedMessage) = when (message) {

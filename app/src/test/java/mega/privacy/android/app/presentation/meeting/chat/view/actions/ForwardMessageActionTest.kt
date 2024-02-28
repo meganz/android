@@ -5,7 +5,6 @@ import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
@@ -74,20 +73,15 @@ class ForwardMessageActionTest {
     }
 
     @Test
-    fun `test that clicking the menu option launches the chat picker`() {
+    fun `test that on trigger launches the chat picker`() {
         val chatId = 123L
         val message = mock<NormalMessage> {
             on { this.chatId } doReturn chatId
         }
         val messages = setOf(message)
-        composeTestRule.setContent(
-            underTest.bottomSheetMenuItem(
-                messages = messages,
-                hideBottomSheet = {},
-            )
-        )
-
-        composeTestRule.onNodeWithTag(CHAT_BOTTOM_SHEET_OPTION_FORWARD_TAG).performClick()
+        composeTestRule.setContent {
+            underTest.OnTrigger(messages = messages) {}
+        }
 
         verify(launchPicker).invoke(any(), eq(chatId), any())
     }

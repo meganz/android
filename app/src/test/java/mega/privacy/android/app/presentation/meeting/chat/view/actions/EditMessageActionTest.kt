@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
@@ -68,19 +67,16 @@ class EditMessageActionTest {
     }
 
     @Test
-    fun `test that clicking the menu option invokes view model`() {
+    fun `test that on trigger invokes view model`() {
         val message = mock<LocationMessage> {
             on { isEditable } doReturn true
         }
         val messages = setOf(message)
-        composeTestRule.setContent(
-            underTest.bottomSheetMenuItem(
-                messages = messages,
-                hideBottomSheet = {},
-            )
-        )
+        composeTestRule.setContent {
+            underTest.OnTrigger(messages = messages) {
+            }
+        }
 
-        composeTestRule.onNodeWithTag(CHAT_BOTTOM_SHEET_OPTION_EDIT_TAG).performClick()
         verify(chatViewModel).onEditMessage(messages.first())
     }
 }

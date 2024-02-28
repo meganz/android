@@ -5,7 +5,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.options.CHAT_BOTTOM_SHEET_OPTION_COPY_TAG
 import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
@@ -24,13 +23,9 @@ class CopyMessageActionTest {
 
     private lateinit var underTest: CopyMessageAction
 
-    private val chatViewModel = mock<ChatViewModel>()
-
     @Before
     fun setUp() {
-        underTest = CopyMessageAction(
-            chatViewModel = chatViewModel,
-        )
+        underTest = CopyMessageAction()
     }
 
     @Test

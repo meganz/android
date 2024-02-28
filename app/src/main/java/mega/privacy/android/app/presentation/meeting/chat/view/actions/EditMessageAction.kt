@@ -8,19 +8,20 @@ import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 
 internal class EditMessageAction(
     private val chatViewModel: ChatViewModel,
-) : MessageAction {
+) : MessageAction() {
 
     override fun appliesTo(messages: Set<TypedMessage>): Boolean =
         messages.size == 1 && messages.first().let { it.isEditable && it !is LocationMessage }
 
-
-    override fun bottomSheetMenuItem(
-        messages: Set<TypedMessage>,
-        hideBottomSheet: () -> Unit,
-    ): @Composable () -> Unit = {
+    override fun bottomSheetItem(onClick: () -> Unit): @Composable () -> Unit = {
         EditBottomSheetOption {
-            hideBottomSheet()
-            chatViewModel.onEditMessage(messages.first())
+            onClick()
         }
+    }
+
+    @Composable
+    override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
+        chatViewModel.onEditMessage(messages.first())
+        onHandled()
     }
 }

@@ -6,14 +6,14 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 /**
  * Message action
  */
-interface MessageAction {
+abstract class MessageAction {
     /**
      * Applies to
      *
      * @param messages
      * @return
      */
-    fun appliesTo(messages: Set<TypedMessage>): Boolean
+    abstract fun appliesTo(messages: Set<TypedMessage>): Boolean
 
     /**
      * In column
@@ -25,5 +25,39 @@ interface MessageAction {
     fun bottomSheetMenuItem(
         messages: Set<TypedMessage>,
         hideBottomSheet: () -> Unit,
-    ): @Composable () -> Unit
+    ): @Composable () -> Unit {
+        return bottomSheetItem {
+            pending.addAll(messages)
+            hideBottomSheet()
+        }
+    }
+
+    /**
+     * Bottom sheet item
+     *
+     * @param onClick
+     * @return the bottom sheet item
+     */
+    abstract fun bottomSheetItem(onClick: () -> Unit): @Composable () -> Unit
+
+    private val pending = mutableSetOf<TypedMessage>()
+
+    /**
+     * On trigger - Action to perform on click
+     *
+     * @param messages
+     */
+    @Composable
+    abstract fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit)
+
+
+    /**
+     * Call if triggered
+     */
+    @Composable
+    fun CallIfTriggered() {
+        if (pending.isNotEmpty()) {
+            OnTrigger(pending) { pending.clear() }
+        }
+    }
 }

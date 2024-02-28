@@ -35,7 +35,7 @@ internal class MessageActionModule {
     @Provides
     @IntoSet
     fun provideCopyActionFactory(): (ChatViewModel) -> MessageAction =
-        { vm -> CopyMessageAction(vm) }
+        { _ -> CopyMessageAction() }
 
     @Provides
     @IntoSet
