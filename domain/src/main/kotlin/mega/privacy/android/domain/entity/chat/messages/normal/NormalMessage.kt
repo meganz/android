@@ -9,6 +9,4 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
  * @property content Message content
  */
 @Polymorphic
-interface NormalMessage : TypedMessage {
-    val content: String
-}
+interface NormalMessage : TypedMessage

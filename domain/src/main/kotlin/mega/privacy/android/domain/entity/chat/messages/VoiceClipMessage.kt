@@ -25,6 +25,7 @@ data class VoiceClipMessage(
     override val shouldShowAvatar: Boolean,
     override val reactions: List<Reaction>,
     override val status: ChatMessageStatus,
+    override val content: String?,
     val name: String,
     val size: Long,
     val duration: Duration,

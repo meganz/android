@@ -33,7 +33,7 @@ data class RichPreviewMessage(
     override val shouldShowAvatar: Boolean,
     override val reactions: List<Reaction>,
     override val status: ChatMessageStatus,
-    val content: String,
+    override val content: String,
     val chatRichPreviewInfo: ChatRichPreviewInfo?,
     val isEdited: Boolean,
 ) : MetaMessage

@@ -30,6 +30,7 @@ internal class CreateNodeAttachmentMessageUseCase @Inject constructor(
             fileNode = typedNode,
             reactions = reactions,
             status = status,
+            content = content,
         )
     }
 }

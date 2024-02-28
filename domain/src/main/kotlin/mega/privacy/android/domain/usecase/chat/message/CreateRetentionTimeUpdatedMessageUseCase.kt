@@ -21,6 +21,7 @@ internal class CreateRetentionTimeUpdatedMessageUseCase @Inject constructor() :
             shouldShowAvatar = shouldShowAvatar,
             reactions = reactions,
             status = status,
+            content = content,
         )
     }
 }

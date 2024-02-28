@@ -29,6 +29,7 @@ class CreateInvalidMessageUseCase @Inject constructor() : CreateTypedMessageUseC
                 Boolean,
                 List<Reaction>,
                 ChatMessageStatus,
+                String?,
             ) -> InvalidMessage = when {
                 type == ChatMessageType.INVALID -> {
                     ::UnrecognizableInvalidMessage
@@ -58,6 +59,7 @@ class CreateInvalidMessageUseCase @Inject constructor() : CreateTypedMessageUseC
                 shouldShowAvatar,
                 reactions,
                 status,
+                content,
             )
         }
 }

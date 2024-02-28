@@ -155,6 +155,7 @@ private fun AlterParticipantsMessageViewSameHandlePreview(
                 shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
+                content = null
             ),
             ownerActionFullName = "Owner",
             targetActionFullName = "Target",
@@ -182,6 +183,7 @@ private fun AlterParticipantsMessageViewDifferentHandlePreview(
                 shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
+                content = null
             ),
             ownerActionFullName = "Owner",
             targetActionFullName = "Target",

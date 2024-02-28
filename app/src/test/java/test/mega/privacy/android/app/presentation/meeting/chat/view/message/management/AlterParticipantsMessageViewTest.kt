@@ -127,6 +127,7 @@ class AlterParticipantsMessageViewTest {
                     shouldShowAvatar = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
+                    content = null
                 ),
                 ownerActionFullName = ownerActionFullName,
                 targetActionFullName = targetActionFullName,

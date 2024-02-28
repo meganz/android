@@ -40,6 +40,7 @@ class ChatCallMessageViewTest {
                 shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
+                content = null
             ),
             isOneToOneChat = true
         )
@@ -64,6 +65,7 @@ class ChatCallMessageViewTest {
                 shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
+                content = null
             ),
             isOneToOneChat = true
         )
@@ -88,6 +90,7 @@ class ChatCallMessageViewTest {
                 shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
+                content = null
             ),
             isOneToOneChat = false
         )
@@ -116,6 +119,7 @@ class ChatCallMessageViewTest {
                 shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
+                content = null
             ),
             isOneToOneChat = true
         )
@@ -144,6 +148,7 @@ class ChatCallMessageViewTest {
                 shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
+                content = null
             ),
             isOneToOneChat = true
         )
@@ -172,6 +177,7 @@ class ChatCallMessageViewTest {
                 shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
+                content = null
             ),
             isOneToOneChat = true
         )
@@ -200,6 +206,7 @@ class ChatCallMessageViewTest {
                 shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
+                content = null
             ),
             isOneToOneChat = true
         )
@@ -228,6 +235,7 @@ class ChatCallMessageViewTest {
                 shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
+                content = null
             ),
             isOneToOneChat = true
         )
@@ -256,6 +264,7 @@ class ChatCallMessageViewTest {
                 shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
+                content = null
             ),
             isOneToOneChat = true
         )

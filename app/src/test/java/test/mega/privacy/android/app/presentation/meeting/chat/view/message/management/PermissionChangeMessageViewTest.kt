@@ -107,6 +107,7 @@ class PermissionChangeMessageViewTest {
                     shouldShowAvatar = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
+                    content = null
                 ),
                 ownerActionFullName = ownerActionFullName,
                 targetActionFullName = targetActionFullName,

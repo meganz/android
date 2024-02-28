@@ -81,6 +81,7 @@ class CreateNodeAttachmentMessageUseCaseTest {
                 fileNode = typedNode,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
+                content = null,
             )
         }
         whenever(addChatFileTypeUseCase(fileNode, request.chatId, request.messageId)).thenReturn(typedNode)

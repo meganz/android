@@ -59,6 +59,7 @@ class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase
                 shouldShowAvatar = shouldShowAvatar,
                 reactions = reactions,
                 status = status,
+                content = content,
             )
 
             else -> InvalidMetaMessage(
@@ -72,6 +73,7 @@ class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase
                 shouldShowAvatar = shouldShowAvatar,
                 reactions = reactions,
                 status = status,
+                content = content,
             )
         }
     }

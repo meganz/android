@@ -32,7 +32,7 @@ data class TextLinkMessage(
     override val userHandle: Long,
     override val shouldShowAvatar: Boolean,
     override val reactions: List<Reaction>,
-    override val content: String,
     override val status: ChatMessageStatus,
+    override val content: String,
     val links: List<LinkDetail>,
 ) : NormalMessage

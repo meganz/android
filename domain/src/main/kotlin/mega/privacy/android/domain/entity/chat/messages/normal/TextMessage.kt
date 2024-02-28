@@ -21,8 +21,8 @@ data class TextMessage(
     override val userHandle: Long,
     override val shouldShowAvatar: Boolean,
     override val reactions: List<Reaction>,
-    override val content: String,
     override val status: ChatMessageStatus,
+    override val content: String,
     val hasOtherLink: Boolean,
     val isEdited: Boolean,
 ) : NormalMessage

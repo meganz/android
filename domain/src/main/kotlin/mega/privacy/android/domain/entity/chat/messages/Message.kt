@@ -59,4 +59,9 @@ interface Message {
      * Status
      */
     val status: ChatMessageStatus
+
+    /**
+     * Content
+     */
+    val content: String?
 }

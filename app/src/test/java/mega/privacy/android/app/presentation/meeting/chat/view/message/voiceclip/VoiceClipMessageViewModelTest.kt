@@ -52,6 +52,7 @@ class VoiceClipMessageViewModelTest {
         isDeletable = false,
         isEditable = false,
         status = ChatMessageStatus.SERVER_RECEIVED,
+        content = null,
         size = 1,
         duration = 3000.milliseconds,
         userHandle = 1L,

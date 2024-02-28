@@ -293,6 +293,7 @@ class NodeAttachmentMessageViewModelTest {
             fileNode = fileNode,
             reactions = emptyList(),
             status = ChatMessageStatus.UNKNOWN,
+            content = null,
         )
 }
 

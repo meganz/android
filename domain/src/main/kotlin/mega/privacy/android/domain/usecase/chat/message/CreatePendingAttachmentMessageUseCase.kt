@@ -33,6 +33,7 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
             shouldShowAvatar = false,
             reactions = emptyList(),
             status = this.getChatMessageStatus(),
+            content = null,
             file = file,
             fileType = fileSystemRepository.getFileTypeInfo(file)
         )

@@ -14,7 +14,7 @@ class ForwardNormalMessageUseCase @Inject constructor(
 ) : ForwardMessageUseCase() {
     override suspend fun forwardMessage(targetChatId: Long, message: TypedMessage): ForwardResult? {
         val normalMessage = message as? NormalMessage ?: return null
-        sendTextMessageUseCase(chatId = targetChatId, message = normalMessage.content)
+        sendTextMessageUseCase(chatId = targetChatId, message = normalMessage.content.orEmpty())
         return ForwardResult.Success(targetChatId)
     }
 }

@@ -73,8 +73,9 @@ class CreatePendingAttachmentMessageUseCaseTest {
             shouldShowAvatar = false,
             reactions = emptyList(),
             status = getChatMessageStatus(state),
+            content = null,
             file = File(filePath),
-            fileType = fileTypeInfo
+            fileType = fileTypeInfo,
         )
         val actual = underTest(pendingMessage)
         assertThat(actual).isEqualTo(expected)

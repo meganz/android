@@ -32,7 +32,7 @@ data class LocationMessage(
     override val shouldShowAvatar: Boolean,
     override val reactions: List<Reaction>,
     override val status: ChatMessageStatus,
-    val content: String?,
+    override val content: String?,
     val chatGeolocationInfo: ChatGeolocationInfo?,
     val isEdited: Boolean,
 ) : MetaMessage

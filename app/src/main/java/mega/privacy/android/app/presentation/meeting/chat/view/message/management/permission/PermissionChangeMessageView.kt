@@ -143,6 +143,7 @@ private fun PermissionChangeMessageViewPreview(
                 shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
+                content = null
             ),
             ownerActionFullName = "Owner",
             targetActionFullName = "Target",

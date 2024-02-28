@@ -19,6 +19,7 @@ internal class CreateChatLinkRemovedMessageUseCase @Inject constructor() :
             shouldShowAvatar = shouldShowAvatar,
             reactions = reactions,
             status = status,
+            content = content,
         )
     }
 }

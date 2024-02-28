@@ -20,5 +20,5 @@ data class TitleChangeMessage(
     override val shouldShowAvatar: Boolean,
     override val reactions: List<Reaction>,
     override val status: ChatMessageStatus,
-    val content: String,
+    override val content: String,
 ) : ManagementMessage

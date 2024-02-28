@@ -21,6 +21,7 @@ data class PendingAttachmentMessage(
     override val fileType: FileTypeInfo,
     override val reactions: List<Reaction>,
     override val status: ChatMessageStatus,
+    override val content: String?,
     val file: File,
 ) : AttachmentMessage {
     override val isMine = true

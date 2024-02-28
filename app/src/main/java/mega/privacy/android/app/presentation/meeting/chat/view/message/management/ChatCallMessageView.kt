@@ -177,6 +177,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     shouldShowAvatar = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
+                    content = null
                 ),
                 isOneToOneChat = true
             ),
@@ -194,6 +195,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     shouldShowAvatar = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
+                    content = null
                 ),
                 isOneToOneChat = true
             ),
@@ -211,6 +213,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     shouldShowAvatar = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
+                    content = null
                 ),
                 isOneToOneChat = false
             ),
@@ -228,6 +231,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     shouldShowAvatar = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
+                    content = null
                 ),
                 isOneToOneChat = true
             ),
@@ -245,6 +249,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     shouldShowAvatar = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
+                    content = null
                 ),
                 isOneToOneChat = false
             ),
@@ -262,6 +267,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     shouldShowAvatar = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
+                    content = null
                 ),
                 isOneToOneChat = true
             ),
@@ -279,6 +285,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     shouldShowAvatar = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
+                    content = null
                 ),
                 isOneToOneChat = false
             ),
@@ -296,6 +303,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     shouldShowAvatar = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
+                    content = null
                 ),
                 isOneToOneChat = true
             ),
@@ -313,6 +321,7 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     shouldShowAvatar = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
+                    content = null
                 ),
                 isOneToOneChat = false
             ),

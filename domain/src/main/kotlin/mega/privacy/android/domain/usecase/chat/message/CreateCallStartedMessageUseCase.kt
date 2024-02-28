@@ -19,6 +19,7 @@ internal class CreateCallStartedMessageUseCase @Inject constructor() : CreateTyp
                 shouldShowAvatar = shouldShowAvatar,
                 reactions = reactions,
                 status = status,
+                content = content,
             )
         }
 }

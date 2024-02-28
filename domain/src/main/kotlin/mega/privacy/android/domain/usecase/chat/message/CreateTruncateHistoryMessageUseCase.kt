@@ -19,6 +19,7 @@ internal class CreateTruncateHistoryMessageUseCase @Inject constructor() :
             shouldShowAvatar = shouldShowAvatar,
             reactions = reactions,
             status = status,
+            content = content,
         )
     }
 }
