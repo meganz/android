@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -22,6 +21,7 @@ import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
@@ -35,7 +35,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.components.transferWidget.TransfersWidgetView
@@ -49,10 +48,11 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.filelink.view.animationScale
 import mega.privacy.android.app.presentation.filelink.view.animationSpecs
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
+import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.navigation.contactArraySeparator
 import mega.privacy.android.app.presentation.search.navigation.searchForeignNodeDialog
@@ -63,15 +63,15 @@ import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
@@ -166,12 +166,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     }
 
     /**
-     * Mapper to open file
-     */
-    @Inject
-    lateinit var getIntentToOpenFileMapper: GetIntentToOpenFileMapper
-
-    /**
      * onCreate
      */
     @OptIn(ExperimentalMaterialNavigationApi::class)
@@ -199,6 +193,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             val scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState)
             val bottomSheetNavigator = rememberBottomSheetNavigator()
             val navHostController = rememberNavController(bottomSheetNavigator)
+            val coroutineScope = rememberCoroutineScope()
 
             MegaAppTheme(isDark = themeMode.isDarkMode()) {
                 Scaffold(
@@ -234,7 +229,15 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                             .statusBarsPadding(),
                         viewModel = viewModel,
                         nodeActionsViewModel = nodeActionsViewModel,
-                        handleClick = ::handleClick,
+                        handleClick = {
+                            coroutineScope.launch {
+                                when (it) {
+                                    is TypedFileNode -> openFileClicked(it)
+                                    is TypedFolderNode -> openFolderClicked(it.id.longValue)
+                                    else -> Timber.e("Unsupported click")
+                                }
+                            }
+                        },
                         navigateToLink = ::navigateToLink,
                         showSortOrderBottomSheet = ::showSortOrderBottomSheet,
                         trackAnalytics = ::trackAnalytics,
@@ -308,14 +311,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     }
 
 
-    private fun handleClick(node: TypedNode?) = node?.let {
-        when (it) {
-            is FileNode -> openFileClicked(it)
-            is FolderNode -> openFolderClicked(it.id.longValue)
-            else -> Timber.e("Unsupported click")
-        }
-    }
-
     /**
      * Clicked on link
      * @param link
@@ -348,43 +343,45 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
      *
      * @param currentFileNode [FileNode]
      */
-    private fun openFileClicked(currentFileNode: FileNode?) {
-        currentFileNode?.let {
-            openFile(fileNode = it)
-            viewModel.onItemPerformedClicked()
-        } ?: run {
-            // Update toolbar title here
+    private suspend fun openFileClicked(currentFileNode: TypedFileNode) {
+        runCatching {
+            nodeActionsViewModel.handleFileNodeClicked(currentFileNode)
+        }.onSuccess { content ->
+            when (content) {
+                is FileNodeContent.Pdf -> openPdfActivity(
+                    content = content.uri,
+                    currentFileNode = currentFileNode,
+                )
+
+                else -> {
+
+                }
+            }
+
+        }.onFailure {
+            Timber.e(it)
         }
     }
 
-    /**
-     * Open File
-     * @param fileNode [FileNode]
-     */
-    private fun openFile(fileNode: FileNode) {
-        lifecycleScope.launch {
-            runCatching {
-                val intent = getIntentToOpenFileMapper(
-                    activity = this@SearchActivity,
-                    fileNode = fileNode,
-                    viewType = Constants.FILE_BROWSER_ADAPTER
-                )
-                intent?.let {
-                    if (MegaApiUtils.isIntentAvailable(this@SearchActivity, it)) {
-                        startActivity(it)
-                    } else {
-                        Toast.makeText(
-                            this@SearchActivity,
-                            getString(R.string.intent_not_available),
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
-            }.onFailure {
-                Timber.e("itemClick:ERROR:httpServerGetLocalLink")
-                viewModel.showShowErrorMessage(errorMessageResId = R.string.general_text_error)
-            }
+    private fun openPdfActivity(
+        content: NodeContentUri,
+        currentFileNode: TypedFileNode,
+    ) {
+        val pdfIntent = Intent(this, PdfViewerActivity::class.java)
+        val mimeType = currentFileNode.type.mimeType
+        pdfIntent.apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, currentFileNode.id.longValue)
+            putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
+            putExtra(Constants.INTENT_EXTRA_KEY_APP, true)
         }
+        nodeActionsViewModel.applyNodeContentUri(
+            intent = pdfIntent,
+            content = content,
+            mimeType = mimeType,
+        )
+        startActivity(pdfIntent)
     }
 
     private fun showSortOrderBottomSheet() {

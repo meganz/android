@@ -1,7 +1,7 @@
-package mega.privacy.android.domain.usecase.chat
+package mega.privacy.android.domain.usecase.node
 
 import mega.privacy.android.domain.entity.node.NodeContentUri
-import mega.privacy.android.domain.entity.node.chat.ChatFile
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetLocalFileForNode
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -9,10 +9,10 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUse
 import javax.inject.Inject
 
 /**
- * Get Chat Node Content Uri Use Case
+ * Get Node Content Uri Use Case
  *
  */
-class GetChatNodeContentUriUseCase @Inject constructor(
+class GetNodeContentUriUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
     private val getLocalFileForNode: GetLocalFileForNode,
     private val httpServerStart: MegaApiHttpServerStartUseCase,
@@ -23,7 +23,7 @@ class GetChatNodeContentUriUseCase @Inject constructor(
      *
      */
     suspend operator fun invoke(
-        fileNode: ChatFile,
+        fileNode: TypedFileNode,
     ): NodeContentUri = getLocalFileForNode(fileNode)?.let {
         NodeContentUri.LocalContentUri(it)
     } ?: run {

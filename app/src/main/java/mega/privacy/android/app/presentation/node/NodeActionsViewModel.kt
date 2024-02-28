@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node
 
+import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,17 +12,19 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.chat.mapper.ChatRequestMessageMapper
+import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.model.NodeActionState
-import mega.privacy.android.app.presentation.node.model.mapper.NodeAccessPermissionIconMapper
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
+import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
-import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
@@ -32,6 +35,7 @@ import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
@@ -50,10 +54,12 @@ import javax.inject.Inject
  * @property snackBarHandler
  * @property moveRequestMessageMapper
  * @property versionHistoryRemoveMessageMapper
- * @property nodeAccessPermissionIconMapper
  * @property checkBackupNodeTypeByHandleUseCase
  * @property attachMultipleNodesUseCase
  * @property chatRequestMessageMapper
+ * @property listToStringWithDelimitersMapper
+ * @property getNodeContentUriUseCase
+ * @property nodeContentUriIntentMapper
  * @property applicationScope
  */
 @HiltViewModel
@@ -67,11 +73,12 @@ class NodeActionsViewModel @Inject constructor(
     private val snackBarHandler: SnackBarHandler,
     private val moveRequestMessageMapper: MoveRequestMessageMapper,
     private val versionHistoryRemoveMessageMapper: VersionHistoryRemoveMessageMapper,
-    private val nodeAccessPermissionIconMapper: NodeAccessPermissionIconMapper,
     private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase,
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase,
     private val chatRequestMessageMapper: ChatRequestMessageMapper,
     private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
+    private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
+    private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -210,15 +217,6 @@ class NodeActionsViewModel @Inject constructor(
     fun markQuotaDialogShown() {
         _state.update { it.copy(showQuotaDialog = consumed()) }
     }
-
-    /**
-     * Get access permission icon
-     * Access permission icon is only shown for incoming shares
-     *
-     * @return icon
-     */
-    private fun getAccessPermissionIcon(accessPermission: AccessPermission, node: TypedNode): Int? =
-        nodeAccessPermissionIconMapper(accessPermission).takeIf { node.isIncomingShare }
 
     /**
      * Contact selected for folder share
@@ -379,5 +377,37 @@ class NodeActionsViewModel @Inject constructor(
         _state.update {
             it.copy(clearAll = consumed)
         }
+    }
+
+
+    /**
+     * Handle file node clicked
+     *
+     * @param fileNode
+     */
+    suspend fun handleFileNodeClicked(fileNode: TypedFileNode) = when (fileNode.type) {
+        is PdfFileTypeInfo -> FileNodeContent.Pdf(
+            uri = getNodeContentUriUseCase(fileNode)
+        )
+
+        else -> FileNodeContent.TextContent
+
+    }
+
+    /**
+     * Apply node content uri
+     *
+     * @param intent
+     * @param content
+     * @param mimeType
+     * @param isSupported
+     */
+    fun applyNodeContentUri(
+        intent: Intent,
+        content: NodeContentUri,
+        mimeType: String,
+        isSupported: Boolean = true,
+    ) {
+        nodeContentUriIntentMapper(intent, content, mimeType, isSupported)
     }
 }

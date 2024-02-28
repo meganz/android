@@ -10,13 +10,15 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.chat.mapper.ChatRequestMessageMapper
+import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
-import mega.privacy.android.app.presentation.node.model.mapper.NodeAccessPermissionIconMapper
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.node.ChatRequestResult
 import mega.privacy.android.domain.entity.node.MoveRequestResult
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -28,6 +30,7 @@ import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
@@ -41,6 +44,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.File
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -60,10 +64,12 @@ class NodeActionsViewModelTest {
     private val checkBackupNodeTypeByHandleUseCase: CheckBackupNodeTypeByHandleUseCase = mock()
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase = mock()
     private val chatRequestMessageMapper: ChatRequestMessageMapper = mock()
-    private val nodeAccessPermissionIconMapper: NodeAccessPermissionIconMapper = mock()
     private val listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper = mock()
+    private val nodeContentUriIntentMapper: NodeContentUriIntentMapper = mock()
+    private val getNodeContentUriUseCase: GetNodeContentUriUseCase = mock()
     private val sampleNode = mock<TypedFileNode>().stub {
         on { id } doReturn NodeId(123)
+        on { type } doReturn PdfFileTypeInfo
     }
     private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -81,8 +87,9 @@ class NodeActionsViewModelTest {
             checkBackupNodeTypeByHandleUseCase = checkBackupNodeTypeByHandleUseCase,
             attachMultipleNodesUseCase = attachMultipleNodesUseCase,
             chatRequestMessageMapper = chatRequestMessageMapper,
-            nodeAccessPermissionIconMapper = nodeAccessPermissionIconMapper,
             listToStringWithDelimitersMapper = listToStringWithDelimitersMapper,
+            getNodeContentUriUseCase = getNodeContentUriUseCase,
+            nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             applicationScope = applicationScope
         )
     }
@@ -223,5 +230,17 @@ class NodeActionsViewModelTest {
             verify(chatRequestMessageMapper).invoke(request)
             verify(snackBarHandler).postSnackbarMessage("Some value")
         }
+
+    @Test
+    fun `test that getNodeContentUriUseCase is called when getNodeContentUri is invoked`() =
+        runTest {
+            whenever(getNodeContentUriUseCase(sampleNode)).thenReturn(
+                NodeContentUri.LocalContentUri(File("path"))
+            )
+            initViewModel()
+            viewModel.handleFileNodeClicked(sampleNode)
+            verify(getNodeContentUriUseCase).invoke(sampleNode)
+        }
+
 }
 

@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
+import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -16,8 +17,8 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.NodeContentUri
-import mega.privacy.android.domain.usecase.chat.GetChatNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetCachedOriginalPathUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetMessageIdsByTypeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFilePathUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
@@ -34,7 +35,7 @@ import javax.inject.Inject
 class NodeAttachmentMessageViewModel @Inject constructor(
     private val getPreviewUseCase: GetPreviewUseCase,
     private val getMessageIdsByTypeUseCase: GetMessageIdsByTypeUseCase,
-    private val getChatNodeContentUriUseCase: GetChatNodeContentUriUseCase,
+    private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getNodePreviewFilePathUseCase: GetNodePreviewFilePathUseCase,
     private val getCachedOriginalPathUseCase: GetCachedOriginalPathUseCase,
@@ -129,7 +130,7 @@ class NodeAttachmentMessageViewModel @Inject constructor(
      * @param message node attachment message
      */
     suspend fun getChatNodeContentUri(message: NodeAttachmentMessage) =
-        getChatNodeContentUriUseCase(
+        getNodeContentUriUseCase(
             fileNode = message.fileNode
         )
 

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.chat.view.message.attachment
+package mega.privacy.android.app.presentation.node
 
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import java.io.File

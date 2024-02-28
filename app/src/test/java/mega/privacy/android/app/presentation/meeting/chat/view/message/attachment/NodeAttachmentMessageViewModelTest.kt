@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
+import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
@@ -25,7 +26,7 @@ import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.chat.ChatFile
-import mega.privacy.android.domain.usecase.chat.GetChatNodeContentUriUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetCachedOriginalPathUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetMessageIdsByTypeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFilePathUseCase
@@ -56,7 +57,7 @@ class NodeAttachmentMessageViewModelTest {
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
     private val nodeContentUriIntentMapper = mock<NodeContentUriIntentMapper>()
     private val getMessageIdsByTypeUseCase = mock<GetMessageIdsByTypeUseCase>()
-    private val getChatNodeContentUriUseCase = mock<GetChatNodeContentUriUseCase>()
+    private val getNodeContentUriUseCase: GetNodeContentUriUseCase = mock()
     private val getNodePreviewFilePathUseCase = mock<GetNodePreviewFilePathUseCase>()
     private val getCachedOriginalPathUseCase = mock<GetCachedOriginalPathUseCase>()
 
@@ -69,7 +70,7 @@ class NodeAttachmentMessageViewModelTest {
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             getMessageIdsByTypeUseCase = getMessageIdsByTypeUseCase,
-            getChatNodeContentUriUseCase = getChatNodeContentUriUseCase,
+            getNodeContentUriUseCase = getNodeContentUriUseCase,
             getNodePreviewFilePathUseCase = getNodePreviewFilePathUseCase,
             getCachedOriginalPathUseCase = getCachedOriginalPathUseCase,
         )
@@ -82,7 +83,7 @@ class NodeAttachmentMessageViewModelTest {
             durationInSecondsTextMapper,
             nodeContentUriIntentMapper,
             getMessageIdsByTypeUseCase,
-            getChatNodeContentUriUseCase,
+            getNodeContentUriUseCase,
             getNodePreviewFilePathUseCase,
             getCachedOriginalPathUseCase,
         )
@@ -195,7 +196,7 @@ class NodeAttachmentMessageViewModelTest {
     fun `test that getChatNodeContentUri returns correct uri`() = runTest {
         val expected = mock<NodeContentUri.LocalContentUri>()
         val fileNode = mock<ChatDefaultFile>()
-        whenever(getChatNodeContentUriUseCase(fileNode)).thenReturn(expected)
+        whenever(getNodeContentUriUseCase(fileNode)).thenReturn(expected)
         val msg = buildNodeAttachmentMessage(fileNode)
         val actual = underTest.getChatNodeContentUri(msg)
         assertThat(actual).isEqualTo(expected)
@@ -249,7 +250,7 @@ class NodeAttachmentMessageViewModelTest {
         }
         val msg = buildNodeAttachmentMessage(fileNode)
         val uri = mock<NodeContentUri.LocalContentUri>()
-        whenever(getChatNodeContentUriUseCase(fileNode)).thenReturn(uri)
+        whenever(getNodeContentUriUseCase(fileNode)).thenReturn(uri)
         val actual = underTest.handleFileNode(msg)
         assertThat(actual).isEqualTo(FileNodeContent.Pdf(uri))
     }

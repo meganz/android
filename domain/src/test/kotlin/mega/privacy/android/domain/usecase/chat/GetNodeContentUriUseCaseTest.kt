@@ -8,6 +8,7 @@ import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetLocalFileForNode
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -19,8 +20,8 @@ import org.mockito.kotlin.whenever
 import java.io.File
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class GetChatNodeContentUriUseCaseTest {
-    private lateinit var underTest: GetChatNodeContentUriUseCase
+internal class GetNodeContentUriUseCaseTest {
+    private lateinit var underTest: GetNodeContentUriUseCase
     private val nodeRepository: NodeRepository = mock()
     private val getLocalFileForNode: GetLocalFileForNode = mock()
     private val httpServerStart: MegaApiHttpServerStartUseCase = mock()
@@ -28,7 +29,7 @@ internal class GetChatNodeContentUriUseCaseTest {
 
     @BeforeAll
     fun setup() {
-        underTest = GetChatNodeContentUriUseCase(
+        underTest = GetNodeContentUriUseCase(
             nodeRepository,
             getLocalFileForNode,
             httpServerStart,
