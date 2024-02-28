@@ -3658,9 +3658,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      */
     private fun removeFragment(fragment: Fragment?) {
         fragment?.let { nonNullFragment ->
-            supportFragmentManager.apply {
-                beginTransaction().apply { remove(nonNullFragment) }.commit()
-                executePendingTransactions()
+            if (!isFinishing) {
+                supportFragmentManager.apply {
+                    beginTransaction().apply { remove(nonNullFragment) }.commit()
+                    executePendingTransactions()
+                }
             }
         }
     }
