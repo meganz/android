@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
-
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -13,7 +12,7 @@ import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 
-internal class CopyMessageAction() : MessageAction() {
+internal class CopyMessageAction : MessageAction() {
     override fun appliesTo(messages: Set<TypedMessage>) =
         messages.all { it is NormalMessage || it is RichPreviewMessage || it is LocationMessage }
 
@@ -28,19 +27,19 @@ internal class CopyMessageAction() : MessageAction() {
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
         val context = LocalContext.current
-        val text = messages.joinToString(separator = "\n") { getMessageContent(it) }
+        val text = messages.joinToString(separator = "\n") { getMessageContent(it).toString() }
         copyToClipboard(context, text)
         onHandled()
     }
 
     private fun getMessageContent(message: TypedMessage) = when (message) {
         is NormalMessage -> message.content
-        is LocationMessage -> message.textMessage
-        is RichPreviewMessage -> message.textMessage
+        is LocationMessage -> message.content
+        is RichPreviewMessage -> message.content
         else -> ""
     }
 
-    fun copyToClipboard(context: Context, text: String?) {
+    internal fun copyToClipboard(context: Context, text: String?) {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText(Constants.COPIED_TEXT_LABEL, text)
         clipboard.setPrimaryClip(clip)

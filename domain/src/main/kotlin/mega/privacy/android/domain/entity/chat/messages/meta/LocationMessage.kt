@@ -14,11 +14,11 @@ import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
  * @property isMine
  * @property userHandle
  * @property shouldShowAvatar
- * @property shouldShowTime
  * @property reactions
  * @property chatGeolocationInfo
  * @property isEdited
  * @property status
+ * @property content
  */
 @Serializable
 data class LocationMessage(
@@ -32,7 +32,7 @@ data class LocationMessage(
     override val shouldShowAvatar: Boolean,
     override val reactions: List<Reaction>,
     override val status: ChatMessageStatus,
-    override val textMessage: String,
+    val content: String?,
     val chatGeolocationInfo: ChatGeolocationInfo?,
     val isEdited: Boolean,
 ) : MetaMessage

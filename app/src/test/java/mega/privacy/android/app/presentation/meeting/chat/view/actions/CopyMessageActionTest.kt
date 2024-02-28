@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.meeting.chat.view.actions
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.options.CHAT_BOTTOM_SHEET_OPTION_COPY_TAG
@@ -14,7 +15,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class CopyMessageActionTest {
@@ -68,5 +71,14 @@ class CopyMessageActionTest {
         )
         composeTestRule.setContent { bottomSheetMenuItem() }
         composeTestRule.onNodeWithTag(CHAT_BOTTOM_SHEET_OPTION_COPY_TAG).assertExists()
+    }
+
+    @Test
+    fun `test that onHandled() is invoked when action is clicked`() {
+        val onHandled: () -> Unit = mock()
+        composeTestRule.setContent {
+            underTest.OnTrigger(messages = setOf(mock<NormalMessage>()), onHandled = onHandled)
+        }
+        verify(onHandled).invoke()
     }
 }

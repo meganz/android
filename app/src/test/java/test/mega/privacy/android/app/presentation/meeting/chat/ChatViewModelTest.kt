@@ -2785,6 +2785,7 @@ internal class ChatViewModelTest {
             }
         }
 
+
     private fun ChatRoom.getNumberParticipants() =
         (peerCount + if (ownPrivilege != ChatRoomPermission.Unknown
             && ownPrivilege != ChatRoomPermission.Removed

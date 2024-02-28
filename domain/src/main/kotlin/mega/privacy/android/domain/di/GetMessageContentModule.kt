@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
+import mega.privacy.android.domain.usecase.chat.message.edit.GetContentFromLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.edit.GetContentFromMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.edit.GetContentFromNormalMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.edit.GetContentFromRichPreviewMessageUseCase
@@ -20,4 +21,8 @@ internal abstract class GetMessageContentModule {
     @Binds
     @IntoSet
     abstract fun bindGetContentFromRichPreviewMessageUseCase(creator: GetContentFromRichPreviewMessageUseCase): GetContentFromMessageUseCase
+
+    @Binds
+    @IntoSet
+    abstract fun bindGetContentFromLocationMessageUseCase(creator: GetContentFromLocationMessageUseCase): GetContentFromMessageUseCase
 }

@@ -8,7 +8,5 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
  * @property textMessage general text message of a meta message
  */
 @Polymorphic
-interface MetaMessage : TypedMessage {
-    val textMessage: String
-}
+interface MetaMessage : TypedMessage
 
