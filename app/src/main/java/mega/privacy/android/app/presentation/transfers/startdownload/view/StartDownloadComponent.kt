@@ -50,6 +50,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.core.ui.utils.MinimumTimeVisibility
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
@@ -101,6 +102,7 @@ internal fun StartDownloadComponent(
                 saveDoNotAskAgain
             )
         },
+        onDestinationSet = viewModel::startDownloadWithDestination,
         snackBarHostState = snackBarHostState,
     )
 }
@@ -145,6 +147,7 @@ private fun StartDownloadComponent(
     onOneOffEventConsumed: () -> Unit,
     onCancelledConfirmed: () -> Unit,
     onDownloadConfirmed: (TransferTriggerEvent, saveDoNotAskAgain: Boolean) -> Unit,
+    onDestinationSet: (TransferTriggerEvent.StartDownloadNode, destination: String) -> Unit,
     snackBarHostState: SnackbarHostState,
 ) {
     val context = LocalContext.current
@@ -152,6 +155,14 @@ private fun StartDownloadComponent(
     val showQuotaExceededDialog = remember { mutableStateOf<StorageState?>(null) }
     val showConfirmLargeTransfer =
         remember { mutableStateOf<StartDownloadTransferEvent.ConfirmLargeDownload?>(null) }
+    val showAskDestinationDialog =
+        remember { mutableStateOf<TransferTriggerEvent.StartDownloadNode?>(null) }
+    val folderPicker = launchFolderPicker { uri ->
+        showAskDestinationDialog.value?.let { event ->
+            onDestinationSet(event, uri.toString())
+            showAskDestinationDialog.value = null
+        }
+    }
 
     EventEffect(
         event = uiState.oneOffViewEvent,
@@ -176,6 +187,10 @@ private fun StartDownloadComponent(
 
                 is StartDownloadTransferEvent.ConfirmLargeDownload -> {
                     showConfirmLargeTransfer.value = it
+                }
+
+                is StartDownloadTransferEvent.AskDestination -> {
+                    showAskDestinationDialog.value = it.originalEvent
                 }
             }
         })
@@ -228,6 +243,9 @@ private fun StartDownloadComponent(
             },
             onDismiss = { showConfirmLargeTransfer.value = null },
         )
+    }
+    if (showAskDestinationDialog.value != null) {
+        folderPicker.launch(null)
     }
 }
 

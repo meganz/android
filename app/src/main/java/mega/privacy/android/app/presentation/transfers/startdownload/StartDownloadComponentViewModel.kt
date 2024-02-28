@@ -40,6 +40,7 @@ import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfers
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetCurrentDownloadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownloadDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
 import timber.log.Timber
 import java.io.File
@@ -64,6 +65,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
     private val setAskBeforeLargeDownloadsSettingUseCase: SetAskBeforeLargeDownloadsSettingUseCase,
     private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
     private val getCurrentDownloadSpeedUseCase: GetCurrentDownloadSpeedUseCase,
+    private val shouldAskDownloadDestinationUseCase: ShouldAskDownloadDestinationUseCase,
 ) : ViewModel() {
 
     private var currentInProgressJob: Job? = null
@@ -127,10 +129,20 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                 }
 
                 is TransferTriggerEvent.StartDownloadNode -> {
-                    startDownloadNodes(
-                        transferTriggerEvent.nodes,
-                        transferTriggerEvent.isHighPriority
-                    )
+                    viewModelScope.launch {
+                        if (shouldAskDownloadDestinationUseCase()) {
+                            _uiState.updateEventAndClearProgress(
+                                StartDownloadTransferEvent.AskDestination(
+                                    transferTriggerEvent
+                                )
+                            )
+                        } else {
+                            startDownloadNodes(
+                                transferTriggerEvent,
+                                getOrCreateStorageDownloadLocationUseCase()
+                            )
+                        }
+                    }
                 }
 
                 is TransferTriggerEvent.StartDownloadForPreview -> {
@@ -139,6 +151,16 @@ internal class StartDownloadComponentViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Start download with the destination manually set by the user
+     * @param startDownloadNode initial event that triggered this download
+     * @param destination the chosen destination
+     */
+    fun startDownloadWithDestination(
+        startDownloadNode: TransferTriggerEvent.StartDownloadNode,
+        destination: String,
+    ) = startDownloadNodes(startDownloadNode, destination)
 
     /**
      * It starts downloading the node for preview with the appropriate use case
@@ -158,9 +180,14 @@ internal class StartDownloadComponentViewModel @Inject constructor(
 
     /**
      * It starts downloading the nodes with the appropriate use case
-     * @param siblingNodes the [Node]s to be download, they must belong to same parent folder
+     * @param startDownloadNode the [TransferTriggerEvent] that starts this download
+     * @param destination the destination where to download the nodes
      */
-    private fun startDownloadNodes(siblingNodes: List<TypedNode>, isHighPriority: Boolean) {
+    private fun startDownloadNodes(
+        startDownloadNode: TransferTriggerEvent.StartDownloadNode,
+        destination: String?,
+    ) {
+        val siblingNodes = startDownloadNode.nodes
         if (siblingNodes.isEmpty()) return
         val firstSibling = siblingNodes.first()
         val parentId = firstSibling.parentId
@@ -171,9 +198,9 @@ internal class StartDownloadComponentViewModel @Inject constructor(
             currentInProgressJob = viewModelScope.launch {
                 startDownloadNodes(
                     nodes = siblingNodes,
-                    isHighPriority = isHighPriority,
+                    isHighPriority = startDownloadNode.isHighPriority,
                     getPath = {
-                        getOrCreateStorageDownloadLocationUseCase()?.ensureSuffix(File.separator)
+                        destination?.ensureSuffix(File.separator)
                     },
                 )
             }

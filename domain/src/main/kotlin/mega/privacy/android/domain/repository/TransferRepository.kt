@@ -540,4 +540,9 @@ interface TransferRepository {
      * @return a flow that emits true if ChatUploadsWorker is enqueued. false otherwise
      */
     fun isChatUploadsWorkerEnqueuedFlow(): Flow<Boolean>
+
+    /**
+     * @return true if the user can choose download's destination. False means downloads will be saved to default destination. See [settingsRepository.setDefaultStorageDownloadLocation()]
+     */
+    suspend fun allowUserToSetDownloadDestination(): Boolean
 }

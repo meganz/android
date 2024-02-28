@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.SDCardGateway
@@ -89,6 +90,7 @@ class DefaultTransfersRepositoryTest {
     private val activeTransferTotalsMapper = mock<ActiveTransferTotalsMapper>()
     private val megaNodeMapper = mock<MegaNodeMapper>()
     private val sdCardGateway = mock<SDCardGateway>()
+    private val deviceGateway = mock<DeviceGateway>()
 
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -119,6 +121,7 @@ class DefaultTransfersRepositoryTest {
             scope = testScope,
             megaNodeMapper = megaNodeMapper,
             sdCardGateway = sdCardGateway,
+            deviceGateway = deviceGateway,
         )
     }
 
@@ -138,6 +141,7 @@ class DefaultTransfersRepositoryTest {
             completedTransferMapper,
             megaNodeMapper,
             sdCardGateway,
+            deviceGateway,
         )
     }
 
@@ -1169,6 +1173,26 @@ class DefaultTransfersRepositoryTest {
             assertThat(underTest.getTotalDownloadBytes()).isEqualTo(bytes)
         }
     }
+
+    @ParameterizedTest
+    @ValueSource(ints = [26, 27, 28, 29])
+    fun `test that allowUserToSetDownloadDestination returns true when sdk is lower than Android 11`(
+        sdk: Int,
+    ) =
+        runTest {
+            whenever(deviceGateway.getSdkVersionInt()).thenReturn(sdk)
+            assertThat(underTest.allowUserToSetDownloadDestination()).isTrue()
+        }
+
+    @ParameterizedTest
+    @ValueSource(ints = [30, 31, 32, 33, 34])
+    fun `test that allowUserToSetDownloadDestination returns false when sdk is equal or higher than Android 11`(
+        sdk: Int,
+    ) =
+        runTest {
+            whenever(deviceGateway.getSdkVersionInt()).thenReturn(sdk)
+            assertThat(underTest.allowUserToSetDownloadDestination()).isFalse()
+        }
 
     private fun stubPauseTransfers(isPause: Boolean) {
         val megaError = mock<MegaError> {

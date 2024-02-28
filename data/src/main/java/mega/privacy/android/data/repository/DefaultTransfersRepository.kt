@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository
 
+import android.os.Build
 import androidx.work.WorkInfo
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -30,6 +31,7 @@ import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.isBackgroundTransfer
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.SDCardGateway
@@ -101,6 +103,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val cancelTokenProvider: CancelTokenProvider,
     private val megaNodeMapper: MegaNodeMapper,
     private val sdCardGateway: SDCardGateway,
+    private val deviceGateway: DeviceGateway,
 ) : TransferRepository {
 
     private val monitorPausedTransfers = MutableStateFlow(false)
@@ -498,6 +501,10 @@ internal class DefaultTransfersRepository @Inject constructor(
         workerManagerGateway.monitorDownloadsStatusInfo().map { workInfos ->
             workInfos.any { it.state == WorkInfo.State.ENQUEUED }
         }
+
+    override suspend fun allowUserToSetDownloadDestination(): Boolean = withContext(ioDispatcher) {
+        deviceGateway.getSdkVersionInt() < Build.VERSION_CODES.R
+    }
 
     override fun isChatUploadsWorkerEnqueuedFlow() =
         workerManagerGateway.monitorChatUploadsStatusInfo().map { workInfos ->

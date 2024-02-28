@@ -32,6 +32,7 @@ import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfers
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetCurrentDownloadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownloadDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -74,6 +75,7 @@ class StartDownloadComponentViewModelTest {
     private val monitorOngoingActiveTransfersUseCase = mock<MonitorOngoingActiveTransfersUseCase>()
     private val getCurrentDownloadSpeedUseCase = mock<GetCurrentDownloadSpeedUseCase>()
     private val getFilePreviewDownloadPathUseCase = mock<GetFilePreviewDownloadPathUseCase>()
+    private val shouldAskDownloadDestinationUseCase = mock<ShouldAskDownloadDestinationUseCase>()
 
 
     private val node: TypedFileNode = mock()
@@ -98,6 +100,7 @@ class StartDownloadComponentViewModelTest {
             setAskBeforeLargeDownloadsSettingUseCase,
             monitorOngoingActiveTransfersUseCase,
             getCurrentDownloadSpeedUseCase,
+            shouldAskDownloadDestinationUseCase,
         )
 
     }
@@ -120,6 +123,7 @@ class StartDownloadComponentViewModelTest {
             setAskBeforeLargeDownloadsSettingUseCase,
             monitorOngoingActiveTransfersUseCase,
             getCurrentDownloadSpeedUseCase,
+            shouldAskDownloadDestinationUseCase,
         )
         initialStub()
     }
@@ -275,6 +279,16 @@ class StartDownloadComponentViewModelTest {
         verifyNoInteractions(setAskBeforeLargeDownloadsSettingUseCase)
     }
 
+    @Test
+    fun `test that AskDestination event is triggered when a download starts and shouldAskDownloadDestinationUseCase is true`() =
+        runTest {
+            commonStub()
+            whenever(shouldAskDownloadDestinationUseCase()).thenReturn(true)
+            val event = TransferTriggerEvent.StartDownloadNode(nodes)
+            underTest.startDownloadWithoutConfirmation(event)
+            assertCurrentEventIsEqualTo(StartDownloadTransferEvent.AskDestination(event))
+        }
+
     private fun provideDownloadNodeParameters() = listOf(
         Arguments.of(
             MultiTransferEvent.ScanningFoldersFinished,
@@ -309,6 +323,7 @@ class StartDownloadComponentViewModelTest {
 
         whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(totalFileSizeOfNodesUseCase(any())).thenReturn(1)
+        whenever(shouldAskDownloadDestinationUseCase()).thenReturn(false)
         stubStartDownload(flowOf(MultiTransferEvent.ScanningFoldersFinished))
     }
 
