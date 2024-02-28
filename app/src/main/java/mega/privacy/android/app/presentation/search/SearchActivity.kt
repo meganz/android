@@ -54,8 +54,8 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImag
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
@@ -68,6 +68,8 @@ import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
 import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
+import mega.privacy.android.app.textEditor.TextEditorActivity
+import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.domain.entity.ThemeMode
@@ -187,7 +189,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
 
             val nodeActionState by nodeActionsViewModel.state.collectAsStateWithLifecycle()
             val transferState by transfersManagementViewModel.state.collectAsStateWithLifecycle()
-            val state by viewModel.state.collectAsStateWithLifecycle()
             // Remember a SystemUiController
             val systemUiController = rememberSystemUiController()
             val useDarkIcons = themeMode.isDarkMode().not()
@@ -366,6 +367,10 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                     )
                 }
 
+                is FileNodeContent.TextContent -> openTextEditorActivity(
+                    currentFileNode = currentFileNode,
+                )
+
                 else -> {
 
                 }
@@ -374,6 +379,14 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
         }.onFailure {
             Timber.e(it)
         }
+    }
+
+    private fun openTextEditorActivity(currentFileNode: TypedFileNode) {
+        val textFileIntent = Intent(this, TextEditorActivity::class.java)
+        textFileIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, currentFileNode.id.longValue)
+            .putExtra(TextEditorViewModel.MODE, TextEditorViewModel.VIEW_MODE)
+            .putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, currentFileNode.type.mimeType)
+        startActivity(textFileIntent)
     }
 
     private fun openPdfActivity(

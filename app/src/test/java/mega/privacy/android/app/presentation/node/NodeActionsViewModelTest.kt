@@ -16,9 +16,9 @@ import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageM
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.ChatRequestResult
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeContentUri
@@ -74,7 +74,6 @@ class NodeActionsViewModelTest {
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val sampleNode = mock<TypedFileNode>().stub {
         on { id } doReturn NodeId(123)
-        on { type } doReturn PdfFileTypeInfo
     }
     private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -240,12 +239,16 @@ class NodeActionsViewModelTest {
     @Test
     fun `test that getNodeContentUriUseCase is called when getNodeContentUri is invoked`() =
         runTest {
-            whenever(getNodeContentUriUseCase(sampleNode)).thenReturn(
+            val pdfNode = mock<TypedFileNode>().stub {
+                on { id } doReturn NodeId(123)
+                on { type } doReturn PdfFileTypeInfo
+            }
+            whenever(getNodeContentUriUseCase(pdfNode)).thenReturn(
                 NodeContentUri.LocalContentUri(File("path"))
             )
             initViewModel()
-            viewModel.handleFileNodeClicked(sampleNode)
-            verify(getNodeContentUriUseCase).invoke(sampleNode)
+            viewModel.handleFileNodeClicked(pdfNode)
+            verify(getNodeContentUriUseCase).invoke(pdfNode)
         }
 
     @Test
@@ -264,6 +267,22 @@ class NodeActionsViewModelTest {
             val fileContent = viewModel.handleFileNodeClicked(imageNode)
             verify(getFeatureFlagValueUseCase).invoke(AppFeatures.ImagePreview)
             Truth.assertThat(fileContent).isInstanceOf(FileNodeContent.ImageForNode::class.java)
+        }
+
+    @Test
+    fun `test that text file node content is returned when file node is text file node`() =
+        runTest {
+            val textNode = mock<TypedFileNode> {
+                whenever(it.type).thenReturn(
+                    TextFileTypeInfo(
+                        mimeType = "text/plain",
+                        extension = "txt"
+                    )
+                )
+            }
+            initViewModel()
+            val fileContent = viewModel.handleFileNodeClicked(textNode)
+            Truth.assertThat(fileContent).isInstanceOf(FileNodeContent.TextContent::class.java)
         }
 }
 

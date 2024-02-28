@@ -21,6 +21,7 @@ import mega.privacy.android.app.presentation.transfers.startdownload.model.Trans
 import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -389,12 +390,17 @@ class NodeActionsViewModel @Inject constructor(
      *
      * @param fileNode
      */
-    suspend fun handleFileNodeClicked(fileNode: TypedFileNode) = when (fileNode.type) {
-        is PdfFileTypeInfo -> FileNodeContent.Pdf(
+    suspend fun handleFileNodeClicked(fileNode: TypedFileNode) = when {
+        fileNode.type is PdfFileTypeInfo -> FileNodeContent.Pdf(
             uri = getNodeContentUriUseCase(fileNode)
         )
 
-        is ImageFileTypeInfo -> FileNodeContent.ImageForNode(getFeatureFlagValueUseCase(AppFeatures.ImagePreview))
+        fileNode.type is TextFileTypeInfo && fileNode.size <= TextFileTypeInfo.MAX_SIZE_OPENABLE_TEXT_FILE -> FileNodeContent.TextContent
+
+        fileNode.type is ImageFileTypeInfo -> FileNodeContent.ImageForNode(
+            getFeatureFlagValueUseCase(AppFeatures.ImagePreview)
+        )
+
         else -> FileNodeContent.TextContent
 
     }
