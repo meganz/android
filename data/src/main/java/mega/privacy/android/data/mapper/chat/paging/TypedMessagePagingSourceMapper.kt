@@ -51,16 +51,8 @@ class TypedMessagePagingSourceMapper @Inject constructor(
             database.invalidationTracker.addObserver(invalidationObserver)
         }
 
-        override fun getRefreshKey(state: PagingState<Int, TypedMessage>): Int? {
-            return originalSource.getRefreshKey(
-                PagingState(
-                    pages = emptyList(),
-                    anchorPosition = state.anchorPosition,
-                    config = state.config,
-                    leadingPlaceholderCount = 0,
-                )
-            )
-        }
+        override fun getRefreshKey(state: PagingState<Int, TypedMessage>) =
+            state.anchorPosition?.let { maxOf(0, it - (state.config.initialLoadSize / 2)) }
 
         override suspend fun load(params: LoadParams<Int>): LoadResult<Int, TypedMessage> {
             Timber.d("Paging mediator mapper load: params : $params")

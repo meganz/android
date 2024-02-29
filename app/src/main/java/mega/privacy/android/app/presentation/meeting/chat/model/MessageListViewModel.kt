@@ -148,6 +148,11 @@ class MessageListViewModel @Inject constructor(
         }
     }
 
+    private val remoteMediator = remoteMediatorFactory.create(
+        chatId = chatId,
+        coroutineScope = viewModelScope,
+    )
+
     private val pagedFlow = unreadCount
         .filterNotNull()
         .flatMapLatest { unreadCount ->
@@ -156,10 +161,7 @@ class MessageListViewModel @Inject constructor(
                     pageSize = 32,
                     initialLoadSize = unreadCount.coerceAtLeast(32),
                 ),
-                remoteMediator = remoteMediatorFactory.create(
-                    chatId = chatId,
-                    coroutineScope = viewModelScope,
-                ),
+                remoteMediator = remoteMediator,
             ) {
                 getChatPagingSourceUseCase(chatId)
             }.flow.cachedIn(viewModelScope).combine(
