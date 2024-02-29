@@ -303,6 +303,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
+import mega.privacy.android.analytics.Analytics;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -419,6 +420,7 @@ import mega.privacy.android.domain.entity.contacts.ContactLink;
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus;
 import mega.privacy.android.domain.usecase.GetPushToken;
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase;
+import mega.privacy.mobile.analytics.event.ChatConversationScreenEvent;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1451,6 +1453,9 @@ public class ChatActivity extends PasscodeActivity
     public void onCreate(Bundle savedInstanceState) {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
+
+        Analytics.INSTANCE.getTracker().trackEvent(ChatConversationScreenEvent.INSTANCE);
+
         viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
         startDownloadViewModel = new ViewModelProvider(this).get(StartDownloadViewModel.class);
         waitingRoomManagementViewModel = new ViewModelProvider(this).get(WaitingRoomManagementViewModel.class);
