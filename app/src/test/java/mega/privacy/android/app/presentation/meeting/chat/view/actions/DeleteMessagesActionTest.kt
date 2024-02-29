@@ -76,6 +76,7 @@ class DeleteMessagesActionTest {
             underTest.bottomSheetMenuItem(
                 messages = emptySet(),
                 hideBottomSheet = {},
+                setAction = {},
             )
         )
 

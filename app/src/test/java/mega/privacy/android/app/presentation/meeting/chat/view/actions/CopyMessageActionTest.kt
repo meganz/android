@@ -64,7 +64,8 @@ class CopyMessageActionTest {
     fun `test that composable contains bottom sheet option`() {
         val bottomSheetMenuItem = underTest.bottomSheetMenuItem(
             messages = setOf(mock<NormalMessage>()),
-            hideBottomSheet = {}
+            hideBottomSheet = {},
+            setAction = {},
         )
         composeTestRule.setContent { bottomSheetMenuItem() }
         composeTestRule.onNodeWithTag(underTest.bottomSheetItemTestTag).assertExists()

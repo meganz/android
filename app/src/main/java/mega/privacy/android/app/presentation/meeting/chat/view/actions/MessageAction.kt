@@ -8,6 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import mega.privacy.android.core.ui.model.MenuActionWithClick
+import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
 
@@ -23,12 +25,16 @@ abstract class MessageAction(
     @DrawableRes val icon: Int,
     private val testTag: String,
 ) {
-    private val pending = mutableSetOf<TypedMessage>()
 
     /**
      * Bottom sheet item test tag
      */
     val bottomSheetItemTestTag = "chat_message_options_sheet:$testTag"
+
+    /**
+     * Toolbar menu item test tag
+     */
+    val toolbarMenuItemTestTag = "chat_message_toolbar:$testTag"
 
     /**
      * Applies to
@@ -48,9 +54,47 @@ abstract class MessageAction(
     fun bottomSheetMenuItem(
         messages: Set<TypedMessage>,
         hideBottomSheet: () -> Unit,
+        setAction: ((@Composable () -> Unit)?) -> Unit,
     ): @Composable () -> Unit = bottomSheetItem {
-        pending.addAll(messages)
+        setAction {
+            OnTrigger(messages = messages) {
+                setAction(null)
+            }
+        }
         hideBottomSheet()
+    }
+
+    /**
+     * Toolbar menu item with click
+     *
+     * @param messages
+     * @param exitSelectMode
+     */
+    fun toolbarMenuItemWithClick(
+        messages: Set<TypedMessage>,
+        exitSelectMode: () -> Unit,
+        setAction: ((@Composable () -> Unit)?) -> Unit,
+    ): MenuActionWithClick =
+        MenuActionWithClick(
+            menuAction = toolbarMenuItem(),
+            onClick = {
+                setAction {
+                    OnTrigger(messages = messages) {
+                        setAction(null)
+                    }
+                }
+                exitSelectMode()
+            }
+        )
+
+    private fun toolbarMenuItem() = object : MenuActionWithIcon {
+        @Composable
+        override fun getIconPainter() = painterResource(id = icon)
+
+        @Composable
+        override fun getDescription() = stringResource(id = text)
+
+        override val testTag: String = toolbarMenuItemTestTag
     }
 
     /**
@@ -76,17 +120,6 @@ abstract class MessageAction(
      */
     @Composable
     abstract fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit)
-
-
-    /**
-     * Call if triggered
-     */
-    @Composable
-    fun CallIfTriggered() {
-        if (pending.isNotEmpty()) {
-            OnTrigger(pending) { pending.clear() }
-        }
-    }
 
 
 }

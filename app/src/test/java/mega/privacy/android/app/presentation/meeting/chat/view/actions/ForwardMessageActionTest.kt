@@ -65,7 +65,9 @@ class ForwardMessageActionTest {
         composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
                 messages = emptySet(),
-            ) {}
+                setAction = {},
+                hideBottomSheet = {}
+            )
         )
 
         composeTestRule.onNodeWithTag(underTest.bottomSheetItemTestTag).assertExists()

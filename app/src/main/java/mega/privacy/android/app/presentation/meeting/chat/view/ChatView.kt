@@ -406,10 +406,11 @@ internal fun ChatView(
 
             selectedMessages = emptySet()
         }
-
-    actions.forEach {
-        it.CallIfTriggered()
+    var pendingAction: (@Composable () -> Unit)? by remember {
+        mutableStateOf(null)
     }
+
+    pendingAction?.let { it() }
 
     with(uiState) {
         val addContactLauncher =
@@ -495,14 +496,16 @@ internal fun ChatView(
                             onMoreReactionsClicked = { showReactionPicker = true },
                             actions = actions.filter { action ->
                                 action.appliesTo(selectedMessages)
-                            }.map {
-                                it.bottomSheetMenuItem(
+                            }.map { action ->
+                                action.bottomSheetMenuItem(
                                     messages = selectedMessages,
-                                ) {
-                                    coroutineScope.launch {
-                                        messageOptionsModalSheetState.hide()
-                                    }
-                                }
+                                    hideBottomSheet = {
+                                        coroutineScope.launch {
+                                            messageOptionsModalSheetState.hide()
+                                        }
+                                    },
+                                    setAction = { pendingAction = it }
+                                )
                             },
                             sheetState = messageOptionsModalSheetState,
                         )
@@ -594,6 +597,15 @@ internal fun ChatView(
                         SelectModeAppBar(
                             title = "",
                             onNavigationPressed = exitSelectMode,
+                            actions = actions.filter {
+                                it.appliesTo(selectedMessages)
+                            }.map { action ->
+                                action.toolbarMenuItemWithClick(
+                                    messages = selectedMessages,
+                                    exitSelectMode = exitSelectMode,
+                                    setAction = { pendingAction = it }
+                                )
+                            }
                         )
                     } else {
                         Column {

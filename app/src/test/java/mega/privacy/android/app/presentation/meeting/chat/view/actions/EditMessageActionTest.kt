@@ -59,7 +59,9 @@ class EditMessageActionTest {
         composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
                 messages = emptySet(),
-            ) {}
+                hideBottomSheet = {},
+                setAction = {},
+            )
         )
 
         composeTestRule.onNodeWithTag(underTest.bottomSheetItemTestTag).assertExists()

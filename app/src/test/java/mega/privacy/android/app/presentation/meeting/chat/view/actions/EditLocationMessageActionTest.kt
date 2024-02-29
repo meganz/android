@@ -65,6 +65,7 @@ class EditLocationMessageActionTest {
             underTest.bottomSheetMenuItem(
                 messages = messages,
                 hideBottomSheet = {},
+                setAction = {},
             )
         )
 
