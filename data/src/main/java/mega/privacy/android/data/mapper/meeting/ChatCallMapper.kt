@@ -64,7 +64,7 @@ internal class ChatCallMapper @Inject constructor(
         usersPendingSpeakRequest = megaChatCall.toUserPendingSpeakRequest(),
         waitingRoomStatus = waitingRoomStatusMapper(megaChatCall.wrJoiningState),
         waitingRoom = chatWaitingRoomMapper(megaChatCall.waitingRoom),
-        handleList = handleListMapper(megaChatCall.handleList),
+        handleList = if (megaChatCall.handleList == null) null else handleListMapper(megaChatCall.handleList),
         speakersList = handleListMapper(megaChatCall.speakersList),
         speakRequestsList = handleListMapper(megaChatCall.speakRequestsList),
     )
