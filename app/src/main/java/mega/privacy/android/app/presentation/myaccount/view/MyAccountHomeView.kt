@@ -38,6 +38,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -66,12 +67,15 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavController
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.apiserver.view.ChangeApiServerDialog
 import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
 import mega.privacy.android.app.presentation.avatar.view.Avatar
 import mega.privacy.android.app.presentation.changepassword.view.Constants
+import mega.privacy.android.app.presentation.meeting.dialog.view.ChangeSFUIdDialog
 import mega.privacy.android.app.presentation.myaccount.MyAccountHomeViewActions
 import mega.privacy.android.app.presentation.myaccount.model.MyAccountHomeUIState
 import mega.privacy.android.app.presentation.myaccount.model.mapper.toAccountAttributes
@@ -471,6 +475,7 @@ private fun AccountInfoSection(
     uiActions: MyAccountHomeViewActions,
     modifier: Modifier = Modifier,
 ) {
+    val scope = rememberCoroutineScope()
     var lastSessionClick by remember { mutableIntStateOf(0) }
     val isExpiredOrGracePeriod =
         uiState.isMasterBusinessAccount && uiState.isBusinessStatusActive.not()
@@ -480,6 +485,7 @@ private fun AccountInfoSection(
         uiState.hasRenewableSubscription || uiState.hasExpireAbleSubscription
 
     var showChangeApiServerDialog by rememberSaveable { mutableStateOf(false) }
+    var showChangeSFUIdDialog by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -625,6 +631,13 @@ private fun AccountInfoSection(
             isIconMode = true,
             onClickListener = {
                 lastSessionClick++
+                scope.launch {
+                    delay(2000)
+                    if (lastSessionClick == 3) {
+                        lastSessionClick = 0
+                        showChangeSFUIdDialog = true
+                    }
+                }
 
                 if (lastSessionClick >= CLICKS_TO_CHANGE_API_SERVER) {
                     showChangeApiServerDialog = true
@@ -637,6 +650,11 @@ private fun AccountInfoSection(
 
     if (showChangeApiServerDialog) {
         ChangeApiServerDialog(onDismissRequest = { showChangeApiServerDialog = false })
+    }
+    if (showChangeSFUIdDialog) {
+        ChangeSFUIdDialog(onDismiss = {
+            showChangeSFUIdDialog = false
+        })
     }
 }
 

@@ -19,7 +19,7 @@ class ChangeSFUIdDialogTest {
 
     private fun initComposeRuleContent() {
         composeRule.setContent {
-            ChangeSFUIdDialog()
+            ChangeSFUIdDialog(onChange = {}, onDismiss = {})
         }
     }
 
