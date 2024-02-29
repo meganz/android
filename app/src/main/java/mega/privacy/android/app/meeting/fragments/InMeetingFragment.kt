@@ -676,13 +676,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         initFloatingWindowContainerDragListener(view)
         initFloatingPanel()
 
-        val meetingName: String = args.meetingName
-        meetingName.let {
-            if (!TextUtil.isTextEmpty(it)) {
-                sharedModel.setMeetingsName(it)
-            }
-        }
-
         binding.hostLeaveCallDialogComposeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
@@ -701,9 +694,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
         }
-
-        // Get meeting link from the arguments supplied when the fragment was instantiated
-        sharedModel.updateMeetingLink(args.meetingLink)
 
         initLiveEventBus()
         takeActionByArgs()
@@ -747,59 +737,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
             }
 
-            MEETING_ACTION_GUEST -> {
-                Timber.d("Action guest")
-                inMeetingViewModel.chatLogout(
-                    SimpleChatRequestListener(
-                        MegaChatRequest.TYPE_LOGOUT,
-                        onSuccess = { _, _, _ ->
-                            Timber.d("Action guest. Log out, done")
-                            inMeetingViewModel.createEphemeralAccountAndJoinChat(
-                                args.firstName,
-                                args.lastName,
-                                SimpleMegaRequestListener(
-                                    MegaRequest.TYPE_CREATE_ACCOUNT,
-                                    onSuccess = { _, _, _ ->
-                                        Timber.d("Action guest. Create ephemeral Account, done")
-                                        inMeetingViewModel.openChatPreview(
-                                            sharedModel.state.value.meetingLink,
-                                            SimpleChatRequestListener(
-                                                MegaChatRequest.TYPE_LOAD_PREVIEW,
-                                                onSuccess = { _, request, _ ->
-                                                    Timber.d(
-                                                        "Action guest. Open chat preview, done. Param type: ${request.paramType}, Chat id: ${request.chatHandle}, Flag: ${request.flag}, Call id: ${
-                                                            request.megaHandleList?.get(
-                                                                0
-                                                            )
-                                                        }"
-                                                    )
-                                                    MegaApplication.getChatManagement()
-                                                        .setOpeningMeetingLink(
-                                                            request.chatHandle,
-                                                            true
-                                                        )
-
-                                                    camIsEnable =
-                                                        (sharedModel.cameraLiveData.value
-                                                            ?: false)
-                                                    speakerIsEnable =
-                                                        (sharedModel.speakerLiveData.value
-                                                            ?: false) == AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
-
-                                                    inMeetingViewModel.joinPublicChat(
-                                                        args.chatId,
-                                                        AutoJoinPublicChatListener(
-                                                            context,
-                                                            this@InMeetingFragment
-                                                        )
-                                                    )
-                                                })
-                                        )
-                                    })
-                            )
-                        })
-                )
-            }
+            MEETING_ACTION_GUEST -> inMeetingViewModel.joinMeetingAsGuest(
+                sharedModel.state.value.meetingLink,
+                sharedModel.state.value.guestFirstName,
+                sharedModel.state.value.guestLastName
+            )
 
             MEETING_ACTION_RINGING_VIDEO_ON -> {
                 Timber.d("Action ringing with video on")
@@ -1021,19 +963,25 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun collectFlows() {
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state) { state: InMeetingUiState ->
 
-            floatingBottomSheet.isVisible = !state.showEndMeetingAsOnlyHostBottomPanel
+            when {
+                state.shouldFinish -> finishActivity()
+                state.joinedAsGuest -> {
+                    inMeetingViewModel.onJoinedAsGuestConsumed()
+                    controlWhenJoinedAChat(state.currentChatId)
+                }
 
-            if (state.error != null) {
-                sharedModel.showSnackBar(getString(state.error))
-            }
-            if (state.updateListUi) {
-                inMeetingViewModel.onUpdateListConsumed()
-                speakerViewCallFragment?.let {
-                    if (it.isAdded) {
-                        it.updateFullList()
+                state.error != null -> sharedModel.showSnackBar(getString(state.error))
+                state.updateListUi -> {
+                    inMeetingViewModel.onUpdateListConsumed()
+                    speakerViewCallFragment?.let {
+                        if (it.isAdded) {
+                            it.updateFullList()
+                        }
                     }
                 }
             }
+
+            floatingBottomSheet.isVisible = !state.showEndMeetingAsOnlyHostBottomPanel
 
             if (state.chatTitle.isNotEmpty()) {
                 toolbarTitle?.apply {
@@ -2068,7 +2016,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun initStartMeeting() {
         if (sharedModel.state.value.chatId == MEGACHAT_INVALID_HANDLE) {
-            val nameChosen: String? = sharedModel.getMeetingName()
+            val nameChosen: String? = sharedModel.state.value.meetingName
             nameChosen?.let {
                 when {
                     !TextUtil.isTextEmpty(it) -> {

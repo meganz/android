@@ -38,6 +38,8 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
  * @property updateListUi                           True, List was sorted and need to be updated. False, if not.
  * @property showEndMeetingAsHostBottomPanel        True, show bottom sheet when a host leaves the call. False otherwise
  * @property showEndMeetingAsOnlyHostBottomPanel    True, show bottom sheet when the only host leaves the call. False otherwise
+ * @property joinedAsGuest                          True, joined as guest. False, otherwise.
+ * @property shouldFinish                           True, if the activity should finish. False, if not.
  */
 data class InMeetingUiState(
     val error: Int? = null,
@@ -65,5 +67,7 @@ data class InMeetingUiState(
     val isMeeting: Boolean = false,
     val updateListUi: Boolean = false,
     val showEndMeetingAsHostBottomPanel: Boolean = false,
-    val showEndMeetingAsOnlyHostBottomPanel: Boolean = false
+    val showEndMeetingAsOnlyHostBottomPanel: Boolean = false,
+    val joinedAsGuest: Boolean = false,
+    val shouldFinish: Boolean = false,
 )

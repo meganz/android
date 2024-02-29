@@ -100,15 +100,17 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
                             }, true).show(parentFragmentManager,
                                 MeetingHasEndedDialogFragment.TAG)
                         } else {
+                            sharedModel.updateGuestFullNameAndMeetingLink(
+                                firstName,
+                                lastName,
+                                meetingLink,
+                                meetingName
+                            )
                             val action = JoinMeetingFragmentDirections
                                 .actionGlobalInMeeting(
                                     MeetingActivity.MEETING_ACTION_GUEST,
                                     chatId,
                                     MEGACHAT_INVALID_HANDLE,
-                                    meetingName,
-                                    meetingLink,
-                                    firstName,
-                                    lastName
                                 )
                             findNavController().navigate(action)
                         }

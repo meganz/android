@@ -280,10 +280,6 @@ class MeetingActivityViewModel @Inject constructor(
     val monitorConnectivityEvent =
         monitorConnectivityUseCase().shareIn(viewModelScope, SharingStarted.Eagerly)
 
-    // Name of meeting
-    private val _meetingNameLiveData: MutableLiveData<String> = MutableLiveData<String>()
-    val meetingNameLiveData: LiveData<String> = _meetingNameLiveData
-
     // Show snack bar
     private val _snackBarLiveData = MutableLiveData("")
     val snackBarLiveData: LiveData<String> = _snackBarLiveData
@@ -317,10 +313,10 @@ class MeetingActivityViewModel @Inject constructor(
         }
 
     private val titleMeetingChangeObserver =
-        Observer<MegaChatRoom> { chatRoom ->
-            meetingActivityRepository.getChatRoom(_state.value.chatId)?.let {
-                if (it.chatId == chatRoom.chatId) {
-                    _meetingNameLiveData.value = getTitleChat(it)
+        Observer<MegaChatRoom> { megaChatRoom ->
+            meetingActivityRepository.getChatRoom(_state.value.chatId)?.let { chatRoom ->
+                if (chatRoom.chatId == megaChatRoom.chatId) {
+                    _state.update { it.copy(meetingName = getTitleChat(chatRoom)) }
                 }
             }
         }
@@ -396,6 +392,25 @@ class MeetingActivityViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Update guest full name and meeting link
+     *
+     * @param firstName First name of a guest
+     * @param lastName Last name of a guest
+     * @param meetingLink   Meeting link
+     */
+    fun updateGuestFullNameAndMeetingLink(
+        firstName: String,
+        lastName: String,
+        meetingLink: String,
+        meetingName: String
+    ) =
+        _state.update { state ->
+            state.copy(
+                guestFirstName = firstName, guestLastName = lastName, meetingLink = meetingLink, meetingName = meetingName
+            )
+        }
 
     /**
      * Control when calls are to be switched
@@ -948,18 +963,10 @@ class MeetingActivityViewModel @Inject constructor(
      *
      * @param name The name
      */
-    fun setMeetingsName(name: String) {
-        _meetingNameLiveData.value = name
-    }
-
-    /**
-     * Method for setting a title for the meeting
-     *
-     * @return The name
-     */
-    fun getMeetingName(): String? {
-        return _meetingNameLiveData.value
-    }
+    fun setMeetingsName(name: String) =
+        _state.update {
+            it.copy(meetingName = name)
+        }
 
     /**
      * Response of clicking mic fab

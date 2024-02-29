@@ -68,11 +68,14 @@ import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
+import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
+import mega.privacy.android.domain.usecase.login.ChatLogoutUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.EnableAudioLevelMonitorUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.IsAudioLevelMonitorEnabledUseCase
+import mega.privacy.android.domain.usecase.meeting.JoinMeetingAsGuestUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 
 import mega.privacy.android.domain.usecase.meeting.RequestHighResolutionVideoUseCase
@@ -91,7 +94,6 @@ import nz.mega.sdk.MegaChatRoom.PRIV_MODERATOR
 import nz.mega.sdk.MegaChatSession
 import nz.mega.sdk.MegaChatVideoListenerInterface
 import nz.mega.sdk.MegaHandleList
-import nz.mega.sdk.MegaRequestListenerInterface
 import org.jetbrains.anko.defaultSharedPreferences
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -122,6 +124,9 @@ import javax.inject.Inject
  * @property getChatCallUseCase                 [GetChatCallUseCase]
  * @property getChatRoomUseCase                 [GetChatRoomUseCase]
  * @property monitorChatRoomUpdates             [MonitorChatRoomUpdates]
+ * @property joinPublicChatUseCase              [JoinPublicChatUseCase]
+ * @property joinMeetingAsGuestUseCase          [JoinMeetingAsGuestUseCase]
+ * @property chatLogoutUseCase                  [ChatLogoutUseCase]
  * @property state                              Current view state as [InMeetingUiState]
  */
 @HiltViewModel
@@ -151,6 +156,9 @@ class InMeetingViewModel @Inject constructor(
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val broadcastCallEndedUseCase: BroadcastCallEndedUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
+    private val joinMeetingAsGuestUseCase: JoinMeetingAsGuestUseCase,
+    private val joinPublicChatUseCase: JoinPublicChatUseCase,
+    private val chatLogoutUseCase: ChatLogoutUseCase
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -901,6 +909,95 @@ class InMeetingViewModel @Inject constructor(
      */
     fun isCallOrSessionOnHoldOfOneToOneCall(): Boolean =
         if (isCallOnHold()) true else isSessionOnHoldOfOneToOneCall()
+
+    /**
+     * Control when join a meeting as a guest
+     *
+     * @param meetingLink   Meeting link
+     * @param firstName     Guest first name
+     * @param lastName      Guest last name
+     */
+    fun joinMeetingAsGuest(meetingLink: String, firstName: String, lastName: String) {
+        viewModelScope.launch {
+            runCatching {
+                joinMeetingAsGuestUseCase(meetingLink, firstName, lastName)
+            }.onSuccess {
+                chatManagement
+                    .setOpeningMeetingLink(
+                        state.value.currentChatId,
+                        true
+                    )
+                autoJoinPublicChat()
+
+            }.onFailure { exception ->
+                Timber.e(exception)
+                chatLogout()
+            }
+        }
+    }
+
+    /**
+     * Chat logout
+     */
+    private fun chatLogout() {
+        viewModelScope.launch {
+            runCatching {
+                chatLogoutUseCase()
+            }.onSuccess {
+                _state.update {
+                    it.copy(
+                        shouldFinish = true,
+                    )
+                }
+            }.onFailure { exception ->
+                Timber.e(exception)
+                _state.update {
+                    it.copy(
+                        shouldFinish = true,
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Auto join public chat
+     */
+    private fun autoJoinPublicChat() {
+        if (!chatManagement.isAlreadyJoining(state.value.currentChatId)) {
+            chatManagement.addJoiningChatId(state.value.currentChatId)
+            viewModelScope.launch {
+                runCatching {
+                    joinPublicChatUseCase(state.value.currentChatId)
+                }.onSuccess {
+                    chatManagement.removeJoiningChatId(state.value.currentChatId)
+                    chatManagement.broadcastJoinedSuccessfully()
+                    _state.update {
+                        it.copy(
+                            joinedAsGuest = true,
+                        )
+                    }
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                    chatManagement.removeJoiningChatId(state.value.currentChatId)
+                    _state.update {
+                        it.copy(
+                            shouldFinish = true,
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets joinedAsGuest in state as consumed.
+     */
+    fun onJoinedAsGuestConsumed() = _state.update {
+        it.copy(
+            joinedAsGuest = false,
+        )
+    }
 
     /**
      * Method to know if a session is on hold in one to one call
@@ -2389,25 +2486,6 @@ class InMeetingViewModel @Inject constructor(
 
         return 0
     }
-
-    /**
-     * Log out of the chat for join as guest action
-     */
-    fun chatLogout(listener: MegaChatRequestListenerInterface) =
-        inMeetingRepository.chatLogout(listener)
-
-    /**
-     * Method to create an ephemera plus plus account, required before joining the chat room
-     *
-     * @param firstName First name of the guest
-     * @param lastName Last name of the guest
-     * @param listener MegaRequestListenerInterface
-     */
-    fun createEphemeralAccountAndJoinChat(
-        firstName: String,
-        lastName: String,
-        listener: MegaRequestListenerInterface,
-    ) = inMeetingRepository.createEphemeralAccountPlusPlus(firstName, lastName, listener)
 
     /**
      * Method to open chat preview when joining as a guest

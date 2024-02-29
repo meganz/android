@@ -31,6 +31,12 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
             )
         } else {
             val chatRoom = sharedModel.getSpecificChat(chatId)
+            sharedModel.updateGuestFullNameAndMeetingLink(
+                guestFisrtName,
+                guestLastName,
+                meetingLink,
+                meetingName
+            )
             if (chatRoom != null && chatRoom.ownPrivilege == MegaChatRoom.PRIV_RM) {
                 Timber.d("I was a member of the chat but was removed, I have to re-join")
                 findNavController().navigate(
@@ -39,10 +45,6 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
                             action = MEETING_ACTION_REJOIN,
                             chatId = chatId,
                             publicChatHandle = publicChatHandle,
-                            meetingName = meetingName,
-                            meetingLink = meetingLink,
-                            firstName = guestFisrtName,
-                            lastName = guestLastName,
                         )
                 )
             } else {
@@ -53,10 +55,6 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
                             action = MEETING_ACTION_JOIN,
                             chatId = chatId,
                             publicChatHandle = publicChatHandle,
-                            meetingName = meetingName,
-                            meetingLink = meetingLink,
-                            firstName = guestFisrtName,
-                            lastName = guestLastName,
                         )
                 )
             }

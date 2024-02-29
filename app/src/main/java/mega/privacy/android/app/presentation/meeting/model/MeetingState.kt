@@ -58,6 +58,9 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property newInvitedParticipants                     List of emails of the new invited participants.
  * @property snackbarMsg                                State to show snackbar message
  * @property subscriptionPlan                           [AccountType]
+ * @property guestFirstName                             Guest first name
+ * @property guestLastName                              Guest last name
+ * @property meetingName                                Meeting name
  */
 data class MeetingState(
     val chatId: Long = -1L,
@@ -102,6 +105,9 @@ data class MeetingState(
     val newInvitedParticipants: List<String> = emptyList(),
     val snackbarMsg: StateEventWithContent<String> = consumed(),
     val subscriptionPlan: AccountType = AccountType.UNKNOWN,
+    val guestFirstName: String = "",
+    val guestLastName: String = "",
+    val meetingName: String = "",
 ) {
     /**
      * Check if waiting room is opened
@@ -131,7 +137,8 @@ data class MeetingState(
     /**
      * Check if Mute all item should be shown
      */
-    fun shouldMuteAllItemBeShown() = hasHostPermission() && participantsSection == ParticipantsSection.InCallSection
+    fun shouldMuteAllItemBeShown() =
+        hasHostPermission() && participantsSection == ParticipantsSection.InCallSection
 
     /**
      * Check if Admit all item should be shown
