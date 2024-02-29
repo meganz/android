@@ -47,6 +47,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property exitFileBrowserEvent State Event that exits the File Browser
  * @property openedFolderNodeHandles Set of opened folder node handles
  * @property errorMessage The [StringRes] of the message to display in the error banner
+ * @property hasNoOpenedFolders true if there are no opened folders
  */
 data class FileBrowserState(
     val currentViewType: ViewType = ViewType.LIST,
@@ -77,4 +78,6 @@ data class FileBrowserState(
     val exitFileBrowserEvent: StateEvent = consumed,
     val openedFolderNodeHandles: Set<Long> = emptySet(),
     @StringRes val errorMessage: Int? = null,
-)
+) {
+    val hasNoOpenedFolders get() = openedFolderNodeHandles.isEmpty()
+}

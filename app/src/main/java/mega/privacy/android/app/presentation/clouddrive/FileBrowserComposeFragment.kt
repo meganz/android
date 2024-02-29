@@ -17,7 +17,6 @@ import androidx.appcompat.view.ActionMode
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -269,11 +268,17 @@ class FileBrowserComposeFragment : Fragment() {
         mediaHandle: Long,
         @StringRes errorMessage: Int?,
     ) {
-        if (isMediaDiscoveryOpen) {
-            SideEffect {
+        LaunchedEffect(
+            isMediaDiscoveryOpen,
+            isMediaDiscoveryOpenedByIconClick,
+            mediaHandle,
+            errorMessage
+        ) {
+            if (isMediaDiscoveryOpen) {
                 fileBrowserActionListener?.showMediaDiscoveryFromCloudDrive(
                     mediaHandle = mediaHandle,
                     isAccessedByIconClick = isMediaDiscoveryOpenedByIconClick,
+                    replaceFragment = fileBrowserViewModel.state().hasNoOpenedFolders,
                     errorMessage = errorMessage,
                 )
                 fileBrowserViewModel.onItemPerformedClicked()

@@ -4,11 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
@@ -18,6 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.ThemeMode
@@ -72,6 +81,20 @@ class DeviceCenterFragment : Fragment() {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val snackbarHostState = remember { SnackbarHostState() }
 
+                // Used to show a blank overlay when a folder is clicked
+                // so two toolbars are not visible at the same time
+                var showBlankOverlay by remember {
+                    mutableStateOf(false)
+                }
+
+                LaunchedEffect(showBlankOverlay) {
+                    // Automatically hide overlay after it's enabled
+                    if (showBlankOverlay) {
+                        delay(200)
+                        showBlankOverlay = false
+                    }
+                }
+
                 MegaAppTheme(isDark = themeMode.isDarkMode()) {
                     DeviceCenterScreen(
                         uiState = uiState,
@@ -96,6 +119,7 @@ class DeviceCenterFragment : Fragment() {
                                     DeviceCenterItemClicked.ItemType.Connection
                                 )
                             )
+                            showBlankOverlay = true
                             megaNavigator.openNodeInBackups(
                                 activity = this@DeviceCenterFragment.activity
                                     ?: return@DeviceCenterScreen,
@@ -122,6 +146,7 @@ class DeviceCenterFragment : Fragment() {
                                     DeviceCenterItemClicked.ItemType.Connection
                                 )
                             )
+                            showBlankOverlay = true
                             megaNavigator.openNodeInCloudDrive(
                                 activity = this@DeviceCenterFragment.activity
                                     ?: return@DeviceCenterScreen,
@@ -175,6 +200,13 @@ class DeviceCenterFragment : Fragment() {
                             }
                         }
                     )
+                    if (showBlankOverlay) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(MaterialTheme.colors.background)
+                        )
+                    }
                 }
             }
         }

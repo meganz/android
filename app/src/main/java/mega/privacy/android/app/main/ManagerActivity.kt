@@ -2875,10 +2875,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     override fun showMediaDiscoveryFromCloudDrive(
         mediaHandle: Long,
         isAccessedByIconClick: Boolean,
+        replaceFragment: Boolean,
         @StringRes errorMessage: Int?,
     ) = showMediaDiscovery(
         mediaHandle = mediaHandle,
         isAccessedByIconClick = isAccessedByIconClick,
+        replaceFragment = replaceFragment,
         errorMessage = errorMessage,
     )
 
@@ -2893,18 +2895,22 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun showMediaDiscovery(
         mediaHandle: Long,
         isAccessedByIconClick: Boolean,
+        replaceFragment: Boolean = false,
         @StringRes errorMessage: Int?,
     ) {
         // Remove the existing Media Discovery View first
         mediaDiscoveryFragment?.let { removeFragment(it) }
-        replaceFragment(
-            fragment = MediaDiscoveryFragment.newInstance(
-                mediaHandle = mediaHandle,
-                isAccessedByIconClick = isAccessedByIconClick,
-                errorMessage = errorMessage,
-            ),
-            fragmentTag = FragmentTag.MEDIA_DISCOVERY.tag,
-        )
+        MediaDiscoveryFragment.newInstance(
+            mediaHandle = mediaHandle,
+            isAccessedByIconClick = isAccessedByIconClick,
+            errorMessage = errorMessage,
+        ).apply {
+            if (replaceFragment) {
+                replaceFragment(this, FragmentTag.MEDIA_DISCOVERY.tag)
+            } else {
+                addFragment(this, FragmentTag.MEDIA_DISCOVERY.tag)
+            }
+        }
         with(viewModel) {
             onMediaDiscoveryOpened(mediaHandle)
             setIsFirstNavigationLevel(false)
@@ -2932,6 +2938,15 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
         ft.replace(R.id.fragment_container, fragment, fragmentTag)
         ft.commitNowAllowingStateLoss()
+    }
+
+    private fun addFragment(fragment: Fragment, fragmentTag: String?) {
+        supportFragmentManager.apply {
+            beginTransaction().apply {
+                add(R.id.fragment_container, fragment, fragmentTag)
+            }.commit()
+            executePendingTransactions()
+        }
     }
 
     /**
@@ -4056,6 +4071,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 showMediaDiscovery(
                     mediaHandle = fileBrowserViewModel.getSafeBrowserParentHandle(),
                     isAccessedByIconClick = false,
+                    replaceFragment = fileBrowserViewModel.state().hasNoOpenedFolders,
                     errorMessage = fileBrowserViewModel.state.value.errorMessage,
                 )
             }
@@ -5599,8 +5615,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 result.oldParentHandle ?: -1L
             when (drawerItem) {
                 DrawerItem.CLOUD_DRIVE -> {
+                    /** If the current folder node was moved to rubbish bin or another directory while
+                     *  in media discovery mode, then exit
+                     */
+                    if (isInMediaDiscovery()) {
+                        fileBrowserViewModel.setMediaDiscoveryVisibility(
+                            isMediaDiscoveryOpen = false,
+                            isMediaDiscoveryOpenedByIconClick = false
+                        )
+                        removeFragment(mediaDiscoveryFragment)
+                    }
                     fileBrowserViewModel.setFileBrowserHandle(oldParentHandle)
-                    refreshCloudDrive()
                 }
 
                 DrawerItem.BACKUPS -> {

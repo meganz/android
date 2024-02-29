@@ -10,7 +10,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.appcompat.view.ActionMode
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.core.view.MenuProvider
@@ -84,25 +88,29 @@ class MediaDiscoveryFragment : Fragment() {
                 val uiState by mediaDiscoveryViewModel.state.collectAsStateWithLifecycle()
 
                 MegaAppTheme(isDark = mode.isDarkMode()) {
-                    MediaDiscoveryView(
-                        mediaDiscoveryGlobalStateViewModel = mediaDiscoveryGlobalStateViewModel,
-                        mediaDiscoveryViewModel = mediaDiscoveryViewModel,
-                        onOKButtonClicked = this@MediaDiscoveryFragment::onOKButtonClicked,
-                        onSettingButtonClicked = this@MediaDiscoveryFragment::onSettingButtonClicked,
-                        showSettingDialog = showSettingsDialog(uiState.mediaDiscoveryViewSettings),
-                        onZoomIn = this@MediaDiscoveryFragment::handleZoomIn,
-                        onZoomOut = this@MediaDiscoveryFragment::handleZoomOut,
-                        onPhotoClicked = this@MediaDiscoveryFragment::onClick,
-                        onPhotoLongPressed = this@MediaDiscoveryFragment::onLongPress,
-                        onCardClick = mediaDiscoveryViewModel::onCardClick,
-                        onTimeBarTabSelected = mediaDiscoveryViewModel::onTimeBarTabSelected,
-                        onSwitchListView = this@MediaDiscoveryFragment::onSwitchListView,
-                        onCapture = this@MediaDiscoveryFragment::onCapture,
-                        onUploadFiles = this@MediaDiscoveryFragment::onUploadFiles,
-                        onStartModalSheetShow = this@MediaDiscoveryFragment::onStartModalSheetShow,
-                        onEndModalSheetHide = this@MediaDiscoveryFragment::onEndModalSheetHide,
-                        onModalSheetVisibilityChange = this@MediaDiscoveryFragment::onModalSheetVisibilityChange,
-                    )
+                    Box(
+                        modifier = Modifier.background(MaterialTheme.colors.background)
+                    ) {
+                        MediaDiscoveryView(
+                            mediaDiscoveryGlobalStateViewModel = mediaDiscoveryGlobalStateViewModel,
+                            mediaDiscoveryViewModel = mediaDiscoveryViewModel,
+                            onOKButtonClicked = this@MediaDiscoveryFragment::onOKButtonClicked,
+                            onSettingButtonClicked = this@MediaDiscoveryFragment::onSettingButtonClicked,
+                            showSettingDialog = showSettingsDialog(uiState.mediaDiscoveryViewSettings),
+                            onZoomIn = this@MediaDiscoveryFragment::handleZoomIn,
+                            onZoomOut = this@MediaDiscoveryFragment::handleZoomOut,
+                            onPhotoClicked = this@MediaDiscoveryFragment::onClick,
+                            onPhotoLongPressed = this@MediaDiscoveryFragment::onLongPress,
+                            onCardClick = mediaDiscoveryViewModel::onCardClick,
+                            onTimeBarTabSelected = mediaDiscoveryViewModel::onTimeBarTabSelected,
+                            onSwitchListView = this@MediaDiscoveryFragment::onSwitchListView,
+                            onCapture = this@MediaDiscoveryFragment::onCapture,
+                            onUploadFiles = this@MediaDiscoveryFragment::onUploadFiles,
+                            onStartModalSheetShow = this@MediaDiscoveryFragment::onStartModalSheetShow,
+                            onEndModalSheetHide = this@MediaDiscoveryFragment::onEndModalSheetHide,
+                            onModalSheetVisibilityChange = this@MediaDiscoveryFragment::onModalSheetVisibilityChange,
+                        )
+                    }
                 }
             }
         }

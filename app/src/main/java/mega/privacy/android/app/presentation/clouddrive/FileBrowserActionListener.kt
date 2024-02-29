@@ -30,6 +30,7 @@ interface FileBrowserActionListener {
     fun showMediaDiscoveryFromCloudDrive(
         mediaHandle: Long,
         isAccessedByIconClick: Boolean,
+        replaceFragment: Boolean,
         @StringRes errorMessage: Int?,
     )
 }
