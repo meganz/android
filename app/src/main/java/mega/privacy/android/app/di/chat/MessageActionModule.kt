@@ -12,10 +12,15 @@ import mega.privacy.android.app.presentation.meeting.chat.view.actions.EditLocat
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.EditMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.ForwardMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.MessageAction
+import mega.privacy.android.app.presentation.meeting.chat.view.actions.OpenWithMessageAction
 
 @Module
 @InstallIn(FragmentComponent::class)
 internal class MessageActionModule {
+    @Provides
+    @IntoSet
+    fun provideOpenWithMessageAction(): (ChatViewModel) -> MessageAction =
+        { vm -> OpenWithMessageAction(vm) }
 
     @Provides
     @IntoSet
