@@ -5,11 +5,11 @@ import dagger.Provides
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.settings.download.DownloadSettingsUseCases
-import mega.privacy.android.domain.usecase.GetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.GetStorageDownloadDefaultPathUseCase
 import mega.privacy.android.domain.usecase.GetStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
 import org.mockito.kotlin.mock
 
 @Module
@@ -20,7 +20,7 @@ import org.mockito.kotlin.mock
 object TestDownloadSettingsUseCases {
     val getDownloadLocationPath = mock<GetStorageDownloadLocationUseCase>()
     val setDownloadLocationPath = mock<SetStorageDownloadLocationUseCase>()
-    val getStorageDownloadAskAlways = mock<GetStorageDownloadAskAlwaysUseCase>()
+    val getStorageDownloadAskAlways = mock<ShouldPromptToSaveDestinationUseCase>()
     val setStorageDownloadAskAlways = mock<SetStorageDownloadAskAlwaysUseCase>()
     val getDefaultDownloadPath = mock<GetStorageDownloadDefaultPathUseCase>()
 
@@ -37,7 +37,7 @@ object TestDownloadSettingsUseCases {
         setDownloadLocationPath
 
     @Provides
-    fun provideGetStorageAskAlways(): GetStorageDownloadAskAlwaysUseCase =
+    fun provideGetStorageAskAlways(): ShouldPromptToSaveDestinationUseCase =
         getStorageDownloadAskAlways
 
     @Provides

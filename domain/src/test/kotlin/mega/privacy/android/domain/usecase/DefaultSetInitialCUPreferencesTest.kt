@@ -19,8 +19,10 @@ class DefaultSetInitialCUPreferencesTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultSetInitialCUPreferences(settingsRepository = settingsRepository,
-            accountRepository = accountRepository)
+        underTest = DefaultSetInitialCUPreferences(
+            settingsRepository = settingsRepository,
+            accountRepository = accountRepository,
+        )
     }
 
     @Test
@@ -30,9 +32,9 @@ class DefaultSetInitialCUPreferencesTest {
     }
 
     @Test
-    fun `test that initial value for settingsRepository setStorageAskAlways is set`() = runTest {
+    fun `test that initial value for settingsRepository setAskDownloadLocation is set`() = runTest {
         underTest()
-        verify(settingsRepository).setStorageAskAlways(true)
+        verify(settingsRepository).setAskDownloadLocation(true)
     }
 
     @Test

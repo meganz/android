@@ -14,6 +14,6 @@ class SetStorageDownloadAskAlwaysUseCase @Inject constructor(
      * @param isChecked as [Boolean]
      */
     suspend operator fun invoke(isChecked: Boolean) {
-        settingsRepository.setStorageAskAlways(isChecked)
+        settingsRepository.setAskDownloadLocation(isChecked)
     }
 }

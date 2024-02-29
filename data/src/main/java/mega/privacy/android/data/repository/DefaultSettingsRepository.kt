@@ -199,13 +199,6 @@ internal class DefaultSettingsRepository @Inject constructor(
     override fun monitorOfflineWarningMessageVisibility(): Flow<Boolean?> =
         uiPreferencesGateway.monitorOfflineWarningMessageVisibility()
 
-    override suspend fun getStorageDownloadAskAlways(): Boolean {
-        return megaLocalStorageGateway.getStorageAskAlways()
-    }
-
-    override suspend fun setStorageAskAlways(isStorageAskAlways: Boolean) =
-        megaLocalStorageGateway.setStorageAskAlways(isStorageAskAlways)
-
     override suspend fun setDefaultStorageDownloadLocation() {
         val defaultDownloadLocation = fileGateway.buildDefaultDownloadDir()
         defaultDownloadLocation.mkdirs()
@@ -214,6 +207,14 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     override suspend fun getStorageDownloadLocation(): String? {
         return megaLocalStorageGateway.getStorageDownloadLocation()
+    }
+
+    override suspend fun isAskDownloadLocation() = withContext(ioDispatcher) {
+        megaLocalStorageGateway.isAskDownloadLocation()
+    }
+
+    override suspend fun setAskDownloadLocation(value: Boolean) = withContext(ioDispatcher) {
+        megaLocalStorageGateway.setAskDownloadLocation(value)
     }
 
     override suspend fun setStorageDownloadLocation(storageDownloadLocation: String) =

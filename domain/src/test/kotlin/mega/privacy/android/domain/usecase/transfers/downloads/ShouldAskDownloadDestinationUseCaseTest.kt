@@ -46,7 +46,7 @@ class ShouldAskDownloadDestinationUseCaseTest {
         runTest {
             whenever(settingsRepository.getStorageDownloadLocation()).thenReturn(null)
             whenever(transferRepository.allowUserToSetDownloadDestination()).thenReturn(true)
-            whenever(settingsRepository.getStorageDownloadAskAlways()).thenReturn(askAlwaysSetting)
+            whenever(settingsRepository.isAskDownloadLocation()).thenReturn(askAlwaysSetting)
             assertThat(underTest()).isTrue()
         }
 
@@ -58,7 +58,7 @@ class ShouldAskDownloadDestinationUseCaseTest {
         runTest {
             whenever(settingsRepository.getStorageDownloadLocation()).thenReturn(if (destinationSet) "destination" else null)
             whenever(transferRepository.allowUserToSetDownloadDestination()).thenReturn(true)
-            whenever(settingsRepository.getStorageDownloadAskAlways()).thenReturn(true)
+            whenever(settingsRepository.isAskDownloadLocation()).thenReturn(true)
             assertThat(underTest()).isTrue()
         }
 
@@ -81,7 +81,7 @@ class ShouldAskDownloadDestinationUseCaseTest {
         runTest {
             whenever(settingsRepository.getStorageDownloadLocation()).thenReturn("destination")
             whenever(transferRepository.allowUserToSetDownloadDestination()).thenReturn(userAllowed)
-            whenever(settingsRepository.getStorageDownloadAskAlways()).thenReturn(false)
+            whenever(settingsRepository.isAskDownloadLocation()).thenReturn(false)
             assertThat(underTest()).isFalse()
         }
 }

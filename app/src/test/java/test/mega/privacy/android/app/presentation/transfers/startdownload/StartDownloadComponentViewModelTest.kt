@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.presentation.transfers.startdownload
 
+import android.net.Uri
 import com.google.common.truth.Truth
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.delay
@@ -21,6 +22,9 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
+import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
+import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
@@ -32,7 +36,9 @@ import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfers
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetCurrentDownloadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownloadDestinationUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -44,6 +50,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -76,6 +83,12 @@ class StartDownloadComponentViewModelTest {
     private val getCurrentDownloadSpeedUseCase = mock<GetCurrentDownloadSpeedUseCase>()
     private val getFilePreviewDownloadPathUseCase = mock<GetFilePreviewDownloadPathUseCase>()
     private val shouldAskDownloadDestinationUseCase = mock<ShouldAskDownloadDestinationUseCase>()
+    private val shouldPromptToSaveDestinationUseCase = mock<ShouldPromptToSaveDestinationUseCase>()
+    private val saveDoNotPromptToSaveDestinationUseCase =
+        mock<SaveDoNotPromptToSaveDestinationUseCase>()
+    private val setStorageDownloadAskAlwaysUseCase = mock<SetStorageDownloadAskAlwaysUseCase>()
+    private val setStorageDownloadLocationUseCase = mock<SetStorageDownloadLocationUseCase>()
+    private val getExternalPathByContentUriUseCase = mock<GetExternalPathByContentUriUseCase>()
 
 
     private val node: TypedFileNode = mock()
@@ -101,6 +114,11 @@ class StartDownloadComponentViewModelTest {
             monitorOngoingActiveTransfersUseCase,
             getCurrentDownloadSpeedUseCase,
             shouldAskDownloadDestinationUseCase,
+            shouldPromptToSaveDestinationUseCase,
+            saveDoNotPromptToSaveDestinationUseCase,
+            setStorageDownloadAskAlwaysUseCase,
+            setStorageDownloadLocationUseCase,
+            getExternalPathByContentUriUseCase,
         )
 
     }
@@ -124,6 +142,11 @@ class StartDownloadComponentViewModelTest {
             monitorOngoingActiveTransfersUseCase,
             getCurrentDownloadSpeedUseCase,
             shouldAskDownloadDestinationUseCase,
+            shouldPromptToSaveDestinationUseCase,
+            saveDoNotPromptToSaveDestinationUseCase,
+            setStorageDownloadAskAlwaysUseCase,
+            setStorageDownloadLocationUseCase,
+            getExternalPathByContentUriUseCase,
         )
         initialStub()
     }
@@ -287,6 +310,72 @@ class StartDownloadComponentViewModelTest {
             val event = TransferTriggerEvent.StartDownloadNode(nodes)
             underTest.startDownloadWithoutConfirmation(event)
             assertCurrentEventIsEqualTo(StartDownloadTransferEvent.AskDestination(event))
+        }
+
+    @Test
+    fun `test that the download starts with destination from getExternalPathByContentUriUseCase when startDownloadWithDestination is invoked`() =
+        runTest {
+            commonStub()
+            val uriString = "content:/destination/"
+            val destinationUri = mock<Uri> {
+                on { toString() } doReturn uriString
+            }
+            val startDownloadNode = TransferTriggerEvent.StartDownloadNode(nodes)
+            val destination = "file:/destination/"
+            whenever(getExternalPathByContentUriUseCase(uriString)).thenReturn(destination)
+            whenever(shouldPromptToSaveDestinationUseCase()).thenReturn(false)
+
+            underTest.startDownloadWithDestination(startDownloadNode, destinationUri)
+
+            verify(startDownloadsWithWorkerUseCase).invoke(
+                nodes,
+                destination,
+                startDownloadNode.isHighPriority
+            )
+        }
+
+    @Test
+    fun `test that promptSaveDestination state is updated when startDownloadWithDestination is invoked and shouldPromptToSaveDestinationUseCase is true`() =
+        runTest {
+            commonStub()
+            val uriString = "content:/destination"
+            val destinationUri = mock<Uri> {
+                on { toString() } doReturn uriString
+            }
+            val startDownloadNode = TransferTriggerEvent.StartDownloadNode(nodes)
+            val destination = "file:/destination"
+            whenever(getExternalPathByContentUriUseCase(uriString)).thenReturn(destination)
+            whenever(shouldPromptToSaveDestinationUseCase()).thenReturn(true)
+
+            underTest.startDownloadWithDestination(startDownloadNode, destinationUri)
+
+            Truth.assertThat(underTest.uiState.value.promptSaveDestination)
+                .isInstanceOf(StateEventWithContentTriggered::class.java)
+            Truth.assertThat((underTest.uiState.value.promptSaveDestination as StateEventWithContentTriggered).content)
+                .isEqualTo(destination)
+
+        }
+
+    @Test
+    fun `test that saveDoNotPromptToSaveDestinationUseCase is invoked when doNotPromptToSaveDestinationAgain is invoked`() =
+        runTest {
+            underTest.doNotPromptToSaveDestinationAgain()
+            verify(saveDoNotPromptToSaveDestinationUseCase).invoke()
+        }
+
+    @Test
+    fun `test that setStorageDownloadLocationUseCase is invoked when saveDestination is invoked`() =
+        runTest {
+            val destination = "destination"
+            underTest.saveDestination(destination)
+            verify(setStorageDownloadLocationUseCase).invoke(destination)
+        }
+
+    @Test
+    fun `test that setStorageDownloadAskAlwaysUseCase is set to false when saveDestination is invoked`() =
+        runTest {
+            underTest.saveDestination("destination")
+            verify(setStorageDownloadAskAlwaysUseCase).invoke(false)
         }
 
     private fun provideDownloadNodeParameters() = listOf(

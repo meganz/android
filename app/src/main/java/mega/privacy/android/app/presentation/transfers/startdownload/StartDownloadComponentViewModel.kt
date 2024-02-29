@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.startdownload
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,6 +30,9 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
+import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
+import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
@@ -40,7 +44,9 @@ import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfers
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetCurrentDownloadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownloadDestinationUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWithWorkerUseCase
 import timber.log.Timber
 import java.io.File
@@ -66,6 +72,11 @@ internal class StartDownloadComponentViewModel @Inject constructor(
     private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
     private val getCurrentDownloadSpeedUseCase: GetCurrentDownloadSpeedUseCase,
     private val shouldAskDownloadDestinationUseCase: ShouldAskDownloadDestinationUseCase,
+    private val shouldPromptToSaveDestinationUseCase: ShouldPromptToSaveDestinationUseCase,
+    private val saveDoNotPromptToSaveDestinationUseCase: SaveDoNotPromptToSaveDestinationUseCase,
+    private val setStorageDownloadAskAlwaysUseCase: SetStorageDownloadAskAlwaysUseCase,
+    private val setStorageDownloadLocationUseCase: SetStorageDownloadLocationUseCase,
+    private val getExternalPathByContentUriUseCase: GetExternalPathByContentUriUseCase,
 ) : ViewModel() {
 
     private var currentInProgressJob: Job? = null
@@ -155,12 +166,23 @@ internal class StartDownloadComponentViewModel @Inject constructor(
     /**
      * Start download with the destination manually set by the user
      * @param startDownloadNode initial event that triggered this download
-     * @param destination the chosen destination
+     * @param destinationUri the chosen destination
      */
     fun startDownloadWithDestination(
         startDownloadNode: TransferTriggerEvent.StartDownloadNode,
-        destination: String,
-    ) = startDownloadNodes(startDownloadNode, destination)
+        destinationUri: Uri,
+    ) {
+        viewModelScope.launch {
+            getExternalPathByContentUriUseCase(destinationUri.toString())?.let { destination ->
+                startDownloadNodes(startDownloadNode, destination)
+                if (shouldPromptToSaveDestinationUseCase()) {
+                    _uiState.update {
+                        it.copy(promptSaveDestination = triggered(destination))
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * It starts downloading the node for preview with the appropriate use case
@@ -289,6 +311,43 @@ internal class StartDownloadComponentViewModel @Inject constructor(
      */
     fun cancelCurrentJob() {
         currentInProgressJob?.cancel()
+    }
+
+    /**
+     * consume prompt save destination event
+     */
+    fun consumePromptSaveDestination() {
+        _uiState.update {
+            it.copy(promptSaveDestination = consumed())
+        }
+    }
+
+    /**
+     * Save selected destination as location for future downloads
+     */
+    fun saveDestination(destination: String) {
+        viewModelScope.launch {
+            runCatching {
+                setStorageDownloadLocationUseCase(destination)
+                setStorageDownloadAskAlwaysUseCase(false)
+            }.onFailure {
+                Timber.e("Error saving the destination:\n$it")
+            }
+        }
+    }
+
+    /**
+     * Save setting to don't prompt the user again to save selected destination
+     */
+    fun doNotPromptToSaveDestinationAgain() {
+        viewModelScope.launch {
+            runCatching {
+                saveDoNotPromptToSaveDestinationUseCase()
+            }.onFailure {
+                Timber.e("Error saving the don't save destination again prompt:\n$it")
+            }
+
+        }
     }
 
     private fun checkAndHandleDeviceIsNotConnected() =

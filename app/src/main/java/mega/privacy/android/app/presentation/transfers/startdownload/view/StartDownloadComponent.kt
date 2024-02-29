@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.view.View
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -15,6 +16,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -49,6 +52,7 @@ import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
+import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.core.ui.utils.MinimumTimeVisibility
@@ -72,11 +76,27 @@ internal fun StartDownloadComponent(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    var eventWithoutWritePermission by remember {
+        mutableStateOf<TransferTriggerEvent?>(null)
+    }
     val notificationPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS)
     } else {
         null
     }
+    val mediaReadPermission = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+        rememberPermissionState(Manifest.permission.WRITE_EXTERNAL_STORAGE) { granted ->
+            if (granted) {
+                eventWithoutWritePermission?.let {
+                    viewModel.startDownload(it)
+                }
+            }
+            eventWithoutWritePermission = null
+        }
+    } else {
+        null
+    }
+
     EventEffect(
         event = event,
         onConsumed = onConsumeEvent,
@@ -90,7 +110,12 @@ internal fun StartDownloadComponent(
                     notificationPermission.launchPermissionRequest()
                 }
             }
-            viewModel.startDownload(it)
+            if (mediaReadPermission?.status?.isGranted == false) {
+                eventWithoutWritePermission = it
+                mediaReadPermission.launchPermissionRequest()
+            } else {
+                viewModel.startDownload(it)
+            }
         })
     StartDownloadComponent(
         uiState = uiState,
@@ -103,6 +128,9 @@ internal fun StartDownloadComponent(
             )
         },
         onDestinationSet = viewModel::startDownloadWithDestination,
+        onPromptSaveDestinationConsumed = viewModel::consumePromptSaveDestination,
+        onSaveDestination = viewModel::saveDestination,
+        onDoNotPromptToSaveDestinationAgain = viewModel::doNotPromptToSaveDestinationAgain,
         snackBarHostState = snackBarHostState,
     )
 }
@@ -147,20 +175,25 @@ private fun StartDownloadComponent(
     onOneOffEventConsumed: () -> Unit,
     onCancelledConfirmed: () -> Unit,
     onDownloadConfirmed: (TransferTriggerEvent, saveDoNotAskAgain: Boolean) -> Unit,
-    onDestinationSet: (TransferTriggerEvent.StartDownloadNode, destination: String) -> Unit,
+    onDestinationSet: (TransferTriggerEvent.StartDownloadNode, destination: Uri) -> Unit,
+    onPromptSaveDestinationConsumed: () -> Unit,
+    onSaveDestination: (String) -> Unit,
+    onDoNotPromptToSaveDestinationAgain: () -> Unit,
     snackBarHostState: SnackbarHostState,
 ) {
     val context = LocalContext.current
-    val showOfflineAlertDialog = remember { mutableStateOf(false) }
+    var showOfflineAlertDialog by rememberSaveable { mutableStateOf(false) }
     val showQuotaExceededDialog = remember { mutableStateOf<StorageState?>(null) }
-    val showConfirmLargeTransfer =
-        remember { mutableStateOf<StartDownloadTransferEvent.ConfirmLargeDownload?>(null) }
-    val showAskDestinationDialog =
-        remember { mutableStateOf<TransferTriggerEvent.StartDownloadNode?>(null) }
+    var showConfirmLargeTransfer by remember {
+        mutableStateOf<StartDownloadTransferEvent.ConfirmLargeDownload?>(null)
+    }
+    var showAskDestinationDialog by remember {
+        mutableStateOf<TransferTriggerEvent.StartDownloadNode?>(null)
+    }
     val folderPicker = launchFolderPicker { uri ->
-        showAskDestinationDialog.value?.let { event ->
-            onDestinationSet(event, uri.toString())
-            showAskDestinationDialog.value = null
+        showAskDestinationDialog?.let { event ->
+            onDestinationSet(event, uri)
+            showAskDestinationDialog = null
         }
     }
 
@@ -182,28 +215,41 @@ private fun StartDownloadComponent(
                     consumeMessage(it, snackBarHostState, context)
 
                 StartDownloadTransferEvent.NotConnected -> {
-                    showOfflineAlertDialog.value = true
+                    showOfflineAlertDialog = true
                 }
 
                 is StartDownloadTransferEvent.ConfirmLargeDownload -> {
-                    showConfirmLargeTransfer.value = it
+                    showConfirmLargeTransfer = it
                 }
 
                 is StartDownloadTransferEvent.AskDestination -> {
-                    showAskDestinationDialog.value = it.originalEvent
+                    showAskDestinationDialog = it.originalEvent
                 }
             }
         })
+
+    var showPromptSaveDestinationDialog by rememberSaveable { mutableStateOf<String?>(null) }
+    var doNotPromptSaveDestinationAgain by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(showPromptSaveDestinationDialog) {
+        doNotPromptSaveDestinationAgain = false
+    }
+    EventEffect(
+        event = uiState.promptSaveDestination,
+        onConsumed = onPromptSaveDestinationConsumed,
+        action = {
+            showPromptSaveDestinationDialog = it
+        }
+    )
     MinimumTimeVisibility(visible = uiState.jobInProgressState == StartDownloadTransferJobInProgress.ProcessingFiles) {
         TransferInProgressDialog(onCancelConfirmed = onCancelledConfirmed)
     }
-    if (showOfflineAlertDialog.value) {
+    if (showOfflineAlertDialog) {
         MegaAlertDialog(
             text = stringResource(id = R.string.error_server_connection_problem),
             confirmButtonText = stringResource(id = R.string.general_ok),
             cancelButtonText = null,
-            onConfirm = { showOfflineAlertDialog.value = false },
-            onDismiss = { showOfflineAlertDialog.value = false },
+            onConfirm = { showOfflineAlertDialog = false },
+            onDismiss = { showOfflineAlertDialog = false },
         )
     }
     showQuotaExceededDialog.value?.let {
@@ -226,7 +272,7 @@ private fun StartDownloadComponent(
             onClose = { showQuotaExceededDialog.value = null },
         )
     }
-    showConfirmLargeTransfer.value?.let {
+    showConfirmLargeTransfer?.let {
         ConfirmationDialog(
             title = stringResource(id = R.string.transfers_confirm_large_download_title),
             text = stringResource(id = R.string.alert_larger_file, it.sizeString),
@@ -235,17 +281,41 @@ private fun StartDownloadComponent(
             cancelButtonText = stringResource(id = R.string.general_cancel),
             onOption1 = {
                 onDownloadConfirmed(it.transferTriggerEvent, false)
-                showConfirmLargeTransfer.value = null
+                showConfirmLargeTransfer = null
             },
             onOption2 = {
                 onDownloadConfirmed(it.transferTriggerEvent, true)
-                showConfirmLargeTransfer.value = null
+                showConfirmLargeTransfer = null
             },
-            onDismiss = { showConfirmLargeTransfer.value = null },
+            onDismiss = { showConfirmLargeTransfer = null },
         )
     }
-    if (showAskDestinationDialog.value != null) {
+    if (showAskDestinationDialog != null) {
         folderPicker.launch(null)
+    }
+    showPromptSaveDestinationDialog?.let { destination ->
+        val radioOption = stringResource(id = R.string.general_do_not_show)
+        //this dialog will be updated once we have a dialog defined for this case that follows our DS
+        ConfirmationDialogWithRadioButtons(
+            radioOptions = listOf(radioOption),
+            cancelButtonText = stringResource(id = R.string.general_negative_button),
+            confirmButtonText = stringResource(id = R.string.general_yes),
+            titleText = stringResource(id = R.string.confirmation_download_location),
+            initialSelectedOption = if (doNotPromptSaveDestinationAgain) radioOption else "",
+            onOptionSelected = {
+                doNotPromptSaveDestinationAgain = doNotPromptSaveDestinationAgain.not()
+            },
+            onDismissRequest = {
+                if (doNotPromptSaveDestinationAgain) {
+                    onDoNotPromptToSaveDestinationAgain()
+                }
+                showPromptSaveDestinationDialog = null
+            },
+            onConfirmRequest = {
+                onSaveDestination(destination)
+                showPromptSaveDestinationDialog = null
+            }
+        )
     }
 }
 

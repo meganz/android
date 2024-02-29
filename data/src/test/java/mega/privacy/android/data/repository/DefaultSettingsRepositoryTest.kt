@@ -160,4 +160,24 @@ internal class DefaultSettingsRepositoryTest {
         whenever(databaseHandler.sdCardUri).thenReturn(expected)
         assertThat(underTest.getDownloadToSdCardUri()).isEqualTo(expected)
     }
+
+    @ParameterizedTest(name = "expected: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that megaLocalStorageGateway value is returned when isAskDownloadLocation is invoked`(
+        expected: Boolean
+    ) =
+        runTest {
+            whenever(megaLocalStorageGateway.isAskDownloadLocation()).thenReturn(expected)
+            assertThat(underTest.isAskDownloadLocation()).isEqualTo(expected)
+        }
+
+    @ParameterizedTest(name = "expected: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that megaLocalStorageGateway is set with correct value when setAskDownloadLocation is invoked`(
+        expected: Boolean
+    ) =
+        runTest {
+            underTest.setAskDownloadLocation(expected)
+            verify(megaLocalStorageGateway).setAskDownloadLocation(expected)
+        }
 }

@@ -93,20 +93,6 @@ interface SettingsRepository {
     suspend fun setSubfolderMediaDiscoveryEnabled(enabled: Boolean)
 
     /**
-     * Get always ask for storage value
-     *
-     * @return isStorageAskAlways as [Boolean]
-     */
-    suspend fun getStorageDownloadAskAlways(): Boolean
-
-    /**
-     * Set to always ask for storage
-     *
-     * @param isStorageAskAlways
-     */
-    suspend fun setStorageAskAlways(isStorageAskAlways: Boolean)
-
-    /**
      * Set the default storage download location
      */
     suspend fun setDefaultStorageDownloadLocation()
@@ -117,6 +103,16 @@ interface SettingsRepository {
      * @return storageDownloadLocation as File Path
      */
     suspend fun getStorageDownloadLocation(): String?
+
+    /**
+     * @return if should ask the user about download location
+     */
+    suspend fun isAskDownloadLocation(): Boolean
+
+    /**
+     * Set if should ask the user about download location
+     */
+    suspend fun setAskDownloadLocation(value: Boolean)
 
     /**
      * Set Storage download location

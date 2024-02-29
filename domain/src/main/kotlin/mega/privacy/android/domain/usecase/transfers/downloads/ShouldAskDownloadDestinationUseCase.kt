@@ -16,6 +16,6 @@ class ShouldAskDownloadDestinationUseCase @Inject constructor(
      */
     suspend operator fun invoke(): Boolean =
         transferRepository.allowUserToSetDownloadDestination()
-                && (settingsRepository.getStorageDownloadAskAlways() || settingsRepository.getStorageDownloadLocation() == null)
+                && (settingsRepository.isAskDownloadLocation() || settingsRepository.getStorageDownloadLocation() == null)
 
 }

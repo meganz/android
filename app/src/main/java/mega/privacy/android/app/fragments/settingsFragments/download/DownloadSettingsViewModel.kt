@@ -8,11 +8,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.settingsFragments.download.model.DownloadSettingsState
-import mega.privacy.android.domain.usecase.GetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.GetStorageDownloadDefaultPathUseCase
 import mega.privacy.android.domain.usecase.GetStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -23,7 +23,7 @@ import javax.inject.Inject
 class DownloadSettingsViewModel @Inject constructor(
     private val setStorageDownloadAskAlwaysUseCase: SetStorageDownloadAskAlwaysUseCase,
     private val setStorageDownloadLocationUseCase: SetStorageDownloadLocationUseCase,
-    private val getStorageDownloadAskAlwaysUseCase: GetStorageDownloadAskAlwaysUseCase,
+    private val shouldPromptToSaveDestinationUseCase: ShouldPromptToSaveDestinationUseCase,
     private val getStorageDownloadLocationUseCase: GetStorageDownloadLocationUseCase,
     private val getStorageDownloadDefaultPathUseCase: GetStorageDownloadDefaultPathUseCase,
 ) : ViewModel() {
@@ -37,7 +37,7 @@ class DownloadSettingsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getStorageDownloadAskAlwaysUseCase().also { askAlways ->
+            shouldPromptToSaveDestinationUseCase().also { askAlways ->
                 _uiState.update { it.copy(isAskAlwaysChecked = askAlways) }
             }
             setDownloadLocation(getStorageDownloadLocationUseCase())
