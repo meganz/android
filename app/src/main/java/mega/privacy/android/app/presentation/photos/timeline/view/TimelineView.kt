@@ -39,7 +39,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -82,6 +84,7 @@ import mega.privacy.android.core.ui.theme.white_alpha_087
 import mega.privacy.android.core.ui.theme.yellow_100
 import mega.privacy.android.core.ui.theme.yellow_700
 import mega.privacy.android.core.ui.theme.yellow_700_alpha_015
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 
 /**
  * Base Compose Timeline View
@@ -101,8 +104,6 @@ fun TimelineView(
     emptyView: @Composable () -> Unit,
     onClickCameraUploadsSync: () -> Unit,
     onClickCameraUploadsUploading: () -> Unit,
-    onClickCameraUploadsComplete: () -> Unit,
-    onClickCameraUploadsWarning: () -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
     onCloseCameraUploadsLimitedAccess: () -> Unit,
     clearCameraUploadsMessage: () -> Unit = {},
@@ -122,6 +123,14 @@ fun TimelineView(
             && timelineViewState.currentMediaSource != TimelinePhotosSource.CLOUD_DRIVE
     val scrollNotInProgress by remember {
         derivedStateOf { !lazyGridState.isScrollInProgress }
+    }
+    var message by remember { mutableStateOf("") }
+
+    LaunchedEffect(message) {
+        if (message.isNotEmpty()) {
+            scaffoldState.snackbarHostState.showSnackbar(message)
+            message = ""
+        }
     }
 
     LaunchedEffect(timelineViewState.cameraUploadsMessage) {
@@ -208,14 +217,35 @@ fun TimelineView(
 
                                 CameraUploadsStatus.Complete -> {
                                     CameraUploadsStatusCompleted(
-                                        onClick = onClickCameraUploadsComplete,
+                                        onClick = {},
                                     )
                                 }
 
                                 CameraUploadsStatus.Warning -> {
                                     CameraUploadsStatusWarning(
                                         progress = timelineViewState.cameraUploadsProgress,
-                                        onClick = onClickCameraUploadsWarning,
+                                        onClick = {
+                                            when (timelineViewState.cameraUploadsFinishedReason) {
+                                                CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET -> {
+                                                    message = context.getString(
+                                                        R.string.photos_camera_uploads_no_internet
+                                                    )
+                                                }
+
+                                                CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW -> {
+                                                    message = context.getString(
+                                                        R.string.photos_camera_uploads_low_battery,
+                                                        20,
+                                                    )
+                                                }
+
+                                                else -> {
+                                                    message = context.getString(
+                                                        R.string.photos_camera_uploads_general_issue
+                                                    )
+                                                }
+                                            }
+                                        },
                                     )
                                 }
 

@@ -132,52 +132,66 @@ class TimelineViewModel @Inject constructor(
                 .collect {
                     when (it) {
                         is CameraUploadsStatusInfo.CheckFilesForUpload -> {
-                            setCameraUploadsSyncFab(isVisible = true)
-
-                            setCameraUploadsCompleteMenu(isVisible = false)
-                            setCameraUploadsWarningMenu(isVisible = false)
+                            handleCameraUploadsCheckStatus(it)
                         }
 
                         is CameraUploadsStatusInfo.UploadProgress -> {
-                            updateCameraUploadProgressIfNeeded(
-                                progress = it.progress,
-                                pending = it.totalToUpload - it.totalUploaded,
-                            )
-
-                            setCameraUploadsUploadingFab(
-                                isVisible = true,
-                                progress = it.progress.floatValue,
-                            )
-                            setCameraUploadsTotalUploaded(it.totalToUpload)
-
-                            isCameraUploadsUploading = true
+                            handleCameraUploadsProgressStatus(it)
                         }
 
                         is CameraUploadsStatusInfo.Finished -> {
-                            updateCameraUploadProgressIfNeeded(progress = Progress(1f), pending = 0)
-
-                            hideCameraUploadsFab()
-                            setCameraUploadsFinishedReason(reason = it.reason)
-
-                            if (it.reason == CameraUploadsFinishedReason.COMPLETED) {
-                                if (isCameraUploadsUploading) {
-                                    setCameraUploadsCompleteFab(isVisible = true)
-                                    setCameraUploadsCompletedMessage(show = true)
-
-                                    isCameraUploadsUploading = false
-                                    delay(4.seconds)
-                                }
-
-                                setCameraUploadsCompleteMenu(isVisible = true)
-                                setCameraUploadsCompleteFab(isVisible = false)
-                            } else {
-                                setCameraUploadsWarningFab(isVisible = true, progress = 0.5f)
-                            }
+                            handleCameraUploadsFinishedStatus(it)
                         }
 
                         else -> Unit
                     }
                 }
+        }
+    }
+
+    private fun handleCameraUploadsCheckStatus(info: CameraUploadsStatusInfo.CheckFilesForUpload) {
+        setCameraUploadsSyncFab(isVisible = true)
+
+        setCameraUploadsCompleteMenu(isVisible = false)
+        setCameraUploadsWarningMenu(isVisible = false)
+    }
+
+    private fun handleCameraUploadsProgressStatus(info: CameraUploadsStatusInfo.UploadProgress) {
+        updateCameraUploadProgressIfNeeded(
+            progress = info.progress,
+            pending = info.totalToUpload - info.totalUploaded,
+        )
+
+        setCameraUploadsUploadingFab(
+            isVisible = true,
+            progress = info.progress.floatValue,
+        )
+        setCameraUploadsTotalUploaded(info.totalToUpload)
+
+        isCameraUploadsUploading = true
+    }
+
+    private suspend fun handleCameraUploadsFinishedStatus(info: CameraUploadsStatusInfo.Finished) {
+        updateCameraUploadProgressIfNeeded(progress = Progress(1f), pending = 0)
+        if (info.reason == CameraUploadsFinishedReason.UNKNOWN) return
+
+        hideCameraUploadsFab()
+        setCameraUploadsFinishedReason(reason = info.reason)
+
+        if (info.reason == CameraUploadsFinishedReason.COMPLETED) {
+            if (isCameraUploadsUploading) {
+                setCameraUploadsCompleteFab(isVisible = true)
+                setCameraUploadsCompletedMessage(show = true)
+
+                isCameraUploadsUploading = false
+                delay(4.seconds)
+            }
+
+            setCameraUploadsCompleteMenu(isVisible = true)
+            setCameraUploadsCompleteFab(isVisible = false)
+        } else {
+            setCameraUploadsCompleteMenu(isVisible = false)
+            setCameraUploadsWarningFab(isVisible = true, progress = 0.5f)
         }
     }
 
@@ -481,6 +495,8 @@ class TimelineViewModel @Inject constructor(
                         progressBarShowing = false
                     )
                 }
+
+                hideCameraUploadsFab()
             }
         }
     }

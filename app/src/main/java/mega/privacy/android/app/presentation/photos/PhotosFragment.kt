@@ -330,7 +330,7 @@ class PhotosFragment : Fragment() {
         // CU complete menu
         val showCameraUploadsComplete = state.showCameraUploadsComplete
         this.menu?.findItem(R.id.action_cu_status_complete)?.isVisible =
-            showCameraUploadsComplete && !showCameraUploadsWarning && photosViewModel.state.value.selectedTab != PhotosTab.Albums
+            showCameraUploadsComplete && !showCameraUploadsButton && !showCameraUploadsWarning && photosViewModel.state.value.selectedTab != PhotosTab.Albums
     }
 
     private fun handleFilterIcons(timelineViewState: TimelineViewState) {
