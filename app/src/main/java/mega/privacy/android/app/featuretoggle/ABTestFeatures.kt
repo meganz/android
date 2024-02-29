@@ -65,6 +65,15 @@ enum class ABTestFeatures(
     adse(
         "Real experiment flag to show external ads",
         false
+    ),
+
+    /**
+     * To use remote feature flag 'ab_dmca' from API
+     * This flag activates the Device Center tab and removes the Backups tab
+     */
+    dmca(
+        "Remote feature flag to show Device Center",
+        false
     );
 
     companion object : FeatureFlagValueProvider {

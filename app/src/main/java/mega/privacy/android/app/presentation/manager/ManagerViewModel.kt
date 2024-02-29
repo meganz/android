@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
+import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
@@ -465,7 +466,7 @@ class ManagerViewModel @Inject constructor(
     private suspend fun getEnabledFeatures(): Set<Feature> {
         return setOfNotNull(
             AppFeatures.QRCodeCompose.takeIf { getFeatureFlagValueUseCase(it) },
-            AppFeatures.DeviceCenter.takeIf { getFeatureFlagValueUseCase(it) },
+            ABTestFeatures.dmca.takeIf { getFeatureFlagValueUseCase(it) },
         )
     }
 

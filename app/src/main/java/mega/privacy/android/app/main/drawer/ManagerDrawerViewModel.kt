@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
-import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.domain.entity.Feature
@@ -25,6 +25,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorMyChatOnlineStatusUseC
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import timber.log.Timber
 import javax.inject.Inject
@@ -176,7 +177,7 @@ internal class ManagerDrawerViewModel @Inject constructor(
     private suspend fun getEnabledFeatures(): Set<Feature> {
         return setOfNotNull(
             AppFeatures.AndroidSync.takeIf { getFeatureFlagValueUseCase(it) },
-            AppFeatures.DeviceCenter.takeIf { getFeatureFlagValueUseCase(it) },
+            ABTestFeatures.dmca.takeIf { getFeatureFlagValueUseCase(it) },
         )
     }
 }

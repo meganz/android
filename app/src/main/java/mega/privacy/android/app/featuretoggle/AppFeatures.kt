@@ -124,23 +124,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Shows the Dashboard Side Menu entrypoint named "Device centre"
-     *
-     * The Device Center shows the list of Devices that have uploaded content through Camera Uploads
-     * or Backups.
-     *
-     * Enabling this Feature Flag will hide the "Backups" Dashboard Side Menu entrypoint, and Backups
-     * can only be accessed inside Device Center when clicking a Device Backup Folder
-     */
-    DeviceCenter(
-        "Shows the Dashboard Side Menu entrypoint named \"Device centre\". The Device Center shows " +
-                "the list of Devices that have uploaded content through Camera Uploads or Backups. " +
-                "Enabling this Feature Flag will hide the \"Backups\" Dashboard Side Menu entrypoint, and " +
-                "Backups can only be accessed inside Device Center when clicking a Device Backup Folder.",
-        false,
-    ),
-
-    /**
      * Enable the remember timeline preferences feature
      */
     RememberTimelinePreferences(
