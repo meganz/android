@@ -16,9 +16,12 @@ import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageM
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AudioFileTypeInfo
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.ChatRequestResult
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeContentUri
@@ -42,13 +45,19 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
+import java.util.stream.Stream
+import kotlin.time.Duration
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -74,6 +83,7 @@ class NodeActionsViewModelTest {
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val sampleNode = mock<TypedFileNode>().stub {
         on { id } doReturn NodeId(123)
+        on { type } doReturn PdfFileTypeInfo
     }
     private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -236,53 +246,85 @@ class NodeActionsViewModelTest {
             verify(snackBarHandler).postSnackbarMessage("Some value")
         }
 
-    @Test
-    fun `test that getNodeContentUriUseCase is called when getNodeContentUri is invoked`() =
+    @ParameterizedTest(name = "File type is {0}")
+    @MethodSource("provideNodeType")
+    fun `test that invoke is called when node is provided with different file types`(
+        node: TypedFileNode,
+        expected: FileNodeContent,
+    ) =
         runTest {
-            val pdfNode = mock<TypedFileNode>().stub {
-                on { id } doReturn NodeId(123)
-                on { type } doReturn PdfFileTypeInfo
-            }
-            whenever(getNodeContentUriUseCase(pdfNode)).thenReturn(
+            whenever(getNodeContentUriUseCase(node)).thenReturn(
                 NodeContentUri.LocalContentUri(File("path"))
             )
-            initViewModel()
-            viewModel.handleFileNodeClicked(pdfNode)
-            verify(getNodeContentUriUseCase).invoke(pdfNode)
-        }
-
-    @Test
-    fun `test that getFeatureFlagValueUseCase is called when file node is image file node`() =
-        runTest {
-            val imageNode = mock<TypedFileNode> {
-                whenever(it.type).thenReturn(
-                    StaticImageFileTypeInfo(
-                        mimeType = "jpeg",
-                        extension = "jpeg"
-                    )
-                )
-            }
             whenever(getFeatureFlagValueUseCase(AppFeatures.ImagePreview)).thenReturn(true)
             initViewModel()
-            val fileContent = viewModel.handleFileNodeClicked(imageNode)
-            verify(getFeatureFlagValueUseCase).invoke(AppFeatures.ImagePreview)
-            Truth.assertThat(fileContent).isInstanceOf(FileNodeContent.ImageForNode::class.java)
+            val actual = viewModel.handleFileNodeClicked(node)
+            when (node.type) {
+                is ImageFileTypeInfo -> {
+                    verifyNoMoreInteractions(getNodeContentUriUseCase)
+                    verify(getFeatureFlagValueUseCase).invoke(AppFeatures.ImagePreview)
+                }
+
+                is TextFileTypeInfo -> {
+                    verifyNoMoreInteractions(getNodeContentUriUseCase)
+                    verifyNoMoreInteractions(getFeatureFlagValueUseCase)
+                }
+
+                else -> {
+                    verify(getNodeContentUriUseCase).invoke(node)
+                    verifyNoMoreInteractions(getFeatureFlagValueUseCase)
+                }
+            }
+            Truth.assertThat(actual).isInstanceOf(expected::class.java)
         }
 
-    @Test
-    fun `test that text file node content is returned when file node is text file node`() =
-        runTest {
-            val textNode = mock<TypedFileNode> {
+    private fun provideNodeType() = Stream.of(
+        Arguments.of(
+            mock<TypedFileNode>().stub {
+                on { type } doReturn PdfFileTypeInfo
+            },
+            mock<FileNodeContent.Pdf>()
+        ),
+        Arguments.of(
+            mock<TypedFileNode>().stub {
+                on { type } doReturn VideoFileTypeInfo(
+                    extension = "mp4",
+                    mimeType = "video",
+                    duration = Duration.INFINITE
+                )
+            },
+            mock<FileNodeContent.AudioOrVideo>()
+        ),
+        Arguments.of(
+            mock<TypedFileNode>().stub {
+                on { type } doReturn AudioFileTypeInfo(
+                    extension = "mp3",
+                    mimeType = "audio",
+                    duration = Duration.INFINITE
+                )
+            },
+            mock<FileNodeContent.AudioOrVideo>()
+        ),
+        Arguments.of(
+            mock<TypedFileNode>().stub {
+                on { type } doReturn StaticImageFileTypeInfo(
+                    extension = "jpeg",
+                    mimeType = "image",
+                )
+            },
+            mock<FileNodeContent.ImageForNode>()
+        ),
+        Arguments.of(
+            mock<TypedFileNode>().stub {
                 whenever(it.type).thenReturn(
                     TextFileTypeInfo(
                         mimeType = "text/plain",
                         extension = "txt"
                     )
                 )
-            }
-            initViewModel()
-            val fileContent = viewModel.handleFileNodeClicked(textNode)
-            Truth.assertThat(fileContent).isInstanceOf(FileNodeContent.TextContent::class.java)
-        }
+            },
+            mock<FileNodeContent.TextContent>()
+        )
+    )
 }
 

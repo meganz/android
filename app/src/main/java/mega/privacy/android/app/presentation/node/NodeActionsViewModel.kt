@@ -19,9 +19,11 @@ import mega.privacy.android.app.presentation.node.model.NodeActionState
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.versions.mapper.VersionHistoryRemoveMessageMapper
+import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -395,11 +397,19 @@ class NodeActionsViewModel @Inject constructor(
             uri = getNodeContentUriUseCase(fileNode)
         )
 
+        fileNode.type is ImageFileTypeInfo -> FileNodeContent.ImageForNode(
+            getFeatureFlagValueUseCase(
+                AppFeatures.ImagePreview
+            )
+        )
+
         fileNode.type is TextFileTypeInfo && fileNode.size <= TextFileTypeInfo.MAX_SIZE_OPENABLE_TEXT_FILE -> FileNodeContent.TextContent
 
-        fileNode.type is ImageFileTypeInfo -> FileNodeContent.ImageForNode(
-            getFeatureFlagValueUseCase(AppFeatures.ImagePreview)
-        )
+        fileNode.type is VideoFileTypeInfo || fileNode.type is AudioFileTypeInfo -> {
+            FileNodeContent.AudioOrVideo(
+                uri = getNodeContentUriUseCase(fileNode)
+            )
+        }
 
         else -> FileNodeContent.TextContent
 

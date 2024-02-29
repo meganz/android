@@ -35,6 +35,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.components.transferWidget.TransfersWidgetView
@@ -42,6 +43,8 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
+import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
@@ -54,11 +57,12 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImag
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.FileNodeContent
+import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
+import mega.privacy.android.app.presentation.search.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.navigation.contactArraySeparator
 import mega.privacy.android.app.presentation.search.navigation.searchForeignNodeDialog
@@ -72,7 +76,9 @@ import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
+import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
@@ -113,6 +119,12 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
      */
     @Inject
     lateinit var transfersManagement: TransfersManagement
+
+    /**
+     * Mapper to convert node source type to Int
+     */
+    @Inject
+    lateinit var nodeSourceTypeToViewTypeMapper: NodeSourceTypeToViewTypeMapper
 
     /**
      * Mapper to convert list to json for sending data in navigation
@@ -354,10 +366,12 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
         runCatching {
             nodeActionsViewModel.handleFileNodeClicked(currentFileNode)
         }.onSuccess { content ->
+            val type = nodeSourceTypeToViewTypeMapper(viewModel.state.value.nodeSourceType)
             when (content) {
                 is FileNodeContent.Pdf -> openPdfActivity(
                     content = content.uri,
                     currentFileNode = currentFileNode,
+                    viewType = type
                 )
 
                 is FileNodeContent.ImageForNode -> {
@@ -369,7 +383,16 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
 
                 is FileNodeContent.TextContent -> openTextEditorActivity(
                     currentFileNode = currentFileNode,
+                    viewType = type
                 )
+
+                is FileNodeContent.AudioOrVideo -> {
+                    openVideoOrAudioFile(
+                        content = content.uri,
+                        fileNode = currentFileNode,
+                        viewType = type
+                    )
+                }
 
                 else -> {
 
@@ -381,17 +404,19 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
         }
     }
 
-    private fun openTextEditorActivity(currentFileNode: TypedFileNode) {
+    private fun openTextEditorActivity(currentFileNode: TypedFileNode, viewType: Int?) {
         val textFileIntent = Intent(this, TextEditorActivity::class.java)
         textFileIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, currentFileNode.id.longValue)
             .putExtra(TextEditorViewModel.MODE, TextEditorViewModel.VIEW_MODE)
             .putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, currentFileNode.type.mimeType)
+            .putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, viewType)
         startActivity(textFileIntent)
     }
 
     private fun openPdfActivity(
         content: NodeContentUri,
         currentFileNode: TypedFileNode,
+        viewType: Int?
     ) {
         val pdfIntent = Intent(this, PdfViewerActivity::class.java)
         val mimeType = currentFileNode.type.mimeType
@@ -400,6 +425,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, currentFileNode.id.longValue)
             putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
+            putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, viewType)
             putExtra(Constants.INTENT_EXTRA_KEY_APP, true)
         }
         nodeActionsViewModel.applyNodeContentUri(
@@ -440,6 +466,62 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             )
         }
         startActivity(intent)
+    }
+
+    private fun openVideoOrAudioFile(
+        fileNode: TypedFileNode,
+        content: NodeContentUri,
+        viewType: Int?
+    ) {
+        val intent = when {
+            fileNode.type.isSupported && fileNode.type is VideoFileTypeInfo ->
+                Intent(this, VideoPlayerActivity::class.java).apply {
+                    putExtra(
+                        Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
+                        viewModel.state.value.sortOrder
+                    )
+                }
+
+            fileNode.type.isSupported && fileNode.type is AudioFileTypeInfo -> Intent(
+                this,
+                AudioPlayerActivity::class.java
+            ).apply {
+                putExtra(
+                    Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
+                    viewModel.state.value.sortOrder
+                )
+            }
+
+            else -> Intent(Intent.ACTION_VIEW)
+        }.apply {
+            putExtra(Constants.INTENT_EXTRA_KEY_PLACEHOLDER, 0)
+            putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, viewType)
+            putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, fileNode.name)
+            putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
+            putExtra(Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, fileNode.parentId.longValue)
+            putExtra(Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK, false)
+            val mimeType =
+                if (fileNode.type.extension == "opus") "audio/*" else fileNode.type.mimeType
+            nodeActionsViewModel.applyNodeContentUri(
+                intent = this,
+                content = content,
+                mimeType = mimeType,
+            )
+        }
+        safeLaunchActivity(intent)
+    }
+
+    private fun safeLaunchActivity(intent: Intent) {
+        runCatching {
+            startActivity(intent)
+        }.onFailure {
+            Timber.e(it)
+            showMegaSnackbar(
+                message = getString(R.string.intent_not_available),
+                actionLabel = null,
+                duration = MegaSnackbarDuration.Short
+            )
+        }
     }
 
     private fun showSortOrderBottomSheet() {

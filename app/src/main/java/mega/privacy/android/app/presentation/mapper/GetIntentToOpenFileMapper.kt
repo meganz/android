@@ -63,6 +63,10 @@ import javax.inject.Inject
  * @property getNodeByHandle [GetNodeByHandle]
  * @property getCloudSortOrder [GetCloudSortOrder]
  */
+@Deprecated(
+    message = "This class is deprecated",
+    replaceWith = ReplaceWith(expression = "NodeActionsViewModel -> handleFileNodeClicked()",)
+)
 class GetIntentToOpenFileMapper @Inject constructor(
     private val getLocalFileForNode: GetLocalFileForNode,
     private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,

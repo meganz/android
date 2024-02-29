@@ -117,7 +117,7 @@ data class AudioFileTypeInfo(
     val duration: Duration,
 ) : FileTypeInfo {
     override val isSupported = extension != "wma" && extension != "aif" && extension != "aiff"
-            && extension != "iff" && extension == "oga" || extension == "3ga"
+            && extension != "iff" && extension != "oga" && extension != "3ga"
 }
 
 /**
