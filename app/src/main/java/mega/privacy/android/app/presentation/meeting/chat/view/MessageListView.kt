@@ -16,13 +16,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
@@ -30,6 +28,7 @@ import mega.privacy.android.app.presentation.extensions.paging.printLoadStates
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UIMessageState
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.ChatUnreadHeaderMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ParticipantUiMessage
 import mega.privacy.android.core.ui.controls.chat.messages.LoadingMessagesHeader
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
@@ -80,6 +79,10 @@ internal fun MessageListView(
     val state by viewModel.state.collectAsStateWithLifecycle()
     onCanSelectChanged(pagingItems.itemSnapshotList.any { it?.isSelectable == true })
 
+    var isDataLoaded by remember {
+        mutableStateOf(false)
+    }
+
     val screenHeight = with(LocalDensity.current) {
         LocalConfiguration.current.screenHeightDp.dp.toPx()
     }
@@ -94,17 +97,12 @@ internal fun MessageListView(
         }
     }
 
-    LaunchedEffect(pagingItems.itemSnapshotList) {
-        if (state.lastSeenMessageId != -1L
-            && !state.isJumpingToLastSeenMessage
-            && pagingItems.loadState.refresh is LoadState.NotLoading
-            && pagingItems.loadState.append is LoadState.NotLoading
-            && (uiState.chat?.unreadCount ?: 0) > 0
-        ) {
+    LaunchedEffect(isDataLoaded) {
+        if (!state.isJumpingToLastSeenMessage && (uiState.chat?.unreadCount ?: 0) > 0) {
             pagingItems.itemSnapshotList.indexOfFirst {
-                it?.id == state.lastSeenMessageId
+                it is ChatUnreadHeaderMessage
             }.takeIf { it != -1 }?.let {
-                scrollState.scrollToItem(it - 1, -(screenHeight * 2 / 3).toInt())
+                scrollState.scrollToItem(it, -(screenHeight * 2 / 3).toInt())
                 // make sure the list is scrolled to the correct position
                 viewModel.onScrolledToLastSeenMessage()
                 pagingItems.itemSnapshotList.firstOrNull()?.id?.let { lastMessageId ->
@@ -133,12 +131,6 @@ internal fun MessageListView(
                     scrollState.scrollToItem(0)
                 }
             }
-    }
-
-    val context = LocalContext.current
-
-    var isDataLoaded by remember {
-        mutableStateOf(false)
     }
 
     LazyColumn(

@@ -36,6 +36,7 @@ import mega.privacy.android.app.presentation.meeting.chat.mapper.UiChatMessageMa
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.ChatHeaderMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.ChatUnreadHeaderMessage
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.HeaderMessage
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
 import mega.privacy.android.domain.usecase.chat.message.GetLastMessageSeenIdUseCase
@@ -183,9 +184,11 @@ class MessageListViewModel @Inject constructor(
                             firstMessage = after,
                             secondMessage = before
                         ) //Messages are passed in reverse order as the list is reversed in the ui
-                    }.insertSeparators { _, after: UiChatMessage? ->
+                    }
+                    .insertSeparators(TerminalSeparatorType.SOURCE_COMPLETE) { _, after: UiChatMessage? ->
                         if (unreadCount > 0
                             && after?.id == state.value.lastSeenMessageId
+                            && after !is HeaderMessage
                             && state.value.lastSeenMessageId != -1L
                         ) {
                             ChatUnreadHeaderMessage(unreadCount)
@@ -196,14 +199,14 @@ class MessageListViewModel @Inject constructor(
                         item = ChatHeaderMessage(),
                         terminalSeparatorType = TerminalSeparatorType.SOURCE_COMPLETE
                     ).let { pagingDataWithoutPending ->
-                    pendingMessages.fold(pagingDataWithoutPending) { pagingData, pendingMessage ->
-                        //pending messages always at the end (header because list is reversed in the ui)
-                        pagingData.insertHeaderItem(
-                            item = pendingMessage,
-                            terminalSeparatorType = TerminalSeparatorType.SOURCE_COMPLETE
-                        )
+                        pendingMessages.fold(pagingDataWithoutPending) { pagingData, pendingMessage ->
+                            //pending messages always at the end (header because list is reversed in the ui)
+                            pagingData.insertHeaderItem(
+                                item = pendingMessage,
+                                terminalSeparatorType = TerminalSeparatorType.SOURCE_COMPLETE
+                            )
+                        }
                     }
-                }
             }
         }
 
