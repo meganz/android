@@ -40,7 +40,7 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
-import mega.privacy.android.domain.usecase.GetLocalFileForNode
+import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
@@ -55,7 +55,7 @@ import javax.inject.Inject
 /**
  * Mapper to get intent to open file
  *
- * @property getLocalFileForNode [GetLocalFileForNode] to get local file if present
+ * @property getLocalFileForNodeUseCase [GetLocalFileForNodeUseCase] to get local file if present
  * @property getFileUrlByNodeHandleUseCase [GetFileUrlByNodeHandleUseCase] to get file url if present
  * @property httpServerStart [MegaApiHttpServerStartUseCase] to start MegaApi Server
  * @property httpServerIsRunning [MegaApiHttpServerIsRunningUseCase] to check Mega Api Http server is running
@@ -68,7 +68,7 @@ import javax.inject.Inject
     replaceWith = ReplaceWith(expression = "NodeActionsViewModel -> handleFileNodeClicked()",)
 )
 class GetIntentToOpenFileMapper @Inject constructor(
-    private val getLocalFileForNode: GetLocalFileForNode,
+    private val getLocalFileForNodeUseCase: GetLocalFileForNodeUseCase,
     private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
     private val httpServerStart: MegaApiHttpServerStartUseCase,
     private val httpServerIsRunning: MegaApiHttpServerIsRunningUseCase,
@@ -111,7 +111,7 @@ class GetIntentToOpenFileMapper @Inject constructor(
                 putExtra(INTENT_EXTRA_KEY_APP, true)
             }
 
-            getLocalFileForNode(fileNode)?.let {
+            getLocalFileForNodeUseCase(fileNode)?.let {
                 val path = it.path
                 if (path.contains(Environment.getExternalStorageDirectory().path)) {
                     pdfIntent.setDataAndType(
@@ -141,7 +141,7 @@ class GetIntentToOpenFileMapper @Inject constructor(
         } else if (MimeTypeList.typeForName(fileNode.name).isURL) {
             val intent = Intent(Intent.ACTION_VIEW)
             try {
-                val br = getLocalFileForNode(fileNode)?.let {
+                val br = getLocalFileForNodeUseCase(fileNode)?.let {
                     val urlFile = File(it.path)
                     FileReader(urlFile).buffered()
                 } ?: run {
@@ -209,7 +209,7 @@ class GetIntentToOpenFileMapper @Inject constructor(
                 putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, fileNode.parentId.longValue)
                 putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, getCloudSortOrder.invoke())
             }
-            getLocalFileForNode(fileNode)?.let {
+            getLocalFileForNodeUseCase(fileNode)?.let {
                 val path = it.path
                 if (path.contains(Environment.getExternalStorageDirectory().path)) {
                     intentInternalIntentPair.first.setDataAndType(

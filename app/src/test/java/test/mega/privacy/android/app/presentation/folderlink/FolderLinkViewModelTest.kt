@@ -32,7 +32,7 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.AddNodeType
-import mega.privacy.android.domain.usecase.GetLocalFileForNode
+import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetPricing
@@ -95,7 +95,7 @@ class FolderLinkViewModelTest {
     private val getCurrentUserEmail: GetCurrentUserEmail = mock()
     private val getPricing: GetPricing = mock()
     private val containsMediaItemUseCase: ContainsMediaItemUseCase = mock()
-    private val getLocalFileForNode: GetLocalFileForNode = mock()
+    private val getLocalFileForNodeUseCase: GetLocalFileForNodeUseCase = mock()
     private val getLocalFolderLinkFromMegaApiFolderUseCase: GetLocalFolderLinkFromMegaApiFolderUseCase =
         mock()
     private val megaApiFolderHttpServerStartUseCase: MegaApiFolderHttpServerStartUseCase = mock()
@@ -138,7 +138,7 @@ class FolderLinkViewModelTest {
             getCurrentUserEmail,
             getPricing,
             containsMediaItemUseCase,
-            getLocalFileForNode,
+            getLocalFileForNodeUseCase,
             getLocalFolderLinkFromMegaApiFolderUseCase,
             megaApiFolderHttpServerStartUseCase,
             megaApiFolderHttpServerIsRunningUseCase,
@@ -173,7 +173,7 @@ class FolderLinkViewModelTest {
             getCurrentUserEmail,
             getPricing,
             containsMediaItemUseCase,
-            getLocalFileForNode,
+            getLocalFileForNodeUseCase,
             getLocalFolderLinkFromMegaApiFolderUseCase,
             megaApiFolderHttpServerStartUseCase,
             megaApiFolderHttpServerIsRunningUseCase,
@@ -548,7 +548,7 @@ class FolderLinkViewModelTest {
             }
 
             whenever(megaApiFolderHttpServerIsRunningUseCase()).thenReturn(0)
-            whenever(getLocalFileForNode(any())).thenReturn(null)
+            whenever(getLocalFileForNodeUseCase(any())).thenReturn(null)
             whenever(getLocalFolderLinkFromMegaApiFolderUseCase(handle)).thenReturn(path)
             whenever(Uri.parse(path)).thenReturn(contentUriMock)
 

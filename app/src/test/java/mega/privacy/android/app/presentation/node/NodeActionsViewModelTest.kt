@@ -21,7 +21,9 @@ import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.ChatRequestResult
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeContentUri
@@ -38,6 +40,7 @@ import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
+import mega.privacy.android.domain.usecase.node.GetNodePreviewFilePathUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
@@ -48,6 +51,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -81,9 +85,9 @@ class NodeActionsViewModelTest {
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper = mock()
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val getNodePreviewFilePathUseCase: GetNodePreviewFilePathUseCase = mock()
     private val sampleNode = mock<TypedFileNode>().stub {
         on { id } doReturn NodeId(123)
-        on { type } doReturn PdfFileTypeInfo
     }
     private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -105,6 +109,7 @@ class NodeActionsViewModelTest {
             getNodeContentUriUseCase = getNodeContentUriUseCase,
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getNodePreviewFilePathUseCase = getNodePreviewFilePathUseCase,
             applicationScope = applicationScope
         )
     }
@@ -256,6 +261,7 @@ class NodeActionsViewModelTest {
             whenever(getNodeContentUriUseCase(node)).thenReturn(
                 NodeContentUri.LocalContentUri(File("path"))
             )
+            whenever(getNodePreviewFilePathUseCase(any())).thenReturn("path")
             whenever(getFeatureFlagValueUseCase(AppFeatures.ImagePreview)).thenReturn(true)
             initViewModel()
             val actual = viewModel.handleFileNodeClicked(node)
@@ -270,8 +276,16 @@ class NodeActionsViewModelTest {
                     verifyNoMoreInteractions(getFeatureFlagValueUseCase)
                 }
 
-                else -> {
+                is VideoFileTypeInfo,
+                is PdfFileTypeInfo,
+                is AudioFileTypeInfo,
+                -> {
                     verify(getNodeContentUriUseCase).invoke(node)
+                    verifyNoMoreInteractions(getFeatureFlagValueUseCase)
+                }
+
+                else -> {
+                    verify(getNodePreviewFilePathUseCase).invoke(node)
                     verifyNoMoreInteractions(getFeatureFlagValueUseCase)
                 }
             }
@@ -324,6 +338,25 @@ class NodeActionsViewModelTest {
                 )
             },
             mock<FileNodeContent.TextContent>()
+        ),
+        Arguments.of(
+            mock<TypedFileNode>().stub {
+                whenever(it.type).thenReturn(
+                    ZipFileTypeInfo(
+                        mimeType = "zip",
+                        extension = "zip"
+                    )
+                )
+            }, mock<FileNodeContent.Other>()
+        ), Arguments.of(
+            mock<TypedFileNode>().stub {
+                whenever(it.type).thenReturn(
+                    UnknownFileTypeInfo(
+                        mimeType = "abc",
+                        extension = "abc"
+                    )
+                )
+            }, mock<FileNodeContent.Other>()
         )
     )
 }

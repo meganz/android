@@ -35,6 +35,7 @@ import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.exception.FileNotCreatedException
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
@@ -525,5 +526,24 @@ internal class FileSystemRepositoryImplTest {
         val argumentCaptor = argumentCaptor<String>()
         verify(fileAttributeGateway).getVideoDuration(argumentCaptor.capture())
         assertThat(argumentCaptor.firstValue).endsWith(filePath)
+    }
+
+    @Test
+    fun `test that getLocalFile invokes gateway method`() = runTest {
+        val file = mock<File>()
+        val fileNode = mock<TypedFileNode> {
+            on { id } doReturn NodeId(1L)
+            on { name } doReturn "name"
+            on { size } doReturn 123L
+            on { modificationTime } doReturn 456L
+        }
+        whenever(
+            fileGateway.getLocalFile(
+                fileName = fileNode.name,
+                fileSize = fileNode.size,
+                lastModifiedDate = fileNode.modificationTime
+            )
+        ).thenReturn(file)
+        assertThat(underTest.getLocalFile(fileNode)).isEqualTo(file)
     }
 }

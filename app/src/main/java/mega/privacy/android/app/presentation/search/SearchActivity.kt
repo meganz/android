@@ -57,8 +57,8 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImag
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
@@ -75,10 +75,12 @@ import mega.privacy.android.app.presentation.transfers.startdownload.view.StartD
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
@@ -96,6 +98,7 @@ import mega.privacy.mobile.analytics.event.SearchImageFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchResetFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchVideosFilterPressedEvent
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -394,6 +397,18 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                     )
                 }
 
+                is FileNodeContent.Other -> {
+                    content.localFile?.let {
+                        if (currentFileNode.type is ZipFileTypeInfo) {
+                            openZipFile(it, currentFileNode)
+                        } else {
+                            handleOtherFiles(it, currentFileNode)
+                        }
+                    } ?: run {
+                        nodeActionsViewModel.downloadNodeForPreview(currentFileNode)
+                    }
+                }
+
                 else -> {
 
                 }
@@ -404,11 +419,63 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
         }
     }
 
+    private suspend fun handleOtherFiles(
+        localFile: File,
+        currentFileNode: TypedFileNode,
+    ) {
+        Intent(Intent.ACTION_VIEW).apply {
+            nodeActionsViewModel.applyNodeContentUri(
+                intent = this,
+                content = NodeContentUri.LocalContentUri(localFile),
+                mimeType = currentFileNode.type.mimeType,
+                isSupported = false
+            )
+            runCatching {
+                startActivity(this)
+            }.onFailure { error ->
+                Timber.e(error)
+                openShareIntent()
+            }
+        }
+    }
+
+    private suspend fun Intent.openShareIntent() {
+        if (resolveActivity(packageManager) == null) {
+            action = Intent.ACTION_SEND
+        }
+        runCatching {
+            startActivity(this)
+        }.onFailure { error ->
+            Timber.e(error)
+            snackbarHostState.showSnackbar(getString(R.string.intent_not_available))
+        }
+    }
+
+    private suspend fun openZipFile(
+        localFile: File,
+        fileNode: TypedFileNode,
+    ) {
+        Timber.d("The file is zip, open in-app.")
+        if (ZipBrowserActivity.zipFileFormatCheck(this, localFile.absolutePath)) {
+            startActivity(
+                Intent(this, ZipBrowserActivity::class.java).apply {
+                    putExtra(
+                        ZipBrowserActivity.EXTRA_PATH_ZIP, localFile.absolutePath
+                    )
+                    putExtra(
+                        ZipBrowserActivity.EXTRA_HANDLE_ZIP, fileNode.id.longValue
+                    )
+                }
+            )
+        } else {
+            snackbarHostState.showSnackbar(getString(R.string.message_zip_format_error))
+        }
+    }
+
     private fun openTextEditorActivity(currentFileNode: TypedFileNode, viewType: Int?) {
         val textFileIntent = Intent(this, TextEditorActivity::class.java)
         textFileIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, currentFileNode.id.longValue)
             .putExtra(TextEditorViewModel.MODE, TextEditorViewModel.VIEW_MODE)
-            .putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, currentFileNode.type.mimeType)
             .putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, viewType)
         startActivity(textFileIntent)
     }
@@ -416,7 +483,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     private fun openPdfActivity(
         content: NodeContentUri,
         currentFileNode: TypedFileNode,
-        viewType: Int?
+        viewType: Int?,
     ) {
         val pdfIntent = Intent(this, PdfViewerActivity::class.java)
         val mimeType = currentFileNode.type.mimeType
@@ -471,7 +538,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     private fun openVideoOrAudioFile(
         fileNode: TypedFileNode,
         content: NodeContentUri,
-        viewType: Int?
+        viewType: Int?,
     ) {
         val intent = when {
             fileNode.type.isSupported && fileNode.type is VideoFileTypeInfo ->
