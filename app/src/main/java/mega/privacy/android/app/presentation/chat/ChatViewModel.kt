@@ -606,9 +606,7 @@ class ChatViewModel @Inject constructor(
                                         }
 
                                         ChatCallTermCodeType.CallUsersLimit -> {
-                                            _state.update {
-                                                it.copy(snackbarMessage = R.string.call_error_too_many_participants)
-                                            }
+                                            showTooManyParticipantsWarning()
                                             ScheduledMeetingStatus.NotJoined(call.duration)
                                         }
 
@@ -633,8 +631,13 @@ class ChatViewModel @Inject constructor(
                                 )
                             }
                         } else if (contains(ChatCallChanges.GenericNotification)) {
-                            if (call.notificationType == CallNotificationType.SFUError && call.termCode == ChatCallTermCodeType.ProtocolVersion) {
-                                showForceUpdateDialog()
+                            if (call.notificationType == CallNotificationType.SFUError) {
+                                if (call.termCode == ChatCallTermCodeType.ProtocolVersion) {
+                                    showForceUpdateDialog()
+                                } else if (call.termCode == ChatCallTermCodeType.CallUsersLimit) {
+                                    showTooManyParticipantsWarning()
+                                }
+
                             }
                         }
                     }
@@ -648,6 +651,14 @@ class ChatViewModel @Inject constructor(
         _state.update {
             it.copy(
                 showForceUpdateDialog = true,
+            )
+        }
+    }
+
+    private fun showTooManyParticipantsWarning() {
+        _state.update {
+            it.copy(
+                snackbarMessage = R.string.call_error_too_many_participants
             )
         }
     }
