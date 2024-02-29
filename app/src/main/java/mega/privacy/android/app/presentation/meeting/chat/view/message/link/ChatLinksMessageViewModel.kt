@@ -35,7 +35,7 @@ class ChatLinksMessageViewModel @Inject constructor(
      */
     suspend fun loadContactInfo(
         link: String,
-        onClick: (Long, String?, String?) -> Unit,
+        onClick: (Long, String?, String?, Boolean) -> Unit,
     ): LinkContent? {
         return runCatching {
             getLinkContentFromCache(link) ?: getContactFromLinkUseCase(link)?.let { contactLink ->
@@ -46,7 +46,8 @@ class ChatLinksMessageViewModel @Inject constructor(
                         onClick(
                             contactLink.contactHandle,
                             contactLink.email,
-                            contactLink.fullName
+                            contactLink.fullName,
+                            contactLink.isContact,
                         )
                     }
                 ).also {

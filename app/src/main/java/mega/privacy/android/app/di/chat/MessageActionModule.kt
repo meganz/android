@@ -13,6 +13,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.actions.EditMessa
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.ForwardMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.MessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.OpenWithMessageAction
+import mega.privacy.android.app.presentation.meeting.chat.view.actions.SendMessageAction
 
 @Module
 @InstallIn(FragmentComponent::class)
@@ -41,6 +42,11 @@ internal class MessageActionModule {
     @IntoSet
     fun provideCopyActionFactory(): (ChatViewModel) -> MessageAction =
         { _ -> CopyMessageAction() }
+
+    @Provides
+    @IntoSet
+    fun provideSendMessageActionFactory(): (ChatViewModel) -> MessageAction =
+        { vm -> SendMessageAction(vm) }
 
     @Provides
     @IntoSet

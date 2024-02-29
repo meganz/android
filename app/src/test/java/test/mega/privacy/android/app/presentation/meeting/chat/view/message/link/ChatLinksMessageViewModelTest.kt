@@ -51,12 +51,14 @@ internal class ChatLinksMessageViewModelTest {
         val contactHandle = 1L
         val email = "email"
         val fullName = "fullName"
+        val isContact = false
         val contactLink = mock<ContactLink> {
             on { this.contactHandle } doReturn contactHandle
             on { this.email } doReturn email
             on { this.fullName } doReturn fullName
+            on { this.isContact } doReturn isContact
         }
-        val click = mock<(Long, String?, String?) -> Unit>()
+        val click = mock<(Long, String?, String?, Boolean) -> Unit>()
         val expectedResult = ContactLinkContent(
             content = contactLink,
             link = link,
@@ -64,7 +66,8 @@ internal class ChatLinksMessageViewModelTest {
                 click(
                     contactHandle,
                     email,
-                    fullName
+                    fullName,
+                    isContact
                 )
             }
         )

@@ -45,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -595,7 +596,9 @@ internal fun ChatView(
                 topBar = {
                     if (isSelectMode) {
                         SelectModeAppBar(
-                            title = "",
+                            title =
+                            if (selectedMessages.isEmpty()) stringResource(id = R.string.select_message_title)
+                            else selectedMessages.size.toString(),
                             onNavigationPressed = exitSelectMode,
                             actions = actions.filter {
                                 it.appliesTo(selectedMessages)

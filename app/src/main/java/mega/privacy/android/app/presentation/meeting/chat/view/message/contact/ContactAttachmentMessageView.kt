@@ -70,6 +70,7 @@ fun ContactAttachmentMessageView(
                         message.contactHandle,
                         message.contactEmail,
                         message.contactUserName,
+                        message.isContact,
                         context,
                         coroutineScope,
                         snackbarHostState,
@@ -94,18 +95,18 @@ internal fun onUserClick(
     handle: Long,
     email: String,
     name: String,
+    isContact: Boolean,
     context: Context,
     coroutineScope: CoroutineScope,
     snackbarHostState: SnackbarHostState?,
-    checkContact: (Long, String, (String) -> Unit, () -> Unit, () -> Unit) -> Unit,
+    checkContact: (Long, String, Boolean, () -> Unit, () -> Unit, () -> Unit) -> Unit,
     inviteUser: (String, Long, () -> Unit) -> Unit,
 ) {
     checkContact(
         handle,
         email,
-        { contactEmail ->
-            openContactInfoActivity(context, contactEmail)
-        },
+        isContact,
+        { openContactInfoActivity(context, email) },
         {
             coroutineScope.launch {
                 val result = snackbarHostState?.showSnackbar(

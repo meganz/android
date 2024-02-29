@@ -54,18 +54,20 @@ fun ChatLinksMessageView(
         message.links.forEach {
             when (it.type) {
                 RegexPatternType.CONTACT_LINK -> {
-                    val linkContent = viewModel.loadContactInfo(it.link) { handle, email, name ->
-                        onUserClick(
-                            handle,
-                            email.orEmpty(),
-                            name.orEmpty(),
-                            context,
-                            coroutineScope,
-                            snackbarHostState,
-                            contactViewModel::checkUser,
-                            contactViewModel::inviteUser,
-                        )
-                    }
+                    val linkContent =
+                        viewModel.loadContactInfo(it.link) { handle, email, name, isContact ->
+                            onUserClick(
+                                handle,
+                                email.orEmpty(),
+                                name.orEmpty(),
+                                isContact,
+                                context,
+                                coroutineScope,
+                                snackbarHostState,
+                                contactViewModel::checkUser,
+                                contactViewModel::inviteUser,
+                            )
+                        }
                     if (linkContent != null) {
                         contentLinks = contentLinks + linkContent
                     }

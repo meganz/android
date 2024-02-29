@@ -5,8 +5,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.user.UserId
-import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserUseCase
@@ -49,33 +47,32 @@ class ContactMessageViewModel @Inject constructor(
     fun checkUser(
         userHandle: Long,
         email: String,
-        onContactClicked: (String) -> Unit,
+        isContact: Boolean,
+        onContactClicked: () -> Unit,
         onNonContactClicked: () -> Unit,
         onNonContactAlreadyInvitedClicked: () -> Unit,
     ) {
         viewModelScope.launch {
             val myUserHandle = getMyUserHandleUseCase()
-            if (userHandle == myUserHandle) {
-                return@launch
-            } else {
-                runCatching {
-                    getUserUseCase(UserId(userHandle))
-                }.onSuccess { it ->
-                    it?.takeIf { it.visibility == UserVisibility.Visible }?.let { user ->
-                        onContactClicked(user.email)
-                    } ?: run {
-                        runCatching { isContactRequestSentUseCase(email) }
-                            .onSuccess { isSent ->
-                                if (isSent) {
-                                    onNonContactAlreadyInvitedClicked()
-                                } else {
-                                    onNonContactClicked()
-                                }
+            when {
+                userHandle == myUserHandle -> {
+                    return@launch
+                }
+
+                isContact -> {
+                    onContactClicked()
+                }
+
+                else -> {
+                    runCatching { isContactRequestSentUseCase(email) }
+                        .onSuccess { isSent ->
+                            if (isSent) {
+                                onNonContactAlreadyInvitedClicked()
+                            } else {
+                                onNonContactClicked()
                             }
-                            .onFailure { Timber.e(it) }
-                    }
-                }.onFailure {
-                    Timber.d(it)
+                        }
+                        .onFailure { Timber.e(it) }
                 }
             }
         }

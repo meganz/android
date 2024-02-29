@@ -9,13 +9,13 @@ import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 
-internal class CopyMessageAction() : MessageAction(
+internal class CopyMessageAction : MessageAction(
     text = R.string.context_copy,
     icon = R.drawable.ic_icon_copy_medium_regular_outline,
     testTag = "action_copy"
 ) {
-    override fun appliesTo(messages: Set<TypedMessage>) =
-        messages.all { it is NormalMessage || it is RichPreviewMessage || it is LocationMessage }
+    override fun appliesTo(messages: Set<TypedMessage>) = messages.isNotEmpty() &&
+            messages.all { it is NormalMessage || it is RichPreviewMessage || it is LocationMessage }
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
