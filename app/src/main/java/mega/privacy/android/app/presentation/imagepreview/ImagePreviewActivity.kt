@@ -375,5 +375,25 @@ class ImagePreviewActivity : BaseActivity() {
                 putExtra("show_screen_label", showScreenLabel)
             }
         }
+
+        fun createSecondaryIntent(
+            context: Context,
+            imageSource: ImagePreviewFetcherSource,
+            menuOptionsSource: ImagePreviewMenuSource,
+            anchorImageNodeId: Long? = null,
+            params: Map<String, Any> = mapOf(),
+            isForeign: Boolean = false,
+            showScreenLabel: Boolean = true,
+        ): Intent {
+            return createIntent(
+                context = context,
+                imageSource = imageSource,
+                menuOptionsSource = menuOptionsSource,
+                anchorImageNodeId = anchorImageNodeId?.let { NodeId(it) },
+                params = params,
+                isForeign = isForeign,
+                showScreenLabel = showScreenLabel,
+            )
+        }
     }
 }

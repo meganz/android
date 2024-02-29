@@ -148,6 +148,9 @@ class ImagePreviewViewModel @Inject constructor(
                 val (currentImageNodeIndex, currentImageNode) = findCurrentImageNode(imageNodes)
                 val isCurrentImageNodeAvailableOffline =
                     currentImageNode?.isAvailableOffline ?: false
+
+                Timber.d("ImagePreview VM imageNodes: ${imageNodes.size}")
+
                 _state.update {
                     it.copy(
                         isInitialized = true,

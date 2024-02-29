@@ -9,6 +9,7 @@ import mega.privacy.android.app.presentation.imagepreview.menu.AlbumContentImage
 import mega.privacy.android.app.presentation.imagepreview.menu.AlbumSharingImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.BackupsImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.CloudDriveImagePreviewMenu
+import mega.privacy.android.app.presentation.imagepreview.menu.ContactFileListImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.DefaultImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.FavouriteImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.FileImagePreviewMenu
@@ -100,4 +101,9 @@ internal interface ImagePreviewMenuModule {
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.ZIP)
     fun ZipImagePreviewMenu.bindZipMenu(): ImagePreviewMenu
+
+    @Binds
+    @IntoMap
+    @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.CONTACT_FILE_LIST)
+    fun ContactFileListImagePreviewMenu.bindContactFileListMenu(): ImagePreviewMenu
 }

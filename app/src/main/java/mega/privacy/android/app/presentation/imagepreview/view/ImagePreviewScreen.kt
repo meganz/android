@@ -459,67 +459,69 @@ private fun ImagePreviewContent(
         HorizontalPager(
             modifier = Modifier.fillMaxSize(),
             state = pagerState,
-            beyondBoundsPageCount = 5,
+            beyondBoundsPageCount = minOf(5, imageNodes.size),
             key = { imageNodes.getOrNull(it)?.id?.longValue ?: -1L },
         ) { index ->
-            val imageNode = imageNodes[index]
 
-            val imageResultTriple by produceState<Triple<ImageResult?, String?, String?>>(
-                initialValue = Triple(null, null, null)
-            ) {
-                downloadImage(imageNode).collectLatest { imageResult ->
-                    value = Triple(
-                        imageResult,
-                        getImagePath(imageResult),
-                        getErrorImagePath(imageResult)
-                    )
-                }
-            }
-
-            val (imageResult, imagePath, errorImagePath) = imageResultTriple
-
-            Box(modifier = Modifier.fillMaxSize()) {
-                val isVideo = imageNode.type is VideoFileTypeInfo
-                ImageContent(
-                    fullSizePath = imageNode.run {
-                        fullSizePath.takeIf {
-                            imageNode.serializedData?.contains(
-                                "local"
-                            ) == true
-                        }
-                    } ?: imagePath,
-                    errorImagePath = imageNode.run {
-                        fullSizePath.takeIf {
-                            imageNode.serializedData?.contains(
-                                "local"
-                            ) == true
-                        }
-                    } ?: errorImagePath,
-                    photoState = photoState,
-                    onImageTap = onImageTap,
-                    enableZoom = !isVideo
-                )
-                if (isVideo) {
-                    IconButton(
-                        modifier = Modifier.align(Alignment.Center),
-                        onClick = { onClickVideoPlay(imageNode) }
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_play),
-                            contentDescription = "Image Preview play video",
-                            tint = Color.White,
+            val imageNode = imageNodes.getOrNull(index)
+            if (imageNode != null) {
+                val imageResultTriple by produceState<Triple<ImageResult?, String?, String?>>(
+                    initialValue = Triple(null, null, null)
+                ) {
+                    downloadImage(imageNode).collectLatest { imageResult ->
+                        value = Triple(
+                            imageResult,
+                            getImagePath(imageResult),
+                            getErrorImagePath(imageResult)
                         )
                     }
                 }
 
-                val progress = imageResult?.getProgressPercentage() ?: 0L
-                if (progress in 1 until 100) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.BottomEnd),
-                        progress = progress.toFloat() / 100,
-                        color = MaterialTheme.colors.secondary,
-                        strokeWidth = 2.dp,
+                val (imageResult, imagePath, errorImagePath) = imageResultTriple
+
+                Box(modifier = Modifier.fillMaxSize()) {
+                    val isVideo = imageNode.type is VideoFileTypeInfo
+                    ImageContent(
+                        fullSizePath = imageNode.run {
+                            fullSizePath.takeIf {
+                                imageNode.serializedData?.contains(
+                                    "local"
+                                ) == true
+                            }
+                        } ?: imagePath,
+                        errorImagePath = imageNode.run {
+                            fullSizePath.takeIf {
+                                imageNode.serializedData?.contains(
+                                    "local"
+                                ) == true
+                            }
+                        } ?: errorImagePath,
+                        photoState = photoState,
+                        onImageTap = onImageTap,
+                        enableZoom = !isVideo
                     )
+                    if (isVideo) {
+                        IconButton(
+                            modifier = Modifier.align(Alignment.Center),
+                            onClick = { onClickVideoPlay(imageNode) }
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_play),
+                                contentDescription = "Image Preview play video",
+                                tint = Color.White,
+                            )
+                        }
+                    }
+
+                    val progress = imageResult?.getProgressPercentage() ?: 0L
+                    if (progress in 1 until 100) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.BottomEnd),
+                            progress = progress.toFloat() / 100,
+                            color = MaterialTheme.colors.secondary,
+                            strokeWidth = 2.dp,
+                        )
+                    }
                 }
             }
         }

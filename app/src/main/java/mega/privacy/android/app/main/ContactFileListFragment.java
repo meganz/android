@@ -8,6 +8,7 @@ import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_CONTACT_FILE_LIST;
+import static mega.privacy.android.app.utils.CoroutinesBridgeKt.onResult;
 import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
@@ -44,6 +45,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.FileProvider;
+import androidx.lifecycle.LifecycleOwnerKt;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -54,30 +56,42 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Unit;
+import kotlinx.coroutines.CoroutineScope;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.featuretoggle.AppFeatures;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.listeners.FabButtonListener;
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity;
+import mega.privacy.android.app.presentation.imagepreview.fetcher.ContactFileListImageNodeFetcher;
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource;
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import timber.log.Timber;
 
-
+@AndroidEntryPoint
 public class ContactFileListFragment extends ContactFileBaseFragment {
 
     private ActionMode actionMode;
@@ -89,6 +103,9 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
     FloatingActionButton fab;
     Stack<Long> parentHandleStack = new Stack<>();
     int currNodePosition = -1;
+
+    @Inject
+    GetFeatureFlagValueUseCase getFeatureFlagUseCase;
 
     private final static String PARENT_HANDLE_STACK = "parentHandleStack";
 
@@ -482,15 +499,40 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
                 navigateToFolder(contactNodes.get(position));
             } else {
                 if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isImage()) {
-                    Intent intent = ImageViewerActivity.getIntentForParentNode(
-                            requireContext(),
-                            megaApi.getParentNode(contactNodes.get(position)).getHandle(),
-                            orderGetChildren,
-                            contactNodes.get(position).getHandle()
-                    );
-                    putThumbnailLocation(intent, listView, position, VIEWER_FROM_CONTACT_FILE_LIST, adapter);
-                    startActivity(intent);
-                    ((ContactFileListActivity) context).overridePendingTransition(0, 0);
+                    CoroutineScope lifecycleScope = LifecycleOwnerKt.getLifecycleScope(this);
+                    getFeatureFlagUseCase.invoke(AppFeatures.ImagePreview, onResult(lifecycleScope, (isEnabled) -> {
+                        if (isEnabled != null && isEnabled) {
+                            MegaNode anchorNode = contactNodes.get(position);
+                            long anchorNodeHandle = anchorNode.getHandle();
+
+                            long parentNodeHandle = megaApi.getParentNode(anchorNode).getHandle();
+
+                            Map<String, Object> previewParams = new HashMap<>();
+                            previewParams.put(ContactFileListImageNodeFetcher.PARENT_ID, parentNodeHandle);
+
+                            Intent intent = ImagePreviewActivity.Companion.createSecondaryIntent(
+                                    requireContext(),
+                                    ImagePreviewFetcherSource.CONTACT_FILE_LIST,
+                                    ImagePreviewMenuSource.CONTACT_FILE_LIST,
+                                    anchorNodeHandle,
+                                    previewParams,
+                                    false,
+                                    true
+                            );
+                            startActivity(intent);
+                        } else {
+                            Intent intent = ImageViewerActivity.getIntentForParentNode(
+                                    requireContext(),
+                                    megaApi.getParentNode(contactNodes.get(position)).getHandle(),
+                                    orderGetChildren,
+                                    contactNodes.get(position).getHandle()
+                            );
+                            putThumbnailLocation(intent, listView, position, VIEWER_FROM_CONTACT_FILE_LIST, adapter);
+                            startActivity(intent);
+                            ((ContactFileListActivity) context).overridePendingTransition(0, 0);
+                        }
+                        return Unit.INSTANCE;
+                    }));
                 } else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isVideoMimeType() || MimeTypeList.typeForName(contactNodes.get(position).getName()).isAudio()) {
                     MegaNode file = contactNodes.get(position);
                     String mimeType = MimeTypeList.typeForName(file.getName()).getType();
