@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.notification.view
+package mega.privacy.android.app.presentation.notification.view.components
 
 import android.content.res.Configuration
 import android.text.format.DateFormat

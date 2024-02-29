@@ -5308,4 +5308,8 @@
     <string name="general_hide_node">Hide</string>
     <!-- Bottom sheet button to unhide a node/file -->
     <string name="general_unhide_node">Unhide</string>
+    <!-- Promo label for promo notification section -->
+    <string name="notifications_screen_notification_label_promo">Promo</string>
+    <!-- Promo notification section title for promo notification section -->
+    <string name="notifications_screen_notification_section_title">Limited time offer</string>
 </resources>

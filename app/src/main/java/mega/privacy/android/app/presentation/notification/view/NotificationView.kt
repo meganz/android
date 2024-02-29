@@ -21,6 +21,7 @@ import androidx.lifecycle.Lifecycle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.presentation.notification.model.NotificationState
+import mega.privacy.android.app.presentation.notification.view.notificationviewtype.NotificationItemView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.core.ui.utils.ComposableLifecycle

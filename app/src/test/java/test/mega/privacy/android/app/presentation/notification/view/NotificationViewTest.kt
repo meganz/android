@@ -11,6 +11,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.presentation.notification.model.NotificationState
 import mega.privacy.android.app.presentation.notification.view.NotificationView
+import mega.privacy.android.app.presentation.notification.view.notificationviewtype.NOTIFICATION_GREEN_ICON_TEST_TAG
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
@@ -211,7 +212,7 @@ class NotificationViewTest {
             ) {}
             )))
         }
-        composeRule.onNodeWithTag("IsNew", useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithTag(NOTIFICATION_GREEN_ICON_TEST_TAG, useUnmergedTree = true).assertIsDisplayed()
     }
 
     @Test
@@ -232,6 +233,6 @@ class NotificationViewTest {
             ) {}
             )))
         }
-        composeRule.onNodeWithTag("IsNew").assertDoesNotExist()
+        composeRule.onNodeWithTag(NOTIFICATION_GREEN_ICON_TEST_TAG).assertDoesNotExist()
     }
 }

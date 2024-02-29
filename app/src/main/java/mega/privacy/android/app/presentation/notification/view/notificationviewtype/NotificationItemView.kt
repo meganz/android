@@ -1,16 +1,14 @@
-package mega.privacy.android.app.presentation.notification.view
+package mega.privacy.android.app.presentation.notification.view.notificationviewtype
 
 import android.content.Context
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -21,29 +19,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.notification.model.Notification
+import mega.privacy.android.app.presentation.notification.view.components.GreenIconView
+import mega.privacy.android.app.presentation.notification.view.components.NotificationSchedMeetingView
 import mega.privacy.android.core.ui.model.SpanIndicator
+import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.grey_500_grey_400
 import mega.privacy.android.core.ui.theme.extensions.grey_900_grey_100
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_054
-import mega.privacy.android.core.ui.theme.grey_alpha_087
 import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_054
-import mega.privacy.android.core.ui.theme.white_alpha_087
 import mega.privacy.android.core.ui.utils.intToDp
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable
 internal fun NotificationItemView(
@@ -165,28 +165,14 @@ private fun NotificationTitleRow(
         )
 
         if (showNewIcon) {
-            Box(
-                modifier = Modifier
-                    .padding(start = 12.dp)
-                    .background(
-                        color = MaterialTheme.colors.secondary,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-            ) {
-                Text(
-                    text = stringResource(id = R.string.new_label_notification_item),
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp, vertical = 3.dp)
-                        .testTag("IsNew"),
-                    color = if (MaterialTheme.colors.isLight) white_alpha_087 else grey_alpha_087,
-                    fontSize = 12.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
+            GreenIconView(
+                greenIconLabelRes = R.string.new_label_notification_item,
+                modifier = Modifier.testTag(NOTIFICATION_GREEN_ICON_TEST_TAG)
+            )
         }
     }
 }
+
 
 @Composable
 private fun NotificationDescription(description: String) {
@@ -240,7 +226,9 @@ private fun NotificationDivider(horizontalPadding: Int) {
 @Preview
 @Preview(uiMode = UI_MODE_NIGHT_YES, name = "PreviewNotificationItemViewDark")
 @Composable
-private fun PreviewNotificationItemView() {
+private fun PreviewNotificationItemView(
+    @PreviewParameter(BooleanProvider::class) booleanParameter: Boolean,
+) {
     val notification = Notification(
         sectionTitle = { "CONTACTS" },
         sectionColour = R.color.orange_400_orange_300,
@@ -254,7 +242,11 @@ private fun PreviewNotificationItemView() {
         backgroundColor = { "#D3D3D3" },
         separatorMargin = { 0 }
     ) {}
-    NotificationItemView(modifier = Modifier,
-        notification, position = 0, notifications = listOf(notification), onClick = {})
-
+    MegaAppTheme(isDark = booleanParameter) {
+        NotificationItemView(modifier = Modifier,
+            notification, position = 0, notifications = listOf(notification), onClick = {})
+    }
 }
+
+internal const val NOTIFICATION_GREEN_ICON_TEST_TAG =
+    "notification_item_view:notification_title_row:new_text"
