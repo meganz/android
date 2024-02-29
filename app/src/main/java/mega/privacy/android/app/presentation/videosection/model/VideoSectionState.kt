@@ -12,6 +12,8 @@ import mega.privacy.android.domain.entity.SortOrder
  * @property searchMode the search mode state
  * @property scrollToTop the scroll to top state
  * @property selectedVideoHandles the selected video handles
+ * @property locationSelectedFilterOption the location selected filter option
+ * @property durationSelectedFilterOption the duration selected filter option
  * @property isInSelection if list is in selection mode or not
  * @property videoPlaylists the video playlists
  * @property currentVideoPlaylist the current video playlist
@@ -38,6 +40,8 @@ data class VideoSectionState(
     val searchMode: Boolean = false,
     val scrollToTop: Boolean = false,
     val selectedVideoHandles: List<Long> = emptyList(),
+    val locationSelectedFilterOption: LocationFilterOption? = null,
+    val durationSelectedFilterOption: DurationFilterOption? = null,
     val isInSelection: Boolean = false,
     val videoPlaylists: List<VideoPlaylistUIEntity> = emptyList(),
     val currentVideoPlaylist: VideoPlaylistUIEntity? = null,

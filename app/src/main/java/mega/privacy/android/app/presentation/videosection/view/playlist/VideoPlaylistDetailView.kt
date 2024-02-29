@@ -240,7 +240,7 @@ fun VideoPlaylistDetailView(
                                 icon = iconPackR.drawable.ic_video_list,
                                 name = videoItem.name,
                                 fileSize = formatFileSize(videoItem.size, LocalContext.current),
-                                duration = videoItem.duration,
+                                duration = videoItem.durationString,
                                 isFavourite = videoItem.isFavourite,
                                 isSelected = videoItem.isSelected,
                                 thumbnailData = if (videoItem.thumbnail?.exists() == true) {

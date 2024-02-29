@@ -11,6 +11,8 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
+import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
+import mega.privacy.android.app.presentation.videosection.model.LocationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
@@ -655,6 +657,97 @@ class VideoSectionViewModelTest {
             underTest.setCurrentDestinationRoute(null)
             assertThat(awaitItem().currentDestinationRoute).isNull()
         }
+    }
+
+    @Test
+    fun `test that the setLocationSelectedFilterOption is correctly updated`() = runTest {
+        val locationOption = LocationFilterOption.CameraUploads
+        initUnderTest()
+
+        underTest.state.test {
+            awaitItem().let {
+                assertThat(it.locationSelectedFilterOption).isNull()
+                assertThat(it.isPendingRefresh).isFalse()
+            }
+            underTest.setLocationSelectedFilterOption(locationOption)
+            awaitItem().let {
+                assertThat(it.locationSelectedFilterOption).isEqualTo(locationOption)
+                assertThat(it.isPendingRefresh).isTrue()
+                assertThat(it.progressBarShowing).isTrue()
+            }
+            underTest.setLocationSelectedFilterOption(null)
+            awaitItem().let {
+                assertThat(it.locationSelectedFilterOption).isNull()
+                assertThat(it.isPendingRefresh).isTrue()
+            }
+        }
+    }
+
+    @Test
+    fun `test that the setDurationSelectedFilterOption is correctly updated`() = runTest {
+        val durationOption = DurationFilterOption.MoreThan20
+        initUnderTest()
+
+        underTest.state.test {
+            awaitItem().let {
+                assertThat(it.durationSelectedFilterOption).isNull()
+                assertThat(it.isPendingRefresh).isFalse()
+            }
+            underTest.setDurationSelectedFilterOption(durationOption)
+            awaitItem().let {
+                assertThat(it.durationSelectedFilterOption).isEqualTo(durationOption)
+                assertThat(it.isPendingRefresh).isTrue()
+                assertThat(it.progressBarShowing).isTrue()
+            }
+            underTest.setDurationSelectedFilterOption(null)
+            awaitItem().let {
+                assertThat(it.durationSelectedFilterOption).isNull()
+                assertThat(it.isPendingRefresh).isTrue()
+            }
+        }
+    }
+
+    @Test
+    fun `test that the videos return correctly when the duration select option is not null`() =
+        runTest {
+            val durationOption = DurationFilterOption.MoreThan20
+
+            val typedVideoNode1 = getTypedVideoNode(1)
+            val typedVideoNode2 = getTypedVideoNode(2)
+            val typedVideoNode3 = getTypedVideoNode(3)
+
+            val videoOfDurationLessThan4 = getVideoUIEntityWithDuration(3)
+            val videoOfDurationBetween4And20 = getVideoUIEntityWithDuration(8)
+            val videoOfDurationMoreThan20 = getVideoUIEntityWithDuration(21)
+
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
+            whenever(getAllVideosUseCase()).thenReturn(
+                listOf(typedVideoNode1, typedVideoNode2, typedVideoNode3)
+            )
+            whenever(videoUIEntityMapper(typedVideoNode1)).thenReturn(videoOfDurationLessThan4)
+            whenever(videoUIEntityMapper(typedVideoNode2)).thenReturn(videoOfDurationBetween4And20)
+            whenever(videoUIEntityMapper(typedVideoNode3)).thenReturn(videoOfDurationMoreThan20)
+
+            underTest.setDurationSelectedFilterOption(durationOption)
+            underTest.refreshNodes()
+
+            underTest.state.drop(1).test {
+                val actual = awaitItem()
+                assertThat(actual.durationSelectedFilterOption).isEqualTo(durationOption)
+                assertThat(actual.allVideos.size).isEqualTo(1)
+                assertThat(actual.allVideos[0].durationInMinutes)
+                    .isEqualTo(videoOfDurationMoreThan20.durationInMinutes)
+            }
+        }
+
+    private fun getTypedVideoNode(videoId: Long) = mock<TypedVideoNode> {
+        on { id }.thenReturn(NodeId(videoId))
+        on { name }.thenReturn("video name")
+    }
+
+    private fun getVideoUIEntityWithDuration(minutes: Long) = mock<VideoUIEntity> {
+        on { name }.thenReturn("video name")
+        on { durationInMinutes }.thenReturn(minutes)
     }
 
     companion object {

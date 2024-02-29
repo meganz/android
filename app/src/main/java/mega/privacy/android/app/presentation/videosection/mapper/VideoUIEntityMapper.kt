@@ -21,7 +21,8 @@ class VideoUIEntityMapper @Inject constructor(
         id = typedVideoNode.id,
         name = typedVideoNode.name,
         size = typedVideoNode.size,
-        duration = durationInSecondsTextMapper(typedVideoNode.duration),
+        durationString = durationInSecondsTextMapper(typedVideoNode.duration),
+        durationInMinutes = typedVideoNode.duration.inWholeMinutes,
         thumbnail = typedVideoNode.thumbnailPath?.let { File(it) },
         isFavourite = typedVideoNode.isFavourite,
         nodeAvailableOffline = typedVideoNode.isAvailableOffline

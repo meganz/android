@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.minutes
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VideoUIEntityMapperTest {
@@ -28,9 +28,10 @@ class VideoUIEntityMapperTest {
         val expectedId = NodeId(123456L)
         val expectedName = "video file name"
         val expectedSize: Long = 100
-        val expectedDurationString = "1:40"
+        val expectedDurationString = "10:00"
         val expectedThumbnail = "video file thumbnail"
         val expectedAvailableOffline = true
+        val expectedDurationTime = 10.minutes
 
         val expectedTypedVideoNode = mock<TypedVideoNode> {
             on { id }.thenReturn(expectedId)
@@ -38,7 +39,7 @@ class VideoUIEntityMapperTest {
             on { size }.thenReturn(expectedSize)
             on { isFavourite }.thenReturn(false)
             on { isAvailableOffline }.thenReturn(expectedAvailableOffline)
-            on { duration }.thenReturn(100.seconds)
+            on { duration }.thenReturn(expectedDurationTime)
             on { thumbnailPath }.thenReturn(expectedThumbnail)
         }
 
@@ -46,7 +47,8 @@ class VideoUIEntityMapperTest {
             assertThat(it.id.longValue).isEqualTo(expectedId.longValue)
             assertThat(it.name).isEqualTo(expectedName)
             assertThat(it.size).isEqualTo(expectedSize)
-            assertThat(it.duration).isEqualTo(expectedDurationString)
+            assertThat(it.durationString).isEqualTo(expectedDurationString)
+            assertThat(it.durationInMinutes).isEqualTo(10)
             assertThat(it.thumbnail?.path).isEqualTo(expectedThumbnail)
             assertThat(it.nodeAvailableOffline).isEqualTo(expectedAvailableOffline)
         }

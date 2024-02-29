@@ -15,9 +15,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.videosection.VideoSectionViewModel
-import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
+import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.allvideos.AllVideosView
 import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistsView
 
@@ -75,6 +75,10 @@ internal fun VideoSectionComposeView(
                     id = SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
                         ?: R.string.sortby_name
                 ),
+                selectedDurationFilterOption = uiState.durationSelectedFilterOption,
+                selectedLocationFilterOption = uiState.locationSelectedFilterOption,
+                onLocationFilterItemClicked = videoSectionViewModel::setLocationSelectedFilterOption,
+                onDurationFilterItemClicked = videoSectionViewModel::setDurationSelectedFilterOption,
                 modifier = Modifier,
                 onSortOrderClick = onSortOrderClick,
                 onClick = onClick,

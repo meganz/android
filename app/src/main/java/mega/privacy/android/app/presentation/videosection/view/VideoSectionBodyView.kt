@@ -136,7 +136,7 @@ internal fun VideoSectionTabs(
                     text = {
                         Text(
                             text = when (tab) {
-                                VideoSectionTab.All -> "All"
+                                VideoSectionTab.All -> "Videos"
                                 VideoSectionTab.Playlists -> "Playlists"
                             },
                             fontWeight = FontWeight.Medium

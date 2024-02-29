@@ -19,6 +19,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
+import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
+import mega.privacy.android.app.presentation.videosection.model.LocationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionState
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
@@ -145,7 +147,10 @@ class VideoSectionViewModel @Inject constructor(
     private fun setPendingRefreshNodes() = _state.update { it.copy(isPendingRefresh = true) }
 
     internal fun refreshNodes() = viewModelScope.launch {
-        val videoList = getVideoUIEntityList().updateOriginalData().filterVideosBySearchQuery()
+        val videoList = getVideoUIEntityList()
+            .updateOriginalData()
+            .filterVideosBySearchQuery()
+            .filterVideosBySelectedFilterOption()
         val sortOrder = getCloudSortOrder()
         _state.update {
             it.copy(
@@ -171,6 +176,30 @@ class VideoSectionViewModel @Inject constructor(
 
     private suspend fun getVideoUIEntityList() =
         getAllVideosUseCase().map { videoUIEntityMapper(it) }
+
+    private fun List<VideoUIEntity>.filterVideosBySelectedFilterOption() =
+        if (_state.value.locationSelectedFilterOption != null ||
+            _state.value.durationSelectedFilterOption != null
+        ) {
+            _state.value.durationSelectedFilterOption?.let {
+                filterVideosByDuration(this, it)
+            } ?: this
+        } else this
+
+    private fun filterVideosByDuration(
+        videos: List<VideoUIEntity>,
+        durationOption: DurationFilterOption,
+    ) = videos.filter {
+        when (durationOption) {
+            DurationFilterOption.LessThan4 -> it.durationInMinutes < 4
+
+            DurationFilterOption.Between4And20 ->
+                it.durationInMinutes in 4..20
+
+            DurationFilterOption.MoreThan20 -> it.durationInMinutes > 20
+        }
+    }
+
 
     internal fun markHandledPendingRefresh() = _state.update { it.copy(isPendingRefresh = false) }
 
@@ -606,6 +635,24 @@ class VideoSectionViewModel @Inject constructor(
     internal fun setCurrentDestinationRoute(route: String?) = _state.update {
         it.copy(currentDestinationRoute = route)
     }
+
+    internal fun setLocationSelectedFilterOption(locationFilterOption: LocationFilterOption?) =
+        _state.update {
+            it.copy(
+                locationSelectedFilterOption = locationFilterOption,
+                progressBarShowing = true,
+                isPendingRefresh = true
+            )
+        }
+
+    internal fun setDurationSelectedFilterOption(durationFilterOption: DurationFilterOption?) =
+        _state.update {
+            it.copy(
+                durationSelectedFilterOption = durationFilterOption,
+                progressBarShowing = true,
+                isPendingRefresh = true
+            )
+        }
 
     companion object {
         private const val ERROR_MESSAGE_REPEATED_TITLE = 0

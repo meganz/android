@@ -9,7 +9,8 @@ import java.io.File
  * @property id NodeId
  * @property name the video's name
  * @property size the video's size
- * @property duration the video's duration
+ * @property durationString the video's duration String
+ * @property durationInMinutes the video's duration in minutes
  * @property thumbnail the video's thumbnail
  * @property isFavourite the video if is Favourite
  * @property nodeAvailableOffline the video if is available for offline
@@ -19,7 +20,8 @@ data class VideoUIEntity(
     val id: NodeId,
     val name: String,
     val size: Long,
-    val duration: String?,
+    val durationString: String?,
+    val durationInMinutes: Long,
     val thumbnail: File? = null,
     val isFavourite: Boolean = false,
     val nodeAvailableOffline: Boolean = false,
