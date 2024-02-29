@@ -9,14 +9,17 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.NotificationsGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
+import mega.privacy.android.data.mapper.notification.PromoNotificationListMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.Contact
@@ -25,6 +28,7 @@ import mega.privacy.android.domain.entity.ScheduledMeetingAlert
 import mega.privacy.android.domain.entity.UserAlert
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
+import mega.privacy.android.domain.entity.notifications.PromoNotification
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.NotificationsRepository
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
@@ -53,6 +57,8 @@ internal class DefaultNotificationsRepository @Inject constructor(
     private val callsPreferencesGateway: CallsPreferencesGateway,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
     private val appEventGateway: AppEventGateway,
+    private val notificationsGateway: NotificationsGateway,
+    private val promoNotificationListMapper: PromoNotificationListMapper,
 ) : NotificationsRepository, LegacyNotificationRepository {
 
     private val _pushNotificationSettings =
@@ -282,5 +288,39 @@ internal class DefaultNotificationsRepository @Inject constructor(
                     ?: megaApiGateway.createInstanceMegaPushNotificationSettings()
 
             appEventGateway.broadcastPushNotificationSettings()
+        }
+
+    override suspend fun getPromoNotifications(): List<PromoNotification> =
+        withContext(dispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request, error ->
+                        when (error.errorCode) {
+                            MegaError.API_OK -> {
+                                continuation.resumeWith(
+                                    Result.success(
+                                        promoNotificationListMapper(
+                                            request.megaNotifications
+                                        )
+                                    )
+                                )
+                            }
+
+                            MegaError.API_ENOENT -> {
+                                continuation.resumeWith(Result.success(emptyList()))
+                            }
+
+                            else -> {
+                                Timber.e("Error getting promo notifications: ${error.errorString}")
+                                continuation.failWithError(error, "getPromoNotifications")
+                            }
+                        }
+                    }
+                )
+                notificationsGateway.getNotifications(listener)
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
         }
 }

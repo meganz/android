@@ -3,6 +3,7 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.Event
 import mega.privacy.android.domain.entity.UserAlert
+import mega.privacy.android.domain.entity.notifications.PromoNotification
 
 /**
  * Notification repository.
@@ -120,4 +121,11 @@ interface NotificationsRepository {
      *  Retrieve the push notification settings from the server and update the data in memory
      */
     suspend fun updatePushNotificationSettings()
+
+    /**
+     *  Get list of Promo notifications
+     *
+     *  @return list of Promo notifications
+     */
+    suspend fun getPromoNotifications(): List<PromoNotification>
 }

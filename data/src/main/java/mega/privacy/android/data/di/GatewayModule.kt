@@ -20,6 +20,7 @@ import mega.privacy.android.data.facade.MegaApiFolderFacade
 import mega.privacy.android.data.facade.MegaChatApiFacade
 import mega.privacy.android.data.facade.MegaLocalRoomFacade
 import mega.privacy.android.data.facade.MegaLocalStorageFacade
+import mega.privacy.android.data.facade.NotificationsFacade
 import mega.privacy.android.data.facade.PermissionFacade
 import mega.privacy.android.data.facade.SDCardFacade
 import mega.privacy.android.data.facade.TelephonyFacade
@@ -47,6 +48,7 @@ import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.HttpConnectionGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.NotificationsGateway
 import mega.privacy.android.data.gateway.PermissionGateway
 import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.TelephonyGateway
@@ -278,5 +280,9 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindChatStorageGateway(implementation: ChatStorageFacade): ChatStorageGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindNotificationGateway(implementation: NotificationsFacade): NotificationsGateway
 
 }
