@@ -21,7 +21,7 @@ import timber.log.Timber
 internal fun openChatFragment(
     context: Context,
     chatId: Long,
-    chatLink: String?,
+    chatLink: String? = null,
 ) {
     context.findChatHostActivity()?.apply {
         supportFragmentManager.commit {

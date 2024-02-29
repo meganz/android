@@ -167,6 +167,7 @@ internal fun ChatView(
         actions = actions,
         messageSetSaver = savers.messageSetSaver,
         consumeDownloadEvent = viewModel::consumeDownloadEvent,
+        onOpenChatConversationEventConsumed = viewModel::onOpenChatConversationEventConsumed,
     )
 }
 
@@ -192,7 +193,6 @@ internal fun ChatView(
  * @param onStartOrJoinMeeting
  * @param onAnswerCall
  * @param onEnableGeolocation
- * @param onUserUpdateHandled
  * @param messageListView
  * @param bottomBar
  * @param onSendClick
@@ -266,6 +266,7 @@ internal fun ChatView(
         save = { "" },
         restore = { emptySet() }),
     consumeDownloadEvent: () -> Unit = {},
+    onOpenChatConversationEventConsumed: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -913,7 +914,7 @@ internal fun ChatView(
                                     context.getString(R.string.general_confirmation_open)
                                 )
                                 if (result == SnackbarResult.ActionPerformed) {
-                                    openChatFragment(context, openChatId, null)
+                                    openChatFragment(context, openChatId)
                                 }
                             } ?: scaffoldState.snackbarHostState.showSnackbar(text)
                         } else {
@@ -930,6 +931,11 @@ internal fun ChatView(
                 muteNotificationDialogOptions = options
                 showMutePushNotificationDialog = true
             }
+
+            EventEffect(
+                event = openChatConversationEvent,
+                onConsumed = onOpenChatConversationEventConsumed,
+            ) { chatId -> openChatFragment(context, chatId) }
         }
 
         StartDownloadComponent(

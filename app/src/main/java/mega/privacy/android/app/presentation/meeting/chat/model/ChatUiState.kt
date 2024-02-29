@@ -38,8 +38,6 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion
  * @property infoToShowEvent Event to show some info. Set it to null in case the activity needs to be closed.
  * @property sendingText Text that is being sent.
  * @property isStartingCall True if it is starting a call, false otherwise.
- * @property messages List of [TypedMessage] containing the chat history.
- * @property pendingMessagesToLoad Number of messages already requested, but pending to load.
  * @property chatHistoryLoadStatus [ChatHistoryLoadStatus]. Until this is not [ChatHistoryLoadStatus.NONE], we can request for more messages.
  * @property mutePushNotificationDialogEvent Event to show the dialog to mute push notifications.
  * @property openWaitingRoomScreen True if should open waiting room screen, false otherwise.
@@ -50,6 +48,7 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion
  * @property editingMessageContent Content of the message being edited.
  * @property myUserHandle User handle of current logged in user.
  * @property downloadEvent Event to start a download.
+ * @property openChatConversationEvent Event to open a chat conversation.
  */
 data class ChatUiState(
     val chat: ChatRoom? = null,
@@ -72,8 +71,6 @@ data class ChatUiState(
     val infoToShowEvent: StateEventWithContent<InfoToShow?> = consumed(),
     val sendingText: String = "",
     val isStartingCall: Boolean = false,
-    val messages: List<UiChatMessage> = emptyList(),
-    val pendingMessagesToLoad: Int = NUMBER_MESSAGES_TO_LOAD,
     val chatHistoryLoadStatus: ChatHistoryLoadStatus? = null,
     val mutePushNotificationDialogEvent: StateEventWithContent<List<ChatPushNotificationMuteOption>> = consumed(),
     val openWaitingRoomScreen: Boolean = false,
@@ -84,6 +81,7 @@ data class ChatUiState(
     val editingMessageContent: String? = null,
     val myUserHandle: Long? = null,
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
+    val openChatConversationEvent: StateEventWithContent<Long> = consumed(),
 ) {
 
     /**

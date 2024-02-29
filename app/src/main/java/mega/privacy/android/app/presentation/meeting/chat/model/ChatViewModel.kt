@@ -43,6 +43,7 @@ import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
+import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
@@ -87,6 +88,7 @@ import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachContactsUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
+import mega.privacy.android.domain.usecase.chat.message.GetChatFromContactMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendGiphyMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
@@ -219,6 +221,7 @@ class ChatViewModel @Inject constructor(
     private val deleteMessagesUseCase: DeleteMessagesUseCase,
     private val editMessageUseCase: EditMessageUseCase,
     private val editLocationMessageUseCase: EditLocationMessageUseCase,
+    private val getChatFromContactMessagesUseCase: GetChatFromContactMessagesUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -1390,6 +1393,28 @@ class ChatViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    /**
+     * Send message
+     */
+    fun onOpenChatWith(messages: List<ContactAttachmentMessage>) {
+        viewModelScope.launch {
+            runCatching {
+                getChatFromContactMessagesUseCase(messages)
+            }.onSuccess {
+                _state.update { state -> state.copy(openChatConversationEvent = triggered(it)) }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * Open chat conversation event consumed
+     */
+    fun onOpenChatConversationEventConsumed() {
+        _state.update { state -> state.copy(openChatConversationEvent = consumed()) }
     }
 
     private fun messageCannotBeEdited() {

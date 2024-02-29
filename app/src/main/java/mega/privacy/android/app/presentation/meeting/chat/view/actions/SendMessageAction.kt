@@ -18,7 +18,7 @@ internal class SendMessageAction(
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
-
+        chatViewModel.onOpenChatWith(messages.map { it as ContactAttachmentMessage })
         onHandled()
     }
 }

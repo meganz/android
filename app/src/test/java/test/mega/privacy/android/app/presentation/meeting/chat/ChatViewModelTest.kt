@@ -50,6 +50,7 @@ import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
+import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.ForwardResult
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
@@ -95,6 +96,7 @@ import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachContactsUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
+import mega.privacy.android.domain.usecase.chat.message.GetChatFromContactMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendGiphyMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
@@ -274,6 +276,7 @@ internal class ChatViewModelTest {
     private val deleteMessagesUseCase = mock<DeleteMessagesUseCase>()
     private val editMessageUseCase = mock<EditMessageUseCase>()
     private val editLocationMessageUseCase = mock<EditLocationMessageUseCase>()
+    private val getChatFromContactMessagesUseCase = mock<GetChatFromContactMessagesUseCase>()
 
     @BeforeEach
     fun resetMocks() {
@@ -332,6 +335,7 @@ internal class ChatViewModelTest {
             deleteMessagesUseCase,
             editMessageUseCase,
             editLocationMessageUseCase,
+            getChatFromContactMessagesUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -431,6 +435,7 @@ internal class ChatViewModelTest {
             deleteMessagesUseCase = deleteMessagesUseCase,
             editMessageUseCase = editMessageUseCase,
             editLocationMessageUseCase = editLocationMessageUseCase,
+            getChatFromContactMessagesUseCase = getChatFromContactMessagesUseCase,
         )
     }
 
@@ -2776,6 +2781,31 @@ internal class ChatViewModelTest {
                 }
             }
         }
+
+    @Test
+    fun `test that open chat with invokes and updates correctly`() = runTest {
+        val messages = listOf(mock<ContactAttachmentMessage>())
+        whenever(getChatFromContactMessagesUseCase(messages)).thenReturn(chatId)
+        with(underTest) {
+            onOpenChatWith(messages)
+            state.test {
+                val result =
+                    (awaitItem().openChatConversationEvent as StateEventWithContentTriggered)
+                        .content
+                assertThat(result).isEqualTo(chatId)
+            }
+        }
+    }
+
+    @Test
+    fun `test that openChatConversationEvent updates state correctly`() = runTest {
+        initTestClass()
+        underTest.onOpenChatConversationEventConsumed()
+        underTest.state.test {
+            assertThat(awaitItem().openChatConversationEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
+        }
+    }
 
 
     private fun ChatRoom.getNumberParticipants() =

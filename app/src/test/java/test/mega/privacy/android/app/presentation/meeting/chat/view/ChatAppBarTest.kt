@@ -1287,40 +1287,6 @@ class ChatAppBarTest {
             .assertIsDisplayed()
     }
 
-    @Ignore("Need to implement a new solution that works with paged loading")
-    @Test
-    fun `test that select menu action is available if messages contains text message`() {
-        val textMessage = TextUiMessage(mock(), mock())
-        initComposeRuleContent(
-            ChatUiState(
-                chat = mock<ChatRoom> { on { isPreview } doReturn false },
-                messages = listOf(textMessage),
-                isConnected = true,
-            )
-        )
-        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_SELECT_ACTION)
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that select menu action is not available if messages contains chat invalid message`() {
-        val invalidMessage = mock<InvalidUiMessage.UnrecognizableInvalidUiMessage>()
-        initComposeRuleContent(
-            ChatUiState(
-                chat = mock<ChatRoom> {
-                    on { isPreview } doReturn false
-                    on { isArchived } doReturn false
-                },
-                isConnected = true,
-                messages = listOf(invalidMessage),
-            )
-        )
-        composeTestRule.onNodeWithTag(TAG_MENU_ACTIONS_SHOW_MORE, true).performClick()
-        composeTestRule.onNodeWithTag(ChatRoomMenuAction.TEST_TAG_SELECT_ACTION)
-            .assertDoesNotExist()
-    }
-
     @Test
     fun `test that Unarchive menu action is available if it is archived`() {
         initComposeRuleContent(
