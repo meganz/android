@@ -25,6 +25,7 @@ import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import nz.mega.sdk.MegaNode
@@ -47,6 +48,7 @@ class MediaPlayerViewModel @Inject constructor(
     private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val legacyPublicAlbumPhotoNodeProvider: LegacyPublicAlbumPhotoNodeProvider,
+    private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
 ) : BaseRxViewModel() {
 
     private val collision = SingleLiveEvent<NameCollision>()
@@ -109,6 +111,15 @@ class MediaPlayerViewModel @Inject constructor(
      */
     fun renameUpdate(node: MegaNode?) {
         _renameUpdate.value = node
+    }
+
+    /**
+     * Hide or unhide the node
+     */
+    fun hideOrUnhideNode(nodeId: NodeId, hide: Boolean) {
+        viewModelScope.launch {
+            updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = hide)
+        }
     }
 
     /**

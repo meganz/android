@@ -20,6 +20,7 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
@@ -42,6 +43,7 @@ class PdfViewerViewModel @Inject constructor(
     private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val getDataBytesFromUrlUseCase: GetDataBytesFromUrlUseCase,
+    private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
 ) : BaseRxViewModel() {
 
     private val _state = MutableStateFlow(PdfViewerState())
@@ -264,5 +266,12 @@ class PdfViewerViewModel @Inject constructor(
      */
     fun resetPdfStreamData() {
         _state.update { it.copy(pdfStreamData = null) }
+    }
+
+    /**
+     * Hide or unhide the node by modifying the sensitive attribute
+     */
+    fun hideOrUnhideNode(nodeId: NodeId, hide: Boolean) = viewModelScope.launch {
+        updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = hide)
     }
 }

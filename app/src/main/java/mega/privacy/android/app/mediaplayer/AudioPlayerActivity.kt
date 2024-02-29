@@ -23,14 +23,17 @@ import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.navigation.fragment.NavHostFragment
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityAudioPlayerBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -77,15 +80,18 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Extending MediaPlayerActivity is to declare portrait in manifest,
  * to avoid crash when set requestedOrientation.
  */
+@AndroidEntryPoint
 class AudioPlayerActivity : MediaPlayerActivity() {
     private lateinit var binding: ActivityAudioPlayerBinding
 
@@ -93,7 +99,15 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
     private var serviceBound = false
 
+    private var isHiddenNodesEnabled: Boolean = false
+
     private var takenDownDialog: AlertDialog? = null
+
+    /**
+     * Inject [GetFeatureFlagValueUseCase] to the Fragment
+     */
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private var serviceGateway: MediaPlayerServiceGateway? = null
     private var playerServiceGateway: PlayerServiceViewModelGateway? = null
@@ -189,6 +203,13 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         }
 
         binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
+
+        lifecycleScope.launch {
+            runCatching {
+                isHiddenNodesEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+                invalidateOptionsMenu()
+            }.onFailure { Timber.e(it) }
+        }
 
         setContentView(binding.root)
         addStartDownloadTransferView(binding.root)
@@ -425,6 +446,24 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                     viewModel.renameUpdate(node = megaApi.getNodeByHandle(playingHandle))
                 }
 
+                R.id.hide -> {
+                    viewModel.hideOrUnhideNode(nodeId = NodeId(playingHandle), hide = true)
+                    // Some times checking node.isMarkedSensitive immediately will still
+                    // get true, so let's add some delay here.
+                    RunOnUIThreadUtils.runDelay(500L) {
+                        refreshMenuOptionsVisibility()
+                    }
+                }
+
+                R.id.unhide -> {
+                    viewModel.hideOrUnhideNode(nodeId = NodeId(playingHandle), hide = false)
+                    // Some times checking node.isMarkedSensitive immediately will still
+                    // get true, so let's add some delay here.
+                    RunOnUIThreadUtils.runDelay(500L) {
+                        refreshMenuOptionsVisibility()
+                    }
+                }
+
                 R.id.move -> {
                     selectFolderToMoveLauncher.launch(
                         Intent(this, FileExplorerActivity::class.java).apply {
@@ -590,6 +629,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             R.id.remove_link,
             R.id.chat_save_for_offline,
             R.id.rename,
+            R.id.hide,
+            R.id.unhide,
             R.id.move,
             R.id.copy,
             R.id.move_to_trash,
@@ -926,6 +967,13 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
                                     menu.findItem(R.id.chat_import).isVisible = false
                                     menu.findItem(R.id.chat_save_for_offline).isVisible = false
+
+                                    Timber.d("isHiddenNodesEnabled: $isHiddenNodesEnabled ; isMarkedSensitive: ${node.isMarkedSensitive}")
+                                    menu.findItem(R.id.hide).isVisible =
+                                        isHiddenNodesEnabled && !node.isMarkedSensitive
+
+                                    menu.findItem(R.id.unhide).isVisible =
+                                        isHiddenNodesEnabled && node.isMarkedSensitive
 
                                     when (access) {
                                         MegaShare.ACCESS_READWRITE,

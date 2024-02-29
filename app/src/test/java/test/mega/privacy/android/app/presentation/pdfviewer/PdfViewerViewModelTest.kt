@@ -20,6 +20,7 @@ import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
@@ -50,6 +51,7 @@ internal class PdfViewerViewModelTest {
     private lateinit var getNodeByHandle: GetNodeByHandle
     private lateinit var legacyCopyNodeUseCase: LegacyCopyNodeUseCase
     private lateinit var getDataBytesFromUrlUseCase: GetDataBytesFromUrlUseCase
+    private lateinit var updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase
 
     @BeforeAll
     fun initialise() {
@@ -64,6 +66,7 @@ internal class PdfViewerViewModelTest {
         checkNameCollisionUseCase = mock()
         getNodeByHandle = mock()
         legacyCopyNodeUseCase = mock()
+        updateNodeSensitiveUseCase = mock()
         underTest = PdfViewerViewModel(
             moveNodeUseCase = moveNodeUseCase,
             checkNameCollision = checkNameCollision,
@@ -71,7 +74,8 @@ internal class PdfViewerViewModelTest {
             getNodeByHandle = getNodeByHandle,
             legacyCopyNodeUseCase = legacyCopyNodeUseCase,
             checkNameCollisionUseCase = checkNameCollisionUseCase,
-            getDataBytesFromUrlUseCase = getDataBytesFromUrlUseCase
+            getDataBytesFromUrlUseCase = getDataBytesFromUrlUseCase,
+            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
         )
     }
 

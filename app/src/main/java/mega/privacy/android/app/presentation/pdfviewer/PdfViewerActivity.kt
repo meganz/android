@@ -47,6 +47,7 @@ import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityPdfviewerBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.FileExplorerActivity
@@ -70,11 +71,13 @@ import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
 import mega.privacy.android.app.utils.MegaNodeUtil.showShareOption
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
+import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
@@ -125,6 +128,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     lateinit var applicationScope: CoroutineScope
 
     private lateinit var binding: ActivityPdfviewerBinding
+
+    private var menu: Menu? = null
 
     var password: String? = null
     var maxIntents = 3
@@ -179,6 +184,11 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     private val viewModel by viewModels<PdfViewerViewModel>()
     private val startDownloadViewModel by viewModels<StartDownloadViewModel>()
 
+    private var isHiddenNodesEnabled: Boolean = false
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
     override fun shouldSetStatusBarTextColor() = false
 
     public override fun onCreate(savedInstanceState: Bundle?) {
@@ -191,6 +201,13 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         }
 
         binding = ActivityPdfviewerBinding.inflate(layoutInflater)
+
+        lifecycleScope.launch {
+            runCatching {
+                isHiddenNodesEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+                invalidateOptionsMenu()
+            }.onFailure { Timber.e(it) }
+        }
 
         with(window) {
             navigationBarColor = ContextCompat.getColor(this@PdfViewerActivity, R.color.black)
@@ -820,6 +837,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         Timber.d("onCreateOptionsMenu")
+        this.menu = menu
         val inflater = menuInflater
         inflater.inflate(R.menu.activity_pdfviewer, menu)
         val shareMenuItem = menu.findItem(R.id.pdf_viewer_share)
@@ -830,6 +848,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         getLinkMenuItem.title =
             resources.getQuantityString(R.plurals.get_links, 1)
         val renameMenuItem = menu.findItem(R.id.pdf_viewer_rename)
+        val hideMenuItem = menu.findItem(R.id.pdf_viewer_hide)
+        val unhideMenuItem = menu.findItem(R.id.pdf_viewer_unhide)
         val moveMenuItem = menu.findItem(R.id.pdf_viewer_move)
         val copyMenuItem = menu.findItem(R.id.pdf_viewer_copy)
         val moveToTrashMenuItem = menu.findItem(R.id.pdf_viewer_move_to_trash)
@@ -844,6 +864,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             downloadMenuItem.isVisible = false
             getLinkMenuItem.isVisible = false
             renameMenuItem.isVisible = false
+            hideMenuItem.isVisible = false
+            unhideMenuItem.isVisible = false
             moveMenuItem.isVisible = false
             copyMenuItem.isVisible = false
             moveToTrashMenuItem.isVisible = false
@@ -868,6 +890,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 propertiesMenuItem.isVisible = true
                 downloadMenuItem.isVisible = true
                 renameMenuItem.isVisible = false
+                hideMenuItem.isVisible = false
+                unhideMenuItem.isVisible = false
                 moveMenuItem.isVisible = false
                 copyMenuItem.isVisible = false
                 moveToTrashMenuItem.isVisible = false
@@ -885,6 +909,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 propertiesMenuItem.isVisible = true
                 downloadMenuItem.isVisible = false
                 renameMenuItem.isVisible = false
+                hideMenuItem.isVisible = false
+                unhideMenuItem.isVisible = false
                 moveMenuItem.isVisible = false
                 copyMenuItem.isVisible = false
                 moveToTrashMenuItem.isVisible = false
@@ -905,6 +931,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 downloadMenuItem.isVisible = true
                 propertiesMenuItem.isVisible = true
                 renameMenuItem.isVisible = true
+                hideMenuItem.isVisible = false
+                unhideMenuItem.isVisible = false
                 moveMenuItem.isVisible = true
                 copyMenuItem.isVisible = true
                 chatMenuItem.isVisible = true
@@ -927,6 +955,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 removeLinkMenuItem.isVisible = false
                 propertiesMenuItem.isVisible = false
                 renameMenuItem.isVisible = false
+                hideMenuItem.isVisible = false
+                unhideMenuItem.isVisible = false
                 moveMenuItem.isVisible = false
                 copyMenuItem.isVisible = false
                 moveToTrashMenuItem.isVisible = false
@@ -962,6 +992,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 propertiesMenuItem.isVisible = false
                 downloadMenuItem.isVisible = true
                 renameMenuItem.isVisible = false
+                hideMenuItem.isVisible = false
+                unhideMenuItem.isVisible = false
                 moveMenuItem.isVisible = false
                 copyMenuItem.isVisible = false
                 moveToTrashMenuItem.isVisible = false
@@ -976,6 +1008,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 downloadMenuItem.isVisible = false
                 getLinkMenuItem.isVisible = false
                 renameMenuItem.isVisible = false
+                hideMenuItem.isVisible = false
+                unhideMenuItem.isVisible = false
                 moveMenuItem.isVisible = false
                 copyMenuItem.isVisible = false
                 moveToTrashMenuItem.isVisible = false
@@ -991,6 +1025,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 removeMenuItem.isVisible = false
                 importMenuItem.isVisible = false
                 saveForOfflineMenuItem.isVisible = false
+                hideMenuItem.isVisible = false
+                unhideMenuItem.isVisible = false
                 chatRemoveMenuItem.isVisible = false
                 getLinkMenuItem.isVisible = false
                 removeLinkMenuItem.isVisible = false
@@ -1020,6 +1056,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 removeMenuItem.isVisible = false
                 getLinkMenuItem.isVisible = false
                 removeLinkMenuItem.isVisible = false
+                hideMenuItem.isVisible = false
+                unhideMenuItem.isVisible = false
                 importMenuItem.isVisible = false
                 saveForOfflineMenuItem.isVisible = false
                 when (megaApi.getAccess(node)) {
@@ -1073,6 +1111,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         val propertiesMenuItem = menu.findItem(R.id.pdf_viewer_properties)
         val getLinkMenuItem = menu.findItem(R.id.pdf_viewer_get_link)
         val renameMenuItem = menu.findItem(R.id.pdf_viewer_rename)
+        val hideMenuItem = menu.findItem(R.id.pdf_viewer_hide)
+        val unhideMenuItem = menu.findItem(R.id.pdf_viewer_unhide)
         val moveMenuItem = menu.findItem(R.id.pdf_viewer_move)
         val copyMenuItem = menu.findItem(R.id.pdf_viewer_copy)
         val moveToTrashMenuItem = menu.findItem(R.id.pdf_viewer_move_to_trash)
@@ -1088,6 +1128,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             propertiesMenuItem.isVisible = false
             downloadMenuItem.isVisible = false
             renameMenuItem.isVisible = false
+            hideMenuItem.isVisible = false
+            unhideMenuItem.isVisible = false
             moveMenuItem.isVisible = false
             copyMenuItem.isVisible = false
             moveToTrashMenuItem.isVisible = false
@@ -1110,11 +1152,15 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 moveToTrashMenuItem.isVisible = false
                 removeMenuItem.isVisible = false
                 renameMenuItem.isVisible = false
+                hideMenuItem.isVisible = false
+                unhideMenuItem.isVisible = false
                 moveMenuItem.isVisible = false
                 copyMenuItem.isVisible = false
                 chatMenuItem.isVisible = false
             } else {
                 propertiesMenuItem.isVisible = true
+                hideMenuItem.isVisible = false
+                unhideMenuItem.isVisible = false
                 if (type == Constants.CONTACT_FILE_ADAPTER) {
                     removeMenuItem.isVisible = false
                     node = megaApi.getNodeByHandle(handle)
@@ -1151,6 +1197,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             }
             downloadMenuItem.isVisible = true
         }
+        hideMenuItem.isVisible = isHiddenNodesEnabled && node?.isMarkedSensitive == false
+        unhideMenuItem.isVisible = isHiddenNodesEnabled && node?.isMarkedSensitive == true
         importMenuItem.isVisible = false
         saveForOfflineMenuItem.isVisible = false
         chatRemoveMenuItem.isVisible = false
@@ -1207,6 +1255,30 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
 
             R.id.pdf_viewer_rename -> {
                 showRenameNodeDialog(this, megaApi.getNodeByHandle(handle), this, this)
+            }
+
+            R.id.pdf_viewer_hide -> {
+                viewModel.hideOrUnhideNode(
+                    nodeId = NodeId(handle),
+                    hide = true,
+                )
+
+                RunOnUIThreadUtils.runDelay(500L) {
+                    item.isVisible = false
+                    menu?.findItem(R.id.pdf_viewer_unhide)?.isVisible = true
+                }
+            }
+
+            R.id.pdf_viewer_unhide -> {
+                viewModel.hideOrUnhideNode(
+                    nodeId = NodeId(handle),
+                    hide = false,
+                )
+
+                RunOnUIThreadUtils.runDelay(500L) {
+                    item.isVisible = false
+                    menu?.findItem(R.id.pdf_viewer_hide)?.isVisible = true
+                }
             }
 
             R.id.pdf_viewer_move -> showMove()

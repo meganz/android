@@ -21,6 +21,7 @@ import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import nz.mega.sdk.MegaNode
@@ -47,6 +48,7 @@ internal class MediaPlayerViewModelTest {
     private lateinit var legacyCopyNodeUseCase: LegacyCopyNodeUseCase
     private lateinit var moveNodeUseCase: MoveNodeUseCase
     private lateinit var getNodeByHandle: GetNodeByHandle
+    private lateinit var updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase
 
     @BeforeAll
     fun initialise() {
@@ -61,6 +63,7 @@ internal class MediaPlayerViewModelTest {
         checkNameCollisionUseCase = mock()
         legacyCopyNodeUseCase = mock()
         getNodeByHandle = mock()
+        updateNodeSensitiveUseCase = mock()
         underTest = MediaPlayerViewModel(
             checkNameCollision = checkNameCollision,
             copyNodeUseCase = copyNodeUseCase,
@@ -68,7 +71,8 @@ internal class MediaPlayerViewModelTest {
             getNodeByHandle = getNodeByHandle,
             legacyCopyNodeUseCase = legacyCopyNodeUseCase,
             checkNameCollisionUseCase = checkNameCollisionUseCase,
-            legacyPublicAlbumPhotoNodeProvider = mock()
+            legacyPublicAlbumPhotoNodeProvider = mock(),
+            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
         )
     }
 

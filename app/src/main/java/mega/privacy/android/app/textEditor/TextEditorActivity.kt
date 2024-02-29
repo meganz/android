@@ -23,16 +23,19 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.animation.AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -70,16 +73,20 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
+import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util.isDarkMode
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaShare
 import org.jetbrains.anko.configuration
 import timber.log.Timber
+import javax.inject.Inject
 import kotlin.math.roundToInt
 
 @AndroidEntryPoint
@@ -109,6 +116,10 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     private var currentUIState = STATE_SHOWN
     private var animator: ViewPropertyAnimator? = null
     private var countDownTimer: CountDownTimer? = null
+    private var isHiddenNodesEnabled: Boolean = false
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
     private val toolbarElevationColor by lazy { getColorForElevation(this, elevation) }
@@ -152,6 +163,13 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         super.onCreate(savedInstanceState)
         binding = ActivityTextFileEditorBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        lifecycleScope.launch {
+            runCatching {
+                isHiddenNodesEnabled = getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+                invalidateOptionsMenu()
+            }.onFailure { Timber.e(it) }
+        }
 
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         getOriginalTextSize()
@@ -272,6 +290,40 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             }
 
             R.id.action_rename -> renameNode()
+            R.id.action_hide -> {
+                val node = viewModel.getNode()!!
+                viewModel.hideOrUnhideNode(
+                    nodeId = NodeId(node.handle),
+                    hide = true,
+                )
+
+                RunOnUIThreadUtils.runDelay(500L) {
+                    menu?.findItem(R.id.action_hide)?.apply {
+                        isVisible = false
+                    }
+                    menu?.findItem(R.id.action_unhide)?.apply {
+                        isVisible = true
+                    }
+                }
+            }
+
+            R.id.action_unhide -> {
+                val node = viewModel.getNode()!!
+                viewModel.hideOrUnhideNode(
+                    nodeId = NodeId(node.handle),
+                    hide = false,
+                )
+
+                RunOnUIThreadUtils.runDelay(500L) {
+                    menu?.findItem(R.id.action_hide)?.apply {
+                        isVisible = true
+                    }
+                    menu?.findItem(R.id.action_unhide)?.apply {
+                        isVisible = false
+                    }
+                }
+            }
+
             R.id.action_move -> selectFolderToMove(this, longArrayOf(viewModel.getNode()!!.handle))
             R.id.action_copy -> selectFolderToCopy(this, longArrayOf(viewModel.getNode()!!.handle))
             R.id.action_line_numbers -> updateLineNumbers()
@@ -420,7 +472,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 }
 
                 else -> {
-                    if (megaApi.isInRubbish(viewModel.getNode())) {
+                    val node = viewModel.getNode()
+                    if (megaApi.isInRubbish(node)) {
                         menu.toggleAllMenuItemsVisibility(false)
                         menu.findItem(R.id.action_remove).isVisible = true
                         updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
@@ -431,7 +484,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
                     when (viewModel.getNodeAccess()) {
                         MegaShare.ACCESS_OWNER -> {
-                            if (viewModel.getNode()?.isExported == true) {
+                            if (node?.isExported == true) {
                                 menu.findItem(R.id.action_get_link).isVisible = false
                             } else {
                                 menu.findItem(R.id.action_remove_link).isVisible = false
@@ -441,6 +494,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                         MegaShare.ACCESS_FULL -> {
                             menu.findItem(R.id.action_get_link).isVisible = false
                             menu.findItem(R.id.action_remove_link).isVisible = false
+                            menu.findItem(R.id.action_hide).isVisible = false
+                            menu.findItem(R.id.action_unhide).isVisible = false
                         }
 
                         MegaShare.ACCESS_READWRITE, MegaShare.ACCESS_READ, MegaShare.ACCESS_UNKNOWN -> {
@@ -449,6 +504,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                             menu.findItem(R.id.action_move_to_trash).isVisible = false
                             menu.findItem(R.id.action_get_link).isVisible = false
                             menu.findItem(R.id.action_remove_link).isVisible = false
+                            menu.findItem(R.id.action_hide).isVisible = false
+                            menu.findItem(R.id.action_unhide).isVisible = false
                         }
                     }
 
@@ -459,6 +516,10 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     menu.findItem(R.id.action_remove).isVisible = false
                     menu.findItem(R.id.chat_action_save_for_offline).isVisible = false
                     menu.findItem(R.id.chat_action_remove).isVisible = false
+                    menu.findItem(R.id.action_hide).isVisible =
+                        isHiddenNodesEnabled && node?.isMarkedSensitive == false
+                    menu.findItem(R.id.action_unhide).isVisible =
+                        isHiddenNodesEnabled && node?.isMarkedSensitive == true
                     menu.findItem(R.id.action_save).isVisible = false
                 }
             }

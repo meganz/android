@@ -64,6 +64,20 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/pdf_viewer_hide"
+        android:orderInCategory="100"
+        android:title="@string/general_hide_node"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/pdf_viewer_unhide"
+        android:orderInCategory="100"
+        android:title="@string/general_unhide_node"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/pdf_viewer_move"
         android:orderInCategory="105"
         android:title="@string/context_move"
