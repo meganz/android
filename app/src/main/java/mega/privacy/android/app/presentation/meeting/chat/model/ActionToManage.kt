@@ -18,4 +18,11 @@ sealed class ActionToManage {
      *
      */
     data object EnableSelectMode : ActionToManage()
+
+    /**
+     * Opens contact info.
+     *
+     * @property email Contact email.
+     */
+    data class OpenContactInfo(val email: String) : ActionToManage()
 }

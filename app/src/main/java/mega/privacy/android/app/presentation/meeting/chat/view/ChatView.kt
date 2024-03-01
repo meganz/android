@@ -942,6 +942,10 @@ internal fun ChatView(
                 when (action) {
                     is ActionToManage.OpenChat -> openChatFragment(context, action.chatId)
                     is ActionToManage.EnableSelectMode -> isSelectMode = true
+                    is ActionToManage.OpenContactInfo -> openContactInfoActivity(
+                        context,
+                        action.email
+                    )
                 }
             }
         }

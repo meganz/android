@@ -16,11 +16,13 @@ internal class DeleteMessageAction(
     text = R.string.context_delete,
     icon = R.drawable.ic_trash_medium_regular_outline,
     testTag = "action_delete",
-    isDestructive = true,
-    addSeparator = false,
 ) {
     override fun appliesTo(messages: Set<TypedMessage>) = messages.isNotEmpty() &&
             messages.all { it.isDeletable && it.isMine }
+
+    override fun showBottomSheetItemSeparator(message: TypedMessage) = false
+
+    override fun isBottomSheetItemDestructive() = true
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {

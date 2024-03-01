@@ -1436,10 +1436,18 @@ class ChatViewModel @Inject constructor(
     /**
      * Enable select mode.
      */
-
     fun onEnableSelectMode() {
         _state.update { state ->
             state.copy(actionToManageEvent = triggered(ActionToManage.EnableSelectMode))
+        }
+    }
+
+    /**
+     * Open contact info.
+     */
+    fun onOpenContactInfo(contactEmail: String) {
+        _state.update { state ->
+            state.copy(actionToManageEvent = triggered(ActionToManage.OpenContactInfo(contactEmail)))
         }
     }
 

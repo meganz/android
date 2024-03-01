@@ -19,15 +19,11 @@ import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
  * @property text
  * @property icon
  * @property testTag
- * @property isDestructive
- * @property addSeparator
  */
 abstract class MessageAction(
     @StringRes val text: Int,
     @DrawableRes val icon: Int,
     private val testTag: String,
-    private val isDestructive: Boolean = false,
-    private val addSeparator: Boolean = true,
 ) {
 
     /**
@@ -114,10 +110,21 @@ abstract class MessageAction(
             modifier = Modifier
                 .testTag(bottomSheetItemTestTag)
                 .clickable { onClick() },
-            isDestructive = isDestructive,
-            addSeparator = addSeparator,
+            isDestructive = isBottomSheetItemDestructive(),
+            addSeparator = showBottomSheetItemSeparator(message),
         )
     }
+
+    /**
+     * Show bottom sheet item separator.
+     */
+    protected open fun showBottomSheetItemSeparator(message: TypedMessage): Boolean = true
+
+
+    /**
+     * Is bottom sheet item destructive.
+     */
+    protected open fun isBottomSheetItemDestructive(): Boolean = false
 
     /**
      * Toolbar item

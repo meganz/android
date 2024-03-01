@@ -2820,6 +2820,20 @@ internal class ChatViewModelTest {
         }
     }
 
+    @Test
+    fun `test that onOpenContactInfo updates correctly`() = runTest {
+        val email = "email"
+        with(underTest) {
+            onOpenContactInfo(email)
+            state.test {
+                val result =
+                    ((awaitItem().actionToManageEvent as StateEventWithContentTriggered)
+                        .content as ActionToManage.OpenContactInfo).email
+                assertThat(result).isEqualTo(email)
+            }
+        }
+    }
+
 
     private fun ChatRoom.getNumberParticipants() =
         (peerCount + if (ownPrivilege != ChatRoomPermission.Unknown
