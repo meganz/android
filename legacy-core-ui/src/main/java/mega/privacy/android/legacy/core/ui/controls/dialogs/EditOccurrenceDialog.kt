@@ -1,5 +1,6 @@
 package mega.privacy.android.legacy.core.ui.controls.dialogs
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,14 +18,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.core.ui.model.MegaSpanStyle
+import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.core.ui.utils.composeLet
 
 /**
@@ -32,31 +40,33 @@ import mega.privacy.android.core.ui.utils.composeLet
  */
 @Composable
 fun EditOccurrenceDialog(
-    modifier: Modifier = Modifier,
     title: String,
     confirmButtonText: String,
-    cancelButtonText: String?,
     dateTitleText: String,
     dateText: String,
     startTimeTitleText: String,
     startTimeText: String,
     endTimeTitleText: String,
     endTimeText: String,
+    freePlanLimitationWarningText: String,
+    cancelButtonText: String?,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
+    onDateTap: () -> Unit,
+    onStartTimeTap: () -> Unit,
+    onEndTimeTap: () -> Unit,
+    onUpgradeNowClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+    shouldShowFreePlanLimitWarning: Boolean = false,
     isConfirmButtonEnabled: Boolean = true,
     isDateEdited: Boolean = false,
     isStartTimeEdited: Boolean = false,
     isEndTimeEdited: Boolean = false,
-    onDateTap: () -> Unit,
-    onStartTimeTap: () -> Unit,
-    onEndTimeTap: () -> Unit,
     dismissOnClickOutside: Boolean = true,
     dismissOnBackPress: Boolean = true,
 ) {
     CompositionLocalProvider(LocalAbsoluteElevation provides 24.dp) {
         AlertDialog(
-            modifier = modifier,
             title = {
                 Text(
                     text = title,
@@ -140,6 +150,29 @@ fun EditOccurrenceDialog(
                             )
                         }
                     }
+
+                    if (shouldShowFreePlanLimitWarning) {
+                        Row(
+                            modifier = Modifier
+                                .clickable { onUpgradeNowClicked() }
+                                .height(72.dp)
+                                .testTag(EDIT_OCCURRENCE_DIALOG_WARNING_TAG)
+                                .fillMaxWidth()
+                        ) {
+                            MegaSpannedText(
+                                value = freePlanLimitationWarningText,
+                                baseStyle = MaterialTheme.typography.body2,
+                                styles = mapOf(
+                                    SpanIndicator('A') to MegaSpanStyle(
+                                        SpanStyle(
+                                            textDecoration = TextDecoration.Underline,
+                                        )
+                                    ),
+                                ),
+                                color = TextColor.Primary
+                            )
+                        }
+                    }
                 }
             },
             onDismissRequest = onDismiss,
@@ -164,6 +197,9 @@ fun EditOccurrenceDialog(
     }
 }
 
+internal const val EDIT_OCCURRENCE_DIALOG_WARNING_TAG =
+    "edit_occurrence_dialog:free_plan_limit_warning"
+
 @CombinedThemePreviews
 @Composable
 private fun EditOccurrenceDialogPreview() {
@@ -172,20 +208,22 @@ private fun EditOccurrenceDialogPreview() {
             modifier = Modifier.padding(horizontal = 240.dp, vertical = 120.dp),
             content = {
                 EditOccurrenceDialog(
+                    cancelButtonText = "Cancel",
                     title = "Edit occurrence",
                     confirmButtonText = "Update",
-                    cancelButtonText = "Cancel",
-                    dateText = "Monday, 5 June",
                     dateTitleText = "Date",
+                    dateText = "Monday, 5 June",
                     startTimeTitleText = "Start time",
-                    endTimeTitleText = "End time",
                     startTimeText = "10:00",
+                    endTimeTitleText = "End time",
                     endTimeText = "11:00",
+                    freePlanLimitationWarningText = "Plans limitation",
                     onConfirm = {},
                     onDismiss = {},
                     onDateTap = {},
                     onStartTimeTap = {},
-                    onEndTimeTap = {}
+                    onEndTimeTap = {},
+                    onUpgradeNowClicked = {}
                 )
             },
         )

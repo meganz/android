@@ -55,7 +55,9 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.extensions.getDateFormatted
 import mega.privacy.android.app.presentation.extensions.getEndTimeFormatted
+import mega.privacy.android.app.presentation.extensions.getEndZoneDateTime
 import mega.privacy.android.app.presentation.extensions.getStartTimeFormatted
+import mega.privacy.android.app.presentation.extensions.getStartZoneDateTime
 import mega.privacy.android.app.presentation.extensions.getTimeFormatted
 import mega.privacy.android.app.presentation.meeting.dialog.view.RecurringMeetingOccurrenceBottomSheetView
 import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingInfoState
@@ -95,6 +97,7 @@ fun RecurringMeetingInfoView(
     onDateTap: () -> Unit,
     onStartTimeTap: () -> Unit,
     onEndTimeTap: () -> Unit,
+    onUpgradeNowClicked: () -> Unit,
 ) {
     val isLight = MaterialTheme.colors.isLight
     val listState = rememberLazyListState()
@@ -182,6 +185,8 @@ fun RecurringMeetingInfoView(
                 endTimeTitleText = stringResource(id = R.string.meetings_update_scheduled_meeting_occurrence_dialog_end_time_section),
                 startTimeText = it.getStartTimeFormatted(is24HourFormat),
                 endTimeText = it.getEndTimeFormatted(is24HourFormat),
+                freePlanLimitationWarningText = stringResource(id = R.string.meetings_edit_occurrence_free_plan_60_minute_limit_warning),
+                shouldShowFreePlanLimitWarning = managementState.shouldShowFreePlanLimitWarning(managementState.editedOccurrence.getStartZoneDateTime(), managementState.editedOccurrence.getEndZoneDateTime()),
                 onConfirm = onEditOccurrence,
                 onDismiss = onDismissDialog,
                 isConfirmButtonEnabled = managementState.isEditionValid(),
@@ -190,7 +195,8 @@ fun RecurringMeetingInfoView(
                 isEndTimeEdited = managementState.isEndTimeEdited(is24HourFormat),
                 onDateTap = onDateTap,
                 onStartTimeTap = onStartTimeTap,
-                onEndTimeTap = onEndTimeTap
+                onEndTimeTap = onEndTimeTap,
+                onUpgradeNowClicked = onUpgradeNowClicked,
             )
         }
     }

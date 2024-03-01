@@ -179,6 +179,7 @@ class RecurringMeetingInfoViewTest {
                 onDateTap = { },
                 onStartTimeTap = { },
                 onEndTimeTap = { },
+                onUpgradeNowClicked = {}
             )
         }
     }
@@ -208,6 +209,7 @@ class RecurringMeetingInfoViewTest {
                 onDateTap = { },
                 onStartTimeTap = { },
                 onEndTimeTap = { },
+                onUpgradeNowClicked = {}
             )
         }
     }

@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getDayAndMonth
 import mega.privacy.android.app.presentation.extensions.getEndZoneDateTime
 import mega.privacy.android.app.presentation.extensions.getStartZoneDateTime
@@ -36,6 +37,8 @@ import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveChatLink
+import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastScheduledMeetingCanceledUseCase
@@ -77,6 +80,8 @@ import javax.inject.Inject
  * @property setWaitingRoomRemindersUseCase             [SetWaitingRoomRemindersUseCase]
  * @property monitorChatCallUpdatesUseCase              [MonitorChatCallUpdatesUseCase]
  * @property getChatCallUseCase                         [GetChatCallUseCase]
+ * @property getCurrentSubscriptionPlanUseCase          [GetCurrentSubscriptionPlanUseCase]
+ * @property monitorAccountDetailUseCase                [MonitorAccountDetailUseCase]
  * @property state                                      Current view state as [ScheduledMeetingManagementState]setWaitingRoom
  */
 @HiltViewModel
@@ -97,11 +102,13 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
     private val updateOccurrenceUseCase: UpdateOccurrenceUseCase,
     private val broadcastScheduledMeetingCanceledUseCase: BroadcastScheduledMeetingCanceledUseCase,
-    private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
     private val getWaitingRoomRemindersUseCase: GetWaitingRoomRemindersUseCase,
     private val setWaitingRoomRemindersUseCase: SetWaitingRoomRemindersUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val getChatCallUseCase: GetChatCallUseCase,
+    private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
+    private val getCurrentSubscriptionPlanUseCase: GetCurrentSubscriptionPlanUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ScheduledMeetingManagementState())
     val state: StateFlow<ScheduledMeetingManagementState> = _state
@@ -116,6 +123,32 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
 
     init {
         checkWaitingRoomWarning()
+        viewModelScope.launch {
+            getFeatureFlagValue(AppFeatures.CallUnlimitedProPlan).let { flag ->
+                _state.update { state ->
+                    state.copy(
+                        isCallUnlimitedProPlanFeatureFlagEnabled = flag,
+                    )
+                }
+            }
+
+            getCurrentSubscriptionPlanUseCase()?.let { currentSubscriptionPlan ->
+                _state.update { it.copy(subscriptionPlan = currentSubscriptionPlan) }
+            }
+        }
+        getAccountDetailUpdates()
+    }
+
+    /**
+     * Get account detail updates
+     */
+    private fun getAccountDetailUpdates() = viewModelScope.launch {
+        monitorAccountDetailUseCase().catch { Timber.e(it) }
+            .collectLatest { accountDetail ->
+                accountDetail.levelDetail?.accountType?.let { subscriptionPlan ->
+                    _state.update { it.copy(subscriptionPlan = subscriptionPlan) }
+                }
+            }
     }
 
     /**

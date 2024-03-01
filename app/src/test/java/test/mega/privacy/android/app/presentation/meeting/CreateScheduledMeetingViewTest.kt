@@ -20,7 +20,6 @@ import java.time.temporal.ChronoUnit
 
 @RunWith(AndroidJUnit4::class)
 class CreateScheduledMeetingViewTest {
-
     @get:Rule
     val composeRule = createComposeRule()
 
@@ -28,11 +27,13 @@ class CreateScheduledMeetingViewTest {
     fun `test that free plan limit warning is shown`() {
         initComposeRuleContent(
             CreateScheduledMeetingState(
-                isCallUnlimitedProPlanFeatureFlagEnabled = true,
-                subscriptionPlan = AccountType.FREE,
                 startDate = ZonedDateTime.now(),
                 endDate = ZonedDateTime.now().plus(80, ChronoUnit.MINUTES)
             ),
+            ScheduledMeetingManagementState(
+                isCallUnlimitedProPlanFeatureFlagEnabled = true,
+                subscriptionPlan = AccountType.FREE
+            )
         )
         composeRule.onNodeWithTag(UPGRADE_ACCOUNT_BUTTON_TAG).assertIsDisplayed()
     }
@@ -41,11 +42,9 @@ class CreateScheduledMeetingViewTest {
     fun `test that free plan limit warning is hidden`() {
         initComposeRuleContent(
             CreateScheduledMeetingState(
-                isCallUnlimitedProPlanFeatureFlagEnabled = true,
-                subscriptionPlan = AccountType.FREE,
                 startDate = ZonedDateTime.now(),
                 endDate = ZonedDateTime.now().plus(10, ChronoUnit.MINUTES)
-            ),
+            ), ScheduledMeetingManagementState(isCallUnlimitedProPlanFeatureFlagEnabled = false)
         )
         composeRule.onNodeWithTag(UPGRADE_ACCOUNT_BUTTON_TAG).assertDoesNotExist()
     }
@@ -56,12 +55,13 @@ class CreateScheduledMeetingViewTest {
         composeRule.setContent {
             CreateScheduledMeetingView(
                 state = CreateScheduledMeetingState(
-                    isCallUnlimitedProPlanFeatureFlagEnabled = true,
-                    subscriptionPlan = AccountType.FREE,
                     startDate = ZonedDateTime.now(),
                     endDate = ZonedDateTime.now().plus(80, ChronoUnit.MINUTES)
                 ),
-                managementState = ScheduledMeetingManagementState(),
+                managementState = ScheduledMeetingManagementState(
+                    isCallUnlimitedProPlanFeatureFlagEnabled = true,
+                    subscriptionPlan = AccountType.FREE
+                ),
                 onDiscardClicked = { },
                 onAcceptClicked = { },
                 onStartTimeClicked = { },
@@ -85,11 +85,12 @@ class CreateScheduledMeetingViewTest {
 
     private fun initComposeRuleContent(
         uiState: CreateScheduledMeetingState,
+        managementState: ScheduledMeetingManagementState,
     ) {
         composeRule.setContent {
             CreateScheduledMeetingView(
                 state = uiState,
-                managementState = ScheduledMeetingManagementState(),
+                managementState = managementState,
                 onDiscardClicked = { },
                 onAcceptClicked = { },
                 onStartTimeClicked = { },

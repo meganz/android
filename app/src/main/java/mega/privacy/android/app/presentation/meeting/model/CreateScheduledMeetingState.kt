@@ -64,8 +64,6 @@ import java.time.temporal.WeekFields
  * @property initialParticipantsList                    List of participants handles.
  * @property participantsRemoved                        List of participants removed.
  * @property weekList                                   List of [Weekday] in the week.
- * @property subscriptionPlan                           [AccountType]
- * @property isCallUnlimitedProPlanFeatureFlagEnabled   True, if Call Unlimited Pro Plan feature flag enabled. False, otherwise.
  */
 data class CreateScheduledMeetingState(
     val scheduledMeeting: ChatScheduledMeeting? = null,
@@ -112,8 +110,6 @@ data class CreateScheduledMeetingState(
             Weekday.Saturday,
             Weekday.Sunday
         ),
-    val subscriptionPlan: AccountType = AccountType.UNKNOWN,
-    val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
 ) {
     /**
      * Check if it's valid title
@@ -166,25 +162,6 @@ data class CreateScheduledMeetingState(
             add(it.handle)
         }
     }
-
-    /**
-     * Should show free plan limit warning
-     */
-    fun shouldShowFreePlanLimitWarning() = isCallUnlimitedProPlanFeatureFlagEnabled &&
-            hasFreePlan() && isDurationExceedingOneHour()
-
-    /**
-     * Check if duration is longer than 60 minutes
-     */
-    private fun isDurationExceedingOneHour() =
-        Duration.between(startDate, endDate).toMinutes() > FREE_PLAN_DURATION_LIMIT_IN_MINUTES
-
-    /**
-     * Check user free plan
-     *
-     * @return True, if has free plan. False, if has pro plan.
-     */
-    private fun hasFreePlan() = subscriptionPlan == AccountType.FREE
 
     /**
      * Get list of participants emails
@@ -346,11 +323,4 @@ data class CreateScheduledMeetingState(
             RecurrenceDialogOption.EveryMonth,
             RecurrenceDialogOption.Custom
         )
-
-    companion object {
-        /**
-         * Free plan duration limit in minutes
-         */
-        const val FREE_PLAN_DURATION_LIMIT_IN_MINUTES = 60
-    }
 }

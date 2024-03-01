@@ -94,9 +94,6 @@ import javax.inject.Inject
  * @property monitorChatRoomUpdates                     [MonitorChatRoomUpdates]
  * @property setWaitingRoomUseCase                      [SetWaitingRoomUseCase]
  * @property setWaitingRoomRemindersUseCase             [SetWaitingRoomRemindersUseCase]
- * @property getFeatureFlagValue                        [GetFeatureFlagValueUseCase]
- * @property getCurrentSubscriptionPlanUseCase          [GetCurrentSubscriptionPlanUseCase]
- * @property monitorAccountDetailUseCase                [MonitorAccountDetailUseCase]
  * @property state                                      Current view state as [CreateScheduledMeetingState]
  */
 @HiltViewModel
@@ -124,9 +121,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val setWaitingRoomUseCase: SetWaitingRoomUseCase,
     private val setWaitingRoomRemindersUseCase: SetWaitingRoomRemindersUseCase,
-    private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
-    private val getCurrentSubscriptionPlanUseCase: GetCurrentSubscriptionPlanUseCase,
-    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CreateScheduledMeetingState())
@@ -157,18 +152,6 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                     endDate = state.getInitialEndDate()
                 )
             }
-            getFeatureFlagValue(AppFeatures.CallUnlimitedProPlan).let { flag ->
-                _state.update { state ->
-                    state.copy(
-                        isCallUnlimitedProPlanFeatureFlagEnabled = flag,
-                    )
-                }
-            }
-
-            getCurrentSubscriptionPlanUseCase()?.let { currentSubscriptionPlan ->
-                _state.update { it.copy(subscriptionPlan = currentSubscriptionPlan) }
-            }
-            getAccountDetailUpdates()
         }
     }
 
@@ -832,18 +815,6 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      */
     fun setOnOpenInfoConsumed() = _state.update { state ->
         state.copy(chatIdToOpenInfoScreen = null)
-    }
-
-    /**
-     * Get account detail updates
-     */
-    private fun getAccountDetailUpdates() = viewModelScope.launch {
-        monitorAccountDetailUseCase().catch { Timber.e(it) }
-            .collectLatest { accountDetail ->
-                accountDetail.levelDetail?.accountType?.let { subscriptionPlan ->
-                    _state.update { it.copy(subscriptionPlan = subscriptionPlan) }
-                }
-            }
     }
 
     /**

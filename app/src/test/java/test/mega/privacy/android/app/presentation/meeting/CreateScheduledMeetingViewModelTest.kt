@@ -1,13 +1,9 @@
 package test.mega.privacy.android.app.presentation.meeting
 
-import app.cash.turbine.test
-import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingViewModel
@@ -15,11 +11,7 @@ import mega.privacy.android.app.presentation.meeting.mapper.RecurrenceDialogOpti
 import mega.privacy.android.app.presentation.meeting.mapper.WeekDayMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.gateway.DeviceGateway
-import mega.privacy.android.domain.entity.AccountSubscriptionCycle
-import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.account.AccountDetail
-import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
@@ -44,7 +36,6 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
@@ -129,10 +120,7 @@ class CreateScheduledMeetingViewModelTest {
             monitorChatRoomUpdates = monitorChatRoomUpdates,
             setWaitingRoomUseCase = setWaitingRoomUseCase,
             setWaitingRoomRemindersUseCase = setWaitingRoomRemindersUseCase,
-            getFeatureFlagValue = getFeatureFlagValue,
-            getCurrentSubscriptionPlanUseCase = getCurrentSubscriptionPlanUseCase,
             setOpenInviteUseCase = setOpenInviteUseCase,
-            monitorAccountDetailUseCase = monitorAccountDetailUseCase
         )
     }
 
@@ -167,33 +155,4 @@ class CreateScheduledMeetingViewModelTest {
             monitorAccountDetailUseCase
         )
     }
-
-    @Test
-    fun `test that subscriptionPlan should be updated when monitorAccountDetailUseCase emits new account type value`() =
-        runTest {
-            val mockAccountType = AccountType.PRO_I
-            val mockAccountDetail = AccountDetail(
-                storageDetail = mock(),
-                sessionDetail = mock(),
-                transferDetail = mock(),
-                levelDetail = AccountLevelDetail(
-                    accountType = mockAccountType,
-                    subscriptionStatus = SubscriptionStatus.VALID,
-                    subscriptionRenewTime = 3L,
-                    accountSubscriptionCycle = AccountSubscriptionCycle.YEARLY,
-                    proExpirationTime = 5L
-                )
-            )
-            whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
-
-            accountDetailFlow.emit(mockAccountDetail)
-
-            advanceUntilIdle()
-
-            underTest.state.test {
-                val state = awaitItem()
-
-                Truth.assertThat(state.subscriptionPlan).isEqualTo(mockAccountType)
-            }
-        }
 }

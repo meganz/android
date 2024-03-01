@@ -5317,4 +5317,6 @@
     <string name="meetings_change_sfu_dialog_subtitle">Default is -1</string>
     <string name="meetings_change_sfu_dialog_hint">Enter SFU ID</string>
     <string name="meetings_change_sfu_dialog_action_button">Change</string>
+    <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Free plans have a limit of 60 minutes per meeting. [A]Upgrade now[/A]</string>
 </resources>

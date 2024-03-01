@@ -200,7 +200,11 @@ internal fun CreateScheduledMeetingView(
                     )
                 }
 
-                if (state.shouldShowFreePlanLimitWarning()) {
+                if (managementState.shouldShowFreePlanLimitWarning(
+                        state.startDate,
+                        state.endDate
+                    )
+                ) {
                     item(key = "Schedule meeting pro plan limit") {
                         WarningMessage(
                             onUpgradeNowClicked = onUpgradeNowClicked,
@@ -881,10 +885,11 @@ private fun CreateScheduledMeetingViewWithFreePlanLimitWarningPreview() {
                 participantItemList = emptyList(),
                 buttons = ScheduleMeetingAction.entries,
                 snackbarMessageContent = consumed(),
-                subscriptionPlan = AccountType.FREE,
-                isCallUnlimitedProPlanFeatureFlagEnabled = true
             ),
-            managementState = ScheduledMeetingManagementState(),
+            managementState = ScheduledMeetingManagementState(
+                isCallUnlimitedProPlanFeatureFlagEnabled = true,
+                subscriptionPlan = AccountType.FREE
+            ),
             onButtonClicked = {},
             onDiscardClicked = {},
             onAcceptClicked = {},

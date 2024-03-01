@@ -6,10 +6,12 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.extensions.getDateFormatted
 import mega.privacy.android.app.presentation.extensions.getEndTimeFormatted
 import mega.privacy.android.app.presentation.extensions.getStartTimeFormatted
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
+import java.time.Duration
 import java.time.ZonedDateTime
 
 /**
@@ -33,6 +35,8 @@ import java.time.ZonedDateTime
  * @property waitingRoomReminder                [WaitingRoomReminders]
  * @property isCallInProgress                   True, if there is a call in progress. False, if not.
  * @property showForceUpdateDialog              True, if the force update dialog should be shown. False, if not.
+ * @property subscriptionPlan                           [AccountType]
+ * @property isCallUnlimitedProPlanFeatureFlagEnabled   True, if Call Unlimited Pro Plan feature flag enabled. False, otherwise.
  * @constructor Create empty Scheduled meeting management state
  */
 data class ScheduledMeetingManagementState(
@@ -54,6 +58,8 @@ data class ScheduledMeetingManagementState(
     val waitingRoomReminder: WaitingRoomReminders = WaitingRoomReminders.Enabled,
     val isCallInProgress: Boolean = false,
     val showForceUpdateDialog: Boolean = false,
+    val subscriptionPlan: AccountType = AccountType.UNKNOWN,
+    val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
 ) {
 
     /**
@@ -91,4 +97,48 @@ data class ScheduledMeetingManagementState(
         selectedOccurrence?.getEndTimeFormatted(is24HourFormat) != editedOccurrence?.getEndTimeFormatted(
             is24HourFormat
         )
+
+    /**
+     * Should show free plan limit warning
+     *
+     * @param startDate [ZonedDateTime]
+     * @param endDate   [ZonedDateTime]
+     */
+    fun shouldShowFreePlanLimitWarning(
+        startDate: ZonedDateTime?,
+        endDate: ZonedDateTime?,
+    ): Boolean {
+        startDate?.let { start ->
+            endDate?.let { end ->
+                return isCallUnlimitedProPlanFeatureFlagEnabled &&
+                        hasFreePlan() && isDurationExceedingOneHour(start, end)
+            }
+        }
+
+        return false
+    }
+
+    /**
+     * Check if duration is longer than 60 minutes
+     *
+     * @param startDate [ZonedDateTime]
+     * @param endDate   [ZonedDateTime]
+     */
+    private fun isDurationExceedingOneHour(startDate: ZonedDateTime, endDate: ZonedDateTime) =
+        Duration.between(startDate, endDate).toMinutes() > FREE_PLAN_DURATION_LIMIT_IN_MINUTES
+
+
+    /**
+     * Check user free plan
+     *
+     * @return True, if has free plan. False, if has pro plan.
+     */
+    private fun hasFreePlan() = subscriptionPlan == AccountType.FREE
+
+    companion object {
+        /**
+         * Free plan duration limit in minutes
+         */
+        const val FREE_PLAN_DURATION_LIMIT_IN_MINUTES = 60
+    }
 }

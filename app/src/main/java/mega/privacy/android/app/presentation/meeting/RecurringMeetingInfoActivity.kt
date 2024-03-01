@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -20,6 +21,7 @@ import mega.privacy.android.app.presentation.extensions.getEndZoneDateTime
 import mega.privacy.android.app.presentation.extensions.getStartZoneDateTime
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.view.RecurringMeetingInfoView
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -146,8 +148,16 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
                 onDateTap = ::showDatePicker,
                 onStartTimeTap = { showTimePicker(true) },
                 onEndTimeTap = { showTimePicker(false) },
+                onUpgradeNowClicked = ::openUpgradeAccount
             )
         }
+    }
+
+    /**
+     * Open upgrade account screen
+     */
+    private fun openUpgradeAccount() {
+        startActivity(Intent(this, UpgradeAccountActivity::class.java))
     }
 
     /**
