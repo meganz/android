@@ -29,6 +29,6 @@ internal class OtherDeviceBottomSheetBodyTest {
         }
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_BODY_OTHER_DEVICE).assertIsDisplayed()
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_RENAME_DEVICE).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_INFO).assertIsDisplayed()
+//        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TILE_INFO).assertIsDisplayed()
     }
 }

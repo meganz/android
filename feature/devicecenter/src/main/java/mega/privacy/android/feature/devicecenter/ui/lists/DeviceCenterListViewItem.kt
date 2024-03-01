@@ -94,7 +94,7 @@ internal fun DeviceCenterListViewItem(
             infoColor = getStatusColor(uiNode.status),
             infoIcon = uiNode.status.icon,
             infoIconTint = getStatusColor(uiNode.status),
-            showMenuButton = true,
+            showMenuButton = uiNode is DeviceUINode,
             isTakenDown = false,
             isFavourite = false,
             isSharedWithPublicLink = false,
@@ -109,8 +109,8 @@ internal fun DeviceCenterListViewItem(
             onMenuClick = {
                 when (uiNode) {
                     is DeviceUINode -> onDeviceMenuClicked(uiNode)
-                    is BackupDeviceFolderUINode -> onBackupFolderMenuClicked(uiNode)
-                    is NonBackupDeviceFolderUINode -> onNonBackupFolderMenuClicked(uiNode)
+//                    is BackupDeviceFolderUINode -> onBackupFolderMenuClicked(uiNode)
+//                    is NonBackupDeviceFolderUINode -> onNonBackupFolderMenuClicked(uiNode)
                 }
             },
         )
