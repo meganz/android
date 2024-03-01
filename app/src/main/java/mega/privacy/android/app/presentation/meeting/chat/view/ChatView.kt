@@ -65,6 +65,7 @@ import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.app.presentation.meeting.chat.extension.getOpenChatId
 import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.extension.isStarted
+import mega.privacy.android.app.presentation.meeting.chat.model.ActionToManage
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
@@ -167,7 +168,7 @@ internal fun ChatView(
         actions = actions,
         messageSetSaver = savers.messageSetSaver,
         consumeDownloadEvent = viewModel::consumeDownloadEvent,
-        onOpenChatConversationEventConsumed = viewModel::onOpenChatConversationEventConsumed,
+        onActionToManageEventConsumed = viewModel::onActionToManageEventConsumed,
     )
 }
 
@@ -266,7 +267,7 @@ internal fun ChatView(
         save = { "" },
         restore = { emptySet() }),
     consumeDownloadEvent: () -> Unit = {},
-    onOpenChatConversationEventConsumed: () -> Unit = {},
+    onActionToManageEventConsumed: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -325,7 +326,9 @@ internal fun ChatView(
                 keyboardController?.hide()
                 showEmojiPicker = false
             } else {
-                selectedMessages = emptySet()
+                if (!isSelectMode) {
+                    selectedMessages = emptySet()
+                }
                 addingReactionTo = null
             }
             true
@@ -601,7 +604,7 @@ internal fun ChatView(
                             onNavigationPressed = exitSelectMode,
                             actions = actions.filter {
                                 it.appliesTo(selectedMessages)
-                            }.map { action ->
+                            }.mapNotNull { action ->
                                 action.toolbarMenuItemWithClick(
                                     messages = selectedMessages,
                                     exitSelectMode = exitSelectMode,
@@ -933,9 +936,14 @@ internal fun ChatView(
             }
 
             EventEffect(
-                event = openChatConversationEvent,
-                onConsumed = onOpenChatConversationEventConsumed,
-            ) { chatId -> openChatFragment(context, chatId) }
+                event = actionToManageEvent,
+                onConsumed = onActionToManageEventConsumed,
+            ) { action ->
+                when (action) {
+                    is ActionToManage.OpenChat -> openChatFragment(context, action.chatId)
+                    is ActionToManage.EnableSelectMode -> isSelectMode = true
+                }
+            }
         }
 
         StartDownloadComponent(

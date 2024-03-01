@@ -48,7 +48,7 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion
  * @property editingMessageContent Content of the message being edited.
  * @property myUserHandle User handle of current logged in user.
  * @property downloadEvent Event to start a download.
- * @property openChatConversationEvent Event to open a chat conversation.
+ * @property actionToManageEvent [ActionToManage].
  */
 data class ChatUiState(
     val chat: ChatRoom? = null,
@@ -81,7 +81,7 @@ data class ChatUiState(
     val editingMessageContent: String? = null,
     val myUserHandle: Long? = null,
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
-    val openChatConversationEvent: StateEventWithContent<Long> = consumed(),
+    val actionToManageEvent: StateEventWithContent<ActionToManage> = consumed(),
 ) {
 
     /**

@@ -78,18 +78,14 @@ abstract class MessageAction(
         messages: Set<TypedMessage>,
         exitSelectMode: () -> Unit,
         setAction: ((@Composable () -> Unit)?) -> Unit,
-    ): MenuActionWithClick =
-        MenuActionWithClick(
-            menuAction = toolbarMenuItem(),
-            onClick = {
-                setAction {
-                    OnTrigger(messages = messages) {
-                        setAction(null)
-                    }
-                }
-                exitSelectMode()
+    ): MenuActionWithClick? = toolbarItem(messages) {
+        setAction {
+            OnTrigger(messages = messages) {
+                setAction(null)
             }
-        )
+        }
+        exitSelectMode()
+    }
 
     private fun toolbarMenuItem() = object : MenuActionWithIcon {
         @Composable
@@ -104,6 +100,7 @@ abstract class MessageAction(
     /**
      * Bottom sheet item
      *
+     * @param message
      * @param onClick
      * @return the bottom sheet item
      */
@@ -121,6 +118,22 @@ abstract class MessageAction(
             addSeparator = addSeparator,
         )
     }
+
+    /**
+     * Toolbar item
+     *
+     * @param messages
+     * @param onClick
+     * @return the toolbar item if any
+     */
+    protected open fun toolbarItem(
+        messages: Set<TypedMessage>,
+        onClick: () -> Unit,
+    ): MenuActionWithClick? =
+        MenuActionWithClick(
+            menuAction = toolbarMenuItem(),
+            onClick = onClick
+        )
 
     /**
      * On trigger - Action to perform on click

@@ -14,6 +14,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.actions.EditMessa
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.ForwardMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.MessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.OpenWithMessageAction
+import mega.privacy.android.app.presentation.meeting.chat.view.actions.SelectMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.SendMessageAction
 
 @Module
@@ -28,6 +29,12 @@ internal class MessageActionModule {
     @IntoSet
     fun provideForwardActionFactory(): (ChatViewModel) -> MessageAction =
         { vm -> ForwardMessageAction(vm) }
+
+    @Provides
+    @IntoSet
+    fun provideSelectActionFactory(): (ChatViewModel) -> MessageAction =
+        { vm -> SelectMessageAction(vm) }
+
 
     @Provides
     @IntoSet
@@ -51,11 +58,11 @@ internal class MessageActionModule {
 
     @Provides
     @IntoSet
-    fun provideDeleteActionFactory(): (ChatViewModel) -> MessageAction =
-        { vm -> DeleteMessageAction(vm) }
+    fun provideAvailableOfflineActionFactory(): (ChatViewModel) -> MessageAction =
+        { vm -> AvailableOfflineMessageAction(vm) }
 
     @Provides
     @IntoSet
-    fun provideAvailableOfflineActionFactory(): (ChatViewModel) -> MessageAction =
-        { vm -> AvailableOfflineMessageAction(vm) }
+    fun provideDeleteActionFactory(): (ChatViewModel) -> MessageAction =
+        { vm -> DeleteMessageAction(vm) }
 }

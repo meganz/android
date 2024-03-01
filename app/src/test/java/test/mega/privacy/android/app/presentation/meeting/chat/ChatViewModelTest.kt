@@ -24,6 +24,7 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ParticipantNameMapper
+import mega.privacy.android.app.presentation.meeting.chat.model.ActionToManage
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
@@ -668,7 +669,7 @@ internal class ChatViewModelTest {
             mock<ChatCall> {
                 on { chatId } doReturn isParticipatingInChatCall
             }
-        }?.let { listOf(it) } ?: emptyList<ChatCall>()
+        }?.let { listOf(it) } ?: emptyList()
         flow.emit(expected)
         underTest.state.test {
             assertThat(awaitItem().callsInOtherChats).isEqualTo(expected)
@@ -2672,7 +2673,7 @@ internal class ChatViewModelTest {
     @Test
     fun `test that consumeDownloadEvent update state correctly`() = runTest {
         initTestClass()
-        underTest.consumeDownloadEvent()
+        underTest.onActionToManageEventConsumed()
         underTest.state.test {
             assertThat(awaitItem().downloadEvent)
                 .isInstanceOf(StateEventWithContentConsumed::class.java)
@@ -2790,20 +2791,32 @@ internal class ChatViewModelTest {
             onOpenChatWith(messages)
             state.test {
                 val result =
-                    (awaitItem().openChatConversationEvent as StateEventWithContentTriggered)
-                        .content
+                    ((awaitItem().actionToManageEvent as StateEventWithContentTriggered)
+                        .content as ActionToManage.OpenChat).chatId
                 assertThat(result).isEqualTo(chatId)
             }
         }
     }
 
     @Test
-    fun `test that openChatConversationEvent updates state correctly`() = runTest {
+    fun `test that onActionToManageEventConsumed updates state correctly`() = runTest {
         initTestClass()
-        underTest.onOpenChatConversationEventConsumed()
+        underTest.onActionToManageEventConsumed()
         underTest.state.test {
-            assertThat(awaitItem().openChatConversationEvent)
+            assertThat(awaitItem().actionToManageEvent)
                 .isInstanceOf(StateEventWithContentConsumed::class.java)
+        }
+    }
+
+    @Test
+    fun `test that onEnableSelectMode updates correctly`() = runTest {
+        with(underTest) {
+            onEnableSelectMode()
+            state.test {
+                val result =
+                    (awaitItem().actionToManageEvent as StateEventWithContentTriggered).content
+                assertThat(result).isInstanceOf(ActionToManage.EnableSelectMode::class.java)
+            }
         }
     }
 

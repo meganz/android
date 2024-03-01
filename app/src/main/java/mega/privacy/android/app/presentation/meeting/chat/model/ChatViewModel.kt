@@ -10,7 +10,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -149,7 +148,6 @@ const val EXTRA_LINK = "LINK"
  *
  * @param savedStateHandle
  */
-@OptIn(FlowPreview::class)
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val isChatNotificationMuteUseCase: IsChatNotificationMuteUseCase,
@@ -1414,7 +1412,9 @@ class ChatViewModel @Inject constructor(
             runCatching {
                 getChatFromContactMessagesUseCase(messages)
             }.onSuccess {
-                _state.update { state -> state.copy(openChatConversationEvent = triggered(it)) }
+                _state.update { state ->
+                    state.copy(actionToManageEvent = triggered(ActionToManage.OpenChat(it)))
+                }
             }.onFailure {
                 Timber.e(it)
             }
@@ -1424,13 +1424,23 @@ class ChatViewModel @Inject constructor(
     /**
      * Open chat conversation event consumed
      */
-    fun onOpenChatConversationEventConsumed() {
-        _state.update { state -> state.copy(openChatConversationEvent = consumed()) }
+    fun onActionToManageEventConsumed() {
+        _state.update { state -> state.copy(actionToManageEvent = consumed()) }
     }
 
     private fun messageCannotBeEdited() {
         val infoToShow = InfoToShow.SimpleString(R.string.error_editing_message)
         _state.update { state -> state.copy(infoToShowEvent = triggered(infoToShow)) }
+    }
+
+    /**
+     * Enable select mode.
+     */
+
+    fun onEnableSelectMode() {
+        _state.update { state ->
+            state.copy(actionToManageEvent = triggered(ActionToManage.EnableSelectMode))
+        }
     }
 
     companion object {
