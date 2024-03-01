@@ -648,7 +648,7 @@ class ManagerViewModelTest {
         mode = EnumSource.Mode.INCLUDE,
     )
     fun `test that camera uploads is started when an account event indicating enough storage space is received`(
-        storageState: StorageState
+        storageState: StorageState,
     ) = runTest {
         monitorMyAccountUpdateFakeFlow.emit(
             MyAccountUpdate(Action.STORAGE_STATE_CHANGED, storageState)
@@ -664,7 +664,7 @@ class ManagerViewModelTest {
         mode = EnumSource.Mode.EXCLUDE,
     )
     fun `test that camera uploads is not started when an account event indicating not enough storage space is received`(
-        storageState: StorageState
+        storageState: StorageState,
     ) = runTest {
         monitorMyAccountUpdateFakeFlow.emit(
             MyAccountUpdate(Action.STORAGE_STATE_CHANGED, storageState)
@@ -1281,6 +1281,16 @@ class ManagerViewModelTest {
                     assertThat(awaitItem().androidSyncServiceEnabled).isFalse()
                 }
         }
+
+    @Test
+    fun `test that the device center previous bottom navigation item is set`() = runTest {
+        val previousItem = 3
+
+        underTest.setDeviceCenterPreviousBottomNavigationItem(previousItem)
+        underTest.state.test {
+            assertThat(awaitItem().deviceCenterPreviousBottomNavigationItem).isEqualTo(previousItem)
+        }
+    }
 
     companion object {
         @JvmField

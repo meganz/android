@@ -33,6 +33,8 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property showRecordingConsentDialog             True if should show the recording consent dialog or False otherwise.
  * @property isRecordingConsentAccepted             True if recording consent dialog has been already accepted or False otherwise.
  * @property callInProgressChatId                   Chat ID of the current call in progress.
+ * @property deviceCenterPreviousBottomNavigationItem  A potentially nullable Integer that holds the
+ * previous Bottom Navigation item before accessing Device Center
  */
 data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
@@ -57,4 +59,5 @@ data class ManagerState(
     val showRecordingConsentDialog: Boolean = false,
     val isRecordingConsentAccepted: Boolean = false,
     val callInProgressChatId: Long = -1L,
+    val deviceCenterPreviousBottomNavigationItem: Int? = null,
 )

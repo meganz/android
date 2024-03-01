@@ -1220,6 +1220,17 @@ class ManagerViewModel @Inject constructor(
         }
     }
 
+    /**
+     * When navigating to Device Center, this holds the previous Bottom Navigation item, so that the
+     * User can go back to it after leaving Device Center
+     *
+     * @param previousItem The previous Bottom Navigation Item, which can be null to signify that
+     * it is not set up
+     */
+    fun setDeviceCenterPreviousBottomNavigationItem(previousItem: Int?) {
+        _state.update { it.copy(deviceCenterPreviousBottomNavigationItem = previousItem) }
+    }
+
     internal companion object {
         internal const val isFirstLoginKey = "EXTRA_FIRST_LOGIN"
         private const val INVALID_HANDLE = -1L

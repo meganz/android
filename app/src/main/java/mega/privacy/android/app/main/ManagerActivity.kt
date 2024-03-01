@@ -3913,6 +3913,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 supportInvalidateOptionsMenu()
                 hideFabButton()
                 hideAdsView()
+                with(viewModel) {
+                    // Only backup the previous Bottom Navigation item when Device Center is accessed
+                    // from the Drawer
+                    if (state().deviceCenterPreviousBottomNavigationItem == null) {
+                        setDeviceCenterPreviousBottomNavigationItem(bottomNavigationCurrentItem)
+                    }
+                }
                 replaceFragmentWithBackStack(
                     fragmentToReplace = deviceCenterFragment,
                     newFragmentInstance = DeviceCenterFragment.newInstance(),
@@ -4853,19 +4860,24 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         return when (item.itemId) {
             android.R.id.home -> {
                 if (isFirstNavigationLevel && drawerItem != DrawerItem.SEARCH) {
-                    if (drawerItem == DrawerItem.SYNC || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.TRANSFERS) {
-                        goBackToBottomNavigationItem(bottomNavigationCurrentItem)
-                        if (transfersToImageViewer) {
-                            switchImageViewerToFront()
+                    when (drawerItem) {
+                        DrawerItem.SYNC, DrawerItem.RUBBISH_BIN, DrawerItem.TRANSFERS -> {
+                            goBackToBottomNavigationItem(bottomNavigationCurrentItem)
+                            if (transfersToImageViewer) {
+                                switchImageViewerToFront()
+                            }
                         }
-                    } else if (drawerItem == DrawerItem.DEVICE_CENTER || drawerItem == DrawerItem.NOTIFICATIONS) {
-                        handleSuperBackPressed()
-                        goBackToBottomNavigationItem(bottomNavigationCurrentItem)
-                        if (transfersToImageViewer) {
-                            switchImageViewerToFront()
+
+                        DrawerItem.DEVICE_CENTER -> handleDeviceCenterBackNavigation()
+                        DrawerItem.NOTIFICATIONS -> {
+                            handleSuperBackPressed()
+                            goBackToBottomNavigationItem(bottomNavigationCurrentItem)
+                            if (transfersToImageViewer) {
+                                switchImageViewerToFront()
+                            }
                         }
-                    } else {
-                        drawerLayout.openDrawer(navigationView)
+
+                        else -> drawerLayout.openDrawer(navigationView)
                     }
                 } else {
                     if (drawerItem == DrawerItem.CLOUD_DRIVE) {
@@ -5159,8 +5171,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         } else if (drawerItem == DrawerItem.SYNC) {
             goBackToBottomNavigationItem(bottomNavigationCurrentItem)
         } else if (drawerItem == DrawerItem.DEVICE_CENTER) {
-            handleSuperBackPressed()
-            goBackToBottomNavigationItem(bottomNavigationCurrentItem)
+            handleDeviceCenterBackNavigation()
         } else if (drawerItem == DrawerItem.RUBBISH_BIN) {
             rubbishBinComposeFragment = getRubbishBinComposeFragment()
             if (rubbishBinComposeFragment == null || rubbishBinComposeFragment?.onBackPressed() == 0) {
@@ -5216,6 +5227,23 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     /**
+     * Handles Back Navigation logic when the User is in Device Center
+     */
+    private fun handleDeviceCenterBackNavigation() {
+        with(viewModel) {
+            // Ensure that when exiting Device Center, only go back to the previous Bottom Navigation
+            // item if Device Center was accessed through a Drawer Click
+            state().deviceCenterPreviousBottomNavigationItem?.let {
+                bottomNavigationCurrentItem = it
+                // Reset back to null
+                setDeviceCenterPreviousBottomNavigationItem(null)
+            }
+        }
+        handleSuperBackPressed()
+        goBackToBottomNavigationItem(bottomNavigationCurrentItem)
+    }
+
+    /**
      * Handles Back Navigation logic when the User is in Cloud Drive or Media Discovery
      *
      * @param performBackNavigation If true, a Back Navigation is performed to remove one level
@@ -5252,7 +5280,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         performBackNavigation()
                         if (isAccessedFolderExited()) {
                             resetIsAccessedFolderExited()
-                            // Go back to Device Center
+                            // Remove Cloud Drive and go back to Device Center
+                            removeFragment(fileBrowserComposeFragment)
                             selectDrawerItem(DrawerItem.DEVICE_CENTER)
                         }
                     }
