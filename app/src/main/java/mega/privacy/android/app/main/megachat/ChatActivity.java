@@ -420,7 +420,16 @@ import mega.privacy.android.domain.entity.contacts.ContactLink;
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus;
 import mega.privacy.android.domain.usecase.GetPushToken;
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase;
+import mega.privacy.mobile.analytics.event.ChatConversationAddToCloudDriveActionMenuEvent;
+import mega.privacy.mobile.analytics.event.ChatConversationCopyActionMenuEvent;
+import mega.privacy.mobile.analytics.event.ChatConversationDeleteActionMenuEvent;
+import mega.privacy.mobile.analytics.event.ChatConversationDownloadActionMenuEvent;
+import mega.privacy.mobile.analytics.event.ChatConversationEditActionMenuEvent;
+import mega.privacy.mobile.analytics.event.ChatConversationForwardActionMenuEvent;
+import mega.privacy.mobile.analytics.event.ChatConversationInviteActionMenuEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationScreenEvent;
+import mega.privacy.mobile.analytics.event.ChatConversationSendMessageActionMenuEvent;
+import mega.privacy.mobile.analytics.event.ChatConversationShareActionMenuEvent;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -4948,8 +4957,10 @@ public class ChatActivity extends PasscodeActivity
 
             int itemId = item.getItemId();
             if (itemId == R.id.chat_cab_menu_edit) {
+                Analytics.INSTANCE.getTracker().trackEvent(ChatConversationEditActionMenuEvent.INSTANCE);
                 editMessage(messagesSelected);
             } else if (itemId == R.id.chat_cab_menu_share) {
+                Analytics.INSTANCE.getTracker().trackEvent(ChatConversationShareActionMenuEvent.INSTANCE);
                 Timber.d("Share option");
                 if (!messagesSelected.isEmpty()) {
                     if (messagesSelected.size() == 1) {
@@ -4959,6 +4970,7 @@ public class ChatActivity extends PasscodeActivity
                     }
                 }
             } else if (itemId == R.id.chat_cab_menu_invite) {
+                Analytics.INSTANCE.getTracker().trackEvent(ChatConversationInviteActionMenuEvent.INSTANCE);
                 ContactController cC = new ContactController(chatActivity);
                 if (messagesSelected.size() == 1) {
                     cC.inviteContact(messagesSelected.get(0).getMessage().getUserEmail(0));
@@ -4970,6 +4982,7 @@ public class ChatActivity extends PasscodeActivity
                     cC.inviteMultipleContacts(contactEmails);
                 }
             } else if (itemId == R.id.chat_cab_menu_start_conversation) {
+                Analytics.INSTANCE.getTracker().trackEvent(ChatConversationSendMessageActionMenuEvent.INSTANCE);
                 if (messagesSelected.size() == 1) {
                     startConversation(messagesSelected.get(0).getMessage().getUserHandle(0));
                 } else {
@@ -4980,9 +4993,11 @@ public class ChatActivity extends PasscodeActivity
                     startGroupConversation(contactHandles);
                 }
             } else if (itemId == R.id.chat_cab_menu_forward) {
+                Analytics.INSTANCE.getTracker().trackEvent(ChatConversationForwardActionMenuEvent.INSTANCE);
                 Timber.d("Forward message");
                 forwardMessages(messagesSelected);
             } else if (itemId == R.id.chat_cab_menu_copy) {
+                Analytics.INSTANCE.getTracker().trackEvent(ChatConversationCopyActionMenuEvent.INSTANCE);
                 String text;
                 if (messagesSelected.size() == 1) {
                     MegaChatMessage msg = messagesSelected.get(0).getMessage();
@@ -4992,8 +5007,10 @@ public class ChatActivity extends PasscodeActivity
                 }
                 copyToClipboard(text);
             } else if (itemId == R.id.chat_cab_menu_delete) {//Delete
+                Analytics.INSTANCE.getTracker().trackEvent(ChatConversationDeleteActionMenuEvent.INSTANCE);
                 showConfirmationDeleteMessages(messagesSelected, chatRoom);
             } else if (itemId == R.id.chat_cab_menu_download) {
+                Analytics.INSTANCE.getTracker().trackEvent(ChatConversationDownloadActionMenuEvent.INSTANCE);
                 ArrayList<Long> messageIds = new ArrayList<>();
                 for (int i = 0; i < messagesSelected.size(); i++) {
                     Long megaNodeHandle = messagesSelected.get(i).getMessage().getMsgId();
@@ -5014,6 +5031,7 @@ public class ChatActivity extends PasscodeActivity
                             return Unit.INSTANCE;
                         });
             } else if (itemId == R.id.chat_cab_menu_import) {
+                Analytics.INSTANCE.getTracker().trackEvent(ChatConversationAddToCloudDriveActionMenuEvent.INSTANCE);
                 finishMultiselectionMode();
                 chatC.importNodesFromAndroidMessages(messagesSelected, IMPORT_ONLY_OPTION);
             } else if (itemId == R.id.chat_cab_menu_offline) {
