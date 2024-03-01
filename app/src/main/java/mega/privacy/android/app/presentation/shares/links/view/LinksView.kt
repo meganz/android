@@ -16,6 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.app.presentation.shares.links.model.LinksUiState
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.app.presentation.view.NodesView
@@ -78,7 +79,7 @@ fun LinksView(
 
     val gridState = rememberLazyGridState()
 
-    if (!uiState.isLoading)
+    if (!uiState.isLoading) {
         if (uiState.nodesList.isNotEmpty()) {
             NodesView(
                 listContentPadding = PaddingValues(top = 17.dp),
@@ -107,4 +108,10 @@ fun LinksView(
                 text = stringResource(id = emptyState.second)
             )
         }
+    } else if (uiState.isInRootLevel) {
+        LoadingStateView(
+            isList = true
+        )
+    }
+
 }

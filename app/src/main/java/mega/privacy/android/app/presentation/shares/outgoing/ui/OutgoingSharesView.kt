@@ -16,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.app.presentation.view.NodesView
@@ -111,6 +112,10 @@ fun OutgoingSharesView(
                 text = stringResource(id = emptyState.second)
             )
         }
+    } else if (uiState.isInRootLevel) {
+        LoadingStateView(
+            isList = uiState.currentViewType == ViewType.LIST
+        )
     }
 
     if (uiState.verifyContactDialog != null) {

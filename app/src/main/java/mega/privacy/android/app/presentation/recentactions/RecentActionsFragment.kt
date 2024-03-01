@@ -9,9 +9,12 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
@@ -35,14 +38,19 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
+import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
+import mega.privacy.android.app.presentation.recentactions.view.RecentLoadingView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -65,6 +73,12 @@ class RecentActionsFragment : Fragment() {
      */
     @Inject
     lateinit var adapter: RecentActionsAdapter
+
+    /**
+     * Get system's default theme mode
+     */
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
 
     private lateinit var emptyLayout: ScrollView
     private lateinit var emptyText: TextView
@@ -91,6 +105,7 @@ class RecentActionsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         nodeController = NodeController(requireActivity())
         setupView()
+        setupLoadingView()
         observeDragSupportEvents(viewLifecycleOwner, listView, Constants.VIEWER_FROM_RECENT_ACTIONS)
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -100,7 +115,8 @@ class RecentActionsFragment : Fragment() {
                     setRecentActions(it.recentActionItems)
                     displayRecentActionsActivity(
                         it.hideRecentActivity,
-                        it.recentActionItems.size
+                        it.recentActionItems.size,
+                        it.isLoading
                     )
                 }
             }
@@ -126,7 +142,7 @@ class RecentActionsFragment : Fragment() {
         listView = binding.listViewRecents
         fastScroller = binding.fastscroll
 
-        fastScroller.setUpScrollListener(object : FastScrollerScrollListener{
+        fastScroller.setUpScrollListener(object : FastScrollerScrollListener {
             override fun onScrolled() {
                 homepageFragment?.hideFabButton()
             }
@@ -136,6 +152,25 @@ class RecentActionsFragment : Fragment() {
             }
         })
         initAdapter()
+    }
+
+    private fun setupLoadingView() {
+        binding.loadingLayout.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val themeMode by getThemeMode()
+                    .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val uiState by viewModel.state.collectAsStateWithLifecycle()
+                MegaAppTheme(isDark = themeMode.isDarkMode()) {
+                    if (uiState.isLoading) {
+                        RecentLoadingView()
+                        visibility = View.VISIBLE
+                    } else {
+                        visibility = View.GONE
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -209,10 +244,14 @@ class RecentActionsFragment : Fragment() {
      * false otherwise.
      * @param listSize
      */
-    private fun displayRecentActionsActivity(hideRecentActivity: Boolean, listSize: Int) {
+    private fun displayRecentActionsActivity(
+        hideRecentActivity: Boolean,
+        listSize: Int,
+        isLoading: Boolean,
+    ) {
         when {
             hideRecentActivity -> hideActivity()
-            listSize == 0 -> showEmptyActivity()
+            !isLoading && listSize == 0 -> showEmptyActivity()
             else -> showActivity(listSize)
         }
     }

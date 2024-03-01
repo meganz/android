@@ -16,9 +16,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.legacy.core.ui.controls.modifier.skeletonEffect
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.legacy.core.ui.controls.modifier.skeletonEffect
 
 /**
  * Loading item for list for node
@@ -28,7 +28,7 @@ import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_
 fun NodeLoadingListViewItem(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
-            .padding(vertical = 8.dp, horizontal = 8.dp),
+            .padding(vertical = 8.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Spacer(
@@ -114,7 +114,7 @@ fun LoadingHeaderView(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .height(40.dp)
-            .padding(top = 8.dp, start = 8.dp, end = 8.dp),
+            .padding(top = 8.dp, start = 16.dp, end = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Spacer(

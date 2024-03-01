@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.app.presentation.view.OverQuotaView
@@ -112,6 +113,10 @@ fun FileBrowserComposeView(
                     text = stringResource(id = emptyState.second)
                 )
             }
+        } else if (uiState.hasNoOpenedFolders) {
+            LoadingStateView(
+                isList = uiState.currentViewType == ViewType.LIST
+            )
         }
     }
 }
