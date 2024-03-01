@@ -15,6 +15,20 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/cab_menu_hide"
+        android:orderInCategory="110"
+        android:title="@string/general_hide_node"
+        app:showAsAction="never"
+        />
+
+    <item
+        android:id="@+id/cab_menu_unhide"
+        android:orderInCategory="110"
+        android:title="@string/general_unhide_node"
+        app:showAsAction="never"
+        />
+
+    <item
         android:id="@+id/cab_menu_download"
         android:icon="@drawable/ic_download_white"
         android:orderInCategory="120"

@@ -69,6 +69,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.theme.MegaAppTheme
@@ -557,6 +558,22 @@ class FileBrowserComposeFragment : Fragment() {
                 }
 
                 OptionItems.CLEAR_ALL_CLICKED -> {
+                    disableSelectMode()
+                }
+
+                OptionItems.HIDE_CLICKED -> {
+                    fileBrowserViewModel.hideOrUnhideNodes(
+                        nodeIds = it.selectedMegaNode.map { node -> NodeId(node.handle) },
+                        hide = true
+                    )
+                    disableSelectMode()
+                }
+
+                OptionItems.UNHIDE_CLICKED -> {
+                    fileBrowserViewModel.hideOrUnhideNodes(
+                        nodeIds = it.selectedMegaNode.map { node -> NodeId(node.handle) },
+                        hide = false
+                    )
                     disableSelectMode()
                 }
 

@@ -38,6 +38,7 @@ import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
@@ -91,6 +92,7 @@ class FileBrowserViewModelTest {
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
+    private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -121,6 +123,7 @@ class FileBrowserViewModelTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
+            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
         )
     }
 

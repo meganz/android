@@ -37,6 +37,7 @@ import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
@@ -92,6 +93,7 @@ class FileBrowserViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+    private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -794,4 +796,13 @@ class FileBrowserViewModel @Inject constructor(
      */
     fun resetIsAccessedFolderExited() =
         _state.update { it.copy(isAccessedFolderExited = false) }
+
+    /**
+     * Hide or unhide the node
+     */
+    fun hideOrUnhideNodes(nodeIds: List<NodeId>, hide: Boolean) = viewModelScope.launch {
+        for (nodeId in nodeIds) {
+            updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = hide)
+        }
+    }
 }

@@ -502,6 +502,8 @@ class LinksComposeFragment : Fragment() {
                     disableSelectMode()
                 }
 
+                OptionItems.HIDE_CLICKED, OptionItems.UNHIDE_CLICKED -> {}
+
                 OptionItems.COPY_CLICKED -> {
                     val nC = NodeController(requireActivity())
                     nC.chooseLocationToCopyNodes(viewModel.state.value.selectedNodeHandles)

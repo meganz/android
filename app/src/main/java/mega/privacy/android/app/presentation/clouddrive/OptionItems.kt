@@ -66,6 +66,16 @@ enum class OptionItems {
     CLEAR_ALL_CLICKED,
 
     /**
+     * Option hide clicked
+     */
+    HIDE_CLICKED,
+
+    /**
+     * Option unhide clicked
+     */
+    UNHIDE_CLICKED,
+
+    /**
      * Option item copy clicked
      */
     COPY_CLICKED,

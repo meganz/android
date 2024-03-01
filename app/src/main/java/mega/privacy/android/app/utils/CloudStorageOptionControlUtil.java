@@ -46,6 +46,8 @@ public class CloudStorageOptionControlUtil {
   public static class Control {
     private final Option selectAll;
     private final Option clearSelection;
+    private final Option hide;
+    private final Option unhide;
     private final Option removeLink;
     private final Option removeShare;
     private final Option rename;
@@ -68,6 +70,8 @@ public class CloudStorageOptionControlUtil {
     public Control() {
       selectAll = new Option(true);
       clearSelection = new Option(true);
+      hide = new Option(false);
+      unhide = new Option(false);
       removeLink = new Option(false);
       removeShare = new Option(false);
       rename = new Option(false);
@@ -85,7 +89,7 @@ public class CloudStorageOptionControlUtil {
       disputeTakedown = new Option(false);
 
       options = Arrays.asList(
-              selectAll, clearSelection, removeLink, removeShare, rename, saveToDevice, getLink, disputeTakedown,
+              selectAll, clearSelection, hide, unhide, removeLink, removeShare, rename, saveToDevice, getLink, disputeTakedown,
               manageLink, shareFolder, sendToChat, shareOut, move, copy, leaveShare, trash, removeFavourites);
     }
 
@@ -95,6 +99,14 @@ public class CloudStorageOptionControlUtil {
 
     public Option clearSelection() {
       return clearSelection;
+    }
+
+    public Option hide() {
+      return hide;
+    }
+
+    public Option unhide() {
+      return unhide;
     }
 
     public Option removeLink() {
@@ -175,6 +187,12 @@ public class CloudStorageOptionControlUtil {
     menu.findItem(R.id.cab_menu_clear_selection).setVisible(control.clearSelection.visible);
     menu.findItem(R.id.cab_menu_clear_selection)
         .setShowAsAction(control.clearSelection.showAsAction);
+
+    menu.findItem(R.id.cab_menu_hide).setVisible(control.hide.visible);
+    menu.findItem(R.id.cab_menu_hide).setShowAsAction(control.hide.showAsAction);
+
+    menu.findItem(R.id.cab_menu_unhide).setVisible(control.unhide.visible);
+    menu.findItem(R.id.cab_menu_unhide).setShowAsAction(control.unhide.showAsAction);
 
     menu.findItem(R.id.cab_menu_remove_link).setVisible(control.removeLink.visible);
     menu.findItem(R.id.cab_menu_remove_link).setShowAsAction(control.removeLink.showAsAction);
