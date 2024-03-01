@@ -20,6 +20,7 @@ import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.allvideos.AllVideosView
 import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPlaylistsView
+import mega.privacy.android.domain.entity.SortOrder
 
 internal const val videoSectionRoute = "videoSection/video_section"
 
@@ -94,7 +95,19 @@ internal fun VideoSectionComposeView(
                 scrollToTop = uiState.scrollToTop,
                 lazyListState = playlistsLazyListState,
                 sortOrder = stringResource(
-                    id = SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
+                    id = SortByHeaderViewModel.orderNameMap[
+                        when (uiState.sortOrder) {
+                            SortOrder.ORDER_SIZE_DESC,
+                            SortOrder.ORDER_SIZE_ASC,
+                            SortOrder.ORDER_FAV_ASC,
+                            SortOrder.ORDER_FAV_DESC,
+                            SortOrder.ORDER_LABEL_ASC,
+                            SortOrder.ORDER_LABEL_DESC,
+                            -> SortOrder.ORDER_DEFAULT_ASC
+
+                            else -> uiState.sortOrder
+                        }
+                    ]
                         ?: R.string.sortby_name
                 ),
                 errorMessage = uiState.createDialogErrorMessage,

@@ -229,10 +229,12 @@ class VideoSectionViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     sortOrder = sortOrder,
-                    progressBarShowing = true
+                    progressBarShowing = true,
+                    isPlaylistProgressBarShown = true
                 )
             }
             setPendingRefreshNodes()
+            loadVideoPlaylists()
         }
 
     internal fun shouldShowSearchMenu() =

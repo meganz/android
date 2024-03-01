@@ -148,6 +148,7 @@ internal fun VideoPlaylistsView(
     }
 
     Scaffold(
+        modifier = modifier,
         scaffoldState = rememberScaffoldState(),
         snackbarHost = {
             SnackbarHost(
@@ -175,9 +176,7 @@ internal fun VideoPlaylistsView(
         }
     ) { paddingValue ->
         Box(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(paddingValue)
+            modifier = Modifier.fillMaxSize().padding(paddingValue)
         ) {
             if (shouldCreateVideoPlaylistDialog) {
                 CreateVideoPlaylistDialog(
@@ -261,7 +260,7 @@ internal fun VideoPlaylistsView(
                 }
 
                 items.isEmpty() -> LegacyMegaEmptyView(
-                    modifier = modifier.testTag(VIDEO_PLAYLISTS_EMPTY_VIEW_TEST_TAG),
+                    modifier = Modifier.testTag(VIDEO_PLAYLISTS_EMPTY_VIEW_TEST_TAG),
                     text = "[B]No[/B] [A]playlists[/A] [B]found[/B]",
                     imagePainter = painterResource(id = R.drawable.ic_homepage_empty_playlists)
                 )

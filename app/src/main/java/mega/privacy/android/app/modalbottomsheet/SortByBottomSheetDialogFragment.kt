@@ -28,6 +28,7 @@ import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
 import mega.privacy.android.app.utils.Constants.ORDER_FAVOURITES
 import mega.privacy.android.app.utils.Constants.ORDER_OFFLINE
 import mega.privacy.android.app.utils.Constants.ORDER_OTHERS
+import mega.privacy.android.app.utils.Constants.ORDER_VIDEO_PLAYLIST
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.SortOrder
 import java.util.Locale
@@ -105,18 +106,35 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 sortByHeaderViewModel.oldOrder.collectLatest { oldOrder ->
-                    when (oldOrder) {
-                        SortOrder.ORDER_DEFAULT_ASC -> setSelectedColor(binding.sortByNameAsc)
-                        SortOrder.ORDER_DEFAULT_DESC -> setSelectedColor(binding.sortByNameDesc)
-                        SortOrder.ORDER_CREATION_ASC -> setSelectedColor(binding.sortByNewestDate)
-                        SortOrder.ORDER_MODIFICATION_DESC -> setSelectedColor(binding.sortByNewestDate)
-                        SortOrder.ORDER_CREATION_DESC -> setSelectedColor(binding.sortByOldestDate)
-                        SortOrder.ORDER_MODIFICATION_ASC -> setSelectedColor(binding.sortByOldestDate)
-                        SortOrder.ORDER_SIZE_DESC -> setSelectedColor(binding.sortByLargestSize)
-                        SortOrder.ORDER_SIZE_ASC -> setSelectedColor(binding.sortBySmallestSize)
-                        SortOrder.ORDER_FAV_ASC -> setSelectedColor(binding.sortByFavoritesType)
-                        SortOrder.ORDER_LABEL_ASC -> setSelectedColor(binding.sortByLabelType)
-                        else -> {}
+                    if (orderType == ORDER_VIDEO_PLAYLIST) {
+                        when (oldOrder) {
+                            SortOrder.ORDER_SIZE_DESC,
+                            SortOrder.ORDER_SIZE_ASC,
+                            SortOrder.ORDER_FAV_ASC,
+                            SortOrder.ORDER_LABEL_ASC,
+                            SortOrder.ORDER_DEFAULT_ASC,
+                            -> setSelectedColor(binding.sortByNameAsc)
+
+                            SortOrder.ORDER_DEFAULT_DESC -> setSelectedColor(binding.sortByNameDesc)
+                            SortOrder.ORDER_MODIFICATION_DESC -> setSelectedColor(binding.sortByNewestDate)
+                            SortOrder.ORDER_MODIFICATION_ASC -> setSelectedColor(binding.sortByOldestDate)
+
+                            else -> {}
+                        }
+                    } else {
+                        when (oldOrder) {
+                            SortOrder.ORDER_DEFAULT_ASC -> setSelectedColor(binding.sortByNameAsc)
+                            SortOrder.ORDER_DEFAULT_DESC -> setSelectedColor(binding.sortByNameDesc)
+                            SortOrder.ORDER_CREATION_ASC -> setSelectedColor(binding.sortByNewestDate)
+                            SortOrder.ORDER_MODIFICATION_DESC -> setSelectedColor(binding.sortByNewestDate)
+                            SortOrder.ORDER_CREATION_DESC -> setSelectedColor(binding.sortByOldestDate)
+                            SortOrder.ORDER_MODIFICATION_ASC -> setSelectedColor(binding.sortByOldestDate)
+                            SortOrder.ORDER_SIZE_DESC -> setSelectedColor(binding.sortByLargestSize)
+                            SortOrder.ORDER_SIZE_ASC -> setSelectedColor(binding.sortBySmallestSize)
+                            SortOrder.ORDER_FAV_ASC -> setSelectedColor(binding.sortByFavoritesType)
+                            SortOrder.ORDER_LABEL_ASC -> setSelectedColor(binding.sortByLabelType)
+                            else -> {}
+                        }
                     }
                 }
             }
@@ -133,6 +151,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 binding.sortByFavoritesType.isVisible = false
                 binding.sortByLabelType.isVisible = false
             }
+
             ORDER_OTHERS -> {
                 binding.sortByNameSeparator.isVisible = false
                 binding.sortByLargestSize.isVisible = false
@@ -141,13 +160,22 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 binding.sortByNewestDate.isVisible = false
                 binding.sortByOldestDate.isVisible = false
             }
+
             ORDER_OFFLINE -> {
                 binding.sortByDateSeparator.isVisible = false
                 binding.sortByFavoritesType.isVisible = false
                 binding.sortByLabelType.isVisible = false
             }
+
             ORDER_FAVOURITES -> {
                 binding.sortByFavoritesType.isVisible = false
+            }
+
+            ORDER_VIDEO_PLAYLIST -> {
+                binding.sortByLargestSize.isVisible = false
+                binding.sortBySmallestSize.isVisible = false
+                binding.sortByFavoritesType.isVisible = false
+                binding.sortByLabelType.isVisible = false
             }
         }
 
@@ -187,7 +215,10 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun setSelectedColor(text: TextView) {
-        val colorSecondary = ColorUtils.getThemeColor(requireContext(), com.google.android.material.R.attr.colorSecondary)
+        val colorSecondary = ColorUtils.getThemeColor(
+            requireContext(),
+            com.google.android.material.R.attr.colorSecondary
+        )
         text.setTextColor(colorSecondary)
 
         var icon = text.compoundDrawablesRelative[0] ?: return
@@ -205,6 +236,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             when (orderType) {
                 ORDER_FAVOURITES,
                 ORDER_CLOUD,
+                ORDER_VIDEO_PLAYLIST,
                 -> {
                     sortByHeaderViewModel.setOrderCloud(order).join()
                     LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
@@ -219,9 +251,11 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         updateFileExplorerOrder(sortOrderIntMapper(order))
                     }
                 }
+
                 ORDER_CAMERA -> {
                     sortByHeaderViewModel.setOrderCamera(order).join()
                 }
+
                 ORDER_OTHERS -> {
                     sortByHeaderViewModel.setOrderOthers(order).join()
                     LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
@@ -236,6 +270,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         updateFileExplorerOrder(sortOrderIntMapper(order))
                     }
                 }
+
                 ORDER_OFFLINE -> {
                     sortByHeaderViewModel.setOrderOffline(order).join()
                     LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)

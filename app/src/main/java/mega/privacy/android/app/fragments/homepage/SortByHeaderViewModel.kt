@@ -177,6 +177,7 @@ class SortByHeaderViewModel @Inject constructor(
             Constants.ORDER_OTHERS -> othersSortOrder.value
             Constants.ORDER_OFFLINE -> offlineSortOrder.value
             Constants.ORDER_FAVOURITES -> cloudSortOrder.value
+            Constants.ORDER_VIDEO_PLAYLIST -> cloudSortOrder.value
             else -> SortOrder.ORDER_DEFAULT_ASC
         }
         _oldOrder.value = order
