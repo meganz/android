@@ -66,6 +66,7 @@ class ShareToolBarMenuItem @Inject constructor(
                 if (localFiles.size == selectedNodes.size) {
                     val filesUri = localFiles.mapNotNull {
                         runCatching {
+
                             getLocalFileUri(it)?.let { filePath ->
                                 Uri.parse(filePath)
                             }
@@ -80,10 +81,10 @@ class ShareToolBarMenuItem @Inject constructor(
                     val intentType = if (similarTypes.size == 1) {
                         "${similarTypes.keys}"
                     } else {
-                        "*"
+                        "*/*"
                     }
                     val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
-                        type = "$intentType/*"
+                        type = intentType
                         putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(filesUri))
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                     }

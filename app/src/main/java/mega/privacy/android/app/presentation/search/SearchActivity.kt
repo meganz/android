@@ -514,7 +514,9 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
         currentFileNode: TypedFileNode,
     ) {
         val nodeSourceType = viewModel.state.value.nodeSourceType
-        val intent = if (isImagePreview && nodeSourceType == NodeSourceType.CLOUD_DRIVE) {
+        val intent = if (isImagePreview &&
+            (nodeSourceType == NodeSourceType.CLOUD_DRIVE || nodeSourceType == NodeSourceType.HOME)
+        ) {
             ImagePreviewActivity.createIntent(
                 context = this,
                 imageSource = ImagePreviewFetcherSource.CLOUD_DRIVE,

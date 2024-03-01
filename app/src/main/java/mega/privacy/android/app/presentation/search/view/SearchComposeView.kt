@@ -127,7 +127,7 @@ fun SearchComposeView(
         }
     ) { padding ->
         Column {
-            if (state.nodeSourceType == NodeSourceType.CLOUD_DRIVE) {
+            if (state.nodeSourceType == NodeSourceType.CLOUD_DRIVE || state.nodeSourceType == NodeSourceType.HOME) {
                 SearchFilterChipsView(
                     filters = state.filters,
                     selectedFilter = state.selectedFilter,

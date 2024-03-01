@@ -1008,7 +1008,7 @@ class ManagerViewModel @Inject constructor(
         NodeSourceType.LINKS -> linksParentHandle
         NodeSourceType.RUBBISH_BIN -> rubbishBinParentHandle
         NodeSourceType.BACKUPS -> backupsParentHandle
-        NodeSourceType.OTHER -> getRootNodeUseCase()?.id?.longValue ?: MegaApiJava.INVALID_HANDLE
+        NodeSourceType.HOME, NodeSourceType.OTHER -> getRootNodeUseCase()?.id?.longValue ?: MegaApiJava.INVALID_HANDLE
     }
 
     /**

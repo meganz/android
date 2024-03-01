@@ -69,7 +69,7 @@ class ShareBottomSheetMenuItem @Inject constructor(
                 if (node is TypedFileNode && path != null) {
                     getLocalFileUri(path)?.let {
                         val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                            type = "${node.type.mimeType}/*"
+                            type = node.type.mimeType
                             putExtra(Intent.EXTRA_STREAM, Uri.parse(it))
                             putExtra(Intent.EXTRA_SUBJECT, node.name)
                             addFlags(

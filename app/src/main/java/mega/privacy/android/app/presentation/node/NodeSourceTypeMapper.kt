@@ -19,7 +19,8 @@ class NodeSourceTypeMapper @Inject constructor() {
      * @param sharesTab selected shares tab
      */
     operator fun invoke(drawerItem: DrawerItem?, sharesTab: SharesTab?) = when (drawerItem) {
-        DrawerItem.HOMEPAGE, DrawerItem.CLOUD_DRIVE -> NodeSourceType.CLOUD_DRIVE
+        DrawerItem.HOMEPAGE -> NodeSourceType.HOME
+        DrawerItem.CLOUD_DRIVE -> NodeSourceType.CLOUD_DRIVE
         DrawerItem.BACKUPS -> NodeSourceType.BACKUPS
         DrawerItem.RUBBISH_BIN -> NodeSourceType.RUBBISH_BIN
         DrawerItem.SHARED_ITEMS -> when (sharesTab) {

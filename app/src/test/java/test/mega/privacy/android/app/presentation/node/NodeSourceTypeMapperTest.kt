@@ -27,10 +27,10 @@ class NodeSourceTypeMapperTest {
     }
 
     private fun provideParameters(): Stream<Arguments> = Stream.of(
+        Arguments.of(DrawerItem.HOMEPAGE, SharesTab.NONE, NodeSourceType.HOME),
         Arguments.of(DrawerItem.CLOUD_DRIVE, SharesTab.NONE, NodeSourceType.CLOUD_DRIVE),
         Arguments.of(DrawerItem.BACKUPS, SharesTab.NONE, NodeSourceType.BACKUPS),
         Arguments.of(DrawerItem.RUBBISH_BIN, SharesTab.NONE, NodeSourceType.RUBBISH_BIN),
-        Arguments.of(DrawerItem.HOMEPAGE, SharesTab.NONE, NodeSourceType.CLOUD_DRIVE),
         Arguments.of(DrawerItem.SHARED_ITEMS, SharesTab.LINKS_TAB, NodeSourceType.LINKS),
         Arguments.of(
             DrawerItem.SHARED_ITEMS,
@@ -42,6 +42,6 @@ class NodeSourceTypeMapperTest {
             SharesTab.INCOMING_TAB,
             NodeSourceType.INCOMING_SHARES
         ),
-        Arguments.of(DrawerItem.SHARED_ITEMS, SharesTab.NONE, NodeSourceType.OTHER),
+        Arguments.of(DrawerItem.SHARED_ITEMS, SharesTab.NONE, NodeSourceType.OTHER)
     )
 }

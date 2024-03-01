@@ -25,6 +25,7 @@ class NodeSourceTypeToViewTypeMapperTest {
     }
 
     private fun provideParam() = Stream.of(
+        Arguments.of(NodeSourceType.HOME, Constants.FILE_BROWSER_ADAPTER),
         Arguments.of(NodeSourceType.CLOUD_DRIVE, Constants.FILE_BROWSER_ADAPTER),
         Arguments.of(NodeSourceType.BACKUPS, Constants.BACKUPS_ADAPTER),
         Arguments.of(NodeSourceType.LINKS, Constants.LINKS_ADAPTER),

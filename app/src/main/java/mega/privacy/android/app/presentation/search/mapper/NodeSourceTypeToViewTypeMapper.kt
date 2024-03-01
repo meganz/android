@@ -15,7 +15,7 @@ class NodeSourceTypeToViewTypeMapper @Inject constructor() {
      * @return Int
      */
     operator fun invoke(nodeSourceType: NodeSourceType) = when (nodeSourceType) {
-        NodeSourceType.CLOUD_DRIVE -> Constants.FILE_BROWSER_ADAPTER
+        NodeSourceType.CLOUD_DRIVE, NodeSourceType.HOME -> Constants.FILE_BROWSER_ADAPTER
         NodeSourceType.RUBBISH_BIN -> Constants.RUBBISH_BIN_ADAPTER
         NodeSourceType.LINKS -> Constants.LINKS_ADAPTER
         NodeSourceType.INCOMING_SHARES -> Constants.INCOMING_SHARES_ADAPTER

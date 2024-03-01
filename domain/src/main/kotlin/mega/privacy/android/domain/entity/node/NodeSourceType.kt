@@ -6,6 +6,11 @@ package mega.privacy.android.domain.entity.node
 enum class NodeSourceType {
 
     /**
+     * When node source is the home page
+     */
+    HOME,
+
+    /**
      * When node source is the cloud drive
      */
     CLOUD_DRIVE,
