@@ -8,6 +8,7 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
+import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -56,7 +57,7 @@ class SendMessageActionTest {
     fun `test that composable contains delete bottom action`() {
         composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
-                messages = emptySet(),
+                messages = setOf(mock<TextMessage>()),
                 hideBottomSheet = {},
                 setAction = {},
             )

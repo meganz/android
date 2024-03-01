@@ -1375,6 +1375,17 @@ class ChatViewModel @Inject constructor(
     }
 
     /**
+     * On download for offline chat node
+     *
+     * @param file [ChatFile]
+     */
+    fun onDownloadForOfflineChatNode(file: ChatFile) {
+        _state.update {
+            it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadForOffline(file)))
+        }
+    }
+
+    /**
      * Edit message.
      *
      * @param message [TypedMessage].

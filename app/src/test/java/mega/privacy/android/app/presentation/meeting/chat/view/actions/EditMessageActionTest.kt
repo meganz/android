@@ -7,6 +7,7 @@ import com.google.common.truth.Truth
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
+import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -58,7 +59,7 @@ class EditMessageActionTest {
     fun `test that composable contains edit bottom action`() {
         composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
-                messages = emptySet(),
+                messages = setOf(mock<TextMessage>()),
                 hideBottomSheet = {},
                 setAction = {},
             )

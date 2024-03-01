@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.FragmentComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
+import mega.privacy.android.app.presentation.meeting.chat.view.actions.AvailableOfflineMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.CopyMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.DeleteMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.EditLocationMessageAction
@@ -52,4 +53,9 @@ internal class MessageActionModule {
     @IntoSet
     fun provideDeleteActionFactory(): (ChatViewModel) -> MessageAction =
         { vm -> DeleteMessageAction(vm) }
+
+    @Provides
+    @IntoSet
+    fun provideAvailableOfflineActionFactory(): (ChatViewModel) -> MessageAction =
+        { vm -> AvailableOfflineMessageAction(vm) }
 }

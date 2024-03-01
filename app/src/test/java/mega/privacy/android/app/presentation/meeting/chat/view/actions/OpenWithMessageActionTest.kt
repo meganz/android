@@ -56,7 +56,7 @@ class OpenWithMessageActionTest {
         val hideBottomSheet = mock<() -> Unit>()
         composeRule.setContent(
             underTest.bottomSheetMenuItem(
-                emptySet(),
+                setOf(mock<NodeAttachmentMessage>()),
                 hideBottomSheet
             ) {}
         )

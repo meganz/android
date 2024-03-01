@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.dialog.CanNotOpen
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import timber.log.Timber
 
 internal class OpenWithMessageAction(
     private val chatViewModel: ChatViewModel,
@@ -35,22 +36,25 @@ internal class OpenWithMessageAction(
         val message = messages.first() as NodeAttachmentMessage
         val context = LocalContext.current
         LaunchedEffect(messages.size) {
-            val contentUri =
-                viewModel.getChatNodeContentUri(message)
-
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                viewModel.applyNodeContentUri(
-                    intent = this,
-                    content = contentUri,
-                    mimeType = message.fileNode.type.mimeType,
-                    isSupported = false
-                )
-            }
             runCatching {
-                context.startActivity(intent)
-                onHandled()
+                viewModel.getChatNodeContentUri(message)
+            }.onSuccess { contentUri ->
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    viewModel.applyNodeContentUri(
+                        intent = this,
+                        content = contentUri,
+                        mimeType = message.fileNode.type.mimeType,
+                        isSupported = false
+                    )
+                }
+                runCatching {
+                    context.startActivity(intent)
+                    onHandled()
+                }.onFailure {
+                    showDownloadDialog = true
+                }
             }.onFailure {
-                showDownloadDialog = true
+                Timber.e(it, "Failed to get content uri")
             }
         }
 

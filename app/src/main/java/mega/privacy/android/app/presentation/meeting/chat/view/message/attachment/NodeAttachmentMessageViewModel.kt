@@ -17,10 +17,13 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.chat.message.GetCachedOriginalPathUseCase
-import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetMessageIdsByTypeUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFilePathUseCase
+import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import timber.log.Timber
 import java.io.File
@@ -39,6 +42,8 @@ class NodeAttachmentMessageViewModel @Inject constructor(
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getNodePreviewFilePathUseCase: GetNodePreviewFilePathUseCase,
     private val getCachedOriginalPathUseCase: GetCachedOriginalPathUseCase,
+    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
+    private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
     fileSizeStringMapper: FileSizeStringMapper,
     durationInSecondsTextMapper: DurationInSecondsTextMapper,
 ) : AbstractAttachmentMessageViewModel<NodeAttachmentMessage>(
@@ -146,4 +151,19 @@ class NodeAttachmentMessageViewModel @Inject constructor(
     ) {
         nodeContentUriIntentMapper(intent, content, mimeType, isSupported)
     }
+
+
+    /**
+     * Is available offline
+     *
+     * @param node
+     */
+    suspend fun isAvailableOffline(node: TypedNode) = isAvailableOfflineUseCase(node)
+
+    /**
+     * Remove offline node
+     *
+     * @param node
+     */
+    suspend fun removeOfflineNode(node: TypedNode) = removeOfflineNodeUseCase(node.id)
 }

@@ -412,8 +412,6 @@ internal fun ChatView(
         mutableStateOf(null)
     }
 
-    pendingAction?.let { it() }
-
     with(uiState) {
         val addContactLauncher =
             rememberLauncherForActivityResult(
@@ -899,6 +897,8 @@ internal fun ChatView(
                         onDismiss = { showJoinAnswerCallDialog = false },
                     )
                 }
+
+                pendingAction?.let { it() }
             }
 
             EventEffect(

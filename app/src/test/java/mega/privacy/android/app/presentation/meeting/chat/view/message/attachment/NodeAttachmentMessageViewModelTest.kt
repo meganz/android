@@ -24,12 +24,15 @@ import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetCachedOriginalPathUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetMessageIdsByTypeUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFilePathUseCase
+import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,6 +40,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -60,6 +64,8 @@ class NodeAttachmentMessageViewModelTest {
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase = mock()
     private val getNodePreviewFilePathUseCase = mock<GetNodePreviewFilePathUseCase>()
     private val getCachedOriginalPathUseCase = mock<GetCachedOriginalPathUseCase>()
+    private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase>()
+    private val removeOfflineNodeUseCase = mock<RemoveOfflineNodeUseCase>()
 
     @BeforeEach
     internal fun initTests() {
@@ -73,6 +79,8 @@ class NodeAttachmentMessageViewModelTest {
             getNodeContentUriUseCase = getNodeContentUriUseCase,
             getNodePreviewFilePathUseCase = getNodePreviewFilePathUseCase,
             getCachedOriginalPathUseCase = getCachedOriginalPathUseCase,
+            isAvailableOfflineUseCase = isAvailableOfflineUseCase,
+            removeOfflineNodeUseCase = removeOfflineNodeUseCase,
         )
     }
 
@@ -86,6 +94,8 @@ class NodeAttachmentMessageViewModelTest {
             getNodeContentUriUseCase,
             getNodePreviewFilePathUseCase,
             getCachedOriginalPathUseCase,
+            isAvailableOfflineUseCase,
+            removeOfflineNodeUseCase,
         )
     }
 
@@ -253,6 +263,26 @@ class NodeAttachmentMessageViewModelTest {
         whenever(getNodeContentUriUseCase(fileNode)).thenReturn(uri)
         val actual = underTest.handleFileNode(msg)
         assertThat(actual).isEqualTo(FileNodeContent.Pdf(uri))
+    }
+
+
+    @ParameterizedTest(name = "with available offline {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that is available offline returns the correct value`(
+        availableOffline: Boolean,
+    ) = runTest {
+        val node = mock<ChatDefaultFile>()
+        whenever(isAvailableOfflineUseCase(node)).thenReturn(availableOffline)
+        assertThat(underTest.isAvailableOffline(node)).isEqualTo(availableOffline)
+    }
+
+    @Test
+    fun `test that remove offline invokes correct use case`() = runTest {
+        val node = mock<ChatDefaultFile> {
+            on { id } doReturn NodeId(1234L)
+        }
+        underTest.removeOfflineNode(node)
+        verify(removeOfflineNodeUseCase).invoke(NodeId(1234L))
     }
 
     private fun getFileAndVideoTypes(): List<FileTypeInfo> {

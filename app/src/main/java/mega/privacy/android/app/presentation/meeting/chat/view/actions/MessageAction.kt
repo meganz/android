@@ -59,7 +59,7 @@ abstract class MessageAction(
         messages: Set<TypedMessage>,
         hideBottomSheet: () -> Unit,
         setAction: ((@Composable () -> Unit)?) -> Unit,
-    ): @Composable () -> Unit = bottomSheetItem {
+    ): @Composable () -> Unit = bottomSheetItem(messages.first()) {
         setAction {
             OnTrigger(messages = messages) {
                 setAction(null)
@@ -107,7 +107,10 @@ abstract class MessageAction(
      * @param onClick
      * @return the bottom sheet item
      */
-    protected open fun bottomSheetItem(onClick: () -> Unit): @Composable () -> Unit = {
+    protected open fun bottomSheetItem(
+        message: TypedMessage,
+        onClick: () -> Unit,
+    ): @Composable () -> Unit = {
         MenuActionListTile(
             text = stringResource(id = text),
             icon = painterResource(id = icon),

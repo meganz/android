@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.management.ManagementMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.InvalidMetaMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
+import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -64,7 +65,7 @@ class ForwardMessageActionTest {
     fun `test that composable contains forward bottom action`() {
         composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
-                messages = emptySet(),
+                messages = setOf(mock<TextMessage>()),
                 setAction = {},
                 hideBottomSheet = {}
             )

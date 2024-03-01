@@ -11,6 +11,7 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_REMOVE_MESSAGES_CONFIRMATION_DIALOG
+import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 import org.junit.Before
 import org.junit.Rule
@@ -74,7 +75,7 @@ class DeleteMessagesActionTest {
     fun `test that composable contains delete bottom action`() {
         composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
-                messages = emptySet(),
+                messages = setOf(mock<NodeAttachmentMessage>()),
                 hideBottomSheet = {},
                 setAction = {},
             )
