@@ -66,8 +66,6 @@ import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
-import mega.privacy.android.app.listeners.SimpleChatRequestListener
-import mega.privacy.android.app.listeners.SimpleMegaRequestListener
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService.Companion.pauseAudioPlayer
@@ -135,10 +133,8 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatListItem
-import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatSession
-import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -1098,8 +1094,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 if (endMeetingAsModeratorDialog == null) {
                     endMeetingAsModeratorDialog = EndMeetingAsModeratorBottomSheetDialogFragment()
                     endMeetingAsModeratorDialog?.run {
-                        setLeaveMeetingCallBack { inMeetingViewModel.hangCall() }
-                        setEndForAllCallBack { inMeetingViewModel.endCallForAll() }
+                        setDismissCallBack {
+                            inMeetingViewModel.hideBottomPanels()
+                        }
+                        setLeaveMeetingCallBack {
+                            inMeetingViewModel.hangCall()
+                        }
+                        setEndForAllCallBack {
+                            inMeetingViewModel.endCallForAll()
+                        }
                         show(
                             this@InMeetingFragment.childFragmentManager,
                             tag

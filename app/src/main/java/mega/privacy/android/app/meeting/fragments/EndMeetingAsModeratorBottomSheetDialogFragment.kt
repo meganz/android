@@ -1,6 +1,7 @@
 package mega.privacy.android.app.meeting.fragments
 
 import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +21,8 @@ class EndMeetingAsModeratorBottomSheetDialogFragment : BottomSheetDialogFragment
     private lateinit var binding: BottomSheetEndMeetingAsModeratorBinding
     private var callBackEndForAll: (() -> Unit)? = null
     private var callBackLeaveMeeting: (() -> Unit)? = null
+    private var callBackDismiss: (() -> Unit)? = null
+
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return BottomSheetDialog(requireContext(),
@@ -46,6 +49,11 @@ class EndMeetingAsModeratorBottomSheetDialogFragment : BottomSheetDialogFragment
         val dialog = dialog ?: return
         BottomSheetBehavior.from(dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet)).state =
             BottomSheetBehavior.STATE_EXPANDED
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        callBackDismiss?.invoke()
     }
 
     /**
@@ -80,5 +88,14 @@ class EndMeetingAsModeratorBottomSheetDialogFragment : BottomSheetDialogFragment
      */
     fun setEndForAllCallBack(endMeetingForAll: () -> Unit) {
         callBackEndForAll = endMeetingForAll
+    }
+
+    /**
+     * Set the call back for dismiss bottom panel
+     *
+     * @param dismissBottomPanel call back
+     */
+    fun setDismissCallBack(dismissBottomPanel: () -> Unit) {
+        callBackDismiss = dismissBottomPanel
     }
 }
