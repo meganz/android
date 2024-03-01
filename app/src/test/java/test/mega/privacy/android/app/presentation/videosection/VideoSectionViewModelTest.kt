@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.videosection.AddVideosToPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
+import mega.privacy.android.domain.usecase.videosection.GetSyncUploadsFolderIdsUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
@@ -76,6 +77,7 @@ class VideoSectionViewModelTest {
     private val getNextDefaultAlbumNameUseCase = mock<GetNextDefaultAlbumNameUseCase>()
     private val removeVideoPlaylistsUseCase = mock<RemoveVideoPlaylistsUseCase>()
     private val updateVideoPlaylistTitleUseCase = mock<UpdateVideoPlaylistTitleUseCase>()
+    private val getSyncUploadsFolderIdsUseCase = mock<GetSyncUploadsFolderIdsUseCase>()
 
     private val expectedVideo = mock<VideoUIEntity> { on { name }.thenReturn("video name") }
 
@@ -108,7 +110,8 @@ class VideoSectionViewModelTest {
             addVideosToPlaylistUseCase = addVideosToPlaylistUseCase,
             getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
             removeVideoPlaylistsUseCase = removeVideoPlaylistsUseCase,
-            updateVideoPlaylistTitleUseCase = updateVideoPlaylistTitleUseCase
+            updateVideoPlaylistTitleUseCase = updateVideoPlaylistTitleUseCase,
+            getSyncUploadsFolderIdsUseCase = getSyncUploadsFolderIdsUseCase
         )
     }
 
@@ -129,7 +132,8 @@ class VideoSectionViewModelTest {
             createVideoPlaylistUseCase,
             addVideosToPlaylistUseCase,
             getNextDefaultAlbumNameUseCase,
-            updateVideoPlaylistTitleUseCase
+            updateVideoPlaylistTitleUseCase,
+            getSyncUploadsFolderIdsUseCase
         )
     }
 
@@ -749,6 +753,99 @@ class VideoSectionViewModelTest {
         on { name }.thenReturn("video name")
         on { durationInMinutes }.thenReturn(minutes)
     }
+
+    @Test
+    fun `test that the videos return correctly when the location select option is CameraUploads`() =
+        runTest {
+            val video1 = getVideoUIEntityWithParentIdAndShared(5)
+            val video2 = getVideoUIEntityWithParentIdAndShared(7)
+            val video3 = getVideoUIEntityWithParentIdAndShared(4)
+
+            initFilterOptionTestData(
+                LocationFilterOption.CameraUploads,
+                listOf(video1, video2, video3)
+            )
+
+            underTest.state.drop(1).test {
+                val actual = awaitItem()
+                assertThat(actual.locationSelectedFilterOption).isEqualTo(
+                    LocationFilterOption.CameraUploads
+                )
+                assertThat(actual.allVideos.size).isEqualTo(1)
+                assertThat(actual.allVideos[0].parentId).isEqualTo(NodeId(7))
+            }
+        }
+
+    @Test
+    fun `test that the videos return correctly when the location select option is SharedItems`() =
+        runTest {
+            val video1 = getVideoUIEntityWithParentIdAndShared(5, true)
+            val video2 = getVideoUIEntityWithParentIdAndShared(7, false)
+            val video3 = getVideoUIEntityWithParentIdAndShared(4, false)
+
+            initFilterOptionTestData(
+                LocationFilterOption.SharedItems,
+                listOf(video1, video2, video3)
+            )
+
+            underTest.state.drop(1).test {
+                val actual = awaitItem()
+                assertThat(actual.locationSelectedFilterOption).isEqualTo(
+                    LocationFilterOption.SharedItems
+                )
+                assertThat(actual.allVideos.size).isEqualTo(1)
+                assertThat(actual.allVideos[0].parentId.longValue).isEqualTo(5)
+            }
+        }
+
+    @Test
+    fun `test that the videos return correctly when the location select option is CloudDrive`() =
+        runTest {
+            val video1 = getVideoUIEntityWithParentIdAndShared(5)
+            val video2 = getVideoUIEntityWithParentIdAndShared(7)
+            val video3 = getVideoUIEntityWithParentIdAndShared(4)
+
+            initFilterOptionTestData(
+                LocationFilterOption.CloudDrive,
+                listOf(video1, video2, video3)
+            )
+
+            underTest.state.drop(1).test {
+                val actual = awaitItem()
+                assertThat(actual.locationSelectedFilterOption).isEqualTo(
+                    LocationFilterOption.CloudDrive
+                )
+                assertThat(actual.allVideos.size).isEqualTo(2)
+            }
+        }
+
+    private suspend fun initFilterOptionTestData(
+        locationFilterOption: LocationFilterOption,
+        videos: List<VideoUIEntity>,
+    ) {
+        val typedVideoNode1 = getTypedVideoNode(1)
+        val typedVideoNode2 = getTypedVideoNode(2)
+        val typedVideoNode3 = getTypedVideoNode(3)
+
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
+        whenever(getAllVideosUseCase()).thenReturn(
+            listOf(typedVideoNode1, typedVideoNode2, typedVideoNode3)
+        )
+        whenever(getSyncUploadsFolderIdsUseCase()).thenReturn(listOf(7))
+        whenever(videoUIEntityMapper(typedVideoNode1)).thenReturn(videos[0])
+        whenever(videoUIEntityMapper(typedVideoNode2)).thenReturn(videos[1])
+        whenever(videoUIEntityMapper(typedVideoNode3)).thenReturn(videos[2])
+
+        underTest.setLocationSelectedFilterOption(locationFilterOption)
+        underTest.refreshNodes()
+    }
+
+    private fun getVideoUIEntityWithParentIdAndShared(pId: Long, shared: Boolean = false) =
+        mock<VideoUIEntity> {
+            on { name }.thenReturn("video name")
+            on { parentId }.thenReturn(NodeId(pId))
+            on { isSharedItems }.thenReturn(shared)
+        }
 
     companion object {
         @JvmField

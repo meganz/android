@@ -44,6 +44,7 @@ import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.videosection.AddVideosToPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
+import mega.privacy.android.domain.usecase.videosection.GetSyncUploadsFolderIdsUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
@@ -75,6 +76,7 @@ class VideoSectionViewModel @Inject constructor(
     private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase,
     private val removeVideoPlaylistsUseCase: RemoveVideoPlaylistsUseCase,
     private val updateVideoPlaylistTitleUseCase: UpdateVideoPlaylistTitleUseCase,
+    private val getSyncUploadsFolderIdsUseCase: GetSyncUploadsFolderIdsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VideoSectionState())
 
@@ -150,7 +152,8 @@ class VideoSectionViewModel @Inject constructor(
         val videoList = getVideoUIEntityList()
             .updateOriginalData()
             .filterVideosBySearchQuery()
-            .filterVideosBySelectedFilterOption()
+            .filterVideosByDuration()
+            .filterVideosByLocation()
         val sortOrder = getCloudSortOrder()
         _state.update {
             it.copy(
@@ -177,29 +180,34 @@ class VideoSectionViewModel @Inject constructor(
     private suspend fun getVideoUIEntityList() =
         getAllVideosUseCase().map { videoUIEntityMapper(it) }
 
-    private fun List<VideoUIEntity>.filterVideosBySelectedFilterOption() =
-        if (_state.value.locationSelectedFilterOption != null ||
-            _state.value.durationSelectedFilterOption != null
-        ) {
-            _state.value.durationSelectedFilterOption?.let {
-                filterVideosByDuration(this, it)
-            } ?: this
-        } else this
+    private suspend fun List<VideoUIEntity>.filterVideosByLocation() =
+        _state.value.locationSelectedFilterOption?.let { locationOption ->
+            val syncUploadsFolderIds = getSyncUploadsFolderIdsUseCase()
+            filter {
+                when (locationOption) {
+                    LocationFilterOption.CloudDrive ->
+                        it.parentId.longValue !in syncUploadsFolderIds
 
-    private fun filterVideosByDuration(
-        videos: List<VideoUIEntity>,
-        durationOption: DurationFilterOption,
-    ) = videos.filter {
-        when (durationOption) {
-            DurationFilterOption.LessThan4 -> it.durationInMinutes < 4
+                    LocationFilterOption.CameraUploads ->
+                        it.parentId.longValue in syncUploadsFolderIds
 
-            DurationFilterOption.Between4And20 ->
-                it.durationInMinutes in 4..20
+                    LocationFilterOption.SharedItems -> it.isSharedItems
+                }
+            }
+        } ?: this
 
-            DurationFilterOption.MoreThan20 -> it.durationInMinutes > 20
-        }
-    }
+    private fun List<VideoUIEntity>.filterVideosByDuration() =
+        _state.value.durationSelectedFilterOption?.let { durationOption ->
+            filter {
+                when (durationOption) {
+                    DurationFilterOption.LessThan4 -> it.durationInMinutes < 4
 
+                    DurationFilterOption.Between4And20 -> it.durationInMinutes in 4..20
+
+                    DurationFilterOption.MoreThan20 -> it.durationInMinutes > 20
+                }
+            }
+        } ?: this
 
     internal fun markHandledPendingRefresh() = _state.update { it.copy(isPendingRefresh = false) }
 

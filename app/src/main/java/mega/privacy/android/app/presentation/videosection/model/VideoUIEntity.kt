@@ -7,6 +7,7 @@ import java.io.File
  * The entity for the video is displayed in videos section
  *
  * @property id NodeId
+ * @property parentId the video's parent id
  * @property name the video's name
  * @property size the video's size
  * @property durationString the video's duration String
@@ -14,10 +15,12 @@ import java.io.File
  * @property thumbnail the video's thumbnail
  * @property isFavourite the video if is Favourite
  * @property nodeAvailableOffline the video if is available for offline
+ * @property isSharedItems the video if is share
  * @property isSelected the video if is selected
  */
 data class VideoUIEntity(
     val id: NodeId,
+    val parentId: NodeId,
     val name: String,
     val size: Long,
     val durationString: String?,
@@ -25,5 +28,6 @@ data class VideoUIEntity(
     val thumbnail: File? = null,
     val isFavourite: Boolean = false,
     val nodeAvailableOffline: Boolean = false,
+    val isSharedItems: Boolean = false,
     val isSelected: Boolean = false
 )
