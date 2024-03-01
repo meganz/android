@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.repository
 
-import androidx.paging.PagingSource
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -17,7 +16,6 @@ import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.ConnectionState
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.RichLinkConfig
-import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.paging.MessagePagingInfo
 import mega.privacy.android.domain.entity.chat.messages.reactions.ReactionUpdate
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
@@ -885,14 +883,6 @@ interface ChatRepository {
      * @param enable
      */
     suspend fun enableRichPreviews(enable: Boolean)
-
-    /**
-     * Get paged messages
-     *
-     * @param chatId
-     * @return flow of paged messages
-     */
-    fun getPagedMessages(chatId: Long): PagingSource<Int, TypedMessage>
 
     /**
      * Store messages

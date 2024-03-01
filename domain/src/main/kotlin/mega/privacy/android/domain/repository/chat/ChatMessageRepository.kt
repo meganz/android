@@ -1,9 +1,11 @@
 package mega.privacy.android.domain.repository.chat
 
+import androidx.paging.PagingSource
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.PendingMessage
+import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import mega.privacy.android.domain.entity.node.NodeId
@@ -464,4 +466,12 @@ interface ChatMessageRepository {
      * @param path The original path to be cached.
      */
     fun cacheOriginalPathForNode(nodeId: NodeId, path: String)
+
+    /**
+     * Get paged messages
+     *
+     * @param chatId
+     * @return flow of paged messages
+     */
+    fun getPagedMessages(chatId: Long): PagingSource<Int, TypedMessage>
 }

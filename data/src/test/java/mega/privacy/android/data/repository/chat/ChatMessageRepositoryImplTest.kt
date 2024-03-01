@@ -15,6 +15,7 @@ import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.data.mapper.chat.ChatMessageMapper
 import mega.privacy.android.data.mapper.chat.messages.PendingMessageEntityMapper
 import mega.privacy.android.data.mapper.chat.messages.PendingMessageMapper
+import mega.privacy.android.data.mapper.chat.paging.TypedMessagePagingSourceMapper
 import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.domain.entity.chat.ChatMessage
@@ -59,7 +60,7 @@ class ChatMessageRepositoryImplTest {
     private val pendingMessageMapper = mock<PendingMessageMapper>()
     private val typedMessageEntityConverters = mock<TypedMessageEntityConverters>()
     private val originalPathCache = mock<Cache<Map<NodeId, String>>>()
-
+    private val typedMessagePagingSourceMapper = mock<TypedMessagePagingSourceMapper>()
     private val megaChatErrorSuccess = mock<MegaChatError> {
         on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
     }
@@ -82,6 +83,7 @@ class ChatMessageRepositoryImplTest {
             pendingMessageMapper = pendingMessageMapper,
             typedMessageEntityConverters = typedMessageEntityConverters,
             originalPathCache = originalPathCache,
+            typedMessagePagingSourceMapper = typedMessagePagingSourceMapper,
         )
     }
 

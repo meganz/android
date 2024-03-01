@@ -147,7 +147,6 @@ class ChatRepositoryImplTest {
             databaseHandler = databaseHandler,
             megaLocalRoomGateway = megaLocalRoomGateway,
             chatStorageGateway = chatStorageGateway,
-            typedMessagePagingSourceMapper = mock(),
             typedMessageEntityMapper = mock(),
             messagePagingInfoMapper = mock(),
             richPreviewEntityMapper = mock(),

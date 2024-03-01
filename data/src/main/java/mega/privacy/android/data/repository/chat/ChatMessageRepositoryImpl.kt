@@ -15,6 +15,7 @@ import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.data.mapper.chat.ChatMessageMapper
 import mega.privacy.android.data.mapper.chat.messages.PendingMessageEntityMapper
 import mega.privacy.android.data.mapper.chat.messages.PendingMessageMapper
+import mega.privacy.android.data.mapper.chat.paging.TypedMessagePagingSourceMapper
 import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.domain.entity.chat.ChatMessage
@@ -40,6 +41,7 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
     private val pendingMessageMapper: PendingMessageMapper,
     private val typedMessageEntityConverters: TypedMessageEntityConverters,
     private val originalPathCache: Cache<Map<NodeId, String>>,
+    private val typedMessagePagingSourceMapper: TypedMessagePagingSourceMapper,
 ) : ChatMessageRepository {
     override suspend fun setMessageSeen(chatId: Long, messageId: Long) = withContext(ioDispatcher) {
         megaChatApiGateway.setMessageSeen(chatId, messageId)
@@ -269,4 +271,7 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
         }
         originalPathCache.set(updated)
     }
+
+    override fun getPagedMessages(chatId: Long) =
+        typedMessagePagingSourceMapper(chatStorageGateway.getTypedMessageRequestPagingSource(chatId))
 }

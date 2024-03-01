@@ -61,7 +61,6 @@ import mega.privacy.android.data.mapper.chat.paging.GiphyEntityMapper
 import mega.privacy.android.data.mapper.chat.paging.MessagePagingInfoMapper
 import mega.privacy.android.data.mapper.chat.paging.RichPreviewEntityMapper
 import mega.privacy.android.data.mapper.chat.paging.TypedMessageEntityMapper
-import mega.privacy.android.data.mapper.chat.paging.TypedMessagePagingSourceMapper
 import mega.privacy.android.data.mapper.notification.ChatMessageNotificationBehaviourMapper
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
@@ -129,7 +128,6 @@ import kotlin.coroutines.suspendCoroutine
  * @property megaLocalRoomGateway
  * @property databaseHandler
  * @property chatStorageGateway
- * @property typedMessagePagingSourceMapper
  * @property typedMessageEntityMapper
  * @property messagePagingInfoMapper
  * @property richPreviewEntityMapper
@@ -161,7 +159,6 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val databaseHandler: DatabaseHandler,
     private val chatStorageGateway: ChatStorageGateway,
-    private val typedMessagePagingSourceMapper: TypedMessagePagingSourceMapper,
     private val typedMessageEntityMapper: TypedMessageEntityMapper,
     private val messagePagingInfoMapper: MessagePagingInfoMapper,
     private val richPreviewEntityMapper: RichPreviewEntityMapper,
@@ -1248,9 +1245,6 @@ internal class ChatRepositoryImpl @Inject constructor(
             continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
-
-    override fun getPagedMessages(chatId: Long) =
-        typedMessagePagingSourceMapper(chatStorageGateway.getTypedMessageRequestPagingSource(chatId))
 
     override suspend fun storeMessages(messages: List<CreateTypedMessageRequest>) {
         withContext(ioDispatcher) {
