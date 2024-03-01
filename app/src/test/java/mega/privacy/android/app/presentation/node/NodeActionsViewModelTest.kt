@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
@@ -32,6 +33,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.exception.node.ForeignNodeException
+import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
@@ -85,6 +87,7 @@ class NodeActionsViewModelTest {
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper = mock()
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase = mock()
     private val getNodePreviewFilePathUseCase: GetNodePreviewFilePathUseCase = mock()
     private val sampleNode = mock<TypedFileNode>().stub {
         on { id } doReturn NodeId(123)
@@ -109,6 +112,7 @@ class NodeActionsViewModelTest {
             getNodeContentUriUseCase = getNodeContentUriUseCase,
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             getNodePreviewFilePathUseCase = getNodePreviewFilePathUseCase,
             applicationScope = applicationScope
         )
@@ -258,8 +262,9 @@ class NodeActionsViewModelTest {
         expected: FileNodeContent,
     ) =
         runTest {
+            val content = NodeContentUri.LocalContentUri(File("path"))
             whenever(getNodeContentUriUseCase(node)).thenReturn(
-                NodeContentUri.LocalContentUri(File("path"))
+                content
             )
             whenever(getNodePreviewFilePathUseCase(any())).thenReturn("path")
             whenever(getFeatureFlagValueUseCase(AppFeatures.ImagePreview)).thenReturn(true)
@@ -273,6 +278,12 @@ class NodeActionsViewModelTest {
 
                 is TextFileTypeInfo -> {
                     verifyNoMoreInteractions(getNodeContentUriUseCase)
+                    verifyNoMoreInteractions(getFeatureFlagValueUseCase)
+                }
+
+                is UrlFileTypeInfo -> {
+                    verify(getNodeContentUriUseCase).invoke(node)
+                    verify(getPathFromNodeContentUseCase).invoke(content)
                     verifyNoMoreInteractions(getFeatureFlagValueUseCase)
                 }
 
@@ -357,6 +368,14 @@ class NodeActionsViewModelTest {
                     )
                 )
             }, mock<FileNodeContent.Other>()
+        ),
+        Arguments.of(
+            mock<TypedFileNode>().stub {
+                whenever(it.type).thenReturn(
+                    UrlFileTypeInfo
+                )
+            },
+            mock<FileNodeContent.UrlContent>()
         )
     )
 }

@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
@@ -34,6 +35,7 @@ import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
@@ -89,6 +91,7 @@ class NodeActionsViewModel @Inject constructor(
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNodePreviewFilePathUseCase: GetNodePreviewFilePathUseCase,
+    private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -424,10 +427,18 @@ class NodeActionsViewModel @Inject constructor(
             )
         }
 
+        fileNode.type is UrlFileTypeInfo -> {
+            val content = getNodeContentUriUseCase(fileNode)
+            val path = getPathFromNodeContentUseCase(content)
+            FileNodeContent.UrlContent(
+                uri = content,
+                path = path
+            )
+        }
+
         else -> FileNodeContent.Other(
             localFile = getNodePreviewFilePathUseCase(fileNode)?.let { File(it) }
         )
-
     }
 
     /**

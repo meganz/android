@@ -41,6 +41,13 @@ sealed interface FileNodeContent {
     data class AudioOrVideo(val uri: NodeContentUri) : FileNodeContent
 
     /**
+     * Url content
+     * @property uri [NodeContentUri]
+     * @property path [String]
+     */
+    data class UrlContent(val uri: NodeContentUri, val path: String?) : FileNodeContent
+
+    /**
      * Other content
      *
      * @property localFile

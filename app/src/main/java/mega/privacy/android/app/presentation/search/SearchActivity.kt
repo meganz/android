@@ -397,6 +397,12 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                     )
                 }
 
+                is FileNodeContent.UrlContent -> {
+                    openUrlFile(
+                        content = content,
+                    )
+                }
+
                 is FileNodeContent.Other -> {
                     content.localFile?.let {
                         if (currentFileNode.type is ZipFileTypeInfo) {
@@ -576,6 +582,23 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             )
         }
         safeLaunchActivity(intent)
+    }
+
+    private fun openUrlFile(
+        content: FileNodeContent.UrlContent,
+    ) {
+        content.path?.let {
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse(it)
+            }
+            startActivity(intent)
+        } ?: run {
+            showMegaSnackbar(
+                message = getString(R.string.general_text_error),
+                actionLabel = null,
+                duration = MegaSnackbarDuration.Short
+            )
+        }
     }
 
     private fun safeLaunchActivity(intent: Intent) {
