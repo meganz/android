@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages.management
 
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,7 +26,7 @@ abstract class ManagementUiChatMessage : UiChatMessage {
     /**
      * Content composable
      */
-    abstract val contentComposable: @Composable (RowScope.() -> Unit)
+    abstract val contentComposable: @Composable () -> Unit
 
     @Composable
     override fun MessageListItem(

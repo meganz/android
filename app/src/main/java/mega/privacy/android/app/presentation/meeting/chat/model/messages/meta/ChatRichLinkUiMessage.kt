@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.meeting.chat.model.messages.meta
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -29,7 +28,7 @@ data class ChatRichLinkUiMessage(
 ) : AvatarMessage() {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    override fun RowScope.ContentComposable(
+    override fun ContentComposable(
         onLongClick: (TypedMessage) -> Unit,
         interactionEnabled: Boolean,
     ) {
@@ -38,14 +37,12 @@ data class ChatRichLinkUiMessage(
             isMe = message.isMine,
             preview = message.chatRichPreviewInfo,
             content = message.content,
-            modifier = Modifier
-                .weight(1f)
-                .conditional(interactionEnabled) {
-                    combinedClickable(
-                        onClick = { message.chatRichPreviewInfo?.url?.let { uriHandler.openUri(it) } },
-                        onLongClick = { onLongClick(message) }
-                    )
-                },
+            modifier = Modifier.conditional(interactionEnabled) {
+                combinedClickable(
+                    onClick = { message.chatRichPreviewInfo?.url?.let { uriHandler.openUri(it) } },
+                    onLongClick = { onLongClick(message) }
+                )
+            },
         )
     }
 

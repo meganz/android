@@ -1,10 +1,8 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages
 
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
 import mega.privacy.android.core.ui.controls.chat.ChatMessageContainer
@@ -20,9 +18,9 @@ abstract class AvatarMessage : UiChatMessage {
      * Content composable
      */
     @Composable
-    abstract fun RowScope.ContentComposable(
+    abstract fun ContentComposable(
         onLongClick: (TypedMessage) -> Unit,
-        interactionEnabled: Boolean
+        interactionEnabled: Boolean,
     )
 
     abstract override val message: TypedMessage
@@ -31,10 +29,10 @@ abstract class AvatarMessage : UiChatMessage {
      * Avatar composable
      */
     @Composable
-    open fun RowScope.MessageAvatar(lastUpdatedCache: Long, modifier: Modifier) {
+    open fun MessageAvatar(lastUpdatedCache: Long, modifier: Modifier) {
         if (showAvatar) {
             ChatAvatar(
-                modifier = modifier.align(Alignment.Bottom),
+                modifier = modifier,
                 handle = userHandle,
                 lastUpdatedCache = lastUpdatedCache
             )

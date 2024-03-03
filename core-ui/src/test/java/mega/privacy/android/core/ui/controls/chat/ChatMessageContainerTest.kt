@@ -1,6 +1,7 @@
 package mega.privacy.android.core.ui.controls.chat
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -115,20 +116,24 @@ class ChatMessageContainerTest {
         onSelectionChange: (Boolean) -> Unit = {},
     ) {
         composeRule.setContent {
-            ChatMessageContainer(
-                isMine = isMine,
-                showForwardIcon = showForwardIcon,
-                reactions = reactions,
-                onMoreReactionsClick = {},
-                onReactionClick = {},
-                onForwardClicked = onForwardClicked,
-                isSendError = isSendError,
-                avatarOrIcon = {},
-                content = {},
-                onReactionLongClick = {},
-                isSelectMode = inSelectMode,
-                onSelectionChanged = onSelectionChange,
-            )
+            LazyColumn() {
+                item {
+                    ChatMessageContainer(
+                        isMine = isMine,
+                        showForwardIcon = showForwardIcon,
+                        reactions = reactions,
+                        onMoreReactionsClick = {},
+                        onReactionClick = {},
+                        onForwardClicked = onForwardClicked,
+                        isSendError = isSendError,
+                        avatarOrIcon = {},
+                        content = {},
+                        onReactionLongClick = {},
+                        isSelectMode = inSelectMode,
+                        onSelectionChanged = onSelectionChange,
+                    )
+                }
+            }
         }
     }
 }

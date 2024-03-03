@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages
 
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -24,14 +23,14 @@ data class ContactAttachmentUiMessage(
 ) : AvatarMessage() {
 
     @Composable
-    override fun RowScope.ContentComposable(
+    override fun ContentComposable(
         onLongClick: (TypedMessage) -> Unit,
         interactionEnabled: Boolean
     ) {
         ContactAttachmentMessageView(
             message = message,
             onLongClick = { onLongClick(message) },
-            modifier = Modifier.weight(weight = 1f, fill = false),
+            modifier = Modifier,
             interactionEnabled = interactionEnabled,
         )
     }

@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.meeting.chat.model.messages.normal
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
@@ -23,7 +22,7 @@ data class TextUiMessage(
 ) : AvatarMessage() {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    override fun RowScope.ContentComposable(
+    override fun ContentComposable(
         onLongClick: (TypedMessage) -> Unit,
         interactionEnabled: Boolean,
     ) {

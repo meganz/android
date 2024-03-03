@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages
 
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.PendingAttachmentMessageView
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
@@ -16,7 +15,7 @@ data class PendingAttachmentUiMessage(
 ) : AvatarMessage() {
 
     @Composable
-    override fun RowScope.ContentComposable(
+    override fun ContentComposable(
         onLongClick: (TypedMessage) -> Unit,
         interactionEnabled: Boolean,
     ) {

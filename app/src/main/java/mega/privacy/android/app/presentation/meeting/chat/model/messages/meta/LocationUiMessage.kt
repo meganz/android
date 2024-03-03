@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.meeting.chat.model.messages.meta
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -30,7 +29,7 @@ class LocationUiMessage(
 ) : AvatarMessage() {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
-    override fun RowScope.ContentComposable(
+    override fun ContentComposable(
         onLongClick: (TypedMessage) -> Unit,
         interactionEnabled: Boolean,
     ) {
@@ -40,24 +39,22 @@ class LocationUiMessage(
         ChatLocationMessageView(
             message = message,
             isEdited = message.isEdited,
-            modifier = Modifier
-                .weight(weight = 1f, fill = false)
-                .conditional(interactionEnabled) {
-                    combinedClickable(
-                        onClick = {
-                            message.chatGeolocationInfo?.let {
-                                openLocationActivity(context, it) {
-                                    coroutineScope.launch {
-                                        snackbarHostState?.showSnackbar(
-                                            context.getString(R.string.intent_not_available_location)
-                                        )
-                                    }
+            modifier = Modifier.conditional(interactionEnabled) {
+                this.combinedClickable(
+                    onClick = {
+                        message.chatGeolocationInfo?.let {
+                            openLocationActivity(context, it) {
+                                coroutineScope.launch {
+                                    snackbarHostState?.showSnackbar(
+                                        context.getString(R.string.intent_not_available_location)
+                                    )
                                 }
                             }
-                        },
-                        onLongClick = { onLongClick(message) }
-                    )
-                }
+                        }
+                    },
+                    onLongClick = { onLongClick(message) },
+                )
+            }
         )
     }
 
