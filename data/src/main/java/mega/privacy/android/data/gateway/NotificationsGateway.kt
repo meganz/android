@@ -1,5 +1,6 @@
 package mega.privacy.android.data.gateway
 
+import nz.mega.sdk.MegaIntegerList
 import nz.mega.sdk.MegaRequestListenerInterface
 
 /**
@@ -26,4 +27,13 @@ internal interface NotificationsGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun getNotifications(listener: MegaRequestListenerInterface)
+
+    /**
+     * Get the list of IDs for enabled notifications
+     *
+     * You take the ownership of the returned value
+     *
+     * @return List of IDs for enabled notifications
+     */
+    suspend fun getEnabledNotifications(): MegaIntegerList?
 }

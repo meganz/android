@@ -19,6 +19,7 @@ import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
+import mega.privacy.android.data.mapper.meeting.IntegerListMapper
 import mega.privacy.android.data.mapper.notification.PromoNotificationListMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
@@ -59,6 +60,7 @@ internal class DefaultNotificationsRepository @Inject constructor(
     private val appEventGateway: AppEventGateway,
     private val notificationsGateway: NotificationsGateway,
     private val promoNotificationListMapper: PromoNotificationListMapper,
+    private val integerListMapper: IntegerListMapper,
 ) : NotificationsRepository, LegacyNotificationRepository {
 
     private val _pushNotificationSettings =
@@ -288,6 +290,12 @@ internal class DefaultNotificationsRepository @Inject constructor(
                     ?: megaApiGateway.createInstanceMegaPushNotificationSettings()
 
             appEventGateway.broadcastPushNotificationSettings()
+        }
+
+    override suspend fun getEnabledNotifications(): List<Int> =
+        withContext(dispatcher) {
+            val notificationsIDs = notificationsGateway.getEnabledNotifications()
+            notificationsIDs?.let { integerListMapper(it) } ?: emptyList()
         }
 
     override suspend fun getPromoNotifications(): List<PromoNotification> =

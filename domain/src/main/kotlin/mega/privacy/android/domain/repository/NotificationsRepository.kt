@@ -128,4 +128,11 @@ interface NotificationsRepository {
      *  @return list of Promo notifications
      */
     suspend fun getPromoNotifications(): List<PromoNotification>
+
+    /**
+     * Get the list of IDs for enabled notifications
+     *
+     * @return List of IDs for enabled notifications
+     */
+    suspend fun getEnabledNotifications(): List<Int>
 }

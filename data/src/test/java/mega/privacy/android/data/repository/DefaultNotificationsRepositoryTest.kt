@@ -18,6 +18,7 @@ import mega.privacy.android.data.mapper.UserAlertContactProvider
 import mega.privacy.android.data.mapper.UserAlertMapper
 import mega.privacy.android.data.mapper.UserAlertScheduledMeetingOccurrProvider
 import mega.privacy.android.data.mapper.UserAlertScheduledMeetingProvider
+import mega.privacy.android.data.mapper.meeting.IntegerListMapper
 import mega.privacy.android.data.mapper.notification.PromoNotificationListMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.model.chat.NonContactInfo
@@ -34,6 +35,7 @@ import mega.privacy.android.domain.usecase.meeting.GetScheduledMeeting
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaEvent
+import nz.mega.sdk.MegaIntegerList
 import nz.mega.sdk.MegaNotification
 import nz.mega.sdk.MegaNotificationList
 import nz.mega.sdk.MegaPushNotificationSettings
@@ -85,6 +87,7 @@ class DefaultNotificationsRepositoryTest {
     private val appEventGateway = mock<AppEventGateway>()
     private val notificationsGateway = mock<NotificationsGateway>()
     private val promoNotificationListMapper = mock<PromoNotificationListMapper>()
+    private val integerListMapper = mock<IntegerListMapper>()
 
     @BeforeAll
     fun setUp() {
@@ -100,6 +103,7 @@ class DefaultNotificationsRepositoryTest {
             appEventGateway = appEventGateway,
             notificationsGateway = notificationsGateway,
             promoNotificationListMapper = promoNotificationListMapper,
+            integerListMapper = integerListMapper,
         )
     }
 
@@ -115,6 +119,7 @@ class DefaultNotificationsRepositoryTest {
             appEventGateway,
             notificationsGateway,
             promoNotificationListMapper,
+            integerListMapper
         )
 
         whenever(callsPreferencesGateway.getCallsMeetingInvitationsPreference())
@@ -299,6 +304,41 @@ class DefaultNotificationsRepositoryTest {
             awaitComplete()
         }
     }
+
+    @Test
+    fun `test that list of enabled notifications will be returned when requested`() = runTest {
+        val expectedList = listOf(1, 2, 3)
+
+        val megaIntegerList = mock<MegaIntegerList> {
+            on { size() } doReturn 3
+            on { get(0) }.thenReturn(1)
+            on { get(1) }.thenReturn(2)
+            on { get(2) }.thenReturn(3)
+
+        }
+        whenever(notificationsGateway.getEnabledNotifications()).thenReturn(megaIntegerList)
+        whenever(integerListMapper.invoke(megaIntegerList))
+            .thenReturn(expectedList)
+        val result = underTest.getEnabledNotifications()
+
+        assertThat(result).isEqualTo(expectedList)
+    }
+
+    @Test
+    fun `test that list of enabled notifications will be empty when there are no enabled notifications`() =
+        runTest {
+            val expectedList = emptyList<Int>()
+
+            val megaIntegerList = mock<MegaIntegerList> {
+                on { size() } doReturn 0
+            }
+            whenever(notificationsGateway.getEnabledNotifications()).thenReturn(megaIntegerList)
+            whenever(integerListMapper.invoke(megaIntegerList))
+                .thenReturn(expectedList)
+            val result = underTest.getEnabledNotifications()
+
+            assertThat(result).isEqualTo(expectedList)
+        }
 
     @Test
     fun `test that list of promo notifications is fetched`() = runTest {
