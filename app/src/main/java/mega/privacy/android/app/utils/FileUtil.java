@@ -743,6 +743,7 @@ public class FileUtil {
     }
 
     /**
+     * @Deprecated use [NodeShareContentUrisIntentMapper].
      * Share multiple files to other apps.
      * <p>
      * credit: https://stackoverflow.com/a/15577579/3077508

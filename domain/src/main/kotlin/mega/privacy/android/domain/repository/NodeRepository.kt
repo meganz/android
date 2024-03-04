@@ -551,6 +551,16 @@ interface NodeRepository {
     ): String
 
     /**
+     * Export node
+     *
+     * @param node [TypedNode]
+     * @return the [String] The public link of the node
+     */
+    suspend fun exportNode(
+        node: TypedNode,
+    ): String
+
+    /**
      * Get banner Quota Time
      */
     suspend fun getBannerQuotaTime(): Long

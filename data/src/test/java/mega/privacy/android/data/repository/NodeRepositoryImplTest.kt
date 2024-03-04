@@ -39,6 +39,7 @@ import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedImageNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
@@ -799,6 +800,30 @@ class NodeRepositoryImplTest {
             )
         }
         assertThat(underTest.exportNode(node, expireTime)).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that exportNode by typed node is successful when SDK call is successful`() = runTest {
+        val typedNode = mock<TypedImageNode>()
+        val megaNode = mock<MegaNode> {
+            on { isTakenDown }.thenReturn(false)
+        }
+        whenever(megaNodeMapper(typedNode)).thenReturn(megaNode)
+        val expected = "result_link"
+        whenever(megaApiGateway.exportNode(any(), anyOrNull(), any())).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                api = mock(),
+                request = mock {
+                    on { link }.thenReturn(expected)
+                },
+                error = mock {
+                    on { errorCode }.thenReturn(
+                        MegaError.API_OK
+                    )
+                },
+            )
+        }
+        assertThat(underTest.exportNode(typedNode)).isEqualTo(expected)
     }
 
     @Test
