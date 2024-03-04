@@ -45,7 +45,7 @@ fun ReactionsView(
     CompositionLocalProvider(LocalLayoutDirection provides flowDirection) {
         FlowRow(
             modifier = modifier
-                .padding(4.dp)
+                .padding(vertical = 4.dp)
                 .testTag(TEST_TAG_REACTIONS_VIEW),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),

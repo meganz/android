@@ -20,7 +20,6 @@ data class TruncateHistoryUiMessage(
     override val contentComposable: @Composable () -> Unit = {
         ChatTruncateHistoryMessageView(
             message = message,
-            modifier = Modifier.padding(start = 32.dp)
         )
     }
 }

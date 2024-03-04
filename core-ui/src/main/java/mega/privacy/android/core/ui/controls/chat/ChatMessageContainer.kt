@@ -101,30 +101,32 @@ fun ChatMessageContainer(
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                .padding(start = 8.dp, end = 8.dp),
+                .padding(start = 8.dp, end = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.Top
         ) {
-            Box(
-                modifier = Modifier
-                    .width(48.dp)
-                    .fillMaxHeight(),
-            ) {
-                if (isSelectMode) {
-                    MegaCheckbox(
-                        checked = isSelected,
-                        onCheckedChange = onSelectionChanged,
-                        modifier = indicatorSizeModifier.align(Alignment.Center)
-                    )
-                } else {
-                    avatarOrIcon?.let { it(indicatorSizeModifier.align(Alignment.BottomCenter)) }
+            if (avatarOrIcon != null) {
+                Box(
+                    modifier = Modifier
+                        .width(40.dp)
+                        .fillMaxHeight(),
+                ) {
+                    if (isSelectMode) {
+                        MegaCheckbox(
+                            checked = isSelected,
+                            onCheckedChange = onSelectionChanged,
+                            modifier = indicatorSizeModifier.align(Alignment.Center)
+                        )
+                    } else {
+                        avatarOrIcon(indicatorSizeModifier.align(Alignment.BottomCenter))
+                    }
                 }
             }
             Row(
                 horizontalArrangement = if (isMine) Arrangement.End else Arrangement.Start,
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
-                    .weight(1f)
+                    .fillMaxWidth()
             ) {
                 val forward: @Composable () -> Unit = {
                     if (shouldDisplayForwardIcon(showForwardIcon, isSelectMode, isSendError)) {
@@ -150,19 +152,19 @@ fun ChatMessageContainer(
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                .padding(start = 8.dp, end = 8.dp),
+                .padding(start = 8.dp, end = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.Top
         ) {
             Spacer(
                 modifier = Modifier
-                    .width(48.dp)
+                    .width(40.dp)
             )
             Row(
                 horizontalArrangement = if (isMine) Arrangement.End else Arrangement.Start,
                 modifier = Modifier
                     .align(Alignment.Top)
-                    .weight(1f)
+                    .fillMaxWidth()
             ) {
                 if (isSendError) {
                     MegaText(
@@ -175,7 +177,7 @@ fun ChatMessageContainer(
                     )
                 } else if (reactions.isNotEmpty()) {
                     ReactionsView(
-                        modifier = Modifier,
+                        modifier = Modifier.padding(end = 8.dp),
                         reactions = reactions,
                         isMine = isMine,
                         onMoreReactionsClick = onMoreReactionsClick,
@@ -184,7 +186,6 @@ fun ChatMessageContainer(
                         interactionEnabled = !isSelectMode,
                     )
                 }
-
             }
         }
     }

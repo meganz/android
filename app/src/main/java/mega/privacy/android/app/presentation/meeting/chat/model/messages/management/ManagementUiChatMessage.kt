@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages.management
 
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -49,6 +50,9 @@ abstract class ManagementUiChatMessage : UiChatMessage {
             onReactionLongClick = { onReactionLongClick(it, reactions) },
             content = { _ -> contentComposable() },
             onSelectionChanged = onSelectedChanged,
+            avatarOrIcon = { modifier ->
+                Spacer(modifier = modifier)
+            }
         )
     }
 

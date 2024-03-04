@@ -41,7 +41,7 @@ fun ChatManagementMessage(
 ) {
     Row(
         modifier = modifier
-            .padding(horizontal = 4.dp)
+            .padding(start = 12.dp, end = 8.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
