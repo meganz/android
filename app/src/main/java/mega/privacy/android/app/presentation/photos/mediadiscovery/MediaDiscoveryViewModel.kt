@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -57,6 +58,7 @@ import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
@@ -102,6 +104,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val isNodeInRubbish: IsNodeInRubbish,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase,
+    private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
@@ -643,6 +646,20 @@ class MediaDiscoveryViewModel @Inject constructor(
                 clearSelectedPhotos()
             } else {
                 legacySaveToDevice()
+            }
+        }
+    }
+
+    /**
+     * Hide or Unhide the selected nodes
+     */
+    fun hideOrUnhideNodes(hide: Boolean) = viewModelScope.launch {
+        for (nodeId in _state.value.selectedPhotoIds) {
+            async {
+                runCatching {
+                    updateNodeSensitiveUseCase(nodeId = NodeId(nodeId), isSensitive = hide)
+                    Timber.d("Hide value: $hide successful")
+                }.onFailure { Timber.e(it) }
             }
         }
     }

@@ -28,6 +28,7 @@ import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
@@ -85,6 +86,7 @@ class MediaDiscoveryViewModelTest {
     private val isNodeInRubbish = mock<IsNodeInRubbish>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getPublicChildNodeFromIdUseCase = mock<GetPublicChildNodeFromIdUseCase>()
+    private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -117,6 +119,7 @@ class MediaDiscoveryViewModelTest {
             isNodeInRubbish,
             getNodeByIdUseCase,
             getPublicChildNodeFromIdUseCase,
+            updateNodeSensitiveUseCase,
         )
     }
 

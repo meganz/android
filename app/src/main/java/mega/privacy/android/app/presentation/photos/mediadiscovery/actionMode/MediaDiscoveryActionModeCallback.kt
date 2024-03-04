@@ -3,13 +3,15 @@ package mega.privacy.android.app.presentation.photos.mediadiscovery.actionMode
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 
 class MediaDiscoveryActionModeCallback(
     val fragment: MediaDiscoveryFragment,
 ) : ActionMode.Callback {
-
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
         mode?.let {
             val inflater = it.menuInflater
@@ -19,6 +21,17 @@ class MediaDiscoveryActionModeCallback(
     }
 
     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+        fragment.lifecycleScope.launch {
+            val isHiddenNodesEnabled = fragment.getFeatureFlagUseCase(AppFeatures.HiddenNodes)
+            val hasSensitiveNode =
+                fragment.mediaDiscoveryViewModel.getSelectedNodes().any { it.isMarkedSensitive }
+
+            menu?.findItem(R.id.cab_menu_hide)?.isVisible =
+                isHiddenNodesEnabled && hasSensitiveNode
+
+            menu?.findItem(R.id. cab_menu_unhide)?.isVisible =
+                isHiddenNodesEnabled &&!hasSensitiveNode
+        }
         return true
     }
 
@@ -46,6 +59,14 @@ class MediaDiscoveryActionModeCallback(
             }
             R.id.cab_menu_clear_selection -> {
                 fragment.actionClearSelection()
+            }
+            R.id.cab_menu_hide -> {
+                fragment.mediaDiscoveryViewModel.hideOrUnhideNodes(hide = true)
+                fragment.destroyActionMode()
+            }
+            R.id.cab_menu_unhide -> {
+                fragment.mediaDiscoveryViewModel.hideOrUnhideNodes(hide = false)
+                fragment.destroyActionMode()
             }
             R.id.cab_menu_move -> {
                 fragment.actionMove()

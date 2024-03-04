@@ -447,20 +447,38 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                 }
 
                 R.id.hide -> {
-                    viewModel.hideOrUnhideNode(nodeId = NodeId(playingHandle), hide = true)
-                    // Some times checking node.isMarkedSensitive immediately will still
-                    // get true, so let's add some delay here.
-                    RunOnUIThreadUtils.runDelay(500L) {
-                        refreshMenuOptionsVisibility()
+                    megaApi.getNodeByHandle(playingHandle)?.let { node ->
+                        megaApi.setNodeSensitive(
+                            node,
+                            true,
+                            OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
+                                if (error.errorCode == MegaError.API_OK) {
+                                    // Some times checking node.isMarkedSensitive immediately will still
+                                    // get true, so let's add some delay here.
+                                    RunOnUIThreadUtils.runDelay(500L) {
+                                        refreshMenuOptionsVisibility()
+                                    }
+                                }
+                            })
+                        )
                     }
                 }
 
                 R.id.unhide -> {
-                    viewModel.hideOrUnhideNode(nodeId = NodeId(playingHandle), hide = false)
-                    // Some times checking node.isMarkedSensitive immediately will still
-                    // get true, so let's add some delay here.
-                    RunOnUIThreadUtils.runDelay(500L) {
-                        refreshMenuOptionsVisibility()
+                    megaApi.getNodeByHandle(playingHandle)?.let { node ->
+                        megaApi.setNodeSensitive(
+                            node,
+                            false,
+                            OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
+                                if (error.errorCode == MegaError.API_OK) {
+                                    // Some times checking node.isMarkedSensitive immediately will still
+                                    // get true, so let's add some delay here.
+                                    RunOnUIThreadUtils.runDelay(500L) {
+                                        refreshMenuOptionsVisibility()
+                                    }
+                                }
+                            })
+                        )
                     }
                 }
 

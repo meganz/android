@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -802,7 +803,14 @@ class FileBrowserViewModel @Inject constructor(
      */
     fun hideOrUnhideNodes(nodeIds: List<NodeId>, hide: Boolean) = viewModelScope.launch {
         for (nodeId in nodeIds) {
-            updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = hide)
+            async {
+                runCatching {
+                    updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = hide)
+                }.onFailure {
+                    Timber.e(it)
+                }
+            }
         }
+
     }
 }
