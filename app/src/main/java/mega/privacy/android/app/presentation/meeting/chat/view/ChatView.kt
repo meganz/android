@@ -171,6 +171,7 @@ internal fun ChatView(
         messageSetSaver = savers.messageSetSaver,
         consumeDownloadEvent = viewModel::consumeDownloadEvent,
         onActionToManageEventConsumed = viewModel::onActionToManageEventConsumed,
+        onVoiceClipRecordEvent = viewModel::onVoiceClipRecordEvent,
     )
 }
 
@@ -270,6 +271,7 @@ internal fun ChatView(
         restore = { emptySet() }),
     consumeDownloadEvent: () -> Unit = {},
     onActionToManageEventConsumed: () -> Unit = {},
+    onVoiceClipRecordEvent: (VoiceClipRecordEvent) -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -683,7 +685,7 @@ internal fun ChatView(
                         }
                         val onVoiceClipEvent: (VoiceClipRecordEvent) -> Unit =
                             { voiceClipRecordEvent ->
-                                println("call view model to handle voice clip record event $voiceClipRecordEvent")
+                                onVoiceClipRecordEvent(voiceClipRecordEvent)
                             }
                         bottomBar(
                             ChatBottomBarParameter(

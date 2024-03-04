@@ -202,9 +202,14 @@ fun ChatInputTextToolbar(
                             .padding(start = 8.dp)
                             .testTag(TEST_TAG_SEND_ICON)
                             .clickable(onClick = {
-                                onSendClick(textFieldValue.text)
+                                if (voiceClipRecorderState.value.show) {
+                                    voiceClipRecorderState.value =
+                                        VoiceClipRecorderState(show = false)
+                                    onVoiceClipEvent(VoiceClipRecordEvent.Finish)
+                                } else {
+                                    onSendClick(textFieldValue.text)
+                                }
                                 isInputExpanded = false
-                                voiceClipRecorderState.value = VoiceClipRecorderState(show = false)
                             }),
                         painter = painterResource(id = R.drawable.ic_send),
                         contentDescription = "Send icon",

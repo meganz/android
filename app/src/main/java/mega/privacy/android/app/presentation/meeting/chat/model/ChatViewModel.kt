@@ -3,12 +3,14 @@ package mega.privacy.android.app.presentation.meeting.chat.model
 import android.content.Intent
 import android.net.Uri
 import android.util.Base64
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -34,7 +36,9 @@ import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteUserAsCon
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ParticipantNameMapper
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.INVALID_LOCATION_MESSAGE_ID
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
+import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.ui.controls.chat.VoiceClipRecordEvent
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReactionUser
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -62,6 +66,7 @@ import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.CloseChatPreviewUseCase
@@ -83,6 +88,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallInOth
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
 import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
+import mega.privacy.android.domain.usecase.chat.RecordAudioUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
@@ -110,6 +116,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.file.CreateNewImageUriUseCase
+import mega.privacy.android.domain.usecase.file.DeleteFileUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
@@ -224,6 +231,9 @@ class ChatViewModel @Inject constructor(
     private val inviteContactUseCase: InviteContactUseCase,
     private val inviteUserAsContactResultOptionMapper: InviteUserAsContactResultOptionMapper,
     private val getChatFromContactMessagesUseCase: GetChatFromContactMessagesUseCase,
+    private val getCacheFileUseCase: GetCacheFileUseCase,
+    private val recordAudioUseCase: RecordAudioUseCase,
+    private val deleteFileUseCase: DeleteFileUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -1497,7 +1507,52 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Handle voice clip record event
+     */
+    fun onVoiceClipRecordEvent(voiceClipRecordEvent: VoiceClipRecordEvent) {
+        when (voiceClipRecordEvent) {
+            VoiceClipRecordEvent.Start -> startRecordingVoiceClip()
+            VoiceClipRecordEvent.Cancel -> recordAudioJob?.cancel(CancelVoiceClip)
+            VoiceClipRecordEvent.Finish -> recordAudioJob?.cancel(StopAndSendVoiceClip)
+            VoiceClipRecordEvent.None, VoiceClipRecordEvent.Lock -> {} //nothing here
+        }
+    }
+
+    private var recordAudioJob: Job? = null
+    private fun startRecordingVoiceClip() {
+        recordAudioJob?.cancel()
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        getCacheFileUseCase(CacheFolderManager.VOICE_CLIP_FOLDER, "note_voice${timeStamp}.m4a")
+            ?.let { voiceClipFile ->
+                recordAudioJob = viewModelScope.launch {
+                    recordAudioUseCase(voiceClipFile).collectLatest {
+                        //this should be used to play waveform animation in AND-18251
+                        Timber.d("recording audio with amplitude $it")
+                    }
+                }
+                recordAudioJob?.invokeOnCompletion {
+                    if (it == StopAndSendVoiceClip) {
+                        //this will be send as a voice clip in AND-17876, for now as an ordinary file
+                        onAttachFiles(listOf(voiceClipFile.toUri()))
+                    } else {
+                        viewModelScope.launch {
+                            deleteFileUseCase(voiceClipFile.toString())
+                        }
+                    }
+                    if (it !is CancellationException) {
+                        Timber.e("Error recording voice clip", it)
+                    }
+                }
+            } ?: run {
+            Timber.e("Cache file for voice clip recording can't be created")
+        }
+    }
+
     companion object {
         private const val INVALID_HANDLE = -1L
     }
 }
+
+internal object StopAndSendVoiceClip : CancellationException()
+internal object CancelVoiceClip : CancellationException()

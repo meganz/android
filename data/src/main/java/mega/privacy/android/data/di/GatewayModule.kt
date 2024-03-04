@@ -15,6 +15,7 @@ import mega.privacy.android.data.facade.FileAttributeFacade
 import mega.privacy.android.data.facade.FileFacade
 import mega.privacy.android.data.facade.FileManagementPreferencesFacade
 import mega.privacy.android.data.facade.HttpConnectionFacade
+import mega.privacy.android.data.facade.MediaRecorderFacade
 import mega.privacy.android.data.facade.MegaApiFacade
 import mega.privacy.android.data.facade.MegaApiFolderFacade
 import mega.privacy.android.data.facade.MegaChatApiFacade
@@ -46,6 +47,7 @@ import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileCompressionGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.HttpConnectionGateway
+import mega.privacy.android.data.gateway.MediaRecorderGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.NotificationsGateway
@@ -284,5 +286,9 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindNotificationGateway(implementation: NotificationsFacade): NotificationsGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindMediaRecorderGateway(implementation: MediaRecorderFacade): MediaRecorderGateway
 
 }

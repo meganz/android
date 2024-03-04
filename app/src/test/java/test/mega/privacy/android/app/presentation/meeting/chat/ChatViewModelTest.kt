@@ -8,9 +8,11 @@ import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
@@ -35,8 +37,10 @@ import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.meeting.chat.model.InviteContactToChatResult
 import mega.privacy.android.app.presentation.meeting.chat.model.InviteUserAsContactResultOption
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
+import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.core.ui.controls.chat.VoiceClipRecordEvent
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReactionUser
 import mega.privacy.android.domain.entity.ChatRequest
@@ -73,6 +77,7 @@ import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.CloseChatPreviewUseCase
@@ -95,6 +100,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallInOth
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.chat.MuteChatNotificationForChatRoomsUseCase
 import mega.privacy.android.domain.usecase.chat.OpenChatLinkUseCase
+import mega.privacy.android.domain.usecase.chat.RecordAudioUseCase
 import mega.privacy.android.domain.usecase.chat.UnmuteChatNotificationUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
@@ -122,6 +128,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.file.CreateNewImageUriUseCase
+import mega.privacy.android.domain.usecase.file.DeleteFileUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
@@ -134,7 +141,9 @@ import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChat
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import nz.mega.sdk.MegaChatError
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -149,6 +158,7 @@ import org.junit.jupiter.params.provider.NullSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -156,6 +166,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
+import java.io.File
 import java.util.stream.Stream
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -284,6 +295,9 @@ internal class ChatViewModelTest {
     private val inviteUserAsContactResultOptionMapper = mock<InviteUserAsContactResultOptionMapper>()
     private val inviteContactUseCase = mock<InviteContactUseCase>()
     private val getChatFromContactMessagesUseCase = mock<GetChatFromContactMessagesUseCase>()
+    private val getCacheFileUseCase = mock<GetCacheFileUseCase>()
+    private val recordAudioUseCase = mock<RecordAudioUseCase>()
+    private val deleteFileUseCase = mock<DeleteFileUseCase>()
 
     @BeforeEach
     fun resetMocks() {
@@ -345,6 +359,9 @@ internal class ChatViewModelTest {
             inviteUserAsContactResultOptionMapper,
             inviteContactUseCase,
             getChatFromContactMessagesUseCase,
+            getCacheFileUseCase,
+            recordAudioUseCase,
+            deleteFileUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -447,6 +464,9 @@ internal class ChatViewModelTest {
             inviteUserAsContactResultOptionMapper = inviteUserAsContactResultOptionMapper,
             inviteContactUseCase = inviteContactUseCase,
             getChatFromContactMessagesUseCase = getChatFromContactMessagesUseCase,
+            getCacheFileUseCase = getCacheFileUseCase,
+            recordAudioUseCase = recordAudioUseCase,
+            deleteFileUseCase = deleteFileUseCase,
         )
     }
 
@@ -2867,6 +2887,43 @@ internal class ChatViewModelTest {
                 assertThat(result).isEqualTo(email)
             }
         }
+    }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class VoiceClipTests {
+        private val path = "/cache/example.m4a"
+        private val destination = File(path)
+
+        @BeforeEach
+        fun setup() {
+            whenever(
+                getCacheFileUseCase(eq(CacheFolderManager.VOICE_CLIP_FOLDER), any())
+            ) doReturn destination
+            whenever(recordAudioUseCase(destination)) doReturn flow {
+                awaitCancellation()
+            }
+        }
+
+        @AfterEach
+        fun cancel() {
+            underTest.onVoiceClipRecordEvent(VoiceClipRecordEvent.Cancel) //to cancel the recording job and don't affect other tests
+        }
+
+        @Test
+        fun `test that audio is recorded to cache file when VoiceClipRecordEvent Start event is received`() =
+            runTest {
+                underTest.onVoiceClipRecordEvent(VoiceClipRecordEvent.Start)
+                verify(recordAudioUseCase).invoke(destination)
+            }
+
+        @Test
+        fun `test that recorded audio is deleted when VoiceClipRecordEvent Cancel event is received`() =
+            runTest {
+                underTest.onVoiceClipRecordEvent(VoiceClipRecordEvent.Start)
+                underTest.onVoiceClipRecordEvent(VoiceClipRecordEvent.Cancel)
+                verify(deleteFileUseCase).invoke(path)
+            }
     }
 
 

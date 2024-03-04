@@ -46,6 +46,7 @@ import mega.privacy.android.data.repository.HttpConnectionRepositoryImpl
 import mega.privacy.android.data.repository.ImageRepositoryImpl
 import mega.privacy.android.data.repository.InAppUpdateRepositoryImpl
 import mega.privacy.android.data.repository.LegacyNotificationRepository
+import mega.privacy.android.data.repository.MediaRecorderRepositoryImpl
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.data.repository.MegaNodeRepositoryImpl
 import mega.privacy.android.data.repository.NodeRepositoryImpl
@@ -96,6 +97,7 @@ import mega.privacy.android.domain.repository.HttpConnectionRepository
 import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.InAppUpdateRepository
 import mega.privacy.android.domain.repository.MediaPlayerRepository
+import mega.privacy.android.domain.repository.MediaRecorderRepository
 import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
@@ -341,6 +343,11 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindRegexRepository(implementation: RegexRepositoryImpl): RegexRepository
+
     @Binds
     abstract fun bindChatMessageRepository(implementation: ChatMessageRepositoryImpl): ChatMessageRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMediaRecorderRepository(implementation: MediaRecorderRepositoryImpl): MediaRecorderRepository
 }
