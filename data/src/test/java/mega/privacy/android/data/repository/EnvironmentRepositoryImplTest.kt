@@ -8,9 +8,9 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.R
 import mega.privacy.android.data.gateway.AppInfoGateway
 import mega.privacy.android.data.gateway.DeviceGateway
-import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
+import mega.privacy.android.data.mapper.environment.ThermalStateMapper
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import org.junit.Before
@@ -30,8 +30,8 @@ class EnvironmentRepositoryImplTest {
     private val megaApiGateway = mock<MegaApiGateway>()
     private val appInfoGateway = mock<AppInfoGateway>()
     private val appInfoPreferencesGateway = mock<AppInfoPreferencesGateway>()
-    private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
     private val applicationIpAddressWrapper = mock<ApplicationIpAddressWrapper>()
+    private val thermalStateMapper = mock<ThermalStateMapper>()
 
 
     @Before
@@ -44,6 +44,7 @@ class EnvironmentRepositoryImplTest {
             appInfoGateway = appInfoGateway,
             appInfoPreferencesGateway = appInfoPreferencesGateway,
             applicationIpAddressWrapper = applicationIpAddressWrapper,
+            thermalStateMapper = thermalStateMapper,
         )
     }
 

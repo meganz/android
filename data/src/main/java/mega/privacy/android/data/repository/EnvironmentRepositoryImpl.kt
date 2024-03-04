@@ -4,12 +4,14 @@ import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.R
 import mega.privacy.android.data.gateway.AppInfoGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
+import mega.privacy.android.data.mapper.environment.ThermalStateMapper
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
 import mega.privacy.android.domain.entity.AppInfo
 import mega.privacy.android.domain.entity.DeviceInfo
@@ -30,6 +32,7 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
     private val appInfoGateway: AppInfoGateway,
     private val appInfoPreferencesGateway: AppInfoPreferencesGateway,
     private val applicationIpAddressWrapper: ApplicationIpAddressWrapper,
+    private val thermalStateMapper: ThermalStateMapper,
 ) : EnvironmentRepository {
 
     override suspend fun getDeviceInfo() =
@@ -91,4 +94,7 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
     override fun getIpAddress() = applicationIpAddressWrapper.getIpAddress().also {
         Timber.d("Current Ip Address $it")
     }
+
+    override fun monitorThermalState() =
+        deviceGateway.monitorThermalState().map { thermalStateMapper(it) }
 }

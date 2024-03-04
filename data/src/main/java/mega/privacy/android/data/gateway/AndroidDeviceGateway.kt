@@ -7,6 +7,7 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.BatteryManager
 import android.os.Build
+import android.os.PowerManager
 import android.os.StatFs
 import android.os.SystemClock
 import android.provider.Settings
@@ -14,9 +15,11 @@ import android.text.format.DateFormat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.data.extensions.registerReceiverAsFlow
@@ -111,6 +114,23 @@ internal class AndroidDeviceGateway @Inject constructor(
             Timber.e(it, "Error getting local IP address")
         }
         return null
+    }
+
+    override fun monitorThermalState() = channelFlow {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val listener = PowerManager.OnThermalStatusChangedListener { status ->
+                trySend(status)
+            }
+            val powerManager =
+                context.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
+            powerManager.addThermalStatusListener(listener)
+
+            awaitClose {
+                powerManager.removeThermalStatusListener(listener)
+            }
+        } else {
+            channel.trySend(0)
+        }
     }
 
     override fun getCurrentHourOfDay(): Int = LocalTime.now().hour

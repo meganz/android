@@ -108,12 +108,17 @@ interface DeviceGateway {
     fun getCurrentMinute(): Int
 
     /**
-     * monitor battery info
+     * Monitor battery info
      */
     val monitorBatteryInfo: Flow<BatteryInfo>
 
     /**
-     * monitor charging state
+     * Monitor charging state
      */
     val monitorChargingStoppedState: Flow<Boolean>
+
+    /**
+     * Monitor thermal state
+     */
+    fun monitorThermalState(): Flow<Int>
 }

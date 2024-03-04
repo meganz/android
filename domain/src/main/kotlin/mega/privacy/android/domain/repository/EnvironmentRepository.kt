@@ -1,7 +1,9 @@
 package mega.privacy.android.domain.repository
 
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.AppInfo
 import mega.privacy.android.domain.entity.DeviceInfo
+import mega.privacy.android.domain.entity.environment.ThermalState
 
 /**
  * Device repository
@@ -87,4 +89,9 @@ interface EnvironmentRepository {
      * @return ip address [String]
      */
     fun getIpAddress(): String?
+
+    /**
+     * Monitor thermal state
+     */
+    fun monitorThermalState(): Flow<ThermalState>
 }
