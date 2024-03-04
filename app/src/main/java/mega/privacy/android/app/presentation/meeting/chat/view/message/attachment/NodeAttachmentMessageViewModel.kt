@@ -17,7 +17,10 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.entity.node.NodeShareContentUri
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.chat.ChatFile
+import mega.privacy.android.domain.usecase.chat.GetShareChatNodesUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetCachedOriginalPathUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetMessageIdsByTypeUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
@@ -27,6 +30,7 @@ import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import timber.log.Timber
 import java.io.File
+import java.util.UUID
 import javax.inject.Inject
 
 /**
@@ -44,6 +48,8 @@ class NodeAttachmentMessageViewModel @Inject constructor(
     private val getCachedOriginalPathUseCase: GetCachedOriginalPathUseCase,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
+    private val nodeShareContentUrisIntentMapper: NodeShareContentUrisIntentMapper,
+    private val getShareChatNodesUseCase: GetShareChatNodesUseCase,
     fileSizeStringMapper: FileSizeStringMapper,
     durationInSecondsTextMapper: DurationInSecondsTextMapper,
 ) : AbstractAttachmentMessageViewModel<NodeAttachmentMessage>(
@@ -166,4 +172,34 @@ class NodeAttachmentMessageViewModel @Inject constructor(
      * @param node
      */
     suspend fun removeOfflineNode(node: TypedNode) = removeOfflineNodeUseCase(node.id)
+
+    /**
+     * Get share chat nodes
+     *
+     * @param fileNodes list of chat file nodes
+     */
+    suspend fun getShareChatNodes(fileNodes: List<ChatFile>) =
+        getShareChatNodesUseCase(fileNodes)
+
+    /**
+     * Get share intent
+     *
+     * @param fileNodes list of chat file nodes
+     * @param content node share content uri
+     * @return intent
+     */
+    fun getShareIntent(fileNodes: List<ChatFile>, content: NodeShareContentUri): Intent {
+        val node = fileNodes.first()
+        val groupMimeType = if (fileNodes.all { it.type.mimeType == node.type.mimeType }) {
+            node.type.mimeType
+        } else {
+            "*/*"
+        }
+        val title = if (fileNodes.size > 1) {
+            "${UUID.randomUUID()}.url"
+        } else {
+            node.name
+        }
+        return nodeShareContentUrisIntentMapper(title, content, groupMimeType)
+    }
 }

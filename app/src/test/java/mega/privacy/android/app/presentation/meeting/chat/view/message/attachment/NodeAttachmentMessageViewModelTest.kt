@@ -25,12 +25,15 @@ import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeShareContentUri
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.chat.ChatFile
-import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
+import mega.privacy.android.domain.entity.node.chat.ChatImageFile
+import mega.privacy.android.domain.usecase.chat.GetShareChatNodesUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetCachedOriginalPathUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetMessageIdsByTypeUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFilePathUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
@@ -43,6 +46,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -66,6 +70,8 @@ class NodeAttachmentMessageViewModelTest {
     private val getCachedOriginalPathUseCase = mock<GetCachedOriginalPathUseCase>()
     private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase>()
     private val removeOfflineNodeUseCase = mock<RemoveOfflineNodeUseCase>()
+    private val nodeShareContentUrisIntentMapper: NodeShareContentUrisIntentMapper = mock()
+    private val getShareChatNodesUseCase: GetShareChatNodesUseCase = mock()
 
     @BeforeEach
     internal fun initTests() {
@@ -81,6 +87,8 @@ class NodeAttachmentMessageViewModelTest {
             getCachedOriginalPathUseCase = getCachedOriginalPathUseCase,
             isAvailableOfflineUseCase = isAvailableOfflineUseCase,
             removeOfflineNodeUseCase = removeOfflineNodeUseCase,
+            nodeShareContentUrisIntentMapper = nodeShareContentUrisIntentMapper,
+            getShareChatNodesUseCase = getShareChatNodesUseCase,
         )
     }
 
@@ -283,6 +291,88 @@ class NodeAttachmentMessageViewModelTest {
         }
         underTest.removeOfflineNode(node)
         verify(removeOfflineNodeUseCase).invoke(NodeId(1234L))
+    }
+
+    @Test
+    fun `test that get share chat nodes returns correctly`() = runTest {
+        val files = listOf<File>(mock(), mock(), mock())
+        val nodes: List<ChatImageFile> = listOf(
+            mock(),
+            mock(),
+            mock(),
+        )
+        val expected = NodeShareContentUri.LocalContentUris(files)
+        whenever(getShareChatNodesUseCase(nodes)).thenReturn(expected)
+        val actual = underTest.getShareChatNodes(nodes)
+        assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that get share intent invokes correctly when share a single file`() {
+        val fileNodes = listOf(mock<ChatDefaultFile> {
+            on { type } doReturn StaticImageFileTypeInfo(
+                mimeType = "image/jpg",
+                extension = "jpg"
+            )
+            on { name } doReturn "name"
+        })
+        val content = mock<NodeShareContentUri.LocalContentUris>()
+        underTest.getShareIntent(fileNodes, content)
+        verify(nodeShareContentUrisIntentMapper).invoke("name", content, "image/jpg")
+    }
+
+    @Test
+    fun `test that get share intent invokes correctly when share multiple files and different mime type`() {
+        val fileNodes = listOf(
+            mock<ChatDefaultFile> {
+                on { type } doReturn StaticImageFileTypeInfo(
+                    mimeType = "image/jpg",
+                    extension = "jpg"
+                )
+                on { name } doReturn "file1"
+            },
+            mock<ChatDefaultFile> {
+                on { type } doReturn StaticImageFileTypeInfo(
+                    mimeType = "image/png",
+                    extension = "png"
+                )
+                on { name } doReturn "file2"
+            },
+        )
+        val content = mock<NodeShareContentUri.LocalContentUris>()
+        underTest.getShareIntent(fileNodes, content)
+        verify(nodeShareContentUrisIntentMapper).invoke(
+            title = any(),
+            content = eq(content),
+            mimeType = eq("*/*")
+        )
+    }
+
+    @Test
+    fun `test that get share intent invokes correctly when share multiple files and same mime type`() {
+        val fileNodes = listOf(
+            mock<ChatDefaultFile> {
+                on { type } doReturn StaticImageFileTypeInfo(
+                    mimeType = "image/jpg",
+                    extension = "jpg"
+                )
+                on { name } doReturn "file1"
+            },
+            mock<ChatDefaultFile> {
+                on { type } doReturn StaticImageFileTypeInfo(
+                    mimeType = "image/jpg",
+                    extension = "jpg"
+                )
+                on { name } doReturn "file2"
+            },
+        )
+        val content = mock<NodeShareContentUri.LocalContentUris>()
+        underTest.getShareIntent(fileNodes, content)
+        verify(nodeShareContentUrisIntentMapper).invoke(
+            title = any(),
+            content = eq(content),
+            mimeType = eq("image/jpg")
+        )
     }
 
     private fun getFileAndVideoTypes(): List<FileTypeInfo> {
