@@ -99,4 +99,22 @@ interface TypedMessageDao {
      */
     @Query("UPDATE typed_messages SET reactions = :reactions WHERE chatId = :chatId AND messageId = :msgId")
     suspend fun updateMessageReactions(chatId: Long, msgId: Long, reactions: String)
+
+    /**
+     * Delete messages by id
+     *
+     * @param messageIds
+     */
+    @Query("DELETE FROM typed_messages WHERE messageId IN (:messageIds)")
+    fun deleteMessagesById(messageIds: List<Long>)
+
+    /**
+     * Get msg ids by chat id and latest date
+     *
+     * @param chatId
+     * @param truncateTimestamp
+     * @return matching message ids
+     */
+    @Query("SELECT messageId FROM typed_messages WHERE chatId = :chatId AND timestamp < :truncateTimestamp")
+    fun getMsgIdsByChatIdAndLatestDate(chatId: Long, truncateTimestamp: Long): List<Long>
 }

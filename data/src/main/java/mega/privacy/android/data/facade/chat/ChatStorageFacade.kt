@@ -3,6 +3,8 @@ package mega.privacy.android.data.facade.chat
 import androidx.room.withTransaction
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.database.chat.InMemoryChatDatabase
+import mega.privacy.android.data.database.dao.ChatMessageMetaDao
+import mega.privacy.android.data.database.dao.ChatNodeDao
 import mega.privacy.android.data.database.entity.chat.ChatGeolocationEntity
 import mega.privacy.android.data.database.entity.chat.ChatNodeEntity
 import mega.privacy.android.data.database.entity.chat.GiphyEntity
@@ -89,11 +91,7 @@ internal class ChatStorageFacade @Inject constructor(
             withTransaction {
                 val messagesToDelete = typedMessageDao.getMsgIdsByChatId(chatId)
                 typedMessageDao.deleteMessagesByChatId(chatId)
-                metaDao.deleteRichPreviewsByMessageId(messagesToDelete)
-                metaDao.deleteGiphysByMessageId(messagesToDelete)
-                metaDao.deleteGeolocationsByMessageId(messagesToDelete)
-                chatNodeDao.removeMessageNodeRelationship(messagesToDelete)
-                chatNodeDao.deleteOrphanedNodes()
+                cascadeMessageDeletion(metaDao, messagesToDelete, chatNodeDao)
             }
         }
     }
@@ -139,5 +137,31 @@ internal class ChatStorageFacade @Inject constructor(
         reactions: String,
     ) {
         database.typedMessageDao().updateMessageReactions(chatId, msgId, reactions)
+    }
+
+    override suspend fun truncateMessages(chatId: Long, truncateTimestamp: Long) {
+        with(database) {
+            val chatNodeDao = chatNodeDao()
+            val metaDao = chatMessageMetaDao()
+            val typedMessageDao = typedMessageDao()
+            withTransaction {
+                val messagesToDelete =
+                    typedMessageDao.getMsgIdsByChatIdAndLatestDate(chatId, truncateTimestamp)
+                typedMessageDao.deleteMessagesById(messagesToDelete)
+                cascadeMessageDeletion(metaDao, messagesToDelete, chatNodeDao)
+            }
+        }
+    }
+
+    private fun cascadeMessageDeletion(
+        metaDao: ChatMessageMetaDao,
+        messagesToDelete: List<Long>,
+        chatNodeDao: ChatNodeDao,
+    ) {
+        metaDao.deleteRichPreviewsByMessageId(messagesToDelete)
+        metaDao.deleteGiphysByMessageId(messagesToDelete)
+        metaDao.deleteGeolocationsByMessageId(messagesToDelete)
+        chatNodeDao.removeMessageNodeRelationship(messagesToDelete)
+        chatNodeDao.deleteOrphanedNodes()
     }
 }

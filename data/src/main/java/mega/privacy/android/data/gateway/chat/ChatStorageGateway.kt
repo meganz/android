@@ -123,4 +123,12 @@ interface ChatStorageGateway {
      * @param reactions Reactions
      */
     suspend fun updateMessageReactions(chatId: Long, msgId: Long, reactions: String)
+
+    /**
+     * Truncate messages
+     *
+     * @param chatId
+     * @param truncateTimestamp
+     */
+    suspend fun truncateMessages(chatId: Long, truncateTimestamp: Long)
 }

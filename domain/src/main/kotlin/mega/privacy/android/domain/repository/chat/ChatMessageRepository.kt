@@ -474,4 +474,12 @@ interface ChatMessageRepository {
      * @return flow of paged messages
      */
     fun getPagedMessages(chatId: Long): PagingSource<Int, TypedMessage>
+
+    /**
+     * Deletes all messages in a chat that have a timestamp older than the truncate timestamp
+     *
+     * @param chatId
+     * @param truncateTimestamp
+     */
+    suspend fun truncateMessages(chatId: Long, truncateTimestamp: Long)
 }

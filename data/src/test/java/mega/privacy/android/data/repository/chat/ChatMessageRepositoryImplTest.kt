@@ -442,4 +442,14 @@ class ChatMessageRepositoryImplTest {
         underTest.cacheOriginalPathForNode(newId, newPath)
         verify(originalPathCache).set(eq(previousCache + (newId to newPath)))
     }
+
+    @Test
+    internal fun `test that truncate messages calls the function on the message gateway`() =
+        runTest {
+            val expectedChatId = 5432L
+            val truncateTimestamp = 23456L
+            underTest.truncateMessages(expectedChatId, truncateTimestamp)
+
+            verify(chatStorageGateway).truncateMessages(expectedChatId, truncateTimestamp)
+        }
 }

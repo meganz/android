@@ -274,4 +274,14 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
 
     override fun getPagedMessages(chatId: Long) =
         typedMessagePagingSourceMapper(chatStorageGateway.getTypedMessageRequestPagingSource(chatId))
+
+
+    override suspend fun truncateMessages(chatId: Long, truncateTimestamp: Long) {
+        withContext(ioDispatcher) {
+            chatStorageGateway.truncateMessages(
+                chatId = chatId,
+                truncateTimestamp = truncateTimestamp
+            )
+        }
+    }
 }
