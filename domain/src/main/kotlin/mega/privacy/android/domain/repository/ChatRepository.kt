@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.chat.messages.paging.MessagePagingInfo
 import mega.privacy.android.domain.entity.chat.messages.reactions.ReactionUpdate
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.chat.notification.ChatMessageNotification
+import mega.privacy.android.domain.entity.chat.room.update.ChatRoomMessageUpdate
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
 
@@ -342,7 +343,7 @@ interface ChatRepository {
      * @return A flow of all messages received from the various updates.
      * These could be new messages or updates to existing messages.
      */
-    fun monitorMessageUpdates(chatId: Long): Flow<ChatMessage>
+    fun monitorMessageUpdates(chatId: Long): Flow<ChatRoomMessageUpdate>
 
     /**
      * Monitor reaction updates on a chat room

@@ -23,7 +23,7 @@ class MonitorChatRoomMessageUpdatesUseCase @Inject constructor(
     suspend operator fun invoke(chatId: Long) {
         chatRepository.monitorMessageUpdates(chatId)
             .collect {
-                saveChatMessagesUseCase(chatId, listOf(it))
+                saveChatMessagesUseCase(chatId, listOf(it.message))
             }
     }
 }

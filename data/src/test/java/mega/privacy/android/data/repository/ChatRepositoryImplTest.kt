@@ -35,6 +35,7 @@ import mega.privacy.android.data.mapper.chat.CombinedChatRoomMapper
 import mega.privacy.android.data.mapper.chat.ConnectionStateMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.chat.messages.reactions.ReactionUpdateMapper
+import mega.privacy.android.data.mapper.chat.update.ChatRoomMessageUpdateMapper
 import mega.privacy.android.data.mapper.notification.ChatMessageNotificationBehaviourMapper
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.chat.NonContactInfo
@@ -120,6 +121,8 @@ class ChatRepositoryImplTest {
     private val chatStorageGateway = mock<ChatStorageGateway>()
     private val reactionUpdateMapper = mock<ReactionUpdateMapper>()
 
+    private val chatRoomMessageUpdateMapper = ChatRoomMessageUpdateMapper(chatMessageMapper)
+
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
@@ -154,6 +157,7 @@ class ChatRepositoryImplTest {
             chatGeolocationEntityMapper = mock(),
             chatNodeEntityListMapper = mock(),
             reactionUpdateMapper = reactionUpdateMapper,
+            chatRoomMessageUpdateMapper = chatRoomMessageUpdateMapper,
             context = context,
         )
 
@@ -1118,6 +1122,31 @@ class ChatRepositoryImplTest {
         underTest.monitorReactionUpdates(chatId).test {
             assertThat(awaitItem()).isEqualTo(reactionUpdate1)
             assertThat(awaitItem()).isEqualTo(reactionUpdate2)
+        }
+    }
+
+    @Test
+    internal fun `test that message updates are returned for monitor message updates`() = runTest {
+        val updates = listOf<ChatRoomUpdate>(
+            ChatRoomUpdate.OnHistoryTruncatedByRetentionTime(mock()),
+            ChatRoomUpdate.OnMessageLoaded(mock()),
+            ChatRoomUpdate.OnMessageReceived(mock()),
+            ChatRoomUpdate.OnMessageUpdate(mock()),
+        )
+        megaChatApiGateway.stub {
+            on { openChatRoom(any()) } doReturn flow {
+                updates.forEach { emit(it) }
+                awaitCancellation()
+            }
+        }
+        val chatMessage = mock<ChatMessage>()
+        chatMessageMapper.stub {
+            onBlocking { invoke(any()) } doReturn chatMessage
+        }
+
+        underTest.monitorMessageUpdates(123L).test {
+            val events = cancelAndConsumeRemainingEvents()
+            assertThat(events).hasSize(updates.size)
         }
     }
 }
