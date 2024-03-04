@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.apiserver.view
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -10,6 +11,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.apiserver.ApiServerViewModel
 import mega.privacy.android.app.presentation.apiserver.extensions.getTextId
 import mega.privacy.android.app.presentation.apiserver.model.ApiServerUIState
+import mega.privacy.android.app.presentation.apiserver.view.navigation.openLoginActivity
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -25,6 +27,7 @@ internal fun ChangeApiServerDialog(
     onDismissRequest: () -> Unit,
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     ChangeApiServerDialog(
         uiState = uiState,
@@ -35,6 +38,7 @@ internal fun ChangeApiServerDialog(
         },
         onConfirmRequest = {
             viewModel.confirmUpdateApiServer()
+            openLoginActivity(context)
             onDismissRequest()
         },
     )
