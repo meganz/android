@@ -528,7 +528,9 @@ class HomepageFragment : Fragment() {
                     } else {
                         HomepageFragmentDirections.actionHomepageFragmentToVideoFragment()
                     }
-                navigate(destination)
+                currentDestination?.getAction(destination.actionId)?.let {
+                    navigate(destination.actionId)
+                }
             }
         }
     }
