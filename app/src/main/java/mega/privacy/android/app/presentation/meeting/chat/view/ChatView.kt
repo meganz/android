@@ -242,12 +242,6 @@ internal fun ChatView(
     onStartOrJoinMeeting: (isStarted: Boolean) -> Unit = {},
     onAnswerCall: () -> Unit = {},
     onEnableGeolocation: () -> Unit = {},
-    messageListView: @Composable (
-        MessageListParameter,
-    ) -> Unit = { param -> MessageListView(param) },
-    bottomBar: @Composable (
-        parameter: ChatBottomBarParameter,
-    ) -> Unit = { parameter -> ChatBottomBar(parameter) },
     onSendClick: (String) -> Unit = {},
     onHoldAndAnswerCall: () -> Unit = {},
     onEndAndAnswerCall: () -> Unit = {},
@@ -687,7 +681,7 @@ internal fun ChatView(
                             { voiceClipRecordEvent ->
                                 onVoiceClipRecordEvent(voiceClipRecordEvent)
                             }
-                        bottomBar(
+                        ChatBottomBar(
                             ChatBottomBarParameter(
                                 uiState = uiState,
                                 showEmojiPicker = showEmojiPicker,
@@ -794,7 +788,7 @@ internal fun ChatView(
                             val deselectItem = { message: TypedMessage ->
                                 selectedMessages = selectedMessages - message
                             }
-                            messageListView(
+                            MessageListView(
                                 MessageListParameter(
                                     uiState = uiState,
                                     scrollState = scrollState,
