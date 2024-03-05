@@ -17,6 +17,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.ContactController
@@ -36,6 +37,20 @@ import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
+import mega.privacy.mobile.analytics.event.ChatConversationAddToCloudDriveActionMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationAvailableOfflineActionMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationCopyActionMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationEditActionMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationForwardActionMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationInfoActionMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationInviteActionMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationOpenWithActionMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationRemoveActionMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationSaveToDeviceActionMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationSelectActionMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationSendMessageActionMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationShareActionMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationViewContactsActionMenuItemEvent
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatContainsMeta
 import nz.mega.sdk.MegaChatMessage
@@ -361,6 +376,7 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
         messagesSelected.add(message)
         val id = view.id
         if (id == R.id.open_with_layout) {
+            Analytics.tracker.trackEvent(ChatConversationOpenWithActionMenuItemEvent)
             if (node == null) {
                 Timber.w("The selected node is NULL")
                 return
@@ -379,27 +395,34 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
             }
             return
         } else if (id == R.id.forward_layout) {
+            Analytics.tracker.trackEvent(ChatConversationForwardActionMenuItemEvent)
             (requireActivity() as ChatActivity).forwardMessages(messagesSelected)
         } else if (id == R.id.edit_layout) {
+            Analytics.tracker.trackEvent(ChatConversationEditActionMenuItemEvent)
             (requireActivity() as ChatActivity).editMessage(messagesSelected)
         } else if (id == R.id.copy_layout) {
+            Analytics.tracker.trackEvent(ChatConversationCopyActionMenuItemEvent)
             val msg = message.message
             val text =
                 if (ChatUtil.isGeolocation(msg)) msg?.containsMeta?.textMessage
                 else (requireActivity() as ChatActivity).copyMessage(message)
             (requireActivity() as ChatActivity).copyToClipboard(text)
         } else if (id == R.id.share_layout) {
+            Analytics.tracker.trackEvent(ChatConversationShareActionMenuItemEvent)
             if (node == null) {
                 Timber.w("The selected node is NULL")
                 return
             }
             ChatUtil.shareMsgFromChat(requireActivity(), message, chatId)
         } else if (id == R.id.select_layout) {
+            Analytics.tracker.trackEvent(ChatConversationSelectActionMenuItemEvent)
             (requireActivity() as ChatActivity).activateActionModeWithItem(positionMessage)
         } else if (id == R.id.option_view_layout) {
+            Analytics.tracker.trackEvent(ChatConversationViewContactsActionMenuItemEvent)
             Timber.d("View option")
             ContactUtil.openContactAttachmentActivity(requireActivity(), chatId, messageId)
         } else if (id == R.id.option_info_layout) {
+            Analytics.tracker.trackEvent(ChatConversationInfoActionMenuItemEvent)
             if (!Util.isOnline(requireContext())) {
                 (requireActivity() as ChatActivity).showSnackbar(
                     Constants.SNACKBAR_TYPE, getString(
@@ -417,6 +440,7 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
                 isChatRoomOpen
             )
         } else if (id == R.id.option_invite_layout) {
+            Analytics.tracker.trackEvent(ChatConversationInviteActionMenuItemEvent)
             if (!Util.isOnline(requireContext())) {
                 (requireActivity() as ChatActivity).showSnackbar(
                     Constants.SNACKBAR_TYPE, getString(
@@ -441,6 +465,7 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
                 cC.inviteMultipleContacts(contactEmails)
             }
         } else if (id == R.id.option_start_conversation_layout) {
+            Analytics.tracker.trackEvent(ChatConversationSendMessageActionMenuItemEvent)
             val numUsers = message.message?.usersCount ?: 0
             if (numUsers == 1L) {
                 message.message?.getUserHandle(0)?.let {
@@ -457,6 +482,7 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
                 (requireActivity() as ChatActivity).startGroupConversation(contactHandles)
             }
         } else if (id == R.id.option_download_layout) {
+            Analytics.tracker.trackEvent(ChatConversationSaveToDeviceActionMenuItemEvent)
             if (node == null) {
                 Timber.w("The selected node is NULL")
                 return
@@ -472,12 +498,14 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
                 }
             }
         } else if (id == R.id.option_import_layout) {
+            Analytics.tracker.trackEvent(ChatConversationAddToCloudDriveActionMenuItemEvent)
             if (node == null) {
                 Timber.w("The selected node is NULL")
                 return
             }
             chatC.importNode(messageId, chatId, Constants.IMPORT_ONLY_OPTION)
         } else if (id == R.id.file_properties_switch || id == R.id.option_save_offline_layout) {
+            Analytics.tracker.trackEvent(ChatConversationAvailableOfflineActionMenuItemEvent)
             if (node == null) {
                 Timber.w("Message or node is NULL")
                 return
@@ -504,6 +532,7 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
                 }
             }
         } else if (id == R.id.delete_layout) {
+            Analytics.tracker.trackEvent(ChatConversationRemoveActionMenuItemEvent)
             (requireActivity() as ChatActivity).showConfirmationDeleteMessages(
                 messagesSelected,
                 chatRoom

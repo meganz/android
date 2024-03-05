@@ -430,6 +430,7 @@ import mega.privacy.mobile.analytics.event.ChatConversationInviteActionMenuEvent
 import mega.privacy.mobile.analytics.event.ChatConversationScreenEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationSendMessageActionMenuEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationShareActionMenuEvent;
+import mega.privacy.mobile.analytics.event.ChatMessageLongPressedEvent;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -2094,7 +2095,7 @@ public class ChatActivity extends PasscodeActivity
 
             ChatScheduledMeeting schedMeet = chatState.getScheduledMeeting();
             if (schedMeet != null) {
-                if(adapter != null){
+                if (adapter != null) {
                     adapter.notifyItemChanged(0);
                 }
                 updateCallBanner();
@@ -5528,6 +5529,7 @@ public class ChatActivity extends PasscodeActivity
     }
 
     public void itemLongClick(int positionInAdapter) {
+        Analytics.INSTANCE.getTracker().trackEvent(ChatMessageLongPressedEvent.INSTANCE);
         int positionInMessages = positionInAdapter - 1;
         if (positionInMessages >= messages.size())
             return;
@@ -10115,7 +10117,7 @@ public class ChatActivity extends PasscodeActivity
         }
     }
 
-    private void updateApp(){
+    private void updateApp() {
         if (forceAppUpdateDialog != null && forceAppUpdateDialog.isShowing()) {
             forceAppUpdateDialog.dismiss();
             viewModel.onForceUpdateDialogConsumed();
