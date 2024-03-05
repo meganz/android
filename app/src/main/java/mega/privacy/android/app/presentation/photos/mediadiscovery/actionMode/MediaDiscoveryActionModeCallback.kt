@@ -23,14 +23,14 @@ class MediaDiscoveryActionModeCallback(
     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
         fragment.lifecycleScope.launch {
             val isHiddenNodesEnabled = fragment.getFeatureFlagUseCase(AppFeatures.HiddenNodes)
-            val hasSensitiveNode =
-                fragment.mediaDiscoveryViewModel.getSelectedNodes().any { it.isMarkedSensitive }
+            val hasNonSensitiveNode =
+                fragment.mediaDiscoveryViewModel.getSelectedNodes().any { !it.isMarkedSensitive }
 
             menu?.findItem(R.id.cab_menu_hide)?.isVisible =
-                isHiddenNodesEnabled && hasSensitiveNode
+                isHiddenNodesEnabled && hasNonSensitiveNode
 
-            menu?.findItem(R.id. cab_menu_unhide)?.isVisible =
-                isHiddenNodesEnabled &&!hasSensitiveNode
+            menu?.findItem(R.id.cab_menu_unhide)?.isVisible =
+                isHiddenNodesEnabled && !hasNonSensitiveNode
         }
         return true
     }

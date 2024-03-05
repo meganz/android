@@ -658,8 +658,7 @@ class MediaDiscoveryViewModel @Inject constructor(
             async {
                 runCatching {
                     updateNodeSensitiveUseCase(nodeId = NodeId(nodeId), isSensitive = hide)
-                    Timber.d("Hide value: $hide successful")
-                }.onFailure { Timber.e(it) }
+                }.onFailure { Timber.e("Hide node exception: $it") }
             }
         }
     }
