@@ -26,8 +26,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.extensions.isPortrait
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
@@ -297,19 +295,13 @@ class FileLinkComposeActivity : TransfersManagementActivity(),
             val nameType = typeForName(title)
             when {
                 nameType.isImage -> lifecycleScope.launch {
-                    val intent = if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
-                        ImagePreviewActivity.createIntent(
-                            context = this@FileLinkComposeActivity,
-                            imageSource = ImagePreviewFetcherSource.PUBLIC_FILE,
-                            menuOptionsSource = ImagePreviewMenuSource.PUBLIC_FILE,
-                            params = mapOf(PublicFileImageNodeFetcher.URL to url),
-                        )
-                    } else {
-                        ImageViewerActivity.getIntentForSingleNode(
-                            this@FileLinkComposeActivity,
-                            url
-                        )
-                    }
+                    val intent = ImagePreviewActivity.createIntent(
+                        context = this@FileLinkComposeActivity,
+                        imageSource = ImagePreviewFetcherSource.PUBLIC_FILE,
+                        menuOptionsSource = ImagePreviewMenuSource.PUBLIC_FILE,
+                        params = mapOf(PublicFileImageNodeFetcher.URL to url),
+                        showScreenLabel = false,
+                    )
                     viewModel.updateImageIntent(intent)
                 }
 

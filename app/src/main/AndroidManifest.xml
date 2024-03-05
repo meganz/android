@@ -709,7 +709,6 @@
             android:name=".presentation.imagepreview.ImagePreviewActivity"
             android:label=""
             android:launchMode="singleTop"
-            android:theme="@style/Theme.Mega.FullScreen.Viewer"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
             android:name=".presentation.imagepreview.slideshow.SlideshowActivity"
