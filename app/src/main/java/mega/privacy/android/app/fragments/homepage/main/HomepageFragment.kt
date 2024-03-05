@@ -507,9 +507,7 @@ class HomepageFragment : Fragment() {
         viewDataBinding.category.categoryFavourites.setOnClickListener(categoryClickListener)
         viewDataBinding.category.categoryDocument.setOnClickListener(categoryClickListener)
         viewDataBinding.category.categoryAudio.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launch {
-                clickAudioSectionTileAndAnalysis()
-            }
+            clickAudioSectionTileAndAnalysis()
         }
         viewDataBinding.category.categoryVideo.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
@@ -535,17 +533,13 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    private suspend fun clickAudioSectionTileAndAnalysis() {
+    private fun clickAudioSectionTileAndAnalysis() {
         Analytics.tracker.trackEvent(HomeScreenAudioTilePressedEvent)
         findNavController().run {
             if (currentDestination?.id == R.id.homepageFragment) {
-                val destination =
-                    if (getFeatureFlagValueUseCase(AppFeatures.NewAudioSection)) {
-                        HomepageFragmentDirections.actionHomepageFragmentToAudioSectionFragment()
-                    } else {
-                        HomepageFragmentDirections.actionHomepageFragmentToAudioFragment()
-                    }
-                navigate(destination)
+                navigate(
+                    HomepageFragmentDirections.actionHomepageFragmentToAudioSectionFragment()
+                )
             }
         }
     }

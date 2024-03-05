@@ -3722,11 +3722,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     hideAdsView()
                 }
 
-                R.id.audioFragment -> {
-                    homepageScreen = HomepageScreen.AUDIO
-                    hideAdsView()
-                }
-
                 R.id.audioSectionFragment -> {
                     homepageScreen = HomepageScreen.AUDIO
                     hideAdsView()
