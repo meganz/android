@@ -115,6 +115,6 @@ interface TypedMessageDao {
      * @param truncateTimestamp
      * @return matching message ids
      */
-    @Query("SELECT messageId FROM typed_messages WHERE chatId = :chatId AND timestamp < :truncateTimestamp")
+    @Query("SELECT messageId FROM typed_messages WHERE chatId = :chatId AND timestamp <= :truncateTimestamp")
     fun getMsgIdsByChatIdAndLatestDate(chatId: Long, truncateTimestamp: Long): List<Long>
 }
