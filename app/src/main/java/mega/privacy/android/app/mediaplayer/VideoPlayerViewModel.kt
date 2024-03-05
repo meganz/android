@@ -1873,17 +1873,17 @@ class VideoPlayerViewModel @Inject constructor(
         val contentResolver = context.contentResolver
         contentResolver?.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
             ?.let { uri ->
-                contentResolver.openOutputStream(uri)?.use { outputStream ->
-                    try {
+                try {
+                    contentResolver.openOutputStream(uri)?.use { outputStream ->
                         bitmap.compress(
                             Bitmap.CompressFormat.JPEG,
                             QUALITY_SCREENSHOT,
                             outputStream
                         )
                         successCallback(bitmap)
-                    } catch (e: Exception) {
-                        Timber.e("Bitmap is saved error: ${e.message}")
                     }
+                } catch (e: Exception) {
+                    Timber.e("Bitmap is saved error: ${e.message}")
                 }
             }
     }
