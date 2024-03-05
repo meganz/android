@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -90,6 +91,21 @@ class SendChatAttachmentsUseCaseTest {
         }
         verify(startChatUploadsWithWorkerUseCase)(eq(listOf(file)), eq(pendingMsgId))
     }
+
+    @Test
+    fun `test that pending message is saved with voice clip type when it's a voice clip`() =
+        runTest {
+            val chatId = 123L
+            val pendingMsgId = 123L
+            val uris = listOf("file")
+            commonStub(pendingMsgId)
+            underTest(chatId, uris, isVoiceClip = true).test {
+                cancelAndIgnoreRemainingEvents()
+            }
+            verify(chatMessageRepository).savePendingMessage(argThat {
+                this.type == PendingMessage.TYPE_VOICE_CLIP
+            })
+        }
 
     private suspend fun commonStub(pendingMsgId: Long = 1L) {
         val pendingMessage = mock<PendingMessage> {

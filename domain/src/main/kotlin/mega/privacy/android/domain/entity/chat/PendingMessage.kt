@@ -31,6 +31,10 @@ data class PendingMessage(
     var name: String? = null,
     var transferTag: Int = -1,
 ) {
+    /**
+     * True if it's a voice clip, false otherwise
+     */
+    val isVoiceClip: Boolean = type == TYPE_VOICE_CLIP
 
     constructor(
         chatId: Long,
@@ -68,5 +72,12 @@ data class PendingMessage(
         this.nodeHandle = nodeHandle
         this.transferTag = transferTag
         this.state = state
+    }
+
+    companion object {
+        /**
+         * Type for voice clip pending message
+         */
+        const val TYPE_VOICE_CLIP = 3
     }
 }

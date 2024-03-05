@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.chat.message
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.merge
+import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
@@ -18,7 +19,7 @@ class SendChatAttachmentsUseCase @Inject constructor(
     private val startChatUploadsWithWorkerUseCase: StartChatUploadsWithWorkerUseCase,
     private val getFileForChatUploadUseCase: GetFileForChatUploadUseCase,
     private val chatMessageRepository: ChatMessageRepository,
-    private val deviceCurrentTimeUseCase: GetDeviceCurrentTimeUseCase
+    private val deviceCurrentTimeUseCase: GetDeviceCurrentTimeUseCase,
 ) {
     /**
      * Invoke
@@ -26,7 +27,7 @@ class SendChatAttachmentsUseCase @Inject constructor(
      * @param chatId the id of the chat where these files will be attached
      * @param uris String representation of the files,
      */
-    operator fun invoke(chatId: Long, uris: List<String>) =
+    operator fun invoke(chatId: Long, uris: List<String>, isVoiceClip: Boolean = false) =
         flow {
             emitAll(
                 //each file is sent as a single message in parallel
@@ -38,7 +39,7 @@ class SendChatAttachmentsUseCase @Inject constructor(
                         val pendingMessageId = chatMessageRepository.savePendingMessage(
                             SavePendingMessageRequest(
                                 chatId = chatId,
-                                type = -1,
+                                type = if (isVoiceClip) PendingMessage.TYPE_VOICE_CLIP else -1,
                                 uploadTimestamp = deviceCurrentTimeUseCase() / 1000,
                                 state = PendingMessageState.UPLOADING,
                                 tempIdKarere = -1,

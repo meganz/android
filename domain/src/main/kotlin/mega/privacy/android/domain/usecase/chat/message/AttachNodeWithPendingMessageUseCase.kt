@@ -44,14 +44,18 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
                     )
                 }
                 val chatId = pendingMessage.chatId
-                chatMessageRepository.attachNode(chatId, nodeId.longValue)
-                    ?.let {
-                        getChatMessageUseCase(chatId, it)?.let { message ->
-                            val request = createSaveSentMessageRequestUseCase(message, chatId)
-                            chatRepository.storeMessages(listOf(request))
-                            chatMessageRepository.deletePendingMessage(pendingMessage)
-                        }
-                    } ?: run {
+                val attachedNode = if (pendingMessage.isVoiceClip) {
+                    chatMessageRepository.attachVoiceMessage(chatId, nodeId.longValue)
+                } else {
+                    chatMessageRepository.attachNode(chatId, nodeId.longValue)
+                }
+                attachedNode?.let {
+                    getChatMessageUseCase(chatId, it)?.let { message ->
+                        val request = createSaveSentMessageRequestUseCase(message, chatId)
+                        chatRepository.storeMessages(listOf(request))
+                        chatMessageRepository.deletePendingMessage(pendingMessage)
+                    }
+                } ?: run {
                     pendingMessage.updateState(
                         PendingMessageState.ERROR_ATTACHING
                     )

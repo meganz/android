@@ -292,7 +292,8 @@ internal class ChatViewModelTest {
     private val deleteMessagesUseCase = mock<DeleteMessagesUseCase>()
     private val editMessageUseCase = mock<EditMessageUseCase>()
     private val editLocationMessageUseCase = mock<EditLocationMessageUseCase>()
-    private val inviteUserAsContactResultOptionMapper = mock<InviteUserAsContactResultOptionMapper>()
+    private val inviteUserAsContactResultOptionMapper =
+        mock<InviteUserAsContactResultOptionMapper>()
     private val inviteContactUseCase = mock<InviteContactUseCase>()
     private val getChatFromContactMessagesUseCase = mock<GetChatFromContactMessagesUseCase>()
     private val getCacheFileUseCase = mock<GetCacheFileUseCase>()
@@ -2406,7 +2407,7 @@ internal class ChatViewModelTest {
             }
             val expected = files.map { it.toString() }
             underTest.onAttachFiles(files)
-            verify(sendChatAttachmentsUseCase).invoke(chatId, expected)
+            verify(sendChatAttachmentsUseCase).invoke(chatId, expected, false)
         }
 
     @Test
@@ -2825,7 +2826,12 @@ internal class ChatViewModelTest {
             whenever(inviteContactUseCase(contactEmail, contactUserHandle, null)).thenReturn(
                 InviteContactRequest.Sent
             )
-            whenever(inviteUserAsContactResultOptionMapper(InviteContactRequest.Sent, contactEmail)).thenReturn(
+            whenever(
+                inviteUserAsContactResultOptionMapper(
+                    InviteContactRequest.Sent,
+                    contactEmail
+                )
+            ).thenReturn(
                 InviteUserAsContactResultOption.ContactInviteSent
             )
 
@@ -2923,6 +2929,14 @@ internal class ChatViewModelTest {
                 underTest.onVoiceClipRecordEvent(VoiceClipRecordEvent.Start)
                 underTest.onVoiceClipRecordEvent(VoiceClipRecordEvent.Cancel)
                 verify(deleteFileUseCase).invoke(path)
+            }
+
+        @Test
+        fun `test that recorded audio is sent when VoiceClipRecordEvent Finish event is received`() =
+            runTest {
+                underTest.onVoiceClipRecordEvent(VoiceClipRecordEvent.Start)
+                underTest.onVoiceClipRecordEvent(VoiceClipRecordEvent.Finish)
+                verify(sendChatAttachmentsUseCase).invoke(chatId, listOf(path), true)
             }
     }
 

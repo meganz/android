@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.meeting.chat.model
 import android.content.Intent
 import android.net.Uri
 import android.util.Base64
-import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -1087,9 +1086,12 @@ class ChatViewModel @Inject constructor(
     /**
      * Attaches files.
      */
-    fun onAttachFiles(files: List<Uri>) {
+    fun onAttachFiles(files: List<Uri>) =
+        onAttachFiles(files.map { it.toString() }, false)
+
+    private fun onAttachFiles(files: List<String>, isVoiceClip: Boolean) {
         viewModelScope.launch {
-            sendChatAttachmentsUseCase(chatId, files.map { it.toString() })
+            sendChatAttachmentsUseCase(chatId, files, isVoiceClip)
                 .catch { Timber.e(it) }
                 .collect {
                     if (it is MultiTransferEvent.TransferNotStarted<*>) {
@@ -1533,8 +1535,7 @@ class ChatViewModel @Inject constructor(
                 }
                 recordAudioJob?.invokeOnCompletion {
                     if (it == StopAndSendVoiceClip) {
-                        //this will be send as a voice clip in AND-17876, for now as an ordinary file
-                        onAttachFiles(listOf(voiceClipFile.toUri()))
+                        onAttachFiles(listOf(voiceClipFile.toString()), true)
                     } else {
                         viewModelScope.launch {
                             deleteFileUseCase(voiceClipFile.toString())
