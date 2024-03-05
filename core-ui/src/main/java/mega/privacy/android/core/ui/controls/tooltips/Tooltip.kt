@@ -23,16 +23,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import kotlinx.coroutines.delay
 import mega.privacy.android.core.ui.theme.MegaTheme
+import mega.privacy.android.core.ui.theme.extensions.body2medium
 
 
 /**
@@ -63,26 +66,39 @@ import mega.privacy.android.core.ui.theme.MegaTheme
 fun Tooltip(
     expanded: MutableState<Boolean>,
     text: String,
-    modifier: Modifier = Modifier,
-) = Tooltip(
-    expanded, modifier
-) {
-    Text(
+) = Tooltip(expanded) {
+    TooltipText(
         text = text,
-        color = MegaTheme.colors.text.inverse,
-        style = MaterialTheme.typography.body2,
+    )
+}
+
+/**
+ * @param expanded Whether the tooltip is currently visible to the user
+ * @param text The text to be shown
+ * @param alignment to position the tooltip instead of default [DropdownMenuPositionProvider]
+ * @param offset
+ */
+@Composable
+fun Tooltip(
+    expanded: MutableState<Boolean>,
+    text: String,
+    alignment: Alignment,
+    offset: IntOffset? = null,
+) = Tooltip(expanded, alignment = alignment, intOffset = offset) {
+    TooltipText(
+        text = text,
     )
 }
 
 @Composable
 internal fun Tooltip(
     expanded: MutableState<Boolean>,
-    modifier: Modifier = Modifier,
     timeoutMillis: Long = TOOLTIP_TIMEOUT,
     properties: PopupProperties = PopupProperties(focusable = false),
+    alignment: Alignment? = null,
+    intOffset: IntOffset? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val offset = DpOffset(0.dp, 0.dp)
     val expandedStates = remember { MutableTransitionState(false) }
     expandedStates.targetState = expanded.value
 
@@ -93,21 +109,48 @@ internal fun Tooltip(
                 expanded.value = false
             }
         }
-
-        Popup(
-            onDismissRequest = { expanded.value = false },
-            popupPositionProvider = DropdownMenuPositionProvider(offset, LocalDensity.current),
-            properties = properties,
-        ) {
-            Box(
-                // Add space for elevation shadow
-                modifier = Modifier.padding(TOOLTIP_ELEVATION.dp),
+        if (alignment == null) {
+            val offset = DpOffset(0.dp, 0.dp)
+            Popup(
+                onDismissRequest = { expanded.value = false },
+                popupPositionProvider = DropdownMenuPositionProvider(offset, LocalDensity.current),
+                properties = properties,
             ) {
-                TooltipContent(expandedStates, MegaTheme.colors.icon.primary, modifier, content)
+                PopupContent(expandedStates, content)
+            }
+        } else {
+            Popup(
+                alignment = alignment,
+                offset = intOffset ?: IntOffset(0, 0),
+                onDismissRequest = { expanded.value = false },
+                properties = properties,
+            ) {
+                PopupContent(expandedStates, content)
             }
         }
     }
 }
+
+@Composable
+private fun PopupContent(
+    expandedStates: MutableTransitionState<Boolean>,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Box(
+        // Add space for elevation shadow
+        modifier = Modifier.padding(TOOLTIP_ELEVATION.dp),
+    ) {
+        TooltipContent(expandedStates, MegaTheme.colors.icon.primary, content)
+    }
+}
+
+@Composable
+private fun TooltipText(text: String) =
+    Text(
+        text = text,
+        color = MegaTheme.colors.text.inverse,
+        style = MaterialTheme.typography.body2medium,
+    )
 
 
 /** @see androidx.compose.material.DropdownMenuContent */
@@ -115,7 +158,6 @@ internal fun Tooltip(
 private fun TooltipContent(
     expandedStates: MutableTransitionState<Boolean>,
     backgroundColor: Color,
-    modifier: Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     // Tooltip open/close animation.
@@ -140,18 +182,18 @@ private fun TooltipContent(
         modifier = Modifier.alpha(alpha),
         elevation = TOOLTIP_ELEVATION.dp,
     ) {
-        val p = TOOLTIP_PADDING.dp
         Column(
-            modifier = modifier
-                .padding(start = p, top = p * 0.5f, end = p, bottom = p * 0.7f)
+            modifier = Modifier
+                .padding(horizontal = TOOLTIP_PADDING_H.dp, vertical = TOOLTIP_PADDING_V.dp)
                 .width(IntrinsicSize.Max),
             content = content,
         )
     }
 }
 
-private const val TOOLTIP_ELEVATION = 16
-private const val TOOLTIP_PADDING = 16
+private const val TOOLTIP_ELEVATION = 0
+private const val TOOLTIP_PADDING_H = 12
+private const val TOOLTIP_PADDING_V = 8
 
 // Tooltip open/close animation duration.
 private const val IN_TRANSITION_DURATION = 64

@@ -1,5 +1,6 @@
 package mega.privacy.android.core.ui.controls.chat
 
+import android.Manifest
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -41,9 +42,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.delay
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.text.MegaText
+import mega.privacy.android.core.ui.controls.tooltips.Tooltip
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
@@ -113,6 +118,7 @@ enum class VoiceClipRecordEvent {
  * @param voiceClipRecorderState
  * @param onVoiceClipEvent callback to notify that a [VoiceClipRecordEvent] just happens
  */
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun VoiceClipRecorderView(
     modifier: Modifier = Modifier,
@@ -121,6 +127,7 @@ fun VoiceClipRecorderView(
     ),
     onVoiceClipEvent: (VoiceClipRecordEvent) -> Unit = {},
 ) {
+    val show = voiceClipRecorderState.value.show
     val density = LocalDensity.current
     val viewHeight =
         remember { with(density) { VOICE_RECORDER_VIEW_HEIGHT_IN_DP.dp.toPx() }.roundToInt() }
@@ -131,179 +138,203 @@ fun VoiceClipRecorderView(
     val textInputBarBottomPadding =
         remember { with(density) { 16.dp.toPx() } }.roundToInt()
     val verticalBarWidth = remember { with(density) { 40.dp.toPx() } }.roundToInt()
-    var isLocked by remember { mutableStateOf(false) }
-    var seconds by remember { mutableIntStateOf(0) }
-    var timerRunning by remember { mutableStateOf(false) }
+    var isLocked by remember(show) { mutableStateOf(false) }
+    var seconds by remember(show) { mutableIntStateOf(0) }
+    var timerRunning by remember(show) { mutableStateOf(false) }
     val screenWidth = LocalConfiguration.current.screenWidthDp
-    var actualViewWidth by remember { mutableIntStateOf(screenWidth) }
+    var actualViewWidth by remember(show) { mutableIntStateOf(screenWidth) }
+    val audioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
+    val showTapAndHoldTooltip = remember { mutableStateOf(false) }
 
-    voiceClipRecorderState.value
-        .takeIf { it.type == PointerEventType.Press && it.event != VoiceClipRecordEvent.Start }
-        ?.run {
-            seconds = 0
-            timerRunning = true
-            sendEvent(VoiceClipRecordEvent.Start, onVoiceClipEvent, voiceClipRecorderState)
-        }
+    Tooltip(
+        expanded = showTapAndHoldTooltip,
+        text = stringResource(id = R.string.recording_less_than_second),
+        alignment = Alignment.TopEnd,
+        offset = IntOffset(0, -textInputBarHeight)
+    )
 
-    voiceClipRecorderState.value.takeIf { it.type == PointerEventType.Release && !isLocked }
-        ?.run {
-            timerRunning = false
-            seconds = 0
-            sendEvent(VoiceClipRecordEvent.Finish, onVoiceClipEvent, voiceClipRecorderState)
-            voiceClipRecorderState.value = VoiceClipRecorderState(show = false)
-            return
-        }
-
-    LaunchedEffect(key1 = timerRunning) {
-        while (timerRunning) {
-            delay(1000L)
-            seconds++
-        }
-    }
-    Popup(
-        alignment = Alignment.TopStart,
-        offset = IntOffset(
-            x = if (voiceClipRecorderState.value.event == VoiceClipRecordEvent.Lock) -textInputBarBottomPadding else 0,
-            y = 0 - (viewHeight - textInputBarHeight)
-        )
-    ) {
-        Box(
-            modifier = modifier
-                .width(actualViewWidth.dp)
-                .padding(
-                    bottom = 10.dp,
-                    start = 16.dp,
-                    end = if (voiceClipRecorderState.value.event == VoiceClipRecordEvent.Lock) 0.dp else 16.dp
-                )
-                .height(VOICE_RECORDER_VIEW_HEIGHT_IN_DP.dp)
-        ) {
-            if (!isLocked) {
-                // vertical bar to lock the recording
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .fillMaxHeight()
-                        .width(40.dp)
-                        .clip(RoundedCornerShape(25.dp))
-                        .background(color = MegaTheme.colors.background.surface1),
-                    contentAlignment = Alignment.TopCenter,
-                ) {
-                    Icon(
-                        modifier = Modifier
-                            .padding(top = 12.dp)
-                            .size(18.dp),
-                        imageVector = ImageVector.vectorResource(R.drawable.ic_icon_lock_medium_regular_solid),
-                        tint = MegaTheme.colors.icon.secondary,
-                        contentDescription = null
-                    )
-                    Icon(
-                        modifier = Modifier
-                            .padding(top = 34.dp)
-                            .size(18.dp),
-                        imageVector = ImageVector.vectorResource(R.drawable.ic_icon_chevron_up_medium_regular_outline),
-                        tint = MegaTheme.colors.icon.disabled,
-                        contentDescription = null
-                    )
-                }
-            }
-
-            // Horizontal bar to cancel the recording and showing recording progress
-            Row(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(
-                        end = if (voiceClipRecorderState.value.event == VoiceClipRecordEvent.Lock) 0.dp else 32.dp
-                    )
-                    .fillMaxWidth()
-                    .height(42.dp)
-                    .clip(RoundedCornerShape(25.dp))
-                    .background(color = MegaTheme.colors.background.surface1),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                TimerWithIndicator(
-                    seconds = seconds,
-                    modifier = Modifier
-                        .wrapContentWidth(Alignment.Start)
-                        .padding(start = 12.dp)
-                )
-
-                if (isLocked) {
-                    Spacer(modifier = Modifier.weight(1f))
-                    RecordingWave()
-                    Spacer(modifier = Modifier.weight(1f))
-                    CancelButton(
-                        modifier = Modifier
-                            .wrapContentWidth(Alignment.End)
-                            .padding(end = 12.dp),
-                        onCancel = {
-                            voiceClipRecorderState.value = VoiceClipRecorderState(show = false)
-                            timerRunning = false
-                            sendEvent(
-                                VoiceClipRecordEvent.Cancel,
-                                onVoiceClipEvent,
-                                voiceClipRecorderState
-                            )
-                        }
-                    )
+    if (show) {
+        voiceClipRecorderState.value
+            .takeIf { it.type == PointerEventType.Press && it.event != VoiceClipRecordEvent.Start }
+            ?.run {
+                if (audioPermissionState.status.isGranted) {
+                    seconds = 0
+                    timerRunning = true
+                    sendEvent(VoiceClipRecordEvent.Start, onVoiceClipEvent, voiceClipRecorderState)
                 } else {
-                    Spacer(modifier = Modifier.weight(1f))
-                    SlideToCancel(
-                        modifier = Modifier
-                            .padding(end = 12.dp)
-                            .offset {
-                                val x = voiceClipRecorderState.value.offsetX
-                                    .roundToInt()
-                                    .takeIf { it < 0 } ?: 0
-                                IntOffset(x, 0)
-                            }
-                    )
+                    audioPermissionState.launchPermissionRequest()
+                    voiceClipRecorderState.value = VoiceClipRecorderState(show = false)
+                    return
                 }
             }
 
-            if (!isLocked) {
-                RecordScroller(
+        voiceClipRecorderState.value.takeIf { it.type == PointerEventType.Release && !isLocked && audioPermissionState.status.isGranted }
+            ?.run {
+                val event = if (seconds < 1) {
+                    showTapAndHoldTooltip.value = true
+                    VoiceClipRecordEvent.Cancel
+                } else {
+                    VoiceClipRecordEvent.Finish
+                }
+
+                timerRunning = false
+                seconds = 0
+                sendEvent(event, onVoiceClipEvent, voiceClipRecorderState)
+                voiceClipRecorderState.value = VoiceClipRecorderState(show = false)
+                return
+            }
+        LaunchedEffect(key1 = timerRunning) {
+            while (timerRunning) {
+                delay(1000L)
+                seconds++
+            }
+        }
+        Popup(
+            alignment = Alignment.TopStart,
+            offset = IntOffset(
+                x = if (voiceClipRecorderState.value.event == VoiceClipRecordEvent.Lock) -textInputBarBottomPadding else 0,
+                y = 0 - (viewHeight - textInputBarHeight)
+            )
+        ) {
+            Box(
+                modifier = modifier
+                    .width(actualViewWidth.dp)
+                    .padding(
+                        bottom = 10.dp,
+                        start = 16.dp,
+                        end = if (voiceClipRecorderState.value.event == VoiceClipRecordEvent.Lock) 0.dp else 16.dp
+                    )
+                    .height(VOICE_RECORDER_VIEW_HEIGHT_IN_DP.dp)
+            ) {
+                if (!isLocked) {
+                    // vertical bar to lock the recording
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .fillMaxHeight()
+                            .width(40.dp)
+                            .clip(RoundedCornerShape(25.dp))
+                            .background(color = MegaTheme.colors.background.surface1),
+                        contentAlignment = Alignment.TopCenter,
+                    ) {
+                        Icon(
+                            modifier = Modifier
+                                .padding(top = 12.dp)
+                                .size(18.dp),
+                            imageVector = ImageVector.vectorResource(R.drawable.ic_icon_lock_medium_regular_solid),
+                            tint = MegaTheme.colors.icon.secondary,
+                            contentDescription = null
+                        )
+                        Icon(
+                            modifier = Modifier
+                                .padding(top = 34.dp)
+                                .size(18.dp),
+                            imageVector = ImageVector.vectorResource(R.drawable.ic_icon_chevron_up_medium_regular_outline),
+                            tint = MegaTheme.colors.icon.disabled,
+                            contentDescription = null
+                        )
+                    }
+                }
+
+                // Horizontal bar to cancel the recording and showing recording progress
+                Row(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .offset {
-                            var x =
-                                if (voiceClipRecorderState.value.offsetX > 0f) 0 else voiceClipRecorderState.value.offsetX.roundToInt()
-                            var y =
-                                if (voiceClipRecorderState.value.offsetY > 0f) 0 else voiceClipRecorderState.value.offsetY.roundToInt()
+                        .padding(
+                            end = if (voiceClipRecorderState.value.event == VoiceClipRecordEvent.Lock) 0.dp else 32.dp
+                        )
+                        .fillMaxWidth()
+                        .height(42.dp)
+                        .clip(RoundedCornerShape(25.dp))
+                        .background(color = MegaTheme.colors.background.surface1),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    TimerWithIndicator(
+                        seconds = seconds,
+                        modifier = Modifier
+                            .wrapContentWidth(Alignment.Start)
+                            .padding(start = 12.dp)
+                    )
 
-                            if (x == 0 && y == 0) { // no movement yet
-                                x = abs(verticalBarWidth - recordScrollerSize) / 2
-                                y =
-                                    abs(textInputBarHeight - recordScrollerSize) / 2
-                            } else if (abs(x) < abs(y)) { // move vertically
-                                x = abs(verticalBarWidth - recordScrollerSize) / 2
-                            } else {  // move horizontally
-                                y =
-                                    abs(textInputBarHeight - recordScrollerSize) / 2
-                            }
-
-                            if (abs(x) > SLIDE_TO_CANCEL_THRESHOLD_IN_PX) {
+                    if (isLocked) {
+                        Spacer(modifier = Modifier.weight(1f))
+                        RecordingWave()
+                        Spacer(modifier = Modifier.weight(1f))
+                        CancelButton(
+                            modifier = Modifier
+                                .wrapContentWidth(Alignment.End)
+                                .padding(end = 12.dp),
+                            onCancel = {
                                 voiceClipRecorderState.value = VoiceClipRecorderState(show = false)
                                 timerRunning = false
-                                seconds = 0
                                 sendEvent(
                                     VoiceClipRecordEvent.Cancel,
                                     onVoiceClipEvent,
                                     voiceClipRecorderState
                                 )
-                            } else if (abs(y) > (viewHeight - recordScrollerSize)) {
-                                // in lock mode, we reduce the width of parent Popup, so the send
-                                // button is visible and clickable.
-                                actualViewWidth = screenWidth - 48
-                                isLocked = true
-                                sendEvent(
-                                    VoiceClipRecordEvent.Lock,
-                                    onVoiceClipEvent,
-                                    voiceClipRecorderState
-                                )
                             }
-                            IntOffset(x, y)
-                        }
-                )
+                        )
+                    } else {
+                        Spacer(modifier = Modifier.weight(1f))
+                        SlideToCancel(
+                            modifier = Modifier
+                                .padding(end = 12.dp)
+                                .offset {
+                                    val x = voiceClipRecorderState.value.offsetX
+                                        .roundToInt()
+                                        .takeIf { it < 0 } ?: 0
+                                    IntOffset(x, 0)
+                                }
+                        )
+                    }
+                }
+
+                if (!isLocked) {
+                    RecordScroller(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .offset {
+                                var x =
+                                    if (voiceClipRecorderState.value.offsetX > 0f) 0 else voiceClipRecorderState.value.offsetX.roundToInt()
+                                var y =
+                                    if (voiceClipRecorderState.value.offsetY > 0f) 0 else voiceClipRecorderState.value.offsetY.roundToInt()
+
+                                if (x == 0 && y == 0) { // no movement yet
+                                    x = abs(verticalBarWidth - recordScrollerSize) / 2
+                                    y =
+                                        abs(textInputBarHeight - recordScrollerSize) / 2
+                                } else if (abs(x) < abs(y)) { // move vertically
+                                    x = abs(verticalBarWidth - recordScrollerSize) / 2
+                                } else {  // move horizontally
+                                    y =
+                                        abs(textInputBarHeight - recordScrollerSize) / 2
+                                }
+
+                                if (abs(x) > SLIDE_TO_CANCEL_THRESHOLD_IN_PX) {
+                                    voiceClipRecorderState.value =
+                                        VoiceClipRecorderState(show = false)
+                                    timerRunning = false
+                                    seconds = 0
+                                    sendEvent(
+                                        VoiceClipRecordEvent.Cancel,
+                                        onVoiceClipEvent,
+                                        voiceClipRecorderState
+                                    )
+                                } else if (abs(y) > (viewHeight - recordScrollerSize)) {
+                                    // in lock mode, we reduce the width of parent Popup, so the send
+                                    // button is visible and clickable.
+                                    actualViewWidth = screenWidth - 48
+                                    isLocked = true
+                                    sendEvent(
+                                        VoiceClipRecordEvent.Lock,
+                                        onVoiceClipEvent,
+                                        voiceClipRecorderState
+                                    )
+                                }
+                                IntOffset(x, y)
+                            }
+                    )
+                }
             }
         }
     }

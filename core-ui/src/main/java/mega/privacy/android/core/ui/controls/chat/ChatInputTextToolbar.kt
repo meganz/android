@@ -127,12 +127,10 @@ fun ChatInputTextToolbar(
                 tint = MegaTheme.colors.icon.secondary,
             )
         }
-        if (voiceClipRecorderState.value.show) {
-            VoiceClipRecorderView(
-                voiceClipRecorderState = voiceClipRecorderState,
-                onVoiceClipEvent = onVoiceClipEvent,
-            )
-        }
+        VoiceClipRecorderView(
+            voiceClipRecorderState = voiceClipRecorderState,
+            onVoiceClipEvent = onVoiceClipEvent,
+        )
         Column {
             Row {
                 Icon(
