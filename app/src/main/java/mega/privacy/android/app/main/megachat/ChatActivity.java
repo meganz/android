@@ -420,17 +420,29 @@ import mega.privacy.android.domain.entity.contacts.ContactLink;
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus;
 import mega.privacy.android.domain.usecase.GetPushToken;
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase;
+import mega.privacy.mobile.analytics.event.ChatConversationAddParticipantsMenuToolbarEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationAddToCloudDriveActionMenuEvent;
+import mega.privacy.mobile.analytics.event.ChatConversationArchiveMenuToolbarEvent;
+import mega.privacy.mobile.analytics.event.ChatConversationCallMenuToolbarEvent;
+import mega.privacy.mobile.analytics.event.ChatConversationClearMenuToolbarEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationCopyActionMenuEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationDeleteActionMenuEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationDownloadActionMenuEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationEditActionMenuEvent;
+import mega.privacy.mobile.analytics.event.ChatConversationEndCallForAllMenuToolbarEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationForwardActionMenuEvent;
+import mega.privacy.mobile.analytics.event.ChatConversationHomeUpMenuToolbarEvent;
+import mega.privacy.mobile.analytics.event.ChatConversationInfoMenuToolbarEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationInviteActionMenuEvent;
+import mega.privacy.mobile.analytics.event.ChatConversationLeaveMenuToolbarEvent;
+import mega.privacy.mobile.analytics.event.ChatConversationMuteMenuToolbarEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationScreenEvent;
+import mega.privacy.mobile.analytics.event.ChatConversationSelectMenuToolbarEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationSendMessageActionMenuEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationShareActionMenuEvent;
 import mega.privacy.mobile.analytics.event.ChatMessageLongPressedEvent;
+import mega.privacy.mobile.analytics.event.ChatConversationUnmuteMenuToolbarEvent;
+import mega.privacy.mobile.analytics.event.ChatConversationVideoMenuToolbarEvent;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -3252,6 +3264,8 @@ public class ChatActivity extends PasscodeActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         Timber.d("onOptionsItemSelected");
 
+        trackOptionsItemSelected(item.getItemId());
+
         if (viewModel.getStorageState() == StorageState.PayWall &&
                 (item.getItemId() == R.id.cab_menu_call_chat || item.getItemId() == R.id.cab_menu_video_chat)) {
             showOverDiskQuotaPaywallWarning();
@@ -3330,6 +3344,34 @@ public class ChatActivity extends PasscodeActivity
             MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(this, NOTIFICATIONS_ENABLED, chatRoom.getChatId());
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void trackOptionsItemSelected(int itemId) {
+        if (itemId == android.R.id.home) {
+            Analytics.INSTANCE.getTracker().trackEvent(ChatConversationHomeUpMenuToolbarEvent.INSTANCE);
+        } else if (itemId == R.id.cab_menu_call_chat) {
+            Analytics.INSTANCE.getTracker().trackEvent(ChatConversationCallMenuToolbarEvent.INSTANCE);
+        } else if (itemId == R.id.cab_menu_video_chat) {
+            Analytics.INSTANCE.getTracker().trackEvent(ChatConversationVideoMenuToolbarEvent.INSTANCE);
+        } else if (itemId == R.id.cab_menu_select_messages) {
+            Analytics.INSTANCE.getTracker().trackEvent(ChatConversationSelectMenuToolbarEvent.INSTANCE);
+        } else if (itemId == R.id.cab_menu_invite_chat) {
+            Analytics.INSTANCE.getTracker().trackEvent(ChatConversationAddParticipantsMenuToolbarEvent.INSTANCE);
+        } else if (itemId == R.id.cab_menu_contact_info_chat) {
+            Analytics.INSTANCE.getTracker().trackEvent(ChatConversationInfoMenuToolbarEvent.INSTANCE);
+        } else if (itemId == R.id.cab_menu_clear_history_chat) {
+            Analytics.INSTANCE.getTracker().trackEvent(ChatConversationClearMenuToolbarEvent.INSTANCE);
+        } else if (itemId == R.id.cab_menu_leave_chat) {
+            Analytics.INSTANCE.getTracker().trackEvent(ChatConversationLeaveMenuToolbarEvent.INSTANCE);
+        } else if (itemId == R.id.cab_menu_end_call_for_all) {
+            Analytics.INSTANCE.getTracker().trackEvent(ChatConversationEndCallForAllMenuToolbarEvent.INSTANCE);
+        } else if (itemId == R.id.cab_menu_archive_chat) {
+            Analytics.INSTANCE.getTracker().trackEvent(ChatConversationArchiveMenuToolbarEvent.INSTANCE);
+        } else if (itemId == R.id.cab_menu_mute_chat) {
+            Analytics.INSTANCE.getTracker().trackEvent(ChatConversationMuteMenuToolbarEvent.INSTANCE);
+        } else if (itemId == R.id.cab_menu_unmute_chat) {
+            Analytics.INSTANCE.getTracker().trackEvent(ChatConversationUnmuteMenuToolbarEvent.INSTANCE);
+        }
     }
 
     /*
