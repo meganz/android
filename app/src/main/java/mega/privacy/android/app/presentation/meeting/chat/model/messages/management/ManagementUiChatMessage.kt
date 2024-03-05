@@ -38,6 +38,7 @@ abstract class ManagementUiChatMessage : UiChatMessage {
         onReactionLongClick: (String, List<UIReaction>) -> Unit,
         onForwardClicked: (TypedMessage) -> Unit,
         onSelectedChanged: (Boolean) -> Unit,
+        onSendErrorClicked: (TypedMessage) -> Unit,
     ) {
         ChatMessageContainer(
             modifier = Modifier.fillMaxWidth(),

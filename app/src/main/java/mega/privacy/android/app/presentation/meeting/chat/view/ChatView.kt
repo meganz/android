@@ -803,6 +803,7 @@ internal fun ChatView(
                                     selectItem = selectItem,
                                     deselectItem = deselectItem,
                                     selectMode = isSelectMode,
+                                    onSendErrorClick = { TODO("Not implemented") }
                                 )
                             )
 
