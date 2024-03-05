@@ -70,6 +70,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuActi
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
+import mega.privacy.android.app.presentation.meeting.chat.model.InviteUserAsContactResultOption
 import mega.privacy.android.app.presentation.meeting.chat.saver.ChatSavers
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.MessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.ChatAppBar
@@ -87,6 +88,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAt
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatFragment
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatPicker
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openContactInfoActivity
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openSentRequests
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.showGroupOrContactInfoActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startLoginActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startMeetingActivity
@@ -910,18 +912,33 @@ internal fun ChatView(
             ) { info ->
                 info?.let {
                     info.getInfo(context).let { text ->
-                        if (info is InfoToShow.ForwardMessagesResult) {
-                            info.result.getOpenChatId(chatId)?.let { openChatId ->
-                                val result = scaffoldState.snackbarHostState.showSnackbar(
+                        when {
+                            info is InfoToShow.ForwardMessagesResult -> {
+                                info.result.getOpenChatId(chatId)?.let { openChatId ->
+                                    val result = scaffoldState.snackbarHostState.showSnackbar(
+                                        text,
+                                        context.getString(R.string.general_confirmation_open)
+                                    )
+                                    if (result == SnackbarResult.ActionPerformed) {
+                                        openChatFragment(context, openChatId)
+                                    }
+                                } ?: scaffoldState.snackbarHostState.showSnackbar(text)
+                            }
+
+                            info is InfoToShow.InviteUserAsContactResult &&
+                                    info.result is InviteUserAsContactResultOption.ContactInviteSent -> {
+
+                                scaffoldState.snackbarHostState.showSnackbar(
                                     text,
-                                    context.getString(R.string.general_confirmation_open)
-                                )
-                                if (result == SnackbarResult.ActionPerformed) {
-                                    openChatFragment(context, openChatId)
+                                    context.getString(R.string.action_see)
+                                ).also { result ->
+                                    if (result == SnackbarResult.ActionPerformed) {
+                                        openSentRequests(context)
+                                    }
                                 }
-                            } ?: scaffoldState.snackbarHostState.showSnackbar(text)
-                        } else {
-                            scaffoldState.snackbarHostState.showSnackbar(text)
+                            }
+
+                            else -> scaffoldState.snackbarHostState.showSnackbar(text)
                         }
                     }
                 } ?: context.findActivity()?.finish()

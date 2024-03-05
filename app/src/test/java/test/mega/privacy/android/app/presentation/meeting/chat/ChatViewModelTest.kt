@@ -23,6 +23,7 @@ import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
+import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteUserAsContactResultOptionMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ParticipantNameMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.ActionToManage
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
@@ -32,6 +33,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.chat.model.ForwardMessagesToChatsResult
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.meeting.chat.model.InviteContactToChatResult
+import mega.privacy.android.app.presentation.meeting.chat.model.InviteUserAsContactResultOption
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -55,6 +57,7 @@ import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.ForwardResult
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
+import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.node.NodeId
@@ -113,6 +116,7 @@ import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCas
 import mega.privacy.android.domain.usecase.contact.GetParticipantFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserUseCase
+import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorAllContactParticipantsInChatUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
@@ -277,6 +281,8 @@ internal class ChatViewModelTest {
     private val deleteMessagesUseCase = mock<DeleteMessagesUseCase>()
     private val editMessageUseCase = mock<EditMessageUseCase>()
     private val editLocationMessageUseCase = mock<EditLocationMessageUseCase>()
+    private val inviteUserAsContactResultOptionMapper = mock<InviteUserAsContactResultOptionMapper>()
+    private val inviteContactUseCase = mock<InviteContactUseCase>()
     private val getChatFromContactMessagesUseCase = mock<GetChatFromContactMessagesUseCase>()
 
     @BeforeEach
@@ -336,6 +342,8 @@ internal class ChatViewModelTest {
             deleteMessagesUseCase,
             editMessageUseCase,
             editLocationMessageUseCase,
+            inviteUserAsContactResultOptionMapper,
+            inviteContactUseCase,
             getChatFromContactMessagesUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
@@ -436,6 +444,8 @@ internal class ChatViewModelTest {
             deleteMessagesUseCase = deleteMessagesUseCase,
             editMessageUseCase = editMessageUseCase,
             editLocationMessageUseCase = editLocationMessageUseCase,
+            inviteUserAsContactResultOptionMapper = inviteUserAsContactResultOptionMapper,
+            inviteContactUseCase = inviteContactUseCase,
             getChatFromContactMessagesUseCase = getChatFromContactMessagesUseCase,
         )
     }
@@ -2780,6 +2790,31 @@ internal class ChatViewModelTest {
                         .content as InfoToShow.SimpleString).stringId
                     assertThat(result).isEqualTo(R.string.error_editing_message)
                 }
+            }
+        }
+
+    @Test
+    fun `test that show successful info note when adding one new contact is sent successfully`() =
+        runTest {
+            val contactUserHandle = 1234L
+            val contactEmail = "a@b.c"
+            val contactMessage = mock<ContactAttachmentMessage> {
+                on { this.contactHandle } doReturn contactUserHandle
+                on { this.contactEmail } doReturn contactEmail
+            }
+            whenever(inviteContactUseCase(contactEmail, contactUserHandle, null)).thenReturn(
+                InviteContactRequest.Sent
+            )
+            whenever(inviteUserAsContactResultOptionMapper(InviteContactRequest.Sent, contactEmail)).thenReturn(
+                InviteUserAsContactResultOption.ContactInviteSent
+            )
+
+            initTestClass()
+            underTest.inviteContacts(setOf(contactMessage))
+            underTest.state.test {
+                val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered)
+                    .content as InfoToShow.InviteUserAsContactResult).result
+                assertThat(result).isInstanceOf(InviteUserAsContactResultOption.ContactInviteSent::class.java)
             }
         }
 

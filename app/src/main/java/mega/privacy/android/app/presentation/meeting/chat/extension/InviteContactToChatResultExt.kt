@@ -26,5 +26,7 @@ fun InviteContactToChatResult.toInfoText(context: Context) = when (this) {
         R.string.number_correctly_add_participant,
         success
     )
+
+    else -> ""
 }
 

@@ -9,6 +9,8 @@ import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
  * @property contactEmail Contact email
  * @property contactUserName Contact name
  * @property contactHandle Contact handle
+ * @property status Status
+ * @property isMe True if the contact is me
  * @property isContact True if it is a contact, false otherwise
  */
 @Serializable
@@ -27,5 +29,6 @@ data class ContactAttachmentMessage(
     val contactEmail: String,
     val contactUserName: String,
     val contactHandle: Long,
+    val isMe: Boolean,
     val isContact: Boolean,
 ) : TypedMessage
