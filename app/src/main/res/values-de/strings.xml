@@ -795,7 +795,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Vergrößern Sie Ihre Cloud. [A]Holen Sie sich mit einem Pro-Account mehr Speicherplatz und Transfervolumen.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">Diese E-Mail-Adresse ist bereits belegt. Bitte verwenden Sie eine andere E-Mail-Adresse.</string>
+    <string name="mail_already_used">Email address already in use. Enter another email address.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
     <string name="mail_changed_confirm_requested">Sie haben einen Bestätigungslink für diese E-Mail-Adresse angefordert.</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
@@ -5272,10 +5272,10 @@
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Gewähren Sie Zugriff auf Ihre Galerie</string>
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Zugriff gewähren</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
-    <string name="meetings_chat_screen_app_update_dialog_title">Update required</string>
+    <string name="meetings_chat_screen_app_update_dialog_title">Update erforderlich</string>
     <string name="meetings_chat_screen_app_update_dialog_message">Da Sie nicht die neueste Version unserer App verwenden, können Sie keine Anrufe oder Konferenzen starten oder an diesen teilnehmen. Führen Sie jetzt ein Update durch, um fortzufahren.</string>
     <string name="meetings_chat_screen_app_update_dialog_update_button">Aktualisieren</string>
-    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Dismiss</string>
+    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Später</string>
     <!-- Title of the bottom panel when the only host left the call on meeting screen -->
     <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Zum Verlassen der Konferenz Gastgeber zuweisen</string>
     <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
@@ -5284,4 +5284,39 @@
     <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">Zuweisen und verlassen</string>
     <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
     <string name="meeting_call_screen_bottom_panel_leave_option">Trotzdem verlassen</string>
+    <!-- Camera uploads updated info in Photos screen. -->
+    <string name="photos_camera_uploads_updated">Kamera-Uploads aktualisiert</string>
+    <!-- Camera uploads no internet info in Photos screen. -->
+    <string name="photos_camera_uploads_no_internet">Upload-Pause wegen fehlender Internetverbindung</string>
+    <!-- Camera uploads low battery info in Photos screen. -->
+    <string name="photos_camera_uploads_low_battery">Upload paused. Battery below %1$d%% and not charging.</string>
+    <!-- Camera uploads general issue info in Photos screen. -->
+    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists please contact support</string>
+    <!-- Camera uploads pending info in Photos screen. -->
+    <plurals name="photos_camera_uploads_pending">
+        <item quantity="one">Kamera-Uploads aktiv, noch %1$d Datei</item>
+        <item quantity="other">Kamera-Uploads aktiv, noch %1$d Dateien</item>
+    </plurals>
+    <!-- Camera uploads completed info in Photos screen. -->
+    <plurals name="photos_camera_uploads_completed">
+        <item quantity="one">Kamera-Uploads abgeschlossen, %1$d Datei hochgeladen</item>
+        <item quantity="other">Kamera-Uploads abgeschlossen, %1$d Dateien hochgeladen</item>
+    </plurals>
+    <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Your free plan has a 60 minute limit on meetings. Pro users have unlimited calls and up to 1000 participants.[/A] [B]Upgrade now.[/B]</string>
+    <!-- Bottom sheet button to hide a node/file -->
+    <string name="general_hide_node">Nicht anzeigen</string>
+    <!-- Bottom sheet button to unhide a node/file -->
+    <string name="general_unhide_node">Unhide</string>
+    <!-- Promo label for promo notification section -->
+    <string name="notifications_screen_notification_label_promo">Aktion</string>
+    <!-- Promo notification section title for promo notification section -->
+    <string name="notifications_screen_notification_section_title">Limited time offer</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_change_sfu_dialog_title">Change SFU Server</string>
+    <string name="meetings_change_sfu_dialog_subtitle">Der Standardwert ist -1</string>
+    <string name="meetings_change_sfu_dialog_hint">SFU-ID eingeben</string>
+    <string name="meetings_change_sfu_dialog_action_button">Ändern</string>
+    <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Free plans have a limit of 60 minutes per meeting. [A]Upgrade now.[/A]</string>
 </resources>

@@ -125,7 +125,7 @@
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">Não é possível mover ou renomear</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">Aguardando a análise de deletado ou de movimento</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning">Eliminação ou o movimento pendente de análise</string>
     <!-- Sync stalled issue reason is delete or move-->
     <string name="sync_stalled_issue_delete_or_move">Ainda não é possível deletar</string>
     <!-- Sync stalled issue reason is upload issue-->
@@ -171,7 +171,7 @@
     <!-- Sync stalled issue reason is upload issue detailed description-->
     <string name="sync_stalled_issue_upload_issue_detail">Não foi possível acessar a pasta de destino</string>
     <!-- Sync stalled issue reason is download issue detailed description-->
-    <string name="sync_stalled_issue_download_issue_detail">Ocorreu uma falha ao fazer o download do arquivo ou ao mover o arquivo temporário para a sua localização final</string>
+    <string name="sync_stalled_issue_download_issue_detail">Houve um problema ao fazer o download do arquivo ou ao mover o arquivo temporário para a sua localização final</string>
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">Um erro local está impedindo o acesso à pasta</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
@@ -189,7 +189,7 @@
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">Uma movimentação ou renomeação foi detectada no MEGA, mas não foi possível replicá-la no dispositivo local.</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">Uma movimentação ou renomeação foi detectada no dispositivo local, mas não foi possível replicá-la no MEGA.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">Foi detectado que uma mudança ou renomeação foi feita localmente, mas não foi possível replicá-la no MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Esperando terminar de escanear para comprovar se o arquivo foi movido ou deletado.</string>
     <!-- Sync subtitle for sync screen to choose folders-->

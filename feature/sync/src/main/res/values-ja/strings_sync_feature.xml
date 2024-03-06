@@ -181,9 +181,9 @@
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">MEGAで移動または名前変更が検出されましたが、ローカルで複製できませんでした。</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">移動または名前変更がローカルで検出されましたが、MEGAで複製できませんでした。</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">移動または名前変更がローカルで行われたものとして検出されましたが、MEGAでは複製できませんでした。</string>
     <!-- Sync stalled issue delete or move scanning detail-->
-    <string name="sync_stalled_issue_delete_or_move_scanning_detail">ファイルが移動または削除されたかどうかを確認するために、スキャンが完了するのを待っています。</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning_detail">ファイルが移動または削除されたかどうかを判断するために、スキャンが完了するのを待っています。</string>
     <!-- Sync subtitle for sync screen to choose folders-->
     <string name="sync_choose_folders">フォルダを選択</string>
 </resources>

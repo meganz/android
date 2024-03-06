@@ -47,9 +47,9 @@
     <!-- Sync to resolve conflict Merge folders -->
     <string name="sync_stalled_issue_merge_folders">Mappen samenvoegen</string>
     <!-- Sync to resolve conflict Choose local file -->
-    <string name="sync_stalled_issue_choose_local_file">Choose the local file</string>
+    <string name="sync_stalled_issue_choose_local_file">Kies het lokale bestand</string>
     <!-- Sync to resolve conflict Choose remote file -->
-    <string name="sync_stalled_issue_choose_remote_file">Choose the file stored in MEGA</string>
+    <string name="sync_stalled_issue_choose_remote_file">Kies het bestand dat is opgeslagen in MEGA</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">Kies het laatst gewijzigd bestand</string>
     <!-- Sync message when conflict resolved -->
@@ -121,7 +121,7 @@
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">Kan niet verplaatsen of hernoemen</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">Verwijdering of verplaatsing wachtend op scannen</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning">Verwijdering of verplaatsing in wacht terwijl u scant</string>
     <!-- Sync stalled issue reason is delete or move-->
     <string name="sync_stalled_issue_delete_or_move">Kan niet verwijderen</string>
     <!-- Sync stalled issue reason is upload issue-->
@@ -167,7 +167,7 @@
     <!-- Sync stalled issue reason is upload issue detailed description-->
     <string name="sync_stalled_issue_upload_issue_detail">Kan de doelmap niet bereiken</string>
     <!-- Sync stalled issue reason is download issue detailed description-->
-    <string name="sync_stalled_issue_download_issue_detail">Er is een fout opgetreden bij het downloaden van het bestand of bij het verplaatsen van het gedownloade tijdelijke bestand naar de uiteindelijke locatie</string>
+    <string name="sync_stalled_issue_download_issue_detail">Er is een fout opgetreden bij het downloaden van het bestand of bij het verplaatsen van het gedownloade tijdelijke bestand naar de uiteindelijke locatie.</string>
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">Een lokale fout verhindert maptoegang</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
@@ -185,9 +185,9 @@
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">Er is een verplaatsing of hernoeming gedetecteerd in MEGA, maar deze kon niet lokaal worden gerepliceerd.</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">Er is lokaal een verplaatsing of hernoeming gedetecteerd, maar deze kon niet worden gerepliceerd in MEGA.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">Verplaatsen of hernoemen werd lokaal gedetecteerd, maar kon niet worden gerepliceerd in MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
-    <string name="sync_stalled_issue_delete_or_move_scanning_detail">Wachten op voltooiing van de scan om te zien of het bestand is verplaatst of verwijderd.</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning_detail">Wacht tot de scan is voltooid om te bepalen of het bestand is verplaatst of verwijderd.</string>
     <!-- Sync subtitle for sync screen to choose folders-->
     <string name="sync_choose_folders">Kies mappen</string>
 </resources>

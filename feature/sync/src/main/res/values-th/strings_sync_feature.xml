@@ -163,7 +163,7 @@
     <!-- Sync stalled issue reason is upload issue detailed description-->
     <string name="sync_stalled_issue_upload_issue_detail">ไม่สามารถเข้าถึงโฟลเดอร์ปลายทางได้</string>
     <!-- Sync stalled issue reason is download issue detailed description-->
-    <string name="sync_stalled_issue_download_issue_detail">การดาวน์โหลดไฟล์ไม่สำเร็จ หรือ การย้ายไฟล์ชั่วคราวไปยังตำแหน่งที่ต้องการไม่สำเร็จ</string>
+    <string name="sync_stalled_issue_download_issue_detail">ไฟล์ไม่สามารถดาวน์โหลดได้ เนื่องจากเกิดข้อผิดพลาดระหว่างการดาวน์โหลดไฟล์ หรือระหว่างการย้ายไฟล์ที่ดาวน์โหลดแล้วไปยังตำแหน่งปลายทาง</string>
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">ไม่สามารถสร้างโฟลเดอร์ได้เนื่องจากข้อผิดพลาดภายในระบบ</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
@@ -181,9 +181,9 @@
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">มีการย้ายหรือเปลี่ยนชื่อไฟล์ใน MEGA แต่ไม่สามารถซิงค์กับอุปกรณ์ของคุณได้</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">มีการย้ายหรือเปลี่ยนชื่อไฟล์ในอุปกรณ์ แต่ไม่สามารถซิงค์กับ MEGA ของคุณได้</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">ระบบตรวจพบว่ามีการย้ายหรือเปลี่ยนชื่อไฟล์ในเครื่องของคุณ แต่ไม่สามารถจำลองการเปลี่ยนแปลงนี้บน MEGA ได้</string>
     <!-- Sync stalled issue delete or move scanning detail-->
-    <string name="sync_stalled_issue_delete_or_move_scanning_detail">กำลังสแกนไฟล์เพื่อดูว่าไฟล์ถูกลบหรือย้ายไปยังตำแหน่งอื่น</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning_detail">กำลังรอการสแกนเพื่อดูว่าไฟล์ถูกย้ายหรือลบไปหรือไม่</string>
     <!-- Sync subtitle for sync screen to choose folders-->
     <string name="sync_choose_folders">เลือกโฟลเดอร์</string>
 </resources>

@@ -786,7 +786,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">ขยับขยายคลาวด์ของคุณ[A]รับพื้นที่เก็บข้อมูลที่เพิ่มขึ้นและโควต้าการถ่ายโอนด้วยบัญชี Pro</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">อีเมลนี้ได้ถูกใช้งานไปแล้ว กรุณาใช้อีเมลอันอื่น</string>
+    <string name="mail_already_used">อีเมลนี้ถูกใช้งานแล้ว กรุณากรอกอีเมลอื่น</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
     <string name="mail_changed_confirm_requested">คุณได้ส่งคำขอลิงก์ยืนยันสำหรับที่อยู่อีเมลนั้นแล้ว</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
@@ -4994,7 +4994,7 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">โทรหาทั้งหมด</string>
     <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
-    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">บัญชี MEGA ที่ใช้อยู่ในแอปพลิเคชันนี้ไม่ตรงกับบัญชี MEGA VPN ของคุณ\nกรุณาออกจากระบบบัญชีนี้ก่อน แล้วเข้าสู่ระบบด้วยบัญชี MEGA VPN ของคุณอีกครั้ง</string>
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">บัญชี MEGA ที่ใช้อยู่ในแอปพลิเคชันนี้ไม่ตรงกับบัญชี MEGA VPN ของคุณ\nกรุณาออกจากระบบบัญชีนี้ก่อน แล้วเข้าสู่ระบบด้วยบัญชี MEGA&#160;VPN ของคุณอีกครั้ง</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
     <string name="chat_attach_pick_from_camera_deny_permission">MEGA ต้องการเข้าถึงกล้องของคุณเพื่อถ่ายภาพและวิดีโอ</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
@@ -5049,4 +5049,37 @@
     <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">มอบหมายและออกจากการเป็นผู้จัดการประชุม</string>
     <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
     <string name="meeting_call_screen_bottom_panel_leave_option">ยืนยันที่จะออก</string>
+    <!-- Camera uploads updated info in Photos screen. -->
+    <string name="photos_camera_uploads_updated">การอัปโหลดจากกล้องได้อัปเดตล่าสุดแล้ว</string>
+    <!-- Camera uploads no internet info in Photos screen. -->
+    <string name="photos_camera_uploads_no_internet">การอัปโหลดถูกหยุดชั่วคราวเนื่องจากการเชื่อมต่ออินเทอร์เน็ตขาดหายไป</string>
+    <!-- Camera uploads low battery info in Photos screen. -->
+    <string name="photos_camera_uploads_low_battery">Upload paused. Battery below %1$d%% and not charging.</string>
+    <!-- Camera uploads general issue info in Photos screen. -->
+    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists please contact support</string>
+    <!-- Camera uploads pending info in Photos screen. -->
+    <plurals name="photos_camera_uploads_pending">
+        <item quantity="other">การอัปโหลดจากกล้องกำลังอยู่ในระหว่างดำเนินการ มี %1$d ไฟล์รอดำเนินการ</item>
+    </plurals>
+    <!-- Camera uploads completed info in Photos screen. -->
+    <plurals name="photos_camera_uploads_completed">
+        <item quantity="other">การอัปโหลดจากกล้องเสร็จสมบูรณ์ มี %1$d ไฟล์ที่อัปโหลดแล้ว</item>
+    </plurals>
+    <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Your free plan has a 60 minute limit on meetings. Pro users have unlimited calls and up to 1000 participants.[/A] [B]Upgrade now.[/B]</string>
+    <!-- Bottom sheet button to hide a node/file -->
+    <string name="general_hide_node">ซ่อน</string>
+    <!-- Bottom sheet button to unhide a node/file -->
+    <string name="general_unhide_node">Unhide</string>
+    <!-- Promo label for promo notification section -->
+    <string name="notifications_screen_notification_label_promo">โปรโมชั่น</string>
+    <!-- Promo notification section title for promo notification section -->
+    <string name="notifications_screen_notification_section_title">ข้อเสนอสุดพิเศษ</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_change_sfu_dialog_title">Change SFU Server</string>
+    <string name="meetings_change_sfu_dialog_subtitle">ค่าเริ่มต้นคือ -1</string>
+    <string name="meetings_change_sfu_dialog_hint">กรอกไอดี SFU</string>
+    <string name="meetings_change_sfu_dialog_action_button">เปลี่ยน</string>
+    <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Free plans have a limit of 60 minutes per meeting. [A]Upgrade now.[/A]</string>
 </resources>

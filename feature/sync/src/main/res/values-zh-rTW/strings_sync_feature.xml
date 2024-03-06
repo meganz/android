@@ -43,9 +43,9 @@
     <!-- Sync to resolve conflict Merge folders -->
     <string name="sync_stalled_issue_merge_folders">合併資料夾</string>
     <!-- Sync to resolve conflict Choose local file -->
-    <string name="sync_stalled_issue_choose_local_file">Choose the local file</string>
+    <string name="sync_stalled_issue_choose_local_file">選擇本地檔案</string>
     <!-- Sync to resolve conflict Choose remote file -->
-    <string name="sync_stalled_issue_choose_remote_file">Choose the file stored in MEGA</string>
+    <string name="sync_stalled_issue_choose_remote_file">選擇儲存在MEGA中的檔案</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">選擇最後修改的檔案</string>
     <!-- Sync message when conflict resolved -->
@@ -117,7 +117,7 @@
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">無法移動或重新命名</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">刪除或移動，等待掃描中</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning">等待刪除或移動的掃描中</string>
     <!-- Sync stalled issue reason is delete or move-->
     <string name="sync_stalled_issue_delete_or_move">還無法刪除</string>
     <!-- Sync stalled issue reason is upload issue-->
@@ -133,7 +133,7 @@
     <!-- Sync stalled issue reason is Folder Matched Against File-->
     <string name="sync_stalled_issue_folder_matched_against_file">您嘗試同步的檔案沒有副檔名，並且與現有資料夾的名稱相同</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Item changed since last sync</string>
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync">自上次同步以來，項目已更改</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->
     <string name="sync_stalled_issue_local_and_remote_not_synced">檔案或資料夾衝突</string>
     <!-- Sync stalled issue reason is Name clash-->
@@ -163,7 +163,7 @@
     <!-- Sync stalled issue reason is upload issue detailed description-->
     <string name="sync_stalled_issue_upload_issue_detail">無法到達目的資料夾</string>
     <!-- Sync stalled issue reason is download issue detailed description-->
-    <string name="sync_stalled_issue_download_issue_detail">下載檔案或將下載的暫存檔案移動到其最終位置時發生失敗</string>
+    <string name="sync_stalled_issue_download_issue_detail">下載檔案或將下載的暫存檔案移到其最終位置時發生出錯</string>
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">一個阻止資料夾存取的本地錯誤</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
@@ -181,9 +181,9 @@
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">在MEGA中偵測到移動或重新命名的變動，但無法在本地複製。</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">在本地偵測到移動或重新命名的變動，但無法在MEGA中複製。</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">偵測到本地發生的移動或重新命名，但無法在MEGA中複製。</string>
     <!-- Sync stalled issue delete or move scanning detail-->
-    <string name="sync_stalled_issue_delete_or_move_scanning_detail">等待完成掃描以查看檔案是否被移動或刪除。</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning_detail">等待掃描完成以確定檔案是否已移動或刪除。</string>
     <!-- Sync subtitle for sync screen to choose folders-->
     <string name="sync_choose_folders">選擇資料夾</string>
 </resources>

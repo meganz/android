@@ -795,7 +795,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Laat uw cloud groeien.[A]Krijg meer opslag- en overdrachttegoed met een Pro-account.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">Dit e-mailadres is al in gebruik. Gelieve een ander e-mailadres te gebruiken.</string>
+    <string name="mail_already_used">E-mailadres is al in gebruik. Voer een ander e-mailadres in.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
     <string name="mail_changed_confirm_requested">U heeft al een bevestigingslink voor dat e-mailadres gevraagd.</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
@@ -5226,7 +5226,7 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Iedereen bellen</string>
     <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
-    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">Deze applicatie is aangemeld bij een ander MEGA-account. \nLog uit bij dit account en log in met uw MEGA VPN-account.</string>
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">Deze applicatie is aangemeld bij een ander MEGA-account. \nLog uit bij dit account en log in met uw MEGA&#160;VPN-account.</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
     <string name="chat_attach_pick_from_camera_deny_permission">MEGA heeft toegang tot uw camera nodig om foto\’s en video\’s vast te leggen</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
@@ -5272,16 +5272,51 @@
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Geef toegang tot uw gallerij</string>
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Toegang verlenen</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
-    <string name="meetings_chat_screen_app_update_dialog_title">Update required</string>
+    <string name="meetings_chat_screen_app_update_dialog_title">Update vereist</string>
     <string name="meetings_chat_screen_app_update_dialog_message">U gebruikt niet de laatste versie van onze applicatie, dus u kunt geen oproepen starten of aansluiten. Update nu om door te gaan.</string>
     <string name="meetings_chat_screen_app_update_dialog_update_button">Updaten</string>
-    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Dismiss</string>
+    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Afwijzen</string>
     <!-- Title of the bottom panel when the only host left the call on meeting screen -->
     <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Gastheer toewijzen om oproep te verlaten</string>
     <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
-    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">You’re the only host on the call. Assign another host for the group before leaving so someone on the call will have host permissions. You’ll remain a host in the group.</string>
+    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">U bent de enige host in het gesprek. Wijs een andere host aan de groep toe voordat u vertrekt, zodat iemand die deelneemt aan het gesprek de host rechten heeft. U blijft gastheer in de groep.</string>
     <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
     <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">Toewijzen en verlaten</string>
     <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
     <string name="meeting_call_screen_bottom_panel_leave_option">Toch verlaten</string>
+    <!-- Camera uploads updated info in Photos screen. -->
+    <string name="photos_camera_uploads_updated">Camerauploads zijn bijgewerkt</string>
+    <!-- Camera uploads no internet info in Photos screen. -->
+    <string name="photos_camera_uploads_no_internet">Upload onderbroken omdat er geen internetverbinding is</string>
+    <!-- Camera uploads low battery info in Photos screen. -->
+    <string name="photos_camera_uploads_low_battery">Het uploaden is gepauzeerd. Batterij onder %1$d%% en laad niet op.</string>
+    <!-- Camera uploads general issue info in Photos screen. -->
+    <string name="photos_camera_uploads_general_issue">Camera-uploads werken niet meer. Probeer camera-uploads opnieuw in te schakelen om dit op te lossen. Als het probleem zich blijft voordoen, neem contact op met de klantenservice</string>
+    <!-- Camera uploads pending info in Photos screen. -->
+    <plurals name="photos_camera_uploads_pending">
+        <item quantity="one">Camera uploads zijn in behandeling,%1$d bestand in wachtrij</item>
+        <item quantity="other">Camera uploads zijn in behandeling, %1$d bestanden in wachtrij</item>
+    </plurals>
+    <!-- Camera uploads completed info in Photos screen. -->
+    <plurals name="photos_camera_uploads_completed">
+        <item quantity="one">Camera uploads voltooid, %1$d bestand geüpload</item>
+        <item quantity="other">Camera uploads voltooid, %1$d bestanden geüpload</item>
+    </plurals>
+    <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Uw gratis abonnement heeft een limiet van 60 minuten voor vergaderingen. Pro-gebruikers kunnen onbeperkt bellen en tot 1000 deelnemers.[/A] [B]Nu upgraden.[/B]</string>
+    <!-- Bottom sheet button to hide a node/file -->
+    <string name="general_hide_node">Verbergen</string>
+    <!-- Bottom sheet button to unhide a node/file -->
+    <string name="general_unhide_node">Unhide</string>
+    <!-- Promo label for promo notification section -->
+    <string name="notifications_screen_notification_label_promo">Promo</string>
+    <!-- Promo notification section title for promo notification section -->
+    <string name="notifications_screen_notification_section_title">Tijdelijke aanbieding</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_change_sfu_dialog_title">Change SFU Server</string>
+    <string name="meetings_change_sfu_dialog_subtitle">Standaard is -1</string>
+    <string name="meetings_change_sfu_dialog_hint">Voer SFU-ID in</string>
+    <string name="meetings_change_sfu_dialog_action_button">Wijzigen</string>
+    <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Gratis abonnementen hebben een limiet van 60 minuten per vergadering. [A]Nu upgraden.[/A]</string>
 </resources>

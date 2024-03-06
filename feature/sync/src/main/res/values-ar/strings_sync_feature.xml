@@ -183,7 +183,7 @@
     <!-- Sync stalled issue reason is upload issue detailed description-->
     <string name="sync_stalled_issue_upload_issue_detail">لا يمكن الوصول إلى مجلد الوجهة</string>
     <!-- Sync stalled issue reason is download issue detailed description-->
-    <string name="sync_stalled_issue_download_issue_detail">حدث فشل في تنزيل الملف أو نقل الملف المؤقت الذي تم تنزيله إلى موقعه النهائي</string>
+    <string name="sync_stalled_issue_download_issue_detail">حدث خطأ أثناء تنزيل الملف أو نقل الملف المؤقت الذي تم تنزيله إلى موقعه النهائي.</string>
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">خطأ محلي يمنع الوصول إلى المجلد</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
@@ -201,9 +201,9 @@
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">تم اكتشاف نقل أو إعادة تسمية في ميغا MEGA ولكن لا يمكن إجراءها محليًا.</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">تم اكتشاف نقل أو إعادة تسمية محليًا، ولكن تعذر إجراؤها في ميغا MEGA.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">تم اكتشاف نقل أو إعادة تسمية حيث يحدث محليًا ولكن تعذر إجراؤها في ميغا MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
-    <string name="sync_stalled_issue_delete_or_move_scanning_detail">في انتظار إنهاء الفحص لمعرفة ما إذا تم نقل أو حذف الملف.</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning_detail">في انتظار انتهاء الفحص لتحديد ما إذا كان الملف قد تم نقله أو حذفه.</string>
     <!-- Sync subtitle for sync screen to choose folders-->
     <string name="sync_choose_folders">اختر المجلدات</string>
 </resources>

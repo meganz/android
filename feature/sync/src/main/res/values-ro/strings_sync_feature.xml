@@ -171,7 +171,7 @@
     <!-- Sync stalled issue reason is upload issue detailed description-->
     <string name="sync_stalled_issue_upload_issue_detail">Nu se poate ajunge la folderul de destinație</string>
     <!-- Sync stalled issue reason is download issue detailed description-->
-    <string name="sync_stalled_issue_download_issue_detail">A apărut o eroare fie la descărcarea fișierului, fie la mutarea fișierului temporar descărcat în locația sa finală</string>
+    <string name="sync_stalled_issue_download_issue_detail">A apărut o eroare fie la descărcarea fișierului, fie la mutarea fișierului temporar descărcat în locația sa finală.</string>
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">O eroare locală împiedică accesul la folder</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
@@ -189,9 +189,9 @@
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">O mutare sau redenumire a fost detectată în MEGA, dar nu a putut fi replicată local.</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">O mutare sau redenumire a fost detectată local, dar nu a putut fi replicată în MEGA.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">O mutare sau redenumire a fost detectată la nivel local, dar nu a putut fi reprodusă în MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
-    <string name="sync_stalled_issue_delete_or_move_scanning_detail">Așteptarea finalizării scanării pentru a vedea dacă fișierul a fost mutat sau șters.</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning_detail">Așteptarea finalizării scanării pentru a determina dacă fișierul a fost mutat sau șters.</string>
     <!-- Sync subtitle for sync screen to choose folders-->
     <string name="sync_choose_folders">Alegeți foldere</string>
 </resources>

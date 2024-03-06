@@ -662,7 +662,7 @@
     <!-- Title of the label where the SDK version is shown -->
     <string name="settings_about_sdk_version">MEGA SDK軟體開發包版本</string>
     <!-- Title of the label where the MEGAchat SDK version is shown -->
-    <string name="settings_about_karere_version">MEGA chat SDK版本</string>
+    <string name="settings_about_karere_version">MEGA Chat SDK版本</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">檢視來源碼</string>
     <!-- title of the screen that shows the ZIP files -->
@@ -786,7 +786,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">加大您的雲端空間。[A]訂閱Pro帳戶以獲得更大儲存空間和傳輸配額。</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">這個電子郵件地址已被使用。請改用其它電子郵件地址。</string>
+    <string name="mail_already_used">電子郵件地址已被使用。請輸入另一個電子郵件地址。</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
     <string name="mail_changed_confirm_requested">你已經為此電子郵件地址申請一封連結確認信。</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
@@ -4260,9 +4260,9 @@
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">開始</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">根據我們的[A]移除指導政策[/A]，此檔案已被下架。</string>
+    <string name="cloud_drive_info_taken_down_file_warning">根據我們的[A]撤除指導政策[/A]，此檔案已被下架。</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">根據我們的[A]移除指導政策[/A]，此資料夾已被下架。</string>
+    <string name="cloud_drive_info_taken_down_folder_warning">根據我們的[A]撤除指導政策[/A]，此資料夾已被下架。</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">加入</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
@@ -4488,9 +4488,9 @@
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">無法開啟檔案</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
+    <string name="dialog_taken_down_folder_description">根據我們的[A]撤除指導政策[/A]，此資料夾已被刪除。如果您認為我們犯了一個錯誤，您可以對這次移除提出異議。</string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
+    <string name="dialog_taken_down_file_description">根據我們的[A]撤除指導政策[/A]，此檔案已被刪除。如果您認為我們犯了一個錯誤，您可以對這次移除提出異議。</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">僅限Pro會員</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
@@ -4994,7 +4994,7 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">與所有人通話</string>
     <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
-    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">此應用程式已登入不同的MEGA帳戶。\n登出此帳戶，然後使用您的MEGA VPN帳戶登入</string>
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">此應用程式已登入不同的MEGA帳戶。\n登出此帳戶，然後使用您的MEGA&#160;VPN帳戶登入</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
     <string name="chat_attach_pick_from_camera_deny_permission">MEGA需要存取您的相機來拍攝照片和影片。</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
@@ -5049,4 +5049,37 @@
     <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">指定再離開</string>
     <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
     <string name="meeting_call_screen_bottom_panel_leave_option">仍要離開</string>
+    <!-- Camera uploads updated info in Photos screen. -->
+    <string name="photos_camera_uploads_updated">相機上傳已更新</string>
+    <!-- Camera uploads no internet info in Photos screen. -->
+    <string name="photos_camera_uploads_no_internet">由於沒有網路連線，上傳已暫停</string>
+    <!-- Camera uploads low battery info in Photos screen. -->
+    <string name="photos_camera_uploads_low_battery">上傳暫停。電量低於%1$d%%且未處充電中。</string>
+    <!-- Camera uploads general issue info in Photos screen. -->
+    <string name="photos_camera_uploads_general_issue">相機上傳停止運作。嘗試重新啟用相機上傳來解決問題。如果問題仍然存在，請聯繫客服</string>
+    <!-- Camera uploads pending info in Photos screen. -->
+    <plurals name="photos_camera_uploads_pending">
+        <item quantity="other">相機上傳正在進行中，%1$d個檔案待處理</item>
+    </plurals>
+    <!-- Camera uploads completed info in Photos screen. -->
+    <plurals name="photos_camera_uploads_completed">
+        <item quantity="other">相機上傳已完成，%1$d個檔案已上傳</item>
+    </plurals>
+    <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]您的免費方案有60分鐘的會議時間限制。Pro版使用者有無限時間的通話，而且最多可容納 1000個與會者。[/A][B]立即升級。[/B]</string>
+    <!-- Bottom sheet button to hide a node/file -->
+    <string name="general_hide_node">隱藏</string>
+    <!-- Bottom sheet button to unhide a node/file -->
+    <string name="general_unhide_node">Unhide</string>
+    <!-- Promo label for promo notification section -->
+    <string name="notifications_screen_notification_label_promo">促銷</string>
+    <!-- Promo notification section title for promo notification section -->
+    <string name="notifications_screen_notification_section_title">限時優惠</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_change_sfu_dialog_title">Change SFU Server</string>
+    <string name="meetings_change_sfu_dialog_subtitle">預設為-1</string>
+    <string name="meetings_change_sfu_dialog_hint">輸入SFU ID</string>
+    <string name="meetings_change_sfu_dialog_action_button">變更</string>
+    <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">免費方案每次會議有60分鐘的限制。[A]立即升級。[/A]</string>
 </resources>

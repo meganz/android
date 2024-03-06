@@ -831,7 +831,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">قم بتوسيع السحابة الخاصة بك.[A]احصل على مساحة تخزين و حصص تراسل معطيات أكبر باستخدام حساب برو Pro.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">البريد الالكتروني مستخدم مسبقاً. يرجى ادخال عنوان بريد الكتروني آخر.</string>
+    <string name="mail_already_used">عنوان البريد الإلكتروني مُستخدم بالفعل. أدخل عنوان بريد إلكتروني آخر.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
     <string name="mail_changed_confirm_requested">لقد طلبت بالفعل رابط التأكيد لعنوان البريد الإلكتروني.</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
@@ -2546,7 +2546,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">إعداد ميغا MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
+    <string name="setup_mega_explanation">تحتاج ميغا MEGA إلى إذنك للوصول إلى الوسائط والملفات الخاصة بك للمشاركة. قد تكون هناك حاجة إلى أذونات وصول أخرى لاستخدام الميزات والخدمات التي يوفرها هذا التطبيق.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">السماح بالوصول إلى الصور والوسائط والملفات</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -6154,7 +6154,7 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">اتصل بالجميع</string>
     <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
-    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">يتم تسجيل الدخول إلى هذا التطبيق من حساب ميغا MEGA مختلف. \nقم بتسجيل الخروج من هذا الحساب وتسجيل الدخول باستخدام حساب ميغا في بي إن MEGA VPN الخاص بك.</string>
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">يتم تسجيل الدخول إلى هذا التطبيق من حساب ميغا MEGA مختلف. \nقم بتسجيل الخروج من هذا الحساب وتسجيل الدخول باستخدام حساب ميغا في بي إن MEGA&#160;VPN الخاص بك.</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
     <string name="chat_attach_pick_from_camera_deny_permission">تحتاج ميغا MEGA إلى الوصول إلى الكاميرا لالتقاط الصور ومقاطع الفيديو.</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
@@ -6224,4 +6224,47 @@
     <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">تعيين و مغادرة</string>
     <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
     <string name="meeting_call_screen_bottom_panel_leave_option">غادر على أي حال</string>
+    <!-- Camera uploads updated info in Photos screen. -->
+    <string name="photos_camera_uploads_updated">تم تحديث ترفيعات الكاميرا</string>
+    <!-- Camera uploads no internet info in Photos screen. -->
+    <string name="photos_camera_uploads_no_internet">Upload paused due to no internet connection</string>
+    <!-- Camera uploads low battery info in Photos screen. -->
+    <string name="photos_camera_uploads_low_battery">تم إيقاف الترفيع مؤقتًا. شحن البطارية أقل من %1$d%% و ليست تُشحن الآن.</string>
+    <!-- Camera uploads general issue info in Photos screen. -->
+    <string name="photos_camera_uploads_general_issue">توقفت ترفيعات الكاميرا عن العمل. حاول إعادة تمكين ترفيعات الكاميرا لحلها. إذا استمرت المشكلة يرجى التواصل مع الدعم</string>
+    <!-- Camera uploads pending info in Photos screen. -->
+    <plurals name="photos_camera_uploads_pending">
+        <item quantity="zero">ترفيعات الكاميرا قيد الإنجاز، %1$d ملف معلق</item>
+        <item quantity="one">ترفيعات الكاميرا قيد الإنجاز، %1$d ملف معلق</item>
+        <item quantity="two">ترفيعات الكاميرا قيد الإنجاز، %1$d ملفان معلقان</item>
+        <item quantity="few">ترفيعات الكاميرا قيد الإنجاز %1$d ملفات معلقة</item>
+        <item quantity="many">ترفيعات الكاميرا قيد الإنجاز، %1$d ملفاً معلقاً</item>
+        <item quantity="other">ترفيعات الكاميرا قيد الإنجاز، %1$d ملف معلق</item>
+    </plurals>
+    <!-- Camera uploads completed info in Photos screen. -->
+    <plurals name="photos_camera_uploads_completed">
+        <item quantity="zero">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملف</item>
+        <item quantity="one">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملف</item>
+        <item quantity="two">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملفين</item>
+        <item quantity="few">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملفات</item>
+        <item quantity="many">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملفاً</item>
+        <item quantity="other">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملف</item>
+    </plurals>
+    <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]باقتك المجانية لها حد 60 دقيقة للاجتماعات. يتمتع مستخدمو برو Pro بمكالمات غير محدودة وما يصل إلى 1000 مشارك.[/A] [B]قم بالترقية الآن.[/B]</string>
+    <!-- Bottom sheet button to hide a node/file -->
+    <string name="general_hide_node">إخفاء</string>
+    <!-- Bottom sheet button to unhide a node/file -->
+    <string name="general_unhide_node">Unhide</string>
+    <!-- Promo label for promo notification section -->
+    <string name="notifications_screen_notification_label_promo">ترويج</string>
+    <!-- Promo notification section title for promo notification section -->
+    <string name="notifications_screen_notification_section_title">عرض لفترة محدودة</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_change_sfu_dialog_title">Change SFU Server</string>
+    <string name="meetings_change_sfu_dialog_subtitle">الافتراضي هو -1</string>
+    <string name="meetings_change_sfu_dialog_hint">أدخل معرف SFU</string>
+    <string name="meetings_change_sfu_dialog_action_button">تغيير</string>
+    <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">الباقات المجانية لها حد 60 دقيقة لكل اجتماع. [A]قم بالترقية الآن.[/A]</string>
 </resources>

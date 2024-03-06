@@ -171,7 +171,7 @@
     <!-- Sync stalled issue reason is upload issue detailed description-->
     <string name="sync_stalled_issue_upload_issue_detail">Impossible d’atteindre la dossier de destination</string>
     <!-- Sync stalled issue reason is download issue detailed description-->
-    <string name="sync_stalled_issue_download_issue_detail">Un échec s’est produit soit lors du téléchargement du fichier soit lors du déplacement du fichier temporaire téléchargé vers son emplacement final</string>
+    <string name="sync_stalled_issue_download_issue_detail">Une erreur s’est produite soit lors du téléchargement du fichier soit lors du déplacement du fichier temporaire téléchargé vers son emplacement final</string>
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">Une erreur locale empêche l’accès au dossier</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
@@ -181,7 +181,7 @@
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
     <string name="sync_stalled_issue_folder_matched_against_file_detail">Le fichier que vous tentez de synchroniser n’a pas d’extension et porte le même nom qu’un dossier existant</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync detailed description-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync_detail">Ce fichier a été modifié à la fois sur MEGA et localement depuis la dernière synchronisation.</string>
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync_detail">Ce fichier a été modifié à la fois sur MEGA et localement depuis la dernière synchronisation</string>
     <!-- Sync stalled issue reason is Local and remote not synced detailed description-->
     <string name="sync_stalled_issue_local_and_remote_not_synced_detail">Ce fichier a des copies contradictoires</string>
     <!-- Sync stalled issue reason is Name clash detailed description-->
@@ -191,7 +191,7 @@
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_local">Un déplacement ou un renommage a été détecté localement, mais n’a pas pu être reproduit sur MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
-    <string name="sync_stalled_issue_delete_or_move_scanning_detail">Attente de la fin de l’analyse pour vérifier si le fichier a été déplacé ou supprimé.</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning_detail">Attente de la fin de l’analyse pour déterminer si le fichier a été déplacé ou supprimé.</string>
     <!-- Sync subtitle for sync screen to choose folders-->
     <string name="sync_choose_folders">Choisir les dossiers</string>
 </resources>

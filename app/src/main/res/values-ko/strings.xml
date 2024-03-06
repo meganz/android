@@ -43,7 +43,7 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">불러오는 중</string>
     <!-- state while importing the file -->
-    <string name="general_importing">Adding</string>
+    <string name="general_importing">추가 중...</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">전달중</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
@@ -381,19 +381,19 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">오류. 폴더가 생성되지 않았습니다</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Item renamed</string>
+    <string name="context_correctly_renamed">항목 이름 수정됨</string>
     <!-- error message -->
     <string name="context_no_renamed">오류. 이름이 바뀌지 않았습니다</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Item copied</string>
+    <string name="context_correctly_copied">항목 복사됨</string>
     <!-- error message -->
     <string name="context_no_copied">오류. 복사되지 않았습니다</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">대상 폴더를 선택하세요</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Item moved</string>
+    <string name="context_correctly_moved">항목 이동됨</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Item moved to Rubbish bin</string>
+    <string name="context_correctly_moved_to_rubbish">항목 휴지통으로 이동됨</string>
     <!-- error message -->
     <string name="context_no_moved">오류. 이동되지 않았습니다</string>
     <!-- success message when sharing a folder -->
@@ -401,7 +401,7 @@
     <!-- error message -->
     <string name="context_no_removed_shared">오류. 공유가 제거되지 않았습니다</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Item deleted</string>
+    <string name="context_correctly_removed">항목 삭제됨</string>
     <!-- error message -->
     <string name="context_no_removed">오류. MEGA에서 삭제되지 않았습니다</string>
     <!-- success message when sending multiple files -->
@@ -786,7 +786,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">클라우드를 키우세요.[A]Pro 계정으로 증가된 저장소와 전송 할당량을 받으세요.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">이 이메일 주소는 이미 사용 중입니다. 다른 이메일 주소를 사용하세요.</string>
+    <string name="mail_already_used">이메일 주소가 이미 사용 중입니다. 다른 이메일을 입력하세요.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
     <string name="mail_changed_confirm_requested">그 이메일 주소에 대한 확인 링크를 이미 요청하였습니다.</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
@@ -1519,7 +1519,7 @@
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">초대장 발송되지 않음</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent_text">The QR code or contact link is invalid. Try to scan a valid code or to open a valid link.</string>
+    <string name="invite_not_sent_text">QR 코드 또는 연락처 링크가 잘못 되었습니다. 올바른 코드를 스캔하거나 올바른 링크를 여세요.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">초대가 발송되지 않았습니다. %s님은 이미 연락처 목록에 존재합니다.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
@@ -2168,7 +2168,7 @@
     <!-- Subtitle of the historic notification for contact request denied -->
     <string name="subtitle_outgoing_contact_request_denied">[A]%s 님이[/A][B]연락처 요청을 거절했습니다.[/B]</string>
     <!-- Subtitle of the historic notification for contact request accepted -->
-    <string name="subtitle_outgoing_contact_request_accepted">[A]%s [/A][B]accepted your contact request.[/B]</string>
+    <string name="subtitle_outgoing_contact_request_accepted">[A]%s 님[/A][B]이 연락처 요청을 수락하였습니다.[/B]</string>
     <!-- Subtitle of the historic notification for deleted shared folders (one or many) -->
     <string name="notification_deleted_shared_folder">[A]%s님이 [/A][B]공유한 폴더에 대한 접근이[/B][B] 삭제되었습니다.[/B]</string>
     <!-- Subtitle of the historic notification when a contact leaves a shared folder -->
@@ -2276,7 +2276,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">MEGA 설정</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
+    <string name="setup_mega_explanation">공유를 하려면 MEGA에 미디어와 파일 접근 권한이 필요합니다. 이 앱이 제공하는 기능과 서비스를 이용하려면 다른 접근 권한이 필요할 수도 있습니다.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">사진, 미디어 그리고 파일에 대한 접근 허용</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -4994,7 +4994,7 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">모두 통화</string>
     <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
-    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">이 앱은 다른 MEGA 계정으로 로그인 되어 있습니다. \n이 계정에서 로그아웃 하고 당신의 MEGA VPN 계정으로 로그인 하세요.</string>
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">이 앱은 다른 MEGA 계정으로 로그인 되어 있습니다. \n이 계정에서 로그아웃 하고 당신의 MEGA&#160;VPN 계정으로 로그인 하세요.</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
     <string name="chat_attach_pick_from_camera_deny_permission">MEGA는 사진과 동영상을 촬영하기 위해 당신의 카메라에 접근해야 합니다</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
@@ -5032,21 +5032,54 @@
     <!-- Title of subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_account_description_subscription_title">구독 세부정보</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
-    <string name="account_upgrade_subscription_details">Subscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. You can switch off the automatic renewal of your MEGA&#160;Pro subscription no later than 24 hours before your next subscription payment is due via Subscriptions in [A]Google Play[/A].</string>
+    <string name="account_upgrade_subscription_details">구독은 처음 선택한 기간과 같은 기간 그리고 같은 가격으로 연속적으로 자동 갱신 됩니다. MEGA&#160;Pro 구독 자동 갱신을 [A]Google Play[/A]의 구독을 통해 다음 구독의 결제 24시간 전에 취소할 수 있습니다.</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">갤러리에 접근 허용</string>
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">접근 허가</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
-    <string name="meetings_chat_screen_app_update_dialog_title">Update required</string>
+    <string name="meetings_chat_screen_app_update_dialog_title">업데이트가 필요합니다</string>
     <string name="meetings_chat_screen_app_update_dialog_message">앱의 최신 버전을 이용하고 있지 않아서 통화를 시작하거나 참여할 수 없습니다. 계속 하려면 지금 업데이트 하세요.</string>
     <string name="meetings_chat_screen_app_update_dialog_update_button">업데이트</string>
-    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Dismiss</string>
+    <string name="meetings_chat_screen_app_update_dialog_cancel_button">해제</string>
     <!-- Title of the bottom panel when the only host left the call on meeting screen -->
     <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">통화를 떠나려면 주최자를 할당하세요</string>
     <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
-    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">You’re the only host on the call. Assign another host for the group before leaving so someone on the call will have host permissions. You’ll remain a host in the group.</string>
+    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">당신은 통화의 유일한 주최자입니다. 떠나기 전에 다른 사람이 주최자 권한을 가질 수 있도록 그룹의 다른 주최자를 할당하세요. 당신은 이 그룹의 주최자로 남게 됩니다.</string>
     <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
     <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">할당하고 떠나기</string>
     <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
     <string name="meeting_call_screen_bottom_panel_leave_option">어쨌든 떠나기</string>
+    <!-- Camera uploads updated info in Photos screen. -->
+    <string name="photos_camera_uploads_updated">카메라 업로드 업데이트됨</string>
+    <!-- Camera uploads no internet info in Photos screen. -->
+    <string name="photos_camera_uploads_no_internet">인터넷 연결이 없어서 업로드가 일시정지 되었습니다</string>
+    <!-- Camera uploads low battery info in Photos screen. -->
+    <string name="photos_camera_uploads_low_battery">업로드가 일시 정지되었습니다. 배터리가 %1$d%% 이하이고 충전 중이지 않습니다</string>
+    <!-- Camera uploads general issue info in Photos screen. -->
+    <string name="photos_camera_uploads_general_issue">카메라 업로드가 작동을 멈추었습니다. 해결하려면 카메라 업로드를 재활성화 하세요. 만약 문제가 계속되면 지원으로 연락하세요</string>
+    <!-- Camera uploads pending info in Photos screen. -->
+    <plurals name="photos_camera_uploads_pending">
+        <item quantity="other">카메라 업로드 진행 중, 파일 %1$d개 대기 중</item>
+    </plurals>
+    <!-- Camera uploads completed info in Photos screen. -->
+    <plurals name="photos_camera_uploads_completed">
+        <item quantity="other">카메라 업로드 진행 중, 파일 %1$d개 대기 중</item>
+    </plurals>
+    <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]무료 요금제는 회의에 60분 제한이 있습니다. Pro 이용자는 무제한 통화와 최대 1,000명의 참여자가 가능합니다.[/A] [B]지금 업그레이드.[/B]</string>
+    <!-- Bottom sheet button to hide a node/file -->
+    <string name="general_hide_node">숨기기</string>
+    <!-- Bottom sheet button to unhide a node/file -->
+    <string name="general_unhide_node">Unhide</string>
+    <!-- Promo label for promo notification section -->
+    <string name="notifications_screen_notification_label_promo">행사</string>
+    <!-- Promo notification section title for promo notification section -->
+    <string name="notifications_screen_notification_section_title">시간 제한이 있는 제안</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_change_sfu_dialog_title">Change SFU Server</string>
+    <string name="meetings_change_sfu_dialog_subtitle">기본값은 -1입니다</string>
+    <string name="meetings_change_sfu_dialog_hint">SFU ID 입력</string>
+    <string name="meetings_change_sfu_dialog_action_button">변경</string>
+    <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">무료 요금제는 회의마다 60분의 제한이 있습니다. [A]지금 업그레이드.[/A]</string>
 </resources>

@@ -59,9 +59,9 @@
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="device_center_list_view_item_sub_state_no_sync_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA can’t sync or backup this folder because the file system on your device is not supported.</string>
+    <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA ne peut ni synchroniser ni sauvegarder ce dossier, car le système de fichiers de votre appareil n’est pas pris en charge.</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
-    <string name="device_center_list_view_item_sub_state_invalid_remote_type">The folder you chose can’t be synced</string>
+    <string name="device_center_list_view_item_sub_state_invalid_remote_type">Le dossier que vous avez choisi ne peut pas être synchronisé</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_local_type">Un fichier ne peut pas être synchronisé individuellement. Vous devez définir la synchronisation du dossier.</string>
     <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
@@ -69,13 +69,13 @@
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
     <string name="device_center_list_view_item_sub_state_remote_node_not_found">Impossible de trouver le dossier dans MEGA. Soit il a été déplacé, soit il a été supprimé, soit vous n’y avez pas accès.</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
-    <string name="device_center_list_view_item_sub_state_storage_overquota">Storage quota has reached the limit.</string>
+    <string name="device_center_list_view_item_sub_state_storage_overquota">La limite du quota d’espace de stockage a été atteinte.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
-    <string name="device_center_list_view_item_sub_state_account_expired">Your plan has expired.</string>
+    <string name="device_center_list_view_item_sub_state_account_expired">Impossible de synchroniser ou sauvegarder ce dossier, car votre abonnement est expiré.</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
-    <string name="device_center_list_view_item_sub_state_foreign_target_overshare">Folder can’t be synced as user who shared this folder has reached their storage quota.</string>
+    <string name="device_center_list_view_item_sub_state_foreign_target_overshare">Le dossier ne peut pas être synchronisé, car l’utilisateur qui l’a partagé a dépassé son quota de stockage.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
-    <string name="device_center_list_view_item_sub_state_remote_path_has_changed">Impossible de trouver le dossier dans MEGA, car il a été déplacé.</string>
+    <string name="device_center_list_view_item_sub_state_remote_path_has_changed">Impossible de trouver le dossier dans MEGA. Soit il a été déplacé, soit il a été supprimé, soit vous n’y avez pas accès.</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="device_center_list_view_item_sub_state_share_non_full_access">Impossible de synchroniser le dossier, car c’est un dossier partagé sans accès total.</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
@@ -83,11 +83,11 @@
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
     <string name="device_center_list_view_item_sub_state_active_sync_below_path">Le dossier ne peut pas être synchronisé, car il comprend déjà des dossiers synchronisés.</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
-    <string name="device_center_list_view_item_sub_state_vboxsharedfolder_unsupported">MEGA can’t sync or backup VirtualBox folders.</string>
+    <string name="device_center_list_view_item_sub_state_vboxsharedfolder_unsupported">MEGA ne peut ni synchroniser ni sauvegarder les dossiers VirtualBox.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
-    <string name="device_center_list_view_item_sub_state_account_blocked">Account has been blocked</string>
+    <string name="device_center_list_view_item_sub_state_account_blocked">Impossible de synchroniser ou sauvegarder ce dossier, car le compte a été bloqué.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
-    <string name="device_center_list_view_item_sub_state_unknown_temporary_error">Problem syncing or backing up this folder. Check again later. If issue continues, contact Support.</string>
+    <string name="device_center_list_view_item_sub_state_unknown_temporary_error">Problème de synchronisation ou de sauvegarde de ce dossier. Réessayez ultérieurement. Si la situation persiste, contactez l’assistance.</string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
     <string name="device_center_list_view_item_sub_state_too_many_action_packets">Le compte a été rechargé. Toute mise à jour manquée de vos sauvegardes ou synchronisations n’a pas été appliquée.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
@@ -97,29 +97,29 @@
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="device_center_list_view_item_sub_state_backup_source_not_below_drive">Impossible de trouver le fichier sur le lecteur externe.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
-    <string name="device_center_list_view_item_sub_state_active_sync_same_path">There’s already a synced folder at the same path</string>
+    <string name="device_center_list_view_item_sub_state_active_sync_same_path">Un dossier synchronisé porte déjà ce nom dans le même chemin.</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">Échec de renommage.</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
-    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">Couldn’t create a sync. File has been ignored.</string>
+    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">Impossible de créer un fichier .megaignore pour cette synchronisation.</string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
-    <string name="device_center_list_view_item_sub_state_sync_config_read_failure">Couldn’t read sync configs from drive.</string>
+    <string name="device_center_list_view_item_sub_state_sync_config_read_failure">Impossible de lire la configuration de la synchronisation. Réessayez ultérieurement ou vérifiez les droits du dossier.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
-    <string name="device_center_list_view_item_sub_state_unknown_drive_path">Sync’s drive path is unknown</string>
+    <string name="device_center_list_view_item_sub_state_unknown_drive_path">Le chemin du lecteur de la synchronisation est inconnu.</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
-    <string name="device_center_list_view_item_sub_state_invalid_scan_interval">Invalid scan interval</string>
+    <string name="device_center_list_view_item_sub_state_invalid_scan_interval">L’intervalle d’analyse est invalide. Vérifiez la configuration de l’intervalle d’analyse et réessayez.</string>
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
-    <string name="device_center_list_view_item_sub_state_notification_system_unavailable">Filesystem notification subsystem has encountered an unrecoverable error.</string>
+    <string name="device_center_list_view_item_sub_state_notification_system_unavailable">Impossible de communiquer avec l’emplacement de la synchronisation. Vérifiez que l’emplacement est accessible et que les droits ont été accordés pour l’emplacement du dossier.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
-    <string name="device_center_list_view_item_sub_state_unable_to_add_watch">Unable to add a filesystem watch.</string>
+    <string name="device_center_list_view_item_sub_state_unable_to_add_watch">Impossible d’ajouter une surveillance du système de fichier. Assurez-vous qu’il y a suffisamment d’espace et de mémoire libres et que vous avez accordé les droits pour l’emplacement du dossier.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
-    <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid">Unable to retrieve a sync root’s FSID.</string>
+    <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid">Impossible de lire l’emplacement de la synchronisation. Vérifiez que l’emplacement est accessible et que les droits ont été accordés pour l’emplacement du dossier.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
     <string name="device_center_list_view_item_sub_state_unable_to_open_database">Unable to open state cache database</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Il n’y a pas suffisamment d’espace pour télécharger.</string>
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
-    <string name="device_center_list_view_item_sub_state_failure_accessing_persistent_storage">No access to persistent storage</string>
+    <string name="device_center_list_view_item_sub_state_failure_accessing_persistent_storage">Impossible de lire l’emplacement de la synchronisation. Vérifiez que l’emplacement est accessible et que les droits ont été accordés pour l’emplacement du dossier.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
     <string name="device_center_list_view_item_sub_state_message_unknown_error">Erreur inconnue</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
@@ -129,11 +129,11 @@
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
     <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now">Impossible de trouver le dossier sur votre appareil. Réessayez plus tard.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
-    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive">Folder in your device can’t be located</string>
+    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive">Impossible de trouver le dossier sur votre appareil</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">Problem syncing or backing up this folder because of changes to the MEGA folder. Stop the backup and try setting it up again in the desktop app, or contact Support.</string>
+    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">Problème de synchronisation ou de sauvegarde de ce dossier en raison de modification du dossier MEGA. Arrêtez la synchronisation ou la sauvegarde, puis tentez de la définir de nouveau dans l’appli pour ordinateur ou contactez l’assistance.</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue">Problem syncing or backing up this folder. Stop the sync or backup and try setting it up again in the desktop app, or contact Support.</string>
+    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue">Problème de synchronisation ou de sauvegarde de ce dossier. Arrêtez la synchronisation ou la sauvegarde, puis tentez de la définir de nouveau dans l’appli pour ordinateur ou contactez l’assistance.</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
     <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Le dossier ne peut pas être synchronisé, car il fait déjà partie d’un dossier synchronisé.</string>
     <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
@@ -156,4 +156,14 @@
     <string name="device_center_device_top_menu_option_info">Renseignements</string>
     <!-- Text to show in the Device Center for a No Network State when there is no network connectivity -->
     <string name="device_center_no_network_state">Aucune connexion à Internet</string>
+    <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
+    <string name="device_center_list_view_item_sub_state_local_filesystem_mismatch">Les fichiers de ce dossier ne peuvent être ni synchronisés ni sauvegardés. Vous devrez réactiver la synchronisation ou la sauvegarde dans l’appli pour ordinateur.</string>
+    <!-- Text to display in Device Center for an empty state when inspecting a device where no sync or backup has been configured -->
+    <string name="device_center_nothing_setup_state">Rien n’est encore configuré</string>
+    <!-- The hint text for the search bar in the Device Center feature when the User is searching for Devices -->
+    <string name="device_center_top_app_bar_search_devices_hint">Recherche d\’appareils</string>
+    <!-- The hint text for the search bar in the Device Center feature when the User is searching for Syncs -->
+    <string name="device_center_top_app_bar_search_syncs_hint">Recherche de synchronisations</string>
+    <!-- Text to show in the Device Center when no search results are found -->
+    <string name="device_center_empty_screen_no_results">Aucun résultat</string>
 </resources>

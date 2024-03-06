@@ -55,9 +55,9 @@
     <!-- Sync to resolve conflict Merge folders -->
     <string name="sync_stalled_issue_merge_folders">Объединить папки</string>
     <!-- Sync to resolve conflict Choose local file -->
-    <string name="sync_stalled_issue_choose_local_file">Choose the local file</string>
+    <string name="sync_stalled_issue_choose_local_file">Выбрать локальный файл</string>
     <!-- Sync to resolve conflict Choose remote file -->
-    <string name="sync_stalled_issue_choose_remote_file">Choose the file stored in MEGA</string>
+    <string name="sync_stalled_issue_choose_remote_file">Выбрать файл в MEGA</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">Выбрать последний изменённый файл</string>
     <!-- Sync message when conflict resolved -->
@@ -145,7 +145,7 @@
     <!-- Sync stalled issue reason is Folder Matched Against File-->
     <string name="sync_stalled_issue_folder_matched_against_file">У файла, который вы пытаетесь синхронизировать, нет расширения и такое же название, как у существующей папки</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Item changed since last sync</string>
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Элемент изменён с момента последней синхронизации</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->
     <string name="sync_stalled_issue_local_and_remote_not_synced">Конфликт файла или папки</string>
     <!-- Sync stalled issue reason is Name clash-->
@@ -175,7 +175,7 @@
     <!-- Sync stalled issue reason is upload issue detailed description-->
     <string name="sync_stalled_issue_upload_issue_detail">Не удаётся добраться до папки назначения</string>
     <!-- Sync stalled issue reason is download issue detailed description-->
-    <string name="sync_stalled_issue_download_issue_detail">Произошел сбой либо при скачивании файла, либо при перемещении скачанного временного файла в его конечное расположение</string>
+    <string name="sync_stalled_issue_download_issue_detail">Произошла ошибка либо при скачивании файла, либо при перемещении скачанного временного файла в его конечное расположение.</string>
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">Локальная ошибка, препятствующая доступу к папке</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
@@ -195,7 +195,7 @@
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_local">Обнаружено локальное перемещение или переименование, но его не удалось воспроизвести в MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
-    <string name="sync_stalled_issue_delete_or_move_scanning_detail">Ожидание завершения сканирования, чтобы проверить, был ли файл перемещён или удалён.</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning_detail">Ожидание завершения сканирования, чтобы определить, был ли файл перемещён или удалён.</string>
     <!-- Sync subtitle for sync screen to choose folders-->
     <string name="sync_choose_folders">Выбор папок</string>
 </resources>

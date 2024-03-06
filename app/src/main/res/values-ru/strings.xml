@@ -43,7 +43,7 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">Загрузка</string>
     <!-- state while importing the file -->
-    <string name="general_importing">Adding</string>
+    <string name="general_importing">Добавление&#8230;</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">Пересылка</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
@@ -402,19 +402,19 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Ошибка. Папка не создана</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Item renamed</string>
+    <string name="context_correctly_renamed">Элемент переименован</string>
     <!-- error message -->
     <string name="context_no_renamed">Ошибка. Не перемещено</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Item copied</string>
+    <string name="context_correctly_copied">Элемент скопирован</string>
     <!-- error message -->
     <string name="context_no_copied">Ошибка. Не скопировано</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Выберите папку назначения</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Item moved</string>
+    <string name="context_correctly_moved">Элемент перемещён</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Item moved to Rubbish bin</string>
+    <string name="context_correctly_moved_to_rubbish">Элемент перемещён в Корзину</string>
     <!-- error message -->
     <string name="context_no_moved">Ошибка. Не перемещено</string>
     <!-- success message when sharing a folder -->
@@ -422,7 +422,7 @@
     <!-- error message -->
     <string name="context_no_removed_shared">Ошибка. Не удалось удалить</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Item deleted</string>
+    <string name="context_correctly_removed">Элемент удалён</string>
     <!-- error message -->
     <string name="context_no_removed">Ошибка. Не удалено</string>
     <!-- success message when sending multiple files -->
@@ -813,7 +813,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Увеличьте своё облако.[A]Получите больше пространства и квоты передач с Pro-аккаунтом.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">Этот адрес электронной почты уже используется. Пожалуйста, используйте другой адрес.</string>
+    <string name="mail_already_used">Адрес электронной почты уже используется. Введите другой адрес электронной почты.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
     <string name="mail_changed_confirm_requested">Вы уже запрашивали ссылку подтверждения для этого адреса.</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
@@ -5690,7 +5690,7 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Позвонить всем</string>
     <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
-    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">В этом приложении выполнен вход в другой аккаунт MEGA. \nВыйдите из этого аккаунта и войдите в свой аккаунт MEGA VPN</string>
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">В этом приложении выполнен вход в другой аккаунт MEGA. \nВыйдите из этого аккаунта и войдите в свой аккаунт MEGA&#160;VPN</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
     <string name="chat_attach_pick_from_camera_deny_permission">Для фото- и видеосъёмки MEGA требуется доступ к камере.</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
@@ -5742,16 +5742,55 @@
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Разрешите доступ к галерее</string>
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Открыть доступ</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
-    <string name="meetings_chat_screen_app_update_dialog_title">Update required</string>
+    <string name="meetings_chat_screen_app_update_dialog_title">Требуется обновление</string>
     <string name="meetings_chat_screen_app_update_dialog_message">У вас не последняя версия нашего приложения, поэтому вы не можете начинать звонки или присоединяться к ним. Обновите приложение, чтобы продолжить.</string>
     <string name="meetings_chat_screen_app_update_dialog_update_button">Изменить</string>
-    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Dismiss</string>
+    <string name="meetings_chat_screen_app_update_dialog_cancel_button">Отклонить</string>
     <!-- Title of the bottom panel when the only host left the call on meeting screen -->
     <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Назначьте организатора, чтобы покинуть звонок</string>
     <!-- Description of the bottom panel when the only host leave the call, displayed on the group call and meeting screen -->
-    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">You’re the only host on the call. Assign another host for the group before leaving so someone on the call will have host permissions. You’ll remain a host in the group.</string>
+    <string name="meeting_call_screen_description_of_bottom_panel_when_only_host_leave_the_meeting">Вы единственный организатор этого звонка. Чтобы кто-то из участников звонка имел права организатора, назначьте другого организатора группы перед выходом. Вы останетесь организатором группы.</string>
     <!-- Option in bottom panel to assign another host and leave the call, displayed on the group call and meeting screen -->
     <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">Назначить и выйти</string>
     <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
     <string name="meeting_call_screen_bottom_panel_leave_option">Всё равно выйти</string>
+    <!-- Camera uploads updated info in Photos screen. -->
+    <string name="photos_camera_uploads_updated">Загрузки из камеры обновлены</string>
+    <!-- Camera uploads no internet info in Photos screen. -->
+    <string name="photos_camera_uploads_no_internet">Upload paused due to no internet connection</string>
+    <!-- Camera uploads low battery info in Photos screen. -->
+    <string name="photos_camera_uploads_low_battery">Загрузка приостановлена. Аккумулятор заряжен менее чем на %1$d%% и не заряжается.</string>
+    <!-- Camera uploads general issue info in Photos screen. -->
+    <string name="photos_camera_uploads_general_issue">Загрузки из камеры перестали работать. Попробуйте повторно включить загрузки из камеры. Если проблема повторяется, пожалуйста, обратитесь в поддержку</string>
+    <!-- Camera uploads pending info in Photos screen. -->
+    <plurals name="photos_camera_uploads_pending">
+        <item quantity="one">Выполняется загрузка из камеры, %1$d файл ожидает обработки</item>
+        <item quantity="few">Выполняется загрузка из камеры, %1$d файла ожидает обработки</item>
+        <item quantity="many">Выполняется загрузка из камеры, %1$d файлов ожидает обработки</item>
+        <item quantity="other">Выполняется загрузка из камеры, %1$d файла ожидает обработки</item>
+    </plurals>
+    <!-- Camera uploads completed info in Photos screen. -->
+    <plurals name="photos_camera_uploads_completed">
+        <item quantity="one">Загрузка из камеры завершена, загружен %1$d файл</item>
+        <item quantity="few">Загрузка из камеры завершена, загружено %1$d файла</item>
+        <item quantity="many">Загрузка из камеры завершена, загружено %1$d файлов</item>
+        <item quantity="other">Загрузка из камеры завершена, загружено %1$d файла</item>
+    </plurals>
+    <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]В бесплатном плане встречи ограничены 60 минутами. У пользователей Pro звонки не ограничены по длительности и могут включать до 1000 участников.[/A] [B]Улучшить план.[/B]</string>
+    <!-- Bottom sheet button to hide a node/file -->
+    <string name="general_hide_node">Скрыть</string>
+    <!-- Bottom sheet button to unhide a node/file -->
+    <string name="general_unhide_node">Unhide</string>
+    <!-- Promo label for promo notification section -->
+    <string name="notifications_screen_notification_label_promo">Промо</string>
+    <!-- Promo notification section title for promo notification section -->
+    <string name="notifications_screen_notification_section_title">Предложение ограничено по времени</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_change_sfu_dialog_title">Change SFU Server</string>
+    <string name="meetings_change_sfu_dialog_subtitle">По умолчанию -1</string>
+    <string name="meetings_change_sfu_dialog_hint">Введите SFU ID</string>
+    <string name="meetings_change_sfu_dialog_action_button">Изменить</string>
+    <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">В бесплатных планах встречи ограничены 60 минутами. [A]Улучшить план.[/A]</string>
 </resources>

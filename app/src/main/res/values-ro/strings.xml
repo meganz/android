@@ -804,7 +804,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Crește-ți capacitatea în cloud.[A]Obține cote mai mari de spațiu de stocare și de transfer cu un cont Pro.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">Această adresă de e-mail este deja folosită. Vă rugăm să folosiți o altă adresă de e-mail.</string>
+    <string name="mail_already_used">Adresa de e-mail este deja folosită. Introduceți o altă adresă de e-mail.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
     <string name="mail_changed_confirm_requested">Ați solicitat deja un link de confirmare pentru acea adresă de e-mail.</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
@@ -1251,7 +1251,7 @@
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
     <string name="text_depleted_transfer_overquota">Cota de transfer pentru această adresă IP a fost depășită. Upgradează contul sau așteaptă %s pentru a continua descărcarea.</string>
     <!-- Button to show plans in the alert when the transfer quota is depleted -->
-    <string name="plans_depleted_transfer_overquota">Vezi planurile</string>
+    <string name="plans_depleted_transfer_overquota">Afișați abonamentele</string>
     <!-- Button option of the alert when the transfer quota is depleted -->
     <string name="continue_without_account_transfer_overquota">Continuă fără cont</string>
     <!-- this is used for example when downloading 1 file or 2 files, Plural of file. 2 files -->
@@ -2074,23 +2074,23 @@
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
     <string name="text_almost_full_warning_pro_account">Unitatea cloud este aproape plină. Upgradează acum și obține până la %1$s spațiu de stocare și %2$s cotă de transfer.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
-    <string name="text_almost_full_warning_pro3_account">Unitatea cloud este aproape plină. Dacă aveți nevoie de mai mult spațiu de stocare, vă rugăm să contactați asistența MEGA pentru a obține un plan personalizat.</string>
+    <string name="text_almost_full_warning_pro3_account">Unitatea cloud este aproape plină. Dacă aveți nevoie de mai mult spațiu de stocare, vă rugăm să contactați asistența MEGA pentru a obține un abonament personalizat.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
     <string name="text_storage_full_warning">Unitatea cloud este plină. Upgradează la Pro și obține până la %1$s spațiu de stocare și %2$s cotă de transfer.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
     <string name="text_storage_full_warning_pro_account">Unitatea cloud este plină. Upgradează acum și obține până la %1$s spațiu de stocare și %2$s cotă de transfer.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
-    <string name="text_storage_full_warning_pro3_account">Unitatea cloud este plină. Dacă aveți nevoie de mai mult spațiu de stocare, vă rugăm să contactați asistența MEGA pentru a obține un plan personalizat.</string>
+    <string name="text_storage_full_warning_pro3_account">Unitatea cloud este plină. Dacă aveți nevoie de mai mult spațiu de stocare, vă rugăm să contactați asistența MEGA pentru a obține un abonament personalizat.</string>
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->
-    <string name="button_plans_almost_full_warning">Vezi planurile</string>
+    <string name="button_plans_almost_full_warning">Vezi abonamentele</string>
     <!-- Button of the dialog shown when the storage is almost full to custom a plan -->
-    <string name="button_custom_almost_full_warning">Plan personalizat</string>
+    <string name="button_custom_almost_full_warning">Abonament personalizat</string>
     <!-- Button of the dialog shown when the storage is almost full to get bonus -->
     <string name="button_bonus_almost_full_warning">Obține bonusul</string>
     <!-- Mail title to upgrade to a custom plan -->
-    <string name="title_mail_upgrade_plan">Upgradează la un plan personalizat</string>
+    <string name="title_mail_upgrade_plan">Upgradează la un abonament personalizat</string>
     <!-- Mail subject to upgrade to a custom plan -->
-    <string name="subject_mail_upgrade_plan">Întreabă-ne cum poți să upgradezi la un plan personalizat:</string>
+    <string name="subject_mail_upgrade_plan">Întreabă-ne cum poți să upgradezi la un abonament personalizat:</string>
     <!-- Used in chat list screen to indicate in a chat list item that the message was sent by me, followed by the message -->
     <string name="word_me">Eu:</string>
     <!-- Title of the button in the contact info screen to start an audio call -->
@@ -2144,7 +2144,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Dacă videoclipurile spre comprimare sunt mai mari de</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">Pentru a dezactiva Planificatorul de golire a Coșului de gunoi sau pentru a seta o perioadă mai lungă de păstrare, vă rugăm să vă abonați la un plan Pro.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Pentru a dezactiva Planificatorul de golire a Coșului de gunoi sau pentru a seta o perioadă mai lungă de păstrare, vă rugăm să vă abonați la un abonament Pro.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">zile</string>
     <!-- Title of the option to generate a public chat link -->
@@ -2296,7 +2296,7 @@
     <!-- Capital letters. Text of the label of a new historic notifications -->
     <string name="new_label_notification_item">Nou</string>
     <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
-    <string name="label_custom_plan">Pentru a vă actualiza abonamentul curent, vă rugăm să contactați echipa noastră de asistență pentru un [A]plan personalizat[/A].</string>
+    <string name="label_custom_plan">Pentru a vă actualiza abonamentul curent, vă rugăm să contactați echipa noastră de asistență pentru un [A]abonament personalizat[/A].</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">numele fișierului</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
@@ -3856,7 +3856,7 @@
     <!-- Text for the sound notifications option on calls settings -->
     <string name="settings_calls_preferences_sound_notifications_text">Auzi un sunet când cineva se alătură sau părăsește un apel.</string>
     <!-- Text indicating a text file was saved to Cloud drive -->
-    <string name="text_editor_creation_success">Fișier salvat în Unitatea cloud.</string>
+    <string name="text_editor_creation_success">Fișier a fost salvat în Unitatea cloud.</string>
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
     <string name="text_editor_creation_error">Fișier nesalvat în Unitatea cloud. Încearcă din nou.</string>
     <!-- Action label to start images slideshow -->
@@ -4914,9 +4914,9 @@
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">Nu se poate deschide fișierul</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
+    <string name="dialog_taken_down_folder_description">Acest folder a fost eliminat în conformitate cu [A]Politica noastră pentru ghidul de eliminare[/A]. Puteți contesta această eliminare dacă credeți că am făcut o greșeală.</string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
+    <string name="dialog_taken_down_file_description">Acest fișier a fost eliminat în conformitate cu [A]Politica noastră pentru ghidul de eliminare[/A]. Puteți contesta această eliminare dacă credeți că am făcut o greșeală.</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">Numai Pro</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
@@ -4936,7 +4936,7 @@
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">Audio</string>
     <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_title_choose_right_plan">Alegeți planul potrivit pentru dvs.</string>
+    <string name="account_upgrade_account_title_choose_right_plan">Alegeți abonamentul potrivit pentru dvs.</string>
     <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_tab_monthly">Lunară</string>
     <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
@@ -4954,9 +4954,9 @@
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Recomandat</string>
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
-    <string name="account_upgrade_account_pro_plan_info_current_plan_label">Planul actual</string>
+    <string name="account_upgrade_account_pro_plan_info_current_plan_label">Abonamentul actual</string>
     <!-- Title of description of features, which are available for users, if they buy plan. -->
-    <string name="account_upgrade_account_description_title_features">Caracteristicile planurilor Pro</string>
+    <string name="account_upgrade_account_description_title_features">Caracteristicile abonamentelor Pro</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_password">&#8226;&#160;Linkuri protejate prin parolă</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
@@ -5076,7 +5076,7 @@
         <item quantity="other">%1$s și %2$s, la fiecare %3$d săptămâni</item>
     </plurals>
     <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
-    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">Aveți deja un abonament recurent pentru acest plan</string>
+    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">Aveți deja un abonament recurent pentru acest abonament</string>
     <!-- Album import storage exceeded title -->
     <string name="album_import_storage_exceeded_title">Nu se poate salva albumul</string>
     <!-- Album import storage exceeded description -->
@@ -5358,7 +5358,7 @@
     <!-- Dialog button to don't deny entry to a participant in the call -->
     <string name="meetings_waiting_room_do_not_deny_user_to_call_dialog_button">Nu refuza</string>
     <!-- camera uploads limited access -->
-    <string name="camera_uploads_limited_access">MEGA are acces limitat la biblioteca dvs. foto și nu poate face copii de rezervă pentru toate fotografiile.</string>
+    <string name="camera_uploads_limited_access">MEGA are acces limitat la biblioteca dvs. foto și nu poate backup-ui toate fotografiile.</string>
     <!-- camera uploads change permissions -->
     <string name="camera_uploads_change_permissions">Atinge pentru a modifica permisiunile.</string>
     <!-- Label to show the number of invitees in the not in call section in the bottom panel of the call-->
@@ -5376,7 +5376,7 @@
     <!-- Title of button to share the chat link in bottom panel in the group call screen -->
     <string name="meetings_group_call_bottom_panel_share_chat_link_button">Partajează linkul chatului</string>
     <!-- Title to display Current plan for user on My account screen. -->
-    <string name="account_my_account_home_view_current_plan_title">Planul actual</string>
+    <string name="account_my_account_home_view_current_plan_title">Abonamentul actual</string>
     <!-- Button title on Storage/Transfer usage screen related to My account screen. When user taps on button he will be redirected to Upgrade account screen. -->
     <string name="account_my_account_usage_get_more_storage_button">Obțineți mai mult spațiu de stocare</string>
     <!-- General message about MEGA in the first message header when there are no message in the chat screen -->
@@ -5384,9 +5384,9 @@
     <!-- Authenticity message about MEGA in the first message header when there are no message in the chat screen -->
     <string name="chat_chatroom_first_message_header_authenticity_info_text">Sistemul se asigură că datele primite sunt într-adevăr de la expeditorul specificat, iar conținutul său nu a fost manipulat în timpul tranzitului.</string>
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_get_pro_title">Obțineți mai mult cu un plan Pro</string>
+    <string name="dialog_onboarding_get_pro_title">Obțineți mai mult cu un abonament Pro</string>
     <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">Treceți la un plan Pro pentru mai mult spațiu de stocare și o mulțime de funcții suplimentare. Planurile noastre încep de la %s o lună.</string>
+    <string name="dialog_onboarding_get_pro_description">Treceți la un abonament Pro pentru mai mult spațiu de stocare și o mulțime de funcții suplimentare. Planurile noastre încep de la %s o lună.</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_some_features_title">Lată ce obțineți:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -5402,7 +5402,7 @@
     <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_description_security">Setați parolele și datele de expirare pentru linkurile de fișiere și folder.</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
-    <string name="dialog_onboarding_button_view_pro_plan">Vezi planurile Pro</string>
+    <string name="dialog_onboarding_button_view_pro_plan">Vezi abonamentele Pro</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s prezintă</string>
     <!-- Warning indicating that a participant is sharing the screen-->
@@ -5458,7 +5458,7 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Suna pe toți</string>
     <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
-    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">Această aplicație este conectată la un alt cont MEGA. \nDeconectați-vă de la acest cont și conectați-vă cu contul MEGA VPN</string>
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">Această aplicație este conectată la un alt cont MEGA. \nDeconectați-vă de la acest cont și conectați-vă cu contul MEGA&#160;VPN</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
     <string name="chat_attach_pick_from_camera_deny_permission">MEGA are nevoie de acces la camera dvs. pentru a captura fotografii și videoclipuri.</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
@@ -5519,4 +5519,41 @@
     <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">Desemnează și părăsesc</string>
     <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
     <string name="meeting_call_screen_bottom_panel_leave_option">Părăsește oricum</string>
+    <!-- Camera uploads updated info in Photos screen. -->
+    <string name="photos_camera_uploads_updated">Încărcări camere au fost actualizate</string>
+    <!-- Camera uploads no internet info in Photos screen. -->
+    <string name="photos_camera_uploads_no_internet">Încărcarea întreruptă din cauza lipsei conexiunii la internet</string>
+    <!-- Camera uploads low battery info in Photos screen. -->
+    <string name="photos_camera_uploads_low_battery">Upload paused. Battery below %1$d%% and not charging.</string>
+    <!-- Camera uploads general issue info in Photos screen. -->
+    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists please contact support</string>
+    <!-- Camera uploads pending info in Photos screen. -->
+    <plurals name="photos_camera_uploads_pending">
+        <item quantity="one">Încărcări cameră în desfășurare, %1$d&#160;fișier în așteptare</item>
+        <item quantity="few">Încărcări cameră în desfășurare, %1$d&#160;fișiere în așteptare</item>
+        <item quantity="other">Încărcări cameră în desfășurare, %1$d de fișiere în așteptare</item>
+    </plurals>
+    <!-- Camera uploads completed info in Photos screen. -->
+    <plurals name="photos_camera_uploads_completed">
+        <item quantity="one">Încărcări cameră complete, %1$d&#160;fișier încărcat</item>
+        <item quantity="few">Încărcări cameră complete, %1$d&#160;fișiere încărcate</item>
+        <item quantity="other">Încărcări cameră complete, %1$d de fișiere încărcate</item>
+    </plurals>
+    <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Your free plan has a 60 minute limit on meetings. Pro users have unlimited calls and up to 1000 participants.[/A] [B]Upgrade now.[/B]</string>
+    <!-- Bottom sheet button to hide a node/file -->
+    <string name="general_hide_node">Ascunde</string>
+    <!-- Bottom sheet button to unhide a node/file -->
+    <string name="general_unhide_node">Unhide</string>
+    <!-- Promo label for promo notification section -->
+    <string name="notifications_screen_notification_label_promo">Promoție</string>
+    <!-- Promo notification section title for promo notification section -->
+    <string name="notifications_screen_notification_section_title">Ofertă de timp limitat</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_change_sfu_dialog_title">Change SFU Server</string>
+    <string name="meetings_change_sfu_dialog_subtitle">Implicit este -1</string>
+    <string name="meetings_change_sfu_dialog_hint">Introduceți ID-ul SFU</string>
+    <string name="meetings_change_sfu_dialog_action_button">Schimbă</string>
+    <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Free plans have a limit of 60 minutes per meeting. [A]Upgrade now.[/A]</string>
 </resources>

@@ -804,7 +804,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Aumente a capacidade da sua nuvem.[A]Obtenha um maior espaço de armazenamento e mais cota de transferência com um plano Pro.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">Este e-mail já está sendo usado. Por favor, use outro e-mail.</string>
+    <string name="mail_already_used">Este email já está sendo usado. Digite outro email.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
     <string name="mail_changed_confirm_requested">Você já solicitou um link de confirmação para esse endereço de e-mail.</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
@@ -5458,7 +5458,7 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Chamar a todos</string>
     <!-- Banner description when a user navigates from other app with a different account than the one currently logged in -->
-    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">Este aplicativo está conectado a outra conta do MEGA. \nFaça logout desta conta e faça login na sua conta da MEGA VPN</string>
+    <string name="account_upgrade_vpn_wrong_account_upgrade_banner_description">Este aplicativo está conectado a outra conta do MEGA. \nFaça logout desta conta e faça login na sua conta da MEGA&#160;VPN</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
     <string name="chat_attach_pick_from_camera_deny_permission">O MEGA precisa acessar a sua câmera para fazer fotos e gravar vídeos.</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
@@ -5519,4 +5519,41 @@
     <string name="meeting_call_screen_bottom_panel_assign_and_leave_option">Designar e sair</string>
     <!-- Option in bottom panel to leave the call, displayed on the group call and meeting screen -->
     <string name="meeting_call_screen_bottom_panel_leave_option">Sair mesmo assim</string>
+    <!-- Camera uploads updated info in Photos screen. -->
+    <string name="photos_camera_uploads_updated">Uploads da câmera atualizados</string>
+    <!-- Camera uploads no internet info in Photos screen. -->
+    <string name="photos_camera_uploads_no_internet">O upload foi pausado por falta de conexão à Internet</string>
+    <!-- Camera uploads low battery info in Photos screen. -->
+    <string name="photos_camera_uploads_low_battery">O upload foi pausado. Há menos de %1$d%% de bateria, e não está sendo carregada.</string>
+    <!-- Camera uploads general issue info in Photos screen. -->
+    <string name="photos_camera_uploads_general_issue">Os uploads da câmera pararam de funcionar - tente reativá-los. Se o problema persistir, entre em contato com o suporte</string>
+    <!-- Camera uploads pending info in Photos screen. -->
+    <plurals name="photos_camera_uploads_pending">
+        <item quantity="one">Uploads da câmera em andamento, %1$d arquivo pendente</item>
+        <item quantity="many">Uploads da câmera em andamento, %1$d de arquivos pendentes</item>
+        <item quantity="other">Uploads da câmera em andamento, %1$d arquivos pendentes</item>
+    </plurals>
+    <!-- Camera uploads completed info in Photos screen. -->
+    <plurals name="photos_camera_uploads_completed">
+        <item quantity="one">Uploads da câmera concluídos, foi feito o upload de %1$d arquivo</item>
+        <item quantity="many">Uploads da câmera concluídos, foi feito o upload de %1$d de arquivos</item>
+        <item quantity="other">Uploads da câmera concluídos, foi feito o upload de %1$d arquivos</item>
+    </plurals>
+    <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]O seu plano gratuito tem um limite de 60 minutos para reuniões. Usuários com planos Pro podem fazer chamadas ilimitadas com até 1000 participantes.[/A] [B]Faça um upgrade.[/B]</string>
+    <!-- Bottom sheet button to hide a node/file -->
+    <string name="general_hide_node">Ocultar</string>
+    <!-- Bottom sheet button to unhide a node/file -->
+    <string name="general_unhide_node">Deixar de ocultar</string>
+    <!-- Promo label for promo notification section -->
+    <string name="notifications_screen_notification_label_promo">Oferta</string>
+    <!-- Promo notification section title for promo notification section -->
+    <string name="notifications_screen_notification_section_title">Oferta por tempo limitado</string>
+    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <string name="meetings_change_sfu_dialog_title">Change SFU Server</string>
+    <string name="meetings_change_sfu_dialog_subtitle">O ID predeterminado é -1</string>
+    <string name="meetings_change_sfu_dialog_hint">Digite o ID SFU</string>
+    <string name="meetings_change_sfu_dialog_action_button">Alterar</string>
+    <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Os planos gratuitos têm um limite de 60 minutos por reunião. [A]Faça um upgrade.[/A]</string>
 </resources>

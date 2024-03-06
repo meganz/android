@@ -51,9 +51,9 @@
     <!-- Sync to resolve conflict Merge folders -->
     <string name="sync_stalled_issue_merge_folders">Unisci le cartelle</string>
     <!-- Sync to resolve conflict Choose local file -->
-    <string name="sync_stalled_issue_choose_local_file">Choose the local file</string>
+    <string name="sync_stalled_issue_choose_local_file">Scegli il file locale</string>
     <!-- Sync to resolve conflict Choose remote file -->
-    <string name="sync_stalled_issue_choose_remote_file">Choose the file stored in MEGA</string>
+    <string name="sync_stalled_issue_choose_remote_file">Scegli il file archiviato in MEGA</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">Scegli l\’ultimo file modificato</string>
     <!-- Sync message when conflict resolved -->
@@ -125,7 +125,7 @@
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">Impossibile spostare o rinominare</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">Elimina o sposta in attesa della scansione</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning">Eliminazione o spostamento in attesa della scansione</string>
     <!-- Sync stalled issue reason is delete or move-->
     <string name="sync_stalled_issue_delete_or_move">Impossibile eliminare ora</string>
     <!-- Sync stalled issue reason is upload issue-->
@@ -171,7 +171,7 @@
     <!-- Sync stalled issue reason is upload issue detailed description-->
     <string name="sync_stalled_issue_upload_issue_detail">Impossibile raggiungere la cartella di destinazione</string>
     <!-- Sync stalled issue reason is download issue detailed description-->
-    <string name="sync_stalled_issue_download_issue_detail">Un fallimento è avvenuto durante il download del file, o durante lo spostamento del file temporaneamente scaricato nella sua posizione finale</string>
+    <string name="sync_stalled_issue_download_issue_detail">Un errore è stato riscontrato durante il download del file, o durante lo spostamento del file temporaneamente scaricato nella sua destinazione finale.</string>
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">Un errore locale impedisce l\’accesso alla cartella</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
@@ -191,7 +191,7 @@
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_local">Localmente è stato riscontrato uno spostamento o una rinominazione, ma è impossibile da replicare su MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
-    <string name="sync_stalled_issue_delete_or_move_scanning_detail">In attesa del termine della scansione per vedere se il file è stato spostato o eliminato.</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning_detail">In attesa del completamento della scansione per determinare se il file è stato spostato o eliminato.</string>
     <!-- Sync subtitle for sync screen to choose folders-->
     <string name="sync_choose_folders">Scegli cartelle</string>
 </resources>

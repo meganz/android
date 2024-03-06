@@ -43,9 +43,9 @@
     <!-- Sync to resolve conflict Merge folders -->
     <string name="sync_stalled_issue_merge_folders">폴더 병합</string>
     <!-- Sync to resolve conflict Choose local file -->
-    <string name="sync_stalled_issue_choose_local_file">Choose the local file</string>
+    <string name="sync_stalled_issue_choose_local_file">로컬 파일 선택</string>
     <!-- Sync to resolve conflict Choose remote file -->
-    <string name="sync_stalled_issue_choose_remote_file">Choose the file stored in MEGA</string>
+    <string name="sync_stalled_issue_choose_remote_file">MEGA에 저장된 파일 선택</string>
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">마지막으로 수정된 파일 선택</string>
     <!-- Sync message when conflict resolved -->
@@ -133,7 +133,7 @@
     <!-- Sync stalled issue reason is Folder Matched Against File-->
     <string name="sync_stalled_issue_folder_matched_against_file">동기화하려는 파일에 확장자가 없고 존재하는 폴더와 이름이 같습니다</string>
     <!-- Sync stalled issue reason is Local and remote changed since last sync-->
-    <string name="sync_stalled_issue_local_and_remote_change_last_sync">Item changed since last sync</string>
+    <string name="sync_stalled_issue_local_and_remote_change_last_sync">지난 동기화 이후로 항목이 변경됨</string>
     <!-- Sync stalled issue reason is Local and remote not synced-->
     <string name="sync_stalled_issue_local_and_remote_not_synced">파일 또는 폴더 충돌</string>
     <!-- Sync stalled issue reason is Name clash-->
@@ -163,7 +163,7 @@
     <!-- Sync stalled issue reason is upload issue detailed description-->
     <string name="sync_stalled_issue_upload_issue_detail">대상 폴더에 도달할 수 없음</string>
     <!-- Sync stalled issue reason is download issue detailed description-->
-    <string name="sync_stalled_issue_download_issue_detail">파일 다운로드 또는 다운로드한 임시 파일을 최종 위치로 이동하던 중 실패함</string>
+    <string name="sync_stalled_issue_download_issue_detail">파일 다운로드 또는 다운로드한 임시 파일을 최종 위치로 이동하던 중 오류가 발생하였습니다.</string>
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">폴더 접근을 막는 로컬 오류 발생</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->

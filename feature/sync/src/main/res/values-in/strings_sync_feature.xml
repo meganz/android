@@ -61,7 +61,7 @@
     <!-- Sync dialog title for battery optimization -->
     <string name="sync_dialog_battery_optimization_title">Battery optimisation</string>
     <!-- Sync dialog cancel button text -->
-    <string name="sync_dialog_battery_optimization_negative_button">Don’t allow</string>
+    <string name="sync_dialog_battery_optimization_negative_button">Jangan izinkan</string>
     <!-- Sync dialog allow button text -->
     <string name="sync_dialog_battery_optimization_positive_button">Izinkan</string>
     <!-- Sync dialog battery optimization message -->
@@ -95,7 +95,7 @@
     <!-- Sync Pause -->
     <string name="sync_card_pause_sync">Hentikan sementara</string>
     <!-- Sync Run -->
-    <string name="sync_card_run_sync">Resume</string>
+    <string name="sync_card_run_sync">Lanjutkan</string>
     <!-- Sync Remove -->
     <string name="sync_card_remove_sync">Hapus</string>
     <!-- Sync dialog for sync over Wi-Fi or mobile data -->
@@ -117,7 +117,7 @@
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">Can’t move or rename</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">Delete or move waiting on scanning</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning">Deletion or move waiting on scanning</string>
     <!-- Sync stalled issue reason is delete or move-->
     <string name="sync_stalled_issue_delete_or_move">Can’t delete yet</string>
     <!-- Sync stalled issue reason is upload issue-->
@@ -163,7 +163,7 @@
     <!-- Sync stalled issue reason is upload issue detailed description-->
     <string name="sync_stalled_issue_upload_issue_detail">Can’t reach the destination folder</string>
     <!-- Sync stalled issue reason is download issue detailed description-->
-    <string name="sync_stalled_issue_download_issue_detail">A failure occurred either downloading the file, or moving the downloaded temporary file to its final location</string>
+    <string name="sync_stalled_issue_download_issue_detail">An error occurred either downloading the file, or moving the downloaded temporary file to its final location.</string>
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">A local error prevents folder access</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
@@ -181,9 +181,9 @@
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename was detected in MEGA, but couldn’t be replicated locally.</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">A move or rename was detected locally, but couldn’t be replicated in MEGA.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">Moving or renaming was detected as happening locally, but couldn’t be replicated in MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
-    <string name="sync_stalled_issue_delete_or_move_scanning_detail">Waiting to finish scan to see if the file was moved or deleted.</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning_detail">Waiting for scan to finish to determine if the file was moved or deleted.</string>
     <!-- Sync subtitle for sync screen to choose folders-->
     <string name="sync_choose_folders">Choose folders</string>
 </resources>
