@@ -11,7 +11,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.TextUtils
 import android.util.DisplayMetrics
 import android.view.Gravity
 import android.view.MotionEvent
@@ -29,7 +28,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -73,7 +71,6 @@ import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings.showResumeTransfersWarning
-import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.ColorUtils.setStatusBarTextColor
 import mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE
@@ -996,35 +993,15 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         val builder =
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                 .apply {
-                    setTitle(R.string.expired_business_title)
-
-                    if (megaApi.isMasterBusinessAccount) {
-                        setMessage(R.string.expired_admin_business_text)
-                    } else {
-                        var expiredString =
-                            getString(R.string.expired_user_business_text)
-                        try {
-                            expiredString = expiredString.replace(
-                                "[B]", "<b><font color=\'"
-                                        + getColorHexString(this@BaseActivity, R.color.black_white)
-                                        + "\'>"
-                            )
-                            expiredString = expiredString.replace("[/B]", "</font></b>")
-                        } catch (e: Exception) {
-                            Timber.w(e, "Exception formatting string")
+                    setTitle(R.string.account_business_account_deactivated_dialog_title)
+                    setMessage(
+                        if (megaApi.isMasterBusinessAccount) {
+                            R.string.account_business_account_deactivated_dialog_admin_body
+                        } else {
+                            R.string.account_business_account_deactivated_dialog_sub_user_body
                         }
-                        setMessage(
-                            TextUtils.concat(
-                                HtmlCompat.fromHtml(
-                                    expiredString,
-                                    HtmlCompat.FROM_HTML_MODE_LEGACY
-                                ),
-                                "\n\n${getString(R.string.expired_user_business_text_2)}"
-                            )
-                        )
-                    }
-
-                    setNegativeButton(R.string.general_dismiss) { dialog, _ ->
+                    )
+                    setNegativeButton(R.string.account_business_account_deactivated_dialog_button) { dialog, _ ->
                         isExpiredBusinessAlertShown = false
 
                         if (finishActivityAtError) {

@@ -4,15 +4,12 @@ import android.os.Bundle
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import androidx.core.content.ContextCompat
-import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.ActivityBusinessExpiredAlertBinding
-import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.isScreenInPortrait
-import timber.log.Timber
 
 /**
  * The class for showing the business expired alert
@@ -24,6 +21,9 @@ class BusinessExpiredAlertActivity : PasscodeActivity() {
         ActivityBusinessExpiredAlertBinding.inflate(layoutInflater)
     }
 
+    /**
+     * onCreate
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -46,10 +46,11 @@ class BusinessExpiredAlertActivity : PasscodeActivity() {
                 if (isScreenInPortrait(this)) {
                     R.drawable.ic_account_expired_admin_portrait
                 } else {
-                    R.drawable.ic_account_expired_admin_portrait
+                    R.drawable.ic_account_expired_admin_landscape
                 }
             )
-            binding.expiredText.text = getString(R.string.expired_admin_business_text)
+            binding.expiredText.text =
+                getString(R.string.account_business_account_deactivated_dialog_admin_body)
             binding.expiredSubtext.isVisible = false
         } else {
             binding.expiredImageLayout.background =
@@ -65,21 +66,8 @@ class BusinessExpiredAlertActivity : PasscodeActivity() {
                     R.drawable.ic_account_expired_user_landscape
                 }
             )
-            var expiredString = getString(R.string.expired_user_business_text)
-            runCatching {
-                expiredString = expiredString.replace(
-                    "[B]",
-                    "<b><font color=\'${
-                        getColorHexString(
-                            this, R.color.grey_900_grey_100
-                        )
-                    }\'>"
-                ).replace("[/B]", "</font></b>")
-            }.onFailure {
-                Timber.w(it, "Exception formatting string")
-            }
             binding.expiredText.text =
-                HtmlCompat.fromHtml(expiredString, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                getString(R.string.account_business_account_deactivated_dialog_sub_user_body)
             binding.expiredSubtext.isVisible = true
         }
         binding.expiredImage.layoutParams = expiredImageParams
@@ -89,6 +77,9 @@ class BusinessExpiredAlertActivity : PasscodeActivity() {
         }
     }
 
+    /**
+     * finish
+     */
     override fun finish() {
         myAccountInfo.isBusinessAlertShown = false
         super.finish()

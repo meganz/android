@@ -28,7 +28,7 @@
             android:layout_marginTop="24dp"
             android:layout_marginRight="24dp"
             android:gravity="center"
-            android:text="@string/expired_business_title"
+            android:text="@string/account_business_account_deactivated_dialog_title"
             android:textAppearance="@style/TextAppearance.Mega.Headline5" />
 
         <TextView
