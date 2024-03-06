@@ -431,7 +431,6 @@ import mega.privacy.mobile.analytics.event.ChatConversationDownloadActionMenuEve
 import mega.privacy.mobile.analytics.event.ChatConversationEditActionMenuEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationEndCallForAllMenuToolbarEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationForwardActionMenuEvent;
-import mega.privacy.mobile.analytics.event.ChatConversationHomeUpMenuToolbarEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationInfoMenuToolbarEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationInviteActionMenuEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationLeaveMenuToolbarEvent;
@@ -440,9 +439,9 @@ import mega.privacy.mobile.analytics.event.ChatConversationScreenEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationSelectMenuToolbarEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationSendMessageActionMenuEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationShareActionMenuEvent;
-import mega.privacy.mobile.analytics.event.ChatMessageLongPressedEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationUnmuteMenuToolbarEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationVideoMenuToolbarEvent;
+import mega.privacy.mobile.analytics.event.ChatMessageLongPressedEvent;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -3347,9 +3346,7 @@ public class ChatActivity extends PasscodeActivity
     }
 
     private void trackOptionsItemSelected(int itemId) {
-        if (itemId == android.R.id.home) {
-            Analytics.INSTANCE.getTracker().trackEvent(ChatConversationHomeUpMenuToolbarEvent.INSTANCE);
-        } else if (itemId == R.id.cab_menu_call_chat) {
+        if (itemId == R.id.cab_menu_call_chat) {
             Analytics.INSTANCE.getTracker().trackEvent(ChatConversationCallMenuToolbarEvent.INSTANCE);
         } else if (itemId == R.id.cab_menu_video_chat) {
             Analytics.INSTANCE.getTracker().trackEvent(ChatConversationVideoMenuToolbarEvent.INSTANCE);
