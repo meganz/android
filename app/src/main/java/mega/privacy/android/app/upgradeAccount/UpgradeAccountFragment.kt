@@ -105,7 +105,6 @@ class UpgradeAccountFragment : Fragment() {
                         startPurchase(uiState.isMonthlySelected, chosenPlan)
                     }
                 },
-                onTOSClicked = this::redirectToTOSPage,
                 onPlayStoreLinkClicked = this::redirectToPlayStoreSubscription,
                 onPricingPageClicked = this::redirectToPricingPage,
                 onChoosingMonthlyYearlyPlan = upgradeAccountViewModel::onSelectingMonthlyPlan,
@@ -208,14 +207,6 @@ class UpgradeAccountFragment : Fragment() {
         }
     }
 
-    private fun redirectToTOSPage() {
-        startActivity(
-            Intent(requireContext(), WebViewActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                .setData(Uri.parse(Constants.TERMS_OF_SERVICE_URL))
-        )
-    }
-
     private fun redirectToPlayStoreSubscription(link: String) {
         val uriUrl = Uri.parse(link)
         val launchBrowser = Intent(ACTION_VIEW, uriUrl)
@@ -268,5 +259,9 @@ class UpgradeAccountFragment : Fragment() {
         } else {
             upgradeAccountActivity.onBackPressedDispatcher.onBackPressed()
         }
+    }
+
+    companion object {
+        const val PRIVACY_POLICY_URL = "https://mega.nz/privacy"
     }
 }
