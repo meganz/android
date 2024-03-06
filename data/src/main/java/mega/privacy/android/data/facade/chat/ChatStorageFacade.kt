@@ -164,4 +164,8 @@ internal class ChatStorageFacade @Inject constructor(
         chatNodeDao.removeMessageNodeRelationship(messagesToDelete)
         chatNodeDao.deleteOrphanedNodes()
     }
+
+    override suspend fun clearChatPendingMessages(chatId: Long) {
+        database.pendingMessageDao().deleteAllForChat(chatId)
+    }
 }

@@ -5,6 +5,7 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatMessage
+import mega.privacy.android.domain.entity.chat.room.update.HistoryTruncated
 import mega.privacy.android.domain.entity.chat.room.update.HistoryTruncatedByRetentionTime
 import mega.privacy.android.domain.entity.chat.room.update.MessageUpdate
 import mega.privacy.android.domain.repository.ChatRepository
@@ -53,13 +54,34 @@ class MonitorChatRoomMessageUpdatesUseCaseTest {
     }
 
     @Test
+    internal fun `test that messages are truncated by time if type is truncate by retention time`() =
+        runTest {
+            val chatId = 123L
+            val truncateTime = 98765L
+            val message = mock<ChatMessage> {
+                on { timestamp } doReturn truncateTime
+            }
+            val update = HistoryTruncatedByRetentionTime(message)
+            chatRepository.stub {
+                on { monitorMessageUpdates(chatId) } doReturn hotFlow(update)
+            }
+
+            val job = launch(
+                start = CoroutineStart.UNDISPATCHED
+            ) { underTest(chatId) }
+
+            verify(chatMessageRepository).truncateMessages(chatId, truncateTime)
+            verify(chatMessageRepository, never()).clearChatPendingMessages(chatId)
+            verify(saveChatMessagesUseCase, never()).invoke(chatId, listOf(message))
+
+            job.cancelAndJoin()
+        }
+
+    @Test
     internal fun `test that messages are truncated if type is truncate`() = runTest {
         val chatId = 123L
-        val truncateTime = 98765L
-        val message = mock<ChatMessage> {
-            on { timestamp } doReturn truncateTime
-        }
-        val update = HistoryTruncatedByRetentionTime(message)
+        val message = mock<ChatMessage>()
+        val update = HistoryTruncated(message)
         chatRepository.stub {
             on { monitorMessageUpdates(chatId) } doReturn hotFlow(update)
         }
@@ -68,8 +90,9 @@ class MonitorChatRoomMessageUpdatesUseCaseTest {
             start = CoroutineStart.UNDISPATCHED
         ) { underTest(chatId) }
 
-        verify(chatMessageRepository).truncateMessages(chatId, truncateTime)
-        verify(saveChatMessagesUseCase, never()).invoke(chatId, listOf(message))
+        verify(chatRepository).clearChatMessages(chatId)
+        verify(chatMessageRepository).clearChatPendingMessages(chatId)
+        verify(saveChatMessagesUseCase).invoke(chatId, listOf(message))
 
         job.cancelAndJoin()
     }

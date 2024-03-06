@@ -131,4 +131,11 @@ interface ChatStorageGateway {
      * @param truncateTimestamp
      */
     suspend fun truncateMessages(chatId: Long, truncateTimestamp: Long)
+
+    /**
+     * Clear chat pending messages
+     *
+     * @param chatId
+     */
+    suspend fun clearChatPendingMessages(chatId: Long)
 }

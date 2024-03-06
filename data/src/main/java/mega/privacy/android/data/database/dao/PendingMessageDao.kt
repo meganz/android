@@ -57,4 +57,12 @@ interface PendingMessageDao {
     @Query("SELECT * FROM pending_messages WHERE chatId = :chatId")
     fun fetchPendingMessagesForChat(chatId: Long): Flow<List<PendingMessageEntity>>
 
+
+    /**
+     * Delete
+     *
+     * @param chatId
+     */
+    @Query("DELETE FROM pending_messages WHERE chatId = :chatId")
+    suspend fun deleteAllForChat(chatId: Long)
 }

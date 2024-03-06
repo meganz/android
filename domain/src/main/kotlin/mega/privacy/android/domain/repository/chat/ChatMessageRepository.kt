@@ -482,4 +482,11 @@ interface ChatMessageRepository {
      * @param truncateTimestamp
      */
     suspend fun truncateMessages(chatId: Long, truncateTimestamp: Long)
+
+    /**
+     * Delete all pending messages in a chat.
+     *
+     * @param chatId
+     */
+    suspend fun clearChatPendingMessages(chatId: Long)
 }

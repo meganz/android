@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.chat.message
 
+import mega.privacy.android.domain.entity.chat.room.update.HistoryTruncated
 import mega.privacy.android.domain.entity.chat.room.update.HistoryTruncatedByRetentionTime
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
@@ -26,10 +27,20 @@ class MonitorChatRoomMessageUpdatesUseCase @Inject constructor(
     suspend operator fun invoke(chatId: Long) {
         chatRepository.monitorMessageUpdates(chatId)
             .collect {
-                if (it is HistoryTruncatedByRetentionTime) {
-                    chatMessageRepository.truncateMessages(chatId, it.message.timestamp)
-                } else {
-                    saveChatMessagesUseCase(chatId, listOf(it.message))
+                when (it) {
+                    is HistoryTruncatedByRetentionTime -> {
+                        chatMessageRepository.truncateMessages(chatId, it.message.timestamp)
+                    }
+
+                    is HistoryTruncated -> {
+                        chatRepository.clearChatMessages(chatId)
+                        chatMessageRepository.clearChatPendingMessages(chatId)
+                        saveChatMessagesUseCase(chatId, listOf(it.message))
+                    }
+
+                    else -> {
+                        saveChatMessagesUseCase(chatId, listOf(it.message))
+                    }
                 }
             }
     }

@@ -284,4 +284,8 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
             )
         }
     }
+
+    override suspend fun clearChatPendingMessages(chatId: Long) = withContext(ioDispatcher) {
+        chatStorageGateway.clearChatPendingMessages(chatId)
+    }
 }
