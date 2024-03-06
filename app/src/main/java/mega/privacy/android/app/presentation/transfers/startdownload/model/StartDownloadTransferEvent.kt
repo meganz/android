@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.startdownload.model
 
+import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import mega.privacy.android.app.R
 
@@ -72,5 +73,27 @@ sealed interface StartDownloadTransferEvent {
          * Transfer cancelled by user action
          */
         data object TransferCancelled : Message(R.string.transfers_cancelled, null, null)
+
+        /**
+         * Save offline has finished
+         */
+        data object FinishOffline : Message(R.string.file_available_offline, null, null)
+    }
+
+    /**
+     * A message should be shown with plural resource
+     * @param message the [PluralsRes] of the message to be shown
+     * @param quantity
+     */
+    sealed class MessagePlural(
+        @PluralsRes val message: Int,
+        val quantity: Int,
+    ) : StartDownloadTransferEvent {
+        /**
+         * Save to device has finished
+         * @param totalNodes
+         */
+        data class FinishDownloading(val totalNodes: Int) :
+            MessagePlural(R.plurals.download_complete, totalNodes)
     }
 }

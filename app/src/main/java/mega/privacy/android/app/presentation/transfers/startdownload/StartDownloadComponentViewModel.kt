@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.lastOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
@@ -284,6 +286,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                     }
                 }.last()
             }
+        monitorFinish()
         checkRating()
         if (terminalEvent == MultiTransferEvent.ScanningFoldersFinished) toDoAfterProcessing?.invoke()
         _uiState.updateEventAndClearProgress(
@@ -404,6 +407,40 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                         )
                     }
                 }
+            }
+        }
+    }
+
+    private var monitorFinishJob: Job? = null
+    private fun monitorFinish() {
+        if (monitorFinishJob == null) {
+            monitorFinishJob = viewModelScope.launch {
+                val lastBeforeClear =
+                    monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD)
+                        .conflate()
+                        .map { it.activeTransferTotals }
+                        .takeWhile {
+                            it.totalTransfers > 0
+                        }.lastOrNull() ?: return@launch
+                (lastBeforeClear.totalFileTransfers - lastBeforeClear.totalFinishedWithErrorsFileTransfers).takeIf { it > 0 }
+                    ?.let {
+                        when (_uiState.value.transferTriggerEvent) {
+                            is TransferTriggerEvent.StartDownloadForOffline -> {
+                                StartDownloadTransferEvent.Message.FinishOffline
+                            }
+
+                            is TransferTriggerEvent.StartDownloadNode -> {
+                                StartDownloadTransferEvent.MessagePlural.FinishDownloading(
+                                    it
+                                )
+                            }
+
+                            else -> null
+                        }?.let { finishEvent ->
+                            _uiState.updateEventAndClearProgress(finishEvent)
+                        }
+                    }
+                monitorFinishJob = null
             }
         }
     }

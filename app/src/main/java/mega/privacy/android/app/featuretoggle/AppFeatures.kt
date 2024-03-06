@@ -112,7 +112,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     DownloadWorker(
         "Enables DownloadWorker for download nodes, instead of DownloadService. This is a work in progress feature.",
-        false,
+        true,
     ),
 
     /**

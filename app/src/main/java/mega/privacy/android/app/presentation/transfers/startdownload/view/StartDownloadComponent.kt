@@ -214,6 +214,9 @@ private fun StartDownloadComponent(
                 is StartDownloadTransferEvent.Message ->
                     consumeMessage(it, snackBarHostState, context)
 
+                is StartDownloadTransferEvent.MessagePlural ->
+                    consumeMessage(it, snackBarHostState, context)
+
                 StartDownloadTransferEvent.NotConnected -> {
                     showOfflineAlertDialog = true
                 }
@@ -373,6 +376,17 @@ private suspend fun consumeMessage(
             context
         )
     }
+}
+
+private suspend fun consumeMessage(
+    event: StartDownloadTransferEvent.MessagePlural,
+    snackBarHostState: SnackbarHostState,
+    context: Context,
+) {
+    //show snack bar
+    snackBarHostState.showSnackbar(
+        context.resources.getQuantityString(event.message, event.quantity, event.quantity)
+    )
 }
 
 private fun consumeMessageAction(
