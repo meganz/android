@@ -36,9 +36,9 @@ internal fun OwnDeviceBottomSheetBody(
     onInfoClicked: () -> Unit,
 ) {
     Column(modifier = Modifier.testTag(BOTTOM_SHEET_BODY_OWN_DEVICE)) {
-//        if (isCameraUploadsEnabled) {
-//            InfoBottomSheetTile(onActionClicked = onInfoClicked)
-//        }
+        if (isCameraUploadsEnabled) {
+            InfoBottomSheetTile(onActionClicked = onInfoClicked)
+        }
         CameraUploadsBottomSheetTile(
             isCameraUploadsEnabled = isCameraUploadsEnabled,
             onActionClicked = onCameraUploadsClicked,

@@ -308,13 +308,13 @@ private fun DeviceCenterAppBar(
 
                 when (uiState.selectedDevice) {
                     is OwnDeviceUINode -> {
-//                        if (uiState.isCameraUploadsEnabled) {
-//                            list.add(DeviceMenuAction.Info)
-//                        }
+                        if (uiState.isCameraUploadsEnabled) {
+                            list.add(DeviceMenuAction.Info)
+                        }
                         list.add(DeviceMenuAction.CameraUploads)
                     }
 
-//                    else -> list.add(DeviceMenuAction.Info)
+                    else -> list.add(DeviceMenuAction.Info)
                 }
 
                 return@let list
