@@ -105,7 +105,7 @@ private fun LoadProgress(loadProgress: Float?, isError: Boolean) {
     loadProgress?.let {
         if (!isError) {
             MegaLinearProgressIndicator(
-                progress = it / 100f,
+                progress = it,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(4.dp)

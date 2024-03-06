@@ -2,8 +2,11 @@ package mega.privacy.android.app.presentation.meeting.chat.model.messages
 
 import androidx.compose.runtime.Composable
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.PendingAttachmentMessageView
+import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.PendingVoiceClipMessageView
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
+import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
+import mega.privacy.android.domain.entity.chat.messages.PendingVoiceClipMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
 /**
@@ -19,7 +22,10 @@ data class PendingAttachmentUiMessage(
         onLongClick: (TypedMessage) -> Unit,
         interactionEnabled: Boolean,
     ) {
-        PendingAttachmentMessageView(message)
+        when (message) {
+            is PendingVoiceClipMessage -> PendingVoiceClipMessageView(message)
+            is PendingFileAttachmentMessage -> PendingAttachmentMessageView(message)
+        }
     }
 
     override val showAvatar = message.shouldShowAvatar

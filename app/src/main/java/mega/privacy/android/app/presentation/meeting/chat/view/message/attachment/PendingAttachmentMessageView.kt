@@ -7,19 +7,18 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.core.ui.controls.chat.messages.file.FileMessageView
-import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
+import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
 
 /**
  * View for pending messages (not send to SDK yet)
  */
 @Composable
 fun PendingAttachmentMessageView(
-    message: PendingAttachmentMessage,
+    message: PendingFileAttachmentMessage,
     modifier: Modifier = Modifier,
     viewModel: PendingAttachmentMessageViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.getOrPutUiStateFlow(message).collectAsStateWithLifecycle()
-
     FileMessageView(
         isMe = message.isMine,
         fileTypeResId = uiState.fileTypeResId,

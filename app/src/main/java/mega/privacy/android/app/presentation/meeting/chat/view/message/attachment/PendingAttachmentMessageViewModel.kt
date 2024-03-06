@@ -49,7 +49,10 @@ class PendingAttachmentMessageViewModel @Inject constructor(
 
     override fun createFirstUiState(attachmentMessage: PendingAttachmentMessage): AttachmentMessageUiState {
         return super.createFirstUiState(attachmentMessage)
-            .copy(previewUri = attachmentMessage.file.absolutePath)
+            .copy(
+                previewUri = attachmentMessage.file?.absolutePath,
+                isError = attachmentMessage.isError,
+            )
     }
 }
 

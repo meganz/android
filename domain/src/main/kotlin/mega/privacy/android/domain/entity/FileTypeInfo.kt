@@ -30,6 +30,16 @@ sealed interface FileTypeInfo {
 }
 
 /**
+ * File types that can be played
+ */
+sealed interface PlayableFileTypeInfo {
+    /**
+     * Duration
+     */
+    val duration: Duration
+}
+
+/**
  * Image file type info
  */
 @Polymorphic
@@ -111,11 +121,8 @@ data class StaticImageFileTypeInfo(
 data class AudioFileTypeInfo(
     override val mimeType: String,
     override val extension: String,
-    /**
-     * Duration
-     */
-    val duration: Duration,
-) : FileTypeInfo {
+    override val duration: Duration,
+) : FileTypeInfo, PlayableFileTypeInfo {
     override val isSupported = extension != "wma" && extension != "aif" && extension != "aiff"
             && extension != "iff" && extension != "oga" && extension != "3ga"
 }
@@ -199,11 +206,8 @@ data class UnMappedFileTypeInfo(
 data class VideoFileTypeInfo(
     override val mimeType: String,
     override val extension: String,
-    /**
-     * Duration
-     */
-    val duration: Duration,
-) : FileTypeInfo {
+    override val duration: Duration,
+) : FileTypeInfo, PlayableFileTypeInfo {
     /**
      * Is supported
      */

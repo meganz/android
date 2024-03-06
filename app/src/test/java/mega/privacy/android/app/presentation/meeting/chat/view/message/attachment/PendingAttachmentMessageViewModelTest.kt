@@ -11,7 +11,7 @@ import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMa
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
-import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
+import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -20,6 +20,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -60,6 +62,18 @@ class PendingAttachmentMessageViewModelTest {
         assertThat(actual.previewUri).endsWith(path)
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that first ui state adds isError flag`(
+        expected: Boolean,
+    ) {
+        setup(emptyFlow())
+        val attachmentMessage = stubMessage()
+        whenever(attachmentMessage.isError) doReturn expected
+        val actual = underTest.createFirstUiState(attachmentMessage)
+        assertThat(actual.isError).isEqualTo(expected)
+    }
+
     @Test
     fun `test that transfer events updates the pending message progress`() = runTest {
         val expected = Progress(0.33f)
@@ -86,7 +100,7 @@ class PendingAttachmentMessageViewModelTest {
         )
     }
 
-    private fun stubMessage() = mock<PendingAttachmentMessage> {
+    private fun stubMessage() = mock<PendingFileAttachmentMessage> {
         on { fileName } doReturn "file.jpg"
         on { fileType } doReturn StaticImageFileTypeInfo("image/jpg", "jpg")
         on { fileSize } doReturn 8435L

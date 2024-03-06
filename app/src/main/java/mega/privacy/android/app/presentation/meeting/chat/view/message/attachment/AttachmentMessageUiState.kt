@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.Progress
  * @property previewUri uri string to file preview
  * @property duration String representation of the duration of the file in case it's playable, null otherwise
  * @property loadProgress load progress, null if it's not loading
+ * @property isError true if there was any error downloading, uploading or attaching the file
  */
 data class AttachmentMessageUiState(
     val fileTypeResId: Int? = null,
@@ -18,4 +19,5 @@ data class AttachmentMessageUiState(
     val previewUri: String? = null,
     val duration: String? = null,
     val loadProgress: Progress? = null,
+    val isError: Boolean = false,
 )

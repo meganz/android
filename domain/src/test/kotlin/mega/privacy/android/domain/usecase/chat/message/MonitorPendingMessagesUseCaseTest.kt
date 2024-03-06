@@ -5,7 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.PendingMessage
-import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
+import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -44,7 +44,7 @@ class MonitorPendingMessagesUseCaseTest {
     fun `test that mapped flow from chat message repository is returned`() = runTest {
         val chatId = 45L
         val pendingMessagesMap = (0..10).associate {
-            val pendingAttachmentMessage = mock<PendingAttachmentMessage>()
+            val pendingAttachmentMessage = mock<PendingFileAttachmentMessage>()
             val pendingMessage = mock<PendingMessage>()
             whenever(createPendingAttachmentMessageUseCase(pendingMessage))
                 .thenReturn(pendingAttachmentMessage)

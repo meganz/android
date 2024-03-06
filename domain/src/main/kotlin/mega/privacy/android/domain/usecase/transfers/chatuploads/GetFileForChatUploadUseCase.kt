@@ -5,7 +5,8 @@ import java.io.File
 import javax.inject.Inject
 
 /**
- * Get a file for this uri that can be accessed by SDK:
+ * Get a file for this uri or path that can be accessed by SDK:
+ * - If the string is already representing an existing file path it returns the file
  * - If the Uri is already representing a file it returns the file
  * - If the Uri is a content uri, it makes a copy in the chat cache folder
  */
@@ -16,18 +17,20 @@ class GetFileForChatUploadUseCase @Inject constructor(
     /**
      * Invoke
      *
-     * @param uriString a string representing the Uri
+     * @param uriOrPathString a string representing the Uri
      */
-    suspend operator fun invoke(uriString: String): File? {
+    suspend operator fun invoke(uriOrPathString: String): File? {
+        val file = File(uriOrPathString)
         return when {
-            fileSystemRepository.isFileUri(uriString) -> {
-                fileSystemRepository.getFileFromFileUri(uriString)
+            file.isFile && file.exists() -> file
+            fileSystemRepository.isFileUri(uriOrPathString) -> {
+                fileSystemRepository.getFileFromFileUri(uriOrPathString)
             }
 
-            fileSystemRepository.isContentUri(uriString) -> {
-                fileSystemRepository.getFileNameFromUri(uriString)?.let {
+            fileSystemRepository.isContentUri(uriOrPathString) -> {
+                fileSystemRepository.getFileNameFromUri(uriOrPathString)?.let {
                     getCacheFileForChatUploadUseCase(File(it))?.also { destination ->
-                        fileSystemRepository.copyContentUriToFile(uriString, destination)
+                        fileSystemRepository.copyContentUriToFile(uriOrPathString, destination)
                     }
                 }
             }
