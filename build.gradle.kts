@@ -28,7 +28,7 @@ buildscript {
         classpath(plugin.jfrog)
         classpath(plugin.junit5)
         classpath(plugin.kotlin.gradle)
-        classpath("androidx.benchmark:benchmark-baseline-profile-gradle-plugin:1.2.0-beta02")
+        classpath("androidx.benchmark:benchmark-baseline-profile-gradle-plugin:1.2.3")
         classpath(tools.mega.gradle)
     }
 }

@@ -23,7 +23,9 @@ android {
         sourceCompatibility = javaVersion
         targetCompatibility = javaVersion
     }
-
+    packaging {
+        resources.excludes.add("/META-INF/*")
+    }
     kotlin {
         val jdk: String by rootProject.extra
         jvmToolchain(jdk.toInt())

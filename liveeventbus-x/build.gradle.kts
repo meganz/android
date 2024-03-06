@@ -1,5 +1,6 @@
 plugins {
     id("com.android.library")
+    id("org.jetbrains.kotlin.android")
 }
 
 android {
@@ -12,6 +13,23 @@ android {
         minSdk = minSdkVersion
         val targetSdkVersion: Int by rootProject.extra
         targetSdk = targetSdkVersion
+    }
+    compileOptions {
+        val javaVersion: JavaVersion by rootProject.extra
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
+    }
+    kotlin {
+        val jdk: String by rootProject.extra
+        jvmToolchain(jdk.toInt())
+    }
+
+    kotlinOptions {
+        val jdk: String by rootProject.extra
+        jvmTarget = jdk
+        val shouldSuppressWarnings: Boolean by rootProject.extra
+        suppressWarnings = shouldSuppressWarnings
+        freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
 }
 

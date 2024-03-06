@@ -62,4 +62,17 @@ dependencies {
     testImplementation(testlib.junit)
     androidTestImplementation(testlib.junit.test.ktx)
     androidTestImplementation(testlib.espresso)
+
+    // temporary fix reference to sdk/src/main/jni/ExoPlayer/library/common/build.gradle
+    // due to guava uses old dependencies
+    // https://github.com/google/ExoPlayer/blob/release-v2/library/common/build.gradle
+    // https://github.com/google/ExoPlayer/blob/release-v2/constants.gradle
+    api("com.google.guava:guava:33.0.0-android") {
+        exclude(group = "com.google.code.findbugs", module = "jsr305")
+        exclude(group = "org.checkerframework", module = "checker-compat-qual")
+        exclude(group = "org.checkerframework", module = "checker-qual")
+        exclude(group = "com.google.errorprone", module = "error_prone_annotations")
+        exclude(group = "com.google.j2objc", module = "j2objc-annotations")
+        exclude(group = "org.codehaus.mojo", module = "animal-sniffer-annotations")
+    }
 }
