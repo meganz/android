@@ -1,10 +1,6 @@
 package mega.privacy.android.feature.devicecenter.ui.bottomsheet
 
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -20,11 +16,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Test class for [DeviceBottomSheet]
+ * Test class for [DeviceBottomSheetBody]
  */
 @OptIn(ExperimentalMaterialApi::class)
 @RunWith(AndroidJUnit4::class)
-internal class DeviceBottomSheetTest {
+internal class DeviceBottomSheetBodyTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -39,18 +35,13 @@ internal class DeviceBottomSheetTest {
             folders = emptyList(),
         )
         composeTestRule.setContent {
-            DeviceBottomSheet(
-                coroutineScope = rememberCoroutineScope(),
-                modalSheetState = ModalBottomSheetState(
-                    initialValue = ModalBottomSheetValue.Expanded,
-                    isSkipHalfExpanded = false,
-                    density = LocalDensity.current,
-                ),
+            DeviceBottomSheetBody(
                 device = ownDeviceUINode,
                 isCameraUploadsEnabled = true,
                 onCameraUploadsClicked = {},
                 onRenameDeviceClicked = {},
                 onInfoClicked = {},
+                onBottomSheetDismissed = {},
             )
         }
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_CONTAINER)
@@ -68,18 +59,13 @@ internal class DeviceBottomSheetTest {
             folders = emptyList(),
         )
         composeTestRule.setContent {
-            DeviceBottomSheet(
-                coroutineScope = rememberCoroutineScope(),
-                modalSheetState = ModalBottomSheetState(
-                    initialValue = ModalBottomSheetValue.Expanded,
-                    isSkipHalfExpanded = false,
-                    density = LocalDensity.current,
-                ),
+            DeviceBottomSheetBody(
                 device = otherDeviceUINode,
                 isCameraUploadsEnabled = true,
                 onCameraUploadsClicked = {},
                 onRenameDeviceClicked = {},
                 onInfoClicked = {},
+                onBottomSheetDismissed = {},
             )
         }
         composeTestRule.onNodeWithTag(BOTTOM_SHEET_CONTAINER)

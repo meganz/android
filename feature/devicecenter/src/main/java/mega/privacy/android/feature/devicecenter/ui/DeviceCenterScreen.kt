@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -37,13 +38,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.feature.devicecenter.R
-import mega.privacy.android.feature.devicecenter.ui.bottomsheet.DeviceBottomSheet
+import mega.privacy.android.feature.devicecenter.ui.bottomsheet.DeviceBottomSheetBody
 import mega.privacy.android.feature.devicecenter.ui.lists.DeviceCenterListViewItem
 import mega.privacy.android.feature.devicecenter.ui.lists.loading.DeviceCenterLoadingScreen
 import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
@@ -163,81 +165,88 @@ internal fun DeviceCenterScreen(
             onBackPressHandled()
         }
     }
-    Scaffold(
-        topBar = {
-            DeviceCenterAppBar(
-                uiState,
-                selectedDevice,
-                modalSheetState,
-                coroutineScope,
-                onBackPressHandled,
-                onActionPressed,
-                onSearchQueryChanged,
-                onSearchCloseClicked,
-                onSearchClicked
-            )
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState) { snackbarData ->
-                MegaSnackbar(snackbarData = snackbarData)
-            }
-        },
-        content = { paddingValues ->
-            when {
-                !uiState.isNetworkConnected -> {
-                    DeviceCenterNoNetworkState()
-                }
-
-                !uiState.isInitialLoadingFinished -> {
-                    DeviceCenterLoadingScreen()
-                }
-
-                uiState.filteredUiItems?.isEmpty() == true -> {
-                    DeviceCenterNoItemsFound()
-                }
-
-                else -> {
-                    DeviceCenterContent(
-                        itemsToDisplay = uiState.filteredUiItems ?: uiState.itemsToDisplay,
-                        onDeviceClicked = { deviceUiNode ->
-                            onDeviceClicked(deviceUiNode)
-                        },
-                        onDeviceMenuClicked = { deviceNode ->
-                            onDeviceMenuClicked(deviceNode)
-                            if (!modalSheetState.isVisible) {
-                                coroutineScope.launch { modalSheetState.show() }
-                            }
-                        },
-                        onBackupFolderClicked = onBackupFolderClicked,
-                        onBackupFolderMenuClicked = onBackupFolderMenuClicked,
-                        onNonBackupFolderClicked = onNonBackupFolderClicked,
-                        onNonBackupFolderMenuClicked = onNonBackupFolderMenuClicked,
-                        modifier = Modifier.padding(paddingValues),
-                    )
-                }
-            }
-
-            uiState.deviceToRename?.let { nonNullDevice ->
-                RenameDeviceDialog(
-                    deviceId = nonNullDevice.id,
-                    oldDeviceName = nonNullDevice.name,
-                    existingDeviceNames = uiState.devices.map { it.name },
-                    onRenameSuccessful = onRenameDeviceSuccessful,
-                    onRenameCancelled = onRenameDeviceCancelled,
-                )
-            }
-
-            DeviceBottomSheet(
-                coroutineScope = coroutineScope,
-                modalSheetState = modalSheetState,
-                device = uiState.menuClickedDevice ?: return@Scaffold,
+    BottomSheet(
+        modalSheetState = modalSheetState,
+        scrimColor = Color.Black.copy(alpha = 0.32f),
+        sheetBody = {
+            DeviceBottomSheetBody(
+                device = uiState.menuClickedDevice ?: return@BottomSheet,
                 isCameraUploadsEnabled = uiState.isCameraUploadsEnabled,
                 onCameraUploadsClicked = onCameraUploadsClicked,
                 onRenameDeviceClicked = onRenameDeviceOptionClicked,
                 onInfoClicked = {},
+                onBottomSheetDismissed = {
+                    coroutineScope.launch { modalSheetState.hide() }
+                }
             )
         },
-    )
+        content = {
+            Scaffold(
+                topBar = {
+                    DeviceCenterAppBar(
+                        uiState,
+                        selectedDevice,
+                        modalSheetState,
+                        coroutineScope,
+                        onBackPressHandled,
+                        onActionPressed,
+                        onSearchQueryChanged,
+                        onSearchCloseClicked,
+                        onSearchClicked
+                    )
+                },
+                snackbarHost = {
+                    SnackbarHost(hostState = snackbarHostState) { snackbarData ->
+                        MegaSnackbar(snackbarData = snackbarData)
+                    }
+                },
+                content = { paddingValues ->
+                    when {
+                        !uiState.isNetworkConnected -> {
+                            DeviceCenterNoNetworkState()
+                        }
+
+                        !uiState.isInitialLoadingFinished -> {
+                            DeviceCenterLoadingScreen()
+                        }
+
+                        uiState.filteredUiItems?.isEmpty() == true -> {
+                            DeviceCenterNoItemsFound()
+                        }
+
+                        else -> {
+                            DeviceCenterContent(
+                                itemsToDisplay = uiState.filteredUiItems ?: uiState.itemsToDisplay,
+                                onDeviceClicked = { deviceUiNode ->
+                                    onDeviceClicked(deviceUiNode)
+                                },
+                                onDeviceMenuClicked = { deviceNode ->
+                                    onDeviceMenuClicked(deviceNode)
+                                    if (!modalSheetState.isVisible) {
+                                        coroutineScope.launch { modalSheetState.show() }
+                                    }
+                                },
+                                onBackupFolderClicked = onBackupFolderClicked,
+                                onBackupFolderMenuClicked = onBackupFolderMenuClicked,
+                                onNonBackupFolderClicked = onNonBackupFolderClicked,
+                                onNonBackupFolderMenuClicked = onNonBackupFolderMenuClicked,
+                                modifier = Modifier.padding(paddingValues),
+                            )
+                        }
+                    }
+
+                    uiState.deviceToRename?.let { nonNullDevice ->
+                        RenameDeviceDialog(
+                            deviceId = nonNullDevice.id,
+                            oldDeviceName = nonNullDevice.name,
+                            existingDeviceNames = uiState.devices.map { it.name },
+                            onRenameSuccessful = onRenameDeviceSuccessful,
+                            onRenameCancelled = onRenameDeviceCancelled,
+                        )
+                    }
+                },
+            )
+        })
 }
 
 @OptIn(ExperimentalMaterialApi::class)

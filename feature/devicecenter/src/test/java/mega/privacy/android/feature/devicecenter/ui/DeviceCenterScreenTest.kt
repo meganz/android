@@ -134,7 +134,7 @@ internal class DeviceCenterScreenTest {
                 onFeatureExited = {},
             )
         }
-        composeTestRule.onNodeWithTag(BOTTOM_SHEET_CONTAINER).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(BOTTOM_SHEET_CONTAINER).assertExists()
     }
 
     @Test
