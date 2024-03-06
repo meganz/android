@@ -13,6 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.BottomSheetChatRoomToolbarBinding
@@ -27,6 +28,18 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getReadExternal
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.domain.entity.chat.FileGalleryItem
+import mega.privacy.mobile.analytics.event.ChatConversationContactMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationFileMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationGIFMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationLocationMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationScanMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationSendImageFilesFloatingActionButtonPressedEvent
+import mega.privacy.mobile.analytics.event.ChatConversationTakePictureMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationVideoMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationVoiceClipMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationVoiceMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatImageAttachmentItemSelected
+import mega.privacy.mobile.analytics.event.ChatImageAttachmentItemSelectedEvent
 
 /**
  * Bottom Sheet Dialog which shows the chat options
@@ -142,6 +155,9 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
      */
     private fun setupButtons() {
         binding.sendFilesButton.setOnClickListener {
+            Analytics.tracker.trackEvent(
+                ChatConversationSendImageFilesFloatingActionButtonPressedEvent
+            )
             val list = viewModel.getSelectedFiles()
             if (list.isNotEmpty()) {
                 listener.onSendFilesSelected(list)
@@ -150,41 +166,49 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
         }
 
         binding.optionVoiceClip.setOnClickListener {
+            Analytics.tracker.trackEvent(ChatConversationVoiceClipMenuItemEvent)
             listener.onRecordVoiceClipClicked()
             dismiss()
         }
 
         binding.optionFile.setOnClickListener {
+            Analytics.tracker.trackEvent(ChatConversationFileMenuItemEvent)
             listener.onSendFileOptionClicked()
             dismiss()
         }
 
         binding.optionVoice.setOnClickListener {
+            Analytics.tracker.trackEvent(ChatConversationVoiceMenuItemEvent)
             listener.onStartCallOptionClicked(false)
             dismiss()
         }
 
         binding.optionVideo.setOnClickListener {
+            Analytics.tracker.trackEvent(ChatConversationVideoMenuItemEvent)
             listener.onStartCallOptionClicked(true)
             dismiss()
         }
 
         binding.optionScan.setOnClickListener {
+            Analytics.tracker.trackEvent(ChatConversationScanMenuItemEvent)
             listener.onScanDocumentOptionClicked()
             dismiss()
         }
 
         binding.optionGif.setOnClickListener {
+            Analytics.tracker.trackEvent(ChatConversationGIFMenuItemEvent)
             listener.onSendGIFOptionClicked()
             dismiss()
         }
 
         binding.optionLocation.setOnClickListener {
+            Analytics.tracker.trackEvent(ChatConversationLocationMenuItemEvent)
             listener.onSendLocationOptionClicked()
             dismiss()
         }
 
         binding.optionContact.setOnClickListener {
+            Analytics.tracker.trackEvent(ChatConversationContactMenuItemEvent)
             listener.onSendContactOptionClicked()
             dismiss()
         }
@@ -218,6 +242,7 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
                     )
                 }
             }
+
             Manifest.permission.CAMERA -> {
                 if (hasPermission) {
                     viewModel.updatePermissionsGranted(typePermission, hasPermission)
@@ -233,6 +258,7 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun onTakePictureClick() {
+        Analytics.tracker.trackEvent(ChatConversationTakePictureMenuItemEvent)
         if (hasCameraPermission) {
             listener.onTakePictureOptionClicked()
             dismiss()
@@ -244,9 +270,21 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private fun onClickItem(file: FileGalleryItem) {
         if (isMultiselectMode) {
             viewModel.longClickItem(file)
+            Analytics.tracker.trackEvent(
+                ChatImageAttachmentItemSelectedEvent(
+                    selectionType = ChatImageAttachmentItemSelected.SelectionType.MultiSelectMode,
+                    imageCount = viewModel.getSelectedFiles().size
+                )
+            )
         } else {
             val files = ArrayList<FileGalleryItem>()
             files.add(file)
+            Analytics.tracker.trackEvent(
+                ChatImageAttachmentItemSelectedEvent(
+                    selectionType = ChatImageAttachmentItemSelected.SelectionType.SingleMode,
+                    imageCount = files.size
+                )
+            )
             listener.onSendFilesSelected(files)
             dismiss()
         }
@@ -254,5 +292,11 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     private fun onLongClickItem(file: FileGalleryItem) {
         viewModel.longClickItem(file)
+        Analytics.tracker.trackEvent(
+            ChatImageAttachmentItemSelectedEvent(
+                selectionType = ChatImageAttachmentItemSelected.SelectionType.MultiSelectMode,
+                imageCount = viewModel.getSelectedFiles().size
+            )
+        )
     }
 }

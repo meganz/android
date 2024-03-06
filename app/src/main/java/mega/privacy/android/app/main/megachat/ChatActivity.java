@@ -421,6 +421,7 @@ import mega.privacy.android.domain.entity.contacts.ContactLink;
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus;
 import mega.privacy.android.domain.usecase.GetPushToken;
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase;
+import mega.privacy.mobile.analytics.event.ChatConversationAddAttachmentButtonPressedEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationAddParticipantsMenuToolbarEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationAddToCloudDriveActionMenuEvent;
 import mega.privacy.mobile.analytics.event.ChatConversationArchiveMenuToolbarEvent;
@@ -4552,6 +4553,7 @@ public class ChatActivity extends PasscodeActivity
             textChat.setText("", TextView.BufferType.EDITABLE);
             controlExpandableInputText(1);
         } else if (id == R.id.more_options_rl) {
+            Analytics.INSTANCE.getTracker().trackEvent(ChatConversationAddAttachmentButtonPressedEvent.INSTANCE);
             showChatRoomToolbarByPanel();
         } else if (id == R.id.cancel_edit) {
             editingMessage = false;
