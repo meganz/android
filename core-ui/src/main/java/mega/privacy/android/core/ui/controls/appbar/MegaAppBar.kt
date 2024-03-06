@@ -168,6 +168,23 @@ fun MegaAppBar(
     )
 }
 
+/**
+ * Method to provide default mega app bar colors.
+ *
+ * This method should only be used in Legacy components
+ * to fetch the themed App Bar colors. E.g. LocalMegaAppBarColors.current.iconsTintColor
+ */
+@Composable
+fun ProvideDefaultMegaAppBarColors(
+    content: @Composable () -> Unit,
+) = CompositionLocalProvider(
+    LocalMegaAppBarColors provides MegaAppBarColors(
+        iconsTintColor = MegaTheme.colors.icon.primary,
+        titleColor = MegaTheme.colors.text.primary,
+        subtitleColor = MegaTheme.colors.text.secondary,
+    ), content
+)
+
 internal data class MegaAppBarColors(
     val iconsTintColor: Color,
     val titleColor: Color,

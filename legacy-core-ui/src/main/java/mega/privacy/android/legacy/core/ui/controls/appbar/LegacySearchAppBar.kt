@@ -39,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.core.ui.controls.appbar.ProvideDefaultMegaAppBarColors
 import mega.privacy.android.core.ui.controls.menus.MenuActions
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.legacy.core.ui.R
@@ -71,15 +72,17 @@ fun LegacySearchAppBar(
 ) {
     when (searchWidgetState) {
         SearchWidgetState.COLLAPSED -> {
-            CollapsedSearchAppBar(
-                onBackPressed = onBackPressed,
-                onSearchClicked = onSearchClicked,
-                elevation = elevation,
-                title = title,
-                actions = actions,
-                onActionPressed = onActionPressed,
-                modifier = modifier,
-            )
+            ProvideDefaultMegaAppBarColors {
+                CollapsedSearchAppBar(
+                    onBackPressed = onBackPressed,
+                    onSearchClicked = onSearchClicked,
+                    elevation = elevation,
+                    title = title,
+                    actions = actions,
+                    onActionPressed = onActionPressed,
+                    modifier = modifier,
+                )
+            }
         }
 
         SearchWidgetState.EXPANDED -> {
