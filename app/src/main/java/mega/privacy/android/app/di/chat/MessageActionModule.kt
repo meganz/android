@@ -13,8 +13,8 @@ import mega.privacy.android.app.presentation.meeting.chat.view.actions.DeleteMes
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.EditLocationMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.EditMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.ForwardMessageAction
-import mega.privacy.android.app.presentation.meeting.chat.view.actions.InviteMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.ImportMessageAction
+import mega.privacy.android.app.presentation.meeting.chat.view.actions.InviteMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.MessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.OpenWithMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.SelectMessageAction
@@ -54,7 +54,7 @@ internal class MessageActionModule {
     @Provides
     @IntoSet
     fun provideImportActionFactory(): (ChatViewModel) -> MessageAction =
-        { vm -> ImportMessageAction(vm) }
+        { _ -> ImportMessageAction() }
 
     @Provides
     @IntoSet

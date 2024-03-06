@@ -84,6 +84,7 @@ import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.tintIcon
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_TO
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_FOLDER_DIALOG_SHOWN
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_FOLDER_DIALOG_TEXT
@@ -1823,7 +1824,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 }
 
                 val intent = Intent()
-                intent.putExtra("IMPORT_TO", parentNode?.handle)
+                intent.putExtra(INTENT_EXTRA_KEY_IMPORT_TO, parentNode?.handle)
                 intent.putExtra("fragmentH", fragmentHandle)
 
                 if (importChatHandles != null) {
@@ -1839,7 +1840,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
 
                 val intent = Intent()
-                intent.putExtra("IMPORT_TO", parentNode?.handle)
+                intent.putExtra(INTENT_EXTRA_KEY_IMPORT_TO, parentNode?.handle)
                 setResult(RESULT_OK, intent)
 
                 finishAndRemoveTask()

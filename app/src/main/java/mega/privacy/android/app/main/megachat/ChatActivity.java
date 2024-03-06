@@ -116,6 +116,7 @@ import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_TO;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID;
@@ -4042,7 +4043,7 @@ public class ChatActivity extends PasscodeActivity
                 return;
             }
 
-            final long toHandle = intent.getLongExtra("IMPORT_TO", 0);
+            final long toHandle = intent.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, 0);
 
             final long[] importMessagesHandles = intent.getLongArrayExtra("HANDLES_IMPORT_CHAT");
 

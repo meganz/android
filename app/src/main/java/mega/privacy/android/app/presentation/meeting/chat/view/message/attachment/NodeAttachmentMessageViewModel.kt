@@ -6,6 +6,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.copynode.CopyRequestResult
+import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
@@ -16,6 +18,7 @@ import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
+import mega.privacy.android.domain.entity.node.ImportNodesResult
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeShareContentUri
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -26,6 +29,7 @@ import mega.privacy.android.domain.usecase.chat.message.GetMessageIdsByTypeUseCa
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
+import mega.privacy.android.domain.usecase.node.ImportTypedNodesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import timber.log.Timber
@@ -49,6 +53,8 @@ class NodeAttachmentMessageViewModel @Inject constructor(
     private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
     private val nodeShareContentUrisIntentMapper: NodeShareContentUrisIntentMapper,
     private val getShareChatNodesUseCase: GetShareChatNodesUseCase,
+    private val importTypedNodesUseCase: ImportTypedNodesUseCase,
+    private val copyRequestMessageMapper: CopyRequestMessageMapper,
     fileSizeStringMapper: FileSizeStringMapper,
     durationInSecondsTextMapper: DurationInSecondsTextMapper,
 ) : AbstractAttachmentMessageViewModel<NodeAttachmentMessage>(
@@ -200,5 +206,25 @@ class NodeAttachmentMessageViewModel @Inject constructor(
             node.name
         }
         return nodeShareContentUrisIntentMapper(title, content, groupMimeType)
+    }
+
+    /**
+     * Import nodes.
+     */
+    suspend fun importNodes(
+        nodes: List<TypedNode>,
+        handleWhereToImport: Long,
+    ) = importTypedNodesUseCase(nodes, handleWhereToImport)
+
+    /**
+     * Get copy nodes result.
+     */
+    fun getCopyNodesResult(result: ImportNodesResult) = with(result) {
+        copyRequestMessageMapper(
+            CopyRequestResult(
+                copySuccess + copyError,
+                copyError
+            )
+        )
     }
 }

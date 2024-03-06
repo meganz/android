@@ -4,6 +4,8 @@ import android.content.Intent
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.presentation.copynode.CopyRequestResult
+import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
@@ -23,9 +25,11 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
+import mega.privacy.android.domain.entity.node.ImportNodesResult
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeShareContentUri
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.entity.node.chat.ChatImageFile
@@ -35,6 +39,7 @@ import mega.privacy.android.domain.usecase.chat.message.GetMessageIdsByTypeUseCa
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
+import mega.privacy.android.domain.usecase.node.ImportTypedNodesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import org.junit.jupiter.api.BeforeEach
@@ -72,6 +77,8 @@ class NodeAttachmentMessageViewModelTest {
     private val removeOfflineNodeUseCase = mock<RemoveOfflineNodeUseCase>()
     private val nodeShareContentUrisIntentMapper: NodeShareContentUrisIntentMapper = mock()
     private val getShareChatNodesUseCase: GetShareChatNodesUseCase = mock()
+    private val importTypedNodesUseCase = mock<ImportTypedNodesUseCase>()
+    private val copyRequestMessageMapper = mock<CopyRequestMessageMapper>()
 
     @BeforeEach
     internal fun initTests() {
@@ -89,6 +96,8 @@ class NodeAttachmentMessageViewModelTest {
             removeOfflineNodeUseCase = removeOfflineNodeUseCase,
             nodeShareContentUrisIntentMapper = nodeShareContentUrisIntentMapper,
             getShareChatNodesUseCase = getShareChatNodesUseCase,
+            importTypedNodesUseCase = importTypedNodesUseCase,
+            copyRequestMessageMapper = copyRequestMessageMapper,
         )
     }
 
@@ -104,6 +113,8 @@ class NodeAttachmentMessageViewModelTest {
             getCachedOriginalPathUseCase,
             isAvailableOfflineUseCase,
             removeOfflineNodeUseCase,
+            importTypedNodesUseCase,
+            copyRequestMessageMapper,
         )
     }
 
@@ -373,6 +384,31 @@ class NodeAttachmentMessageViewModelTest {
             content = eq(content),
             mimeType = eq("image/jpg")
         )
+    }
+
+    @Test
+    fun `test that import nodes invokes and returns correctly`() = runTest {
+        val nodes = listOf(mock<TypedNode>(), mock<TypedNode>(), mock<TypedNode>())
+        val result = mock<ImportNodesResult>()
+        val handleWhereToImport = 1234L
+        whenever(importTypedNodesUseCase(nodes, handleWhereToImport)).thenReturn(result)
+
+        assertThat(underTest.importNodes(nodes, handleWhereToImport)).isEqualTo(result)
+    }
+
+    @Test
+    fun `test that get copy nodes result invokes and returns correctly`() = runTest {
+        val copySuccess = 1
+        val copyError = 2
+        val result = mock<ImportNodesResult> {
+            on { this.copySuccess } doReturn copySuccess
+            on { this.copyError } doReturn copyError
+        }
+        val copyResult = CopyRequestResult(copySuccess + copyError, copyError)
+        val stringResult = "copyResult"
+        whenever(copyRequestMessageMapper(copyResult)).thenReturn(stringResult)
+
+        assertThat(underTest.getCopyNodesResult(result)).isEqualTo(stringResult)
     }
 
     private fun getFileAndVideoTypes(): List<FileTypeInfo> {
