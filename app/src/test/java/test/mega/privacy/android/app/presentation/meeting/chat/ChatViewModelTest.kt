@@ -2712,7 +2712,7 @@ internal class ChatViewModelTest {
     }
 
     @Test
-    fun `test that onDownloadChatNode updates state correctly`() = runTest {
+    fun `test that on download node for preview updates state correctly`() = runTest {
         val node = mock<ChatDefaultFile>()
         initTestClass()
         underTest.onDownloadForPreviewChatNode(node)
@@ -2722,6 +2722,34 @@ internal class ChatViewModelTest {
                 .isInstanceOf(StateEventWithContentTriggered::class.java)
             val content = (actual.downloadEvent as StateEventWithContentTriggered).content
             assertThat(content).isInstanceOf(TransferTriggerEvent.StartDownloadForPreview::class.java)
+        }
+    }
+
+    @Test
+    fun `test that on download node for offline updates state correctly`() = runTest {
+        val node = mock<ChatDefaultFile>()
+        initTestClass()
+        underTest.onDownloadForOfflineChatNode(node)
+        underTest.state.test {
+            val actual = awaitItem()
+            assertThat(actual.downloadEvent)
+                .isInstanceOf(StateEventWithContentTriggered::class.java)
+            val content = (actual.downloadEvent as StateEventWithContentTriggered).content
+            assertThat(content).isInstanceOf(TransferTriggerEvent.StartDownloadForOffline::class.java)
+        }
+    }
+
+    @Test
+    fun `test that on download node updates state correctly`() = runTest {
+        val node = mock<ChatDefaultFile>()
+        initTestClass()
+        underTest.onDownloadNode(listOf(node))
+        underTest.state.test {
+            val actual = awaitItem()
+            assertThat(actual.downloadEvent)
+                .isInstanceOf(StateEventWithContentTriggered::class.java)
+            val content = (actual.downloadEvent as StateEventWithContentTriggered).content
+            assertThat(content).isInstanceOf(TransferTriggerEvent.StartDownloadNode::class.java)
         }
     }
 

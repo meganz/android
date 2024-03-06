@@ -1378,7 +1378,7 @@ class ChatViewModel @Inject constructor(
     }
 
     /**
-     * On download chat node
+     * On download node for preview
      *
      * @param file [ChatFile]
      */
@@ -1396,6 +1396,17 @@ class ChatViewModel @Inject constructor(
     fun onDownloadForOfflineChatNode(file: ChatFile) {
         _state.update {
             it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadForOffline(file)))
+        }
+    }
+
+    /**
+     * On download node
+     *
+     * @param nodes
+     */
+    fun onDownloadNode(nodes: List<ChatFile>) {
+        _state.update {
+            it.copy(downloadEvent = triggered(TransferTriggerEvent.StartDownloadNode(nodes)))
         }
     }
 

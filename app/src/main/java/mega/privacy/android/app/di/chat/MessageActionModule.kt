@@ -17,6 +17,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.actions.ImportMes
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.InviteMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.MessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.OpenWithMessageAction
+import mega.privacy.android.app.presentation.meeting.chat.view.actions.SaveToDeviceMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.SelectMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.SendMessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.ShareMessageAction
@@ -81,6 +82,11 @@ internal class MessageActionModule {
     @IntoSet
     fun provideSendMessageActionFactory(): (ChatViewModel) -> MessageAction =
         { vm -> SendMessageAction(vm) }
+
+    @Provides
+    @IntoSet
+    fun provideSaveToDeviceActionFactory(): (ChatViewModel) -> MessageAction =
+        { vm -> SaveToDeviceMessageAction(vm) }
 
     @Provides
     @IntoSet
