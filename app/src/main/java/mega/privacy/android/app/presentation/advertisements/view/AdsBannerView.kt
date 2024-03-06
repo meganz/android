@@ -58,6 +58,7 @@ internal fun AdsBannerView(
                         setBackgroundColor(webpageBackgroundColor)
                         settings.javaScriptEnabled = true
                         settings.domStorageEnabled = true
+                        clipToOutline = true
                         webViewClient = object : WebViewClient() {
 
                             override fun onPageFinished(view: WebView?, url: String?) {
