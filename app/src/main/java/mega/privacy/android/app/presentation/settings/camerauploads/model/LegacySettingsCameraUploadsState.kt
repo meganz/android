@@ -11,10 +11,8 @@ import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
  * @property isCameraUploadsEnabled Checks whether Camera Uploads is enabled or not
  * @property isMediaUploadsEnabled Checks whether Media Upload is enabled or not
  * @property isChargingRequiredForVideoCompression Checks whether compressing videos require the device to be charged or not
- * @property primaryUploadSyncHandle Primary Upload Sync Handle
  * @property primaryFolderPath The Primary Folder path
  * @property primaryFolderName Name of the Camera Uploads Folder
- * @property secondaryUploadSyncHandle Secondary Upload Sync Handle
  * @property secondaryFolderName Name of the Camera Uploads Folder
  * @property secondaryFolderPath The Secondary Folder path
  * @property shouldShowBusinessAccountPrompt Checks whether the Dialog indicating that the account is a Business Account should be shown or not
@@ -36,10 +34,8 @@ data class LegacySettingsCameraUploadsState(
     val isCameraUploadsEnabled: Boolean = false,
     val isMediaUploadsEnabled: Boolean = false,
     val isChargingRequiredForVideoCompression: Boolean = false,
-    val primaryUploadSyncHandle: Long? = null,
     val primaryFolderPath: String = "",
     val primaryFolderName: String = "",
-    val secondaryUploadSyncHandle: Long? = null,
     val secondaryFolderName: String = "",
     val secondaryFolderPath: String = "",
     val shouldShowBusinessAccountPrompt: Boolean = false,

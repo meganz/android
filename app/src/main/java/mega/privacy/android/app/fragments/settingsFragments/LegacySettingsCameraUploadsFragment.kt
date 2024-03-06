@@ -303,6 +303,7 @@ class LegacySettingsCameraUploadsFragment : SettingsBaseFragment(),
             }
 
             KEY_CAMERA_UPLOAD_CAMERA_FOLDER -> {
+                Timber.d("Selecting the new local Folder for Primary Uploads")
                 canStartCameraUploads = false
                 intent = Intent(context, FileStorageActivity::class.java).apply {
                     action = FileStorageActivity.Mode.PICK_FOLDER.action
@@ -316,6 +317,7 @@ class LegacySettingsCameraUploadsFragment : SettingsBaseFragment(),
 
             KEY_CAMERA_UPLOAD_MEGA_FOLDER -> {
                 if (viewModel.isConnected.not()) return false
+                Timber.d("Selecting the new Cloud Drive Folder for Primary Uploads")
                 canStartCameraUploads = false
                 intent = Intent(context, FileExplorerActivity::class.java).apply {
                     action = FileExplorerActivity.ACTION_CHOOSE_MEGA_FOLDER_SYNC
@@ -328,6 +330,7 @@ class LegacySettingsCameraUploadsFragment : SettingsBaseFragment(),
             }
 
             KEY_LOCAL_SECONDARY_MEDIA_FOLDER -> {
+                Timber.d("Selecting the new local Folder for Secondary Uploads")
                 canStartCameraUploads = false
                 intent = Intent(context, FileStorageActivity::class.java).apply {
                     action = FileStorageActivity.Mode.PICK_FOLDER.action
@@ -341,6 +344,7 @@ class LegacySettingsCameraUploadsFragment : SettingsBaseFragment(),
 
             KEY_MEGA_SECONDARY_MEDIA_FOLDER -> {
                 if (viewModel.isConnected.not()) return false
+                Timber.d("Selecting the new Cloud Drive Folder for Secondary Uploads")
                 canStartCameraUploads = false
                 intent = Intent(context, FileExplorerActivity::class.java).apply {
                     action = FileExplorerActivity.ACTION_CHOOSE_MEGA_FOLDER_SYNC

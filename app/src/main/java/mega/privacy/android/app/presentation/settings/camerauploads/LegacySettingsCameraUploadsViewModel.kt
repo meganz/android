@@ -41,7 +41,9 @@ import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSize
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderNodeValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderNodeValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
@@ -87,6 +89,7 @@ import javax.inject.Inject
  * @property getVideoCompressionSizeLimitUseCase Retrieves the maximum video file size that can be compressed
  * @property isCameraUploadsByWifiUseCase Checks whether Camera Uploads can only be run on Wi-Fi / Wi-Fi or Mobile Data
  * @property isChargingRequiredForVideoCompressionUseCase Checks whether compressing videos require the device to be charged or not
+ * @property isPrimaryFolderNodeValidUseCase Checks whether the Primary Folder node is valid or not
  * @property isPrimaryFolderPathValidUseCase Checks whether the Primary Folder path is valid or not
  * @property monitorConnectivityUseCase Monitors the device online status
  * @property preparePrimaryFolderPathUseCase Prepares the Primary Folder path
@@ -105,6 +108,7 @@ import javax.inject.Inject
  * @property startCameraUploadUseCase Start the camera upload
  * @property stopCameraUploadsUseCase Stop the camera upload
  * @property broadcastBusinessAccountExpiredUseCase broadcast business account expired
+ * @property isSecondaryFolderNodeValidUseCase Checks whether the Secondary Folder node is valid or not
  * @property snackBarHandler Handler used to display a Snackbar
  */
 @HiltViewModel
@@ -122,6 +126,7 @@ class LegacySettingsCameraUploadsViewModel @Inject constructor(
     private val getVideoCompressionSizeLimitUseCase: GetVideoCompressionSizeLimitUseCase,
     private val isCameraUploadsByWifiUseCase: IsCameraUploadsByWifiUseCase,
     private val isChargingRequiredForVideoCompressionUseCase: IsChargingRequiredForVideoCompressionUseCase,
+    private val isPrimaryFolderNodeValidUseCase: IsPrimaryFolderNodeValidUseCase,
     private val isPrimaryFolderPathValidUseCase: IsPrimaryFolderPathValidUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val preparePrimaryFolderPathUseCase: PreparePrimaryFolderPathUseCase,
@@ -154,6 +159,7 @@ class LegacySettingsCameraUploadsViewModel @Inject constructor(
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
     private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase,
     private val setupMediaUploadsSyncHandleUseCase: SetupMediaUploadsSyncHandleUseCase,
+    private val isSecondaryFolderNodeValidUseCase: IsSecondaryFolderNodeValidUseCase,
     private val isSecondaryFolderPathValidUseCase: IsSecondaryFolderPathValidUseCase,
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase,
     private val clearCameraUploadsRecordUseCase: ClearCameraUploadsRecordUseCase,
@@ -246,22 +252,21 @@ class LegacySettingsCameraUploadsViewModel @Inject constructor(
      */
     private suspend fun enableMediaUploads() {
         runCatching {
-            val isValid = isNewSettingValid(
-                isSecondaryEnabled = true,
-                secondaryPath = _state.value.secondaryFolderPath.takeIf { it.isNotBlank() }
-                    ?: "-1"
-            )
-            if (isValid.not()) {
+            val isCurrentSecondaryFolderPathValid =
+                isSecondaryFolderPathValidUseCase(_state.value.secondaryFolderPath)
+            if (!isCurrentSecondaryFolderPathValid) {
                 setSecondaryFolderLocalPathUseCase("")
             }
+
             // Sets up a Secondary Folder with a Media Uploads folder name
             setupDefaultSecondaryFolderUseCase()
             setupMediaUploadsSettingUseCase(isEnabled = true)
             stopCameraUploads()
+
             _state.update {
                 it.copy(
                     isMediaUploadsEnabled = !it.isMediaUploadsEnabled,
-                    secondaryFolderPath = if (isValid.not()) "" else it.secondaryFolderPath
+                    secondaryFolderPath = if (!isCurrentSecondaryFolderPathValid) "" else it.secondaryFolderPath,
                 )
             }
         }.onFailure {
@@ -296,20 +301,20 @@ class LegacySettingsCameraUploadsViewModel @Inject constructor(
      */
     fun setSecondaryUploadNode(newHandle: Long) {
         viewModelScope.launch {
-            if (isNewSettingValid(secondaryHandle = newHandle)) {
-                runCatching {
+            runCatching {
+                if (isSecondaryFolderNodeValidUseCase(newHandle)) {
                     setupSecondaryFolderUseCase(newHandle)
-                }.onFailure {
-                    Timber.w(it)
+                } else {
+                    Timber.e("The new Cloud Drive Folder for Secondary Uploads is invalid")
                     snackBarHandler.postSnackbarMessage(
-                        resId = R.string.general_error,
+                        resId = R.string.error_invalid_folder_selected,
                         snackbarDuration = MegaSnackbarDuration.Long,
                     )
                 }
-            } else {
-                Timber.e("Error choosing the Cloud Drive Folder for Secondary Uploads")
+            }.onFailure {
+                Timber.e("An Exception occurred when setting the new Cloud Drive Folder for Secondary Uploads:\n$it")
                 snackBarHandler.postSnackbarMessage(
-                    resId = R.string.error_invalid_folder_selected,
+                    resId = R.string.general_error,
                     snackbarDuration = MegaSnackbarDuration.Long,
                 )
             }
@@ -330,13 +335,6 @@ class LegacySettingsCameraUploadsViewModel @Inject constructor(
      */
     fun showAccessMediaLocationRationale() {
         snackBarHandler.postSnackbarMessage(R.string.on_refuse_storage_permission)
-    }
-
-    /**
-     * Resets all Timestamps and cleans the Cache Directory
-     */
-    private suspend fun resetTimestampsAndCacheDirectory() {
-        clearCacheDirectory()
     }
 
     private suspend fun resetAndDisableMediaUploads() {
@@ -402,7 +400,7 @@ class LegacySettingsCameraUploadsViewModel @Inject constructor(
             runCatching {
                 setUploadOptionUseCase(uploadOption)
                 refreshUploadOption()
-                resetTimestampsAndCacheDirectory()
+                clearCacheDirectory()
                 stopCameraUploads()
             }.onFailure {
                 Timber.e(it)
@@ -492,21 +490,24 @@ class LegacySettingsCameraUploadsViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 if (isPrimaryFolderPathValidUseCase(newPath)) {
-                    newPath?.let {
-                        setPrimaryFolderPathUseCase(newFolderPath = it)
-                    }
-                    resetTimestampsAndCacheDirectory()
+                    newPath?.let { setPrimaryFolderPathUseCase(it) }
+                    clearCacheDirectory()
                     clearCameraUploadsRecordUseCase(listOf(CameraUploadFolderType.Primary))
                     stopCameraUploads()
-                    refreshPrimaryFolderPath()
+                    _state.update { it.copy(primaryFolderPath = newPath.orEmpty()) }
                 } else {
+                    Timber.e("The new Folder for Primary Uploads is invalid")
                     snackBarHandler.postSnackbarMessage(
                         resId = R.string.error_invalid_folder_selected,
                         snackbarDuration = MegaSnackbarDuration.Long,
                     )
                 }
             }.onFailure {
-                Timber.e(it)
+                Timber.e("An exception occurred when setting the new Folder for Primary Uploads:\n$it")
+                snackBarHandler.postSnackbarMessage(
+                    resId = R.string.general_error,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
             }
         }
     }
@@ -518,21 +519,21 @@ class LegacySettingsCameraUploadsViewModel @Inject constructor(
      */
     fun setPrimaryUploadNode(newHandle: Long) {
         viewModelScope.launch {
-            if (isNewSettingValid(primaryHandle = newHandle)) {
-                runCatching {
+            runCatching {
+                if (isPrimaryFolderNodeValidUseCase(newHandle)) {
                     setupPrimaryFolderUseCase(newHandle)
                     stopCameraUploads()
-                }.onFailure {
-                    Timber.w(it)
+                } else {
+                    Timber.e("The new Cloud Drive Folder for Primary Uploads is invalid")
                     snackBarHandler.postSnackbarMessage(
-                        resId = R.string.general_error,
+                        resId = R.string.error_invalid_folder_selected,
                         snackbarDuration = MegaSnackbarDuration.Long,
                     )
                 }
-            } else {
-                Timber.e("Error choosing the Cloud Drive Folder for Primary Uploads")
+            }.onFailure {
+                Timber.e("An exception occurred when setting the new Cloud Drive Folder for Primary Uploads:\n$it")
                 snackBarHandler.postSnackbarMessage(
-                    resId = R.string.error_invalid_folder_selected,
+                    resId = R.string.general_error,
                     snackbarDuration = MegaSnackbarDuration.Long,
                 )
             }
@@ -572,11 +573,9 @@ class LegacySettingsCameraUploadsViewModel @Inject constructor(
                     uploadOption = getUploadOption.await(),
                     videoCompressionSizeLimit = videoCompressionSizeLimit.await(),
                     videoQuality = videoQuality.await(),
-                    primaryUploadSyncHandle = primaryUploadNode.await()?.id?.longValue,
                     primaryFolderName = primaryUploadNode.await()?.name ?: "",
                     secondaryFolderName = secondaryUploadNode.await()?.name ?: "",
-                    secondaryUploadSyncHandle = secondaryUploadNode.await()?.id?.longValue,
-                    secondaryFolderPath = secondaryFolderPath.await()
+                    secondaryFolderPath = secondaryFolderPath.await(),
                 )
             }
         }
@@ -614,31 +613,25 @@ class LegacySettingsCameraUploadsViewModel @Inject constructor(
 
 
     /**
-     * Update Primary Upload Node Handle and Name
+     * Updates the [LegacySettingsCameraUploadsState.primaryFolderName]
      */
     fun updatePrimaryUploadNode(nodeHandle: Long) {
         viewModelScope.launch {
             val node = getPrimaryFolderNode(nodeHandle)
             _state.update {
-                it.copy(
-                    primaryUploadSyncHandle = nodeHandle,
-                    primaryFolderName = node?.name ?: ""
-                )
+                it.copy(primaryFolderName = node?.name ?: "")
             }
         }
     }
 
     /**
-     * Update Secondary Upload Node Handle and Name
+     * Updates the [LegacySettingsCameraUploadsState.secondaryFolderName]
      */
     fun updateSecondaryUploadNode(nodeHandle: Long) {
         viewModelScope.launch {
             val node = getSecondaryFolderNode(nodeHandle)
             _state.update {
-                it.copy(
-                    secondaryUploadSyncHandle = nodeHandle,
-                    secondaryFolderName = node?.name ?: ""
-                )
+                it.copy(secondaryFolderName = node?.name ?: "")
             }
         }
     }
@@ -706,15 +699,6 @@ class LegacySettingsCameraUploadsViewModel @Inject constructor(
     private suspend fun refreshUploadFilesNamesKept() {
         val areUploadFileNamesKept = areUploadFileNamesKeptUseCase()
         _state.update { it.copy(areUploadFileNamesKept = areUploadFileNamesKept) }
-    }
-
-    /**
-     * Updates the value of [LegacySettingsCameraUploadsState.primaryFolderPath] whenever a valid Primary
-     * Folder path is set
-     */
-    private suspend fun refreshPrimaryFolderPath() {
-        val primaryFolderPath = getPrimaryFolderPathUseCase()
-        _state.update { it.copy(primaryFolderPath = primaryFolderPath) }
     }
 
     /**
@@ -791,57 +775,25 @@ class LegacySettingsCameraUploadsViewModel @Inject constructor(
     fun setSecondaryFolder(newPath: String?) {
         viewModelScope.launch {
             runCatching {
-                if (isNewSettingValid(secondaryPath = newPath)
-                    && isSecondaryFolderPathValidUseCase(newPath)
-                ) {
+                if (isSecondaryFolderPathValidUseCase(newPath)) {
                     newPath?.let { setSecondaryFolderLocalPathUseCase(it) }
                     clearCameraUploadsRecordUseCase(listOf(CameraUploadFolderType.Secondary))
                     stopCameraUploads()
-                    _state.update {
-                        it.copy(secondaryFolderPath = newPath.orEmpty())
-                    }
+                    _state.update { it.copy(secondaryFolderPath = newPath.orEmpty()) }
                 } else {
+                    Timber.e("The new Folder for Secondary Uploads is invalid")
                     snackBarHandler.postSnackbarMessage(
                         resId = R.string.error_invalid_folder_selected,
                         snackbarDuration = MegaSnackbarDuration.Long,
                     )
                 }
             }.onFailure {
-                Timber.e(it)
+                Timber.e("An exception occurred when setting the new Folder for Secondary Uploads:\n$it")
+                snackBarHandler.postSnackbarMessage(
+                    resId = R.string.general_error,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
             }
-        }
-    }
-
-    /**
-     * Checks the new Camera Uploads configuration set by the User
-     *
-     * @param primaryPath Defines the Primary Folder path
-     * @param secondaryPath Defines the Secondary Folder path
-     * @param primaryHandle Defines the Primary Folder handle
-     * @param secondaryHandle Defines the Secondary Folder handle
-     * @param isSecondaryEnabled whether isSecondaryFolder is enabled or not
-     *
-     * @return true if the new Camera Uploads configuration is valid
-     */
-    fun isNewSettingValid(
-        primaryPath: String? = _state.value.primaryFolderPath,
-        secondaryPath: String? = _state.value.secondaryFolderPath,
-        primaryHandle: Long? = _state.value.primaryUploadSyncHandle,
-        secondaryHandle: Long? = _state.value.secondaryUploadSyncHandle,
-        isSecondaryEnabled: Boolean = _state.value.isMediaUploadsEnabled,
-    ): Boolean {
-        with(_state.value) {
-            // if primary uploads is enabled, then local path of primary upload can't be empty.
-            // The primary and secondary upload cloud folders must exist
-            return primaryHandle != -1L && secondaryHandle != -1L && !((isCameraUploadsEnabled && primaryPath.isNullOrBlank())
-                    // if secondary uploads is enabled, local path of secondary upload can't be empty
-                    || (isSecondaryEnabled && secondaryPath.isNullOrBlank())
-                    // if secondary upload is enabled primary upload and secondary upload cloud folder can't be the same
-                    || (primaryHandle != null && primaryHandle == secondaryHandle && isSecondaryEnabled)
-                    // if secondary media is enabled  secondary upload local folder can't be the sub folder of primary local folder
-                    || (primaryPath?.contains(secondaryPath ?: "-1") == true && isSecondaryEnabled)
-                    // if secondary media is enabled  primary upload local folder can't be the sub folder of secondary local folder
-                    || (secondaryPath?.contains(primaryPath ?: "-1") == true && isSecondaryEnabled))
         }
     }
 

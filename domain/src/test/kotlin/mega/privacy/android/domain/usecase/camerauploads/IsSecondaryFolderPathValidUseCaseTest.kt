@@ -1,16 +1,16 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.NullAndEmptySource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -21,82 +21,73 @@ import java.util.stream.Stream
 /**
  * Test class for [IsSecondaryFolderPathValidUseCase]
  */
-@ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class IsSecondaryFolderPathValidUseCaseTest {
+internal class IsSecondaryFolderPathValidUseCaseTest {
 
     private lateinit var underTest: IsSecondaryFolderPathValidUseCase
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val getPrimaryFolderPathUseCase = mock<GetPrimaryFolderPathUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest = IsSecondaryFolderPathValidUseCase(
-            cameraUploadRepository = cameraUploadRepository,
+            getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
             fileSystemRepository = fileSystemRepository,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(
-            cameraUploadRepository,
-            fileSystemRepository,
-        )
+        reset(getPrimaryFolderPathUseCase, fileSystemRepository)
     }
 
-    @ParameterizedTest(name = "path: {0}")
-    @MethodSource("provideInvalidParameters")
+    @ParameterizedTest(name = "path: \"{0}\"")
+    @NullAndEmptySource
+    @ValueSource(strings = [" "])
     fun `test that the secondary folder path is invalid if it is null or empty`(path: String?) =
         runTest {
             assertThat(underTest(path)).isFalse()
         }
 
-    @ParameterizedTest(name = "does folder exists: {0}")
-    @ValueSource(booleans = [true, false])
-    fun `test that the secondary folder is valid or not if it exists`(doesFolderExists: Boolean) =
+    @Test
+    fun `test that the secondary folder path is invalid if it does not exist in the file system`() =
         runTest {
-            val testPrimaryFolderPath = "test/primary/folder/path"
-            val testSecondaryFolderPath = "test/secondary/folder/path"
+            whenever(fileSystemRepository.doesFolderExists(any())).thenReturn(false)
 
-            whenever(cameraUploadRepository.getPrimaryFolderLocalPath()).thenReturn(
-                testPrimaryFolderPath
-            )
-            whenever(fileSystemRepository.doesFolderExists(any())).thenReturn(doesFolderExists)
-
-            val expectedAnswer = underTest(testSecondaryFolderPath)
-            if (doesFolderExists) {
-                assertThat(expectedAnswer).isTrue()
-            } else {
-                assertThat(expectedAnswer).isFalse()
-            }
+            assertThat(underTest("new/path")).isFalse()
         }
 
-    @ParameterizedTest(name = "when primary path is {0} and secondary is {1}, then is secondary valid is {2}")
-    @MethodSource("providePathParameters")
-    fun `test that the primary folder is valid or not when compared to the secondary folder path`(
-        primaryFolderPath: String,
+    @Test
+    fun `test that the secondary folder path is valid if it exists in the file system and the primary folder path is empty`() =
+        runTest {
+            whenever(fileSystemRepository.doesFolderExists(any())).thenReturn(true)
+            whenever(getPrimaryFolderPathUseCase()).thenReturn("")
+
+            assertThat(underTest("new/path")).isTrue()
+        }
+
+    @ParameterizedTest(name = "when secondary folder path is \"{0}\" and primary folder path is \"{1}\", then is secondary folder valid is {2}")
+    @MethodSource("provideFolderParameters")
+    fun `test that the secondary folder path is valid or not if it exists in the file system and the primary folder path exists`(
         secondaryFolderPath: String,
+        primaryFolderPath: String,
         isSecondaryFolderValid: Boolean,
     ) = runTest {
-        whenever(cameraUploadRepository.getPrimaryFolderLocalPath()).thenReturn(
-            primaryFolderPath
-        )
         whenever(fileSystemRepository.doesFolderExists(any())).thenReturn(true)
+        whenever(getPrimaryFolderPathUseCase()).thenReturn(primaryFolderPath)
 
-        val expectedAnswer = underTest(secondaryFolderPath)
-        assertThat(expectedAnswer).isEqualTo(isSecondaryFolderValid)
+        assertThat(underTest(secondaryFolderPath)).isEqualTo(isSecondaryFolderValid)
     }
 
-    private fun provideInvalidParameters() = Stream.of(
-        Arguments.of(null),
-        Arguments.of(""),
-        Arguments.of(" "),
-    )
-
-    private fun providePathParameters() = Stream.of(
-        Arguments.of("test/path", "test/path", false),
-        Arguments.of("test/path", "test/path/2", true),
+    private fun provideFolderParameters() = Stream.of(
+        Arguments.of("A/B/C", "A/B/C", false),
+        Arguments.of("A/B/C", "A/B/CD", true),
+        Arguments.of("A/B/CD", "A/B/C", true),
+        Arguments.of("A/B", "A/B/C", false),
+        Arguments.of("A/B/C", "A/B", false),
+        Arguments.of("A", "A", false),
+        Arguments.of("A", "B", true),
+        Arguments.of("B", "A", true),
     )
 }

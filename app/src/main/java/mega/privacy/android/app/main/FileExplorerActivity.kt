@@ -1864,6 +1864,11 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
             SELECT_CAMERA_FOLDER -> {
                 val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
+                if (parentNode?.handle != -1L) {
+                    Timber.d("Successfully selected the new Cloud Drive Folder")
+                } else {
+                    Timber.e("The new Cloud Drive Folder is invalid")
+                }
                 val intent = Intent()
                 intent.putExtra("SELECT_MEGA_FOLDER", parentNode?.handle)
                 setResult(RESULT_OK, intent)

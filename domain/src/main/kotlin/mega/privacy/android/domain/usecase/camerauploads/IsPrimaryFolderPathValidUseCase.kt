@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import java.nio.file.Paths
 import javax.inject.Inject
 
 /**
@@ -24,10 +25,26 @@ class IsPrimaryFolderPathValidUseCase @Inject constructor(
      * @return true if the Primary Folder exists and is different from the Secondary Folder
      * local path. Otherwise, return false
      */
-    suspend operator fun invoke(path: String?) = path?.let { nonNullPath ->
-        nonNullPath.isNotBlank()
-                && fileSystemRepository.doesFolderExists(nonNullPath)
-                && ((nonNullPath != getSecondaryFolderPathUseCase()).takeIf { isSecondaryFolderEnabled() }
-            ?: true)
-    } ?: false
+    suspend operator fun invoke(path: String?): Boolean =
+        if (!path.isNullOrBlank() && fileSystemRepository.doesFolderExists(path)) {
+            if (isSecondaryFolderEnabled()) {
+                val secondaryFolderPath = getSecondaryFolderPathUseCase()
+                if (secondaryFolderPath.isNotBlank()) {
+                    val primaryAbsolutePath = Paths.get(path).toAbsolutePath()
+                    val secondaryAbsolutePath =
+                        Paths.get(secondaryFolderPath).toAbsolutePath()
+
+                    !primaryAbsolutePath.startsWith(secondaryAbsolutePath) &&
+                            !secondaryAbsolutePath.startsWith(primaryAbsolutePath)
+                } else {
+                    // An empty Secondary Folder Path automatically makes the Primary Folder Path valid
+                    true
+                }
+            } else {
+                // When Secondary Folder uploads are disabled, it automatically makes the Primary
+                // Folder path valid
+                true
+            }
+        } else false
 }
+

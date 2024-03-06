@@ -481,6 +481,11 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
     }
 
     private void finishPickFolder() {
+        if (path.getAbsolutePath().isBlank()) {
+            Timber.e("The new Local Folder is invalid");
+        } else {
+            Timber.d("Successfully selected the new Local Folder");
+        }
         Intent intent = new Intent();
         intent.putExtra(EXTRA_PATH, path.getAbsolutePath());
         intent.putExtra(EXTRA_IS_FOLDER_IN_SD_CARD, isFolderInSDCard);
