@@ -116,6 +116,7 @@ internal class CacheFolderFacade @Inject constructor(
     override suspend fun getPreviewDownloadPathForNode(): String =
         (context.externalCacheDir ?: context.cacheDir).path + File.separator
 
-    override suspend fun getFilePreviewPath(fileName: String) =
+    override suspend fun getPreviewFile(fileName: String) = File(
         getPreviewDownloadPathForNode() + fileName
+    ).takeIf { it.exists() }
 }

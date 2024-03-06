@@ -24,11 +24,11 @@ interface CacheRepository {
     fun getCacheFile(folderName: String, fileName: String): File?
 
     /**
-     * Get the file preview download path
+     * Get preview file
      *
      * @param fileName The name of the file
      */
-    suspend fun getFilePreviewPath(fileName: String): String
+    suspend fun getPreviewFile(fileName: String): File?
 
     /**
      * Get the path to download file for preview

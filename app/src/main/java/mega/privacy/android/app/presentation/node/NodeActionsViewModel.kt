@@ -44,12 +44,11 @@ import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
-import mega.privacy.android.domain.usecase.node.GetNodePreviewFilePathUseCase
+import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -90,7 +89,7 @@ class NodeActionsViewModel @Inject constructor(
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val getNodePreviewFilePathUseCase: GetNodePreviewFilePathUseCase,
+    private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
@@ -437,7 +436,7 @@ class NodeActionsViewModel @Inject constructor(
         }
 
         else -> FileNodeContent.Other(
-            localFile = getNodePreviewFilePathUseCase(fileNode)?.let { File(it) }
+            localFile = getNodePreviewFileUseCase(fileNode)
         )
     }
 

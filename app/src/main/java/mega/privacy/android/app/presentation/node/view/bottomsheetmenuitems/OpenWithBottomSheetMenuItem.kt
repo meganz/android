@@ -26,7 +26,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
-import mega.privacy.android.domain.usecase.node.GetNodePreviewFilePathUseCase
+import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
 import timber.log.Timber
 import java.io.File
@@ -38,7 +38,7 @@ import javax.inject.Inject
  *
  * @param menuAction [OpenWithMenuAction]
  * @param getFileUriUseCase [GetFileUriUseCase]
- * @param getLocalFilePathUseCase [GetNodePreviewFilePathUseCase]
+ * @param getNodePreviewFileUseCase [GetNodePreviewFileUseCase]
  * @param httpServerStartUseCase [MegaApiHttpServerStartUseCase]
  * @param getStreamingUriStringForNode [GetStreamingUriStringForNode]
  * @param snackBarHandler [SnackBarHandler]
@@ -47,7 +47,7 @@ import javax.inject.Inject
 class OpenWithBottomSheetMenuItem @Inject constructor(
     override val menuAction: OpenWithMenuAction,
     private val getFileUriUseCase: GetFileUriUseCase,
-    private val getLocalFilePathUseCase: GetNodePreviewFilePathUseCase,
+    private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
     private val httpServerStartUseCase: MegaApiHttpServerStartUseCase,
     private val httpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
     private val getStreamingUriStringForNode: GetStreamingUriStringForNode,
@@ -74,11 +74,11 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
         if (node is TypedFileNode) {
             parentCoroutineScope.launch {
                 withContext(NonCancellable) {
-                    val localPath = getLocalFilePath(node)
+                    val file = getLocalFile(node)
                     if (node.type is AudioFileTypeInfo || node.type is VideoFileTypeInfo) {
-                        openAudioOrVideoFiles(localPath, node, navController, parentCoroutineScope)
+                        openAudioOrVideoFiles(file, node, navController, parentCoroutineScope)
                     } else {
-                        localPath?.let {
+                        file?.let {
                             openNotStreamableFiles(
                                 navController,
                                 it,
@@ -96,12 +96,12 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
     }
 
     private suspend fun openAudioOrVideoFiles(
-        localPath: String?,
+        localFile: File?,
         node: TypedFileNode,
         navController: NavHostController,
         parentCoroutineScope: CoroutineScope,
     ) {
-        val fileUri = getAudioOrVideoFileUri(localPath, node)
+        val fileUri = getAudioOrVideoFileUri(localFile, node)
         Intent(Intent.ACTION_VIEW).apply {
             if (fileUri != null) {
                 setDataAndType(Uri.parse(fileUri), node.type.mimeType)
@@ -113,7 +113,7 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 parentCoroutineScope.ensureActive()
                 navController.context.startActivity(this)
-            } else if (localPath == null) {
+            } else if (localFile == null) {
                 parentCoroutineScope.ensureActive()
                 navController.navigate(cannotOpenFileDialog)
             } else {
@@ -124,11 +124,11 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
 
     private suspend fun openNotStreamableFiles(
         navController: NavHostController,
-        localPath: String,
+        localFile: File?,
         fileTypeInfo: FileTypeInfo,
         parentCoroutineScope: CoroutineScope,
     ) {
-        val localFileUri = getLocalFileUri(localPath)
+        val localFileUri = getLocalFileUri(localFile)
         Intent(Intent.ACTION_VIEW).apply {
             localFileUri?.let {
                 setDataAndType(Uri.parse(it), fileTypeInfo.mimeType)
@@ -147,9 +147,9 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
     }
 
     private suspend fun getAudioOrVideoFileUri(
-        localPath: String?,
+        localFile: File?,
         node: TypedFileNode,
-    ): String? = localPath?.let {
+    ): String? = localFile?.let {
         getLocalFileUri(it)
     } ?: run {
         if (httpServerRunning() == 0) {
@@ -158,12 +158,12 @@ class OpenWithBottomSheetMenuItem @Inject constructor(
         getStreamingUri(node)
     }
 
-    private suspend fun getLocalFileUri(filePath: String) = runCatching {
-        getFileUriUseCase(File(filePath), Constants.AUTHORITY_STRING_FILE_PROVIDER)
+    private suspend fun getLocalFileUri(file: File?) = runCatching {
+        file?.let { getFileUriUseCase(it, Constants.AUTHORITY_STRING_FILE_PROVIDER) }
     }.onFailure { Timber.e("Error getting local file uri: ${it.message}") }.getOrNull()
 
-    private suspend fun getLocalFilePath(node: TypedFileNode): String? = runCatching {
-        getLocalFilePathUseCase(node)
+    private suspend fun getLocalFile(node: TypedFileNode): File? = runCatching {
+        getNodePreviewFileUseCase(node)
     }.onFailure { Timber.e("Error getting local file path: ${it.message}") }.getOrNull()
 
     private suspend fun getStreamingUri(node: TypedFileNode) = runCatching {

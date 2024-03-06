@@ -42,11 +42,10 @@ import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
-import mega.privacy.android.domain.usecase.node.GetNodePreviewFilePathUseCase
+import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -88,7 +87,7 @@ class NodeActionsViewModelTest {
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase = mock()
-    private val getNodePreviewFilePathUseCase: GetNodePreviewFilePathUseCase = mock()
+    private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase = mock()
     private val sampleNode = mock<TypedFileNode>().stub {
         on { id } doReturn NodeId(123)
     }
@@ -113,7 +112,7 @@ class NodeActionsViewModelTest {
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
-            getNodePreviewFilePathUseCase = getNodePreviewFilePathUseCase,
+            getNodePreviewFileUseCase = getNodePreviewFileUseCase,
             applicationScope = applicationScope
         )
     }
@@ -266,7 +265,7 @@ class NodeActionsViewModelTest {
             whenever(getNodeContentUriUseCase(node)).thenReturn(
                 content
             )
-            whenever(getNodePreviewFilePathUseCase(any())).thenReturn("path")
+            whenever(getNodePreviewFileUseCase(any())).thenReturn(File("path"))
             whenever(getFeatureFlagValueUseCase(AppFeatures.ImagePreview)).thenReturn(true)
             initViewModel()
             val actual = viewModel.handleFileNodeClicked(node)
@@ -296,7 +295,7 @@ class NodeActionsViewModelTest {
                 }
 
                 else -> {
-                    verify(getNodePreviewFilePathUseCase).invoke(node)
+                    verify(getNodePreviewFileUseCase).invoke(node)
                     verifyNoMoreInteractions(getFeatureFlagValueUseCase)
                 }
             }

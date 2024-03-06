@@ -2,8 +2,7 @@ package mega.privacy.android.domain.usecase.chat
 
 import mega.privacy.android.domain.entity.node.NodeShareContentUri
 import mega.privacy.android.domain.entity.node.chat.ChatFile
-import mega.privacy.android.domain.usecase.node.GetNodePreviewFilePathUseCase
-import java.io.File
+import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import javax.inject.Inject
 
 /**
@@ -12,7 +11,7 @@ import javax.inject.Inject
  */
 class GetShareChatNodesUseCase @Inject constructor(
     private val exportChatNodesUseCase: ExportChatNodesUseCase,
-    private val getNodePreviewFilePathUseCase: GetNodePreviewFilePathUseCase,
+    private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
 ) {
     /**
      * Invoke
@@ -20,7 +19,7 @@ class GetShareChatNodesUseCase @Inject constructor(
      */
     suspend operator fun invoke(chatNodes: List<ChatFile>): NodeShareContentUri {
         val files = chatNodes.mapNotNull {
-            getNodePreviewFilePathUseCase(it)?.let { path -> File(path) }
+            getNodePreviewFileUseCase(it)
         }
         return if (files.size == chatNodes.size) {
             NodeShareContentUri.LocalContentUris(files)

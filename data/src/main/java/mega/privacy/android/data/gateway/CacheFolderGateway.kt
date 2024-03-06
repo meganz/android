@@ -85,9 +85,9 @@ interface CacheFolderGateway {
     suspend fun getPreviewDownloadPathForNode(): String
 
     /**
-     * Get the path of the file preview download
+     * Get the file preview download
      *
      * @param fileName Name of the file
      */
-    suspend fun getFilePreviewPath(fileName: String): String
+    suspend fun getPreviewFile(fileName: String): File?
 }

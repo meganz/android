@@ -5,7 +5,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -14,7 +13,7 @@ import javax.inject.Inject
  */
 class GetNodeContentUriUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
-    private val getNodePreviewFilePathUseCase: GetNodePreviewFilePathUseCase,
+    private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
     private val httpServerStart: MegaApiHttpServerStartUseCase,
     private val httpServerIsRunning: MegaApiHttpServerIsRunningUseCase,
 ) {
@@ -24,8 +23,8 @@ class GetNodeContentUriUseCase @Inject constructor(
      */
     suspend operator fun invoke(
         fileNode: TypedFileNode,
-    ): NodeContentUri = getNodePreviewFilePathUseCase(fileNode)?.let {
-        NodeContentUri.LocalContentUri(File(it))
+    ): NodeContentUri = getNodePreviewFileUseCase(fileNode)?.let {
+        NodeContentUri.LocalContentUri(it)
     } ?: run {
         val shouldStopHttpSever = if (httpServerIsRunning() == 0) {
             httpServerStart()

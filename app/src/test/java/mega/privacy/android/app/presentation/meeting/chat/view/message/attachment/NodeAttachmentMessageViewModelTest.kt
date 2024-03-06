@@ -34,7 +34,7 @@ import mega.privacy.android.domain.usecase.chat.message.GetCachedOriginalPathUse
 import mega.privacy.android.domain.usecase.chat.message.GetMessageIdsByTypeUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
-import mega.privacy.android.domain.usecase.node.GetNodePreviewFilePathUseCase
+import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import org.junit.jupiter.api.BeforeEach
@@ -66,7 +66,7 @@ class NodeAttachmentMessageViewModelTest {
     private val nodeContentUriIntentMapper = mock<NodeContentUriIntentMapper>()
     private val getMessageIdsByTypeUseCase = mock<GetMessageIdsByTypeUseCase>()
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase = mock()
-    private val getNodePreviewFilePathUseCase = mock<GetNodePreviewFilePathUseCase>()
+    private val getNodePreviewFileUseCase = mock<GetNodePreviewFileUseCase>()
     private val getCachedOriginalPathUseCase = mock<GetCachedOriginalPathUseCase>()
     private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase>()
     private val removeOfflineNodeUseCase = mock<RemoveOfflineNodeUseCase>()
@@ -83,7 +83,7 @@ class NodeAttachmentMessageViewModelTest {
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             getMessageIdsByTypeUseCase = getMessageIdsByTypeUseCase,
             getNodeContentUriUseCase = getNodeContentUriUseCase,
-            getNodePreviewFilePathUseCase = getNodePreviewFilePathUseCase,
+            getNodePreviewFileUseCase = getNodePreviewFileUseCase,
             getCachedOriginalPathUseCase = getCachedOriginalPathUseCase,
             isAvailableOfflineUseCase = isAvailableOfflineUseCase,
             removeOfflineNodeUseCase = removeOfflineNodeUseCase,
@@ -100,7 +100,7 @@ class NodeAttachmentMessageViewModelTest {
             nodeContentUriIntentMapper,
             getMessageIdsByTypeUseCase,
             getNodeContentUriUseCase,
-            getNodePreviewFilePathUseCase,
+            getNodePreviewFileUseCase,
             getCachedOriginalPathUseCase,
             isAvailableOfflineUseCase,
             removeOfflineNodeUseCase,

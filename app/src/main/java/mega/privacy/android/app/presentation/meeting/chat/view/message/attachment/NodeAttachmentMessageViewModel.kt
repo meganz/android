@@ -25,11 +25,10 @@ import mega.privacy.android.domain.usecase.chat.message.GetCachedOriginalPathUse
 import mega.privacy.android.domain.usecase.chat.message.GetMessageIdsByTypeUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
-import mega.privacy.android.domain.usecase.node.GetNodePreviewFilePathUseCase
+import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import timber.log.Timber
-import java.io.File
 import java.util.UUID
 import javax.inject.Inject
 
@@ -44,7 +43,7 @@ class NodeAttachmentMessageViewModel @Inject constructor(
     private val getMessageIdsByTypeUseCase: GetMessageIdsByTypeUseCase,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
-    private val getNodePreviewFilePathUseCase: GetNodePreviewFilePathUseCase,
+    private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
     private val getCachedOriginalPathUseCase: GetCachedOriginalPathUseCase,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
@@ -122,7 +121,7 @@ class NodeAttachmentMessageViewModel @Inject constructor(
             )
 
             else -> FileNodeContent.Other(
-                localFile = getNodePreviewFilePathUseCase(message.fileNode)?.let { File(it) }
+                localFile = getNodePreviewFileUseCase(message.fileNode)
             )
         }
     }

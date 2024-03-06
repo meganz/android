@@ -8,7 +8,7 @@ import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
-import mega.privacy.android.domain.usecase.node.GetNodePreviewFilePathUseCase
+import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,7 +23,7 @@ import java.io.File
 internal class GetNodeContentUriUseCaseTest {
     private lateinit var underTest: GetNodeContentUriUseCase
     private val nodeRepository: NodeRepository = mock()
-    private val getNodePreviewFilePathUseCase: GetNodePreviewFilePathUseCase = mock()
+    private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase = mock()
     private val httpServerStart: MegaApiHttpServerStartUseCase = mock()
     private val httpServerIsRunning: MegaApiHttpServerIsRunningUseCase = mock()
 
@@ -31,7 +31,7 @@ internal class GetNodeContentUriUseCaseTest {
     fun setup() {
         underTest = GetNodeContentUriUseCase(
             nodeRepository,
-            getNodePreviewFilePathUseCase,
+            getNodePreviewFileUseCase,
             httpServerStart,
             httpServerIsRunning
         )
@@ -41,7 +41,7 @@ internal class GetNodeContentUriUseCaseTest {
     fun resetMocks() {
         reset(
             nodeRepository,
-            getNodePreviewFilePathUseCase,
+            getNodePreviewFileUseCase,
             httpServerStart,
             httpServerIsRunning
         )
@@ -49,7 +49,7 @@ internal class GetNodeContentUriUseCaseTest {
 
     @Test
     fun `test that local content uri is returned`() = runTest {
-        whenever(getNodePreviewFilePathUseCase(any())).thenReturn("path")
+        whenever(getNodePreviewFileUseCase(any())).thenReturn(File("path"))
         val fileNode = mock<ChatImageFile>()
         assertThat(underTest(fileNode)).isEqualTo(
             NodeContentUri.LocalContentUri(
@@ -60,7 +60,7 @@ internal class GetNodeContentUriUseCaseTest {
 
     @Test
     fun `test that remote content uri is returned and should stop http server`() = runTest {
-        whenever(getNodePreviewFilePathUseCase(any())).thenReturn(null)
+        whenever(getNodePreviewFileUseCase(any())).thenReturn(null)
         whenever(httpServerIsRunning()).thenReturn(0)
         val chatFile = mock<ChatImageFile>()
         val link = "link"
@@ -76,7 +76,7 @@ internal class GetNodeContentUriUseCaseTest {
 
     @Test
     fun `test that remote content uri is returned and should not stop http server`() = runTest {
-        whenever(getNodePreviewFilePathUseCase(any())).thenReturn(null)
+        whenever(getNodePreviewFileUseCase(any())).thenReturn(null)
         whenever(httpServerIsRunning()).thenReturn(1)
         val chatFile = mock<ChatImageFile>()
         val link = "link"
