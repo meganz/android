@@ -56,4 +56,4 @@ captures
 *.DS_Store
 wget-log
 
-credential.properties
+credentials.properties
