@@ -906,6 +906,16 @@ class TextEditorViewModel @Inject constructor(
                                     TransferTriggerEvent.StartDownloadNode(nodes)
                                 )
                             }
+
+                            else -> {
+                                val node = getNode()?.handle?.let {
+                                    getNodeByIdUseCase(NodeId(it))
+                                }
+                                val nodes = listOfNotNull(node)
+                                updateDownloadEvent(
+                                    TransferTriggerEvent.StartDownloadNode(nodes)
+                                )
+                            }
                         }
                     } else {
                         when (getAdapterType()) {
