@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -157,6 +158,7 @@ internal fun DeviceCenterScreen(
             )
         },
     )
+    val keyboardController = LocalSoftwareKeyboardController.current
     // Handle the Back Press if the Bottom Dialog is visible and the User is in Folder View
     BackHandler(enabled = modalSheetState.isVisible || selectedDevice != null) {
         if (modalSheetState.isVisible) {
@@ -221,15 +223,22 @@ internal fun DeviceCenterScreen(
                                     onDeviceClicked(deviceUiNode)
                                 },
                                 onDeviceMenuClicked = { deviceNode ->
+                                    keyboardController?.hide()
                                     onDeviceMenuClicked(deviceNode)
                                     if (!modalSheetState.isVisible) {
                                         coroutineScope.launch { modalSheetState.show() }
                                     }
                                 },
                                 onBackupFolderClicked = onBackupFolderClicked,
-                                onBackupFolderMenuClicked = onBackupFolderMenuClicked,
+                                onBackupFolderMenuClicked = {
+                                    keyboardController?.hide()
+                                    onBackupFolderMenuClicked(it)
+                                },
                                 onNonBackupFolderClicked = onNonBackupFolderClicked,
-                                onNonBackupFolderMenuClicked = onNonBackupFolderMenuClicked,
+                                onNonBackupFolderMenuClicked = {
+                                    keyboardController?.hide()
+                                    onNonBackupFolderMenuClicked(it)
+                                },
                                 modifier = Modifier.padding(paddingValues),
                             )
                         }
