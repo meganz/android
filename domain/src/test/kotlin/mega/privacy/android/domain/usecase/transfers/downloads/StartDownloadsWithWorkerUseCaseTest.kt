@@ -106,28 +106,30 @@ class StartDownloadsWithWorkerUseCaseTest {
 
     @Test
     fun `test that single events are filtered out`() = runTest {
+        val mockFinish = mock<MultiTransferEvent.ScanningFoldersFinished>()
         mockFlow(
             flowOf(
                 mock<MultiTransferEvent.SingleTransferEvent>(),
-                MultiTransferEvent.ScanningFoldersFinished,
+                mockFinish,
             )
         )
         underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
-            assertThat(awaitItem()).isEqualTo(MultiTransferEvent.ScanningFoldersFinished)
+            assertThat(awaitItem()).isEqualTo(mockFinish)
             awaitComplete()
         }
     }
 
     @Test
     fun `test that flow completes when finish processing transfers is emitted`() = runTest {
+        val mockFinish = mock<MultiTransferEvent.ScanningFoldersFinished>()
         mockFlow(
             flowOf(
-                MultiTransferEvent.ScanningFoldersFinished,
+                mockFinish,
                 mock<MultiTransferEvent.SingleTransferEvent>(),
             )
         )
         underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
-            assertThat(awaitItem()).isEqualTo(MultiTransferEvent.ScanningFoldersFinished)
+            assertThat(awaitItem()).isEqualTo(mockFinish)
             awaitComplete()
         }
     }
@@ -136,7 +138,7 @@ class StartDownloadsWithWorkerUseCaseTest {
     fun `test that download worker is started when start download finish correctly`() = runTest {
         mockFlow(
             flowOf(
-                MultiTransferEvent.ScanningFoldersFinished,
+                mock<MultiTransferEvent.ScanningFoldersFinished>(),
             )
         )
         underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).collect()
@@ -148,7 +150,7 @@ class StartDownloadsWithWorkerUseCaseTest {
         var workerStarted = false
         mockFlow(
             flow {
-                emit(MultiTransferEvent.ScanningFoldersFinished)
+                emit(mock<MultiTransferEvent.ScanningFoldersFinished>())
                 awaitCancellation()
             }
         )
@@ -171,7 +173,7 @@ class StartDownloadsWithWorkerUseCaseTest {
         mockFlow(
             flow {
                 delay(1000)
-                emit(MultiTransferEvent.ScanningFoldersFinished)
+                emit(mock<MultiTransferEvent.ScanningFoldersFinished>())
             }
         )
         val job =

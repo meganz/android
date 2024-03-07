@@ -138,7 +138,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
     fun `test that download worker is started when start download finish correctly`() = runTest {
         mockFlow(
             flowOf(
-                MultiTransferEvent.ScanningFoldersFinished,
+                mock<MultiTransferEvent.ScanningFoldersFinished>(),
             )
         )
         underTest(listOf(mock()), 1L).collect()
@@ -150,7 +150,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
         var workerStarted = false
         mockFlow(
             flow {
-                emit(MultiTransferEvent.ScanningFoldersFinished)
+                emit(mock<MultiTransferEvent.ScanningFoldersFinished>())
                 awaitCancellation()
             }
         )

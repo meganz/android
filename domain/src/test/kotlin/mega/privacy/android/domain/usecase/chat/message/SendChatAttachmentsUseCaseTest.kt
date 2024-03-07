@@ -114,7 +114,7 @@ class SendChatAttachmentsUseCaseTest {
         whenever(chatMessageRepository.savePendingMessage(any()))
             .thenReturn(pendingMessage)
         whenever(startChatUploadsWithWorkerUseCase(any(), any())).thenReturn(
-            flowOf(MultiTransferEvent.ScanningFoldersFinished)
+            flowOf(mock<MultiTransferEvent.ScanningFoldersFinished>())
         )
         whenever(getFileForChatUploadUseCase(any())).thenReturn(file)
     }

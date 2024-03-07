@@ -39,12 +39,27 @@ sealed interface MultiTransferEvent {
                         true
                     }
 
-                    this is TransferEvent.TransferFinishEvent && transfer.isFolderTransfer -> true
-                    this is TransferEvent.TransferStartEvent && !transfer.isFolderTransfer -> true
+                    this is TransferEvent.TransferFinishEvent -> true
+                    this is TransferEvent.TransferUpdateEvent && !transfer.isFolderTransfer -> true
                     else -> false
                 }
             }
         }
+
+        /**
+         * This event indicates that the transfer was not done due to being already transferred.
+         */
+        val isAlreadyTransferredEvent by lazy {
+            with(transferEvent.transfer) {
+                !isFolderTransfer && isAlreadyDownloaded
+            }
+        }
+
+        /**
+         * This event is related to a file transfer, not a folder.
+         */
+        val isFileTransferEvent by lazy { !transferEvent.transfer.isFolderTransfer }
+
 
         /**
          * Current overall progress of all the initiated transfers. May be inaccurate since some nodes may not have been processed yet, and therefore, totalBytesToTransfer could be inaccurate.
@@ -54,8 +69,11 @@ sealed interface MultiTransferEvent {
 
     /**
      * All transfers has been scanned by the sdk, starting from this event transfers can be retried by sdk if the app is closed
+     * @property scannedFiles the amount of files scanned for the transfer of the involved nodes
+     * @property alreadyDownloadedFiles the amount of already downloaded files
      */
-    data object ScanningFoldersFinished : MultiTransferEvent
+    data class ScanningFoldersFinished(val scannedFiles: Int, val alreadyDownloadedFiles: Int) :
+        MultiTransferEvent
 
     /**
      * Event to notify that the download cannot be done due to insufficient storage space in the destination path
