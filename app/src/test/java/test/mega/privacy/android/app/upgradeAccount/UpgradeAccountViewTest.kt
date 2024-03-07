@@ -137,7 +137,6 @@ class UpgradeAccountViewTest {
                 ),
                 onBackPressed = {},
                 onBuyClicked = {},
-                onTOSClicked = {},
                 onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
@@ -174,7 +173,6 @@ class UpgradeAccountViewTest {
                 ),
                 onBackPressed = {},
                 onBuyClicked = {},
-                onTOSClicked = {},
                 onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
@@ -210,7 +208,6 @@ class UpgradeAccountViewTest {
                 ),
                 onBackPressed = {},
                 onBuyClicked = {},
-                onTOSClicked = {},
                 onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
@@ -240,7 +237,6 @@ class UpgradeAccountViewTest {
                 ),
                 onBackPressed = {},
                 onBuyClicked = {},
-                onTOSClicked = {},
                 onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
@@ -270,7 +266,6 @@ class UpgradeAccountViewTest {
                 ),
                 onBackPressed = {},
                 onBuyClicked = {},
-                onTOSClicked = {},
                 onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
@@ -297,7 +292,6 @@ class UpgradeAccountViewTest {
                 ),
                 onBackPressed = {},
                 onBuyClicked = {},
-                onTOSClicked = {},
                 onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
@@ -328,7 +322,6 @@ class UpgradeAccountViewTest {
                 ),
                 onBuyClicked = onBuyClicked,
                 onBackPressed = {},
-                onTOSClicked = {},
                 onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
@@ -360,7 +353,6 @@ class UpgradeAccountViewTest {
                 ),
                 onBackPressed = {},
                 onBuyClicked = {},
-                onTOSClicked = {},
                 onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
@@ -389,7 +381,6 @@ class UpgradeAccountViewTest {
                 hideBillingWarning = hideBillingWarning,
                 onBackPressed = {},
                 onBuyClicked = {},
-                onTOSClicked = {},
                 onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
@@ -414,7 +405,6 @@ class UpgradeAccountViewTest {
                 ),
                 onBackPressed = {},
                 onBuyClicked = {},
-                onTOSClicked = {},
                 onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
@@ -440,7 +430,6 @@ class UpgradeAccountViewTest {
                 ),
                 onBackPressed = {},
                 onBuyClicked = {},
-                onTOSClicked = {},
                 onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
@@ -467,7 +456,6 @@ class UpgradeAccountViewTest {
                 ),
                 onBackPressed = {},
                 onBuyClicked = {},
-                onTOSClicked = {},
                 onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
@@ -494,7 +482,6 @@ class UpgradeAccountViewTest {
                 ),
                 onBackPressed = {},
                 onBuyClicked = {},
-                onTOSClicked = {},
                 onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
@@ -528,7 +515,6 @@ class UpgradeAccountViewTest {
                 ),
                 onBackPressed = {},
                 onBuyClicked = {},
-                onTOSClicked = {},
                 onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
@@ -602,7 +588,6 @@ class UpgradeAccountViewTest {
                 ),
                 onBackPressed = {},
                 onBuyClicked = {},
-                onTOSClicked = {},
                 onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingPlanType = {},
@@ -630,7 +615,6 @@ class UpgradeAccountViewTest {
                 ),
                 onBackPressed = {},
                 onBuyClicked = {},
-                onTOSClicked = {},
                 onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingPlanType = {},
@@ -647,17 +631,16 @@ class UpgradeAccountViewTest {
     }
 
     @Test
-    fun `test that subscription details is shown correctly`() {
+    fun `test that subscription details are shown correctly when pre-selected plan is Pro I`() {
         composeRule.setContent {
             UpgradeAccountView(
                 state = getUpgradeAccountState(
-                    accountType = AccountType.PRO_I,
+                    accountType = AccountType.FREE,
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
                 onBackPressed = {},
                 onBuyClicked = {},
-                onTOSClicked = {},
                 onPlayStoreLinkClicked = {},
                 onPricingPageClicked = {},
                 onChoosingMonthlyYearlyPlan = {},
@@ -672,8 +655,98 @@ class UpgradeAccountViewTest {
         composeRule.onNodeWithTag(GOOGLE_PLAY_STORE_SUBSCRIPTION_LINK_TAG)
             .assertExists()
         composeRule.onNodeWithTag(SUBSCRIPTION_DETAILS_TITLE_TAG).assertExists()
-        composeRule.onNodeWithTag(SUBSCRIPTION_DETAILS_DESCRIPTION_TAG).assertExists()
+        composeRule.onNodeWithTag("${SUBSCRIPTION_DETAILS_DESCRIPTION_TAG}_yearly_pro_i_with_price")
+            .assertExists()
+    }
 
+    @Test
+    fun `test that subscription details are shown correctly when current plan is Pro I and pre-selected plan is Pro II`() {
+        composeRule.setContent {
+            UpgradeAccountView(
+                state = getUpgradeAccountState(
+                    accountType = AccountType.PRO_I,
+                    showBillingWarning = false,
+                    isPaymentMethodAvailable = true
+                ),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onPlayStoreLinkClicked = {},
+                onPricingPageClicked = {},
+                onChoosingMonthlyYearlyPlan = {},
+                onChoosingPlanType = {},
+                showBillingWarning = {},
+                hideBillingWarning = {},
+                onDialogConfirmButtonClicked = {},
+                onDialogDismissButtonClicked = {},
+                showUpgradeWarningBanner = false
+            )
+        }
+        composeRule.onNodeWithTag(GOOGLE_PLAY_STORE_SUBSCRIPTION_LINK_TAG)
+            .assertExists()
+        composeRule.onNodeWithTag(SUBSCRIPTION_DETAILS_TITLE_TAG).assertExists()
+        composeRule.onNodeWithTag("${SUBSCRIPTION_DETAILS_DESCRIPTION_TAG}_yearly_pro_ii_with_price")
+            .assertExists()
+    }
+
+    @Test
+    fun `test that subscription details are shown correctly when user selects monthly tab`() {
+        composeRule.setContent {
+            UpgradeAccountView(
+                state = getUpgradeAccountState(
+                    accountType = AccountType.FREE,
+                    showBillingWarning = false,
+                    isPaymentMethodAvailable = true
+                ),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onPlayStoreLinkClicked = {},
+                onPricingPageClicked = {},
+                onChoosingMonthlyYearlyPlan = {},
+                onChoosingPlanType = {},
+                showBillingWarning = {},
+                hideBillingWarning = {},
+                onDialogConfirmButtonClicked = {},
+                onDialogDismissButtonClicked = {},
+                showUpgradeWarningBanner = false
+            )
+        }
+        composeRule.onNodeWithTag("$UPGRADE_ACCOUNT_SCREEN_TAG$MONTHLY_TAB_TAG").performClick()
+        composeRule.onNodeWithTag(GOOGLE_PLAY_STORE_SUBSCRIPTION_LINK_TAG)
+            .assertExists()
+        composeRule.onNodeWithTag(SUBSCRIPTION_DETAILS_TITLE_TAG).assertExists()
+        composeRule.onNodeWithTag("${SUBSCRIPTION_DETAILS_DESCRIPTION_TAG}_monthly_pro_i_with_price")
+            .assertExists()
+    }
+
+    @Test
+    fun `test that subscription details are shown correctly when current plan is monthly Pro III and no plan was preselected`() {
+        composeRule.setContent {
+            UpgradeAccountView(
+                state = getUpgradeAccountState(
+                    accountType = AccountType.PRO_III,
+                    showBillingWarning = false,
+                    isPaymentMethodAvailable = true,
+                    userSubscription = UserSubscription.MONTHLY_SUBSCRIBED,
+                ),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onPlayStoreLinkClicked = {},
+                onPricingPageClicked = {},
+                onChoosingMonthlyYearlyPlan = {},
+                onChoosingPlanType = {},
+                showBillingWarning = {},
+                hideBillingWarning = {},
+                onDialogConfirmButtonClicked = {},
+                onDialogDismissButtonClicked = {},
+                showUpgradeWarningBanner = false
+            )
+        }
+        composeRule.onNodeWithTag("$UPGRADE_ACCOUNT_SCREEN_TAG$MONTHLY_TAB_TAG").performClick()
+        composeRule.onNodeWithTag(GOOGLE_PLAY_STORE_SUBSCRIPTION_LINK_TAG)
+            .assertExists()
+        composeRule.onNodeWithTag(SUBSCRIPTION_DETAILS_TITLE_TAG).assertExists()
+        composeRule.onNodeWithTag("${SUBSCRIPTION_DETAILS_DESCRIPTION_TAG}_monthly_no_price")
+            .assertExists()
     }
 
     private fun getUpgradeAccountState(
