@@ -50,10 +50,16 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
 
         Timber.d("Meeting Name: $meetingName")
         releaseVideoAndHideKeyboard()
+        sharedModel.updateGuestFullNameAndMeetingLink(
+            guestFisrtName,
+            guestLastName,
+            meetingLink,
+            meetingName
+        )
+
 
         val action = InMeetingFragmentDirections.actionGlobalInMeeting(
             action = MEETING_ACTION_CREATE,
-            meetingName = meetingName
         )
         findNavController().navigate(action)
     }
