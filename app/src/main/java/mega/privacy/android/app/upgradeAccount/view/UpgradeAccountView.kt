@@ -644,9 +644,7 @@ private fun SubscriptionDetails(
                     } else {
                         R.string.account_upgrade_account_subscription_details_body_yearly_with_price
                     },
-                    formattedPrice.currencyCode,
                     formattedPrice.price,
-                    formattedPrice.currencyCode,
                     formattedPrice.price
                 )
                 testTag = if (isMonthly) "_monthly_lite_with_price" else "_yearly_lite_with_price"
@@ -661,9 +659,7 @@ private fun SubscriptionDetails(
                     } else {
                         R.string.account_upgrade_account_subscription_details_body_yearly_with_price
                     },
-                    formattedPrice.currencyCode,
                     formattedPrice.price,
-                    formattedPrice.currencyCode,
                     formattedPrice.price
                 )
                 testTag = if (isMonthly) "_monthly_pro_i_with_price" else "_yearly_pro_i_with_price"
@@ -678,9 +674,7 @@ private fun SubscriptionDetails(
                     } else {
                         R.string.account_upgrade_account_subscription_details_body_yearly_with_price
                     },
-                    formattedPrice.currencyCode,
                     formattedPrice.price,
-                    formattedPrice.currencyCode,
                     formattedPrice.price
                 )
                 testTag =
@@ -696,9 +690,7 @@ private fun SubscriptionDetails(
                     } else {
                         R.string.account_upgrade_account_subscription_details_body_yearly_with_price
                     },
-                    formattedPrice.currencyCode,
                     formattedPrice.price,
-                    formattedPrice.currencyCode,
                     formattedPrice.price
                 )
                 testTag =
