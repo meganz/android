@@ -124,14 +124,13 @@ class ChatMessageContainerTest {
                         reactions = reactions,
                         onMoreReactionsClick = {},
                         onReactionClick = {},
+                        onReactionLongClick = {},
                         onForwardClicked = onForwardClicked,
                         isSendError = isSendError,
-                        avatarOrIcon = {},
-                        content = {},
-                        onReactionLongClick = {},
                         isSelectMode = inSelectMode,
                         onSelectionChanged = onSelectionChange,
-                    )
+                        avatarOrIcon = {},
+                    ) {}
                 }
             }
         }

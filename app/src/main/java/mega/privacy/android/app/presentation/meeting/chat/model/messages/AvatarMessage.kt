@@ -58,7 +58,6 @@ abstract class AvatarMessage : UiChatMessage {
         onSendErrorClicked: (TypedMessage) -> Unit,
     ) {
         ChatMessageContainer(
-            modifier = Modifier.fillMaxWidth(),
             isMine = displayAsMine,
             showForwardIcon = shouldDisplayForwardIcon,
             reactions = reactions,
@@ -66,20 +65,19 @@ abstract class AvatarMessage : UiChatMessage {
             onReactionClick = { onReactionClicked(id, it, reactions) },
             onReactionLongClick = { onReactionLongClick(it, reactions) },
             onForwardClicked = { onForwardClicked(message) },
+            modifier = Modifier.fillMaxWidth(),
+            isSelectMode = state.isInSelectMode,
+            isSelected = state.isChecked,
+            onSelectionChanged = onSelectedChanged,
             avatarOrIcon = { avatarModifier ->
                 MessageAvatar(
                     lastUpdatedCache = state.lastUpdatedCache,
                     avatarModifier,
                 )
-            },
-            content = { interactionEnabled ->
-                ContentComposable(onLongClick, interactionEnabled)
-            },
-            isSelectMode = state.isInSelectMode,
-            isSelected = state.isChecked,
-            onSelectionChanged = onSelectedChanged,
-            onSendErrorClick = { onSendErrorClicked(message) }
-        )
+            }
+        ) { interactionEnabled ->
+            ContentComposable(onLongClick, interactionEnabled)
+        }
     }
 
     override val isSelectable = true

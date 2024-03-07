@@ -77,7 +77,6 @@ fun ChatMessageContainer(
     isSendError: Boolean = false,
     isSelectMode: Boolean = false,
     isSelected: Boolean = false,
-    onSendErrorClick: () -> Unit = {},
     onSelectionChanged: (Boolean) -> Unit = {},
     avatarOrIcon: @Composable ((modifier: Modifier) -> Unit)? = null,
     content: @Composable (interactionEnabled: Boolean) -> Unit,
@@ -169,7 +168,6 @@ fun ChatMessageContainer(
                 if (isSendError) {
                     MegaText(
                         modifier = Modifier
-                            .clickable(enabled = true, onClick = onSendErrorClick)
                             .padding(top = 2.dp),
                         text = stringResource(id = R.string.manual_retry_alert),
                         style = MaterialTheme.typography.body4,
@@ -227,17 +225,18 @@ private fun Preview(
         LazyColumn() {
             item {
                 ChatMessageContainer(
-                    modifier = Modifier,
                     isMine = parameter.isMe,
+                    showForwardIcon = true,
                     reactions = parameter.reactions,
                     onMoreReactionsClick = { },
                     onReactionClick = { },
                     onReactionLongClick = {},
                     onForwardClicked = {},
-                    onSelectionChanged = { isSelected = !isSelected },
+                    modifier = Modifier,
+                    isSendError = parameter.isMe && parameter.hasSendError,
                     isSelectMode = parameter.inSelectMode,
                     isSelected = isSelected,
-                    isSendError = parameter.isMe && parameter.hasSendError,
+                    onSelectionChanged = { isSelected = !isSelected },
                     avatarOrIcon = {
                         Icon(
                             modifier = it,
@@ -246,7 +245,6 @@ private fun Preview(
                             tint = MegaTheme.colors.icon.secondary
                         )
                     },
-                    showForwardIcon = true,
                     content = parameter.content,
                 )
             }
