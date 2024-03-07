@@ -20,6 +20,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -32,6 +33,7 @@ import mega.privacy.android.app.main.managerSections.TransfersFragment
 import mega.privacy.android.app.main.managerSections.TransfersViewModel
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
+import mega.privacy.android.app.presentation.transfers.startdownload.view.createStartDownloadView
 import mega.privacy.android.app.usecase.DownloadNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.Constants
@@ -103,8 +105,18 @@ internal class TransferPageFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         return FragmentTransferPageBinding.inflate(inflater, container, false).also {
+            addStartDownloadTransferView(it.root)
             _binding = it
         }.root
+    }
+
+    private fun addStartDownloadTransferView(root: ViewGroup) {
+        root.addView(
+            createStartDownloadView(
+                requireActivity(),
+                emptyFlow(), //This view is just to show messages, as transfers can not be started in this screen, that's why it has no events
+            ) {}
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
