@@ -22,7 +22,6 @@ import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
-import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
@@ -48,13 +47,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideClearCacheDirectory(cameraUploadRepository: CameraUploadRepository): ClearCacheDirectory =
             ClearCacheDirectory(cameraUploadRepository::clearCacheDirectory)
-
-        /**
-         * Provide the [MonitorBatteryInfo] implementation
-         */
-        @Provides
-        fun provideMonitorBatteryInfo(cameraUploadRepository: CameraUploadRepository): MonitorBatteryInfo =
-            MonitorBatteryInfo(cameraUploadRepository::monitorBatteryInfo)
 
         /**
          * Provide the [MonitorChargingStoppedState] implementation

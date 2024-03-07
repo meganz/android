@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.AppInfo
+import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.DeviceInfo
 import mega.privacy.android.domain.entity.environment.ThermalState
 
@@ -94,4 +95,9 @@ interface EnvironmentRepository {
      * Monitor thermal state
      */
     fun monitorThermalState(): Flow<ThermalState>
+
+    /**
+     * Monitor battery info
+     */
+    fun monitorBatteryInfo(): Flow<BatteryInfo>
 }

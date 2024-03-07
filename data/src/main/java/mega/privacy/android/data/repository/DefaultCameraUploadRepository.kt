@@ -359,8 +359,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     override suspend fun broadcastCameraUploadsFolderDestination(data: CameraUploadsFolderDestinationUpdate) =
         appEventGateway.broadcastCameraUploadsFolderDestination(data)
 
-    override fun monitorBatteryInfo() = deviceGateway.monitorBatteryInfo
-
     override fun monitorChargingStoppedInfo() = deviceGateway.monitorChargingStoppedState
 
     override suspend fun renameNode(nodeHandle: Long, newName: String): Unit =

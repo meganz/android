@@ -82,7 +82,6 @@ import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
-import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
@@ -115,6 +114,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUse
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupHeartbeatStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UploadCameraUploadsRecordsUseCase
+import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -155,7 +155,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val monitorBatteryInfo: MonitorBatteryInfo,
+    private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase,
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
     private val isNodeInRubbishOrDeletedUseCase: IsNodeInRubbishOrDeletedUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
@@ -443,7 +443,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     private fun CoroutineScope.monitorBatteryLevelStatus() = launch {
-        monitorBatteryInfo().collect {
+        monitorBatteryInfoUseCase().collect {
             deviceAboveMinimumBatteryLevel = (it.level > LOW_BATTERY_LEVEL || it.isCharging)
             if (!deviceAboveMinimumBatteryLevel) {
                 abortWork(reason = CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW)

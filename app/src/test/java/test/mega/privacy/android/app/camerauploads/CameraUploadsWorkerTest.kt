@@ -73,7 +73,6 @@ import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
-import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
@@ -106,6 +105,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUse
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupHeartbeatStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UploadCameraUploadsRecordsUseCase
+import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -166,7 +166,7 @@ class CameraUploadsWorkerTest {
     private val getDefaultNodeHandleUseCase: GetDefaultNodeHandleUseCase = mock()
     private val monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
-    private val monitorBatteryInfo: MonitorBatteryInfo = mock()
+    private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase = mock()
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase = mock()
     private val isNodeInRubbishOrDeletedUseCase: IsNodeInRubbishOrDeletedUseCase = mock()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
@@ -272,7 +272,7 @@ class CameraUploadsWorkerTest {
                 ioDispatcher = ioDispatcher,
                 monitorPausedTransfersUseCase = monitorPausedTransfersUseCase,
                 monitorConnectivityUseCase = monitorConnectivityUseCase,
-                monitorBatteryInfo = monitorBatteryInfo,
+                monitorBatteryInfoUseCase = monitorBatteryInfoUseCase,
                 backgroundFastLoginUseCase = backgroundFastLoginUseCase,
                 isNodeInRubbishOrDeletedUseCase = isNodeInRubbishOrDeletedUseCase,
                 monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
@@ -327,7 +327,7 @@ class CameraUploadsWorkerTest {
 
         // mock monitor events
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
-        whenever(monitorBatteryInfo()).thenReturn(emptyFlow())
+        whenever(monitorBatteryInfoUseCase()).thenReturn(emptyFlow())
         whenever(monitorPausedTransfersUseCase()).thenReturn(emptyFlow())
         whenever(monitorStorageOverQuotaUseCase()).thenReturn(emptyFlow())
         whenever(monitorNodeUpdatesUseCase()).thenReturn(emptyFlow())
@@ -1273,7 +1273,7 @@ class CameraUploadsWorkerTest {
         underTest.doWork()
 
         verify(monitorConnectivityUseCase).invoke()
-        verify(monitorBatteryInfo).invoke()
+        verify(monitorBatteryInfoUseCase).invoke()
         verify(monitorStorageOverQuotaUseCase).invoke()
         verify(monitorNodeUpdatesUseCase).invoke()
     }
@@ -1333,7 +1333,7 @@ class CameraUploadsWorkerTest {
     @Test
     fun `test that worker returns failure when battery level too low and is not charging`() =
         runTest {
-            whenever(monitorBatteryInfo()).thenReturn(flowOf(BatteryInfo(10, false)))
+            whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(10, false)))
 
             val result = underTest.doWork()
 
@@ -1349,7 +1349,7 @@ class CameraUploadsWorkerTest {
     @Test
     fun `test that worker is rescheduled when battery level too low and is not charging`() =
         runTest {
-            whenever(monitorBatteryInfo()).thenReturn(flowOf(BatteryInfo(10, false)))
+            whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(10, false)))
 
             underTest.doWork()
 
