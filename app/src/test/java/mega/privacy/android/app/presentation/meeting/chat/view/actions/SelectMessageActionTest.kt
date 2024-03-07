@@ -16,17 +16,24 @@ import mega.privacy.android.domain.entity.chat.messages.meta.InvalidMetaMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
+import mega.privacy.mobile.analytics.event.ChatConversationSelectActionMenuItemEvent
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import test.mega.privacy.android.app.AnalyticsTestRule
 
 @RunWith(AndroidJUnit4::class)
 class SelectMessageActionTest {
+
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    private val analyticsRule = AnalyticsTestRule()
+
     @get:Rule
-    var composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private lateinit var underTest: SelectMessageAction
 
@@ -120,5 +127,6 @@ class SelectMessageActionTest {
             underTest.OnTrigger(messages = setOf(mock<NormalMessage>()), onHandled = onHandled)
         }
         verify(onHandled).invoke()
+        assertThat(analyticsRule.events).contains(ChatConversationSelectActionMenuItemEvent)
     }
 }

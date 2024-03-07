@@ -9,12 +9,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.CanNotOpenFileDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.mobile.analytics.event.ChatConversationOpenWithActionMenuItemEvent
 import timber.log.Timber
 
 internal class OpenWithMessageAction(
@@ -29,6 +31,7 @@ internal class OpenWithMessageAction(
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
+        Analytics.tracker.trackEvent(ChatConversationOpenWithActionMenuItemEvent)
         var showDownloadDialog by rememberSaveable {
             mutableStateOf(false)
         }

@@ -1,10 +1,12 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
 import androidx.compose.runtime.Composable
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.mobile.analytics.event.ChatConversationSendMessageActionMenuItemEvent
 
 internal class SendMessageAction(
     private val chatViewModel: ChatViewModel,
@@ -18,6 +20,7 @@ internal class SendMessageAction(
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
+        Analytics.tracker.trackEvent(ChatConversationSendMessageActionMenuItemEvent)
         chatViewModel.onOpenChatWith(messages.map { it as ContactAttachmentMessage })
         onHandled()
     }

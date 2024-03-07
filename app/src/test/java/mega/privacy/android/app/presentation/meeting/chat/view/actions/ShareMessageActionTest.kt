@@ -13,14 +13,20 @@ import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import test.mega.privacy.android.app.AnalyticsTestRule
 
 @RunWith(AndroidJUnit4::class)
 class ShareMessageActionTest {
+
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    private val analyticsRule = AnalyticsTestRule()
+
     @get:Rule
-    var composeRule = createAndroidComposeRule<ComponentActivity>()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private val underTest: ShareMessageAction = ShareMessageAction()
 
@@ -44,15 +50,15 @@ class ShareMessageActionTest {
     @Test
     fun `test that open with option shows correctly`() {
         val hideBottomSheet = mock<() -> Unit>()
-        composeRule.setContent(
+        composeTestRule.setContent(
             underTest.bottomSheetMenuItem(
                 setOf(mock<NodeAttachmentMessage>()),
                 hideBottomSheet
             ) {}
         )
-        with(composeRule) {
+        with(composeTestRule) {
             onNodeWithTag(underTest.bottomSheetItemTestTag).assertIsDisplayed()
-            onNodeWithText(composeRule.activity.getString(R.string.general_share)).assertIsDisplayed()
+            onNodeWithText(composeTestRule.activity.getString(R.string.general_share)).assertIsDisplayed()
             onNodeWithTag(underTest.bottomSheetItemTestTag).performClick()
             verify(hideBottomSheet).invoke()
         }

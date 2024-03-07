@@ -16,11 +16,13 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
+import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
@@ -28,11 +30,16 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.AnalyticsTestRule
 
 @RunWith(AndroidJUnit4::class)
 class AvailableOfflineMessageActionTest {
+
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    private val analyticsRule = AnalyticsTestRule()
+
     @get:Rule
-    var composeRule = createAndroidComposeRule<ComponentActivity>()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private val viewModel = mock<ChatViewModel>()
     private val underTest: AvailableOfflineMessageAction = AvailableOfflineMessageAction(viewModel)
@@ -44,6 +51,10 @@ class AvailableOfflineMessageActionTest {
     }
     private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
         on { viewModelStore } doReturn viewModelStore
+    }
+
+    private val contactMessage = mock<ContactAttachmentMessage> {
+        on { isContact } doReturn true
     }
 
     @Test
@@ -66,7 +77,7 @@ class AvailableOfflineMessageActionTest {
     fun `test that open with option shows correctly`() = runTest {
         val hideBottomSheet = mock<() -> Unit>()
         whenever(managementMessageViewModel.isAvailableOffline(anyOrNull())).thenReturn(true)
-        composeRule.setContent {
+        composeTestRule.setContent {
             CompositionLocalProvider(
                 LocalViewModelStoreOwner provides viewModelStoreOwner
             ) {
@@ -77,9 +88,9 @@ class AvailableOfflineMessageActionTest {
                 ).invoke()
             }
         }
-        with(composeRule) {
+        with(composeTestRule) {
             onNodeWithTag(underTest.bottomSheetItemTestTag).assertIsDisplayed()
-            onNodeWithText(composeRule.activity.getString(R.string.file_properties_available_offline)).assertIsDisplayed()
+            onNodeWithText(composeTestRule.activity.getString(R.string.file_properties_available_offline)).assertIsDisplayed()
             onNodeWithTag(OFFLINE_SWITCH_TEST_TAG).assertIsDisplayed()
             onNodeWithTag(underTest.bottomSheetItemTestTag).performClick()
             verify(hideBottomSheet).invoke()

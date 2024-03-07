@@ -9,6 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatPicker
@@ -17,6 +18,7 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.management.ManagementMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.InvalidMetaMessage
+import mega.privacy.mobile.analytics.event.ChatConversationForwardActionMenuItemEvent
 
 internal class ForwardMessageAction(
     private val chatViewModel: ChatViewModel,
@@ -31,6 +33,7 @@ internal class ForwardMessageAction(
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
+        Analytics.tracker.trackEvent(ChatConversationForwardActionMenuItemEvent)
         val chatPickerLauncher =
             rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartActivityForResult()

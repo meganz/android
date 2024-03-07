@@ -7,19 +7,25 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
+import mega.privacy.mobile.analytics.event.ChatConversationInviteActionMenuItemEvent
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.AnalyticsTestRule
 
 @RunWith(AndroidJUnit4::class)
 class InviteMessageActionTest {
 
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    private val analyticsRule = AnalyticsTestRule()
+
     @get:Rule
-    var composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private lateinit var underTest: InviteMessageAction
 
@@ -105,6 +111,7 @@ class InviteMessageActionTest {
         }
 
         verify(chatViewModel).inviteContacts(expectedMessageSet)
+        assertThat(analyticsRule.events).contains(ChatConversationInviteActionMenuItemEvent)
     }
 
 

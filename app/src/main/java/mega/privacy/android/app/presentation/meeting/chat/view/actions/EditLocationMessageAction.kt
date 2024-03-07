@@ -3,11 +3,13 @@ package mega.privacy.android.app.presentation.meeting.chat.view.actions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatLocationView
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
+import mega.privacy.mobile.analytics.event.ChatConversationEditActionMenuItemEvent
 
 internal class EditLocationMessageAction(
     private val chatViewModel: ChatViewModel,
@@ -22,6 +24,7 @@ internal class EditLocationMessageAction(
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
+        Analytics.tracker.trackEvent(ChatConversationEditActionMenuItemEvent)
         val uiState by chatViewModel.state.collectAsStateWithLifecycle()
         ChatLocationView(
             isGeolocationEnabled = uiState.isGeolocationEnabled,

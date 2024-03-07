@@ -3,26 +3,35 @@ package mega.privacy.android.app.presentation.meeting.chat.view.actions
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import mega.privacy.android.app.namecollision.data.NameCollision
+import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
+import mega.privacy.mobile.analytics.event.ChatConversationAddToCloudDriveActionMenuItemEvent
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.jupiter.api.Assertions.*
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import test.mega.privacy.android.app.AnalyticsTestRule
 
 @RunWith(AndroidJUnit4::class)
 class ImportMessageActionTest {
 
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    private val analyticsRule = AnalyticsTestRule()
+
     @get:Rule
-    var composeTestRule = createComposeRule()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private lateinit var underTest: ImportMessageAction
 
@@ -71,5 +80,7 @@ class ImportMessageActionTest {
             )
         }
         verify(folderPicker).invoke(any(), any())
+        assertThat(analyticsRule.events)
+            .contains(ChatConversationAddToCloudDriveActionMenuItemEvent)
     }
 }

@@ -8,18 +8,24 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
+import mega.privacy.mobile.analytics.event.ChatConversationViewContactsActionMenuItemEvent
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import test.mega.privacy.android.app.AnalyticsTestRule
 
 @RunWith(AndroidJUnit4::class)
 class ContactInfoMessageActionTest {
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    private val analyticsRule = AnalyticsTestRule()
+
     @get:Rule
-    var composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private lateinit var underTest: ContactInfoMessageAction
 
@@ -94,5 +100,6 @@ class ContactInfoMessageActionTest {
             underTest.OnTrigger(messages = setOf(contactMessage), onHandled = onHandled)
         }
         verify(onHandled).invoke()
+        assertThat(analyticsRule.events).contains(ChatConversationViewContactsActionMenuItemEvent)
     }
 }

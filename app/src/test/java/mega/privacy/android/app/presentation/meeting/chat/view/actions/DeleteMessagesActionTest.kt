@@ -13,20 +13,25 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_REMOVE_MESSAGES_CONFIRMATION_DIALOG
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
+import mega.privacy.mobile.analytics.event.ChatConversationRemoveActionMenuItemEvent
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import test.mega.privacy.android.app.AnalyticsTestRule
 
 @RunWith(AndroidJUnit4::class)
 class DeleteMessagesActionTest {
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    private val analyticsRule = AnalyticsTestRule()
 
     @get:Rule
-    var composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private lateinit var underTest: DeleteMessageAction
 
@@ -92,6 +97,7 @@ class DeleteMessagesActionTest {
 
         composeTestRule.onNodeWithTag(TEST_TAG_REMOVE_MESSAGES_CONFIRMATION_DIALOG)
             .assertIsDisplayed()
+        assertThat(analyticsRule.events).contains(ChatConversationRemoveActionMenuItemEvent)
     }
 
     @Test

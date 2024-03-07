@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.namecollision.NameCollisionActivity
 import mega.privacy.android.app.namecollision.data.NameCollision
@@ -24,6 +25,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.mobile.analytics.event.ChatConversationAddToCloudDriveActionMenuItemEvent
 
 internal class ImportMessageAction(
     private val launchFolderPicker: (Context, ActivityResultLauncher<Intent>) -> Unit = ::openFileExplorerActivity,
@@ -38,6 +40,7 @@ internal class ImportMessageAction(
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
+        Analytics.tracker.trackEvent(ChatConversationAddToCloudDriveActionMenuItemEvent)
         val snackbarHostState = LocalSnackBarHostState.current
         val error = stringResource(id = R.string.import_success_error)
         var handleWhereToImport by rememberSaveable { mutableStateOf<Long?>(null) }

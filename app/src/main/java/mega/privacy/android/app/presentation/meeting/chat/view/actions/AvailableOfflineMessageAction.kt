@@ -14,6 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
+import mega.privacy.mobile.analytics.event.ChatConversationAvailableOfflineActionMenuItemEvent
 import timber.log.Timber
 
 internal const val OFFLINE_SWITCH_TEST_TAG = "available_offline_message_option:offline_switch"
@@ -72,6 +74,7 @@ internal class AvailableOfflineMessageAction(
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
+        Analytics.tracker.trackEvent(ChatConversationAvailableOfflineActionMenuItemEvent)
         val snackbarHostState = LocalSnackBarHostState.current
         val removeMessage = stringResource(id = R.string.file_removed_offline)
         val viewModel = hiltViewModel<NodeAttachmentMessageViewModel>()

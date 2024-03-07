@@ -55,6 +55,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
@@ -117,6 +118,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.mobile.analytics.event.ChatMessageLongPressedEvent
 
 @Composable
 internal fun ChatView(
@@ -744,6 +746,7 @@ internal fun ChatView(
                                 selectedMessages = setOf(message)
                                 // Use message for showing correct available options
                                 coroutineScope.launch {
+                                    Analytics.tracker.trackEvent(ChatMessageLongPressedEvent)
                                     messageOptionsModalSheetState.show()
                                 }
                             }
