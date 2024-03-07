@@ -2,9 +2,7 @@ package mega.privacy.android.app.presentation.meeting.chat.view.message.meta
 
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -25,11 +23,9 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openGiphyViewerActivity
 import mega.privacy.android.app.services.GiphyService
 import mega.privacy.android.core.ui.controls.chat.messages.GiphyMessagePlaceHolder
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
-import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.domain.entity.chat.messages.meta.ChatGifInfo
 import timber.log.Timber
 
@@ -37,21 +33,21 @@ import timber.log.Timber
 /**
  * Giphy message view
  *
- * @param gifInfo giphy info
- * @param title option text title of the giphy image
- * @param autoPlayGif whether gif should be auto played
- * @param onLoaded callback when gif is loaded
+ * @param gifInfo
+ * @param autoPlay
+ * @param modifier
+ * @param title
+ * @param onLoaded
+ * @param onError
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GiphyMessageView(
     gifInfo: ChatGifInfo,
-    autoPlayGif: Boolean,
+    autoPlay: Boolean,
     modifier: Modifier = Modifier,
     title: String? = null,
     onLoaded: () -> Unit = {},
-    onLongClick: () -> Unit = {},
-    interactionEnabled: Boolean = true,
+    onError: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val maxWidth = 256
@@ -61,24 +57,12 @@ fun GiphyMessageView(
         val actualHeight: Int = actualWidth * height / width
 
         var showPlaceHolder by remember { mutableStateOf(false) }
-        var autoPlay: Boolean by remember { mutableStateOf(autoPlayGif) }
+
 
         Box(
             modifier = modifier
                 .size(width = actualWidth.dp, height = actualHeight.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .conditional(interactionEnabled) {
-                    combinedClickable(
-                        onClick = {
-                            if (!autoPlay) {
-                                autoPlay = true
-                            } else {
-                                openGiphyViewerActivity(context, gifInfo)
-                            }
-                        },
-                        onLongClick = onLongClick
-                    )
-                },
+                .clip(RoundedCornerShape(12.dp)),
         ) {
             if (autoPlay) {
                 val url = webpSrc?.toUri()?.toString()
@@ -93,7 +77,7 @@ fun GiphyMessageView(
                     onState = { state ->
                         when (state) {
                             is AsyncImagePainter.State.Success -> onLoaded()
-                            is AsyncImagePainter.State.Error -> autoPlay = false
+                            is AsyncImagePainter.State.Error -> onError()
                             else -> {}
                         }
                         showPlaceHolder = state !is AsyncImagePainter.State.Success

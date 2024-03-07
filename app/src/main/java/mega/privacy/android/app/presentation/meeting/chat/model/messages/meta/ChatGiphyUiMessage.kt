@@ -1,9 +1,19 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages.meta
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.GiphyMessageView
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openGiphyViewerActivity
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
 
@@ -14,8 +24,8 @@ private const val MAX_SIZE_FOR_AUTO_PLAY = 1024 * 1024 * 4  // 4MB
  *
  * @property message
  * @property showAvatar
- * @property showTime
  */
+@OptIn(ExperimentalFoundationApi::class)
 class ChatGiphyUiMessage(
     override val message: GiphyMessage,
     override val reactions: List<UIReaction>,
@@ -27,13 +37,29 @@ class ChatGiphyUiMessage(
         interactionEnabled: Boolean
     ) {
         message.chatGifInfo?.let { giphy ->
+            var autoPlayGif: Boolean by remember { mutableStateOf(giphy.webpSize < MAX_SIZE_FOR_AUTO_PLAY) }
+            val context = LocalContext.current
+
+            val onClick = {
+                if (!autoPlayGif) {
+                    autoPlayGif = true
+                } else {
+                    openGiphyViewerActivity(context, giphy)
+                }
+            }
+
             GiphyMessageView(
                 gifInfo = giphy,
+                autoPlay = autoPlayGif,
+                modifier = Modifier.conditional(interactionEnabled) {
+                    combinedClickable(
+                        onClick = { onClick() },
+                        onLongClick = { onLongClick(message) }
+                    )
+                },
                 title = giphy.title,
-                autoPlayGif = if (autoPlay) true else giphy.webpSize < MAX_SIZE_FOR_AUTO_PLAY,
-                onLoaded = { autoPlay = true },
-                onLongClick = { onLongClick(message) },
-                interactionEnabled = interactionEnabled,
+                onLoaded = { autoPlayGif = true },
+                onError = { autoPlayGif = false }
             )
         }
     }
@@ -44,5 +70,4 @@ class ChatGiphyUiMessage(
     override val timeSent = message.time
     override val userHandle = message.userHandle
     override val id = message.msgId
-    private var autoPlay: Boolean = false
 }
