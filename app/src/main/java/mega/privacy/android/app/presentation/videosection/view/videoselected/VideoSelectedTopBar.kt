@@ -52,6 +52,7 @@ internal fun VideoSelectedTopBar(
                 },
                 modifier = Modifier.fillMaxWidth().testTag(SELECTED_MODE_TOP_BAR_TEST_TAG),
                 elevation = AppBarDefaults.TopAppBarElevation,
+                onNavigationPressed = onBackPressed
             )
         }
 

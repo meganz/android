@@ -660,6 +660,9 @@
             android:name=".mediaplayer.SelectSubtitleFileActivity"
             android:launchMode="singleTop" />
         <activity
+            android:name=".presentation.videosection.VideoSelectedActivity"
+            android:launchMode="singleTop" />
+        <activity
             android:name=".activities.settingsActivities.StartScreenPreferencesActivity"
             android:label="@string/start_screen_setting"
             android:launchMode="singleTop" />
