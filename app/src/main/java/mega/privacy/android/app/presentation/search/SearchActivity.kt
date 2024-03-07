@@ -13,10 +13,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHostState
@@ -25,6 +25,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -69,6 +71,7 @@ import mega.privacy.android.app.presentation.search.navigation.contactArraySepar
 import mega.privacy.android.app.presentation.search.navigation.searchForeignNodeDialog
 import mega.privacy.android.app.presentation.search.navigation.searchOverQuotaDialog
 import mega.privacy.android.app.presentation.search.navigation.shareFolderAccessDialog
+import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
@@ -208,6 +211,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             // Remember a SystemUiController
             val systemUiController = rememberSystemUiController()
             val useDarkIcons = themeMode.isDarkMode().not()
+
             systemUiController.setSystemBarsColor(
                 color = Color.Transparent,
                 darkIcons = useDarkIcons
@@ -241,36 +245,56 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                         }
                     },
                 ) { padding ->
-                    SearchNavHostController(
+                    ConstraintLayout(
                         modifier = Modifier
                             .padding(padding)
-                            .statusBarsPadding(),
-                        viewModel = viewModel,
-                        nodeActionsViewModel = nodeActionsViewModel,
-                        navigateToLink = ::navigateToLink,
-                        showSortOrderBottomSheet = ::showSortOrderBottomSheet,
-                        trackAnalytics = ::trackAnalytics,
-                        nodeActionHandler = bottomSheetActionHandler,
-                        navHostController = navHostController,
-                        bottomSheetNavigator = bottomSheetNavigator,
-                        listToStringWithDelimitersMapper = listToStringWithDelimitersMapper,
-                        handleClick = {
-                            coroutineScope.launch {
-                                when (it) {
-                                    is TypedFileNode -> openFileClicked(it)
-                                    is TypedFolderNode -> openFolderClicked(it.id.longValue)
-                                    else -> Timber.e("Unsupported click")
+                            .fillMaxSize()
+                    ) {
+                        val (audioPlayer, searchContainer) = createRefs()
+                        MiniAudioPlayerView(
+                            modifier = Modifier
+                                .constrainAs(audioPlayer) {
+                                    bottom.linkTo(parent.bottom)
+                                }
+                                .fillMaxWidth(),
+                            lifecycle = lifecycle,
+                        )
+
+                        SearchNavHostController(
+                            modifier = Modifier
+                                .constrainAs(searchContainer) {
+                                    top.linkTo(parent.top)
+                                    bottom.linkTo(audioPlayer.top)
+                                    height = Dimension.fillToConstraints
+                                }
+                                .fillMaxWidth(),
+                            viewModel = viewModel,
+                            nodeActionsViewModel = nodeActionsViewModel,
+                            navigateToLink = ::navigateToLink,
+                            showSortOrderBottomSheet = ::showSortOrderBottomSheet,
+                            trackAnalytics = ::trackAnalytics,
+                            nodeActionHandler = bottomSheetActionHandler,
+                            navHostController = navHostController,
+                            bottomSheetNavigator = bottomSheetNavigator,
+                            listToStringWithDelimitersMapper = listToStringWithDelimitersMapper,
+                            handleClick = {
+                                coroutineScope.launch {
+                                    when (it) {
+                                        is TypedFileNode -> openFileClicked(it)
+                                        is TypedFolderNode -> openFolderClicked(it.id.longValue)
+                                        else -> Timber.e("Unsupported click")
+                                    }
+                                }
+                            },
+                            onBackPressed = {
+                                if (viewModel.state.value.selectedNodes.isNotEmpty()) {
+                                    viewModel.clearSelection()
+                                } else {
+                                    onBackPressedDispatcher.onBackPressed()
                                 }
                             }
-                        },
-                        onBackPressed = {
-                            if (viewModel.state.value.selectedNodes.isNotEmpty()) {
-                                viewModel.clearSelection()
-                            } else {
-                                onBackPressedDispatcher.onBackPressed()
-                            }
-                        }
-                    )
+                        )
+                    }
                 }
 
                 EventEffect(
@@ -327,7 +351,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             viewModel.onSortOrderChanged()
         }
     }
-
 
     /**
      * Clicked on link

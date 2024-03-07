@@ -314,7 +314,7 @@ class NodeActionsViewModel @Inject constructor(
 
     /**
      * Download node for preview
-     * Triggers TransferTriggerEvent.StartDownloadForPreview with parameter [TypedNode]
+     * Triggers TransferTriggerEvent.StartDownloadForPreview with parameter [TypedFileNode]
      */
     fun downloadNodeForPreview(fileNode: TypedFileNode) {
         _state.update {

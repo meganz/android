@@ -17,6 +17,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.media3.ui.PlayerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
@@ -46,6 +48,8 @@ class MiniAudioPlayerController(
 
     private var metadataChangedJob: Job? = null
     private var sharingScope: CoroutineScope? = null
+    private var _audioBinding = MutableStateFlow(false)
+    val audioBinding: Flow<Boolean> = _audioBinding
 
     /**
      * The parameter that determine the player view whether should be visible
@@ -83,6 +87,9 @@ class MiniAudioPlayerController(
                 setupPlayerView()
                 if (visible()) {
                     onPlayerVisibilityChanged?.invoke()
+                    sharingScope?.launch {
+                        _audioBinding.emit(true)
+                    }
                 }
             }
         }
@@ -185,6 +192,7 @@ class MiniAudioPlayerController(
         }
 
         onPlayerVisibilityChanged?.invoke()
+        sharingScope?.launch { _audioBinding.emit(false) }
     }
 
     private fun setupPlayerView() {
@@ -204,4 +212,5 @@ class MiniAudioPlayerController(
             audioPlayerPlaying.value = playing
         }
     }
+
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.media3.ui.PlayerView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mini_audio_player"
+    android:layout_width="0dp"
+    android:layout_height="@dimen/audio_player_mini_controller_height"
+    android:background="?attr/colorPrimary"
+    android:visibility="gone"
+    app:controller_layout_id="@layout/audio_player_control_in_mini_player"
+    app:player_layout_id="@layout/audio_player_view_controller_only"
+    app:surface_type="none" />
