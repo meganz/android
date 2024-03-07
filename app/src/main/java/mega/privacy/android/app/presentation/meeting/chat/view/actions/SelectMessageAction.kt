@@ -18,7 +18,7 @@ internal class SelectMessageAction(
     icon = R.drawable.ic_check_circle_medium_regular_outline,
     testTag = "action_select"
 ) {
-    override fun appliesTo(messages: Set<TypedMessage>) = messages.size == 1
+    override fun shouldDisplayFor(messages: Set<TypedMessage>) = messages.size == 1
             && messages.first() !is ManagementMessage && messages.first() !is InvalidMetaMessage
             && messages.first() !is InvalidMessage
 

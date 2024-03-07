@@ -64,4 +64,10 @@ interface Message {
      * Content
      */
     val content: String?
+
+    /**
+     * @return true if the message has not been sent due to an error
+     */
+    fun isSendError() = isMine &&
+            (status == ChatMessageStatus.SENDING_MANUAL || status == ChatMessageStatus.SERVER_REJECTED)
 }

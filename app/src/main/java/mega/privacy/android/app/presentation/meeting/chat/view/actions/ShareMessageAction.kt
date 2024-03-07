@@ -19,7 +19,7 @@ internal class ShareMessageAction : MessageAction(
     icon = iconPackR.drawable.ic_menu_share,
     testTag = "action_share",
 ) {
-    override fun appliesTo(messages: Set<TypedMessage>) = messages.isNotEmpty() &&
+    override fun shouldDisplayFor(messages: Set<TypedMessage>) = messages.isNotEmpty() &&
             messages.all { it is NodeAttachmentMessage }
 
     @Composable

@@ -16,7 +16,7 @@ internal class EditMessageAction(
     testTag = "action_edit",
 ) {
 
-    override fun appliesTo(messages: Set<TypedMessage>): Boolean =
+    override fun shouldDisplayFor(messages: Set<TypedMessage>): Boolean =
         messages.size == 1 && messages.first().let { it.isEditable && it !is LocationMessage }
 
     @Composable

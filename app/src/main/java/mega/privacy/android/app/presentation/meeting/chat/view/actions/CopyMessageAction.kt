@@ -16,7 +16,7 @@ internal class CopyMessageAction : MessageAction(
     icon = R.drawable.ic_icon_copy_medium_regular_outline,
     testTag = "action_copy"
 ) {
-    override fun appliesTo(messages: Set<TypedMessage>) = messages.isNotEmpty() &&
+    override fun shouldDisplayFor(messages: Set<TypedMessage>) = messages.isNotEmpty() &&
             messages.all { it is NormalMessage || it is RichPreviewMessage || it is LocationMessage }
 
     @Composable

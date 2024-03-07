@@ -15,7 +15,7 @@ internal class SendMessageAction(
     icon = R.drawable.ic_send_message_modal,
     testTag = "send_message",
 ) {
-    override fun appliesTo(messages: Set<TypedMessage>) = messages.isNotEmpty() &&
+    override fun shouldDisplayFor(messages: Set<TypedMessage>) = messages.isNotEmpty() &&
             messages.all { it is ContactAttachmentMessage && it.isContact }
 
     @Composable

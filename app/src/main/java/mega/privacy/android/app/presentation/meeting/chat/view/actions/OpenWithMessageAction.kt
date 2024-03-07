@@ -26,7 +26,7 @@ internal class OpenWithMessageAction(
     icon = mega.privacy.android.icon.pack.R.drawable.ic_menu_open_with,
     testTag = "open_with",
 ) {
-    override fun appliesTo(messages: Set<TypedMessage>) =
+    override fun shouldDisplayFor(messages: Set<TypedMessage>) =
         messages.size == 1 && messages.first() is NodeAttachmentMessage
 
     @Composable

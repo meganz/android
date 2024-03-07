@@ -19,8 +19,10 @@ internal class DeleteMessageAction(
     icon = R.drawable.ic_trash_medium_regular_outline,
     testTag = "action_delete",
 ) {
-    override fun appliesTo(messages: Set<TypedMessage>) = messages.isNotEmpty() &&
+    override fun shouldDisplayFor(messages: Set<TypedMessage>) = messages.isNotEmpty() &&
             messages.all { it.isDeletable && it.isMine }
+
+    override val appliesToSendError = true
 
     override fun showBottomSheetItemSeparator(message: TypedMessage) = false
 

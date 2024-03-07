@@ -16,7 +16,7 @@ internal class ContactInfoMessageAction(
     icon = R.drawable.ic_info_medium_regular_outline,
     testTag = "action_contact_info",
 ) {
-    override fun appliesTo(messages: Set<TypedMessage>) = messages.size == 1
+    override fun shouldDisplayFor(messages: Set<TypedMessage>) = messages.size == 1
             && messages.first() is ContactAttachmentMessage
             && (messages.first() as ContactAttachmentMessage).isContact
 

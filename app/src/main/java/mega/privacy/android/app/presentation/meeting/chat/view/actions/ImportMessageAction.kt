@@ -35,7 +35,7 @@ internal class ImportMessageAction(
     icon = R.drawable.ic_cloud_upload_medium_regular_outline,
     testTag = "import_node",
 ) {
-    override fun appliesTo(messages: Set<TypedMessage>) = messages.isNotEmpty()
+    override fun shouldDisplayFor(messages: Set<TypedMessage>) = messages.isNotEmpty()
             && messages.all { it is NodeAttachmentMessage }
 
     @Composable

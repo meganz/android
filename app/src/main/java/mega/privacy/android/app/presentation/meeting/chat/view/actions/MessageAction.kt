@@ -37,12 +37,27 @@ abstract class MessageAction(
     val toolbarMenuItemTestTag = "chat_message_toolbar:$testTag"
 
     /**
+     * Applies to send error
+     */
+    protected open val appliesToSendError = false
+
+    /**
      * Applies to
      *
      * @param messages
-     * @return
+     * @return true if the action should be displayed for the selected set of messages
      */
-    abstract fun appliesTo(messages: Set<TypedMessage>): Boolean
+    fun appliesTo(messages: Set<TypedMessage>) =
+        (appliesToSendError || messages.none { it.isSendError() }) && shouldDisplayFor(messages)
+
+    /**
+     * Should display for
+     *
+     * @param messages
+     * @return true if the action should be displayed for the selected set of messages excluding
+     * checking for send errors
+     */
+    protected abstract fun shouldDisplayFor(messages: Set<TypedMessage>): Boolean
 
     /**
      * In column

@@ -13,7 +13,7 @@ internal class SaveToDeviceMessageAction(
     icon = mega.privacy.android.icon.pack.R.drawable.ic_menu_download,
     testTag = "save_to_device",
 ) {
-    override fun appliesTo(messages: Set<TypedMessage>) = messages.isNotEmpty() &&
+    override fun shouldDisplayFor(messages: Set<TypedMessage>) = messages.isNotEmpty() &&
             messages.all { it is NodeAttachmentMessage }
 
     @Composable

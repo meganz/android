@@ -28,7 +28,7 @@ internal class ForwardMessageAction(
     icon = CoreResources.drawable.ic_arrow_corner_right,
     testTag = "action_forward",
 ) {
-    override fun appliesTo(messages: Set<TypedMessage>) = messages.isNotEmpty() &&
+    override fun shouldDisplayFor(messages: Set<TypedMessage>) = messages.isNotEmpty() &&
             messages.none { it is ManagementMessage || it is InvalidMessage || it is InvalidMetaMessage }
 
     @Composable
