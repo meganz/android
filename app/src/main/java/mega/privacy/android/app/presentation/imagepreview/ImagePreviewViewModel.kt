@@ -395,11 +395,11 @@ class ImagePreviewViewModel @Inject constructor(
             // chat nodes are not using this screen for now
             when {
                 isFromFolderLink -> getPublicChildNodeFromIdUseCase(node.id)
-                imagePreviewMenuSource == ImagePreviewMenuSource.PUBLIC_FILE -> {
-                    node.serializedData?.let {
-                        getPublicNodeFromSerializedDataUseCase(it)
-                    }
-                }
+
+                imagePreviewMenuSource in listOf(
+                    ImagePreviewMenuSource.ALBUM_SHARING,
+                    ImagePreviewMenuSource.PUBLIC_FILE,
+                ) -> node.serializedData?.let { getPublicNodeFromSerializedDataUseCase(it) }
 
                 else -> addImageTypeUseCase(node)
             }
