@@ -60,4 +60,9 @@ data class ActiveTransferTotals(
      */
     val totalFinishedWithErrorsFileTransfers =
         totalFinishedFileTransfers - totalCompletedFileTransfers - totalAlreadyDownloadedFiles
+
+    /**
+     * The total number of files that has been fully downloaded
+     */
+    val totalFilesDownloaded = totalCompletedFileTransfers - totalAlreadyDownloadedFiles
 }

@@ -49,6 +49,8 @@ import mega.privacy.android.app.presentation.transfers.startdownload.model.Start
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.view.TransferInProgressDialog
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
+import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
+import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
@@ -57,8 +59,6 @@ import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.core.ui.utils.MinimumTimeVisibility
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
-import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
 
@@ -331,16 +331,58 @@ private suspend fun consumeFinishProcessing(
 ) {
     when (event.exception) {
         null -> {
-            val message = when (transferTriggerEvent) {
-                is TransferTriggerEvent.StartDownloadForPreview -> {
+            val message = when {
+                transferTriggerEvent is TransferTriggerEvent.StartDownloadForPreview -> {
                     context.resources.getString(R.string.cloud_drive_snackbar_preparing_file_for_preview_context)
                 }
 
-                else -> context.resources.getQuantityString(
-                    R.plurals.download_started,
-                    event.totalNodes,
-                    event.totalNodes,
-                )
+                event.totalAlreadyDownloaded == 0 -> {
+                    context.resources.getQuantityString(
+                        R.plurals.download_started,
+                        event.totalNodes,
+                        event.totalNodes,
+                    )
+                }
+
+                event.filesToDownload == 0 -> {
+                    context.resources.getQuantityString(
+                        R.plurals.already_downloaded_service,
+                        event.totalFiles,
+                        event.totalFiles,
+                    )
+                }
+
+                event.totalAlreadyDownloaded == 1 -> {
+                    context.resources.getQuantityString(
+                        R.plurals.file_already_downloaded_and_files_pending_download,
+                        event.filesToDownload,
+                        event.filesToDownload
+                    )
+                }
+
+                event.filesToDownload == 1 -> {
+                    context.resources.getQuantityString(
+                        R.plurals.files_already_downloaded_and_file_pending_download,
+                        event.totalAlreadyDownloaded,
+                        event.totalAlreadyDownloaded
+                    )
+                }
+
+                else -> {
+                    StringBuilder().append(
+                        context.resources.getQuantityString(
+                            R.plurals.file_already_downloaded,
+                            event.totalAlreadyDownloaded,
+                            event.totalAlreadyDownloaded
+                        )
+                    ).append(" ").append(
+                        context.resources.getQuantityString(
+                            R.plurals.file_pending_download,
+                            event.filesToDownload,
+                            event.filesToDownload
+                        )
+                    ).toString()
+                }
             }
             snackBarHostState.showSnackbar(message)
         }

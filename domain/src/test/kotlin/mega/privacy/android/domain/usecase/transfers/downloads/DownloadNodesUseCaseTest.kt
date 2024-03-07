@@ -528,7 +528,7 @@ class DownloadNodesUseCaseTest {
                         on { nodeHandle }.thenReturn(handle)
                     })
                 } else {
-                    TransferEvent.TransferStartEvent(mock {
+                    TransferEvent.TransferUpdateEvent(mock {
                         on { isFolderTransfer }.thenReturn(false)
                         on { nodeHandle }.thenReturn(handle)
                     })

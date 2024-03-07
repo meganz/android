@@ -288,14 +288,18 @@ internal class StartDownloadComponentViewModel @Inject constructor(
             }
         monitorFinish()
         checkRating()
-        if (terminalEvent == MultiTransferEvent.ScanningFoldersFinished) toDoAfterProcessing?.invoke()
+        if (terminalEvent is MultiTransferEvent.ScanningFoldersFinished) toDoAfterProcessing?.invoke()
         _uiState.updateEventAndClearProgress(
             when (terminalEvent) {
                 MultiTransferEvent.InsufficientSpace -> StartDownloadTransferEvent.Message.NotSufficientSpace
                 else -> {
+                    val finishedEvent =
+                        (terminalEvent as? MultiTransferEvent.ScanningFoldersFinished)
                     StartDownloadTransferEvent.FinishProcessing(
                         exception = lastError?.takeIf { terminalEvent == null },
                         totalNodes = nodes.size,
+                        totalFiles = finishedEvent?.scannedFiles ?: 0,
+                        totalAlreadyDownloaded = finishedEvent?.alreadyDownloadedFiles ?: 0,
                     )
                 }
             }
@@ -422,7 +426,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                         .takeWhile {
                             it.totalTransfers > 0
                         }.lastOrNull() ?: return@launch
-                (lastBeforeClear.totalFileTransfers - lastBeforeClear.totalFinishedWithErrorsFileTransfers).takeIf { it > 0 }
+                (lastBeforeClear.totalFilesDownloaded).takeIf { it > 0 }
                     ?.let {
                         when (_uiState.value.transferTriggerEvent) {
                             is TransferTriggerEvent.StartDownloadForOffline -> {

@@ -13,9 +13,18 @@ sealed interface StartDownloadTransferEvent {
      * Transfers scanning has finished
      * @param exception [Throwable] in case of not correctly finished
      * @param totalNodes
+     * @param totalFiles total files on this nodes
+     * @param totalAlreadyDownloaded total files already downloaded, so they won't be downloaded
+     * @property filesToDownload
      */
-    data class FinishProcessing(val exception: Throwable?, val totalNodes: Int) :
-        StartDownloadTransferEvent
+    data class FinishProcessing(
+        val exception: Throwable?,
+        val totalNodes: Int,
+        val totalFiles: Int,
+        val totalAlreadyDownloaded: Int,
+    ) : StartDownloadTransferEvent {
+        val filesToDownload = totalFiles - totalAlreadyDownloaded
+    }
 
     /**
      * we can't do work because there's no Internet connection

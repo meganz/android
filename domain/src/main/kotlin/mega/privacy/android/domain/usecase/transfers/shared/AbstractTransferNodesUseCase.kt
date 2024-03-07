@@ -46,6 +46,8 @@ abstract class AbstractTransferNodesUseCase<T, R>(
         doTransfer: (T) -> Flow<TransferEvent>,
     ): Flow<MultiTransferEvent> {
         val alreadyScanned = mutableSetOf<R>()
+        val scannedFiles = mutableSetOf<R>()
+        val alreadyDownloadedFiles = mutableSetOf<R>()
         val allIds = items.map(::generateIdFromItem)
         var scanningFinishedSend = false
         return channelFlow {
@@ -91,6 +93,14 @@ abstract class AbstractTransferNodesUseCase<T, R>(
                     //update active transfers db
                     addOrUpdateActiveTransferUseCase(event.transferEvent)
 
+                    //keep track of files counters
+                    if (event.isFileTransferEvent) {
+                        val id = generateIdFromTransferEvent(event.transferEvent)
+                        scannedFiles.add(id)
+                        if (event.isAlreadyTransferredEvent) {
+                            alreadyDownloadedFiles.add(id)
+                        }
+                    }
                     //check if is a single node scanning finish event
                     if (event.isFinishScanningEvent) {
                         val id = generateIdFromTransferEvent(event.transferEvent)
@@ -102,7 +112,12 @@ abstract class AbstractTransferNodesUseCase<T, R>(
                             if (!scanningFinishedSend && alreadyScanned.containsAll(allIds)) {
                                 scanningFinishedSend = true
                                 invalidateCancelTokenUseCase() //we need to avoid a future cancellation from now on
-                                emit(MultiTransferEvent.ScanningFoldersFinished)
+                                emit(
+                                    MultiTransferEvent.ScanningFoldersFinished(
+                                        scannedFiles.size,
+                                        alreadyDownloadedFiles.size
+                                    )
+                                )
                             }
                         }
                     }
