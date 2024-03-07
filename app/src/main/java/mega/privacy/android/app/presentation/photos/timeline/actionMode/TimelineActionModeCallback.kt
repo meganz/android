@@ -3,8 +3,12 @@ package mega.privacy.android.app.presentation.photos.timeline.actionMode
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.PhotosFragment
+import timber.log.Timber
 
 class TimelineActionModeCallback(
     private val fragment: PhotosFragment,
@@ -19,6 +23,17 @@ class TimelineActionModeCallback(
     }
 
     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+        fragment.lifecycleScope.launch {
+            val isHiddenNodesEnabled = fragment.getFeatureFlagUseCase(AppFeatures.HiddenNodes)
+            val hasNonSensitiveNode =
+                fragment.timelineViewModel.getSelectedNodes().any { !it.isMarkedSensitive }
+
+            menu?.findItem(R.id.cab_menu_hide)?.isVisible =
+                isHiddenNodesEnabled && hasNonSensitiveNode
+
+            menu?.findItem(R.id.cab_menu_unhide)?.isVisible =
+                isHiddenNodesEnabled && !hasNonSensitiveNode
+        }
         return true
     }
 
@@ -45,6 +60,14 @@ class TimelineActionModeCallback(
             }
             R.id.cab_menu_clear_selection -> {
                 fragment.actionClearSelection()
+            }
+            R.id.cab_menu_hide -> {
+                fragment.timelineViewModel.hideOrUnhideNodes(hide = true)
+                fragment.destroyActionMode()
+            }
+            R.id.cab_menu_unhide -> {
+                fragment.timelineViewModel.hideOrUnhideNodes(hide = false)
+                fragment.destroyActionMode()
             }
             R.id.cab_menu_move -> {
                 fragment.actionMove()

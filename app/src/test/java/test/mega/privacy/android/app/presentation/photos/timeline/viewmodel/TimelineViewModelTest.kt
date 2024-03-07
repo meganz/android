@@ -41,6 +41,7 @@ import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
@@ -118,6 +119,8 @@ class TimelineViewModelTest {
     private val broadcastBusinessAccountExpiredUseCase =
         mock<BroadcastBusinessAccountExpiredUseCase>()
 
+    private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
+
     @BeforeEach
     fun setUp() {
         getTimelinePhotosUseCase.stub {
@@ -158,7 +161,8 @@ class TimelineViewModelTest {
             setTimelineFilterPreferencesUseCase = setTimelineFilterPreferencesUseCase,
             hasMediaPermissionUseCase = hasMediaPermissionUseCase,
             timelinePreferencesMapper = timelinePreferencesMapper,
-            broadcastBusinessAccountExpiredUseCase = broadcastBusinessAccountExpiredUseCase
+            broadcastBusinessAccountExpiredUseCase = broadcastBusinessAccountExpiredUseCase,
+            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
         )
     }
 

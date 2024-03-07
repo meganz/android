@@ -42,6 +42,7 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
@@ -51,6 +52,7 @@ import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
@@ -108,6 +110,7 @@ class TimelineViewModel @Inject constructor(
     private val timelinePreferencesMapper: TimelinePreferencesMapper,
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
     private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
+    private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     monitorCameraUploadsStatusInfoUseCase: MonitorCameraUploadsStatusInfoUseCase,
 ) : ViewModel() {
 
@@ -758,6 +761,16 @@ class TimelineViewModel @Inject constructor(
     private fun setCameraUploadsFinishedReason(reason: CameraUploadsFinishedReason) {
         _state.update {
             it.copy(cameraUploadsFinishedReason = reason)
+        }
+    }
+
+    fun hideOrUnhideNodes(hide: Boolean) = viewModelScope.launch {
+        for (node in getSelectedNodes()) {
+            async {
+                runCatching {
+                    updateNodeSensitiveUseCase(nodeId = NodeId(node.handle), isSensitive = hide)
+                }.onFailure { Timber.e("Update sensitivity failed: $it") }
+            }
         }
     }
 }
