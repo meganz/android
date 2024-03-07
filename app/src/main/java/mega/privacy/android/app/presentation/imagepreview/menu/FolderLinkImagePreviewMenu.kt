@@ -36,7 +36,7 @@ internal class FolderLinkImagePreviewMenu @Inject constructor(
     }
 
     override suspend fun isForwardMenuVisible(imageNode: ImageNode): Boolean {
-        return checkFullAccessPermission(imageNode)
+        return false
     }
 
     override suspend fun isSaveToDeviceMenuVisible(imageNode: ImageNode): Boolean {
