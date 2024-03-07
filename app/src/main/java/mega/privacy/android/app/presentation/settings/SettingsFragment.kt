@@ -81,7 +81,7 @@ import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSe
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
-import mega.privacy.android.app.settings.camerauploads.SettingsCameraUploadsComposeActivity
+import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsComposeActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject

@@ -1,8 +1,8 @@
-package mega.privacy.android.app.settings.camerauploads.navigation
+package mega.privacy.android.app.presentation.settings.camerauploads.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import mega.privacy.android.app.settings.camerauploads.navigation.routes.SettingsCameraUploadsRoute
+import mega.privacy.android.app.presentation.settings.camerauploads.navigation.routes.SettingsCameraUploadsRoute
 
 /**
  * Route for [SettingsCameraUploadsRoute]

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.settings.camerauploads.tiles
+package mega.privacy.android.app.presentation.settings.camerauploads.tiles
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column

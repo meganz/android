@@ -422,7 +422,7 @@
             android:label="@string/section_photo_sync"
             android:launchMode="singleTop" />
         <activity
-            android:name=".settings.camerauploads.SettingsCameraUploadsComposeActivity"
+            android:name=".presentation.settings.camerauploads.SettingsCameraUploadsComposeActivity"
             android:label="@string/section_photo_sync"
             android:launchMode="singleTop" />
         <activity

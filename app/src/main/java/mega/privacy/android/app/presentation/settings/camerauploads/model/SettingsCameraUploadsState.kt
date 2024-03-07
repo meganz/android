@@ -1,4 +1,4 @@
-package mega.privacy.android.app.settings.camerauploads.model
+package mega.privacy.android.app.presentation.settings.camerauploads.model
 
 /**
  * The UI State class for Settings Camera Uploads

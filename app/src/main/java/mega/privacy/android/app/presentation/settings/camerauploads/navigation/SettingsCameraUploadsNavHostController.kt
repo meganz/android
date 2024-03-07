@@ -1,4 +1,4 @@
-package mega.privacy.android.app.settings.camerauploads.navigation
+package mega.privacy.android.app.presentation.settings.camerauploads.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

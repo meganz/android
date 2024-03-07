@@ -1,4 +1,4 @@
-package mega.privacy.android.app.settings.camerauploads
+package mega.privacy.android.app.presentation.settings.camerauploads
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

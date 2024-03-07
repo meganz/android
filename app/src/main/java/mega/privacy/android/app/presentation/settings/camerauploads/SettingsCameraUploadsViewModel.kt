@@ -1,4 +1,4 @@
-package mega.privacy.android.app.settings.camerauploads
+package mega.privacy.android.app.presentation.settings.camerauploads
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.settings.camerauploads.model.SettingsCameraUploadsState
+import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsState
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import timber.log.Timber
 import javax.inject.Inject

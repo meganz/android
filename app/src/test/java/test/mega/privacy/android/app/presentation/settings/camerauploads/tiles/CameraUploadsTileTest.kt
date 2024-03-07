@@ -7,9 +7,9 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.settings.camerauploads.tiles.CAMERA_UPLOADS_TILE
-import mega.privacy.android.app.settings.camerauploads.tiles.CAMERA_UPLOADS_TILE_SWITCH
-import mega.privacy.android.app.settings.camerauploads.tiles.CameraUploadsTile
+import mega.privacy.android.app.presentation.settings.camerauploads.tiles.CAMERA_UPLOADS_TILE
+import mega.privacy.android.app.presentation.settings.camerauploads.tiles.CAMERA_UPLOADS_TILE_SWITCH
+import mega.privacy.android.app.presentation.settings.camerauploads.tiles.CameraUploadsTile
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

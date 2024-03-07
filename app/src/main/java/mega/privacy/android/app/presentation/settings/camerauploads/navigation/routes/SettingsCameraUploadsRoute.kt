@@ -1,7 +1,7 @@
-package mega.privacy.android.app.settings.camerauploads.navigation.routes
+package mega.privacy.android.app.presentation.settings.camerauploads.navigation.routes
 
 import androidx.compose.runtime.Composable
-import mega.privacy.android.app.settings.camerauploads.SettingsCameraUploadsView
+import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsView
 
 /**
  * A Route Composable to the main Settings Camera Uploads screen

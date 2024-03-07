@@ -1,4 +1,4 @@
-package mega.privacy.android.app.settings.camerauploads
+package mega.privacy.android.app.presentation.settings.camerauploads
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Column

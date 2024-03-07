@@ -15,7 +15,7 @@ import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterI
 import mega.privacy.android.app.presentation.meeting.chat.ChatHostActivity
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
-import mega.privacy.android.app.settings.camerauploads.SettingsCameraUploadsComposeActivity
+import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsComposeActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope

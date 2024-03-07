@@ -37,7 +37,7 @@ import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUseC
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.shouldEnableCUPage
 import mega.privacy.android.app.presentation.photos.view.PhotosBodyView
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
-import mega.privacy.android.app.settings.camerauploads.dialogs.CameraUploadsBusinessAccountDialog
+import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.CameraUploadsBusinessAccountDialog
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId

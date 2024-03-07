@@ -76,7 +76,7 @@ import mega.privacy.android.app.presentation.photos.timeline.viewmodel.updateFil
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.zoomIn
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.zoomOut
 import mega.privacy.android.app.presentation.photos.view.showSortByDialog
-import mega.privacy.android.app.settings.camerauploads.SettingsCameraUploadsComposeActivity
+import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsComposeActivity
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion

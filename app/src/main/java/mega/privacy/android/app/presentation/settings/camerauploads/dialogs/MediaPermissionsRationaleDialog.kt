@@ -1,4 +1,4 @@
-package mega.privacy.android.app.settings.camerauploads.dialogs
+package mega.privacy.android.app.presentation.settings.camerauploads.dialogs
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable

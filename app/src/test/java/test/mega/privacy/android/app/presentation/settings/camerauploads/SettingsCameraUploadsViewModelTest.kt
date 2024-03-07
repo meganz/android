@@ -3,7 +3,7 @@ package test.mega.privacy.android.app.presentation.settings.camerauploads
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.settings.camerauploads.SettingsCameraUploadsViewModel
+import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import org.junit.jupiter.api.BeforeEach
