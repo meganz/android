@@ -43,7 +43,6 @@ fun MegaSnackbar(
     shape = MaterialTheme.shapes.small,
     backgroundColor = MegaTheme.colors.components.toastBackground,
     contentColor = MegaTheme.colors.text.inverse,
-    elevation = 8.dp
 )
 
 @Composable

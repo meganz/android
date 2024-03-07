@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
@@ -15,7 +14,6 @@ import mega.privacy.android.domain.entity.node.backup.BackupNodeType
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeByHandleUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -51,7 +49,6 @@ class ShareFolderToolbarMenuItem @Inject constructor(
             parentScope.launch {
                 val hasBackUpNodes = it.find { handle ->
                     runCatching {
-                        delay(TimeUnit.MINUTES.toMillis(1))
                         checkBackupNodeTypeByHandleUseCase(handle) != BackupNodeType.NonBackupNode
                     }.getOrElse {
                         Timber.e(it)

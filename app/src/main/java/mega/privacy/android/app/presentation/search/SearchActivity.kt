@@ -12,12 +12,13 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material.Scaffold
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
@@ -76,7 +77,7 @@ import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
-import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
+import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -218,17 +219,12 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             val coroutineScope = rememberCoroutineScope()
 
             MegaAppTheme(isDark = themeMode.isDarkMode()) {
-                Scaffold(
-                    modifier = Modifier,
+                MegaScaffold(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .systemBarsPadding()
+                        .imePadding(),
                     scaffoldState = scaffoldState,
-                    snackbarHost = {
-                        SnackbarHost(
-                            modifier = Modifier.navigationBarsPadding(),
-                            hostState = snackbarHostState
-                        ) { data ->
-                            MegaSnackbar(snackbarData = data)
-                        }
-                    },
                     floatingActionButton = {
                         AnimatedVisibility(
                             visible = transferState.widgetVisible,

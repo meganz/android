@@ -37,8 +37,7 @@ internal fun TransfersWidgetView(
 ) {
     FloatingActionButton(
         onClick = onClick,
-        modifier = modifier
-            .padding(16.dp),
+        modifier = modifier.padding(bottom = 16.dp, end = 16.dp, start = 16.dp),
         backgroundColor = MaterialTheme.colors.primary,
     ) {
 
