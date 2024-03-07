@@ -985,6 +985,11 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * It informs that all the actions are only read.
      * The message is different depending if the account belongs to an admin or an user.
      */
+    @Deprecated(
+        message = "This Dialog is deprecated. Please use the Compose version BusinessAccountSuspendedDialog instead",
+        replaceWith = ReplaceWith("BusinessAccountSuspendedDialog"),
+        level = DeprecationLevel.WARNING,
+    )
     protected fun showExpiredBusinessAlert() {
         if (isActivityInBackground || expiredBusinessAlert != null && expiredBusinessAlert?.isShowing == true) {
             return
