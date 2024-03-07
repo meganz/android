@@ -19,6 +19,7 @@ import mega.privacy.android.app.presentation.videosection.view.playlist.videoPla
 internal fun VideoSectionFeatureScreen(
     videoSectionViewModel: VideoSectionViewModel,
     onClick: (item: VideoUIEntity, index: Int) -> Unit,
+    onAddElementsClicked: () -> Unit = {},
     onSortOrderClick: () -> Unit = {},
     onMenuClick: (VideoUIEntity) -> Unit = {},
     onLongClick: (item: VideoUIEntity, index: Int) -> Unit = { _, _ -> },
@@ -44,6 +45,7 @@ internal fun VideoSectionFeatureScreen(
         onPlaylistDetailItemClick = onPlaylistItemClick,
         onPlaylistItemMenuClick = onPlaylistItemMenuClick,
         onPlaylistItemLongClick = onPlaylistItemLongClick,
+        onAddElementsClicked = onAddElementsClicked
     )
 }
 
@@ -57,6 +59,7 @@ internal fun VideoSectionNavHost(
     onPlaylistItemMenuClick: (VideoPlaylistUIEntity) -> Unit,
     onPlaylistItemLongClick: (VideoPlaylistUIEntity, index: Int) -> Unit,
     onPlaylistDetailItemClick: (item: VideoUIEntity, index: Int) -> Unit,
+    onAddElementsClicked: () -> Unit,
     modifier: Modifier,
     viewModel: VideoSectionViewModel = hiltViewModel(),
 ) {
@@ -108,6 +111,8 @@ internal fun VideoSectionNavHost(
                 shouldDeleteVideoPlaylistDialog = state.shouldDeleteSingleVideoPlaylist,
                 shouldRenameVideoPlaylistDialog = state.shouldRenameVideoPlaylist,
                 shouldShowVideoPlaylistBottomSheetDetails = state.shouldShowMoreVideoPlaylistOptions,
+                numberOfAddedVideos = state.numberOfAddedVideos,
+                addedMessageShown = viewModel::clearNumberOfAddedVideos,
                 setShouldDeleteVideoPlaylistDialog = viewModel::setShouldDeleteSingleVideoPlaylist,
                 setShouldRenameVideoPlaylistDialog = viewModel::setShouldRenameVideoPlaylist,
                 setShouldShowVideoPlaylistBottomSheetDetails = viewModel::setShouldShowMoreVideoPlaylistOptions,
@@ -117,9 +122,7 @@ internal fun VideoSectionNavHost(
                 onDeleteDialogPositiveButtonClicked = { playlist ->
                     viewModel.removeVideoPlaylists(listOf(playlist))
                 },
-                onAddElementsClicked = {
-                    //TODO navigate to elements selected page
-                },
+                onAddElementsClicked = onAddElementsClicked,
                 errorMessage = state.createDialogErrorMessage,
                 onClick = onPlaylistDetailItemClick,
                 onMenuClick = onMenuClick

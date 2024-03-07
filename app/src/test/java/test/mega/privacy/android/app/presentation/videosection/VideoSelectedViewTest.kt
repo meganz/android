@@ -1,11 +1,17 @@
 package test.mega.privacy.android.app.presentation.videosection
 
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import coil.Coil
+import coil.ImageLoader
+import coil.annotation.ExperimentalCoilApi
+import coil.test.FakeImageLoaderEngine
+import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoSelectedState
@@ -17,17 +23,28 @@ import mega.privacy.android.app.presentation.videosection.view.videoselected.VID
 import mega.privacy.android.app.presentation.videosection.view.videoselected.VideoSelectedView
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.*
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
+@OptIn(ExperimentalCoilApi::class)
+@HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class VideoSelectedViewTest {
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    @Before
+    fun setUp() {
+        val engine = FakeImageLoaderEngine.Builder().build()
+        val imageLoader = ImageLoader.Builder(composeTestRule.activity)
+            .components { add(engine) }
+            .build()
+        Coil.setImageLoader(imageLoader)
+    }
 
     private fun setComposeContent(
         uiState: VideoSelectedState = VideoSelectedState(),

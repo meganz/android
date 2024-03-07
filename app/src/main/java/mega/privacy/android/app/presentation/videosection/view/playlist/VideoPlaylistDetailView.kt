@@ -107,6 +107,8 @@ fun VideoPlaylistDetailView(
     shouldDeleteVideoPlaylistDialog: Boolean,
     shouldRenameVideoPlaylistDialog: Boolean,
     shouldShowVideoPlaylistBottomSheetDetails: Boolean,
+    numberOfAddedVideos: Int,
+    addedMessageShown: () -> Unit,
     setShouldDeleteVideoPlaylistDialog: (Boolean) -> Unit,
     setShouldRenameVideoPlaylistDialog: (Boolean) -> Unit,
     setShouldShowVideoPlaylistBottomSheetDetails: (Boolean) -> Unit,
@@ -145,6 +147,18 @@ fun VideoPlaylistDetailView(
     LaunchedEffect(shouldShowVideoPlaylistBottomSheetDetails) {
         if (shouldShowVideoPlaylistBottomSheetDetails) {
             modalSheetState.show()
+        }
+    }
+
+    LaunchedEffect(numberOfAddedVideos) {
+        if (numberOfAddedVideos > 0) {
+            val message = if (numberOfAddedVideos == 1) {
+                "1 item"
+            } else {
+                "$numberOfAddedVideos items"
+            }
+            snackBarHostState.showSnackbar("Added $message to \'${playlist?.title}\'")
+            addedMessageShown()
         }
     }
 
@@ -417,6 +431,8 @@ private fun VideoPlaylistDetailViewPreview() {
             onAddElementsClicked = {},
             shouldShowVideoPlaylistBottomSheetDetails = false,
             setShouldShowVideoPlaylistBottomSheetDetails = {},
+            addedMessageShown = {},
+            numberOfAddedVideos = 0,
         )
     }
 }

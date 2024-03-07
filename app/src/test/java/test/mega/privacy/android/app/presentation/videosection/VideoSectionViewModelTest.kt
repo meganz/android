@@ -40,7 +40,6 @@ import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -421,16 +420,32 @@ class VideoSectionViewModelTest {
         runTest {
             val testPlaylistID = NodeId(1L)
             val testVideoIDs = listOf(NodeId(1L), NodeId(2L), NodeId(3L))
+            val videoPlaylist = mock<VideoPlaylist> {
+                on { title }.thenReturn("playlist")
+                on { id }.thenReturn(NodeId(1L))
+            }
+            val videoPlaylistUIEntity = mock<VideoPlaylistUIEntity> {
+                on { title }.thenReturn("playlist")
+                on { id }.thenReturn(NodeId(0L))
+            }
+
             whenever(addVideosToPlaylistUseCase(testPlaylistID, testVideoIDs)).thenReturn(
                 testVideoIDs.size
             )
+            whenever(getVideoPlaylistsUseCase()).thenReturn(listOf(videoPlaylist, videoPlaylist))
+            whenever(videoPlaylistUIEntityMapper(videoPlaylist)).thenReturn(videoPlaylistUIEntity)
 
             initUnderTest()
-
+            underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
             underTest.addVideosToPlaylist(testPlaylistID, testVideoIDs)
             underTest.state.drop(1).test {
                 val actual = awaitItem()
                 assertThat(actual.numberOfAddedVideos).isEqualTo(testVideoIDs.size)
+                val updated = awaitItem()
+                assertThat(updated.videoPlaylists).isNotEmpty()
+                assertThat(updated.isPlaylistProgressBarShown).isFalse()
+                assertThat(updated.currentVideoPlaylist?.title).isEqualTo(videoPlaylistUIEntity.title)
+                assertThat(updated.currentVideoPlaylist?.id).isEqualTo(videoPlaylistUIEntity.id)
             }
         }
 
@@ -613,10 +628,26 @@ class VideoSectionViewModelTest {
         runTest {
             val newTitle = "newTitle"
             val playlistID = NodeId(1L)
+            val videoPlaylist = mock<VideoPlaylist> {
+                on { title }.thenReturn("playlist")
+                on { id }.thenReturn(NodeId(1L))
+            }
+            val videoPlaylistUIEntity = mock<VideoPlaylistUIEntity> {
+                on { title }.thenReturn("playlist")
+                on { id }.thenReturn(NodeId(0L))
+            }
+            val updatedVideoPlaylistUIEntity = mock<VideoPlaylistUIEntity> {
+                on { title }.thenReturn(newTitle)
+                on { id }.thenReturn(NodeId(0L))
+            }
 
-            whenever(updateVideoPlaylistTitleUseCase(playlistID, newTitle)).thenReturn(
-                newTitle
+            whenever(getVideoPlaylistsUseCase()).thenReturn(listOf(videoPlaylist, videoPlaylist))
+            whenever(videoPlaylistUIEntityMapper(videoPlaylist)).thenReturn(videoPlaylistUIEntity)
+            whenever(updateVideoPlaylistTitleUseCase(playlistID, newTitle)).thenReturn(newTitle)
+            whenever(videoPlaylistUIEntity.copy(title = newTitle)).thenReturn(
+                updatedVideoPlaylistUIEntity
             )
+            underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
 
             underTest.state.test {
                 assertThat(awaitItem().shouldRenameVideoPlaylist).isFalse()
@@ -624,7 +655,12 @@ class VideoSectionViewModelTest {
                 assertThat(awaitItem().shouldRenameVideoPlaylist).isTrue()
                 underTest.updateVideoPlaylistTitle(playlistID, newTitle)
                 assertThat(awaitItem().shouldRenameVideoPlaylist).isFalse()
-                cancelAndIgnoreRemainingEvents()
+
+                val updated = awaitItem()
+                assertThat(updated.videoPlaylists).isNotEmpty()
+                assertThat(updated.isPlaylistProgressBarShown).isFalse()
+                assertThat(updated.currentVideoPlaylist?.title).isEqualTo(newTitle)
+                assertThat(updated.currentVideoPlaylist?.id).isEqualTo(videoPlaylistUIEntity.id)
             }
         }
 

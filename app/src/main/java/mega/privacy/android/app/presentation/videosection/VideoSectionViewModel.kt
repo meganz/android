@@ -519,6 +519,24 @@ class VideoSectionViewModel @Inject constructor(
                         numberOfAddedVideos = numberOfAddedVideos
                     )
                 }
+                refreshVideoPlaylistsWithUpdateCurrentVideoPlaylist()
+            }
+        }
+
+    private fun refreshVideoPlaylistsWithUpdateCurrentVideoPlaylist() =
+        viewModelScope.launch {
+            val videoPlaylists =
+                getVideoPlaylists().updateOriginalPlaylistData().filterVideoPlaylistsBySearchQuery()
+            val updatedCurrentVideoPlaylist = videoPlaylists.firstOrNull {
+                it.id == _state.value.currentVideoPlaylist?.id
+            }
+            _state.update {
+                it.copy(
+                    videoPlaylists = videoPlaylists,
+                    isPlaylistProgressBarShown = false,
+                    scrollToTop = false,
+                    currentVideoPlaylist = updatedCurrentVideoPlaylist
+                )
             }
         }
 
@@ -536,8 +554,7 @@ class VideoSectionViewModel @Inject constructor(
                                 shouldRenameVideoPlaylist = false
                             )
                         }
-                        loadVideoPlaylists()
-                        updateCurrentVideoPlaylistAfterUpdatedTitle(title)
+                        refreshVideoPlaylistsWithUpdatedTitle(title)
                     }.onFailure { exception ->
                         Timber.e(exception)
                         _state.update {
@@ -549,15 +566,21 @@ class VideoSectionViewModel @Inject constructor(
                 }
             }
 
-    private fun updateCurrentVideoPlaylistAfterUpdatedTitle(newTitle: String) =
-        _state.value.currentVideoPlaylist?.copy(title = newTitle)
-            ?.let { updatedCurrentVideoPlaylist ->
-                _state.update {
-                    it.copy(
-                        currentVideoPlaylist = updatedCurrentVideoPlaylist
-                    )
-                }
+    private fun refreshVideoPlaylistsWithUpdatedTitle(newTitle: String) =
+        viewModelScope.launch {
+            val videoPlaylists =
+                getVideoPlaylists().updateOriginalPlaylistData().filterVideoPlaylistsBySearchQuery()
+            val updatedCurrentVideoPlaylist =
+                _state.value.currentVideoPlaylist?.copy(title = newTitle)
+            _state.update {
+                it.copy(
+                    videoPlaylists = videoPlaylists,
+                    isPlaylistProgressBarShown = false,
+                    scrollToTop = false,
+                    currentVideoPlaylist = updatedCurrentVideoPlaylist
+                )
             }
+        }
 
     internal fun setShouldRenameVideoPlaylist(value: Boolean) = _state.update {
         it.copy(shouldRenameVideoPlaylist = value)
@@ -663,6 +686,8 @@ class VideoSectionViewModel @Inject constructor(
                 isPendingRefresh = true
             )
         }
+
+    internal fun clearNumberOfAddedVideos() = _state.update { it.copy(numberOfAddedVideos = 0) }
 
     companion object {
         private const val ERROR_MESSAGE_REPEATED_TITLE = 0

@@ -23,7 +23,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
-class VideoPlaylistDetailViewKtTest {
+class VideoPlaylistDetailViewTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -51,6 +51,8 @@ class VideoPlaylistDetailViewKtTest {
         onClick: (item: VideoUIEntity, index: Int) -> Unit = { _, _ -> },
         onMenuClick: (VideoUIEntity) -> Unit = { _ -> },
         onLongClick: ((item: VideoUIEntity, index: Int) -> Unit) = { _, _ -> },
+        numberOfAddedVideos: Int = 0,
+        addedMessageShown: () -> Unit = {},
     ) {
         composeTestRule.setContent {
             VideoPlaylistDetailView(
@@ -71,7 +73,9 @@ class VideoPlaylistDetailViewKtTest {
                 errorMessage = errorMessage,
                 onClick = onClick,
                 onMenuClick = onMenuClick,
-                onLongClick = onLongClick
+                onLongClick = onLongClick,
+                numberOfAddedVideos = numberOfAddedVideos,
+                addedMessageShown = addedMessageShown
             )
         }
     }

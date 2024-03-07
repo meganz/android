@@ -10,6 +10,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.runtime.getValue
@@ -19,6 +20,7 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,6 +56,7 @@ import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
@@ -97,6 +100,24 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
 
         override fun onMenuItemSelected(menuItem: MenuItem): Boolean = true
     }
+
+    private val videoSelectedActivityLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            when (result.resultCode) {
+                Activity.RESULT_OK -> {
+                    result.data?.getStringArrayListExtra(
+                        VideoSelectedActivity.INTENT_KEY_VIDEO_SELECTED
+                    )?.let { items ->
+                        videoSectionViewModel.state.value.currentVideoPlaylist?.let { currentPlaylist ->
+                            videoSectionViewModel.addVideosToPlaylist(
+                                currentPlaylist.id,
+                                items.map { NodeId(it.toLong()) })
+                        }
+
+                    }
+                }
+            }
+        }
 
     /**
      * onCreateView
@@ -151,7 +172,8 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
         }
 
         viewLifecycleOwner.collectFlow(
-            videoSectionViewModel.state.map { it.currentDestinationRoute }.distinctUntilChanged()
+            videoSectionViewModel.state.map { it.currentDestinationRoute }.distinctUntilChanged(),
+            minActiveState = Lifecycle.State.CREATED
         ) { route ->
             route?.let { updateToolbarWhenDestinationChanged(it) }
         }
@@ -185,6 +207,14 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                         },
                         onMenuClick = { item ->
                             showOptionsMenuForItem(item)
+                        },
+                        onAddElementsClicked = {
+                            videoSelectedActivityLauncher.launch(
+                                Intent(
+                                    requireActivity(),
+                                    VideoSelectedActivity::class.java
+                                )
+                            )
                         }
                     )
                 }
