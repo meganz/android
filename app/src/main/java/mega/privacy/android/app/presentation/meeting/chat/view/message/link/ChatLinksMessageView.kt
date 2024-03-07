@@ -16,8 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.onUserClick
 import mega.privacy.android.app.presentation.meeting.chat.view.message.contact.ContactMessageViewModel
-import mega.privacy.android.app.presentation.meeting.chat.view.message.contact.onUserClick
 import mega.privacy.android.core.ui.controls.chat.messages.ChatBubble
 import mega.privacy.android.core.ui.controls.dividers.DividerSpacing
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
