@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.saver.ChatSavers
@@ -18,6 +19,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.actions.MessageAc
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.mobile.analytics.event.ChatConversationScreenEvent
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -48,5 +50,10 @@ internal class ChatFragment : Fragment() {
                 )
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Analytics.tracker.trackEvent(ChatConversationScreenEvent)
     }
 }
