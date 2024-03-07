@@ -13,6 +13,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_REMOVE_MESSAGES_CONFIRMATION_DIALOG
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
+import mega.privacy.mobile.analytics.event.ChatConversationDeleteActionMenuEvent
 import mega.privacy.mobile.analytics.event.ChatConversationRemoveActionMenuItemEvent
 import org.junit.Before
 import org.junit.Rule
@@ -97,7 +98,6 @@ class DeleteMessagesActionTest {
 
         composeTestRule.onNodeWithTag(TEST_TAG_REMOVE_MESSAGES_CONFIRMATION_DIALOG)
             .assertIsDisplayed()
-        assertThat(analyticsRule.events).contains(ChatConversationRemoveActionMenuItemEvent)
     }
 
     @Test
@@ -125,5 +125,19 @@ class DeleteMessagesActionTest {
             onNodeWithText(activity.getString(R.string.context_remove)).performClick()
         }
         verify(chatViewModel).onDeletedMessages(messages)
+    }
+
+    @Test
+    fun `test that analytics tracker sends the right event when message action is triggered from a bottom sheet`() {
+        underTest.trackTriggerEvent(source = MessageAction.TriggerSource.BottomSheet)
+
+        assertThat(analyticsRule.events).contains(ChatConversationRemoveActionMenuItemEvent)
+    }
+
+    @Test
+    fun `test that analytics tracker sends the right event when message action is triggered from a toolbar`() {
+        underTest.trackTriggerEvent(source = MessageAction.TriggerSource.Toolbar)
+
+        assertThat(analyticsRule.events).contains(ChatConversationDeleteActionMenuEvent)
     }
 }

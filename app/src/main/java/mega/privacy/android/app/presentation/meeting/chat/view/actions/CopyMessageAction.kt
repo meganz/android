@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
+import mega.privacy.mobile.analytics.event.ChatConversationCopyActionMenuEvent
 import mega.privacy.mobile.analytics.event.ChatConversationCopyActionMenuItemEvent
 
 internal class CopyMessageAction : MessageAction(
@@ -21,9 +22,20 @@ internal class CopyMessageAction : MessageAction(
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
-        Analytics.tracker.trackEvent(ChatConversationCopyActionMenuItemEvent)
         messages.joinToString(separator = "\n") { it.content.orEmpty() }
             .copyToClipboard(LocalContext.current)
         onHandled()
+    }
+
+    override fun trackTriggerEvent(source: TriggerSource) {
+        when (source) {
+            TriggerSource.BottomSheet -> {
+                Analytics.tracker.trackEvent(ChatConversationCopyActionMenuItemEvent)
+            }
+
+            TriggerSource.Toolbar -> {
+                Analytics.tracker.trackEvent(ChatConversationCopyActionMenuEvent)
+            }
+        }
     }
 }

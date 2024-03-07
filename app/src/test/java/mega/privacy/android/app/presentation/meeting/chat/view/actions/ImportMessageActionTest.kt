@@ -2,21 +2,20 @@ package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
 import android.content.Context
 import android.content.Intent
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth
-import mega.privacy.android.app.namecollision.data.NameCollision
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
+import mega.privacy.mobile.analytics.event.ChatConversationAddToCloudDriveActionMenuEvent
 import mega.privacy.mobile.analytics.event.ChatConversationAddToCloudDriveActionMenuItemEvent
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.*
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
@@ -51,7 +50,7 @@ class ImportMessageActionTest {
 
     @Test
     fun `test that action applies to attachment messages`() {
-        Truth.assertThat(
+        assertThat(
             underTest.appliesTo(
                 setOf(mock<NodeAttachmentMessage> {
                     on { exists } doReturn true
@@ -62,7 +61,7 @@ class ImportMessageActionTest {
 
     @Test
     fun `test that action does not apply to non existent node attachment messages`() {
-        Truth.assertThat(
+        assertThat(
             underTest.appliesTo(
                 setOf(mock<NodeAttachmentMessage> {
                     on { exists } doReturn false
@@ -73,7 +72,7 @@ class ImportMessageActionTest {
 
     @Test
     fun `test that action does not apply other type of messages`() {
-        Truth.assertThat(underTest.appliesTo(setOf(mock<LocationMessage>()))).isFalse()
+        assertThat(underTest.appliesTo(setOf(mock<LocationMessage>()))).isFalse()
     }
 
     @Test
@@ -98,7 +97,19 @@ class ImportMessageActionTest {
             )
         }
         verify(folderPicker).invoke(any(), any())
-        assertThat(analyticsRule.events)
-            .contains(ChatConversationAddToCloudDriveActionMenuItemEvent)
+    }
+
+    @Test
+    fun `test that analytics tracker sends the right event when message action is triggered from a bottom sheet`() {
+        underTest.trackTriggerEvent(source = MessageAction.TriggerSource.BottomSheet)
+
+        assertThat(analyticsRule.events).contains(ChatConversationAddToCloudDriveActionMenuItemEvent)
+    }
+
+    @Test
+    fun `test that analytics tracker sends the right event when message action is triggered from a toolbar`() {
+        underTest.trackTriggerEvent(source = MessageAction.TriggerSource.Toolbar)
+
+        assertThat(analyticsRule.events).contains(ChatConversationAddToCloudDriveActionMenuEvent)
     }
 }

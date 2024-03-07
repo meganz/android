@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.chat.messages.management.ManagementMes
 import mega.privacy.android.domain.entity.chat.messages.meta.InvalidMetaMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
+import mega.privacy.mobile.analytics.event.ChatConversationForwardActionMenuEvent
 import mega.privacy.mobile.analytics.event.ChatConversationForwardActionMenuItemEvent
 import org.junit.Before
 import org.junit.Rule
@@ -94,6 +95,19 @@ class ForwardMessageActionTest {
         }
 
         verify(launchPicker).invoke(any(), eq(chatId), any())
+    }
+
+    @Test
+    fun `test that analytics tracker sends the right event when message action is triggered from a bottom sheet`() {
+        underTest.trackTriggerEvent(source = MessageAction.TriggerSource.BottomSheet)
+
         assertThat(analyticsRule.events).contains(ChatConversationForwardActionMenuItemEvent)
+    }
+
+    @Test
+    fun `test that analytics tracker sends the right event when message action is triggered from a toolbar`() {
+        underTest.trackTriggerEvent(source = MessageAction.TriggerSource.Toolbar)
+
+        assertThat(analyticsRule.events).contains(ChatConversationForwardActionMenuEvent)
     }
 }

@@ -18,6 +18,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openSe
 import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.mobile.analytics.event.ChatConversationInviteActionMenuEvent
 import mega.privacy.mobile.analytics.event.ChatConversationInviteActionMenuItemEvent
 
 /**
@@ -64,6 +65,18 @@ class InviteMessageAction(
                 }
                 Analytics.tracker.trackEvent(ChatConversationInviteActionMenuItemEvent)
                 onHandled()
+            }
+        }
+    }
+
+    override fun trackTriggerEvent(source: TriggerSource) {
+        when (source) {
+            TriggerSource.BottomSheet -> {
+                Analytics.tracker.trackEvent(ChatConversationInviteActionMenuItemEvent)
+            }
+
+            TriggerSource.Toolbar -> {
+                Analytics.tracker.trackEvent(ChatConversationInviteActionMenuEvent)
             }
         }
     }

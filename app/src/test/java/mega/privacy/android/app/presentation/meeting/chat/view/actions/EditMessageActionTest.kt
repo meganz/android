@@ -4,17 +4,16 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
+import mega.privacy.mobile.analytics.event.ChatConversationEditActionMenuEvent
 import mega.privacy.mobile.analytics.event.ChatConversationEditActionMenuItemEvent
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.*
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
@@ -44,21 +43,21 @@ class EditMessageActionTest {
 
     @Test
     fun `test that action applies to editable, non location messages`() {
-        Truth.assertThat(underTest.appliesTo(setOf(mock<NormalMessage> {
+        assertThat(underTest.appliesTo(setOf(mock<NormalMessage> {
             on { isEditable } doReturn true
         }))).isTrue()
     }
 
     @Test
     fun `test that action does not apply to editable, location messages`() {
-        Truth.assertThat(underTest.appliesTo(setOf(mock<LocationMessage> {
+        assertThat(underTest.appliesTo(setOf(mock<LocationMessage> {
             on { isEditable } doReturn true
         }))).isFalse()
     }
 
     @Test
     fun `test that action does not apply to non editable messages`() {
-        Truth.assertThat(underTest.appliesTo(setOf(mock<NormalMessage> {
+        assertThat(underTest.appliesTo(setOf(mock<NormalMessage> {
             on { isEditable } doReturn false
         }))).isFalse()
     }
@@ -88,7 +87,19 @@ class EditMessageActionTest {
         }
 
         verify(chatViewModel).onEditMessage(messages.first())
-        assertThat(analyticsRule.events)
-            .contains(ChatConversationEditActionMenuItemEvent)
+    }
+
+    @Test
+    fun `test that analytics tracker sends the right event when message action is triggered from a bottom sheet`() {
+        underTest.trackTriggerEvent(source = MessageAction.TriggerSource.BottomSheet)
+
+        assertThat(analyticsRule.events).contains(ChatConversationEditActionMenuItemEvent)
+    }
+
+    @Test
+    fun `test that analytics tracker sends the right event when message action is triggered from a toolbar`() {
+        underTest.trackTriggerEvent(source = MessageAction.TriggerSource.Toolbar)
+
+        assertThat(analyticsRule.events).contains(ChatConversationEditActionMenuEvent)
     }
 }

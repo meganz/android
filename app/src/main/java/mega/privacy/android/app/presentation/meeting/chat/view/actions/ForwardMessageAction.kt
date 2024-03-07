@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.management.ManagementMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.InvalidMetaMessage
+import mega.privacy.mobile.analytics.event.ChatConversationForwardActionMenuEvent
 import mega.privacy.mobile.analytics.event.ChatConversationForwardActionMenuItemEvent
 
 internal class ForwardMessageAction(
@@ -35,7 +36,6 @@ internal class ForwardMessageAction(
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
-        Analytics.tracker.trackEvent(ChatConversationForwardActionMenuItemEvent)
         val chatPickerLauncher =
             rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartActivityForResult()
@@ -59,4 +59,15 @@ internal class ForwardMessageAction(
         }
     }
 
+    override fun trackTriggerEvent(source: TriggerSource) {
+        when (source) {
+            TriggerSource.BottomSheet -> {
+                Analytics.tracker.trackEvent(ChatConversationForwardActionMenuItemEvent)
+            }
+
+            TriggerSource.Toolbar -> {
+                Analytics.tracker.trackEvent(ChatConversationForwardActionMenuEvent)
+            }
+        }
+    }
 }

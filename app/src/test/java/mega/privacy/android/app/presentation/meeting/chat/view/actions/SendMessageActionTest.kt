@@ -9,6 +9,8 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
+import mega.privacy.mobile.analytics.event.ChatConversationSendMessageActionMenuEvent
+import mega.privacy.mobile.analytics.event.ChatConversationSendMessageActionMenuItemEvent
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -69,5 +71,19 @@ class SendMessageActionTest {
         )
 
         composeTestRule.onNodeWithTag(underTest.bottomSheetItemTestTag).assertExists()
+    }
+
+    @Test
+    fun `test that analytics tracker sends the right event when message action is triggered from a bottom sheet`() {
+        underTest.trackTriggerEvent(source = MessageAction.TriggerSource.BottomSheet)
+
+        assertThat(analyticsRule.events).contains(ChatConversationSendMessageActionMenuItemEvent)
+    }
+
+    @Test
+    fun `test that analytics tracker sends the right event when message action is triggered from a toolbar`() {
+        underTest.trackTriggerEvent(source = MessageAction.TriggerSource.Toolbar)
+
+        assertThat(analyticsRule.events).contains(ChatConversationSendMessageActionMenuEvent)
     }
 }

@@ -6,6 +6,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
+import mega.privacy.mobile.analytics.event.ChatConversationEditActionMenuEvent
 import mega.privacy.mobile.analytics.event.ChatConversationEditActionMenuItemEvent
 
 internal class EditMessageAction(
@@ -21,8 +22,19 @@ internal class EditMessageAction(
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
-        Analytics.tracker.trackEvent(ChatConversationEditActionMenuItemEvent)
         chatViewModel.onEditMessage(messages.first())
         onHandled()
+    }
+
+    override fun trackTriggerEvent(source: TriggerSource) {
+        when (source) {
+            TriggerSource.BottomSheet -> {
+                Analytics.tracker.trackEvent(ChatConversationEditActionMenuItemEvent)
+            }
+
+            TriggerSource.Toolbar -> {
+                Analytics.tracker.trackEvent(ChatConversationEditActionMenuEvent)
+            }
+        }
     }
 }

@@ -72,6 +72,7 @@ abstract class MessageAction(
         setAction: ((@Composable () -> Unit)?) -> Unit,
     ): @Composable () -> Unit = bottomSheetItem(messages.first()) {
         setAction {
+            trackTriggerEvent(source = TriggerSource.BottomSheet)
             OnTrigger(messages = messages) {
                 setAction(null)
             }
@@ -91,6 +92,7 @@ abstract class MessageAction(
         setAction: ((@Composable () -> Unit)?) -> Unit,
     ): MenuActionWithClick? = toolbarItem(messages) {
         setAction {
+            trackTriggerEvent(source = TriggerSource.Toolbar)
             OnTrigger(messages = messages) {
                 setAction(null)
             }
@@ -165,5 +167,27 @@ abstract class MessageAction(
     @Composable
     abstract fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit)
 
+    /**
+     * Track [OnTrigger] - Analytics purposes
+     * Should be called before we call the [OnTrigger] method
+     *
+     * @param source [TriggerSource]
+     */
+    open fun trackTriggerEvent(source: TriggerSource) {}
 
+    /**
+     * An interface to differentiate the trigger source of a message action
+     */
+    sealed interface TriggerSource {
+
+        /**
+         * Indicates that bottom sheet is the trigger source of a message action
+         */
+        data object BottomSheet : TriggerSource
+
+        /**
+         * Indicates that toolbar is the trigger source of a message action
+         */
+        data object Toolbar : TriggerSource
+    }
 }

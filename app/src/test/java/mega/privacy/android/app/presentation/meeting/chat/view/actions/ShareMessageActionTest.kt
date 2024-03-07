@@ -12,6 +12,8 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
+import mega.privacy.mobile.analytics.event.ChatConversationShareActionMenuEvent
+import mega.privacy.mobile.analytics.event.ChatConversationShareActionMenuItemEvent
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
@@ -81,5 +83,19 @@ class ShareMessageActionTest {
             onNodeWithTag(underTest.bottomSheetItemTestTag).performClick()
             verify(hideBottomSheet).invoke()
         }
+    }
+
+    @Test
+    fun `test that analytics tracker sends the right event when message action is triggered from a bottom sheet`() {
+        underTest.trackTriggerEvent(source = MessageAction.TriggerSource.BottomSheet)
+
+        assertThat(analyticsRule.events).contains(ChatConversationShareActionMenuItemEvent)
+    }
+
+    @Test
+    fun `test that analytics tracker sends the right event when message action is triggered from a toolbar`() {
+        underTest.trackTriggerEvent(source = MessageAction.TriggerSource.Toolbar)
+
+        assertThat(analyticsRule.events).contains(ChatConversationShareActionMenuEvent)
     }
 }

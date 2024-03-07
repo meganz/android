@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
+import mega.privacy.mobile.analytics.event.ChatConversationCopyActionMenuEvent
 import mega.privacy.mobile.analytics.event.ChatConversationCopyActionMenuItemEvent
 import org.junit.Before
 import org.junit.Rule
@@ -84,6 +85,19 @@ class CopyMessageActionTest {
             underTest.OnTrigger(messages = setOf(mock<NormalMessage>()), onHandled = onHandled)
         }
         verify(onHandled).invoke()
+    }
+
+    @Test
+    fun `test that analytics tracker sends the right event when message action is triggered from a bottom sheet`() {
+        underTest.trackTriggerEvent(source = MessageAction.TriggerSource.BottomSheet)
+
         assertThat(analyticsRule.events).contains(ChatConversationCopyActionMenuItemEvent)
+    }
+
+    @Test
+    fun `test that analytics tracker sends the right event when message action is triggered from a toolbar`() {
+        underTest.trackTriggerEvent(source = MessageAction.TriggerSource.Toolbar)
+
+        assertThat(analyticsRule.events).contains(ChatConversationCopyActionMenuEvent)
     }
 }

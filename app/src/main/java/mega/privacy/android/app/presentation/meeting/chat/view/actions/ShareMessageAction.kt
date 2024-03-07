@@ -11,6 +11,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.mobile.analytics.event.ChatConversationShareActionMenuEvent
 import mega.privacy.mobile.analytics.event.ChatConversationShareActionMenuItemEvent
 import timber.log.Timber
 
@@ -24,7 +25,6 @@ internal class ShareMessageAction : MessageAction(
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
-        Analytics.tracker.trackEvent(ChatConversationShareActionMenuItemEvent)
         val viewModel = hiltViewModel<NodeAttachmentMessageViewModel>()
         val context = LocalContext.current
         LaunchedEffect(messages) {
@@ -42,6 +42,18 @@ internal class ShareMessageAction : MessageAction(
                 Timber.e(it, "Failed to share message")
             }
             onHandled()
+        }
+    }
+
+    override fun trackTriggerEvent(source: TriggerSource) {
+        when (source) {
+            TriggerSource.BottomSheet -> {
+                Analytics.tracker.trackEvent(ChatConversationShareActionMenuItemEvent)
+            }
+
+            TriggerSource.Toolbar -> {
+                Analytics.tracker.trackEvent(ChatConversationShareActionMenuEvent)
+            }
         }
     }
 }

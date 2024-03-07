@@ -1,10 +1,12 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
 import androidx.compose.runtime.Composable
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.mobile.analytics.event.ChatConversationDownloadActionMenuEvent
 
 internal class SaveToDeviceMessageAction(
     private val chatViewModel: ChatViewModel,
@@ -22,5 +24,14 @@ internal class SaveToDeviceMessageAction(
             messages.map { (it as NodeAttachmentMessage).fileNode }
         )
         onHandled()
+    }
+
+    override fun trackTriggerEvent(source: TriggerSource) {
+        when (source) {
+            TriggerSource.BottomSheet -> Unit
+            TriggerSource.Toolbar -> {
+                Analytics.tracker.trackEvent(ChatConversationDownloadActionMenuEvent)
+            }
+        }
     }
 }

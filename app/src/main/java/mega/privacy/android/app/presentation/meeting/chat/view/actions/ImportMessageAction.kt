@@ -25,6 +25,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.mobile.analytics.event.ChatConversationAddToCloudDriveActionMenuEvent
 import mega.privacy.mobile.analytics.event.ChatConversationAddToCloudDriveActionMenuItemEvent
 
 internal class ImportMessageAction(
@@ -40,7 +41,6 @@ internal class ImportMessageAction(
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
-        Analytics.tracker.trackEvent(ChatConversationAddToCloudDriveActionMenuItemEvent)
         val snackbarHostState = LocalSnackBarHostState.current
         val error = stringResource(id = R.string.import_success_error)
         var handleWhereToImport by rememberSaveable { mutableStateOf<Long?>(null) }
@@ -127,6 +127,18 @@ internal class ImportMessageAction(
             LaunchedEffect(Unit) {
                 collisionsResult?.let { snackbarHostState?.showSnackbar(it) }
                 onHandled()
+            }
+        }
+    }
+
+    override fun trackTriggerEvent(source: TriggerSource) {
+        when (source) {
+            TriggerSource.BottomSheet -> {
+                Analytics.tracker.trackEvent(ChatConversationAddToCloudDriveActionMenuItemEvent)
+            }
+
+            TriggerSource.Toolbar -> {
+                Analytics.tracker.trackEvent(ChatConversationAddToCloudDriveActionMenuEvent)
             }
         }
     }

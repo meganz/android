@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.InviteM
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.ContactAttachmentMessageViewModel
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
+import mega.privacy.mobile.analytics.event.ChatConversationInviteActionMenuEvent
 import mega.privacy.mobile.analytics.event.ChatConversationInviteActionMenuItemEvent
 import org.junit.Before
 import org.junit.Rule
@@ -162,6 +163,19 @@ class InviteMessageActionTest {
                 }
             }
             verify(onHandled).invoke()
-            assertThat(analyticsRule.events).contains(ChatConversationInviteActionMenuItemEvent)
         }
+
+    @Test
+    fun `test that analytics tracker sends the right event when message action is triggered from a bottom sheet`() {
+        underTest.trackTriggerEvent(source = MessageAction.TriggerSource.BottomSheet)
+
+        assertThat(analyticsRule.events).contains(ChatConversationInviteActionMenuItemEvent)
+    }
+
+    @Test
+    fun `test that analytics tracker sends the right event when message action is triggered from a toolbar`() {
+        underTest.trackTriggerEvent(source = MessageAction.TriggerSource.Toolbar)
+
+        assertThat(analyticsRule.events).contains(ChatConversationInviteActionMenuEvent)
+    }
 }

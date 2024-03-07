@@ -13,21 +13,28 @@ import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 import mega.privacy.android.domain.entity.node.chat.ChatImageFile
+import mega.privacy.mobile.analytics.event.ChatConversationDownloadActionMenuEvent
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import test.mega.privacy.android.app.AnalyticsTestRule
 
 @RunWith(AndroidJUnit4::class)
 internal class SaveToDeviceMessageActionTest {
+
     private lateinit var underTest: SaveToDeviceMessageAction
     private val chatViewModel: ChatViewModel = mock()
 
+    private val analyticsRule = AnalyticsTestRule()
+    private val composeRule = createAndroidComposeRule<ComponentActivity>()
+
     @get:Rule
-    var composeRule = createAndroidComposeRule<ComponentActivity>()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeRule)
 
     @Before
     fun setup() {
@@ -98,5 +105,12 @@ internal class SaveToDeviceMessageActionTest {
         }
         verify(onHandled).invoke()
         verify(chatViewModel).onDownloadNode(listOf(fileNode))
+    }
+
+    @Test
+    fun `test that analytics tracker sends the right event when message action is triggered from a toolbar`() {
+        underTest.trackTriggerEvent(source = MessageAction.TriggerSource.Toolbar)
+
+        Truth.assertThat(analyticsRule.events).contains(ChatConversationDownloadActionMenuEvent)
     }
 }
