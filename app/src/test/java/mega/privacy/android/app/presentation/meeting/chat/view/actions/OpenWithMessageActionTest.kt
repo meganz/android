@@ -7,6 +7,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
@@ -18,6 +19,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import test.mega.privacy.android.app.AnalyticsTestRule
@@ -44,7 +46,24 @@ class OpenWithMessageActionTest {
 
     @Test
     fun `test that action applies to node attachment messages`() {
-        assertThat(underTest.appliesTo(setOf(mock<NodeAttachmentMessage>()))).isTrue()
+        assertThat(
+            underTest.appliesTo(
+                setOf(mock<NodeAttachmentMessage> {
+                    on { exists } doReturn true
+                })
+            )
+        ).isTrue()
+    }
+
+    @Test
+    fun `test that action does not apply to non existent node attachment messages`() {
+        Truth.assertThat(
+            underTest.appliesTo(
+                setOf(mock<NodeAttachmentMessage> {
+                    on { exists } doReturn false
+                })
+            )
+        ).isFalse()
     }
 
     @Test

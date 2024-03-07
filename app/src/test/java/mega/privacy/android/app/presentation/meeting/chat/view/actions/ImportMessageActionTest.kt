@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import test.mega.privacy.android.app.AnalyticsTestRule
@@ -50,7 +51,24 @@ class ImportMessageActionTest {
 
     @Test
     fun `test that action applies to attachment messages`() {
-        Truth.assertThat(underTest.appliesTo(setOf(mock<NodeAttachmentMessage>()))).isTrue()
+        Truth.assertThat(
+            underTest.appliesTo(
+                setOf(mock<NodeAttachmentMessage> {
+                    on { exists } doReturn true
+                })
+            )
+        ).isTrue()
+    }
+
+    @Test
+    fun `test that action does not apply to non existent node attachment messages`() {
+        Truth.assertThat(
+            underTest.appliesTo(
+                setOf(mock<NodeAttachmentMessage> {
+                    on { exists } doReturn false
+                })
+            )
+        ).isFalse()
     }
 
     @Test

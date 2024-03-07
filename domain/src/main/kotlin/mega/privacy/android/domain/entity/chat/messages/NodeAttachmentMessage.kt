@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.node.chat.ChatFile
 /**
  * Node attachment message
  * @property fileNode The attached node
+ * @property exists Whether the node exists
  */
 @Serializable
 data class NodeAttachmentMessage(
@@ -24,6 +25,7 @@ data class NodeAttachmentMessage(
     override val status: ChatMessageStatus,
     override val content: String?,
     val fileNode: ChatFile,
+    val exists: Boolean,
 ) : AttachmentMessage {
     override val fileSize = fileNode.size
     override val fileName = fileNode.name

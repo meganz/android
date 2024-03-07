@@ -1033,6 +1033,21 @@ class NodeRepositoryImplTest {
             assertThat(actual?.serializedData).isEqualTo(serializedData)
         }
 
+    @Test
+    fun `test that does node exist returns true when node is found`() = runTest {
+        val node = NodeId(1L)
+        val megaNode = mock<MegaNode>()
+        whenever(megaApiGateway.getMegaNodeByHandle(node.longValue)).thenReturn(megaNode)
+        assertThat(underTest.doesNodeExist(node)).isTrue()
+    }
+
+    @Test
+    fun `test that does node exist returns false when node is not found`() = runTest {
+        val node = NodeId(1L)
+        whenever(megaApiGateway.getMegaNodeByHandle(node.longValue)).thenReturn(null)
+        assertThat(underTest.doesNodeExist(node)).isFalse()
+    }
+
     companion object {
         private const val nodeHandle = 1L
         private val nodeId = NodeId(nodeHandle)

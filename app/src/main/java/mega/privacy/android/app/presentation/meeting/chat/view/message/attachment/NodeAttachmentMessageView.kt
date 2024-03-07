@@ -67,6 +67,10 @@ fun NodeAttachmentMessageView(
             combinedClickable(
                 onClick = {
                     coroutineScope.launch {
+                        if (!message.exists) {
+                            snackbarHostState?.showSnackbar(context.getString(R.string.error_file_not_available))
+                            return@launch
+                        }
                         runCatching {
                             viewModel.handleFileNode(message)
                         }.onSuccess { content ->

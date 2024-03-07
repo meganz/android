@@ -36,7 +36,7 @@ internal class ImportMessageAction(
     testTag = "import_node",
 ) {
     override fun shouldDisplayFor(messages: Set<TypedMessage>) = messages.isNotEmpty()
-            && messages.all { it is NodeAttachmentMessage }
+            && messages.all { it is NodeAttachmentMessage && it.exists }
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {

@@ -236,6 +236,10 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun doesNodeExist(nodeId: NodeId): Boolean = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(nodeId.longValue) != null
+    }
+
     override suspend fun getNodeFromSerializedData(serializedData: String) =
         withContext(ioDispatcher) {
             megaApiGateway.unSerializeNode(serializedData)?.let {

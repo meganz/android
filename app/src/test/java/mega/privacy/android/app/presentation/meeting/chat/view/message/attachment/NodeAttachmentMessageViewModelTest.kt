@@ -450,6 +450,7 @@ class NodeAttachmentMessageViewModelTest {
             reactions = emptyList(),
             status = ChatMessageStatus.UNKNOWN,
             content = null,
+            exists = true,
         )
 }
 

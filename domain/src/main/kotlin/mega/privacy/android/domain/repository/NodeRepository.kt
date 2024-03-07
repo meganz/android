@@ -111,6 +111,14 @@ interface NodeRepository {
     suspend fun getNodeById(nodeId: NodeId): Node?
 
     /**
+     * Checks if a Node exists
+     *
+     * @param nodeId
+     * @return true if node exists
+     */
+    suspend fun doesNodeExist(nodeId: NodeId): Boolean
+
+    /**
      * Get node by its serialized data
      *
      * @param serializedData

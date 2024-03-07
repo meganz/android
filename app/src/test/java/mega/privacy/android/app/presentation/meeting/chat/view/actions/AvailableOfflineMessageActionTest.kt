@@ -59,7 +59,24 @@ class AvailableOfflineMessageActionTest {
 
     @Test
     fun `test that action applies to node attachment messages`() {
-        Truth.assertThat(underTest.appliesTo(setOf(mock<NodeAttachmentMessage>()))).isTrue()
+        Truth.assertThat(
+            underTest.appliesTo(
+                setOf(mock<NodeAttachmentMessage> {
+                    on { exists } doReturn true
+                })
+            )
+        ).isTrue()
+    }
+
+    @Test
+    fun `test that action does not apply to non existent node attachment messages`() {
+        Truth.assertThat(
+            underTest.appliesTo(
+                setOf(mock<NodeAttachmentMessage> {
+                    on { exists } doReturn false
+                })
+            )
+        ).isFalse()
     }
 
     @Test

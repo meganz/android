@@ -10,11 +10,14 @@ import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessa
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.chat.ChatImageFile
+import mega.privacy.android.domain.usecase.node.DoesNodeExistUseCase
 import mega.privacy.android.domain.usecase.node.chat.AddChatFileTypeUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -27,15 +30,21 @@ class CreateNodeAttachmentMessageUseCaseTest {
 
     private val createInvalidMessageUseCase = mock<CreateInvalidMessageUseCase>()
     private val addChatFileTypeUseCase = mock<AddChatFileTypeUseCase>()
+    private val doesNodeExistUseCase: DoesNodeExistUseCase = mock()
 
     @BeforeAll
     internal fun setUp() {
         underTest =
-            CreateNodeAttachmentMessageUseCase(createInvalidMessageUseCase, addChatFileTypeUseCase)
+            CreateNodeAttachmentMessageUseCase(
+                createInvalidMessageUseCase = createInvalidMessageUseCase,
+                doesNodeExistUseCase = doesNodeExistUseCase,
+                addChatFileTypeUseCase = addChatFileTypeUseCase,
+            )
     }
 
     @BeforeEach
-    internal fun resetMocks() = reset(createInvalidMessageUseCase, addChatFileTypeUseCase)
+    internal fun resetMocks() =
+        reset(createInvalidMessageUseCase, addChatFileTypeUseCase, doesNodeExistUseCase)
 
     @Test
     fun `test that if message has no nodes it returns an invalid message`() = runTest {
@@ -59,8 +68,11 @@ class CreateNodeAttachmentMessageUseCaseTest {
         assertThat(actual).isEqualTo(expected)
     }
 
-    @Test
-    fun `test that the use case returns the correctly mapped message`() = runTest {
+    @ParameterizedTest(name = "when node exists : {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that the use case returns the correctly mapped message`(
+        exists: Boolean,
+    ) = runTest {
         val fileNode = mock<FileNode>()
         val message = mock<ChatMessage> {
             on { nodeList } doReturn listOf(fileNode)
@@ -82,9 +94,13 @@ class CreateNodeAttachmentMessageUseCaseTest {
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
                 content = null,
+                exists = exists
             )
         }
-        whenever(addChatFileTypeUseCase(fileNode, request.chatId, request.messageId)).thenReturn(typedNode)
+        whenever(doesNodeExistUseCase(fileNode.id)).thenReturn(exists)
+        whenever(addChatFileTypeUseCase(fileNode, request.chatId, request.messageId)).thenReturn(
+            typedNode
+        )
         val actual = underTest(request)
         assertThat(actual).isEqualTo(expected)
     }

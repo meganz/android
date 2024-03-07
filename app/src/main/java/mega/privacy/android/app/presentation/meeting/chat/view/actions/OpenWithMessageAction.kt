@@ -27,7 +27,7 @@ internal class OpenWithMessageAction(
     testTag = "open_with",
 ) {
     override fun shouldDisplayFor(messages: Set<TypedMessage>) =
-        messages.size == 1 && messages.first() is NodeAttachmentMessage
+        messages.size == 1 && messages.first().let { it is NodeAttachmentMessage && it.exists }
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {

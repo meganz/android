@@ -37,7 +37,7 @@ internal class AvailableOfflineMessageAction(
     testTag = "available_offline",
 ) {
     override fun shouldDisplayFor(messages: Set<TypedMessage>) =
-        messages.size == 1 && messages.first() is NodeAttachmentMessage
+        messages.size == 1 && messages.first().let { it is NodeAttachmentMessage && it.exists }
 
     override fun bottomSheetItem(
         message: TypedMessage,
