@@ -47,6 +47,7 @@ internal fun VideoPlaylistItemView(
     title: String,
     numberOfVideos: Int,
     totalDuration: String?,
+    isSelected: Boolean,
     onClick: () -> Unit,
     thumbnailList: List<Any?>?,
     modifier: Modifier = Modifier,
@@ -67,7 +68,7 @@ internal fun VideoPlaylistItemView(
     ) {
         VideoPlaylistThumbnailView(
             icon = icon,
-            modifier = modifier,
+            modifier = Modifier,
             thumbnailList = thumbnailList
         )
 
@@ -77,7 +78,8 @@ internal fun VideoPlaylistItemView(
             totalDuration = totalDuration,
             showMenuButton = showMenuButton,
             onMenuClick = onMenuClick,
-            modifier = modifier
+            modifier = Modifier,
+            isSelected = isSelected
         )
     }
 }
@@ -88,8 +90,11 @@ internal fun VideoPlaylistThumbnailView(
     modifier: Modifier,
     thumbnailList: List<Any?>?,
 ) {
-    Box(contentAlignment = Alignment.TopStart) {
-        val thumbnailModifier = modifier
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.TopStart
+    ) {
+        val thumbnailModifier = Modifier
             .width(126.dp)
             .height(80.dp)
             .clip(RoundedCornerShape(10.dp))
@@ -104,7 +109,7 @@ internal fun VideoPlaylistThumbnailView(
         Image(
             painter = painterResource(id = R.drawable.ic_video_stack),
             contentDescription = "video stack",
-            modifier = modifier
+            modifier = Modifier
                 .padding(top = 5.dp, end = 5.dp)
                 .size(24.dp)
                 .align(Alignment.TopEnd)
@@ -218,6 +223,7 @@ internal fun VideoPlaylistInfoView(
     numberOfVideos: Int,
     totalDuration: String?,
     showMenuButton: Boolean,
+    isSelected: Boolean,
     onMenuClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -229,7 +235,7 @@ internal fun VideoPlaylistInfoView(
         val (videoPlaylistName, threeDots, playlistInfoText) = createRefs()
         Text(
             text = title,
-            modifier = modifier
+            modifier = Modifier
                 .padding(bottom = 5.dp)
                 .constrainAs(videoPlaylistName) {
                     start.linkTo(parent.start)
@@ -243,20 +249,29 @@ internal fun VideoPlaylistInfoView(
             maxLines = 2
         )
         Image(
-            painter = painterResource(id = mega.privacy.android.core.R.drawable.ic_dots_vertical_grey),
+            painter = painterResource(
+                id = if (isSelected)
+                    R.drawable.ic_select_thumbnail
+                else
+                    mega.privacy.android.core.R.drawable.ic_dots_vertical_grey
+            ),
             contentDescription = "3 dots",
-            modifier = modifier
+            modifier = Modifier
                 .constrainAs(threeDots) {
                     end.linkTo(parent.end)
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
                     visibility = if (showMenuButton) Visibility.Visible else Visibility.Gone
                 }
-                .clickable { onMenuClick() }
+                .clickable {
+                    if (!isSelected) {
+                        onMenuClick()
+                    }
+                }
         )
 
         Text(
-            modifier = modifier.constrainAs(playlistInfoText) {
+            modifier = Modifier.constrainAs(playlistInfoText) {
                 start.linkTo(videoPlaylistName.start)
                 top.linkTo(videoPlaylistName.bottom)
             },
@@ -289,6 +304,7 @@ private fun VideoPlaylistItemViewWithoutVideosPreview() {
             numberOfVideos = 0,
             totalDuration = null,
             onClick = {},
+            isSelected = false
         )
     }
 }
@@ -305,6 +321,7 @@ private fun VideoPlaylistItemViewWith1VideoPreview() {
             numberOfVideos = 1,
             totalDuration = "00:05:55",
             onClick = {},
+            isSelected = false
         )
     }
 }
@@ -321,6 +338,7 @@ private fun VideoPlaylistItemViewMultipleVideosPreview() {
             numberOfVideos = 3,
             totalDuration = "1:00:55",
             onClick = {},
+            isSelected = true
         )
     }
 }

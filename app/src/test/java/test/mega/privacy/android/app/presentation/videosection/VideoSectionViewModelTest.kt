@@ -79,6 +79,10 @@ class VideoSectionViewModelTest {
     private val getSyncUploadsFolderIdsUseCase = mock<GetSyncUploadsFolderIdsUseCase>()
 
     private val expectedVideo = mock<VideoUIEntity> { on { name }.thenReturn("video name") }
+    private val videoPlaylistUIEntity = mock<VideoPlaylistUIEntity> {
+        on { title }.thenReturn("playlist")
+        on { videos }.thenReturn(listOf(expectedVideo, expectedVideo))
+    }
 
     @BeforeEach
     fun setUp() {
@@ -263,7 +267,7 @@ class VideoSectionViewModelTest {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos).isNotEmpty()
 
-                underTest.onLongItemClicked(expectedVideo, 0)
+                underTest.onItemClicked(expectedVideo, 0)
                 assertThat(awaitItem().selectedVideoHandles.size).isEqualTo(1)
                 cancelAndIgnoreRemainingEvents()
             }
@@ -278,7 +282,7 @@ class VideoSectionViewModelTest {
                 underTest.refreshNodes()
                 assertThat(awaitItem().allVideos.size).isEqualTo(2)
 
-                underTest.onLongItemClicked(expectedVideo, 0)
+                underTest.onItemClicked(expectedVideo, 0)
                 assertThat(awaitItem().selectedVideoHandles.size).isEqualTo(1)
 
                 underTest.onItemClicked(expectedVideo, 1)
@@ -336,12 +340,81 @@ class VideoSectionViewModelTest {
     }
 
     private suspend fun initVideoPlaylistsReturned() {
-        val videoPlaylistUIEntity = mock<VideoPlaylistUIEntity> {
-            on { title }.thenReturn("playlist")
-        }
         whenever(getVideoPlaylistsUseCase()).thenReturn(listOf(mock(), mock()))
         whenever(videoPlaylistUIEntityMapper(any())).thenReturn(videoPlaylistUIEntity)
     }
+
+    @Test
+    fun `test that the selected playlist item is updated by 1 when long clicked`() =
+        runTest {
+            initVideoPlaylistsReturned()
+            initUnderTest()
+
+            underTest.onTabSelected(VideoSectionTab.Playlists)
+
+            underTest.state.drop(1).test {
+                assertThat(awaitItem().videoPlaylists).isNotEmpty()
+
+                underTest.onVideoPlaylistItemClicked(videoPlaylistUIEntity, 0)
+                assertThat(awaitItem().selectedVideoPlaylistHandles.size).isEqualTo(1)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the checked index is incremented by 1 when the selected playlist item gets clicked`() =
+        runTest {
+            initVideoPlaylistsReturned()
+            initUnderTest()
+
+            underTest.onTabSelected(VideoSectionTab.Playlists)
+
+            underTest.state.drop(1).test {
+                assertThat(awaitItem().videoPlaylists.size).isEqualTo(2)
+
+                underTest.onVideoPlaylistItemClicked(videoPlaylistUIEntity, 0)
+                assertThat(awaitItem().selectedVideoPlaylistHandles.size).isEqualTo(1)
+
+                underTest.onVideoPlaylistItemClicked(videoPlaylistUIEntity, 1)
+                assertThat(awaitItem().selectedVideoPlaylistHandles.size).isEqualTo(2)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the selected playlist size equals the videos size when selecting all playlists`() =
+        runTest {
+            initVideoPlaylistsReturned()
+            initUnderTest()
+
+            underTest.onTabSelected(VideoSectionTab.Playlists)
+
+            underTest.state.drop(1).test {
+                assertThat(awaitItem().videoPlaylists.size).isEqualTo(2)
+
+                underTest.selectAllVideoPlaylists()
+                awaitItem().let { state ->
+                    assertThat(state.selectedVideoPlaylistHandles.size).isEqualTo(state.videoPlaylists.size)
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that isInSelection is correctly updated when selecting and clearing all playlists`() =
+        runTest {
+            initVideoPlaylistsReturned()
+            initUnderTest()
+
+            underTest.state.drop(1).test {
+                underTest.selectAllVideoPlaylists()
+                assertThat(awaitItem().isInSelection).isTrue()
+
+                underTest.clearAllSelectedVideoPlaylists()
+                assertThat(awaitItem().isInSelection).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     @Test
     fun `test that the playlists returned correctly when search query is not empty`() = runTest {
@@ -373,6 +446,63 @@ class VideoSectionViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that the selected video item of playlist is updated by 1 when long clicked`() =
+        runTest {
+            initUnderTest()
+
+            underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
+
+            underTest.state.test {
+                assertThat(awaitItem().currentVideoPlaylist?.videos).isNotEmpty()
+
+                underTest.onVideoItemOfPlaylistClicked(expectedVideo, 0)
+                assertThat(awaitItem().selectedVideoHandlesOfPlaylist.size).isEqualTo(1)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the selected videos of playlist size equals the videos size when selecting all videos of playlist`() =
+        runTest {
+            initUnderTest()
+
+            underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
+
+            underTest.state.test {
+                assertThat(awaitItem().currentVideoPlaylist?.videos?.size).isEqualTo(2)
+
+                underTest.selectAllVideosOfPlaylist()
+                awaitItem().let { state ->
+                    assertThat(state.selectedVideoHandlesOfPlaylist.size).isEqualTo(2)
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that isInSelection is correctly updated when selecting and clearing all videos of playlist`() =
+        runTest {
+            initVideoPlaylistsReturned()
+            initUnderTest()
+
+            underTest.onTabSelected(VideoSectionTab.Playlists)
+
+            underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
+
+            underTest.state.drop(1).test {
+                underTest.selectAllVideosOfPlaylist()
+                assertThat(awaitItem().isInSelection).isTrue()
+
+                underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
+                awaitItem()
+                underTest.clearAllSelectedVideosOfPlaylist()
+                assertThat(awaitItem().isInSelection).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
 
     @Test
     fun `test that create video playlist returns a video playlist with the right title`() =

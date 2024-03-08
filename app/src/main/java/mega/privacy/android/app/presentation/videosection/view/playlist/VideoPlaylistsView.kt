@@ -53,36 +53,6 @@ import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.shared.theme.MegaAppTheme
 
-/**
- * Test tag for creating video playlist fab button
- */
-const val FAB_BUTTON_TEST_TAG = "fab_button_test_tag"
-
-/**
- * Test tag for CreateVideoPlaylistDialog
- */
-const val CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG = "create_video_playlist_dialog_test_tag"
-
-/**
- * Test tag for RenameVideoPlaylistDialog
- */
-const val RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG = "rename_video_playlist_dialog_test_tag"
-
-/**
- * Test tag for DeleteVideoPlaylistDialog
- */
-const val DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG = "delete_video_playlist_dialog_test_tag"
-
-/**
- * Test tag for progressBar
- */
-const val PROGRESS_BAR_TEST_TAG = "progress_bar_test_tag"
-
-/**
- * Test tag for empty view
- */
-const val VIDEO_PLAYLISTS_EMPTY_VIEW_TEST_TAG = "video_playlists_empty_view_test_tag"
-
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun VideoPlaylistsView(
@@ -296,6 +266,7 @@ internal fun VideoPlaylistsView(
                                 numberOfVideos = videoPlaylistItem.numberOfVideos,
                                 thumbnailList = videoPlaylistItem.thumbnailList,
                                 totalDuration = videoPlaylistItem.totalDuration,
+                                isSelected = videoPlaylistItem.isSelected,
                                 onClick = { onClick(videoPlaylistItem, it) },
                                 onMenuClick = {
                                     clickedItem = it
@@ -446,3 +417,33 @@ private fun FabButtonPreview() {
         CreateVideoPlaylistFabButton(onCreateVideoPlaylistClick = {})
     }
 }
+
+/**
+ * Test tag for creating video playlist fab button
+ */
+const val FAB_BUTTON_TEST_TAG = "fab_button_test_tag"
+
+/**
+ * Test tag for CreateVideoPlaylistDialog
+ */
+const val CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG = "create_video_playlist_dialog_test_tag"
+
+/**
+ * Test tag for RenameVideoPlaylistDialog
+ */
+const val RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG = "rename_video_playlist_dialog_test_tag"
+
+/**
+ * Test tag for DeleteVideoPlaylistDialog
+ */
+const val DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG = "delete_video_playlist_dialog_test_tag"
+
+/**
+ * Test tag for progressBar
+ */
+const val PROGRESS_BAR_TEST_TAG = "progress_bar_test_tag"
+
+/**
+ * Test tag for empty view
+ */
+const val VIDEO_PLAYLISTS_EMPTY_VIEW_TEST_TAG = "video_playlists_empty_view_test_tag"

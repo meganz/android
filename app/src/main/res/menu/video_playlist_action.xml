@@ -1,0 +1,33 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_delete"
+        android:icon="@drawable/ic_trash_bin"
+        android:orderInCategory="1"
+        android:title="@string/general_remove"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/save_for_offline"
+        android:orderInCategory="120"
+        android:icon="@drawable/ic_save_offline"
+        android:title="@string/file_properties_available_offline"
+        android:visible="true"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/select_all"
+        android:orderInCategory="3"
+        android:title="@string/action_select_all"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/clear_selection"
+        android:orderInCategory="4"
+        android:title="@string/action_unselect_all"
+        app:showAsAction="never" />
+
+
+</menu>

@@ -19,13 +19,15 @@ import mega.privacy.android.app.presentation.videosection.view.playlist.videoPla
 internal fun VideoSectionFeatureScreen(
     videoSectionViewModel: VideoSectionViewModel,
     onClick: (item: VideoUIEntity, index: Int) -> Unit,
-    onAddElementsClicked: () -> Unit = {},
-    onSortOrderClick: () -> Unit = {},
-    onMenuClick: (VideoUIEntity) -> Unit = {},
-    onLongClick: (item: VideoUIEntity, index: Int) -> Unit = { _, _ -> },
-    onPlaylistItemClick: (item: VideoUIEntity, index: Int) -> Unit = { _, _ -> },
-    onPlaylistItemMenuClick: (VideoPlaylistUIEntity) -> Unit = { _ -> },
-    onPlaylistItemLongClick: (VideoPlaylistUIEntity, index: Int) -> Unit = { _, _ -> },
+    onAddElementsClicked: () -> Unit,
+    onSortOrderClick: () -> Unit,
+    onMenuClick: (VideoUIEntity) -> Unit,
+    onLongClick: (item: VideoUIEntity, index: Int) -> Unit,
+    onPlaylistDetailItemClick: (item: VideoUIEntity, index: Int) -> Unit,
+    onPlaylistDetailItemLongClick: (item: VideoUIEntity, index: Int) -> Unit,
+    onPlaylistItemClick: (item: VideoPlaylistUIEntity, index: Int) -> Unit,
+    onPlaylistItemLongClick: (VideoPlaylistUIEntity, index: Int) -> Unit,
+    onPlaylistItemMenuClick: (VideoPlaylistUIEntity) -> Unit = {},
 ) {
     val navHostController = rememberNavController()
     val route = navHostController.currentDestination?.route
@@ -42,10 +44,11 @@ internal fun VideoSectionFeatureScreen(
         onSortOrderClick = onSortOrderClick,
         onMenuClick = onMenuClick,
         onLongClick = onLongClick,
-        onPlaylistDetailItemClick = onPlaylistItemClick,
-        onPlaylistItemMenuClick = onPlaylistItemMenuClick,
+        onPlaylistDetailItemClick = onPlaylistDetailItemClick,
+        onPlaylistItemClick = onPlaylistItemClick,
         onPlaylistItemLongClick = onPlaylistItemLongClick,
-        onAddElementsClicked = onAddElementsClicked
+        onAddElementsClicked = onAddElementsClicked,
+        onPlaylistDetailLongClicked = onPlaylistDetailItemLongClick,
     )
 }
 
@@ -56,11 +59,13 @@ internal fun VideoSectionNavHost(
     onSortOrderClick: () -> Unit,
     onMenuClick: (VideoUIEntity) -> Unit,
     onLongClick: (item: VideoUIEntity, index: Int) -> Unit,
-    onPlaylistItemMenuClick: (VideoPlaylistUIEntity) -> Unit,
+    onPlaylistItemClick: (VideoPlaylistUIEntity, index: Int) -> Unit,
     onPlaylistItemLongClick: (VideoPlaylistUIEntity, index: Int) -> Unit,
     onPlaylistDetailItemClick: (item: VideoUIEntity, index: Int) -> Unit,
     onAddElementsClicked: () -> Unit,
+    onPlaylistDetailLongClicked: (item: VideoUIEntity, index: Int) -> Unit,
     modifier: Modifier,
+    onPlaylistItemMenuClick: (VideoPlaylistUIEntity) -> Unit = {},
     viewModel: VideoSectionViewModel = hiltViewModel(),
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
@@ -92,11 +97,15 @@ internal fun VideoSectionNavHost(
                 onSortOrderClick = onSortOrderClick,
                 onMenuClick = onMenuClick,
                 onLongClick = onLongClick,
-                onPlaylistItemClick = { playlist, _ ->
-                    viewModel.updateCurrentVideoPlaylist(playlist)
-                    navHostController.navigate(
-                        route = videoPlaylistDetailRoute,
-                    )
+                onPlaylistItemClick = { playlist, index ->
+                    if (state.isInSelection) {
+                        onPlaylistItemClick(playlist, index)
+                    } else {
+                        viewModel.updateCurrentVideoPlaylist(playlist)
+                        navHostController.navigate(
+                            route = videoPlaylistDetailRoute,
+                        )
+                    }
                 },
                 onPlaylistItemMenuClick = onPlaylistItemMenuClick,
                 onPlaylistItemLongClick = onPlaylistItemLongClick
@@ -125,7 +134,8 @@ internal fun VideoSectionNavHost(
                 onAddElementsClicked = onAddElementsClicked,
                 errorMessage = state.createDialogErrorMessage,
                 onClick = onPlaylistDetailItemClick,
-                onMenuClick = onMenuClick
+                onMenuClick = onMenuClick,
+                onLongClick = onPlaylistDetailLongClicked
             )
         }
     }

@@ -72,14 +72,14 @@ internal fun VideoItemView(
             modifier = modifier,
             thumbnailData = thumbnailData,
             duration = duration,
-            isFavourite = isFavourite,
-            isSelected = isSelected
+            isFavourite = isFavourite
         )
 
         VideoInfoView(
             name = name,
             fileSize = fileSize,
             showMenuButton = showMenuButton,
+            isSelected = isSelected,
             nodeAvailableOffline = nodeAvailableOffline,
             onMenuClick = onMenuClick,
             modifier = modifier
@@ -90,14 +90,16 @@ internal fun VideoItemView(
 @Composable
 internal fun VideoThumbnailView(
     @DrawableRes icon: Int,
-    isSelected: Boolean,
     modifier: Modifier,
     thumbnailData: Any?,
     duration: String?,
     isFavourite: Boolean,
 ) {
-    Box(contentAlignment = Alignment.TopStart) {
-        val thumbnailModifier = modifier
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.TopStart
+    ) {
+        val thumbnailModifier = Modifier
             .width(126.dp)
             .height(80.dp)
             .clip(RoundedCornerShape(5.dp))
@@ -124,7 +126,7 @@ internal fun VideoThumbnailView(
         }
         duration?.let {
             Text(
-                modifier = modifier
+                modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(bottom = 5.dp, end = 5.dp)
                     .height(16.dp),
@@ -136,7 +138,7 @@ internal fun VideoThumbnailView(
         Image(
             painter = painterResource(id = R.drawable.ic_play_circle),
             contentDescription = "play",
-            modifier = modifier
+            modifier = Modifier
                 .size(16.dp)
                 .align(Alignment.Center)
         )
@@ -144,20 +146,10 @@ internal fun VideoThumbnailView(
             Image(
                 painter = painterResource(id = R.drawable.ic_favourite_white),
                 contentDescription = "favourite",
-                modifier = modifier
+                modifier = Modifier
                     .padding(top = 5.dp, end = 5.dp)
                     .size(12.dp)
                     .align(Alignment.TopEnd)
-            )
-        }
-        if (isSelected) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_select_thumbnail),
-                contentDescription = "selectedIcon",
-                modifier = modifier
-                    .padding(top = 5.dp, start = 5.dp)
-                    .size(20.dp)
-                    .align(Alignment.TopStart)
             )
         }
     }
@@ -167,6 +159,7 @@ internal fun VideoThumbnailView(
 internal fun VideoInfoView(
     name: String,
     fileSize: String?,
+    isSelected: Boolean,
     showMenuButton: Boolean,
     nodeAvailableOffline: Boolean,
     onMenuClick: () -> Unit,
@@ -180,7 +173,7 @@ internal fun VideoInfoView(
         val (videoName, threeDots, fileSizeText, offlineIcon) = createRefs()
         Text(
             text = name,
-            modifier = modifier
+            modifier = Modifier
                 .padding(bottom = 5.dp)
                 .constrainAs(videoName) {
                     start.linkTo(parent.start)
@@ -194,20 +187,29 @@ internal fun VideoInfoView(
             maxLines = 2
         )
         Image(
-            painter = painterResource(id = CoreUiR.drawable.ic_dots_vertical_grey),
+            painter = painterResource(
+                id = if (isSelected)
+                    R.drawable.ic_select_thumbnail
+                else
+                    CoreUiR.drawable.ic_dots_vertical_grey
+            ),
             contentDescription = "3 dots",
-            modifier = modifier
+            modifier = Modifier
                 .constrainAs(threeDots) {
                     end.linkTo(parent.end)
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
                     visibility = if (showMenuButton) Visibility.Visible else Visibility.Gone
                 }
-                .clickable { onMenuClick() }
+                .clickable {
+                    if (!isSelected) {
+                        onMenuClick()
+                    }
+                }
         )
 
         Text(
-            modifier = modifier.constrainAs(fileSizeText) {
+            modifier = Modifier.constrainAs(fileSizeText) {
                 start.linkTo(videoName.start)
                 top.linkTo(offlineIcon.top)
                 bottom.linkTo(offlineIcon.bottom)
@@ -220,7 +222,7 @@ internal fun VideoInfoView(
         )
 
         Image(
-            modifier = modifier
+            modifier = Modifier
                 .padding(start = 10.dp)
                 .constrainAs(offlineIcon) {
                     start.linkTo(fileSizeText.end)

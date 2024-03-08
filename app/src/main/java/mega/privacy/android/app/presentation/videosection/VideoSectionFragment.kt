@@ -24,8 +24,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -177,6 +179,18 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
         ) { route ->
             route?.let { updateToolbarWhenDestinationChanged(it) }
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            merge(
+                videoSectionViewModel.state.map { it.selectedVideoHandles }.distinctUntilChanged(),
+                videoSectionViewModel.state.map { it.selectedVideoPlaylistHandles }
+                    .distinctUntilChanged(),
+                videoSectionViewModel.state.map { it.selectedVideoHandlesOfPlaylist }
+                    .distinctUntilChanged()
+            ).collectLatest { list ->
+                updateActionModeTitle(count = list.size)
+            }
+        }
     }
 
     private fun initVideoSectionComposeView() {
@@ -202,8 +216,8 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                             }
                         },
                         onLongClick = { item, index ->
-                            videoSectionViewModel.onLongItemClicked(item, index)
                             activateActionMode()
+                            videoSectionViewModel.onItemClicked(item, index)
                         },
                         onMenuClick = { item ->
                             showOptionsMenuForItem(item)
@@ -215,10 +229,31 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                                     VideoSelectedActivity::class.java
                                 )
                             )
+                        },
+                        onPlaylistDetailItemClick = { item, index ->
+                            if (uiState.isInSelection) {
+                                videoSectionViewModel.onVideoItemOfPlaylistClicked(item, index)
+                            } else {
+                                openVideoFile(
+                                    activity = requireActivity(),
+                                    item = item,
+                                    index = index
+                                )
+                            }
+                        },
+                        onPlaylistItemClick = { item, index ->
+                            videoSectionViewModel.onVideoPlaylistItemClicked(item, index)
+                        },
+                        onPlaylistItemLongClick = { item, index ->
+                            activateVideoPlaylistActionMode(ACTION_TYPE_VIDEO_PLAYLIST)
+                            videoSectionViewModel.onVideoPlaylistItemClicked(item, index)
+                        },
+                        onPlaylistDetailItemLongClick = { item, index ->
+                            activateVideoPlaylistActionMode(ACTION_TYPE_VIDEO_PLAYLIST_DETAIL)
+                            videoSectionViewModel.onVideoItemOfPlaylistClicked(item, index)
                         }
                     )
                 }
-                updateActionModeTitle(count = uiState.selectedVideoHandles.size)
             }
         }
     }
@@ -300,6 +335,21 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
         }
     }
 
+    private fun activateVideoPlaylistActionMode(actionType: Int) {
+        if (actionMode == null) {
+            actionMode =
+                (requireActivity() as? AppCompatActivity)?.startSupportActionMode(
+                    VideoPlaylistActionMode(
+                        managerActivity = requireActivity() as ManagerActivity,
+                        videoSectionViewModel = videoSectionViewModel,
+                        actionType = actionType
+                    ) {
+                        disableSelectMode()
+                    }
+                )
+        }
+    }
+
     private fun updateActionModeTitle(count: Int) {
         if (count == 0) actionMode?.finish()
         actionMode?.title = count.toString()
@@ -338,6 +388,8 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
     private fun disableSelectMode() {
         actionMode = null
         videoSectionViewModel.clearAllSelectedVideos()
+        videoSectionViewModel.clearAllSelectedVideoPlaylists()
+        videoSectionViewModel.clearAllSelectedVideosOfPlaylist()
     }
 
     private fun setupMiniAudioPlayer() {
@@ -383,5 +435,17 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
      */
     override fun exitSearch() {
         videoSectionViewModel.exitSearch()
+    }
+
+    companion object {
+        /**
+         * The action type for video playlist
+         */
+        const val ACTION_TYPE_VIDEO_PLAYLIST = 10
+
+        /**
+         * The action type for video playlist detail
+         */
+        const val ACTION_TYPE_VIDEO_PLAYLIST_DETAIL = 11
     }
 }

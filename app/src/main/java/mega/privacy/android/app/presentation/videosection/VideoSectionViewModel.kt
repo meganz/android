@@ -360,6 +360,38 @@ class VideoSectionViewModel @Inject constructor(
         it.copy(isSelected = false)
     }
 
+    internal fun clearAllSelectedVideoPlaylists() {
+        val playlists = clearVideoPlaylistsSelected()
+        _state.update {
+            it.copy(
+                videoPlaylists = playlists,
+                selectedVideoPlaylistHandles = emptyList(),
+                isInSelection = false
+            )
+        }
+    }
+
+    internal fun clearAllSelectedVideosOfPlaylist() {
+        _state.value.currentVideoPlaylist?.let { playlist ->
+            val updatedVideos = clearVideosSelectedOfPlaylist(playlist) ?: return@let
+            val updatedPlaylist = playlist.copy(videos = updatedVideos)
+            _state.update {
+                it.copy(
+                    currentVideoPlaylist = updatedPlaylist,
+                    selectedVideoHandlesOfPlaylist = emptyList(),
+                    isInSelection = false
+                )
+            }
+        }
+    }
+
+    private fun clearVideoPlaylistsSelected() = _state.value.videoPlaylists.map {
+        it.copy(isSelected = false)
+    }
+
+    private fun clearVideosSelectedOfPlaylist(playlist: VideoPlaylistUIEntity) =
+        playlist.videos?.map { it.copy(isSelected = false) }
+
     internal fun selectAllNodes() {
         val videos = _state.value.allVideos.map { item ->
             item.copy(isSelected = true)
@@ -376,11 +408,41 @@ class VideoSectionViewModel @Inject constructor(
         }
     }
 
-    internal fun onItemClicked(item: VideoUIEntity, index: Int) {
-        updateVideoItemInSelectionState(item = item, index = index)
+    internal fun selectAllVideoPlaylists() {
+        val playlists = _state.value.videoPlaylists.map { item ->
+            item.copy(isSelected = true)
+        }
+        val selectedHandles = _state.value.videoPlaylists.map { item ->
+            item.id.longValue
+        }
+        _state.update {
+            it.copy(
+                videoPlaylists = playlists,
+                selectedVideoPlaylistHandles = selectedHandles,
+                isInSelection = true
+            )
+        }
     }
 
-    internal fun onLongItemClicked(item: VideoUIEntity, index: Int) =
+    internal fun selectAllVideosOfPlaylist() =
+        _state.value.currentVideoPlaylist?.let { playlist ->
+            val videos = playlist.videos?.map { item ->
+                item.copy(isSelected = true)
+            } ?: return@let
+            val selectedHandles = playlist.videos.map { item ->
+                item.id.longValue
+            }
+            val updatedCurrentVideoPlaylist = playlist.copy(videos = videos)
+            _state.update {
+                it.copy(
+                    currentVideoPlaylist = updatedCurrentVideoPlaylist,
+                    selectedVideoHandlesOfPlaylist = selectedHandles,
+                    isInSelection = true
+                )
+            }
+        }
+
+    internal fun onItemClicked(item: VideoUIEntity, index: Int) =
         updateVideoItemInSelectionState(item = item, index = index)
 
     private fun updateVideoItemInSelectionState(item: VideoUIEntity, index: Int) {
@@ -412,6 +474,76 @@ class VideoSectionViewModel @Inject constructor(
                 selectedHandles.remove(item.id.longValue)
             }
         }
+
+    internal fun onVideoPlaylistItemClicked(item: VideoPlaylistUIEntity, index: Int) =
+        updateVideoPlaylistItemInSelectionState(item = item, index = index)
+
+    private fun updateVideoPlaylistItemInSelectionState(item: VideoPlaylistUIEntity, index: Int) {
+        val isSelected = !item.isSelected
+        val selectedHandles = updateSelectedVideoPlaylistHandles(item, isSelected)
+        val updatedPlaylists =
+            _state.value.videoPlaylists.updateVideoPlaylistItemSelectedState(index, isSelected)
+        _state.update {
+            it.copy(
+                videoPlaylists = updatedPlaylists,
+                selectedVideoPlaylistHandles = selectedHandles,
+                isInSelection = selectedHandles.isNotEmpty()
+            )
+        }
+    }
+
+    private fun updateSelectedVideoPlaylistHandles(
+        item: VideoPlaylistUIEntity,
+        isSelected: Boolean,
+    ) =
+        _state.value.selectedVideoPlaylistHandles.toMutableList().also { selectedHandles ->
+            if (isSelected) {
+                selectedHandles.add(item.id.longValue)
+            } else {
+                selectedHandles.remove(item.id.longValue)
+            }
+        }
+
+    internal fun onVideoItemOfPlaylistClicked(item: VideoUIEntity, index: Int) =
+        updateVideoItemOfPlaylistInSelectionState(item = item, index = index)
+
+    private fun updateVideoItemOfPlaylistInSelectionState(item: VideoUIEntity, index: Int) =
+        _state.value.currentVideoPlaylist?.let { playlist ->
+            val isSelected = !item.isSelected
+            val updatedVideos =
+                playlist.videos?.updateItemSelectedState(index, isSelected) ?: return@let
+            val selectedHandles = updateSelectedVideoOfPlaylistHandles(item, isSelected)
+            val updatedCurrentPlaylist = playlist.copy(videos = updatedVideos)
+            _state.update {
+                it.copy(
+                    currentVideoPlaylist = updatedCurrentPlaylist,
+                    selectedVideoHandlesOfPlaylist = selectedHandles,
+                    isInSelection = selectedHandles.isNotEmpty()
+                )
+            }
+        }
+
+    private fun updateSelectedVideoOfPlaylistHandles(
+        item: VideoUIEntity,
+        isSelected: Boolean,
+    ) =
+        _state.value.selectedVideoHandlesOfPlaylist.toMutableList().also { selectedHandles ->
+            if (isSelected) {
+                selectedHandles.add(item.id.longValue)
+            } else {
+                selectedHandles.remove(item.id.longValue)
+            }
+        }
+
+    private fun List<VideoPlaylistUIEntity>.updateVideoPlaylistItemSelectedState(
+        index: Int,
+        isSelected: Boolean,
+    ) =
+        if (index in indices) {
+            toMutableList().also { list ->
+                list[index] = list[index].copy(isSelected = isSelected)
+            }
+        } else this
 
     internal suspend fun getSelectedNodes(): List<TypedNode> =
         _state.value.selectedVideoHandles.mapNotNull {
