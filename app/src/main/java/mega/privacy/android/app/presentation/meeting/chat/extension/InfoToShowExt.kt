@@ -14,6 +14,5 @@ fun InfoToShow.getInfo(context: Context) = with(this) {
         is InfoToShow.SimpleString -> context.getString(stringId)
         is InfoToShow.QuantityString -> context.resources.getQuantityString(stringId, count, count)
         is InfoToShow.ForwardMessagesResult -> result.toInfoText(context)
-        is InfoToShow.InviteUserAsContactResult -> result.toInfoText(context)
     }
 }

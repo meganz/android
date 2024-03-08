@@ -61,13 +61,4 @@ sealed class InfoToShow {
     data class ForwardMessagesResult(
         val result: ForwardMessagesToChatsResult,
     ) : InfoToShow()
-
-    /**
-     * Show result of inviting a user as a contact.
-     *
-     * @property result [InviteUserAsContactResultOption]
-     */
-    data class InviteUserAsContactResult(
-        val result: InviteUserAsContactResultOption,
-    ) : InfoToShow()
 }

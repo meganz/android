@@ -1,9 +1,21 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
+
+import androidx.compose.material.SnackbarResult
 import androidx.compose.runtime.Composable
+
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.meeting.chat.extension.toString
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
+import mega.privacy.android.app.presentation.meeting.chat.model.InviteUserAsContactResult
+import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.ContactAttachmentMessageViewModel
+import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openSentRequests
+import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.mobile.analytics.event.ChatConversationInviteActionMenuItemEvent
@@ -25,8 +37,34 @@ class InviteMessageAction(
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
-        Analytics.tracker.trackEvent(ChatConversationInviteActionMenuItemEvent)
-        chatViewModel.inviteContacts(messages.map { it as ContactAttachmentMessage }.toSet())
-        onHandled()
+        val viewModel = hiltViewModel<ContactAttachmentMessageViewModel>()
+        val snackBarHostState = LocalSnackBarHostState.current
+        val context = LocalContext.current
+        LaunchedEffect(Unit) {
+            launch {
+                if (messages.size == 1) {
+                    val result =
+                        viewModel.inviteContact(messages.first() as ContactAttachmentMessage)
+
+                    if (result is InviteUserAsContactResult.ContactInviteSent) {
+                        snackBarHostState?.showSnackbar(
+                            result.toString(context),
+                            context.getString(R.string.action_see)
+                        ).also { snackBarResult ->
+                            if (snackBarResult == SnackbarResult.ActionPerformed) {
+                                openSentRequests(context)
+                            }
+                        }
+                    } else {
+                        snackBarHostState?.showSnackbar(result.toString(context))
+                    }
+                } else {
+                    viewModel.inviteMultipleContacts(messages as Set<ContactAttachmentMessage>)
+                        .also { result -> snackBarHostState?.showSnackbar(result.toString(context)) }
+                }
+                Analytics.tracker.trackEvent(ChatConversationInviteActionMenuItemEvent)
+                onHandled()
+            }
+        }
     }
 }

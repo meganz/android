@@ -1,10 +1,18 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
 import androidx.activity.ComponentActivity
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
+import mega.privacy.android.app.presentation.meeting.chat.model.InviteUserAsContactResult
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.InviteMultipleUsersAsContactResult
+import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.ContactAttachmentMessageViewModel
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 import mega.privacy.mobile.analytics.event.ChatConversationInviteActionMenuItemEvent
@@ -13,7 +21,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.AnalyticsTestRule
@@ -30,6 +40,15 @@ class InviteMessageActionTest {
     private lateinit var underTest: InviteMessageAction
 
     private val chatViewModel = mock<ChatViewModel>()
+
+    private val contactAttachmentMessageViewModel = mock<ContactAttachmentMessageViewModel>()
+
+    private val viewModelStore = mock<ViewModelStore> {
+        on { get(argThat<String> { contains(ContactAttachmentMessageViewModel::class.java.canonicalName.orEmpty()) }) } doReturn contactAttachmentMessageViewModel
+    }
+    private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
+        on { viewModelStore } doReturn viewModelStore
+    }
 
     @Before
     fun setUp() {
@@ -85,34 +104,64 @@ class InviteMessageActionTest {
     }
 
     @Test
-    fun `test that onHandled() is invoked when action is clicked`() {
-        val onHandled: () -> Unit = mock()
+
+    fun `test that onHandle is invoked when one contact attachment message is invited`() = runTest {
+        val contactAttachmentMessage = mock<ContactAttachmentMessage> {
+            on { isMe } doReturn false
+            on { isContact } doReturn true
+            on { userHandle } doReturn 1L
+        }
+        val onHandled = mock<() -> Unit>()
+        whenever(contactAttachmentMessageViewModel.inviteContact(contactAttachmentMessage)).thenReturn(
+            InviteUserAsContactResult.ContactInviteSent
+        )
         composeTestRule.setContent {
-            underTest.OnTrigger(
-                messages = setOf(mock<ContactAttachmentMessage>()),
-                onHandled = onHandled
-            )
+            CompositionLocalProvider(
+                LocalViewModelStoreOwner provides viewModelStoreOwner
+            ) {
+                underTest.OnTrigger(
+                    messages = setOf(contactAttachmentMessage),
+                    onHandled = onHandled
+                )
+            }
         }
         verify(onHandled).invoke()
     }
 
     @Test
-    fun `test that viewmodel inviteContacts() is invoked when action is clicked`() {
-        val contactAttachmentMessage = mock<ContactAttachmentMessage>()
-        whenever(contactAttachmentMessage.isMe).thenReturn(false)
-        whenever(contactAttachmentMessage.isContact).thenReturn(true)
-        whenever(contactAttachmentMessage.userHandle).thenReturn(1L)
-        val expectedMessageSet = setOf(contactAttachmentMessage)
-        composeTestRule.setContent {
-            underTest.OnTrigger(
-                messages = expectedMessageSet,
-                onHandled = {}
+    fun `test that onHandle is invoked when multi contact attachment messages are invited`() =
+        runTest {
+            val contactAttachmentMessage1 = mock<ContactAttachmentMessage> {
+                on { isMe } doReturn false
+                on { isContact } doReturn true
+                on { userHandle } doReturn 1L
+            }
+            val contactAttachmentMessage2 = mock<ContactAttachmentMessage> {
+                on { isMe } doReturn false
+                on { isContact } doReturn true
+                on { userHandle } doReturn 2L
+            }
+            val onHandled = mock<() -> Unit>()
+            val expectedMessageSet = setOf(
+                contactAttachmentMessage1,
+                contactAttachmentMessage2
             )
+            whenever(
+                contactAttachmentMessageViewModel.inviteMultipleContacts(
+                    expectedMessageSet
+                )
+            ).thenReturn(InviteMultipleUsersAsContactResult.AllSent(expectedMessageSet.size))
+            composeTestRule.setContent {
+                CompositionLocalProvider(
+                    LocalViewModelStoreOwner provides viewModelStoreOwner
+                ) {
+                    underTest.OnTrigger(
+                        messages = expectedMessageSet,
+                        onHandled = onHandled
+                    )
+                }
+            }
+            verify(onHandled).invoke()
+            assertThat(analyticsRule.events).contains(ChatConversationInviteActionMenuItemEvent)
         }
-
-        verify(chatViewModel).inviteContacts(expectedMessageSet)
-        assertThat(analyticsRule.events).contains(ChatConversationInviteActionMenuItemEvent)
-    }
-
-
 }

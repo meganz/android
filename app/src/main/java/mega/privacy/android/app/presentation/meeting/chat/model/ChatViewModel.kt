@@ -31,7 +31,6 @@ import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
-import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteUserAsContactResultOptionMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ParticipantNameMapper
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.INVALID_LOCATION_MESSAGE_ID
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
@@ -109,7 +108,6 @@ import mega.privacy.android.domain.usecase.contact.GetParticipantFirstNameUseCas
 import mega.privacy.android.domain.usecase.contact.GetParticipantFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserUseCase
-import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorAllContactParticipantsInChatUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
@@ -227,8 +225,6 @@ class ChatViewModel @Inject constructor(
     private val deleteMessagesUseCase: DeleteMessagesUseCase,
     private val editMessageUseCase: EditMessageUseCase,
     private val editLocationMessageUseCase: EditLocationMessageUseCase,
-    private val inviteContactUseCase: InviteContactUseCase,
-    private val inviteUserAsContactResultOptionMapper: InviteUserAsContactResultOptionMapper,
     private val getChatFromContactMessagesUseCase: GetChatFromContactMessagesUseCase,
     private val getCacheFileUseCase: GetCacheFileUseCase,
     private val recordAudioUseCase: RecordAudioUseCase,
@@ -1429,48 +1425,6 @@ class ChatViewModel @Inject constructor(
                 )
             }
         }
-    }
-
-    /**
-     * Invite contacts
-     *
-     * @param contactMessageList set of [ContactAttachmentMessage]
-     */
-    fun inviteContacts(contactMessageList: Set<ContactAttachmentMessage>) = viewModelScope.launch {
-        if (contactMessageList.size == 1) {
-            inviteSingleContact(contactMessageList.first())
-        } else if (contactMessageList.size > 1) {
-            inviteMultipleContacts(contactMessageList)
-        }
-    }
-
-    private suspend fun inviteMultipleContacts(messageList: Set<ContactAttachmentMessage>) {
-        runCatching {
-            TODO("not implemented")
-        }.onSuccess {
-
-        }.onFailure { Timber.e(it) }
-    }
-
-    private suspend fun inviteSingleContact(
-        message: ContactAttachmentMessage,
-    ) {
-        runCatching {
-            inviteContactUseCase(
-                email = message.contactEmail,
-                handle = message.contactHandle,
-                message = null
-            )
-        }.onSuccess {
-            val email = message.contactEmail
-            val infoToShow = InfoToShow.InviteUserAsContactResult(
-                inviteUserAsContactResultOptionMapper(
-                    inviteContactRequest = it,
-                    email = email
-                )
-            )
-            _state.update { state -> state.copy(infoToShowEvent = triggered(infoToShow)) }
-        }.onFailure { Timber.e(it) }
     }
 
     /**
