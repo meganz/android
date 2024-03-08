@@ -5,6 +5,8 @@ import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
+import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
+import mega.privacy.android.domain.entity.chat.messages.PendingVoiceClipMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.FormatInvalidMessage
@@ -56,5 +58,7 @@ val typedMessageSerialisationModule = SerializersModule {
         subclass(RichPreviewMessage::class)
         subclass(TextLinkMessage::class)
         subclass(TextMessage::class)
+        subclass(PendingFileAttachmentMessage::class)
+        subclass(PendingVoiceClipMessage::class)
     }
 }

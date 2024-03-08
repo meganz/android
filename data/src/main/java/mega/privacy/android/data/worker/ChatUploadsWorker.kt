@@ -9,6 +9,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
+import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -70,19 +71,32 @@ class ChatUploadsWorker @AssistedInject constructor(
     ) = chatUploadNotificationMapper(activeTransferTotals, null, paused)
 
     override suspend fun onTransferEventReceived(event: TransferEvent) {
-        (event as? TransferEvent.TransferFinishEvent)?.transfer?.pendingMessageId()
-            ?.let { pendingMessageId ->
-                runCatching {
-                    Timber.d("Node will be attached")
-                    //once uploaded, it can be attached to the chat
-                    attachNodeWithPendingMessageUseCase(
-                        pendingMessageId,
-                        NodeId(event.transfer.nodeHandle)
-                    )
-                }.onFailure {
-                    Timber.e(it, "Node could not be attached")
+        event.transfer.pendingMessageId()?.let { pendingMessageId ->
+            (event as? TransferEvent.TransferFinishEvent)?.let { finishEvent ->
+                if (finishEvent.error == null) {
+                    runCatching {
+                        Timber.d("Node will be attached")
+                        //once uploaded, it can be attached to the chat
+                        attachNodeWithPendingMessageUseCase(
+                            pendingMessageId,
+                            NodeId(event.transfer.nodeHandle)
+                        )
+                    }.onFailure {
+                        updateState(PendingMessageState.ERROR_ATTACHING, event)
+                        Timber.e(it, "Node could not be attached")
+                    }
+                } else {
+                    updateState(PendingMessageState.ERROR_UPLOADING, event)
                 }
             }
+        }
+    }
+
+    private suspend fun updateState(
+        state: PendingMessageState,
+        transferEvent: TransferEvent
+    ) {
+        //AND-18383 create a use-case to update pending message state and use it also in AttachNodeWithPendingMessageUseCase
     }
 
     companion object {

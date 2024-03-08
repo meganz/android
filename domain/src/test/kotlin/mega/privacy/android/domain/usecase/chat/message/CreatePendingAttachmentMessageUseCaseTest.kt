@@ -75,9 +75,8 @@ class CreatePendingAttachmentMessageUseCaseTest {
             reactions = emptyList(),
             status = getChatMessageStatus(state),
             content = null,
-            file = File(filePath),
+            filePath = filePath,
             fileType = fileTypeInfo,
-            isError = state == PendingMessageState.ERROR_ATTACHING || state == PendingMessageState.ERROR_UPLOADING,
         )
         val actual = underTest(pendingMessage)
         assertThat(actual).isEqualTo(expected)
@@ -117,7 +116,6 @@ class CreatePendingAttachmentMessageUseCaseTest {
             status = getChatMessageStatus(state),
             content = null,
             fileType = fileTypeInfo,
-            isError = state == PendingMessageState.ERROR_ATTACHING || state == PendingMessageState.ERROR_UPLOADING,
         )
         val actual = underTest(pendingMessage)
         assertThat(actual).isEqualTo(expected)

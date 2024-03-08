@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -65,7 +64,7 @@ class AttachNodeWithPendingMessageUseCaseTest {
         underTest(pendingMsgId, NodeId(1L))
         verify(chatMessageRepository)
             .updatePendingMessage(
-                eq(pendingMessage.createRequest(PendingMessageState.ATTACHING))
+                pendingMsgId, pendingMessage.createRequest(PendingMessageState.ATTACHING)
             )
     }
 
@@ -81,7 +80,8 @@ class AttachNodeWithPendingMessageUseCaseTest {
             underTest(pendingMsgId, NodeId(1L))
             verify(chatMessageRepository)
                 .updatePendingMessage(
-                    eq(pendingMessage.createRequest(PendingMessageState.ERROR_ATTACHING))
+                    pendingMsgId,
+                    pendingMessage.createRequest(PendingMessageState.ERROR_ATTACHING)
                 )
         }
 

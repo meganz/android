@@ -18,7 +18,7 @@ fun PendingAttachmentMessageView(
     modifier: Modifier = Modifier,
     viewModel: PendingAttachmentMessageViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.getOrPutUiStateFlow(message).collectAsStateWithLifecycle()
+    val uiState by viewModel.updateAndGetUiStateFlow(message).collectAsStateWithLifecycle()
     FileMessageView(
         isMe = message.isMine,
         fileTypeResId = uiState.fileTypeResId,

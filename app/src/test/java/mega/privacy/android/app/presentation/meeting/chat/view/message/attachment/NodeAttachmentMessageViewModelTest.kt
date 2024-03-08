@@ -137,7 +137,7 @@ class NodeAttachmentMessageViewModelTest {
         }
         whenever(getPreviewUseCase(fileNode)).thenReturn(previewFile)
         val msg = buildNodeAttachmentMessage(fileNode)
-        underTest.getOrPutUiStateFlow(msg).test {
+        underTest.updateAndGetUiStateFlow(msg).test {
             val actual = awaitItem().previewUri
             assertThat(actual).isEqualTo(expected)
         }
@@ -160,7 +160,7 @@ class NodeAttachmentMessageViewModelTest {
         whenever(fileSizeStringMapper(any())).thenReturn(expectedSize)
 
         val msg = buildNodeAttachmentMessage(fileNode)
-        underTest.getOrPutUiStateFlow(msg).test {
+        underTest.updateAndGetUiStateFlow(msg).test {
             val actual = awaitItem()
             assertThat(actual.fileName).isEqualTo(expectedName)
             assertThat(actual.fileSize).isEqualTo(expectedSize)
@@ -184,7 +184,7 @@ class NodeAttachmentMessageViewModelTest {
         whenever(getCachedOriginalPathUseCase(fileNode)).thenReturn(expected)
 
         val msg = buildNodeAttachmentMessage(fileNode)
-        underTest.getOrPutUiStateFlow(msg).test {
+        underTest.updateAndGetUiStateFlow(msg).test {
             val actual = awaitItem()
             assertThat(actual.previewUri).isEqualTo(expected)
         }
@@ -204,7 +204,7 @@ class NodeAttachmentMessageViewModelTest {
         whenever(fileSizeStringMapper(any())).thenReturn("1byte")
 
         val msg = buildNodeAttachmentMessage(fileNode)
-        underTest.getOrPutUiStateFlow(msg).test {
+        underTest.updateAndGetUiStateFlow(msg).test {
             val actual = awaitItem()
             assertThat(actual.previewUri).isNull()
         }

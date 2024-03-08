@@ -69,7 +69,7 @@ class PendingAttachmentMessageViewModelTest {
     ) {
         setup(emptyFlow())
         val attachmentMessage = stubMessage()
-        whenever(attachmentMessage.isError) doReturn expected
+        whenever(attachmentMessage.isSendError()) doReturn expected
         val actual = underTest.createFirstUiState(attachmentMessage)
         assertThat(actual.isError).isEqualTo(expected)
     }
@@ -84,12 +84,23 @@ class PendingAttachmentMessageViewModelTest {
             on { appData } doReturn listOf(TransferAppData.ChatUpload(pendingMsgId))
             on { progress } doReturn expected
         }
-        underTest.getOrPutUiStateFlow(attachmentMessage).test {
+        underTest.updateAndGetUiStateFlow(attachmentMessage).test {
             assertThat(awaitItem().loadProgress).isNull()
             eventsFlow.emit(TransferEvent.TransferUpdateEvent(transfer))
             assertThat(awaitItem().loadProgress).isEqualTo(expected)
         }
     }
+
+    @Test
+    fun `test that error state is updated when a new attachment message with error is received`() =
+        runTest {
+            underTest.updateAndGetUiStateFlow(stubMessage()).test {
+                assertThat(awaitItem().isError).isFalse()
+            }
+            underTest.updateAndGetUiStateFlow(stubMessage(true)).test {
+                assertThat(awaitItem().isError).isTrue()
+            }
+        }
 
     internal fun setup(transferEvents: Flow<TransferEvent>) = runTest {
         whenever(monitorTransferEventsUseCase()) doReturn transferEvents
@@ -100,12 +111,13 @@ class PendingAttachmentMessageViewModelTest {
         )
     }
 
-    private fun stubMessage() = mock<PendingFileAttachmentMessage> {
+    private fun stubMessage(isError: Boolean = false) = mock<PendingFileAttachmentMessage> {
         on { fileName } doReturn "file.jpg"
         on { fileType } doReturn StaticImageFileTypeInfo("image/jpg", "jpg")
         on { fileSize } doReturn 8435L
         on { msgId } doReturn pendingMsgId
         on { file } doReturn File("file.jpg")
+        on { isSendError() } doReturn isError
     }
 
     private val pendingMsgId = 879L

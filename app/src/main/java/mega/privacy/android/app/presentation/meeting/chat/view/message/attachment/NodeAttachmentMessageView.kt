@@ -17,7 +17,6 @@ fun NodeAttachmentMessageView(
     modifier: Modifier = Modifier,
     uiState: AttachmentMessageUiState,
 ) {
-
     FileMessageView(
         isMe = message.isMine,
         fileTypeResId = uiState.fileTypeResId,

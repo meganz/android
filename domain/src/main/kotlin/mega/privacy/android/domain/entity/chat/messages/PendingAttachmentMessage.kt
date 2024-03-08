@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.chat.messages
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.PlayableFileTypeInfo
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
@@ -9,11 +11,9 @@ import java.io.File
 /**
  * Pending attachment message
  * @property file
- * @property isError
  */
 sealed interface PendingAttachmentMessage : AttachmentMessage {
     val file: File?
-    val isError: Boolean
     override val isMine get() = true
     override val fileName get() = file?.name ?: ""
     override val fileSize get() = file?.length() ?: 0L
@@ -22,7 +22,9 @@ sealed interface PendingAttachmentMessage : AttachmentMessage {
 
 /**
  * Pending attachment message for ordinary files
+ * @property filePath
  */
+@Serializable
 data class PendingFileAttachmentMessage(
     override val chatId: Long,
     override val msgId: Long,
@@ -35,14 +37,17 @@ data class PendingFileAttachmentMessage(
     override val reactions: List<Reaction>,
     override val status: ChatMessageStatus,
     override val content: String?,
-    override val file: File,
-    override val isError: Boolean,
-) : PendingAttachmentMessage
+    val filePath: String,
+) : PendingAttachmentMessage {
+    @Transient
+    override val file = File(filePath)
+}
 
 
 /**
  * Pending voice clip message
  */
+@Serializable
 data class PendingVoiceClipMessage(
     override val chatId: Long,
     override val msgId: Long,
@@ -55,7 +60,7 @@ data class PendingVoiceClipMessage(
     override val reactions: List<Reaction>,
     override val status: ChatMessageStatus,
     override val content: String?,
-    override val isError: Boolean,
 ) : PendingAttachmentMessage {
+    @Transient
     override val file = null
 }

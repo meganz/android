@@ -37,7 +37,6 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
                 status = this.getChatMessageStatus(),
                 content = null,
                 fileType = fileSystemRepository.getFileTypeInfo(file),
-                isError = isError(),
             )
         } else {
             PendingFileAttachmentMessage(
@@ -51,9 +50,8 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
                 reactions = emptyList(),
                 status = this.getChatMessageStatus(),
                 content = null,
-                file = file,
+                filePath = filePath,
                 fileType = fileSystemRepository.getFileTypeInfo(file),
-                isError = isError(),
             )
         }
     }
@@ -70,11 +68,4 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
             PendingMessageState.ERROR_UPLOADING -> ChatMessageStatus.SENDING_MANUAL
             else -> ChatMessageStatus.UNKNOWN
         }
-
-    private fun PendingMessage.isError() =
-        when (getState()) {
-            PendingMessageState.ERROR_UPLOADING, PendingMessageState.ERROR_ATTACHING -> true
-            else -> false
-        }
-
 }

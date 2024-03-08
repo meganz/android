@@ -282,11 +282,13 @@ class ChatMessageRepositoryImplTest {
             on { state } doReturn mock()
             on { filePath } doReturn "file"
         }
+        val pendingMessageId = 23L
         val pendingMessageEntity = mock<PendingMessageEntity>()
+        val expected = pendingMessageEntity.copy(pendingMessageId = pendingMessageId)
         whenever(pendingMessageEntityMapper(savePendingMessageRequest))
             .thenReturn(pendingMessageEntity)
-        underTest.updatePendingMessage(savePendingMessageRequest)
-        verify(chatStorageGateway).updatePendingMessage(pendingMessageEntity)
+        underTest.updatePendingMessage(pendingMessageId, savePendingMessageRequest)
+        verify(chatStorageGateway).updatePendingMessage(eq(expected))
     }
 
     @Test

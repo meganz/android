@@ -58,7 +58,7 @@ data class NodeAttachmentUiMessage(
     ) {
         val viewModel: NodeAttachmentMessageViewModel = hiltViewModel()
         val chatViewModel: ChatViewModel = hiltViewModel()
-        val uiState by viewModel.getOrPutUiStateFlow(message).collectAsStateWithLifecycle()
+        val uiState by viewModel.updateAndGetUiStateFlow(message).collectAsStateWithLifecycle()
         val coroutineScope = rememberCoroutineScope()
         val context = LocalContext.current
         val snackbarHostState = LocalSnackBarHostState.current

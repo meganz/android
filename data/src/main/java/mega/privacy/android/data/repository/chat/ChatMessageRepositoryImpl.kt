@@ -143,9 +143,13 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updatePendingMessage(savePendingMessageRequest: SavePendingMessageRequest) {
+    override suspend fun updatePendingMessage(
+        pendingMessageId: Long,
+        savePendingMessageRequest: SavePendingMessageRequest,
+    ) {
         return withContext(ioDispatcher) {
-            val pendingMessage = pendingMessageEntityMapper(savePendingMessageRequest)
+            val pendingMessage =
+                pendingMessageEntityMapper(savePendingMessageRequest).copy(pendingMessageId = pendingMessageId)
             chatStorageGateway.updatePendingMessage(pendingMessage)
         }
     }

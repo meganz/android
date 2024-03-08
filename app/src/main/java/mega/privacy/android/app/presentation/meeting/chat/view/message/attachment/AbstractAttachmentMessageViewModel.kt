@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.meeting.chat.view.message.attachme
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.node.model.mapper.getFileIconChat
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
@@ -27,16 +28,26 @@ abstract class AbstractAttachmentMessageViewModel<T : AttachmentMessage>(
     /**
      * Get or create the [MutableStateFlow] for a given attachment message and chat id
      */
-    internal fun getOrPutUiStateFlow(
+    internal fun updateAndGetUiStateFlow(
         attachmentMessage: T,
-    ): MutableStateFlow<AttachmentMessageUiState> =
-        _uiStateFlowMap.getOrPut(attachmentMessage.msgId) {
+    ): MutableStateFlow<AttachmentMessageUiState> {
+        if (_uiStateFlowMap.containsKey(attachmentMessage.msgId)) {
+            updateMessage(attachmentMessage)
+        }
+        return _uiStateFlowMap.getOrPut(attachmentMessage.msgId) {
             MutableStateFlow(
                 createFirstUiState(attachmentMessage)
             ).also {
                 onMessageAdded(it, attachmentMessage)
             }
         }
+    }
+
+    private fun updateMessage(attachmentMessage: T) {
+        _uiStateFlowMap[attachmentMessage.msgId]?.update {
+            it.copy(isError = attachmentMessage.isSendError())
+        }
+    }
 
     internal fun getUiStateFlow(messageId: Long): MutableStateFlow<AttachmentMessageUiState>? =
         _uiStateFlowMap[messageId]
@@ -57,5 +68,6 @@ abstract class AbstractAttachmentMessageViewModel<T : AttachmentMessage>(
         fileSize = fileSizeStringMapper(attachmentMessage.fileSize),
         duration = attachmentMessage.duration?.let { durationInSecondsTextMapper(it) },
         fileTypeResId = getFileIconChat(attachmentMessage.fileType),
+        isError = attachmentMessage.isSendError()
     )
 }

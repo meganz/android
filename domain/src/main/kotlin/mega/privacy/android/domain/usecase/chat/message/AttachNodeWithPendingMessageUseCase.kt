@@ -35,7 +35,7 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
                 chatMessageRepository.cacheOriginalPathForNode(nodeId, pendingMessage.filePath)
                 pendingMessage.updateState(
                     PendingMessageState.ATTACHING,
-                    nodeId.longValue
+                    nodeId.longValue,
                 )
                 runCatching {
                     setNodeAttributesAfterUploadUseCase(
@@ -57,7 +57,8 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
                     }
                 } ?: run {
                     pendingMessage.updateState(
-                        PendingMessageState.ERROR_ATTACHING
+                        PendingMessageState.ERROR_ATTACHING,
+                        nodeId.longValue,
                     )
                 }
             }
@@ -65,9 +66,10 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
 
     private suspend fun PendingMessage.updateState(
         state: PendingMessageState,
-        nodeHandle: Long = this.nodeHandle,
+        nodeHandle: Long,
     ) {
         chatMessageRepository.updatePendingMessage(
+            this.id,
             SavePendingMessageRequest(
                 chatId = this.chatId,
                 type = this.type,
