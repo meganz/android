@@ -211,6 +211,12 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun deletePendingMessageById(pendingMessageId: Long) {
+        withContext(ioDispatcher) {
+            chatStorageGateway.deletePendingMessage(pendingMessageId)
+        }
+    }
+
     override suspend fun getMessageIdsByType(chatId: Long, type: ChatMessageType): List<Long> =
         withContext(ioDispatcher) {
             chatStorageGateway.getMessageIdsByType(chatId, type)

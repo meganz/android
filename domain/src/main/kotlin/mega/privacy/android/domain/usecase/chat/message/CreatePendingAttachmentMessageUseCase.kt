@@ -29,7 +29,7 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
                 chatId = chatId,
                 msgId = id,
                 time = uploadTimestamp,
-                isDeletable = false,
+                isDeletable = true,
                 isEditable = false,
                 userHandle = getMyUserHandleUseCase(),
                 shouldShowAvatar = false,
@@ -44,7 +44,7 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
                 chatId = chatId,
                 msgId = id,
                 time = uploadTimestamp,
-                isDeletable = false,
+                isDeletable = true,
                 isEditable = false,
                 userHandle = getMyUserHandleUseCase(),
                 shouldShowAvatar = false,
@@ -67,6 +67,7 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
             PendingMessageState.ATTACHING -> ChatMessageStatus.SENDING
             PendingMessageState.ERROR_ATTACHING -> ChatMessageStatus.SERVER_REJECTED
             PendingMessageState.SENT -> ChatMessageStatus.DELIVERED
+            PendingMessageState.ERROR_UPLOADING -> ChatMessageStatus.SENDING_MANUAL
             else -> ChatMessageStatus.UNKNOWN
         }
 

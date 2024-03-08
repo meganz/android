@@ -8,6 +8,7 @@ import dagger.multibindings.IntoSet
 import mega.privacy.android.domain.usecase.chat.message.delete.DeleteGeneralMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.delete.DeleteMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.delete.DeleteNodeAttachmentMessageUseCase
+import mega.privacy.android.domain.usecase.chat.message.delete.DeletePendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.delete.DeleteVoiceClipMessageUseCase
 
 @Module
@@ -25,5 +26,9 @@ internal abstract class DeleteMessageModule {
     @Binds
     @IntoSet
     abstract fun bindDeleteVoiceClipMessageUseCase(creator: DeleteVoiceClipMessageUseCase): DeleteMessageUseCase
+
+    @Binds
+    @IntoSet
+    abstract fun bindDeletePendingMessageUseCase(creator: DeletePendingMessageUseCase): DeleteMessageUseCase
 }
 

@@ -68,7 +68,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
             chatId = chatId,
             msgId = msgId,
             time = time,
-            isDeletable = false,
+            isDeletable = true,
             isEditable = false,
             userHandle = userHandle,
             shouldShowAvatar = false,
@@ -109,7 +109,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
             chatId = chatId,
             msgId = msgId,
             time = time,
-            isDeletable = false,
+            isDeletable = true,
             isEditable = false,
             userHandle = userHandle,
             shouldShowAvatar = false,
@@ -128,6 +128,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
             PendingMessageState.ATTACHING -> ChatMessageStatus.SENDING
             PendingMessageState.SENT -> ChatMessageStatus.DELIVERED
             PendingMessageState.ERROR_ATTACHING -> ChatMessageStatus.SERVER_REJECTED
+            PendingMessageState.ERROR_UPLOADING -> ChatMessageStatus.SENDING_MANUAL
             else -> ChatMessageStatus.UNKNOWN
         }
 }

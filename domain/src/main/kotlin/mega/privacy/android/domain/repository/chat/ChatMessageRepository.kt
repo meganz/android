@@ -318,11 +318,18 @@ interface ChatMessageRepository {
     suspend fun getPendingMessage(pendingMessageId: Long): PendingMessage?
 
     /**
-     * Delete pending message by id
+     * Delete pending message
      *
      * @param pendingMessage
      */
     suspend fun deletePendingMessage(pendingMessage: PendingMessage)
+
+    /**
+     * Delete pending message by id
+     *
+     * @param pendingMessageId
+     */
+    suspend fun deletePendingMessageById(pendingMessageId: Long)
 
     /**
      * Get message ids by type
