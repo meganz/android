@@ -33,7 +33,7 @@ internal class CreateNodeAttachmentMessageUseCase @Inject constructor(
             reactions = reactions,
             status = status,
             content = content,
-            exists = if(isMine) doesNodeExistUseCase(fileNode.id) else true
+            exists = if (isMine) doesNodeExistUseCase(fileNode.id) else true
         )
     }
 }

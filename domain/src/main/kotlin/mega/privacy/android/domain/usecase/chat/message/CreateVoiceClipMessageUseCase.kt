@@ -6,13 +6,23 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageInfo
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.usecase.node.DoesNodeExistUseCase
+import mega.privacy.android.domain.usecase.node.chat.AddChatFileTypeUseCase
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
-internal class CreateVoiceClipMessageUseCase @Inject constructor() : CreateTypedMessageUseCase {
+internal class CreateVoiceClipMessageUseCase @Inject constructor(
+    private val createInvalidMessageUseCase: CreateInvalidMessageUseCase,
+    private val doesNodeExistUseCase: DoesNodeExistUseCase,
+    private val addChatFileTypeUseCase: AddChatFileTypeUseCase,
+) : CreateTypedMessageUseCase {
 
     override suspend fun invoke(request: CreateTypedMessageInfo): TypedMessage = with(request) {
         val fileNode = nodeList.firstOrNull() as? FileNode
+            ?: return@with createInvalidMessageUseCase(request)
+
+        val typedNode = addChatFileTypeUseCase(fileNode, chatId, messageId)
+
         return VoiceClipMessage(
             chatId = chatId,
             msgId = messageId,
@@ -22,12 +32,14 @@ internal class CreateVoiceClipMessageUseCase @Inject constructor() : CreateTyped
             isMine = isMine,
             userHandle = userHandle,
             status = status,
-            name = fileNode?.name.orEmpty(),
-            size = fileNode?.size ?: 0L,
-            duration = (fileNode?.type as? AudioFileTypeInfo)?.duration ?: 0.seconds,
+            fileNode = typedNode,
+            name = typedNode.name,
+            size = typedNode.size,
+            duration = (typedNode.type as? AudioFileTypeInfo)?.duration ?: 0.seconds,
             shouldShowAvatar = shouldShowAvatar,
             reactions = reactions,
             content = content,
+            exists = if (isMine) doesNodeExistUseCase(typedNode.id) else true
         )
     }
 }
