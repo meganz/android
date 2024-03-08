@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.main.megachat.MapsActivity
@@ -124,6 +125,7 @@ import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
+import mega.privacy.mobile.analytics.event.ChatConversationUnmuteMenuToolbarEvent
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Collections
@@ -699,7 +701,11 @@ class ChatViewModel @Inject constructor(
      */
     fun handleActionPress(action: ChatRoomMenuAction) {
         when (action) {
-            is ChatRoomMenuAction.Unmute -> unmutePushNotification()
+            is ChatRoomMenuAction.Unmute -> {
+                Analytics.tracker.trackEvent(ChatConversationUnmuteMenuToolbarEvent)
+                unmutePushNotification()
+            }
+
             else -> {}
         }
     }

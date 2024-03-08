@@ -136,6 +136,7 @@ import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
+import mega.privacy.mobile.analytics.event.ChatConversationUnmuteMenuToolbarEvent
 import nz.mega.sdk.MegaChatError
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -162,11 +163,13 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
+import test.mega.privacy.android.app.AnalyticsTestExtension
 import java.io.File
 import java.util.stream.Stream
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+
 internal class ChatViewModelTest {
 
     private val chatId = 123L
@@ -1680,6 +1683,9 @@ internal class ChatViewModelTest {
                 val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered)
                     .content as InfoToShow.MuteOptionResult).result
                 assertThat(result).isInstanceOf(ChatPushNotificationMuteOption.Unmute::class.java)
+                assertThat(analyticsTestExtension.events).contains(
+                    ChatConversationUnmuteMenuToolbarEvent
+                )
             }
         }
 
@@ -1694,6 +1700,9 @@ internal class ChatViewModelTest {
             underTest.state.test {
                 assertThat(awaitItem().infoToShowEvent)
                     .isInstanceOf(StateEventWithContentConsumed::class.java)
+                assertThat(analyticsTestExtension.events).contains(
+                    ChatConversationUnmuteMenuToolbarEvent
+                )
             }
         }
 
@@ -2957,6 +2966,10 @@ internal class ChatViewModelTest {
         @JvmField
         @RegisterExtension
         val extension = CoroutineMainDispatcherExtension(testDispatcher)
+
+        @JvmField
+        @RegisterExtension
+        val analyticsTestExtension = AnalyticsTestExtension()
     }
 }
 

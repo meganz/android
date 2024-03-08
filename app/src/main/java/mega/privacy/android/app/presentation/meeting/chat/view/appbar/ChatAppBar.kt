@@ -22,6 +22,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
 import mega.privacy.android.app.extensions.navigateToAppSettings
@@ -40,6 +41,16 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.mobile.analytics.event.ChatConversationAddParticipantsMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.ChatConversationArchiveMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.ChatConversationCallMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.ChatConversationClearMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.ChatConversationEndCallForAllMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.ChatConversationInfoMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.ChatConversationMuteMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.ChatConversationSelectMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.ChatConversationUnarchiveMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.ChatConversationVideoMenuToolbarEvent
 
 internal const val TEST_TAG_USER_CHAT_STATE = "chat_app_bar:icon_user_chat_status"
 internal const val TEST_TAG_NOTIFICATION_MUTE = "chat_app_bar:icon_chat_notification_mute"
@@ -107,6 +118,14 @@ internal fun ChatAppBar(
             when (it) {
                 is ChatRoomMenuAction.AudioCall, is ChatRoomMenuAction.VideoCall -> {
                     isVideoCall = it is ChatRoomMenuAction.VideoCall
+                    Analytics.tracker.trackEvent(
+                        if (isVideoCall) {
+                            ChatConversationVideoMenuToolbarEvent
+                        } else {
+                            ChatConversationCallMenuToolbarEvent
+                        }
+                    )
+
                     if (uiState.callsInOtherChats.any { call -> call.status?.isJoined == true }) {
                         showParticipatingInACallDialog()
                         return@onActionPressed
@@ -117,10 +136,12 @@ internal fun ChatAppBar(
                 }
 
                 ChatRoomMenuAction.Info -> {
+                    Analytics.tracker.trackEvent(ChatConversationInfoMenuToolbarEvent)
                     showGroupOrContactInfoActivity()
                 }
 
                 ChatRoomMenuAction.AddParticipants -> {
+                    Analytics.tracker.trackEvent(ChatConversationAddParticipantsMenuToolbarEvent)
                     when {
                         !uiState.hasAnyContact -> showNoContactToAddDialog()
                         uiState.allContactsParticipateInChat -> showAllContactsParticipateInChat()
@@ -129,18 +150,34 @@ internal fun ChatAppBar(
                 }
 
                 ChatRoomMenuAction.Clear -> {
+                    Analytics.tracker.trackEvent(ChatConversationClearMenuToolbarEvent)
                     showClearChatConfirmationDialog()
                 }
 
-                ChatRoomMenuAction.Mute -> showMutePushNotificationDialog()
+                ChatRoomMenuAction.Mute -> {
+                    Analytics.tracker.trackEvent(ChatConversationMuteMenuToolbarEvent)
+                    showMutePushNotificationDialog()
+                }
 
-                ChatRoomMenuAction.Archive -> archiveChat()
+                ChatRoomMenuAction.Archive -> {
+                    Analytics.tracker.trackEvent(ChatConversationArchiveMenuToolbarEvent)
+                    archiveChat()
+                }
 
-                ChatRoomMenuAction.Unarchive -> unarchiveChat()
+                ChatRoomMenuAction.Unarchive -> {
+                    Analytics.tracker.trackEvent(ChatConversationUnarchiveMenuToolbarEvent)
+                    unarchiveChat()
+                }
 
-                ChatRoomMenuAction.EndCallForAll -> showEndCallForAllDialog()
+                ChatRoomMenuAction.EndCallForAll -> {
+                    Analytics.tracker.trackEvent(ChatConversationEndCallForAllMenuToolbarEvent)
+                    showEndCallForAllDialog()
+                }
 
-                ChatRoomMenuAction.Select -> enableSelectMode()
+                ChatRoomMenuAction.Select -> {
+                    Analytics.tracker.trackEvent(ChatConversationSelectMenuToolbarEvent)
+                    enableSelectMode()
+                }
 
                 else -> (it as ChatRoomMenuAction).let(onMenuActionPressed)
             }
@@ -198,7 +235,7 @@ private fun getChatRoomActions(uiState: ChatUiState, canSelect: Boolean): List<C
         if (canSelect) {
             add(ChatRoomMenuAction.Select)
         }
-}
+    }
 
 private fun checkStorageState(
     context: Context,
