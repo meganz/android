@@ -94,6 +94,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startM
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startWaitingRoom
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatAttachFileBottomSheet
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatToolbarBottomSheet
+import mega.privacy.android.app.presentation.meeting.chat.view.sheet.MessageNotSentBottomSheet
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.MessageOptionsBottomSheet
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ReactionsInfoBottomSheet
 import mega.privacy.android.app.presentation.qrcode.findActivity
@@ -332,6 +333,16 @@ internal fun ChatView(
             true
         }
     )
+    val messageNotSentBottomSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        confirmValueChange = {
+            if (it != ModalBottomSheetValue.Hidden) {
+                keyboardController?.hide()
+                showEmojiPicker = false
+            }
+            true
+        }
+    )
     val reactionInfoBottomSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         confirmValueChange = {
@@ -455,6 +466,9 @@ internal fun ChatView(
         val isMessageOptionsModalShown by derivedStateOf {
             messageOptionsModalSheetState.currentValue != ModalBottomSheetValue.Hidden
         }
+        val isMessageNotSentModalShown by derivedStateOf {
+            messageNotSentBottomSheetState.currentValue != ModalBottomSheetValue.Hidden
+        }
         val isReactionInfoModalShown by derivedStateOf {
             reactionInfoBottomSheetState.currentValue != ModalBottomSheetValue.Hidden
         }
@@ -473,6 +487,7 @@ internal fun ChatView(
                 isMessageOptionsModalShown -> messageOptionsModalSheetState
                 isReactionInfoModalShown -> reactionInfoBottomSheetState
                 isToolbarModalShown -> toolbarModalSheetState
+                isMessageNotSentModalShown -> messageNotSentBottomSheetState
                 else -> noBottomSheetState
             },
             sheetBody = {
@@ -509,6 +524,25 @@ internal fun ChatView(
                                 )
                             },
                             sheetState = messageOptionsModalSheetState,
+                        )
+                    }
+
+                    isMessageNotSentModalShown -> {
+                        MessageNotSentBottomSheet(
+                            actions = actions.filter { action ->
+                                action.appliesTo(selectedMessages)
+                            }.map { action ->
+                                action.bottomSheetMenuItem(
+                                    messages = selectedMessages,
+                                    hideBottomSheet = {
+                                        coroutineScope.launch {
+                                            messageNotSentBottomSheetState.hide()
+                                        }
+                                    },
+                                    setAction = { pendingAction = it }
+                                )
+                            },
+                            sheetState = messageNotSentBottomSheetState,
                         )
                     }
 
