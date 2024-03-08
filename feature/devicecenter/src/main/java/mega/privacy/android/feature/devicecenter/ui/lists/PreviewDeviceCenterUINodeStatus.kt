@@ -25,7 +25,7 @@ private fun PreviewDeviceCenterUINodeStatus(
         DeviceCenterListViewItem(
             uiNode = OwnDeviceUINode(
                 id = "1234-5678",
-                name = "Backup Name",
+                name = "Device Name",
                 icon = DeviceIconType.Android,
                 status = status,
                 folders = emptyList(),

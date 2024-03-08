@@ -1,31 +1,29 @@
 package mega.privacy.android.feature.devicecenter.ui.lists
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import mega.privacy.android.core.ui.controls.lists.StatusListViewItem
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
+import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceCenterUINodeIcon
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
 import mega.privacy.android.legacy.core.ui.controls.divider.CustomDivider
-import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.shared.theme.MegaAppTheme
-import java.io.File
 
 /**
  * Test tag for the Device Center List View Item
@@ -37,8 +35,8 @@ internal const val DEVICE_CENTER_LIST_VIEW_ITEM_DIVIDER_TAG =
     "device_center_list_view_item:custom_divider"
 
 /**
- * A Composable Class extending [NodeListViewItem] that represents a Device / Device Folder entry
- * in the Device Center. Each entry also shows a [CustomDivider]
+ * A Composable Class that represents a Device / Folder entry in the Device Center.
+ * Each entry also shows a [CustomDivider]
  *
  * @param uiNode The [DeviceCenterUINode] to be displayed
  * @param onDeviceClicked Lambda that performs a specific action when a Device is clicked
@@ -67,23 +65,10 @@ internal fun DeviceCenterListViewItem(
             .fillMaxWidth()
             .height(72.dp)
     ) {
-        val (nodeListViewItem, divider) = createRefs()
+        val (item, divider) = createRefs()
 
-        NodeListViewItem(
-            modifier = Modifier
-                .testTag(DEVICE_CENTER_LIST_VIEW_ITEM_TAG)
-                .constrainAs(nodeListViewItem) {
-                    top.linkTo(parent.top)
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                },
-            isSelected = false,
-            folderInfo = getStatusText(uiNode.status),
+        StatusListViewItem(
             icon = uiNode.icon.iconRes,
-            applySecondaryColorIconTint = uiNode.icon.applySecondaryColorTint,
-            fileSize = null,
-            modifiedDate = null,
             name = uiNode.name.ifBlank {
                 when (uiNode) {
                     is DeviceUINode -> stringResource(R.string.device_center_list_view_item_title_unknown_device)
@@ -91,27 +76,34 @@ internal fun DeviceCenterListViewItem(
                     else -> ""
                 }
             },
-            infoColor = getStatusColor(uiNode.status),
-            infoIcon = uiNode.status.icon,
-            infoIconTint = getStatusColor(uiNode.status),
-            showMenuButton = true,
-            isTakenDown = false,
-            isFavourite = false,
-            isSharedWithPublicLink = false,
-            imageState = remember { mutableStateOf(null as File?) },
-            onClick = {
-                when (uiNode) {
-                    is DeviceUINode -> onDeviceClicked(uiNode)
-                    is BackupDeviceFolderUINode -> onBackupFolderClicked(uiNode)
-                    is NonBackupDeviceFolderUINode -> onNonBackupFolderClicked(uiNode)
+            statusText = getStatusText(uiNode.status),
+            modifier = Modifier
+                .testTag(DEVICE_CENTER_LIST_VIEW_ITEM_TAG)
+                .constrainAs(item) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
                 }
+                .clickable {
+                    when (uiNode) {
+                        is DeviceUINode -> onDeviceClicked(uiNode)
+                        is BackupDeviceFolderUINode -> onBackupFolderClicked(uiNode)
+                        is NonBackupDeviceFolderUINode -> onNonBackupFolderClicked(uiNode)
+                    }
+                },
+            applySecondaryColorIconTint = uiNode.icon.applySecondaryColorTint,
+            statusIcon = uiNode.status.icon,
+            statusColor = uiNode.status.color,
+            onMoreClicked = if (uiNode is DeviceUINode) { ->
+                onDeviceMenuClicked(uiNode)
+            } else {
+                null
             },
-            onMenuClick = {
-                when (uiNode) {
-                    is DeviceUINode -> onDeviceMenuClicked(uiNode)
-                    is BackupDeviceFolderUINode -> onBackupFolderMenuClicked(uiNode)
-                    is NonBackupDeviceFolderUINode -> onNonBackupFolderMenuClicked(uiNode)
-                }
+            onInfoClicked = if (uiNode is DeviceUINode) {
+                null
+            } else { ->
+                // TODO When the Info page is done
             },
         )
         CustomDivider(
@@ -128,7 +120,7 @@ internal fun DeviceCenterListViewItem(
 }
 
 /**
- * Retrieves the Status Text to be displayed in the Body Section of [NodeListViewItem]
+ * Retrieves the Status Text to be displayed in the Body Section of [DeviceCenterListViewItem]
  *
  * @param uiNodeStatus The [DeviceCenterUINodeStatus]
  * @return The corresponding Status Text
@@ -143,27 +135,19 @@ private fun getStatusText(uiNodeStatus: DeviceCenterUINodeStatus) =
     }
 
 /**
- * Retrieves the Status Color to be applied in the Body Section of [NodeListViewItem]
- *
- * @param uiNodeStatus The [DeviceCenterUINodeStatus]
- * @return The corresponding Status Color
- */
-@Composable
-private fun getStatusColor(uiNodeStatus: DeviceCenterUINodeStatus) =
-    uiNodeStatus.color ?: MaterialTheme.colors.textColorSecondary
-
-/**
- * A Preview Composable that displays [DeviceCenterListViewItem]
+ * A Preview Composable that displays [DeviceCenterListViewItem] for a Device
  */
 @CombinedThemePreviews
 @Composable
-private fun DeviceCenterListViewItemPreview() {
+private fun DeviceCenterListViewItemDevicePreview(
+    @PreviewParameter(DeviceCenterUINodeDeviceIconProvider::class) icon: DeviceCenterUINodeIcon,
+) {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterListViewItem(
             uiNode = OwnDeviceUINode(
                 id = "1234-5678",
-                name = "Backup Name",
-                icon = DeviceIconType.Android,
+                name = "Device Name",
+                icon = icon,
                 status = DeviceCenterUINodeStatus.UpToDate,
                 folders = emptyList(),
             ),
@@ -172,12 +156,34 @@ private fun DeviceCenterListViewItemPreview() {
 }
 
 /**
- * A Preview Composable that displays [DeviceCenterListViewItem] with a default Title if the Device
- * has no name
+ * A Preview Composable that displays [DeviceCenterListViewItem] for a Folder Connection
  */
 @CombinedThemePreviews
 @Composable
-private fun DeviceCenterListViewItemWithEmptyTitlePreview() {
+private fun DeviceCenterListViewItemDeviceFolderPreview(
+    @PreviewParameter(DeviceCenterUINodeFolderIconProvider::class) icon: DeviceCenterUINodeIcon,
+) {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        DeviceCenterListViewItem(
+            uiNode = BackupDeviceFolderUINode(
+                id = "1234-5678",
+                name = "Connection Folder Name",
+                icon = icon,
+                status = DeviceCenterUINodeStatus.UpToDate,
+                rootHandle = 1234L,
+            ),
+        )
+    }
+}
+
+
+/**
+ * A Preview Composable that displays [DeviceCenterListViewItem] for a Device
+ * with a default Title if the Device has no name
+ */
+@CombinedThemePreviews
+@Composable
+private fun DeviceCenterListViewItemDeviceWithEmptyTitlePreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterListViewItem(
             uiNode = OwnDeviceUINode(

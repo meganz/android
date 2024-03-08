@@ -135,7 +135,7 @@ class DeviceCenterFragment : Fragment() {
                                 nodeName = backupDeviceFolderUINode.name,
                                 nodeHandle = backupDeviceFolderUINode.rootHandle,
                                 nodeStatus = getString(backupDeviceFolderUINode.status.name),
-                                nodeStatusColorInt = backupDeviceFolderUINode.status.color?.toArgb(),
+                                nodeStatusColorInt = backupDeviceFolderUINode.status.legacyColor?.toArgb(),
                                 nodeIcon = backupDeviceFolderUINode.icon.iconRes,
                                 nodeStatusIcon = backupDeviceFolderUINode.status.icon,
                             )
@@ -162,7 +162,7 @@ class DeviceCenterFragment : Fragment() {
                                 nodeName = nonBackupDeviceFolderUINode.name,
                                 nodeHandle = nonBackupDeviceFolderUINode.rootHandle,
                                 nodeStatus = getString(nonBackupDeviceFolderUINode.status.name),
-                                nodeStatusColorInt = nonBackupDeviceFolderUINode.status.color?.toArgb(),
+                                nodeStatusColorInt = nonBackupDeviceFolderUINode.status.legacyColor?.toArgb(),
                                 nodeIcon = nonBackupDeviceFolderUINode.icon.iconRes,
                                 nodeStatusIcon = nonBackupDeviceFolderUINode.status.icon,
                             )

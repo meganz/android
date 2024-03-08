@@ -99,7 +99,7 @@ fun MenuActionNodeHeaderWithBody(
                     Icon(
                         modifier = modifier
                             .testTag(HEADER_NODE_BODY_ICON)
-                            .padding(top = 2.dp, end = 8.dp)
+                            .padding(top = 2.dp, end = 4.dp)
                             .size(16.dp),
                         painter = painterResource(nonNullBodyIcon),
                         contentDescription = "Body Icon",
@@ -107,7 +107,9 @@ fun MenuActionNodeHeaderWithBody(
                     )
                 }
                 Text(
-                    modifier = modifier.testTag(HEADER_NODE_BODY),
+                    modifier = modifier
+                        .testTag(HEADER_NODE_BODY)
+                        .padding(top = 2.dp),
                     text = body,
                     style = MaterialTheme.typography.subtitle2,
                     color = bodyColor,
