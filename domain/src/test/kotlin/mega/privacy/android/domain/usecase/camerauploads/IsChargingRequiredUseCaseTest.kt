@@ -1,22 +1,15 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.camerauploads
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 
-/**
- * Test class for [DefaultIsChargingRequired]
- */
-@OptIn(ExperimentalCoroutinesApi::class)
-class DefaultIsChargingRequiredTest {
-    private lateinit var underTest: IsChargingRequired
+internal class IsChargingRequiredUseCaseTest {
+    private lateinit var underTest: IsChargingRequiredUseCase
 
     private val getVideoCompressionSizeLimitUseCase = mock<GetVideoCompressionSizeLimitUseCase>()
     private val isChargingRequiredForVideoCompressionUseCase =
@@ -24,7 +17,7 @@ class DefaultIsChargingRequiredTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultIsChargingRequired(
+        underTest = IsChargingRequiredUseCase(
             getVideoCompressionSizeLimitUseCase = getVideoCompressionSizeLimitUseCase,
             isChargingRequiredForVideoCompressionUseCase = isChargingRequiredForVideoCompressionUseCase,
         )

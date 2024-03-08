@@ -69,7 +69,6 @@ import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
-import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
@@ -91,6 +90,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUs
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HandleLocalIpChangeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorStorageOverQuotaUseCase
@@ -158,7 +158,7 @@ class CameraUploadsWorkerTest {
     private val isWifiNotSatisfiedUseCase: IsWifiNotSatisfiedUseCase = mock()
     private val setPrimaryFolderLocalPathUseCase: SetPrimaryFolderLocalPathUseCase = mock()
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase = mock()
-    private val isChargingRequired: IsChargingRequired = mock()
+    private val isChargingRequiredUseCase: IsChargingRequiredUseCase = mock()
     private val getUploadFolderHandleUseCase: GetUploadFolderHandleUseCase = mock()
     private val setPrimarySyncHandle: SetPrimarySyncHandle = mock()
     private val setSecondarySyncHandle: SetSecondarySyncHandle = mock()
@@ -262,7 +262,7 @@ class CameraUploadsWorkerTest {
                 isWifiNotSatisfiedUseCase = isWifiNotSatisfiedUseCase,
                 setPrimaryFolderLocalPathUseCase = setPrimaryFolderLocalPathUseCase,
                 setSecondaryFolderLocalPathUseCase = setSecondaryFolderLocalPathUseCase,
-                isChargingRequired = isChargingRequired,
+                isChargingRequiredUseCase = isChargingRequiredUseCase,
                 getUploadFolderHandleUseCase = getUploadFolderHandleUseCase,
                 setPrimarySyncHandle = setPrimarySyncHandle,
                 setSecondarySyncHandle = setSecondarySyncHandle,
@@ -970,7 +970,7 @@ class CameraUploadsWorkerTest {
             whenever(getPendingCameraUploadsRecordsUseCase()).thenReturn(list)
             whenever(getUploadVideoQualityUseCase()).thenReturn(VideoQuality.LOW)
             whenever(getFileByPathUseCase(videoRecord.filePath)).thenReturn(videoFile)
-            whenever(isChargingRequired(size)).thenReturn(true)
+            whenever(isChargingRequiredUseCase(size)).thenReturn(true)
             whenever(monitorBatteryInfoUseCase()).thenReturn(
                 flowOf(BatteryInfo(100, false))
             )
@@ -1003,7 +1003,7 @@ class CameraUploadsWorkerTest {
             whenever(getPendingCameraUploadsRecordsUseCase()).thenReturn(expected)
             whenever(getUploadVideoQualityUseCase()).thenReturn(VideoQuality.LOW)
             whenever(getFileByPathUseCase(videoRecord.filePath)).thenReturn(videoFile)
-            whenever(isChargingRequired(size)).thenReturn(true)
+            whenever(isChargingRequiredUseCase(size)).thenReturn(true)
             whenever(monitorBatteryInfoUseCase()).thenReturn(
                 flowOf(BatteryInfo(100, true))
             )

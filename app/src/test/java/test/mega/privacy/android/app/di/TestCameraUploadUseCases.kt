@@ -13,7 +13,6 @@ import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
-import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
@@ -30,9 +29,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideGetNodeByFingerprint() = mock<GetNodeByFingerprintUseCase>()
-
-    @Provides
-    fun provideIsChargingRequired() = mock<IsChargingRequired>()
 
     @Provides
     fun provideSetPrimarySyncHandle() = mock<SetPrimarySyncHandle>()

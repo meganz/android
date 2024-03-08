@@ -79,7 +79,6 @@ import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
-import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
@@ -101,6 +100,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUs
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HandleLocalIpChangeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorStorageOverQuotaUseCase
@@ -147,7 +147,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val isWifiNotSatisfiedUseCase: IsWifiNotSatisfiedUseCase,
     private val setPrimaryFolderLocalPathUseCase: SetPrimaryFolderLocalPathUseCase,
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase,
-    private val isChargingRequired: IsChargingRequired,
+    private val isChargingRequiredUseCase: IsChargingRequiredUseCase,
     private val getUploadFolderHandleUseCase: GetUploadFolderHandleUseCase,
     private val setPrimarySyncHandle: SetPrimarySyncHandle,
     private val setSecondarySyncHandle: SetSecondarySyncHandle,
@@ -1382,7 +1382,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     private suspend fun canCompressVideo(queueSize: Long): Boolean =
-        (monitorBatteryInfoUseCase().first().isCharging || !isChargingRequired(queueSize)).also {
+        (monitorBatteryInfoUseCase().first().isCharging || !isChargingRequiredUseCase(queueSize)).also {
             if (!it) Timber.d("Charging required for video compression of $queueSize MB")
         }
 
