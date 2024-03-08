@@ -9,6 +9,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
+import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
+import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.management.ManagementMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.InvalidMetaMessage
@@ -53,6 +55,34 @@ class ForwardMessageActionTest {
     @Test
     fun `test that action applies to non management messages`() {
         assertThat(underTest.appliesTo(setOf(mock<NormalMessage>()))).isTrue()
+    }
+
+    @Test
+    fun `test that action applies to node attachment messages that exists`() {
+        assertThat(underTest.appliesTo(setOf(mock<NodeAttachmentMessage> {
+            on { exists } doReturn true
+        }))).isTrue()
+    }
+
+    @Test
+    fun `test that action applies to voice clip messages that exists`() {
+        assertThat(underTest.appliesTo(setOf(mock<VoiceClipMessage> {
+            on { exists } doReturn true
+        }))).isTrue()
+    }
+
+    @Test
+    fun `test that action does not apply to node attachment messages that does not exists`() {
+        assertThat(underTest.appliesTo(setOf(mock<NodeAttachmentMessage> {
+            on { exists } doReturn false
+        }))).isFalse()
+    }
+
+    @Test
+    fun `test that action does not apply to voice clip messages that does not exists`() {
+        assertThat(underTest.appliesTo(setOf(mock<VoiceClipMessage> {
+            on { exists } doReturn false
+        }))).isFalse()
     }
 
     @Test

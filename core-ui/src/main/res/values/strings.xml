@@ -15,4 +15,5 @@
     <string name="slide_to_cancel">Slide to cancel</string>
     <string name="general_cancel">Cancel</string>
     <string name="recording_less_than_second"/>
+    <string name="error_message_voice_clip"/>
 </resources>

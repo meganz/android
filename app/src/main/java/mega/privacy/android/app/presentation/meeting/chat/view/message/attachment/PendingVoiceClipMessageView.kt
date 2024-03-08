@@ -23,7 +23,7 @@ fun PendingVoiceClipMessageView(
         isMe = message.isMine,
         timestamp = uiState.duration ?: "",
         modifier = modifier,
-        isError = uiState.isError,
+        exists = true,
         loadProgress = uiState.loadProgress?.floatValue,
         interactionEnabled = false,
     )

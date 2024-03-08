@@ -60,6 +60,12 @@ sealed interface MultiTransferEvent {
          */
         val isFileTransferEvent by lazy { !transferEvent.transfer.isFolderTransfer }
 
+        /**
+         * Returns true if the transfer finished with error.
+         */
+        val finishedWithError by lazy {
+            transferEvent is TransferEvent.TransferFinishEvent && transferEvent.error != null
+        }
 
         /**
          * Current overall progress of all the initiated transfers. May be inaccurate since some nodes may not have been processed yet, and therefore, totalBytesToTransfer could be inaccurate.
