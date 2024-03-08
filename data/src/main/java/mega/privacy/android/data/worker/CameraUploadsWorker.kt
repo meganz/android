@@ -78,18 +78,18 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectoryUseCase
-import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
-import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
+import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
+import mega.privacy.android.domain.usecase.camerauploads.DisableMediaUploadsSettingsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DoesCameraUploadsRecordExistsInTargetNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ExtractGpsCoordinatesUseCase
@@ -166,7 +166,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val setupSecondaryFolderUseCase: SetupSecondaryFolderUseCase,
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
     private val resetTotalUploadsUseCase: ResetTotalUploadsUseCase,
-    private val disableMediaUploadSettings: DisableMediaUploadSettings,
+    private val disableMediaUploadSettingsUseCase: DisableMediaUploadsSettingsUseCase,
     private val createCameraUploadTemporaryRootDirectoryUseCase: CreateCameraUploadTemporaryRootDirectoryUseCase,
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase,
     private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
@@ -1129,7 +1129,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun handleInvalidLocalSecondaryFolder() {
         sendFolderUnavailableStatus(CameraUploadFolderType.Secondary)
-        disableMediaUploadSettings()
+        disableMediaUploadSettingsUseCase()
         setSecondaryFolderLocalPathUseCase("")
         broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.DisableMediaUploads)
     }

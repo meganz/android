@@ -68,7 +68,6 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectoryUseCase
-import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
@@ -80,6 +79,7 @@ import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
+import mega.privacy.android.domain.usecase.camerauploads.DisableMediaUploadsSettingsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DoesCameraUploadsRecordExistsInTargetNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ExtractGpsCoordinatesUseCase
@@ -177,7 +177,7 @@ class CameraUploadsWorkerTest {
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase =
         mock()
     private val resetTotalUploadsUseCase: ResetTotalUploadsUseCase = mock()
-    private val disableMediaUploadSettings: DisableMediaUploadSettings = mock()
+    private val disableMediaUploadSettingsUseCase: DisableMediaUploadsSettingsUseCase = mock()
     private val createCameraUploadTemporaryRootDirectoryUseCase: CreateCameraUploadTemporaryRootDirectoryUseCase =
         mock()
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase =
@@ -281,7 +281,7 @@ class CameraUploadsWorkerTest {
                 setupSecondaryFolderUseCase = setupSecondaryFolderUseCase,
                 establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
                 resetTotalUploadsUseCase = resetTotalUploadsUseCase,
-                disableMediaUploadSettings = disableMediaUploadSettings,
+                disableMediaUploadSettingsUseCase = disableMediaUploadSettingsUseCase,
                 createCameraUploadTemporaryRootDirectoryUseCase = createCameraUploadTemporaryRootDirectoryUseCase,
                 deleteCameraUploadsTemporaryRootDirectoryUseCase = deleteCameraUploadsTemporaryRootDirectoryUseCase,
                 scheduleCameraUploadUseCase = scheduleCameraUploadUseCase,
@@ -1113,7 +1113,7 @@ class CameraUploadsWorkerTest {
 
             underTest.doWork()
 
-            verify(disableMediaUploadSettings).invoke()
+            verify(disableMediaUploadSettingsUseCase).invoke()
             verify(setSecondaryFolderLocalPathUseCase).invoke("")
             verify(broadcastCameraUploadsSettingsActionUseCase).invoke(CameraUploadsSettingsAction.DisableMediaUploads)
             verify(underTest).setProgress(

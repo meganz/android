@@ -23,7 +23,6 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
-import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.backup.MonitorBackupInfoTypeUseCase
@@ -31,6 +30,7 @@ import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpi
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
+import mega.privacy.android.domain.usecase.camerauploads.DisableMediaUploadsSettingsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
@@ -119,7 +119,7 @@ class LegacySettingsCameraUploadsViewModel @Inject constructor(
     private val areUploadFileNamesKeptUseCase: AreUploadFileNamesKeptUseCase,
     private val checkEnableCameraUploadsStatusUseCase: CheckEnableCameraUploadsStatusUseCase,
     private val clearCacheDirectory: ClearCacheDirectory,
-    private val disableMediaUploadSettings: DisableMediaUploadSettings,
+    private val disableMediaUploadsSettingsUseCase: DisableMediaUploadsSettingsUseCase,
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
     private val getUploadOptionUseCase: GetUploadOptionUseCase,
     private val getUploadVideoQualityUseCase: GetUploadVideoQualityUseCase,
@@ -338,7 +338,7 @@ class LegacySettingsCameraUploadsViewModel @Inject constructor(
     }
 
     private suspend fun resetAndDisableMediaUploads() {
-        disableMediaUploadSettings()
+        disableMediaUploadsSettingsUseCase()
     }
 
     /**

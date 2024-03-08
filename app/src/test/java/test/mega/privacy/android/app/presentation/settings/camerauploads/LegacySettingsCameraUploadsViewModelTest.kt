@@ -21,13 +21,13 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
-import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
+import mega.privacy.android.domain.usecase.camerauploads.DisableMediaUploadsSettingsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
@@ -99,7 +99,7 @@ internal class LegacySettingsCameraUploadsViewModelTest {
     private val checkEnableCameraUploadsStatusUseCase =
         mock<CheckEnableCameraUploadsStatusUseCase>()
     private val clearCacheDirectory = mock<ClearCacheDirectory>()
-    private val disableMediaUploadSettings = mock<DisableMediaUploadSettings>()
+    private val disableMediaUploadsSettingsUseCase = mock<DisableMediaUploadsSettingsUseCase>()
     private val getPrimaryFolderPathUseCase = mock<GetPrimaryFolderPathUseCase>()
     private val getUploadOptionUseCase = mock<GetUploadOptionUseCase>()
     private val getUploadVideoQualityUseCase = mock<GetUploadVideoQualityUseCase>()
@@ -155,7 +155,7 @@ internal class LegacySettingsCameraUploadsViewModelTest {
             areUploadFileNamesKeptUseCase,
             checkEnableCameraUploadsStatusUseCase,
             clearCacheDirectory,
-            disableMediaUploadSettings,
+            disableMediaUploadsSettingsUseCase,
             getPrimaryFolderPathUseCase,
             getUploadOptionUseCase,
             getUploadVideoQualityUseCase,
@@ -211,7 +211,7 @@ internal class LegacySettingsCameraUploadsViewModelTest {
             areUploadFileNamesKeptUseCase = areUploadFileNamesKeptUseCase,
             checkEnableCameraUploadsStatusUseCase = checkEnableCameraUploadsStatusUseCase,
             clearCacheDirectory = clearCacheDirectory,
-            disableMediaUploadSettings = disableMediaUploadSettings,
+            disableMediaUploadsSettingsUseCase = disableMediaUploadsSettingsUseCase,
             getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
             getUploadOptionUseCase = getUploadOptionUseCase,
             getUploadVideoQualityUseCase = getUploadVideoQualityUseCase,
@@ -628,7 +628,7 @@ internal class LegacySettingsCameraUploadsViewModelTest {
             underTest.toggleMediaUploads()
             // disable media upload
             underTest.toggleMediaUploads()
-            verify(disableMediaUploadSettings).invoke()
+            verify(disableMediaUploadsSettingsUseCase).invoke()
         }
 
     @Test

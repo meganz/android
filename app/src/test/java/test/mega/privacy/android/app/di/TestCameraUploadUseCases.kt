@@ -12,7 +12,6 @@ import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
-import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
@@ -40,9 +39,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideClearCacheDirectory() = mock<ClearCacheDirectory>()
-
-    @Provides
-    fun provideDisableMediaUploadSettings() = mock<DisableMediaUploadSettings>()
 
     @Provides
     fun provideCreateCameraUploadFolder() = mock<CreateCameraUploadFolder>()
