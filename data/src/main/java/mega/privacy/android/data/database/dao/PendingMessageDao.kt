@@ -7,6 +7,8 @@ import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.database.entity.chat.PendingMessageEntity
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateAndNodeHandleRequest
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 
 /**
  * Pending message dao
@@ -24,12 +26,20 @@ interface PendingMessageDao {
     suspend fun insert(pendingMessageEntity: PendingMessageEntity): Long
 
     /**
-     * Update
+     * Update the pending message
      *
-     * @param pendingMessageEntity
+     * @param updatePendingMessageStateRequest
      */
-    @Update
-    suspend fun update(pendingMessageEntity: PendingMessageEntity)
+    @Update(entity = PendingMessageEntity::class)
+    suspend fun update(updatePendingMessageStateRequest: UpdatePendingMessageStateRequest)
+
+    /**
+     * Update the pending message
+     *
+     * @param updatePendingMessageStateAndNodeHandleRequest
+     */
+    @Update(entity = PendingMessageEntity::class)
+    suspend fun update(updatePendingMessageStateAndNodeHandleRequest: UpdatePendingMessageStateAndNodeHandleRequest)
 
     /**
      * Delete

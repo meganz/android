@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaChatError
@@ -277,18 +278,10 @@ class ChatMessageRepositoryImplTest {
     }
 
     @Test
-    fun `test that updatePendingMessage saves the mapped entities`() = runTest {
-        val savePendingMessageRequest = mock<SavePendingMessageRequest> {
-            on { state } doReturn mock()
-            on { filePath } doReturn "file"
-        }
-        val pendingMessageId = 23L
-        val pendingMessageEntity = mock<PendingMessageEntity>()
-        val expected = pendingMessageEntity.copy(pendingMessageId = pendingMessageId)
-        whenever(pendingMessageEntityMapper(savePendingMessageRequest))
-            .thenReturn(pendingMessageEntity)
-        underTest.updatePendingMessage(pendingMessageId, savePendingMessageRequest)
-        verify(chatStorageGateway).updatePendingMessage(eq(expected))
+    fun `test that updatePendingMessage invokes gateway update`() = runTest {
+        val updatePendingMessageRequest = mock<UpdatePendingMessageStateRequest>()
+        underTest.updatePendingMessage(updatePendingMessageRequest)
+        verify(chatStorageGateway).updatePendingMessage(updatePendingMessageRequest)
     }
 
     @Test

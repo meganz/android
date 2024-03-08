@@ -1,8 +1,8 @@
 package mega.privacy.android.domain.usecase.chat.message
 
-import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
-import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateAndNodeHandleRequest
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
@@ -21,6 +21,7 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val createSaveSentMessageRequestUseCase: CreateSaveSentMessageRequestUseCase,
     private val setNodeAttributesAfterUploadUseCase: SetNodeAttributesAfterUploadUseCase,
+    private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
 ) {
     /**
      * Invoke
@@ -33,9 +34,12 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
         chatMessageRepository.getPendingMessage(pendingMessageId)
             ?.let { pendingMessage ->
                 chatMessageRepository.cacheOriginalPathForNode(nodeId, pendingMessage.filePath)
-                pendingMessage.updateState(
-                    PendingMessageState.ATTACHING,
-                    nodeId.longValue,
+                updatePendingMessageUseCase(
+                    UpdatePendingMessageStateAndNodeHandleRequest(
+                        pendingMessageId = pendingMessage.id,
+                        state = PendingMessageState.ATTACHING,
+                        nodeHandle = nodeId.longValue,
+                    )
                 )
                 runCatching {
                     setNodeAttributesAfterUploadUseCase(
@@ -56,33 +60,13 @@ class AttachNodeWithPendingMessageUseCase @Inject constructor(
                         chatMessageRepository.deletePendingMessage(pendingMessage)
                     }
                 } ?: run {
-                    pendingMessage.updateState(
-                        PendingMessageState.ERROR_ATTACHING,
-                        nodeId.longValue,
+                    updatePendingMessageUseCase(
+                        UpdatePendingMessageStateRequest(
+                            pendingMessageId = pendingMessage.id,
+                            state = PendingMessageState.ERROR_ATTACHING,
+                        )
                     )
                 }
             }
-    }
-
-    private suspend fun PendingMessage.updateState(
-        state: PendingMessageState,
-        nodeHandle: Long,
-    ) {
-        chatMessageRepository.updatePendingMessage(
-            this.id,
-            SavePendingMessageRequest(
-                chatId = this.chatId,
-                type = this.type,
-                uploadTimestamp = this.uploadTimestamp,
-                state = state,
-                tempIdKarere = this.tempIdKarere,
-                videoDownSampled = this.videoDownSampled,
-                filePath = this.filePath,
-                nodeHandle = nodeHandle,
-                fingerprint = this.fingerprint,
-                name = this.name,
-                transferTag = this.transferTag,
-            )
-        )
     }
 }

@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -144,13 +145,10 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updatePendingMessage(
-        pendingMessageId: Long,
-        savePendingMessageRequest: SavePendingMessageRequest,
+        updatePendingMessageRequest: UpdatePendingMessageRequest,
     ) {
         return withContext(ioDispatcher) {
-            val pendingMessage =
-                pendingMessageEntityMapper(savePendingMessageRequest).copy(pendingMessageId = pendingMessageId)
-            chatStorageGateway.updatePendingMessage(pendingMessage)
+            chatStorageGateway.updatePendingMessage(updatePendingMessageRequest)
         }
     }
 

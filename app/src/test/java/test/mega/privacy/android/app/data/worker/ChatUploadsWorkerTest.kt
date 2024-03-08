@@ -22,12 +22,16 @@ import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.worker.AreNotificationsEnabledUseCase
 import mega.privacy.android.data.worker.ChatUploadsWorker
 import mega.privacy.android.domain.entity.chat.PendingMessage
+import mega.privacy.android.domain.entity.chat.PendingMessageState
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
+import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
@@ -73,6 +77,7 @@ class ChatUploadsWorkerTest {
         mock<ClearActiveTransfersIfFinishedUseCase>()
     private val chatUploadNotificationMapper = mock<ChatUploadNotificationMapper>()
     private val chatMessageRepository = mock<ChatMessageRepository>()
+    private val updatePendingMessageUseCase = mock<UpdatePendingMessageUseCase>()
 
     @Before
     fun init() {
@@ -114,28 +119,73 @@ class ChatUploadsWorkerTest {
             clearActiveTransfersIfFinishedUseCase,
             chatUploadNotificationMapper,
             attachNodeWithPendingMessageUseCase,
+            updatePendingMessageUseCase,
         )
     }
 
     @Test
     fun `test that node is attached to chat once upload is finished`() = runTest {
-        val pendingMsgId = 16L
-        val chatId = 124L
-        val nodeId = 1353L
-        val appData = TransferAppData.ChatUpload(pendingMsgId)
+        val finishEvent = commonStub()
+
+        underTest.onTransferEventReceived(finishEvent)
+
+        verify(attachNodeWithPendingMessageUseCase).invoke(PENDING_MSG_ID, NodeId(NODE_ID))
+    }
+
+    @Test
+    fun `test that pending message is updated to error uploading if the upload fails`() = runTest {
+        val finishEvent = commonStub(true)
+
+        underTest.onTransferEventReceived(finishEvent)
+
+        verify(updatePendingMessageUseCase).invoke(
+            UpdatePendingMessageStateRequest(
+                PENDING_MSG_ID,
+                state = PendingMessageState.ERROR_UPLOADING
+            )
+        )
+    }
+
+    @Test
+    fun `test that pending message is updated to error attaching if the attach fails`() = runTest {
+        val finishEvent = commonStub()
+        whenever(
+            attachNodeWithPendingMessageUseCase(
+                PENDING_MSG_ID,
+                NodeId(NODE_ID),
+            )
+        ).thenThrow(RuntimeException::class.java)
+
+        underTest.onTransferEventReceived(finishEvent)
+
+        verify(updatePendingMessageUseCase).invoke(
+            UpdatePendingMessageStateRequest(
+                PENDING_MSG_ID,
+                state = PendingMessageState.ERROR_ATTACHING
+            )
+        )
+    }
+
+    private suspend fun commonStub(withError: Boolean = false): TransferEvent.TransferFinishEvent {
+        val appData = TransferAppData.ChatUpload(PENDING_MSG_ID)
         val transfer = mock<Transfer> {
             on { this.appData } doReturn listOf(appData)
-            on { this.nodeHandle } doReturn nodeId
+            on { this.nodeHandle } doReturn NODE_ID
         }
+        val error = if (withError) mock<MegaException>() else null
         val finishEvent = mock<TransferEvent.TransferFinishEvent> {
             on { this.transfer } doReturn transfer
+            on { this.error } doReturn error
         }
         val pendingMsg = mock<PendingMessage> {
-            on { id } doReturn pendingMsgId
-            on { this.chatId } doReturn chatId
+            on { id } doReturn PENDING_MSG_ID
+            on { this.chatId } doReturn CHAT_ID
         }
-        whenever(chatMessageRepository.getPendingMessage(pendingMsgId)).thenReturn(pendingMsg)
-        underTest.onTransferEventReceived(finishEvent)
-        verify(attachNodeWithPendingMessageUseCase).invoke(pendingMsgId, NodeId(nodeId))
+        whenever(chatMessageRepository.getPendingMessage(PENDING_MSG_ID)).thenReturn(pendingMsg)
+        return finishEvent
     }
 }
+
+private const val PENDING_MSG_ID = 16L
+private const val CHAT_ID = 124L
+private const val NODE_ID = 1353L

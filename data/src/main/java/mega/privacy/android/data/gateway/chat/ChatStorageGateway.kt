@@ -10,6 +10,7 @@ import mega.privacy.android.data.database.entity.chat.PendingMessageEntity
 import mega.privacy.android.data.database.entity.chat.RichPreviewEntity
 import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
 import mega.privacy.android.domain.entity.chat.ChatMessageType
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageRequest
 
 /**
  * Chat storage gateway
@@ -70,9 +71,9 @@ interface ChatStorageGateway {
     /**
      * Update pending message
      *
-     * @param pendingMessage
+     * @param updatePendingMessageRequest
      */
-    suspend fun updatePendingMessage(pendingMessage: PendingMessageEntity)
+    suspend fun updatePendingMessage(updatePendingMessageRequest: UpdatePendingMessageRequest)
 
     /**
      * Delete pending message by id

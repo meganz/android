@@ -14,6 +14,9 @@ import mega.privacy.android.data.database.entity.chat.RichPreviewEntity
 import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
 import mega.privacy.android.data.gateway.chat.ChatStorageGateway
 import mega.privacy.android.domain.entity.chat.ChatMessageType
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageRequest
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateAndNodeHandleRequest
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import javax.inject.Inject
 
 /**
@@ -111,8 +114,14 @@ internal class ChatStorageFacade @Inject constructor(
         pendingMessageEntity: PendingMessageEntity,
     ) = database.pendingMessageDao().insert(pendingMessageEntity)
 
-    override suspend fun updatePendingMessage(pendingMessage: PendingMessageEntity) {
-        database.pendingMessageDao().update(pendingMessage)
+    override suspend fun updatePendingMessage(updatePendingMessageRequest: UpdatePendingMessageRequest) {
+        when (updatePendingMessageRequest) {
+            is UpdatePendingMessageStateRequest ->
+                database.pendingMessageDao().update(updatePendingMessageRequest)
+
+            is UpdatePendingMessageStateAndNodeHandleRequest ->
+                database.pendingMessageDao().update(updatePendingMessageRequest)
+        }
     }
 
     override suspend fun deletePendingMessage(pendingMessageId: Long) {

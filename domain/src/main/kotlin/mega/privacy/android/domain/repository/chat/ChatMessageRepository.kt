@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import mega.privacy.android.domain.entity.node.NodeId
 
@@ -203,14 +204,12 @@ interface ChatMessageRepository {
     suspend fun savePendingMessage(savePendingMessageRequest: SavePendingMessageRequest): PendingMessage
 
     /**
-     * Save pending message
+     * Update pending message
      *
-     * @param savePendingMessageRequest
-     * @return saved PendingMessage
+     * @param updatePendingMessageRequest
      */
     suspend fun updatePendingMessage(
-        pendingMessageId: Long,
-        savePendingMessageRequest: SavePendingMessageRequest,
+        updatePendingMessageRequest: UpdatePendingMessageRequest,
     )
 
     /**
