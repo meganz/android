@@ -208,7 +208,9 @@ class AlbumsViewModel @Inject constructor(
         val updatedUserUIAlbums = userUIAlbums.map { uiAlbum ->
             if ((uiAlbum.id as? Album.UserAlbum)?.id == userAlbum.id) {
                 val cover = uiAlbum.id.cover
-                val defaultCover = photos.maxByOrNull { it.modificationTime }
+                val defaultCover = photos.sortedWith((compareByDescending<Photo> {
+                    it.modificationTime
+                }.thenByDescending { it.id })).firstOrNull()
                 val imageVideoCount = getImageAndVideoCount(photos)
                 uiAlbumMapper(
                     count = photos.size,
