@@ -22,4 +22,12 @@ internal class NotificationsFacade @Inject constructor(
     }
 
     override suspend fun getEnabledNotifications(): MegaIntegerList? = megaApi.enabledNotifications
+    override fun setLastReadNotification(
+        notificationId: Long,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.setLastReadNotification(notificationId, listener)
+
+    override fun getLastReadNotificationId(listener: MegaRequestListenerInterface) {
+        return megaApi.getLastReadNotification(listener)
+    }
 }

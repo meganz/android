@@ -135,4 +135,19 @@ interface NotificationsRepository {
      * @return List of IDs for enabled notifications
      */
     suspend fun getEnabledNotifications(): List<Int>
+
+    /**
+     * Set last read notification for Notification Center
+     *
+     * @param notificationId ID of the notification to be set as last read. Value `0` is an invalid ID.
+     * Passing `0` will clear a previously set last read value.
+     */
+    suspend fun setLastReadNotification(notificationId: Long)
+
+    /**
+     * Get last read notification ID for Notification Center
+     *
+     * @return ID of the last read Notification
+     */
+    suspend fun getLastReadNotificationId(): Long
 }

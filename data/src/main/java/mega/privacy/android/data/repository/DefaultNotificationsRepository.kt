@@ -331,4 +331,41 @@ internal class DefaultNotificationsRepository @Inject constructor(
                 }
             }
         }
+
+    override suspend fun setLastReadNotification(notificationId: Long): Unit =
+        withContext(dispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("setLastReadNotification") {
+                    it.number
+                }
+                notificationsGateway.setLastReadNotification(notificationId, listener)
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
+
+    override suspend fun getLastReadNotificationId(): Long =
+        withContext(dispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request, error ->
+                        when (error.errorCode) {
+                            MegaError.API_OK -> {
+                                continuation.resumeWith(Result.success(request.number))
+                            }
+
+                            else -> {
+                                Timber.e("Error getting last read notification: ${error.errorString}")
+                                continuation.failWithError(error, "getLastReadNotificationId")
+                            }
+                        }
+                    }
+                )
+                notificationsGateway.getLastReadNotificationId(listener)
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
 }
