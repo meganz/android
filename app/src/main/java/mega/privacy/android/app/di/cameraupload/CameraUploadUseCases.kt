@@ -14,12 +14,10 @@ import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.DefaultDisableMediaUploadSettings
-import mega.privacy.android.domain.usecase.DefaultIsNotEnoughQuota
 import mega.privacy.android.domain.usecase.DefaultSetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.DefaultSetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
-import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 
@@ -64,12 +62,6 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindSetSecondarySyncHandle(setSecondarySyncHandle: DefaultSetSecondarySyncHandle): SetSecondarySyncHandle
-
-    /**
-     * Provide the [IsNotEnoughQuota] implementation
-     */
-    @Binds
-    abstract fun bindIsNotEnoughQuota(isNotEnoughQuota: DefaultIsNotEnoughQuota): IsNotEnoughQuota
 
     /**
      * Provide the [DisableMediaUploadSettings] implementation

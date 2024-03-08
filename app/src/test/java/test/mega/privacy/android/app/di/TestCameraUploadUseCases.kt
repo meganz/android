@@ -14,7 +14,6 @@ import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
-import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.camerauploads.GetNodeByFingerprintUseCase
@@ -44,9 +43,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideDisableMediaUploadSettings() = mock<DisableMediaUploadSettings>()
-
-    @Provides
-    fun provideIsNotEnoughQuota() = mock<IsNotEnoughQuota>()
 
     @Provides
     fun provideCreateCameraUploadFolder() = mock<CreateCameraUploadFolder>()

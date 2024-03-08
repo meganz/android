@@ -79,8 +79,8 @@ import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
-import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
@@ -138,7 +138,7 @@ import java.util.Hashtable
 class CameraUploadsWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val isNotEnoughQuota: IsNotEnoughQuota,
+    private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase,
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
     private val isPrimaryFolderPathValidUseCase: IsPrimaryFolderPathValidUseCase,
     private val isSecondaryFolderSetUseCase: IsSecondaryFolderSetUseCase,
@@ -587,7 +587,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      *
      * @return true if the device has not enough cloud storage space
      */
-    private suspend fun isStorageQuotaExceeded() = isNotEnoughQuota().also {
+    private fun isStorageQuotaExceeded() = isStorageOverQuotaUseCase().also {
         if (it) Timber.e("Storage Quota exceeded")
     }
 

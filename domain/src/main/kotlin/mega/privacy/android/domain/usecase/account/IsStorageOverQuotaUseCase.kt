@@ -1,17 +1,20 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.account
 
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import javax.inject.Inject
 
 /**
- * Default not enough quota
+ * Check if the storage is over quota
  *
  * @property monitorStorageStateEventUseCase
  */
-class DefaultIsNotEnoughQuota @Inject constructor(
+class IsStorageOverQuotaUseCase @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
-) : IsNotEnoughQuota {
-    override suspend fun invoke() =
+) {
+    /**
+     * Invoke
+     */
+    operator fun invoke() =
         monitorStorageStateEventUseCase().value.storageState == StorageState.Red
 }

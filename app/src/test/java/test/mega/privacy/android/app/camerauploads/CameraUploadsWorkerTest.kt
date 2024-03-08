@@ -69,8 +69,8 @@ import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
-import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
@@ -148,7 +148,7 @@ class CameraUploadsWorkerTest {
     private lateinit var workExecutor: WorkManagerTaskExecutor
     private lateinit var workDatabase: WorkDatabase
 
-    private val isNotEnoughQuota: IsNotEnoughQuota = mock()
+    private val isStorageOverQuotaUseCase: IsStorageOverQuotaUseCase = mock()
     private val ioDispatcher = UnconfinedTestDispatcher()
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase = mock()
     private val isPrimaryFolderPathValidUseCase: IsPrimaryFolderPathValidUseCase = mock()
@@ -253,7 +253,7 @@ class CameraUploadsWorkerTest {
                         { _, _ -> }, workExecutor
                     )
                 ),
-                isNotEnoughQuota = isNotEnoughQuota,
+                isStorageOverQuotaUseCase = isStorageOverQuotaUseCase,
                 getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
                 isPrimaryFolderPathValidUseCase = isPrimaryFolderPathValidUseCase,
                 isSecondaryFolderSetUseCase = isSecondaryFolderSetUseCase,
@@ -333,7 +333,7 @@ class CameraUploadsWorkerTest {
         // mock check preconditions
         whenever(hasMediaPermissionUseCase()).thenReturn(true)
         whenever(loginMutex.isLocked).thenReturn(false)
-        whenever(isNotEnoughQuota()).thenReturn(false)
+        whenever(isStorageOverQuotaUseCase()).thenReturn(false)
         whenever(isCameraUploadsEnabledUseCase()).thenReturn(true)
         whenever(isWifiNotSatisfiedUseCase()).thenReturn(false)
         whenever(getPrimaryFolderPathUseCase()).thenReturn(primaryLocalPath)
@@ -1388,7 +1388,7 @@ class CameraUploadsWorkerTest {
 
     @Test
     fun `test that worker returns failure when quota is not enough`() = runTest {
-        whenever(isNotEnoughQuota.invoke()).thenReturn(true)
+        whenever(isStorageOverQuotaUseCase.invoke()).thenReturn(true)
 
         val result = underTest.doWork()
 
@@ -1404,7 +1404,7 @@ class CameraUploadsWorkerTest {
     @Test
     fun `test that worker is rescheduled when quota is not enough`() =
         runTest {
-            whenever(isNotEnoughQuota.invoke()).thenReturn(true)
+            whenever(isStorageOverQuotaUseCase.invoke()).thenReturn(true)
 
             underTest.doWork()
 
