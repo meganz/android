@@ -81,12 +81,6 @@ interface DeviceGateway {
     val nanoTime: Long
 
     /**
-     * isCharging
-     * @return [Boolean] whether device is charging or not
-     */
-    suspend fun isCharging(): Boolean
-
-    /**
      * Get Local Ip Address
      * @return [String]
      */
@@ -113,12 +107,7 @@ interface DeviceGateway {
     val monitorBatteryInfo: Flow<BatteryInfo>
 
     /**
-     * Monitor charging state
-     */
-    val monitorChargingStoppedState: Flow<Boolean>
-
-    /**
      * Monitor thermal state
      */
-    fun monitorThermalState(): Flow<Int>
+    val monitorThermalState: Flow<Int>
 }

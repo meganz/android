@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
@@ -32,7 +33,7 @@ import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinatesUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
+import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPreviewUseCase
@@ -84,8 +85,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
     private val addCompletedTransferUseCase: AddCompletedTransferUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val fileSystemRepository: FileSystemRepository,
-    private val monitorChargingStoppedState: MonitorChargingStoppedState,
-    private val isChargingUseCase: IsChargingUseCase,
+    private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase,
     private val isChargingRequiredForVideoCompressionUseCase: IsChargingRequiredForVideoCompressionUseCase,
 ) {
 
@@ -173,7 +173,9 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                         if (shouldCompressVideo) {
                             var isCompressionCancelled = false
                             videoCompressionSemaphore.acquire()
-                            if (isChargingRequiredForVideoCompression && isChargingUseCase().not()) {
+                            if (isChargingRequiredForVideoCompression
+                                && monitorBatteryInfoUseCase().first().isCharging.not()
+                            ) {
                                 videoCompressionSemaphore.release()
                                 semaphore.release()
                                 return@launch
@@ -181,8 +183,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                             channelFlow compression@{
                                 launch {
                                     flow {
-                                        emit(isChargingUseCase())
-                                        emitAll(monitorChargingStoppedState().map { !it })
+                                        emitAll(monitorBatteryInfoUseCase().map { it.isCharging })
                                     }.collect { isCharging ->
                                         if (isChargingRequiredForVideoCompression && !isCharging) {
                                             isCompressionCancelled = true

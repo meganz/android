@@ -564,17 +564,6 @@ class DefaultCameraUploadRepositoryTest {
                 )
             }
 
-        @ParameterizedTest(name = "device charging: {0}")
-        @ValueSource(booleans = [true, false])
-        fun `test that charging state is correctly returned`(
-            isCharging: Boolean,
-        ) =
-            runTest {
-                whenever(deviceGateway.isCharging()).thenReturn(isCharging)
-                val actual = underTest.isCharging()
-                assertThat(actual).isEqualTo(isCharging)
-            }
-
         @Test
         fun `test that the video compression size limit is retrieved`() = runTest {
             val testSizeLimit = 300

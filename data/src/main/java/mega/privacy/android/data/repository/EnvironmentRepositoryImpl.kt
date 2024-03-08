@@ -96,7 +96,7 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
     }
 
     override fun monitorThermalState() =
-        deviceGateway.monitorThermalState().map { thermalStateMapper(it) }
+        deviceGateway.monitorThermalState.map { thermalStateMapper(it) }
 
     override fun monitorBatteryInfo() =
         deviceGateway.monitorBatteryInfo

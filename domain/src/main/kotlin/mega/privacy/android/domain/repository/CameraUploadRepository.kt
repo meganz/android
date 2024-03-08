@@ -283,11 +283,6 @@ interface CameraUploadRepository {
     suspend fun getCameraUploadsSyncHandles(): Pair<Long, Long>?
 
     /**
-     * monitor charging stopped info
-     */
-    fun monitorChargingStoppedInfo(): Flow<Boolean>
-
-    /**
      * Monitor camera upload folder icon updates
      */
     fun monitorCameraUploadsFolderDestination(): Flow<CameraUploadsFolderDestinationUpdate>
@@ -432,12 +427,6 @@ interface CameraUploadRepository {
         latitude: Double,
         longitude: Double,
     )
-
-    /**
-     * isCharging
-     * @return [Boolean] whether device is charging or not
-     */
-    suspend fun isCharging(): Boolean
 
     /**
      * Get backup folder Id

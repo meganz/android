@@ -6,12 +6,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
@@ -28,7 +28,7 @@ import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinatesUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
+import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.CreateImageOrVideoPreviewUseCase
@@ -38,7 +38,6 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.DeleteThumbnailUseCa
 import mega.privacy.android.domain.usecase.transfers.completed.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadUseCase
 import mega.privacy.android.domain.usecase.video.CompressVideoUseCase
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -85,8 +84,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
     private val fileSystemRepository = mock<FileSystemRepository>()
     private val addCompletedTransferUseCase = mock<AddCompletedTransferUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
-    private val monitorChargingStoppedState: MonitorChargingStoppedState = mock()
-    private val isChargingUseCase: IsChargingUseCase = mock()
+    private val monitorBatteryInfoUseCase = mock<MonitorBatteryInfoUseCase>()
     private val isChargingRequiredForVideoCompressionUseCase: IsChargingRequiredForVideoCompressionUseCase =
         mock()
 
@@ -138,8 +136,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
             fileSystemRepository = fileSystemRepository,
             addCompletedTransferUseCase = addCompletedTransferUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
-            monitorChargingStoppedState = monitorChargingStoppedState,
-            isChargingUseCase = isChargingUseCase,
+            monitorBatteryInfoUseCase = monitorBatteryInfoUseCase,
             isChargingRequiredForVideoCompressionUseCase = isChargingRequiredForVideoCompressionUseCase
         )
     }
@@ -1059,7 +1056,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
             val quality = VideoQuality.HIGH
             whenever(getUploadVideoQualityUseCase()).thenReturn(quality)
             setInput(cameraUploadFolderType, type = CameraUploadsRecordType.TYPE_VIDEO)
-            whenever(isChargingUseCase()).thenReturn(false)
+            whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(100, false)))
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
             whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(true)
@@ -1080,9 +1077,13 @@ class UploadCameraUploadsRecordsUseCaseTest {
             setInput(cameraUploadFolderType, type = CameraUploadsRecordType.TYPE_VIDEO)
             val quality = VideoQuality.HIGH
             whenever(getUploadVideoQualityUseCase()).thenReturn(quality)
-            whenever(isChargingUseCase()).thenReturn(true)
             whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(true)
-            whenever(monitorChargingStoppedState()).thenReturn(flowOf(true, false))
+            whenever(monitorBatteryInfoUseCase()).thenReturn(
+                flowOf(
+                    BatteryInfo(100, true),
+                    BatteryInfo(100, false)
+                )
+            )
             whenever(compressVideoUseCase(tempRoot, record.filePath, record.tempFilePath, quality))
                 .thenReturn(flow {
                     emit(compressionEvents.first())
@@ -1110,9 +1111,8 @@ class UploadCameraUploadsRecordsUseCaseTest {
         ) = runTest {
             setInput(cameraUploadFolderType)
             val quality = VideoQuality.MEDIUM
-            whenever(isChargingUseCase()).thenReturn(false)
+            whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(100, false)))
             whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(false)
-            whenever(monitorChargingStoppedState()).thenReturn(emptyFlow())
             whenever(getUploadVideoQualityUseCase()).thenReturn(quality)
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)
@@ -1162,9 +1162,8 @@ class UploadCameraUploadsRecordsUseCaseTest {
         ) = runTest {
             setInput(cameraUploadFolderType, CameraUploadsRecordType.TYPE_VIDEO)
             val quality = VideoQuality.MEDIUM
-            whenever(isChargingUseCase()).thenReturn(false)
+            whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(100, false)))
             whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(false)
-            whenever(monitorChargingStoppedState()).thenReturn(emptyFlow())
             whenever(getUploadVideoQualityUseCase()).thenReturn(quality)
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(true)
@@ -1217,9 +1216,8 @@ class UploadCameraUploadsRecordsUseCaseTest {
         ) = runTest {
             setInput(cameraUploadFolderType, CameraUploadsRecordType.TYPE_VIDEO)
             val quality = VideoQuality.MEDIUM
-            whenever(isChargingUseCase()).thenReturn(false)
+            whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(100, false)))
             whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(false)
-            whenever(monitorChargingStoppedState()).thenReturn(emptyFlow())
             whenever(getUploadVideoQualityUseCase()).thenReturn(quality)
             whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(record.tempFilePath)).thenReturn(false)

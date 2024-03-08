@@ -91,7 +91,6 @@ import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUs
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HandleLocalIpChangeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsChargingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorStorageOverQuotaUseCase
@@ -190,7 +189,6 @@ class CameraUploadsWorkerTest {
     private val sendBackupHeartBeatSyncUseCase: SendBackupHeartBeatSyncUseCase = mock()
     private val updateCameraUploadsBackupHeartbeatStatusUseCase: UpdateCameraUploadsBackupHeartbeatStatusUseCase =
         mock()
-    private val isChargingUseCase: IsChargingUseCase = mock()
     private val monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase = mock()
     private val broadcastStorageOverQuotaUseCase: BroadcastStorageOverQuotaUseCase = mock()
     private val cameraUploadsNotificationManagerWrapper: CameraUploadsNotificationManagerWrapper =
@@ -290,7 +288,6 @@ class CameraUploadsWorkerTest {
                 updateCameraUploadsBackupStatesUseCase = updateCameraUploadsBackupStatesUseCase,
                 sendBackupHeartBeatSyncUseCase = sendBackupHeartBeatSyncUseCase,
                 updateCameraUploadsBackupHeartbeatStatusUseCase = updateCameraUploadsBackupHeartbeatStatusUseCase,
-                isChargingUseCase = isChargingUseCase,
                 monitorStorageOverQuotaUseCase = monitorStorageOverQuotaUseCase,
                 broadcastStorageOverQuotaUseCase = broadcastStorageOverQuotaUseCase,
                 hasMediaPermissionUseCase = hasMediaPermissionUseCase,
@@ -974,7 +971,9 @@ class CameraUploadsWorkerTest {
             whenever(getUploadVideoQualityUseCase()).thenReturn(VideoQuality.LOW)
             whenever(getFileByPathUseCase(videoRecord.filePath)).thenReturn(videoFile)
             whenever(isChargingRequired(size)).thenReturn(true)
-            whenever(isChargingUseCase()).thenReturn(false)
+            whenever(monitorBatteryInfoUseCase()).thenReturn(
+                flowOf(BatteryInfo(100, false))
+            )
 
             underTest.doWork()
 
@@ -1005,8 +1004,9 @@ class CameraUploadsWorkerTest {
             whenever(getUploadVideoQualityUseCase()).thenReturn(VideoQuality.LOW)
             whenever(getFileByPathUseCase(videoRecord.filePath)).thenReturn(videoFile)
             whenever(isChargingRequired(size)).thenReturn(true)
-            whenever(isChargingUseCase()).thenReturn(true)
-
+            whenever(monitorBatteryInfoUseCase()).thenReturn(
+                flowOf(BatteryInfo(100, true))
+            )
             underTest.doWork()
 
             verify(doesCameraUploadsRecordExistsInTargetNodeUseCase)

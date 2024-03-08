@@ -16,7 +16,6 @@ import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
-import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.camerauploads.GetNodeByFingerprintUseCase
@@ -52,9 +51,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideIsNotEnoughQuota() = mock<IsNotEnoughQuota>()
-
-    @Provides
-    fun provideMonitorChargingStoppedState() = mock<MonitorChargingStoppedState>()
 
     @Provides
     fun provideCreateCameraUploadFolder() = mock<CreateCameraUploadFolder>()

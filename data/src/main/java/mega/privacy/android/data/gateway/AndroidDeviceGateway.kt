@@ -3,7 +3,6 @@ package mega.privacy.android.data.gateway
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.BatteryManager
 import android.os.Build
@@ -81,13 +80,6 @@ internal class AndroidDeviceGateway @Inject constructor(
     override val nanoTime: Long
         get() = System.nanoTime()
 
-    override suspend fun isCharging(): Boolean {
-        val batteryIntent =
-            context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-        val status = batteryIntent?.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
-        return status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB || status == BatteryManager.BATTERY_PLUGGED_WIRELESS
-    }
-
     override suspend fun getLocalIpAddress(): String? {
         runCatching {
             val interfaces = NetworkInterface.getNetworkInterfaces()
@@ -116,7 +108,7 @@ internal class AndroidDeviceGateway @Inject constructor(
         return null
     }
 
-    override fun monitorThermalState() = channelFlow {
+    override val monitorThermalState = channelFlow {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val listener = PowerManager.OnThermalStatusChangedListener { status ->
                 trySend(status)
@@ -149,17 +141,6 @@ internal class AndroidDeviceGateway @Inject constructor(
             return@map BatteryInfo(level = level, isCharging = isCharging)
         }.catch {
             Timber.e(it, "MonitorBatteryInfo Exception")
-        }.toSharedFlow(appScope)
-
-    override val monitorChargingStoppedState =
-        context.registerReceiverAsFlow(
-            flags = ContextCompat.RECEIVER_EXPORTED,
-            Intent.ACTION_POWER_DISCONNECTED,
-        ).map {
-            Timber.d("Charging Stopped")
-            true
-        }.catch {
-            Timber.e(it, "MonitorChargingStoppedState Exception")
         }.toSharedFlow(appScope)
 }
 

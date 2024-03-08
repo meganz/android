@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.update
@@ -100,7 +101,6 @@ import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUs
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HandleLocalIpChangeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsChargingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorStorageOverQuotaUseCase
@@ -173,7 +173,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val updateCameraUploadsBackupStatesUseCase: UpdateCameraUploadsBackupStatesUseCase,
     private val sendBackupHeartBeatSyncUseCase: SendBackupHeartBeatSyncUseCase,
     private val updateCameraUploadsBackupHeartbeatStatusUseCase: UpdateCameraUploadsBackupHeartbeatStatusUseCase,
-    private val isChargingUseCase: IsChargingUseCase,
     private val monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase,
     private val broadcastStorageOverQuotaUseCase: BroadcastStorageOverQuotaUseCase,
     private val cameraUploadsNotificationManagerWrapper: CameraUploadsNotificationManagerWrapper,
@@ -1383,7 +1382,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     private suspend fun canCompressVideo(queueSize: Long): Boolean =
-        (isChargingUseCase() || !isChargingRequired(queueSize)).also {
+        (monitorBatteryInfoUseCase().first().isCharging || !isChargingRequired(queueSize)).also {
             if (!it) Timber.d("Charging required for video compression of $queueSize MB")
         }
 

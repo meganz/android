@@ -359,8 +359,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     override suspend fun broadcastCameraUploadsFolderDestination(data: CameraUploadsFolderDestinationUpdate) =
         appEventGateway.broadcastCameraUploadsFolderDestination(data)
 
-    override fun monitorChargingStoppedInfo() = deviceGateway.monitorChargingStoppedState
-
     override suspend fun renameNode(nodeHandle: Long, newName: String): Unit =
         withContext(ioDispatcher) {
             val node = megaApiGateway.getMegaNodeByHandle(nodeHandle)
@@ -512,10 +510,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
                 }
             }
         }
-
-    override suspend fun isCharging() = deviceGateway.isCharging().also {
-        Timber.d("Is Device charging $it")
-    }
 
     override suspend fun getBackupFolderId(cameraUploadFolderType: CameraUploadFolderType): Long? =
         withContext(ioDispatcher) {
