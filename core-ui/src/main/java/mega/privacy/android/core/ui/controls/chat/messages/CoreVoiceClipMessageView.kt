@@ -4,7 +4,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,21 +18,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import mega.privacy.android.core.R
-import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -73,12 +68,8 @@ fun CoreVoiceClipMessageView(
     playProgress: Float? = null,
     isPlaying: Boolean = false,
     onPlayClicked: () -> Unit = {},
-    onLongClick: () -> Unit = {},
     interactionEnabled: Boolean,
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
-    val snackbarHostState = LocalSnackBarHostState.current
     Box(
         modifier = modifier
             .size(width = 209.dp, height = 56.dp)
@@ -89,21 +80,7 @@ fun CoreVoiceClipMessageView(
                     isMe -> MegaTheme.colors.icon.accent
                     else -> MegaTheme.colors.background.surface2
                 }
-            )
-            .conditional(interactionEnabled) {
-                combinedClickable(
-                    onClick = {
-                        if (exists) {
-                            onPlayClicked()
-                        } else {
-                            coroutineScope.launch {
-                                snackbarHostState?.showSnackbar(context.getString(R.string.error_message_voice_clip))
-                            }
-                        }
-                    },
-                    onLongClick = onLongClick,
-                )
-            },
+            ),
         contentAlignment = Alignment.BottomCenter,
     ) {
         Row(
@@ -120,13 +97,7 @@ fun CoreVoiceClipMessageView(
                     if (loadProgress != null)
                         return@PlayButton
 
-                    if (exists) {
-                        onPlayClicked()
-                    } else {
-                        coroutineScope.launch {
-                            snackbarHostState?.showSnackbar(context.getString(R.string.error_message_voice_clip))
-                        }
-                    }
+                    onPlayClicked()
                 },
                 interactionEnabled = interactionEnabled,
             )
