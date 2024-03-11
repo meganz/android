@@ -54,7 +54,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextIndent
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -91,6 +90,7 @@ import mega.privacy.android.core.ui.theme.extensions.body4
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_800
 import mega.privacy.android.core.ui.theme.extensions.grey_100_alpha_060_dark_grey
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.core.ui.theme.extensions.subtitle1medium
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.core.ui.theme.extensions.yellow_100_yellow_700_alpha_015
 import mega.privacy.android.core.ui.theme.subtitle1
@@ -295,7 +295,10 @@ fun UpgradeAccountView(
                     )
                 }
 
-                FeaturesOfPlans(showNoAdsFeature = state.showNoAdsFeature)
+                FeaturesOfPlans(
+                    showNoAdsFeature = state.showNoAdsFeature,
+                    showNewFeatures = state.showNewFeatures,
+                )
                 if (state.localisedSubscriptionsList.isNotEmpty()) {
                     SubscriptionDetails(
                         onLinkClick = onPlayStoreLinkClicked,
@@ -525,15 +528,13 @@ fun EmptySubscriptionPlansInfoCards(brush: Brush) {
 @Composable
 private fun FeaturesOfPlans(
     showNoAdsFeature: Boolean,
+    showNewFeatures: Boolean,
 ) {
-    val style = TextStyle(
-        fontFamily = FontFamily.SansSerif,
-        fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.25.sp,
-        textIndent = TextIndent(restLine = 12.sp)
+    val modifier = Modifier.padding(
+        start = 10.dp,
+        bottom = 12.dp
     )
+    val textIndent = TextIndent(restLine = 11.sp)
     Column(
         modifier = Modifier.padding(
             start = 24.dp,
@@ -542,74 +543,75 @@ private fun FeaturesOfPlans(
             bottom = 30.dp
         )
     ) {
-        Text(
+        MegaText(
             text = stringResource(id = R.string.account_upgrade_account_description_title_features),
-            style = MaterialTheme.typography.subtitle1,
-            color = MaterialTheme.colors.onPrimary,
-            fontWeight = FontWeight.Medium,
+            textColor = TextColor.Primary,
+            style = MaterialTheme.typography.subtitle1medium,
         )
         Column(
             modifier = Modifier.padding(top = 16.dp)
         ) {
-            Text(
+            MegaText(
                 text = stringResource(id = R.string.account_upgrade_account_description_feature_password),
-                style = style,
-                color = MaterialTheme.colors.black_white,
-                modifier = Modifier.padding(
-                    start = 10.dp,
-                    bottom = 12.dp
-                )
+                textColor = TextColor.Primary,
+                style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
+                modifier = modifier
             )
-            Text(
+            MegaText(
                 text = stringResource(id = R.string.account_upgrade_account_description_feature_link),
-                style = style,
-                color = MaterialTheme.colors.black_white,
-                modifier = Modifier.padding(
-                    start = 10.dp,
-                    bottom = 12.dp
-                )
+                textColor = TextColor.Primary,
+                style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
+                modifier = modifier
             )
-            Text(
+            MegaText(
                 text = stringResource(id = R.string.account_upgrade_account_description_feature_transfer),
-                style = style,
-                color = MaterialTheme.colors.black_white,
-                modifier = Modifier.padding(
-                    start = 10.dp,
-                    bottom = 12.dp
-                )
+                textColor = TextColor.Primary,
+                style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
+                modifier = modifier
             )
-            Text(
+            MegaText(
                 text = stringResource(id = R.string.account_upgrade_account_description_feature_backup),
-                style = style,
-                color = MaterialTheme.colors.black_white,
-                modifier = Modifier.padding(
-                    start = 10.dp,
-                    bottom = 12.dp
-                )
+                textColor = TextColor.Primary,
+                style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
+                modifier = modifier
             )
-            Text(
+            MegaText(
                 text = stringResource(id = R.string.account_upgrade_account_description_feature_rewind),
-                style = style,
-                color = MaterialTheme.colors.black_white,
-                modifier = Modifier.padding(
-                    start = 10.dp,
-                    bottom = 12.dp
-                ),
+                textColor = TextColor.Primary,
+                style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
+                modifier = modifier
             )
-            Text(
+            MegaText(
                 text = stringResource(id = R.string.account_upgrade_account_description_feature_rubbish_bin),
-                style = style,
-                color = MaterialTheme.colors.black_white,
+                textColor = TextColor.Primary,
+                style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
                 modifier = Modifier.padding(
                     start = 10.dp,
-                    bottom = if (showNoAdsFeature) 12.dp else 0.dp
+                    bottom = if (showNoAdsFeature || showNewFeatures) 12.dp else 0.dp
                 )
             )
+            if (showNewFeatures) {
+                MegaText(
+                    text = stringResource(id = R.string.account_upgrade_account_description_feature_meetings),
+                    textColor = TextColor.Primary,
+                    style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
+                    modifier = modifier
+                )
+                MegaText(
+                    text = stringResource(id = R.string.account_upgrade_account_description_feature_vpn),
+                    textColor = TextColor.Primary,
+                    style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
+                    modifier = Modifier.padding(
+                        start = 10.dp,
+                        bottom = if (showNoAdsFeature) 12.dp else 0.dp
+                    )
+                )
+            }
             if (showNoAdsFeature) {
-                Text(
+                MegaText(
                     text = stringResource(id = R.string.account_upgrade_account_description_feature_advertisement),
-                    style = style,
-                    color = MaterialTheme.colors.black_white,
+                    textColor = TextColor.Primary,
+                    style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
                     modifier = Modifier.padding(start = 10.dp)
                 )
             }

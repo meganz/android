@@ -172,6 +172,19 @@ class UpgradeAccountViewModel @Inject constructor(
                 Timber.e("Failed to fetch feature flags or ab_ads test flag with error: ${it.message}")
             }
         }
+        viewModelScope.launch {
+            runCatching {
+                val showStringsForNewFeatures =
+                    getFeatureFlagValueUseCase(AppFeatures.ShowStringsForNewFeatures)
+                _state.update { state ->
+                    state.copy(
+                        showNewFeatures = showStringsForNewFeatures
+                    )
+                }
+            }.onFailure {
+                Timber.e("Failed to fetch feature flag ShowStringsForNewFeatures with error: ${it.message}")
+            }
+        }
     }
 
     /**

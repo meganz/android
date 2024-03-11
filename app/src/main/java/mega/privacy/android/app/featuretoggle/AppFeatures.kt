@@ -232,6 +232,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     NotificationCenter(
         "To show promotional dynamic messages in Notifications",
         false
+    ),
+
+    /**
+     * To show strings for new features (meetings and VPN), strings should be hidden until the features are released
+     */
+    ShowStringsForNewFeatures(
+        "Show strings for new features (meetings and VPN)",
+        false
     );
 
     companion object : FeatureFlagValueProvider {
