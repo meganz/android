@@ -58,6 +58,7 @@ class VoiceClipMessageViewModelTest {
         shouldShowAvatar = true,
         reactions = emptyList(),
         exists = true,
+        rowId = 765L,
     )
 
     private val voiceClipPlayer: VoiceClipPlayer = mock()

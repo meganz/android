@@ -4,14 +4,12 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
-import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
-import mega.privacy.android.domain.usecase.node.DoesNodeExistUseCase
 import mega.privacy.android.domain.usecase.node.chat.AddChatFileTypeUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -80,6 +78,7 @@ class CreateVoiceClipMessageUseCaseTest {
         val message = mock<ChatMessage> {
             on { nodeList } doReturn listOf(fileNode)
             on { status } doReturn ChatMessageStatus.UNKNOWN
+            on { rowId } doReturn 5432L
         }
         val typedNode = mock<ChatDefaultFile> {
             on { name } doReturn "name"
@@ -102,7 +101,8 @@ class CreateVoiceClipMessageUseCaseTest {
                 name = typedNode.name,
                 size = typedNode.size,
                 duration = 0.seconds,
-                exists = exists
+                exists = exists,
+                rowId = rowId,
             )
         }
         whenever(addChatFileTypeUseCase(fileNode, request.chatId, request.messageId))

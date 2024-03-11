@@ -37,7 +37,8 @@ internal class CreateVoiceClipMessageUseCase @Inject constructor(
             shouldShowAvatar = shouldShowAvatar,
             reactions = reactions,
             content = content,
-            exists = exists
+            exists = exists,
+            rowId = rowId,
         )
     }
 }
