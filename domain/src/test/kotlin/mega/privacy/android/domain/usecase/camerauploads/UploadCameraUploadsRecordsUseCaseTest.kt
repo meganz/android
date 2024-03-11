@@ -87,6 +87,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
     private val monitorBatteryInfoUseCase = mock<MonitorBatteryInfoUseCase>()
     private val isChargingRequiredForVideoCompressionUseCase: IsChargingRequiredForVideoCompressionUseCase =
         mock()
+    private val monitorConcurrentUploadsLimitUseCase: MonitorConcurrentUploadsLimitUseCase = mock()
 
     private val primaryUploadNodeId = NodeId(1111L)
     private val secondaryUploadNodeId = NodeId(2222L)
@@ -137,7 +138,8 @@ class UploadCameraUploadsRecordsUseCaseTest {
             addCompletedTransferUseCase = addCompletedTransferUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             monitorBatteryInfoUseCase = monitorBatteryInfoUseCase,
-            isChargingRequiredForVideoCompressionUseCase = isChargingRequiredForVideoCompressionUseCase
+            isChargingRequiredForVideoCompressionUseCase = isChargingRequiredForVideoCompressionUseCase,
+            monitorConcurrentUploadsLimitUseCase = monitorConcurrentUploadsLimitUseCase,
         )
     }
 
@@ -163,6 +165,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
             fileSystemRepository,
             addCompletedTransferUseCase,
             getNodeByIdUseCase,
+            monitorConcurrentUploadsLimitUseCase,
         )
     }
 
@@ -170,6 +173,8 @@ class UploadCameraUploadsRecordsUseCaseTest {
     fun setupMock(): Unit = runBlocking {
         whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
         whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(false)
+        whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(100, true)))
+        whenever(monitorConcurrentUploadsLimitUseCase(8)).thenReturn(flowOf(8))
     }
 
     private fun getUploadNodeId(cameraUploadFolderType: CameraUploadFolderType) =

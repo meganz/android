@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -26,6 +27,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsTransferProgress
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsConcurrentUploadsLimit
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -46,6 +48,7 @@ import mega.privacy.android.domain.usecase.video.CompressVideoUseCase
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 /**
@@ -87,24 +90,12 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
     private val fileSystemRepository: FileSystemRepository,
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase,
     private val isChargingRequiredForVideoCompressionUseCase: IsChargingRequiredForVideoCompressionUseCase,
+    private val monitorConcurrentUploadsLimitUseCase: MonitorConcurrentUploadsLimitUseCase,
 ) {
 
     companion object {
-        private const val CONCURRENT_UPLOADS_LIMIT = 8
         private const val CONCURRENT_VIDEO_COMPRESSION_LIMIT = 1
     }
-
-    /**
-     * Limit the number of concurrent uploads to [CONCURRENT_UPLOADS_LIMIT]
-     * to not overload the memory of the app,
-     */
-    private val semaphore = Semaphore(CONCURRENT_UPLOADS_LIMIT)
-
-    /**
-     * Limit the number of concurrent video compression to [CONCURRENT_VIDEO_COMPRESSION_LIMIT]
-     * to not overload the memory and cache size of the app
-     */
-    private val videoCompressionSemaphore = Semaphore(CONCURRENT_VIDEO_COMPRESSION_LIMIT)
 
     /**
      * Camera Uploads upload process
@@ -121,13 +112,49 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
         secondaryUploadNodeId: NodeId,
         tempRoot: String,
     ): Flow<CameraUploadsTransferProgress> = channelFlow {
+        // Limit the number of concurrent uploads to [CONCURRENT_UPLOADS_LIMIT]
+        val semaphore = Semaphore(CameraUploadsConcurrentUploadsLimit.Default.limit)
+
+        // Limit the number of concurrent uploads based on the device state
+        val deviceStateSemaphore = Semaphore(CameraUploadsConcurrentUploadsLimit.Default.limit)
+
+        // Keep tracks of number of permits preempted in [deviceStateSemaphore]
+        // to avoid releasing more than acquired
+        val preemptedPermitsCount = AtomicInteger(0)
+
+        // Limit the number of concurrent video compression to [CONCURRENT_VIDEO_COMPRESSION_LIMIT]
+        // to not overload the memory and cache size of the app
+        val videoCompressionSemaphore = Semaphore(CONCURRENT_VIDEO_COMPRESSION_LIMIT)
+
         val videoQuality = getUploadVideoQualityUseCase()
         val locationTagsDisabled = !areLocationTagsEnabledUseCase()
         val isChargingRequiredForVideoCompression = isChargingRequiredForVideoCompressionUseCase()
 
+        launch {
+            monitorConcurrentUploadsLimitUseCase(CameraUploadsConcurrentUploadsLimit.Default.limit)
+                .collectLatest { concurrentUploadsLimit ->
+                    val permitsToRestrict =
+                        CameraUploadsConcurrentUploadsLimit.Default.limit - concurrentUploadsLimit
+                    while (permitsToRestrict != preemptedPermitsCount.get()) {
+                        when {
+                            preemptedPermitsCount.get() < permitsToRestrict -> {
+                                deviceStateSemaphore.acquire()
+                                preemptedPermitsCount.incrementAndGet()
+                            }
+
+                            else -> {
+                                deviceStateSemaphore.release()
+                                preemptedPermitsCount.decrementAndGet()
+                            }
+                        }
+                    }
+                }
+        }
+
         cameraUploadsRecords.map { record ->
             launch {
                 semaphore.acquire()
+                deviceStateSemaphore.acquire()
 
                 yield()
 
@@ -162,6 +189,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                                 }
                                 .singleOrNull()
                                 ?: run {
+                                    deviceStateSemaphore.release()
                                     semaphore.release()
                                     return@launch
                                 }
@@ -177,6 +205,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                                 && monitorBatteryInfoUseCase().first().isCharging.not()
                             ) {
                                 videoCompressionSemaphore.release()
+                                deviceStateSemaphore.release()
                                 semaphore.release()
                                 return@launch
                             }
@@ -252,6 +281,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                                 }
                             }
                             if (isCompressionCancelled) {
+                                deviceStateSemaphore.release()
                                 semaphore.release()
                                 return@launch
                             }
@@ -326,6 +356,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                                         )
                                     )
 
+                                    deviceStateSemaphore.release()
                                     semaphore.release()
                                 }
 
@@ -382,6 +413,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                             trySend(CameraUploadsTransferProgress.Error(record, it))
                         }
 
+                        deviceStateSemaphore.release()
                         semaphore.release()
                         return@launch
                     }
@@ -395,6 +427,7 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                             trySend(CameraUploadsTransferProgress.Error(record, it))
                         }
 
+                        deviceStateSemaphore.release()
                         semaphore.release()
                         return@launch
                     }
