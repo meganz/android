@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.chat.message
 
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.PendingMessage
+import mega.privacy.android.domain.entity.chat.PendingMessage.Companion.UNKNOWN_TRANSFER_TAG
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.PendingVoiceClipMessage
@@ -37,6 +38,7 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
                 status = this.getChatMessageStatus(),
                 content = null,
                 fileType = fileSystemRepository.getFileTypeInfo(file),
+                transferTag = pendingMessage.transferTag.takeIf { it != UNKNOWN_TRANSFER_TAG },
             )
         } else {
             PendingFileAttachmentMessage(
@@ -52,6 +54,7 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
                 content = null,
                 filePath = filePath,
                 fileType = fileSystemRepository.getFileTypeInfo(file),
+                transferTag = pendingMessage.transferTag.takeIf { it != UNKNOWN_TRANSFER_TAG },
             )
         }
     }

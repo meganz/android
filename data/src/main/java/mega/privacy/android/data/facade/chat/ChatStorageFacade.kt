@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateAndNodeHandleRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageTransferTagRequest
 import javax.inject.Inject
 
 /**
@@ -120,6 +121,9 @@ internal class ChatStorageFacade @Inject constructor(
                 database.pendingMessageDao().update(updatePendingMessageRequest)
 
             is UpdatePendingMessageStateAndNodeHandleRequest ->
+                database.pendingMessageDao().update(updatePendingMessageRequest)
+
+            is UpdatePendingMessageTransferTagRequest ->
                 database.pendingMessageDao().update(updatePendingMessageRequest)
         }
     }

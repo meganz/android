@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.database.entity.chat.PendingMessageEntity
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateAndNodeHandleRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageTransferTagRequest
 
 /**
  * Pending message dao
@@ -40,6 +41,14 @@ interface PendingMessageDao {
      */
     @Update(entity = PendingMessageEntity::class)
     suspend fun update(updatePendingMessageStateAndNodeHandleRequest: UpdatePendingMessageStateAndNodeHandleRequest)
+
+    /**
+     * Update the pending message
+     *
+     * @param updatePendingMessageTransferTagRequest
+     */
+    @Update(entity = PendingMessageEntity::class)
+    suspend fun update(updatePendingMessageTransferTagRequest: UpdatePendingMessageTransferTagRequest)
 
     /**
      * Delete

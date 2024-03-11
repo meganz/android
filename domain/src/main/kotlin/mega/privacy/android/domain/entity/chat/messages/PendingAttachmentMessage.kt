@@ -11,9 +11,11 @@ import java.io.File
 /**
  * Pending attachment message
  * @property file
+ * @property transferTag
  */
 sealed interface PendingAttachmentMessage : AttachmentMessage {
     val file: File?
+    val transferTag: Int?
     override val isMine get() = true
     override val fileName get() = file?.name ?: ""
     override val fileSize get() = file?.length() ?: 0L
@@ -39,6 +41,7 @@ data class PendingFileAttachmentMessage(
     override val reactions: List<Reaction>,
     override val status: ChatMessageStatus,
     override val content: String?,
+    override val transferTag: Int?,
     val filePath: String,
 ) : PendingAttachmentMessage {
     @Transient
@@ -62,6 +65,7 @@ data class PendingVoiceClipMessage(
     override val reactions: List<Reaction>,
     override val status: ChatMessageStatus,
     override val content: String?,
+    override val transferTag: Int?,
 ) : PendingAttachmentMessage {
     @Transient
     override val file = null

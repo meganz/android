@@ -29,7 +29,7 @@ data class PendingMessage(
     var nodeHandle: Long = -1,
     var fingerprint: String? = null,
     var name: String? = null,
-    var transferTag: Int = -1,
+    var transferTag: Int = UNKNOWN_TRANSFER_TAG,
 ) {
     /**
      * True if it's a voice clip, false otherwise
@@ -79,5 +79,10 @@ data class PendingMessage(
          * Type for voice clip pending message
          */
         const val TYPE_VOICE_CLIP = 3
+
+        /**
+         * Tag for pending messages where transfer is still unknown or not started
+         */
+        const val UNKNOWN_TRANSFER_TAG = -1
     }
 }

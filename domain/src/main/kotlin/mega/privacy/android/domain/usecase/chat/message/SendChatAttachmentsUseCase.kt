@@ -51,7 +51,7 @@ class SendChatAttachmentsUseCase @Inject constructor(
                                 transferTag = -1,
                             )
                         ).id
-                        startChatUploadsWithWorkerUseCase(listOf(file), pendingMessageId)
+                        startChatUploadsWithWorkerUseCase(file, pendingMessageId)
                     }.merge()
             )
         }

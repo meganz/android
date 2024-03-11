@@ -66,7 +66,7 @@ class SendChatAttachmentsUseCaseTest {
         underTest(chatId, uris).test {
             cancelAndIgnoreRemainingEvents()
         }
-        verify(startChatUploadsWithWorkerUseCase)(eq(listOf(file)), any())
+        verify(startChatUploadsWithWorkerUseCase)(eq(file), any())
     }
 
     @Test
@@ -89,7 +89,7 @@ class SendChatAttachmentsUseCaseTest {
         underTest(chatId, uris).test {
             cancelAndIgnoreRemainingEvents()
         }
-        verify(startChatUploadsWithWorkerUseCase)(eq(listOf(file)), eq(pendingMsgId))
+        verify(startChatUploadsWithWorkerUseCase)(eq(file), eq(pendingMsgId))
     }
 
     @Test

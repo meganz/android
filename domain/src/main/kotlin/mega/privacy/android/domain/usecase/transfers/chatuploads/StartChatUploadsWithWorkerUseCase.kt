@@ -2,10 +2,14 @@ package mega.privacy.android.domain.usecase.transfers.chatuploads
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onEach
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageTransferTagRequest
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.chat.FoldersNotAllowedAsChatUploadException
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.shared.AbstractStartTransfersWithWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.UploadFilesUseCase
 import java.io.File
@@ -24,20 +28,21 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
     private val startChatUploadsWorkerUseCase: StartChatUploadsWorkerUseCase,
     private val isChatUploadsWorkerStartedUseCase: IsChatUploadsWorkerStartedUseCase,
     private val compressFileForChatUseCase: CompressFileForChatUseCase,
+    private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
     cancelCancelTokenUseCase: CancelCancelTokenUseCase,
 ) : AbstractStartTransfersWithWorkerUseCase(cancelCancelTokenUseCase) {
 
     /**
      * Invoke
      *
-     * @param files a list of files that will be uploaded to chats folder in the cloud drive. Any folder will be filtered out because folders are not allowed as chat uploads
+     * @param file the file that will be uploaded to chats folder in the cloud drive. If it's a folder will be filtered out because folders are not allowed as chat uploads
      * @param pendingMessageId the message id to be included in the app data, so the ChatUploadsWorker can associate the files to the corresponding message
      */
     operator fun invoke(
-        files: List<File>,
+        file: File,
         pendingMessageId: Long,
     ): Flow<MultiTransferEvent> = flow {
-        val onlyFiles = files.filter {
+        val fileList = listOf(file).filter {
             if (it.isFile) {
                 true
             } else {
@@ -58,8 +63,15 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
         startTransfersAndWorker(
             doTransfers = {
                 uploadFilesUseCase(
-                    onlyFiles, chatFilesFolderId, appData, false
-                )
+                    fileList, chatFilesFolderId, appData, false
+                ).onEach {
+                    //update transfer tag on Start event
+                    ((it as? MultiTransferEvent.SingleTransferEvent)?.transferEvent as? TransferEvent.TransferStartEvent)?.transfer?.tag?.let { transferTag ->
+                        updatePendingMessageUseCase(
+                            UpdatePendingMessageTransferTagRequest(pendingMessageId, transferTag)
+                        )
+                    }
+                }
             },
             startWorker = {
                 startChatUploadsWorkerUseCase()

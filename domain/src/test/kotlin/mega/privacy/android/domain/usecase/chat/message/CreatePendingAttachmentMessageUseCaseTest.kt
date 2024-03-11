@@ -53,6 +53,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
         val time = 72834578L
         val userHandle = 245L
         val filePath = "filepath"
+        val transferTag = 344
         val fileTypeInfo = mock<UnknownFileTypeInfo>()
         whenever(getMyUserHandleUseCase()).thenReturn(userHandle)
         whenever(fileSystemRepository.getFileTypeInfo(File(filePath)))
@@ -63,6 +64,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
             uploadTimestamp = time,
             state = state.value,
             filePath = filePath,
+            transferTag = transferTag,
         )
         val expected = PendingFileAttachmentMessage(
             chatId = chatId,
@@ -77,6 +79,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
             content = null,
             filePath = filePath,
             fileType = fileTypeInfo,
+            transferTag = transferTag,
         )
         val actual = underTest(pendingMessage)
         assertThat(actual).isEqualTo(expected)
@@ -92,6 +95,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
         val time = 72834578L
         val userHandle = 245L
         val filePath = "filepath"
+        val transferTag = 344
         val fileTypeInfo = mock<UnknownFileTypeInfo>()
         whenever(getMyUserHandleUseCase()).thenReturn(userHandle)
         whenever(fileSystemRepository.getFileTypeInfo(File(filePath)))
@@ -103,6 +107,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
             state = state.value,
             filePath = filePath,
             type = PendingMessage.TYPE_VOICE_CLIP,
+            transferTag = transferTag,
         )
         val expected = PendingVoiceClipMessage(
             chatId = chatId,
@@ -116,6 +121,7 @@ class CreatePendingAttachmentMessageUseCaseTest {
             status = getChatMessageStatus(state),
             content = null,
             fileType = fileTypeInfo,
+            transferTag = transferTag,
         )
         val actual = underTest(pendingMessage)
         assertThat(actual).isEqualTo(expected)
