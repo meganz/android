@@ -70,4 +70,9 @@ interface Message {
      */
     fun isSendError() = isMine &&
             (status == ChatMessageStatus.SENDING_MANUAL || status == ChatMessageStatus.SERVER_REJECTED)
+
+    /**
+     * @return true if the message has not been sent due to an error or another reason
+     */
+    fun isNotSent() = isSendError()
 }

@@ -20,7 +20,7 @@ class ChatHeaderMessage : HeaderMessage() {
         onReactionLongClick: (String, List<UIReaction>) -> Unit,
         onForwardClicked: (TypedMessage) -> Unit,
         onSelectedChanged: (Boolean) -> Unit,
-        onSendErrorClicked: (TypedMessage) -> Unit,
+        onNotSentClick: (TypedMessage) -> Unit,
     ) {
         FirstMessageHeader(state.chatTitle, state.scheduledMeeting)
     }

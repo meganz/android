@@ -19,6 +19,7 @@ sealed interface PendingAttachmentMessage : AttachmentMessage {
     override val fileSize get() = file?.length() ?: 0L
     override val duration get() = (fileType as? PlayableFileTypeInfo)?.duration
     override val rowId get() = -1L
+    override fun isNotSent() = true // pending messages are not sent by definition
 }
 
 /**

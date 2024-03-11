@@ -46,7 +46,7 @@ internal fun MessageListView(
         onMoreReactionsClicked = parameter.onMoreReactionsClicked,
         onReactionClicked = parameter.onReactionClicked,
         onReactionLongClick = parameter.onReactionLongClick,
-        onSendErrorClick = parameter.onSendErrorClick,
+        onNotSentClick = parameter.onNotSentClick,
         onMessageLongClick = parameter.onMessageLongClick,
         onForwardClicked = parameter.onForwardClicked,
         onCanSelectChanged = parameter.onCanSelectChanged,
@@ -67,7 +67,7 @@ internal fun MessageListView(
     onReactionLongClick: (String, List<UIReaction>) -> Unit,
     onMessageLongClick: (TypedMessage) -> Unit,
     onForwardClicked: (TypedMessage) -> Unit,
-    onSendErrorClick: (TypedMessage) -> Unit,
+    onNotSentClick: (TypedMessage) -> Unit,
     onCanSelectChanged: (Boolean) -> Unit,
     selectMode: Boolean,
     selectedItems: Set<Long>,
@@ -196,7 +196,7 @@ internal fun MessageListView(
                             onReactionLongClick = onReactionLongClick,
                             onForwardClicked = onForwardClicked,
                             onSelectedChanged = onSelectedChanged,
-                            onSendErrorClicked = onSendErrorClick,
+                            onNotSentClick = onNotSentClick,
                         )
                     }
                 }
@@ -232,7 +232,7 @@ internal data class MessageListParameter(
     val onReactionClicked: (Long, String, List<UIReaction>) -> Unit,
     val onReactionLongClick: (String, List<UIReaction>) -> Unit,
     val onForwardClicked: (TypedMessage) -> Unit,
-    val onSendErrorClick: (TypedMessage) -> Unit,
+    val onNotSentClick: (TypedMessage) -> Unit,
     val onCanSelectChanged: (Boolean) -> Unit,
     val selectMode: Boolean,
     val selectedItems: Set<Long>,

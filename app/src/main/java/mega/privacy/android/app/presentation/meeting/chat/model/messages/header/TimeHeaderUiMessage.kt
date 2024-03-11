@@ -28,7 +28,7 @@ class TimeHeaderUiMessage(
         onReactionLongClick: (String, List<UIReaction>) -> Unit,
         onForwardClicked: (TypedMessage) -> Unit,
         onSelectedChanged: (Boolean) -> Unit,
-        onSendErrorClicked: (TypedMessage) -> Unit,
+        onNotSentClick: (TypedMessage) -> Unit,
     ) {
         TimeHeader(
             timeString = TimeUtils.formatTime(timeSent),

@@ -28,7 +28,7 @@ abstract class AvatarMessage : UiChatMessage {
     )
 
     abstract override val message: TypedMessage
-    
+
     /**
      * Avatar composable
      */
@@ -59,7 +59,7 @@ abstract class AvatarMessage : UiChatMessage {
         onReactionLongClick: (String, List<UIReaction>) -> Unit,
         onForwardClicked: (TypedMessage) -> Unit,
         onSelectedChanged: (Boolean) -> Unit,
-        onSendErrorClicked: (TypedMessage) -> Unit,
+        onNotSentClick: (TypedMessage) -> Unit,
     ) {
         ChatMessageContainer(
             isMine = displayAsMine,
@@ -83,7 +83,7 @@ abstract class AvatarMessage : UiChatMessage {
         ) { interactionEnabled ->
             ContentComposable(interactionEnabled) {
                 Modifier.contentInteraction(
-                    onSendErrorClicked = onSendErrorClicked,
+                    onNotSentClick = onNotSentClick,
                     onClick = it,
                     onLongClick = onLongClick,
                     interactionEnabled = interactionEnabled
@@ -93,13 +93,13 @@ abstract class AvatarMessage : UiChatMessage {
     }
 
     private fun Modifier.contentInteraction(
-        onSendErrorClicked: (TypedMessage) -> Unit,
+        onNotSentClick: (TypedMessage) -> Unit,
         onClick: () -> Unit,
         onLongClick: (TypedMessage) -> Unit,
         interactionEnabled: Boolean,
-    ) = if (message.isSendError()) {
-        forSendError(
-            onErrorClick = { onSendErrorClicked(message) }
+    ) = if (message.isNotSent()) {
+        forNotSent(
+            onNotSentClick = { onNotSentClick(message) }
         )
     } else {
         setClickHandlers(
@@ -109,8 +109,9 @@ abstract class AvatarMessage : UiChatMessage {
         )
     }
 
-    private fun Modifier.forSendError(onErrorClick: () -> Unit) = this.combinedClickable(
-        onClick = onErrorClick,
+    private fun Modifier.forNotSent(onNotSentClick: () -> Unit) = this.combinedClickable(
+        onClick = onNotSentClick,
+        onLongClick = onNotSentClick,
     )
 
     private fun Modifier.setClickHandlers(

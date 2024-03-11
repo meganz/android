@@ -22,9 +22,12 @@ data class PendingAttachmentUiMessage(
         interactionEnabled: Boolean,
         initialiseModifier: (onClick: () -> Unit) -> Modifier,
     ) {
+        val modifier = initialiseModifier {
+            //click here will never occur as a pending message is always a not sent message
+        }
         when (message) {
-            is PendingVoiceClipMessage -> PendingVoiceClipMessageView(message)
-            is PendingFileAttachmentMessage -> PendingAttachmentMessageView(message)
+            is PendingVoiceClipMessage -> PendingVoiceClipMessageView(message, modifier)
+            is PendingFileAttachmentMessage -> PendingAttachmentMessageView(message, modifier)
         }
     }
 

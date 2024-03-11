@@ -199,8 +199,6 @@ internal fun ChatView(
  * @param onStartOrJoinMeeting
  * @param onAnswerCall
  * @param onEnableGeolocation
- * @param messageListView
- * @param bottomBar
  * @param onSendClick
  * @param onHoldAndAnswerCall
  * @param onEndAndAnswerCall
@@ -828,12 +826,14 @@ internal fun ChatView(
                                 selectedMessages = selectedMessages - message
                             }
 
-                            val onSendErrorClick: (TypedMessage) -> Unit = {
-                                coroutineScope.launch {
-                                    messageNotSentBottomSheetState.show()
+                            val onNotSentClick: (TypedMessage) -> Unit =
+                                { message: TypedMessage ->
+                                    selectedMessages = setOf(message)
+                                    coroutineScope.launch {
+                                        messageNotSentBottomSheetState.show()
+                                    }
                                 }
-                            }
-                            
+
                             MessageListView(
                                 MessageListParameter(
                                     uiState = uiState,
@@ -849,7 +849,7 @@ internal fun ChatView(
                                     selectItem = selectItem,
                                     deselectItem = deselectItem,
                                     selectMode = isSelectMode,
-                                    onSendErrorClick = onSendErrorClick
+                                    onNotSentClick = onNotSentClick
                                 )
                             )
 
