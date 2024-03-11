@@ -1,0 +1,36 @@
+package mega.privacy.android.domain.usecase
+
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.repository.PhotosRepository
+import javax.inject.Inject
+
+/**
+ * Get shared files history images nodes use case
+ */
+class MonitorSharedFilesHistoryImageNodesUseCase @Inject constructor(
+    private val photosRepository: PhotosRepository,
+) {
+    private val nodesCache: MutableMap<NodeId, ImageNode> = mutableMapOf()
+
+    /**
+     * Invoke use case
+     */
+    operator fun invoke(chatRoomId: Long, messageIds: List<Long>): Flow<List<ImageNode>> = flow {
+        emit(populateNodes(chatRoomId, messageIds))
+        //TODO monitorChatMessages
+    }
+
+    private suspend fun populateNodes(chatRoomId: Long, messageIds: List<Long>): List<ImageNode> {
+        val nodes = messageIds.mapNotNull { messageId ->
+            photosRepository.getImageNodeFromChatMessage(chatRoomId, messageId)
+        }
+
+        nodesCache.clear()
+        nodesCache.putAll(nodes.associateBy { it.id })
+
+        return nodesCache.values.toList()
+    }
+}

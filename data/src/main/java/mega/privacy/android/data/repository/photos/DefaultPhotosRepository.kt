@@ -638,15 +638,19 @@ internal class DefaultPhotosRepository @Inject constructor(
         messageId: Long,
     ): Photo? =
         withContext(ioDispatcher) {
-            val chatRoom = megaChatApiGateway.getChatRoom(chatId)
-            val chatMessage = megaChatApiGateway.getMessage(chatId, messageId)
-                ?: megaChatApiGateway.getMessageFromNodeHistory(chatId, messageId)
-            var node = chatMessage?.megaNodeList?.get(0)
-            if (chatRoom?.isPreview == true && node != null) {
-                node = megaApiFacade.authorizeChatNode(node, chatRoom.authorizationToken)
-            }
-            node?.let { mapMegaNodeToPhoto(it, filterSvg = false) }
+            getChatNode(chatId, messageId)?.let { mapMegaNodeToPhoto(it, filterSvg = false) }
         }
+
+    private fun getChatNode(chatId: Long, messageId: Long): MegaNode? {
+        val chatRoom = megaChatApiGateway.getChatRoom(chatId)
+        val chatMessage = megaChatApiGateway.getMessage(chatId, messageId)
+            ?: megaChatApiGateway.getMessageFromNodeHistory(chatId, messageId)
+        var node = chatMessage?.megaNodeList?.get(0)
+        if (chatRoom?.isPreview == true && node != null) {
+            node = megaApiFacade.authorizeChatNode(node, chatRoom.authorizationToken)
+        }
+        return node
+    }
 
     override suspend fun getPhotoByPublicLink(link: String): Photo? =
         withContext(ioDispatcher) {
@@ -898,6 +902,24 @@ internal class DefaultPhotosRepository @Inject constructor(
                 .filter { it.type is ImageFileTypeInfo || it.type is VideoFileTypeInfo }
         }
     }
+
+    override suspend fun getImageNodeFromChatMessage(chatId: Long, messageId: Long): ImageNode? =
+        withContext(ioDispatcher) {
+            getChatNode(chatId, messageId)?.let { megaNode ->
+                if (isImageNodeValid(megaNode) ||
+                    isVideoNodeValid(megaNode)
+                ) {
+                    imageNodeMapper(
+                        megaNode = megaNode,
+                        requireSerializedData = true,
+                        offline = offlineNodesCache[megaNode.handle.toString()],
+                        numVersion = megaApiFacade::getNumVersions
+                    )
+                } else {
+                    null
+                }
+            }
+        }
 
     override fun clearCache() {
         isInitialized = false

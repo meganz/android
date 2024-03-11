@@ -164,4 +164,15 @@ interface PhotosRepository {
      * Get imageNodes from files
      */
     suspend fun getImageNodesInFiles(files: List<File>): List<ImageNode>
+
+    /**
+     * Get imageNode by chatId and messageId
+     *
+     * @param chatId
+     * @param messageId
+     */
+    suspend fun getImageNodeFromChatMessage(
+        chatId: Long,
+        messageId: Long,
+    ): ImageNode?
 }

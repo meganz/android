@@ -8,6 +8,7 @@ import dagger.multibindings.IntoMap
 import mega.privacy.android.app.presentation.imagepreview.menu.AlbumContentImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.AlbumSharingImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.BackupsImagePreviewMenu
+import mega.privacy.android.app.presentation.imagepreview.menu.SharedFilesHistoryImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.CloudDriveImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.ContactFileListImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.DefaultImagePreviewMenu
@@ -106,4 +107,9 @@ internal interface ImagePreviewMenuModule {
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.CONTACT_FILE_LIST)
     fun ContactFileListImagePreviewMenu.bindContactFileListMenu(): ImagePreviewMenu
+
+    @Binds
+    @IntoMap
+    @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.SHARED_FILES_HISTORY)
+    fun SharedFilesHistoryImagePreviewMenu.bindSharedFilesHistoryMenu(): ImagePreviewMenu
 }

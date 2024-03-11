@@ -285,6 +285,7 @@ internal fun ImagePreviewScreen(
                             ImagePreviewTopBar(
                                 imageNode = imageNode,
                                 showSlideshowMenu = viewModel::isSlideshowMenuVisible,
+                                showForwardMenu = viewModel::isForwardMenuVisible,
                                 showSaveToDeviceMenu = viewModel::isSaveToDeviceMenuVisible,
                                 showManageLinkMenu = viewModel::isGetLinkMenuVisible,
                                 showSendToMenu = viewModel::isSendToChatMenuVisible,
@@ -364,7 +365,10 @@ internal fun ImagePreviewScreen(
                         onClickOpenWith(currentImageNode)
                         hideBottomSheet(coroutineScope, modalSheetState)
                     },
-                    onClickForward = {},
+                    onClickForward = {
+                        onClickSendTo(currentImageNode)
+                        hideBottomSheet(coroutineScope, modalSheetState)
+                    },
                     onClickSaveToDevice = {
                         onClickSaveToDevice(currentImageNode)
                         hideBottomSheet(coroutineScope, modalSheetState)
@@ -589,6 +593,7 @@ private fun ImagePreviewTopBar(
     modifier: Modifier = Modifier,
     imageNode: ImageNode,
     showSlideshowMenu: suspend (ImageNode) -> Boolean,
+    showForwardMenu: suspend (ImageNode) -> Boolean,
     showSaveToDeviceMenu: suspend (ImageNode) -> Boolean,
     showManageLinkMenu: suspend (ImageNode) -> Boolean,
     showSendToMenu: suspend (ImageNode) -> Boolean,
@@ -619,6 +624,10 @@ private fun ImagePreviewTopBar(
                 value = showSlideshowMenu(imageNode)
             }
 
+            val isForwardMenuVisible by produceState(false, imageNode) {
+                value = showForwardMenu(imageNode)
+            }
+
             val isSaveToDeviceMenuVisible by produceState(false, imageNode) {
                 value = showSaveToDeviceMenu(imageNode)
             }
@@ -642,6 +651,17 @@ private fun ImagePreviewTopBar(
                         contentDescription = null,
                         tint = MaterialTheme.colors.black_white,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SLIDESHOW),
+                    )
+                }
+            }
+
+            if (isForwardMenuVisible) {
+                IconButton(onClick = onClickSlideshow) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_forward),
+                        contentDescription = null,
+                        tint = MaterialTheme.colors.black_white,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_FORWARD),
                     )
                 }
             }
