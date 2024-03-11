@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyPickerActivity
 import mega.privacy.android.app.activities.GiphyPickerActivity.Companion.GIF_DATA
@@ -37,6 +38,15 @@ import mega.privacy.android.core.ui.controls.chat.attachpanel.AttachItem
 import mega.privacy.android.core.ui.controls.chat.attachpanel.AttachItemPlaceHolder
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.mobile.analytics.event.ChatConversationContactMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationFileMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationGIFMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationGalleryMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationLocationMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationScanMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationTakePictureMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatImageAttachmentItemSelected
+import mega.privacy.mobile.analytics.event.ChatImageAttachmentItemSelectedEvent
 import nz.mega.documentscanner.DocumentScannerActivity
 
 /**
@@ -101,8 +111,17 @@ fun ChatToolbarBottomSheet(
                 .fillMaxWidth()
                 .padding(4.dp),
             sheetState = sheetState,
-            onTakePicture = onTakePicture,
+            onTakePicture = {
+                Analytics.tracker.trackEvent(ChatConversationTakePictureMenuItemEvent)
+                onTakePicture()
+            },
             onFileGalleryItemClicked = {
+                Analytics.tracker.trackEvent(
+                    ChatImageAttachmentItemSelectedEvent(
+                        ChatImageAttachmentItemSelected.SelectionType.SingleMode,
+                        1
+                    )
+                )
                 it.fileUri?.toUri()?.let { uri ->
                     onAttachFiles(listOf(uri))
                     coroutineScope.launch { sheetState.hide() }
@@ -119,25 +138,37 @@ fun ChatToolbarBottomSheet(
             AttachItem(
                 iconId = R.drawable.ic_attach_from_gallery,
                 itemName = stringResource(id = R.string.chat_attach_panel_gallery),
-                onItemClick = { galleryPicker.launch(PickVisualMediaRequest()) },
+                onItemClick = {
+                    Analytics.tracker.trackEvent(ChatConversationGalleryMenuItemEvent)
+                    galleryPicker.launch(PickVisualMediaRequest())
+                },
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_GALLERY)
             )
             AttachItem(
                 iconId = R.drawable.ic_attach_from_file,
                 itemName = pluralStringResource(id = R.plurals.general_num_files, count = 1),
-                onItemClick = onAttachFileClicked,
+                onItemClick = {
+                    Analytics.tracker.trackEvent(ChatConversationFileMenuItemEvent)
+                    onAttachFileClicked()
+                },
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_FILE)
             )
             AttachItem(
                 iconId = R.drawable.ic_attach_from_gif,
                 itemName = stringResource(id = R.string.chat_room_toolbar_gif_option),
-                onItemClick = { openGifPicker(context, gifPickerLauncher) },
+                onItemClick = {
+                    Analytics.tracker.trackEvent(ChatConversationGIFMenuItemEvent)
+                    openGifPicker(context, gifPickerLauncher)
+                },
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_GIF)
             )
             AttachItem(
                 iconId = R.drawable.ic_attach_from_scan,
                 itemName = stringResource(id = R.string.chat_room_toolbar_scan_option),
-                onItemClick = { openDocumentScanner(context, scanDocumentLauncher) },
+                onItemClick = {
+                    Analytics.tracker.trackEvent(ChatConversationScanMenuItemEvent)
+                    openDocumentScanner(context, scanDocumentLauncher)
+                },
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_SCAN)
             )
         }
@@ -150,13 +181,17 @@ fun ChatToolbarBottomSheet(
             AttachItem(
                 iconId = R.drawable.ic_attach_from_location,
                 itemName = stringResource(id = R.string.chat_room_toolbar_location_option),
-                onItemClick = onPickLocation,
+                onItemClick = {
+                    Analytics.tracker.trackEvent(ChatConversationLocationMenuItemEvent)
+                    onPickLocation()
+                },
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_LOCATION)
             )
             AttachItem(
                 iconId = R.drawable.ic_attach_from_contact,
                 itemName = stringResource(id = R.string.attachment_upload_panel_contact),
                 onItemClick = {
+                    Analytics.tracker.trackEvent(ChatConversationContactMenuItemEvent)
                     coroutineScope.launch { sheetState.hide() }
                     onAttachContactClicked()
                 },

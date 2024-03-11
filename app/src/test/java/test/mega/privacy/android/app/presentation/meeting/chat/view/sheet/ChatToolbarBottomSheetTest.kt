@@ -1,17 +1,19 @@
 package test.mega.privacy.android.app.presentation.meeting.chat.view.sheet
 
+import androidx.activity.ComponentActivity
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatGalleryState
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatGalleryViewModel
@@ -23,19 +25,27 @@ import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_AT
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_LOCATION
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_SCAN
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_GALLERY_LIST
+import mega.privacy.mobile.analytics.event.ChatConversationContactMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationFileMenuItemEvent
+import mega.privacy.mobile.analytics.event.ChatConversationLocationMenuItemEvent
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import test.mega.privacy.android.app.AnalyticsTestRule
 
 @OptIn(ExperimentalMaterialApi::class)
 @RunWith(AndroidJUnit4::class)
 class ChatToolbarBottomSheetTest {
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    private val analyticsRule = AnalyticsTestRule()
+
     @get:Rule
-    var composeTestRule = createComposeRule()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private val onAttachFileClicked: () -> Unit = mock()
     private val onAttachContactClicked: () -> Unit = mock()
@@ -99,6 +109,7 @@ class ChatToolbarBottomSheetTest {
         initComposeRuleContent()
         composeTestRule.onNodeWithTag(TEST_TAG_ATTACH_FROM_CONTACT).performClick()
         verify(onAttachContactClicked).invoke()
+        assertThat(analyticsRule.events).contains(ChatConversationContactMenuItemEvent)
     }
 
     @Test
@@ -106,6 +117,7 @@ class ChatToolbarBottomSheetTest {
         initComposeRuleContent()
         composeTestRule.onNodeWithTag(TEST_TAG_ATTACH_FROM_FILE).performClick()
         verify(onAttachFileClicked).invoke()
+        assertThat(analyticsRule.events).contains(ChatConversationFileMenuItemEvent)
     }
 
     @Test
@@ -113,6 +125,7 @@ class ChatToolbarBottomSheetTest {
         initComposeRuleContent()
         composeTestRule.onNodeWithTag(TEST_TAG_ATTACH_FROM_LOCATION).performClick()
         verify(onPickLocation).invoke()
+        assertThat(analyticsRule.events).contains(ChatConversationLocationMenuItemEvent)
     }
 
     private fun initComposeRuleContent() {

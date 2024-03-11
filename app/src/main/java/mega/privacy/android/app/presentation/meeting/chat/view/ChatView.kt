@@ -117,6 +117,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.mobile.analytics.event.ChatConversationAddAttachmentButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ChatMessageLongPressedEvent
 
 @Composable
@@ -699,6 +700,9 @@ internal fun ChatView(
                     if (haveWritePermission) {
                         val onAttachmentClick: () -> Unit = {
                             coroutineScope.launch {
+                                Analytics.tracker.trackEvent(
+                                    ChatConversationAddAttachmentButtonPressedEvent
+                                )
                                 toolbarModalSheetState.show()
                             }
                         }
