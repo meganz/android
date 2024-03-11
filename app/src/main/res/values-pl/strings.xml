@@ -799,7 +799,7 @@
     <!-- Button to park an account -->
     <string name="park_account_button">Zaparkuj</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">To jest ostatni krok przed zawieszeniem konta, wprowadź noweg hasło. Twoje dane będą&#160;przechowywanie przez conajmniej 60 dni. Jeżeli chcesz odwiesić swoje konto, skontaktuj się z support&#64;mega.nz</string>
+    <string name="park_account_text_last_step">To ostatni krok do zaparkowania konta, wprowadź nowe hasło. Twoje dane będą przechowywane przez co najmniej 60 &#160; dni. Jeśli pamiętasz hasło swojego zaparkowanego konta, kontakt support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">Wprowadź nowe hasło</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
@@ -1939,7 +1939,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Gdy następnym razem zalogujesz się na swoje konto, zostaniesz poproszony o podanie 6-cyfrowego kodu podanego przez aplikację uwierzytelniającego.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Zapisz swój klucz <b>odzyskiwania</b> w bezpiecznym miejscu, aby uniknąć problemów w przypadku utraty dostępu do aplikacji lub jeśli chcesz wyłączyć uwierzytelnianie dwuskładnikowe.</string>
+    <string name="recommendation_2fa_enabled">Zapisz swój  <b>klucz odzyskiwania</b> w bezpiecznej lokalizacji, aby uniknąć problemów w przypadku utraty dostępu do aplikacja lub jeśli chcesz wyłączyć uwierzytelnianie dwuskładnikowe.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Nieprawidłowy kod</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -5741,10 +5741,13 @@
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Zezwalaj na dostęp do swojej galerii</string>
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Przyznaj dostęp</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">Wymagana aktualizacja</string>
+    <!-- The Body of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_message">Nie używasz najnowszej wersji naszej aplikacji, więc nie możesz rozpoczynać połączeń ani dołączać do nich. Zaktualizuj teraz, aby kontynuować.</string>
+    <!-- Button text of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_update_button">Zaktualizuj</string>
+    <!-- Negative Button text of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_cancel_button">Odrzucić</string>
     <!-- Title of the bottom panel when the only host left the call on meeting screen -->
     <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">Przypisanie hosta do opuszczenia połączenia</string>
@@ -5759,9 +5762,9 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">Upload paused due to no internet connection</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">Upload paused. Battery below %1$d%% and not charging.</string>
+    <string name="photos_camera_uploads_low_battery">Przesyłanie wstrzymane. Bateria poniżej %1$d%% i nie ładuje.</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Przesyłanie wgraj kamery przestało działać. Spróbuj ponownie włączyć przesyłanie z kamery, aby rozwiązać ten problem. Jeśli problem nadal występuje, skontaktuj się z pomocą techniczną</string>
+    <string name="photos_camera_uploads_general_issue">Przesyłanie wgraj kamery przestało działać. Spróbuj ponownie włączyć przesyłanie z kamery, aby rozwiązać ten problem. Jeśli problem nadal występuje, skontaktuj kontakt wsparcie.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Trwa przesyłanie kamery, %1$d plików oczekuje na przesłanie</item>
@@ -5777,20 +5780,39 @@
         <item quantity="other">Przesyłanie kamery zakończone, przesłano %1$d plików</item>
     </plurals>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
-    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Twój darmowy plan ma limit 60 minut na spotkania. Użytkownicy Pro mają nieograniczoną liczbę połączeń i do 1000 uczestników.[/A] [B]Uaktualnij teraz.[/B]</string>
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Twój darmowy plan ma limit 60 &#160; minut na spotkanie. Użytkownicy Pro mają nieograniczoną liczbę połączeń i do 1000 &#160; uczestników.[/A] [B]Uaktualnij teraz.[/B]</string>
     <!-- Bottom sheet button to hide a node/file -->
     <string name="general_hide_node">Ukryj</string>
     <!-- Bottom sheet button to unhide a node/file -->
-    <string name="general_unhide_node">Unhide</string>
+    <string name="general_unhide_node">Odkryj</string>
     <!-- Promo label for promo notification section -->
     <string name="notifications_screen_notification_label_promo">Promocja</string>
     <!-- Promo notification section title for promo notification section -->
     <string name="notifications_screen_notification_section_title">Oferta ograniczona czasowo</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
-    <string name="meetings_change_sfu_dialog_title">Change SFU Server</string>
+    <!-- The title of the Dialog shown to Change the SFU Server Id  -->
+    <string name="meetings_change_sfu_dialog_title">Zmień serwer SFU</string>
+    <!-- The body of the Dialog shown to Change the SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_subtitle">Domyślna wartość to -1</string>
+    <!-- The placeholder text to prompt user to enter the SFU Server Id -->
     <string name="meetings_change_sfu_dialog_hint">Wprowadź SFU ID</string>
+    <!-- Button text to change SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_action_button">Zmień</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
-    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Bezpłatne plan mają limit 60 minut na spotkanie. [A]Uaktualnij teraz.[/A]</string>
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Bezpłatne plany mają limit 60 &#160; minut na spotkanie. [A]Uaktualnij teraz.[/A]</string>
+    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
+    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">Zostaniesz obciążony %1$s natychmiast, a Twoja subskrypcja zostanie automatycznie odnowiona po 1 &#160; miesiącu %2$s miesięcznie. Twoje konto Google &#160; Play zostanie obciążone opłatą za odnowienie w ciągu 24 godzin od zakończenia każdego okresu rozliczeniowego. Aby anulować subskrypcję, musisz wyłączyć automatyczne odnawianie subskrypcji MEGA &#160; Pro co najmniej 24 &#160; godziny przed końcem okresu rozliczeniowego za pośrednictwem Subskrypcji w [A]Google &#160; Play[/A].\nUaktualniając swoje konto, zgadzasz się na MEGA [B]Regulamin[/B] a [C]Politykę prywatności[/C].</string>
+    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">Zostaniesz obciążony %1$s natychmiast, a Twoja subskrypcja zostanie automatycznie odnowiona po 12 &#160; miesiącach %2$s rocznie. Twoje konto Google &#160; Play zostanie obciążone opłatą za odnowienie w ciągu 24 godzin od zakończenia każdego okresu rozliczeniowego. Aby anulować subskrypcję, musisz wyłączyć automatyczne odnawianie subskrypcji MEGA &#160; Pro co najmniej 24 &#160; godzin przed końcem okresu rozliczeniowego za pośrednictwem Subskrypcji w [A]Google &#160; Play[/A].\nUaktualniając swoje konto, zgadzasz się na MEGA [B]Regulamin[/B] a [C]Politykę prywatności[/C].</string>
+    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
+    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">Zostaniesz obciążony natychmiast, a Twoja subskrypcja zostanie automatycznie odnowiona po 1 &#160; miesiącach. Twoje konto Google &#160; Play zostanie obciążone opłatą za odnowienie w ciągu 24 godzin od zakończenia każdego okresu rozliczeniowego. Aby anulować subskrypcję, musisz wyłączyć automatyczne odnawianie subskrypcji MEGA &#160; Pro co najmniej 24 &#160; godzin przed końcem okresu rozliczeniowego za pośrednictwem Subskrypcji w [A]Google &#160; Play[/A].\nUaktualniając swoje konto, zgadzasz się na MEGA [B]Regulamin[/B] a [C]Politykę prywatności[/C].</string>
+    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
+    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">Zostaniesz obciążony natychmiast, a Twoja subskrypcja zostanie automatycznie odnowiona po 12 &#160; miesiącach. Twoje konto Google &#160; Play zostanie obciążone opłatą za odnowienie w ciągu 24 godzin od zakończenia każdego okresu rozliczeniowego. Aby anulować subskrypcję, musisz wyłączyć automatyczne odnawianie subskrypcji MEGA &#160; Pro co najmniej 24 &#160; godzin przed końcem okresu rozliczeniowego za pośrednictwem Subskrypcji w [A]Google &#160; Play[/A].\nUaktualniając swoje konto, zgadzasz się na MEGA [B]Regulamin[/B] a [C]Politykę prywatności[/C].</string>
+    <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
+    <string name="account_business_account_deactivated_dialog_title">Biznes firmowe dezaktywowane</string>
+    <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->
+    <string name="account_business_account_deactivated_dialog_sub_user_body">Twoje konto firmowe zostało dezaktywowane z powodu niepowodzenia płatności. Możesz przeglądać tylko swoje dane.\nPoproś administratora konto firmowego o rozwiązanie problemu.</string>
+    <!-- The body of the Dialog shown to a suspended Business Account Administrator -->
+    <string name="account_business_account_deactivated_dialog_admin_body">Twoje konto firmowe zostało dezaktywowane z powodu niepowodzenia płatności. Możesz przeglądać tylko swoje dane.\nAby dokonać płatności i ponownie aktywować subskrypcja, zaloguj się do MEGA przez przeglądarkę.</string>
+    <!-- The button of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
+    <string name="account_business_account_deactivated_dialog_button">OK, rozumiem</string>
 </resources>

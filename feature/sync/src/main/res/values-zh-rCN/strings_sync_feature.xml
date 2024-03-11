@@ -117,7 +117,7 @@
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">无法移动或重命名</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">Deletion or move waiting on scanning</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning">等待删除或移动的扫描中</string>
     <!-- Sync stalled issue reason is delete or move-->
     <string name="sync_stalled_issue_delete_or_move">还无法删除</string>
     <!-- Sync stalled issue reason is upload issue-->
@@ -163,7 +163,7 @@
     <!-- Sync stalled issue reason is upload issue detailed description-->
     <string name="sync_stalled_issue_upload_issue_detail">无法访问目标文件夹</string>
     <!-- Sync stalled issue reason is download issue detailed description-->
-    <string name="sync_stalled_issue_download_issue_detail">An error occurred either downloading the file, or moving the downloaded temporary file to its final location.</string>
+    <string name="sync_stalled_issue_download_issue_detail">下载文件或将下载的临时文件移动到其最终位置时出错。</string>
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">本地错误导致无法访问文件夹</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
@@ -181,9 +181,9 @@
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">在MEGA中检测到移动或重命名，但无法在本地复制。</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">Moving or renaming was detected as happening locally, but couldn’t be replicated in MEGA.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">检测到本地发生的移动或重命名，但无法在MEGA中复制。</string>
     <!-- Sync stalled issue delete or move scanning detail-->
-    <string name="sync_stalled_issue_delete_or_move_scanning_detail">Waiting for scan to finish to determine if the file was moved or deleted.</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning_detail">等待扫描完成以确定文件是否已移动或删除。</string>
     <!-- Sync subtitle for sync screen to choose folders-->
     <string name="sync_choose_folders">选择文件夹</string>
 </resources>

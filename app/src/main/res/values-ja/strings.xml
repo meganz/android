@@ -772,7 +772,7 @@
     <!-- Button to park an account -->
     <string name="park_account_button">放置</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">これは、あなたのアカウントをそのままにしておくための最後のステップです。新しいパスワードを入力してください。あなたのデータは少なくとも60日間は保持されます。そのままにしておいたアカウントのパスワードを思い出された場合は、support&#64;mega.nzまでご連絡ください。</string>
+    <string name="park_account_text_last_step">これは、あなたのアカウントをそのままにしておくための最後のステップです。新しいパスワードを入力してください。あなたのデータは少なくとも60&#160;日間は保持されます。そのままにしておいたアカウントのパスワードを思い出された場合は、support&#64;mega.nzまでご連絡ください。</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">新しいパスワードを入力</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
@@ -1810,7 +1810,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">次回アカウントにログインすると、オーセンティケータアプリで提供される6桁のコードを入力するよう求められます。</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">アプリへのアクセスができなくなったり、二要素認証を無効にしたい場合の問題を回避するために、<b>回復キー</b>安全な場所に保存してください。</string>
+    <string name="recommendation_2fa_enabled">Please save your                                                                         <b>recovery key</b>                                                                         in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">コードが無効です</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -5036,10 +5036,13 @@
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">ギャラリーへのアクセスを許可する</string>
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">アクセスを許可</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">アップデートが必要です</string>
+    <!-- The Body of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_message">当社の最新バージョンのアプリを使用されていないため、通話を開始したり、通話に参加したりできません。今すぐアップデートしてから続行してください。</string>
+    <!-- Button text of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_update_button">更新</string>
+    <!-- Negative Button text of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_cancel_button">却下</string>
     <!-- Title of the bottom panel when the only host left the call on meeting screen -->
     <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">主催者を割り当てて通話を終了する</string>
@@ -5054,7 +5057,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">インターネット接続がないためアップロードが一時停止されました</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">アップロードが一時停止されました。バッテリーが%1$d%%を下回っており、充電されていません。</string>
+    <string name="photos_camera_uploads_low_battery">アップロードが一時停止されました。バッテリーが%1$d&#160;%%を下回っており、充電されていません。</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">カメラアップロードが機能しなくなりました。これを解決するには、カメラアップロードを再度有効にしてみてください。問題が解決しない場合は、サポートにご連絡ください。</string>
     <!-- Camera uploads pending info in Photos screen. -->
@@ -5066,7 +5069,7 @@
         <item quantity="other">カメラアップロードが完了しました。%1$d個のファイルがアップロードされました。</item>
     </plurals>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
-    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]無料プランではミーティングに60分の制限があります。Proユーザー様は無制限の通話と、最大1000人の参加者まで可能です。[/A][B]ぜひ今すぐアップグレードしてください。[/B]</string>
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]無料プランではミーティングに60&#160;分の制限があります。Proユーザー様は無制限の通話と、最大1000&#160;人の参加者まで可能です。[/A][B]ぜひ今すぐアップグレードしてください。[/B]</string>
     <!-- Bottom sheet button to hide a node/file -->
     <string name="general_hide_node">隠す</string>
     <!-- Bottom sheet button to unhide a node/file -->
@@ -5075,11 +5078,30 @@
     <string name="notifications_screen_notification_label_promo">プロモ</string>
     <!-- Promo notification section title for promo notification section -->
     <string name="notifications_screen_notification_section_title">期間限定オファー</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <!-- The title of the Dialog shown to Change the SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_title">Change SFU Server</string>
+    <!-- The body of the Dialog shown to Change the SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_subtitle">デフォルトは-1です</string>
+    <!-- The placeholder text to prompt user to enter the SFU Server Id -->
     <string name="meetings_change_sfu_dialog_hint">SFU IDを入力してください</string>
+    <!-- Button text to change SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_action_button">変更</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
-    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">無料プランでは、1回のミーティングあたり60分の制限があります。[A]ぜひ今すぐアップグレードしてください。[/A]</string>
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">無料プランでは、1回のミーティングあたり60&#160;分の制限があります。[A]ぜひ今すぐアップグレードしてください。[/A]</string>
+    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
+    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">すぐに%1$sが請求され、お客様のサブスクリプションは1&#160;か月後に月額%2$sで自動的に更新されます。Google Playアカウントには、各請求期間の終了から24時間以内に更新料金が請求されます。サブスクリプションをキャンセルするには、請求期間が終了する少なくとも24&#160;時間前に、[A]Google&#160;Play[/A]のサブスクリプション経由でMEGA&#160;Proサブスクリプションの自動更新を無効にする必要があります。\nアカウントをアップグレードすると、MEGAの[B]ご利用規約[/B]および[C]プライバシーポリシー[/C]に同意されたことになります。</string>
+    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">すぐに%1$sが請求され、お客様のサブスクリプションは12&#160;か月後に月額%2$sで自動的に更新されます。Google Playアカウントには、各請求期間の終了から24時間以内に更新料金が請求されます。サブスクリプションをキャンセルするには、請求期間が終了する少なくとも24&#160;時間前に、[A]Google&#160;Play[/A]のサブスクリプション経由でMEGA&#160;Proサブスクリプションの自動更新を無効にする必要があります。\nアカウントをアップグレードすると、MEGAの[B]ご利用規約[/B]および[C]プライバシーポリシー[/C]に同意されたことになります。</string>
+    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
+    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">すぐに請求され、お客様のサブスクリプションは1&#160;か月後に自動的に更新されます。Google&#160;Playアカウントには、各請求期間の終了から24時間以内に更新料金が請求されます。サブスクリプションをキャンセルするには、請求期間が終了する少なくとも24&#160;時間前に、[A]Google&#160;Play[/A]のサブスクリプション経由でMEGA&#160;Proサブスクリプションの自動更新を無効にする必要があります。\nアカウントをアップグレードすると、MEGAの[B]ご利用規約[/B]および[C]プライバシーポリシー[/C]に同意されたことになります。</string>
+    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
+    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">すぐに請求され、お客様のサブスクリプションは12&#160;か月後に自動的に更新されます。Google&#160;Playアカウントには、各請求期間の終了から24&#160;時間以内に更新料金が請求されます。サブスクリプションをキャンセルするには、請求期間が終了する少なくとも24&#160;時間前に、[A]Google&#160;Play[/A]のサブスクリプション経由でMEGA&#160;Proサブスクリプションの自動更新を無効にする必要があります。\nアカウントをアップグレードすると、MEGAの[B]ご利用規約[/B]および[C]プライバシーポリシー[/C]に同意されたことになります。</string>
+    <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
+    <string name="account_business_account_deactivated_dialog_title">ビジネスアカウントの停止</string>
+    <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->
+    <string name="account_business_account_deactivated_dialog_sub_user_body">お支払いに失敗されたため、お客様のビジネスアカウントが無効になりました。データの閲覧のみが可能です。\nこの問題を解決するには、ビジネスアカウン管理者様にお尋ねください。</string>
+    <!-- The body of the Dialog shown to a suspended Business Account Administrator -->
+    <string name="account_business_account_deactivated_dialog_admin_body">お支払いに失敗されたため、お客様のビジネスアカウントが無効になりました。データの閲覧のみが可能です。\nお支払いを行ってサブスクリプションを再有効化するには、ブラウザからMEGAにログインしてください。</string>
+    <!-- The button of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
+    <string name="account_business_account_deactivated_dialog_button">はい、わかりました。</string>
 </resources>
