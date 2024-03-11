@@ -36,6 +36,7 @@ data class CreateTypedMessageRequest(
     override val chatGifInfo: ChatGifInfo?,
     override val nodeList: List<Node>,
     override val reactions: List<Reaction>,
+    override val exists: Boolean,
 ) : ChatMessageInfo by message, CreateTypedMessageInfo {
     constructor(
         chatMessage: ChatMessage,
@@ -43,6 +44,7 @@ data class CreateTypedMessageRequest(
         isMine: Boolean,
         shouldShowAvatar: Boolean,
         reactions: List<Reaction>,
+        exists: Boolean,
     ) : this(
         message = chatMessage,
         chatId = chatId,
@@ -55,5 +57,6 @@ data class CreateTypedMessageRequest(
         chatGifInfo = chatMessage.containsMeta?.giphy,
         nodeList = chatMessage.nodeList,
         reactions = reactions,
+        exists = exists,
     )
 }

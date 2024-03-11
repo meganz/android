@@ -49,6 +49,7 @@ class CreateNormalChatMessageUseCaseTest {
                     isMine = true,
                     shouldShowAvatar = true,
                     reactions = emptyList(),
+                    exists = true,
                 )
             )
         )
@@ -76,6 +77,7 @@ class CreateNormalChatMessageUseCaseTest {
                     isMine = true,
                     shouldShowAvatar = true,
                     reactions = emptyList(),
+                    exists = true,
                 )
             )
         )

@@ -5,11 +5,17 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.chat.message.reactions.GetReactionsUseCase
+import mega.privacy.android.domain.usecase.node.DoesNodeExistUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verifyNoInteractions
@@ -21,18 +27,19 @@ class CreateSaveMessageRequestUseCaseTest {
     private lateinit var underTest: CreateSaveMessageRequestUseCase
 
     private val getReactionsUseCase = mock<GetReactionsUseCase>()
+    private val doesNodeExistUseCase = mock<DoesNodeExistUseCase>()
 
     private val myHandle = 123L
     private val chatId = 456L
 
     @BeforeAll
     internal fun setUp() {
-        underTest = CreateSaveMessageRequestUseCase(getReactionsUseCase)
+        underTest = CreateSaveMessageRequestUseCase(getReactionsUseCase, doesNodeExistUseCase)
     }
 
     @BeforeEach
     internal fun resetMocks() {
-        reset(getReactionsUseCase)
+        reset(getReactionsUseCase, doesNodeExistUseCase)
     }
 
     @Test
@@ -146,5 +153,67 @@ class CreateSaveMessageRequestUseCaseTest {
         )
         assertThat(actual.map { it.reactions }).containsExactly(emptyList<Reaction>())
         verifyNoInteractions(getReactionsUseCase)
+    }
+
+
+
+    @Test
+    fun `test that exists is true if node list is null`() = runTest {
+        val message = mock<ChatMessage> {
+            on { nodeList }.thenReturn(emptyList())
+        }
+
+        val actual = underTest(
+            chatId = chatId,
+            chatMessages = listOf(message),
+            currentUserHandle = myHandle,
+            nextMessageUserHandle = null,
+        )
+
+        assertThat(actual.map { it.exists }).containsExactly(true)
+        verifyNoInteractions(doesNodeExistUseCase)
+    }
+
+    @Test
+    fun `test that exists is true if node list is not null and message is not mine`() = runTest {
+        val nodeId = NodeId(123L)
+        val node = mock<Node> {
+            on { id }.thenReturn(nodeId)
+        }
+        val message = mock<ChatMessage> {
+            on { nodeList } doReturn listOf(node)
+            on { userHandle } doReturn 789L
+        }
+        val actual = underTest(
+            chatId = chatId,
+            chatMessages = listOf(message),
+            currentUserHandle = myHandle,
+            nextMessageUserHandle = null,
+        )
+        assertThat(actual.map { it.exists }).containsExactly(true)
+        verifyNoInteractions(doesNodeExistUseCase)
+    }
+
+    @ParameterizedTest(name = " when does not exists use case returns {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that exists has correct value if node list is not null and message is mine`(
+        exists: Boolean,
+    ) = runTest {
+        val nodeId = NodeId(123L)
+        val node = mock<Node> {
+            on { id }.thenReturn(nodeId)
+        }
+        val message = mock<ChatMessage> {
+            on { nodeList } doReturn listOf(node)
+            on { userHandle } doReturn myHandle
+        }
+        whenever(doesNodeExistUseCase(nodeId)).thenReturn(exists)
+        val actual = underTest(
+            chatId = chatId,
+            chatMessages = listOf(message),
+            currentUserHandle = myHandle,
+            nextMessageUserHandle = null,
+        )
+        assertThat(actual.map { it.exists }).containsExactly(exists)
     }
 }

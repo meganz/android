@@ -14,7 +14,6 @@ import mega.privacy.android.domain.entity.node.Node
  * @property chatId Chat ID.
  * @property isMine True if the message is mine.
  * @property shouldShowAvatar True if the avatar should be shown.
- * @property shouldShowTime True if the time should be shown.
  * @property metaType [ContainsMetaType]
  * @property textMessage
  * @property chatRichPreviewInfo [ChatRichPreviewInfo]
@@ -22,6 +21,7 @@ import mega.privacy.android.domain.entity.node.Node
  * @property chatGifInfo [ChatGifInfo]
  * @property nodeList List of nodes
  * @property reactions List of [Reaction]
+ * @property exists Whether the message content exists.
  */
 interface CreateTypedMessageInfo : ChatMessageInfo {
     val chatId: Long
@@ -34,4 +34,5 @@ interface CreateTypedMessageInfo : ChatMessageInfo {
     val chatGifInfo: ChatGifInfo?
     val nodeList: List<Node>
     val reactions: List<Reaction>
+    val exists: Boolean
 }

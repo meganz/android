@@ -49,6 +49,7 @@ class CreateMetaMessageUseCaseTest {
                     isMine = true,
                     shouldShowAvatar = true,
                     reactions = emptyList(),
+                    exists = true,
                 )
             )
         ).isInstanceOf(
@@ -79,6 +80,7 @@ class CreateMetaMessageUseCaseTest {
                     isMine = true,
                     shouldShowAvatar = true,
                     reactions = emptyList(),
+                    exists = true,
                 )
             )
         ).isInstanceOf(

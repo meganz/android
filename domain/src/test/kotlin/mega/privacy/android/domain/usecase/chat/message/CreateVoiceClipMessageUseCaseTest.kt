@@ -32,14 +32,12 @@ class CreateVoiceClipMessageUseCaseTest {
 
     private val createInvalidMessageUseCase = mock<CreateInvalidMessageUseCase>()
     private val addChatFileTypeUseCase = mock<AddChatFileTypeUseCase>()
-    private val doesNodeExistUseCase: DoesNodeExistUseCase = mock()
 
     @BeforeAll
     internal fun setUp() {
         underTest =
             CreateVoiceClipMessageUseCase(
                 createInvalidMessageUseCase = createInvalidMessageUseCase,
-                doesNodeExistUseCase = doesNodeExistUseCase,
                 addChatFileTypeUseCase = addChatFileTypeUseCase,
             )
     }
@@ -49,7 +47,6 @@ class CreateVoiceClipMessageUseCaseTest {
         reset(
             createInvalidMessageUseCase,
             addChatFileTypeUseCase,
-            doesNodeExistUseCase
         )
 
     @Test
@@ -87,7 +84,7 @@ class CreateVoiceClipMessageUseCaseTest {
         val typedNode = mock<ChatDefaultFile> {
             on { name } doReturn "name"
         }
-        val request = buildRequest(message)
+        val request = buildRequest(message, exists)
         val expected = with(request) {
             VoiceClipMessage(
                 chatId = chatId,
@@ -108,19 +105,19 @@ class CreateVoiceClipMessageUseCaseTest {
                 exists = exists
             )
         }
-        whenever(doesNodeExistUseCase(fileNode.id)).thenReturn(exists)
         whenever(addChatFileTypeUseCase(fileNode, request.chatId, request.messageId))
             .thenReturn(typedNode)
         val actual = underTest(request)
         assertThat(actual).isEqualTo(expected)
     }
 
-    private fun buildRequest(message: ChatMessage) =
+    private fun buildRequest(message: ChatMessage, exists: Boolean = true) =
         CreateTypedMessageRequest(
             chatMessage = message,
             chatId = 123L,
             isMine = true,
             shouldShowAvatar = true,
             reactions = emptyList(),
+            exists = exists
         )
 }

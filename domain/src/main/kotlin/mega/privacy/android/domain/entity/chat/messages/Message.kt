@@ -66,6 +66,11 @@ interface Message {
     val content: String?
 
     /**
+     * Whether the message content exists
+     */
+    val exists: Boolean get() = true
+
+    /**
      * @return true if the message has not been sent due to an error
      */
     fun isSendError() = isMine &&

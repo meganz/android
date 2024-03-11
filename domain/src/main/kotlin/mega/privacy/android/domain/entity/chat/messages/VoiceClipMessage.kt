@@ -29,9 +29,9 @@ data class VoiceClipMessage(
     override val reactions: List<Reaction>,
     override val status: ChatMessageStatus,
     override val content: String?,
+    override val exists: Boolean,
     val fileNode: ChatFile,
     val name: String,
     val size: Long,
     val duration: Duration,
-    val exists: Boolean
 ) : TypedMessage

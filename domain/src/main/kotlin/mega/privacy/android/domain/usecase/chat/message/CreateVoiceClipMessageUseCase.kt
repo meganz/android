@@ -6,14 +6,12 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageInfo
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.usecase.node.DoesNodeExistUseCase
 import mega.privacy.android.domain.usecase.node.chat.AddChatFileTypeUseCase
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
 internal class CreateVoiceClipMessageUseCase @Inject constructor(
     private val createInvalidMessageUseCase: CreateInvalidMessageUseCase,
-    private val doesNodeExistUseCase: DoesNodeExistUseCase,
     private val addChatFileTypeUseCase: AddChatFileTypeUseCase,
 ) : CreateTypedMessageUseCase {
 
@@ -39,7 +37,7 @@ internal class CreateVoiceClipMessageUseCase @Inject constructor(
             shouldShowAvatar = shouldShowAvatar,
             reactions = reactions,
             content = content,
-            exists = if (isMine) doesNodeExistUseCase(typedNode.id) else true
+            exists = exists
         )
     }
 }

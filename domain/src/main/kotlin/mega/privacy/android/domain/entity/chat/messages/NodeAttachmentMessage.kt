@@ -24,9 +24,9 @@ data class NodeAttachmentMessage(
     override val reactions: List<Reaction>,
     override val status: ChatMessageStatus,
     override val content: String?,
+    override val exists: Boolean,
     override val rowId: Long,
     val fileNode: ChatFile,
-    val exists: Boolean,
 ) : AttachmentMessage {
     override val fileSize = fileNode.size
     override val fileName = fileNode.name

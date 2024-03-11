@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.chat.message.paging
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.usecase.chat.message.reactions.GetReactionsUseCase
+import mega.privacy.android.domain.usecase.node.DoesNodeExistUseCase
 import javax.inject.Inject
 
 /**
@@ -10,6 +11,7 @@ import javax.inject.Inject
  */
 class CreateSaveMessageRequestUseCase @Inject constructor(
     private val getReactionsUseCase: GetReactionsUseCase,
+    private val doesNodeExistUseCase: DoesNodeExistUseCase,
 ) {
 
     /**
@@ -27,7 +29,7 @@ class CreateSaveMessageRequestUseCase @Inject constructor(
     ): List<CreateTypedMessageRequest> {
         return chatMessages
             .sortedBy { it.timestamp }
-            .mapIndexed { index, chatMessage ->
+            .map { chatMessage ->
                 val isMine = chatMessage.userHandle == currentUserHandle
                 val shouldShowAvatar = shouldShowAvatar(
                     current = chatMessage,
@@ -38,12 +40,14 @@ class CreateSaveMessageRequestUseCase @Inject constructor(
                     ),
                     currentIsMine = isMine
                 )
-                val previous = chatMessages.getOrNull(index - 1)
                 val reactions = if (chatMessage.hasConfirmedReactions) {
                     getReactionsUseCase(chatId, chatMessage.messageId, currentUserHandle)
                 } else {
                     emptyList()
                 }
+                val exists = chatMessage.nodeList.firstOrNull()?.let {
+                    if (isMine) doesNodeExistUseCase(it.id) else true
+                } ?: true
 
                 CreateTypedMessageRequest(
                     chatMessage = chatMessage,
@@ -51,6 +55,7 @@ class CreateSaveMessageRequestUseCase @Inject constructor(
                     isMine = isMine,
                     shouldShowAvatar = shouldShowAvatar,
                     reactions = reactions,
+                    exists = exists
                 )
             }
     }

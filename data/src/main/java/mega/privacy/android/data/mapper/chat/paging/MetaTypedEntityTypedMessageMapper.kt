@@ -38,6 +38,7 @@ class MetaTypedEntityTypedMessageMapper @Inject constructor(
             chatGifInfo = entity.giphyEntity,
             nodeList = entity.nodeList,
             reactions = entity.typedMessageEntity.reactions,
+            exists = true
         )
 
         return createTypedMessageUseCases[entity.typedMessageEntity.type]?.invoke(request)

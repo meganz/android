@@ -30,21 +30,19 @@ class CreateNodeAttachmentMessageUseCaseTest {
 
     private val createInvalidMessageUseCase = mock<CreateInvalidMessageUseCase>()
     private val addChatFileTypeUseCase = mock<AddChatFileTypeUseCase>()
-    private val doesNodeExistUseCase: DoesNodeExistUseCase = mock()
 
     @BeforeAll
     internal fun setUp() {
         underTest =
             CreateNodeAttachmentMessageUseCase(
                 createInvalidMessageUseCase = createInvalidMessageUseCase,
-                doesNodeExistUseCase = doesNodeExistUseCase,
                 addChatFileTypeUseCase = addChatFileTypeUseCase,
             )
     }
 
     @BeforeEach
     internal fun resetMocks() =
-        reset(createInvalidMessageUseCase, addChatFileTypeUseCase, doesNodeExistUseCase)
+        reset(createInvalidMessageUseCase, addChatFileTypeUseCase)
 
     @Test
     fun `test that if message has no nodes it returns an invalid message`() = runTest {
@@ -79,7 +77,7 @@ class CreateNodeAttachmentMessageUseCaseTest {
             on { status } doReturn ChatMessageStatus.UNKNOWN
         }
         val typedNode = mock<ChatImageFile>()
-        val request = buildRequest(message)
+        val request = buildRequest(message, exists)
         val expected = with(request) {
             NodeAttachmentMessage(
                 chatId = 123L,
@@ -98,7 +96,6 @@ class CreateNodeAttachmentMessageUseCaseTest {
                 rowId = rowId,
             )
         }
-        whenever(doesNodeExistUseCase(fileNode.id)).thenReturn(exists)
         whenever(addChatFileTypeUseCase(fileNode, request.chatId, request.messageId)).thenReturn(
             typedNode
         )
@@ -106,12 +103,13 @@ class CreateNodeAttachmentMessageUseCaseTest {
         assertThat(actual).isEqualTo(expected)
     }
 
-    private fun buildRequest(message: ChatMessage) =
+    private fun buildRequest(message: ChatMessage, exists: Boolean = true) =
         CreateTypedMessageRequest(
             chatMessage = message,
             chatId = 123L,
             isMine = true,
             shouldShowAvatar = true,
             reactions = emptyList(),
+            exists = exists
         )
 }

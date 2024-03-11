@@ -98,6 +98,7 @@ class TypedMessageEntityMapperTest {
             shouldShowAvatar = expectedShouldShowAvatar,
             isMine = expectedIsMine,
             reactions = expectedReactions,
+            exists = true,
         )
 
         val actual = underTest(requestResolver)
