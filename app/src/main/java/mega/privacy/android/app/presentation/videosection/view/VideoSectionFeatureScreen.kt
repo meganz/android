@@ -25,16 +25,11 @@ internal fun VideoSectionFeatureScreen(
     onLongClick: (item: VideoUIEntity, index: Int) -> Unit,
     onPlaylistDetailItemClick: (item: VideoUIEntity, index: Int) -> Unit,
     onPlaylistDetailItemLongClick: (item: VideoUIEntity, index: Int) -> Unit,
-    onPlaylistItemClick: (item: VideoPlaylistUIEntity, index: Int) -> Unit,
     onPlaylistItemLongClick: (VideoPlaylistUIEntity, index: Int) -> Unit,
+    onActionModeFinished: () -> Unit,
     onPlaylistItemMenuClick: (VideoPlaylistUIEntity) -> Unit = {},
 ) {
     val navHostController = rememberNavController()
-    val route = navHostController.currentDestination?.route
-
-    LaunchedEffect(route) {
-        route?.let { videoSectionViewModel.setCurrentDestinationRoute(it) }
-    }
 
     VideoSectionNavHost(
         modifier = Modifier,
@@ -45,10 +40,10 @@ internal fun VideoSectionFeatureScreen(
         onMenuClick = onMenuClick,
         onLongClick = onLongClick,
         onPlaylistDetailItemClick = onPlaylistDetailItemClick,
-        onPlaylistItemClick = onPlaylistItemClick,
         onPlaylistItemLongClick = onPlaylistItemLongClick,
         onAddElementsClicked = onAddElementsClicked,
         onPlaylistDetailLongClicked = onPlaylistDetailItemLongClick,
+        onActionModeFinished = onActionModeFinished
     )
 }
 
@@ -59,11 +54,11 @@ internal fun VideoSectionNavHost(
     onSortOrderClick: () -> Unit,
     onMenuClick: (VideoUIEntity) -> Unit,
     onLongClick: (item: VideoUIEntity, index: Int) -> Unit,
-    onPlaylistItemClick: (VideoPlaylistUIEntity, index: Int) -> Unit,
     onPlaylistItemLongClick: (VideoPlaylistUIEntity, index: Int) -> Unit,
     onPlaylistDetailItemClick: (item: VideoUIEntity, index: Int) -> Unit,
     onAddElementsClicked: () -> Unit,
     onPlaylistDetailLongClicked: (item: VideoUIEntity, index: Int) -> Unit,
+    onActionModeFinished: () -> Unit,
     modifier: Modifier,
     onPlaylistItemMenuClick: (VideoPlaylistUIEntity) -> Unit = {},
     viewModel: VideoSectionViewModel = hiltViewModel(),
@@ -83,6 +78,12 @@ internal fun VideoSectionNavHost(
         navHostController.popBackStack()
     }
 
+    val route = navHostController.currentDestination?.route
+
+    LaunchedEffect(route) {
+        route?.let { viewModel.setCurrentDestinationRoute(it) }
+    }
+
     NavHost(
         modifier = modifier,
         navController = navHostController,
@@ -99,7 +100,7 @@ internal fun VideoSectionNavHost(
                 onLongClick = onLongClick,
                 onPlaylistItemClick = { playlist, index ->
                     if (state.isInSelection) {
-                        onPlaylistItemClick(playlist, index)
+                        viewModel.onVideoPlaylistItemClicked(playlist, index)
                     } else {
                         viewModel.updateCurrentVideoPlaylist(playlist)
                         navHostController.navigate(
@@ -108,7 +109,8 @@ internal fun VideoSectionNavHost(
                     }
                 },
                 onPlaylistItemMenuClick = onPlaylistItemMenuClick,
-                onPlaylistItemLongClick = onPlaylistItemLongClick
+                onPlaylistItemLongClick = onPlaylistItemLongClick,
+                onDeleteDialogButtonClicked = onActionModeFinished
             )
         }
         composable(
@@ -122,20 +124,28 @@ internal fun VideoSectionNavHost(
                 shouldShowVideoPlaylistBottomSheetDetails = state.shouldShowMoreVideoPlaylistOptions,
                 numberOfAddedVideos = state.numberOfAddedVideos,
                 addedMessageShown = viewModel::clearNumberOfAddedVideos,
+                numberOfRemovedItems = state.numberOfRemovedItems,
+                removedMessageShown = viewModel::clearNumberOfRemovedItems,
                 setShouldDeleteVideoPlaylistDialog = viewModel::setShouldDeleteSingleVideoPlaylist,
                 setShouldRenameVideoPlaylistDialog = viewModel::setShouldRenameVideoPlaylist,
                 setShouldShowVideoPlaylistBottomSheetDetails = viewModel::setShouldShowMoreVideoPlaylistOptions,
                 inputPlaceHolderText = state.createVideoPlaylistPlaceholderTitle,
                 setInputValidity = viewModel::setNewPlaylistTitleValidity,
                 onRenameDialogPositiveButtonClicked = viewModel::updateVideoPlaylistTitle,
-                onDeleteDialogPositiveButtonClicked = { playlist ->
-                    viewModel.removeVideoPlaylists(listOf(playlist))
-                },
+                onDeleteDialogPositiveButtonClicked = viewModel::removeVideoPlaylists,
                 onAddElementsClicked = onAddElementsClicked,
                 errorMessage = state.createDialogErrorMessage,
                 onClick = onPlaylistDetailItemClick,
                 onMenuClick = onMenuClick,
-                onLongClick = onPlaylistDetailLongClicked
+                onLongClick = onPlaylistDetailLongClicked,
+                shouldDeleteVideosDialog = state.shouldDeleteVideosFromPlaylist,
+                setShouldDeleteVideosDialog = viewModel::setShouldDeleteVideosFromPlaylist,
+                onDeleteVideosDialogPositiveButtonClicked = { playlist ->
+                    viewModel.setShouldDeleteVideosFromPlaylist(false)
+                    val removedVideoIDs = state.selectedVideoElementIDs
+                    viewModel.removeVideosFromPlaylist(playlist.id, removedVideoIDs)
+                    onActionModeFinished()
+                },
             )
         }
     }

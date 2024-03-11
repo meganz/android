@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
+import mega.privacy.android.app.presentation.videosection.view.playlist.DETAIL_DELETE_VIDEOS_DIALOG_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG
@@ -45,7 +46,7 @@ class VideoPlaylistDetailViewTest {
         inputPlaceHolderText: String = "",
         setInputValidity: (Boolean) -> Unit = {},
         onRenameDialogPositiveButtonClicked: (playlistID: NodeId, newTitle: String) -> Unit = { _, _ -> },
-        onDeleteDialogPositiveButtonClicked: (VideoPlaylistUIEntity) -> Unit = { _ -> },
+        onDeleteDialogPositiveButtonClicked: (List<VideoPlaylistUIEntity>) -> Unit = { _ -> },
         onAddElementsClicked: () -> Unit = {},
         errorMessage: Int? = null,
         onClick: (item: VideoUIEntity, index: Int) -> Unit = { _, _ -> },
@@ -53,6 +54,11 @@ class VideoPlaylistDetailViewTest {
         onLongClick: ((item: VideoUIEntity, index: Int) -> Unit) = { _, _ -> },
         numberOfAddedVideos: Int = 0,
         addedMessageShown: () -> Unit = {},
+        shouldDeleteVideosDialog: Boolean = false,
+        setShouldDeleteVideosDialog: (Boolean) -> Unit = {},
+        onDeleteVideosDialogPositiveButtonClicked: (VideoPlaylistUIEntity) -> Unit = {},
+        removedMessageShown: () -> Unit = {},
+        numberOfRemovedItems: Int = 0,
     ) {
         composeTestRule.setContent {
             VideoPlaylistDetailView(
@@ -75,7 +81,12 @@ class VideoPlaylistDetailViewTest {
                 onMenuClick = onMenuClick,
                 onLongClick = onLongClick,
                 numberOfAddedVideos = numberOfAddedVideos,
-                addedMessageShown = addedMessageShown
+                addedMessageShown = addedMessageShown,
+                shouldDeleteVideosDialog = shouldDeleteVideosDialog,
+                setShouldDeleteVideosDialog = setShouldDeleteVideosDialog,
+                onDeleteVideosDialogPositiveButtonClicked = onDeleteVideosDialogPositiveButtonClicked,
+                removedMessageShown = removedMessageShown,
+                numberOfRemovedItems = numberOfRemovedItems,
             )
         }
     }
@@ -162,6 +173,26 @@ class VideoPlaylistDetailViewTest {
 
         composeTestRule.onNodeWithTag(DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG)
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that DeleteVideosDialog is not displayed correctly when shouldDeleteVideosDialog is false`() {
+        setComposeContent(
+            playlist = playlist,
+            shouldDeleteVideosDialog = false
+        )
+
+        composeTestRule.onNodeWithTag(DETAIL_DELETE_VIDEOS_DIALOG_TEST_TAG).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `test that DeleteVideosDialog is displayed correctly when shouldDeleteVideosDialog is true`() {
+        setComposeContent(
+            playlist = playlist,
+            shouldDeleteVideosDialog = true
+        )
+
+        composeTestRule.onNodeWithTag(DETAIL_DELETE_VIDEOS_DIALOG_TEST_TAG).assertIsDisplayed()
     }
 
     @Test

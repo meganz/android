@@ -75,6 +75,7 @@ internal fun VideoPlaylistsView(
     onCreateDialogPositiveButtonClicked: (String) -> Unit,
     onRenameDialogPositiveButtonClicked: (playlistID: NodeId, newTitle: String) -> Unit,
     onDeleteDialogPositiveButtonClicked: (VideoPlaylistUIEntity) -> Unit,
+    onDeletePlaylistsDialogPositiveButtonClicked: () -> Unit,
     setInputValidity: (Boolean) -> Unit,
     onClick: (item: VideoPlaylistUIEntity, index: Int) -> Unit,
     onSortOrderClick: () -> Unit,
@@ -198,15 +199,22 @@ internal fun VideoPlaylistsView(
             }
 
             if (shouldDeleteVideoPlaylistDialog) {
-                DeleteVideoPlaylistDialog(
+                DeleteItemsDialog(
                     modifier = Modifier.testTag(DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
+                    title = "Delete playlist?",
+                    text = "Do we need additional explanation to delete playlists?",
+                    confirmButtonText = "Delete",
                     onDeleteButtonClicked = {
                         if (clickedItem != -1) {
                             onDeleteDialogPositiveButtonClicked(items[clickedItem])
+                        } else {
+                            onDeletePlaylistsDialogPositiveButtonClicked()
                         }
+                        clickedItem = -1
                     },
                     onDismiss = {
                         setShouldDeleteVideoPlaylist(false)
+                        clickedItem = -1
                     }
                 )
             }
@@ -271,7 +279,6 @@ internal fun VideoPlaylistsView(
                                 onMenuClick = {
                                     clickedItem = it
                                     coroutineScope.launch { modalSheetState.show() }
-
                                 },
                                 onLongClick = { onLongClick(videoPlaylistItem, it) }
                             )
@@ -319,16 +326,19 @@ internal fun CreateVideoPlaylistFabButton(
 }
 
 @Composable
-internal fun DeleteVideoPlaylistDialog(
+internal fun DeleteItemsDialog(
+    title: String,
+    text: String?,
+    confirmButtonText: String,
     onDeleteButtonClicked: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     MegaAlertDialog(
         modifier = modifier,
-        title = "Delete playlist?",
-        text = "Do we need additional explanation to delete playlists?",
-        confirmButtonText = "Delete",
+        title = title,
+        text = text ?: "",
+        confirmButtonText = confirmButtonText,
         cancelButtonText = stringResource(id = R.string.button_cancel),
         onConfirm = onDeleteButtonClicked,
         onDismiss = onDismiss
@@ -339,7 +349,24 @@ internal fun DeleteVideoPlaylistDialog(
 @Composable
 private fun DeleteVideoPlaylistDialogPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
-        DeleteVideoPlaylistDialog(
+        DeleteItemsDialog(
+            title = "Delete playlist?",
+            text = "Do we need additional explanation to delete playlists?",
+            confirmButtonText = "Delete",
+            onDeleteButtonClicked = {},
+            onDismiss = {}
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun DeleteVideosDialogPreview() {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        DeleteItemsDialog(
+            title = "Remove from playlist?",
+            text = null,
+            confirmButtonText = "Remove",
             onDeleteButtonClicked = {},
             onDismiss = {}
         )
@@ -374,6 +401,7 @@ private fun VideoPlaylistsViewPreview() {
             onDeleteDialogPositiveButtonClicked = {},
             onDeletedMessageShown = {},
             setInputValidity = {},
+            onDeletePlaylistsDialogPositiveButtonClicked = {}
         )
     }
 }
@@ -405,7 +433,8 @@ private fun VideoPlaylistsViewCreateDialogShownPreview() {
             onRenameDialogPositiveButtonClicked = { _, _ -> },
             onDeleteDialogPositiveButtonClicked = {},
             setInputValidity = {},
-            onDeletedMessageShown = {}
+            onDeletedMessageShown = {},
+            onDeletePlaylistsDialogPositiveButtonClicked = {}
         )
     }
 }

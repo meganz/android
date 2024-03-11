@@ -180,6 +180,23 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
             route?.let { updateToolbarWhenDestinationChanged(it) }
         }
 
+        viewLifecycleOwner.collectFlow(
+            videoSectionViewModel.state.map { it.actionMode }.distinctUntilChanged()
+        ) { isActionMode ->
+            if (!isActionMode) {
+                actionMode?.finish()
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(
+            videoSectionViewModel.state.map { it.isVideoPlaylistCreatedSuccessfully }
+                .distinctUntilChanged()
+        ) { isSuccess ->
+            if (isSuccess) {
+                navigateToVideoSelectedActivity()
+            }
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             merge(
                 videoSectionViewModel.state.map { it.selectedVideoHandles }.distinctUntilChanged(),
@@ -223,12 +240,7 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                             showOptionsMenuForItem(item)
                         },
                         onAddElementsClicked = {
-                            videoSelectedActivityLauncher.launch(
-                                Intent(
-                                    requireActivity(),
-                                    VideoSelectedActivity::class.java
-                                )
-                            )
+                            navigateToVideoSelectedActivity()
                         },
                         onPlaylistDetailItemClick = { item, index ->
                             if (uiState.isInSelection) {
@@ -241,9 +253,6 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                                 )
                             }
                         },
-                        onPlaylistItemClick = { item, index ->
-                            videoSectionViewModel.onVideoPlaylistItemClicked(item, index)
-                        },
                         onPlaylistItemLongClick = { item, index ->
                             activateVideoPlaylistActionMode(ACTION_TYPE_VIDEO_PLAYLIST)
                             videoSectionViewModel.onVideoPlaylistItemClicked(item, index)
@@ -251,11 +260,21 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                         onPlaylistDetailItemLongClick = { item, index ->
                             activateVideoPlaylistActionMode(ACTION_TYPE_VIDEO_PLAYLIST_DETAIL)
                             videoSectionViewModel.onVideoItemOfPlaylistClicked(item, index)
-                        }
+                        },
+                        onActionModeFinished = { actionMode?.finish() }
                     )
                 }
             }
         }
+    }
+
+    private fun navigateToVideoSelectedActivity() {
+        videoSelectedActivityLauncher.launch(
+            Intent(
+                requireActivity(),
+                VideoSelectedActivity::class.java
+            )
+        )
     }
 
     private fun showSortByPanel() {
@@ -332,6 +351,7 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                         disableSelectMode()
                     }
                 )
+            videoSectionViewModel.setActionMode(true)
         }
     }
 
@@ -347,6 +367,7 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                         disableSelectMode()
                     }
                 )
+            videoSectionViewModel.setActionMode(true)
         }
     }
 
@@ -390,6 +411,7 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
         videoSectionViewModel.clearAllSelectedVideos()
         videoSectionViewModel.clearAllSelectedVideoPlaylists()
         videoSectionViewModel.clearAllSelectedVideosOfPlaylist()
+        videoSectionViewModel.setActionMode(false)
     }
 
     private fun setupMiniAudioPlayer() {

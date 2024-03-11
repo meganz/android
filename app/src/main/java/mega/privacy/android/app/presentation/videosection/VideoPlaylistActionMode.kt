@@ -56,7 +56,11 @@ internal class VideoPlaylistActionMode(
                 }
 
 
-                R.id.action_delete -> {}
+                R.id.action_delete -> if (actionType == ACTION_TYPE_VIDEO_PLAYLIST_DETAIL) {
+                    videoSectionViewModel.setShouldDeleteVideosFromPlaylist(true)
+                } else {
+                    videoSectionViewModel.setShouldDeleteVideoPlaylist(true)
+                }
             }
         }
     }

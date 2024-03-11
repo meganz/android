@@ -62,41 +62,6 @@ import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
- * Test tag for empty view
- */
-const val VIDEO_PLAYLIST_DETAIL_EMPTY_VIEW_TEST_TAG = "video_playlist_detail_empty_view_test_tag"
-
-/**
- * Test tag for playlist title
- */
-const val PLAYLIST_TITLE_TEST_TAG = "playlist_title_test_tag"
-
-/**
- * Test tag for playlist total duration
- */
-const val PLAYLIST_TOTAL_DURATION_TEST_TAG = "playlist_total_duration_test_tag"
-
-/**
- * Test tag for playlist number of videos
- */
-const val PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG = "playlist_number_of_videos_test_tag"
-
-/**
- * Test tag for RenameVideoPlaylistDialog in detail page
- */
-const val DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
-    "detail_rename_video_playlist_dialog_test_tag"
-
-/**
- * Test tag for DeleteVideoPlaylistDialog in detail page
- */
-const val DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
-    "detail_delete_video_playlist_dialog_test_tag"
-
-
-internal const val videoPlaylistDetailRoute = "videoSection/video_playlist/detail"
-
-/**
  * Video playlist detail view
  */
 @OptIn(ExperimentalMaterialApi::class)
@@ -106,16 +71,21 @@ fun VideoPlaylistDetailView(
     isInputTitleValid: Boolean,
     shouldDeleteVideoPlaylistDialog: Boolean,
     shouldRenameVideoPlaylistDialog: Boolean,
+    shouldDeleteVideosDialog: Boolean,
     shouldShowVideoPlaylistBottomSheetDetails: Boolean,
     numberOfAddedVideos: Int,
+    numberOfRemovedItems: Int,
     addedMessageShown: () -> Unit,
+    removedMessageShown: () -> Unit,
     setShouldDeleteVideoPlaylistDialog: (Boolean) -> Unit,
     setShouldRenameVideoPlaylistDialog: (Boolean) -> Unit,
     setShouldShowVideoPlaylistBottomSheetDetails: (Boolean) -> Unit,
+    setShouldDeleteVideosDialog: (Boolean) -> Unit,
     inputPlaceHolderText: String,
     setInputValidity: (Boolean) -> Unit,
     onRenameDialogPositiveButtonClicked: (playlistID: NodeId, newTitle: String) -> Unit,
-    onDeleteDialogPositiveButtonClicked: (VideoPlaylistUIEntity) -> Unit,
+    onDeleteDialogPositiveButtonClicked: (List<VideoPlaylistUIEntity>) -> Unit,
+    onDeleteVideosDialogPositiveButtonClicked: (VideoPlaylistUIEntity) -> Unit,
     onAddElementsClicked: () -> Unit,
     modifier: Modifier = Modifier,
     errorMessage: Int? = null,
@@ -162,6 +132,18 @@ fun VideoPlaylistDetailView(
         }
     }
 
+    LaunchedEffect(numberOfRemovedItems) {
+        if (numberOfRemovedItems > 0) {
+            val message = if (numberOfRemovedItems == 1) {
+                "1 item"
+            } else {
+                "$numberOfRemovedItems items"
+            }
+            snackBarHostState.showSnackbar("Removed $message from \'${playlist?.title}\'")
+            removedMessageShown()
+        }
+    }
+
     BackHandler(enabled = modalSheetState.isVisible) {
         coroutineScope.launch {
             modalSheetState.hide()
@@ -188,8 +170,8 @@ fun VideoPlaylistDetailView(
             )
         }
     ) { paddingValue ->
-        if (shouldRenameVideoPlaylistDialog) {
-            playlist?.let {
+        playlist?.let {
+            if (shouldRenameVideoPlaylistDialog) {
                 CreateVideoPlaylistDialog(
                     modifier = Modifier.testTag(DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
                     title = "Rename",
@@ -210,14 +192,15 @@ fun VideoPlaylistDetailView(
                     isInputTitleValid
                 }
             }
-        }
 
-        if (shouldDeleteVideoPlaylistDialog) {
-            playlist?.let {
-                DeleteVideoPlaylistDialog(
+            if (shouldDeleteVideoPlaylistDialog) {
+                DeleteItemsDialog(
                     modifier = Modifier.testTag(DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
+                    title = "Delete playlist?",
+                    text = "Do we need additional explanation to delete playlists?",
+                    confirmButtonText = "Delete",
                     onDeleteButtonClicked = {
-                        onDeleteDialogPositiveButtonClicked(playlist)
+                        onDeleteDialogPositiveButtonClicked(listOf(playlist))
                     },
                     onDismiss = {
                         setShouldDeleteVideoPlaylistDialog(false)
@@ -225,7 +208,24 @@ fun VideoPlaylistDetailView(
                     }
                 )
             }
+
+            if (shouldDeleteVideosDialog) {
+                DeleteItemsDialog(
+                    modifier = Modifier.testTag(DETAIL_DELETE_VIDEOS_DIALOG_TEST_TAG),
+                    title = "Remove from playlist?",
+                    text = null,
+                    confirmButtonText = "Remove",
+                    onDeleteButtonClicked = {
+                        onDeleteVideosDialogPositiveButtonClicked(playlist)
+                    },
+                    onDismiss = {
+                        setShouldDeleteVideosDialog(false)
+                        coroutineScope.launch { modalSheetState.hide() }
+                    }
+                )
+            }
         }
+
 
         Column(modifier = modifier.padding(paddingValue)) {
             VideoPlaylistHeaderView(
@@ -433,6 +433,11 @@ private fun VideoPlaylistDetailViewPreview() {
             setShouldShowVideoPlaylistBottomSheetDetails = {},
             addedMessageShown = {},
             numberOfAddedVideos = 0,
+            shouldDeleteVideosDialog = false,
+            setShouldDeleteVideosDialog = {},
+            onDeleteVideosDialogPositiveButtonClicked = {},
+            removedMessageShown = {},
+            numberOfRemovedItems = 0,
         )
     }
 }
@@ -458,3 +463,43 @@ private fun PlayAllButtonViewPreview() {
         PlayAllButtonView()
     }
 }
+
+/**
+ * Test tag for empty view
+ */
+const val VIDEO_PLAYLIST_DETAIL_EMPTY_VIEW_TEST_TAG = "video_playlist_detail_empty_view_test_tag"
+
+/**
+ * Test tag for playlist title
+ */
+const val PLAYLIST_TITLE_TEST_TAG = "playlist_title_test_tag"
+
+/**
+ * Test tag for playlist total duration
+ */
+const val PLAYLIST_TOTAL_DURATION_TEST_TAG = "playlist_total_duration_test_tag"
+
+/**
+ * Test tag for playlist number of videos
+ */
+const val PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG = "playlist_number_of_videos_test_tag"
+
+/**
+ * Test tag for RenameVideoPlaylistDialog in detail page
+ */
+const val DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
+    "detail_rename_video_playlist_dialog_test_tag"
+
+/**
+ * Test tag for delete video playlist in detail page
+ */
+const val DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
+    "detail_delete_video_playlist_dialog_test_tag"
+
+/**
+ * Test tag for delete videos dialog in detail page
+ */
+const val DETAIL_DELETE_VIDEOS_DIALOG_TEST_TAG = "detail_delete_videos_dialog_test_tag"
+
+
+internal const val videoPlaylistDetailRoute = "videoSection/video_playlist/detail"
