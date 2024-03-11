@@ -5,6 +5,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.core.ui.model.MenuActionWithClick
+import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.management.ManagementMessage
@@ -19,7 +20,9 @@ internal class SelectMessageAction(
     testTag = "action_select"
 ) {
     override fun shouldDisplayFor(messages: Set<TypedMessage>) = messages.size == 1
-            && messages.first() !is ManagementMessage && messages.first() !is InvalidMetaMessage
+            && messages.first() !is ManagementMessage
+            && messages.first() !is InvalidMetaMessage
+            && messages.first() !is PendingAttachmentMessage
             && messages.first() !is InvalidMessage
 
     override fun toolbarItem(

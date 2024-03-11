@@ -1,6 +1,10 @@
 package mega.privacy.android.domain.usecase.chat.message.delete
 
+import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
+import mega.privacy.android.domain.entity.chat.messages.meta.MetaMessage
+import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import javax.inject.Inject
 
@@ -15,5 +19,10 @@ class DeleteGeneralMessageUseCase @Inject constructor(
         chatMessageRepository.deleteMessage(message.chatId, message.msgId)
     }
 
-    override suspend fun canDelete(message: TypedMessage) = message.isDeletable
+    override suspend fun canDelete(message: TypedMessage) =
+        message.isDeletable &&
+                (message is InvalidMessage
+                        || message is MetaMessage
+                        || message is NormalMessage
+                        || message is ContactAttachmentMessage)
 }

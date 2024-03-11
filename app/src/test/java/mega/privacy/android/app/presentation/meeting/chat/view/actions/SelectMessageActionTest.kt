@@ -8,6 +8,7 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
+import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
 import mega.privacy.android.domain.entity.chat.messages.management.ManagementMessage
@@ -98,6 +99,11 @@ class SelectMessageActionTest {
     fun `test that action does not apply to more than one message`() {
         assertThat(underTest.appliesTo(setOf(mock<NormalMessage>(), mock<NormalMessage>())))
             .isFalse()
+    }
+
+    @Test
+    fun `test that action does not apply to pending messages`() {
+        assertThat(underTest.appliesTo(setOf(mock<PendingFileAttachmentMessage>()))).isFalse()
     }
 
     @Test

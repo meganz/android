@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatPicker
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
+import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.domain.entity.chat.messages.invalid.InvalidMessage
@@ -32,7 +33,7 @@ internal class ForwardMessageAction(
     testTag = "action_forward",
 ) {
     override fun shouldDisplayFor(messages: Set<TypedMessage>) = messages.isNotEmpty()
-            && messages.none { it is ManagementMessage || it is InvalidMessage || it is InvalidMetaMessage }
+            && messages.none { it is ManagementMessage || it is InvalidMessage || it is InvalidMetaMessage || it is PendingAttachmentMessage }
             && messages.none { it is NodeAttachmentMessage && !it.exists }
             && messages.none { it is VoiceClipMessage && !it.exists }
 
