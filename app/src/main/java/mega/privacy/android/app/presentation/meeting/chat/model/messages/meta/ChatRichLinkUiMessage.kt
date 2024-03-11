@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages.meta
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -11,8 +9,6 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarMessage
 import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.ChatRichLinkMessageView
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
-import mega.privacy.android.core.ui.theme.extensions.conditional
-import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
 
 /**
@@ -20,28 +16,27 @@ import mega.privacy.android.domain.entity.chat.messages.meta.RichPreviewMessage
  *
  * @property message
  * @property showAvatar
- * @property showTime
  */
 data class ChatRichLinkUiMessage(
     override val message: RichPreviewMessage,
     override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
-    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun ContentComposable(
-        onLongClick: (TypedMessage) -> Unit,
         interactionEnabled: Boolean,
+        initialiseModifier: (onClick: () -> Unit) -> Modifier,
     ) {
         val uriHandler = LocalUriHandler.current
         ChatRichLinkMessageView(
             isMe = message.isMine,
             preview = message.chatRichPreviewInfo,
             content = message.content,
-            modifier = Modifier.conditional(interactionEnabled) {
-                combinedClickable(
-                    onClick = { message.chatRichPreviewInfo?.url?.let { uriHandler.openUri(it) } },
-                    onLongClick = { onLongClick(message) }
-                )
+            modifier = initialiseModifier {
+                message.chatRichPreviewInfo?.url?.let {
+                    uriHandler.openUri(
+                        it
+                    )
+                }
             },
         )
     }

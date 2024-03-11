@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages.meta
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,8 +11,6 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.AvatarM
 import mega.privacy.android.app.presentation.meeting.chat.view.message.meta.GiphyMessageView
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openGiphyViewerActivity
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
-import mega.privacy.android.core.ui.theme.extensions.conditional
-import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.GiphyMessage
 
 private const val MAX_SIZE_FOR_AUTO_PLAY = 1024 * 1024 * 4  // 4MB
@@ -25,7 +21,6 @@ private const val MAX_SIZE_FOR_AUTO_PLAY = 1024 * 1024 * 4  // 4MB
  * @property message
  * @property showAvatar
  */
-@OptIn(ExperimentalFoundationApi::class)
 class ChatGiphyUiMessage(
     override val message: GiphyMessage,
     override val reactions: List<UIReaction>,
@@ -33,8 +28,8 @@ class ChatGiphyUiMessage(
 
     @Composable
     override fun ContentComposable(
-        onLongClick: (TypedMessage) -> Unit,
-        interactionEnabled: Boolean
+        interactionEnabled: Boolean,
+        initialiseModifier: (onClick: () -> Unit) -> Modifier,
     ) {
         message.chatGifInfo?.let { giphy ->
             var autoPlayGif: Boolean by remember { mutableStateOf(giphy.webpSize < MAX_SIZE_FOR_AUTO_PLAY) }
@@ -51,12 +46,7 @@ class ChatGiphyUiMessage(
             GiphyMessageView(
                 gifInfo = giphy,
                 autoPlay = autoPlayGif,
-                modifier = Modifier.conditional(interactionEnabled) {
-                    combinedClickable(
-                        onClick = { onClick() },
-                        onLongClick = { onLongClick(message) }
-                    )
-                },
+                modifier = initialiseModifier(onClick),
                 title = giphy.title,
                 onLoaded = { autoPlayGif = true },
                 onError = { autoPlayGif = false }

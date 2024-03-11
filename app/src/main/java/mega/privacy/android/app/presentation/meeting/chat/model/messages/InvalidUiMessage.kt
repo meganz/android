@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.controls.chat.messages.ChatErrorBubble
@@ -25,8 +26,8 @@ sealed class InvalidUiMessage : AvatarMessage() {
 
     @Composable
     override fun ContentComposable(
-        onLongClick: (TypedMessage) -> Unit,
-        interactionEnabled: Boolean
+        interactionEnabled: Boolean,
+        initialiseModifier: (onClick: () -> Unit) -> Modifier,
     ) {
         ChatErrorBubble(errorText = getErrorMessage())
     }

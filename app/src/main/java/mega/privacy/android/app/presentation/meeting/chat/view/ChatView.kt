@@ -827,6 +827,13 @@ internal fun ChatView(
                             val deselectItem = { message: TypedMessage ->
                                 selectedMessages = selectedMessages - message
                             }
+
+                            val onSendErrorClick: (TypedMessage) -> Unit = {
+                                coroutineScope.launch {
+                                    messageNotSentBottomSheetState.show()
+                                }
+                            }
+                            
                             MessageListView(
                                 MessageListParameter(
                                     uiState = uiState,
@@ -842,7 +849,7 @@ internal fun ChatView(
                                     selectItem = selectItem,
                                     deselectItem = deselectItem,
                                     selectMode = isSelectMode,
-                                    onSendErrorClick = { TODO("Not implemented") }
+                                    onSendErrorClick = onSendErrorClick
                                 )
                             )
 

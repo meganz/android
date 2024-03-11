@@ -1,13 +1,13 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.PendingAttachmentMessageView
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.PendingVoiceClipMessageView
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.PendingVoiceClipMessage
-import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
 /**
  * Pending attachment ui message
@@ -19,8 +19,8 @@ data class PendingAttachmentUiMessage(
 
     @Composable
     override fun ContentComposable(
-        onLongClick: (TypedMessage) -> Unit,
         interactionEnabled: Boolean,
+        initialiseModifier: (onClick: () -> Unit) -> Modifier,
     ) {
         when (message) {
             is PendingVoiceClipMessage -> PendingVoiceClipMessageView(message)

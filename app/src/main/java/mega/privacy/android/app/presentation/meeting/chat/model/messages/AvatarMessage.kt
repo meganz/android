@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
@@ -7,11 +9,13 @@ import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
 import mega.privacy.android.core.ui.controls.chat.ChatMessageContainer
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
 /**
  * Avatar message
  */
+@OptIn(ExperimentalFoundationApi::class)
 abstract class AvatarMessage : UiChatMessage {
 
     /**
@@ -19,8 +23,8 @@ abstract class AvatarMessage : UiChatMessage {
      */
     @Composable
     abstract fun ContentComposable(
-        onLongClick: (TypedMessage) -> Unit,
         interactionEnabled: Boolean,
+        initialiseModifier: (onClick: () -> Unit) -> Modifier,
     )
 
     abstract override val message: TypedMessage
@@ -74,10 +78,50 @@ abstract class AvatarMessage : UiChatMessage {
                     lastUpdatedCache = state.lastUpdatedCache,
                     avatarModifier,
                 )
-            }
+            },
+            isSendError = message.isSendError()
         ) { interactionEnabled ->
-            ContentComposable(onLongClick, interactionEnabled)
+            ContentComposable(interactionEnabled) {
+                Modifier.contentInteraction(
+                    onSendErrorClicked = onSendErrorClicked,
+                    onClick = it,
+                    onLongClick = onLongClick,
+                    interactionEnabled = interactionEnabled
+                )
+            }
         }
+    }
+
+    private fun Modifier.contentInteraction(
+        onSendErrorClicked: (TypedMessage) -> Unit,
+        onClick: () -> Unit,
+        onLongClick: (TypedMessage) -> Unit,
+        interactionEnabled: Boolean,
+    ) = if (message.isSendError()) {
+        forSendError(
+            onErrorClick = { onSendErrorClicked(message) }
+        )
+    } else {
+        setClickHandlers(
+            onClick = onClick,
+            onLongClick = { onLongClick(message) },
+            interactionEnabled = interactionEnabled,
+        )
+    }
+
+    private fun Modifier.forSendError(onErrorClick: () -> Unit) = this.combinedClickable(
+        onClick = onErrorClick,
+    )
+
+    private fun Modifier.setClickHandlers(
+        onClick: () -> Unit,
+        onLongClick: () -> Unit,
+        interactionEnabled: Boolean,
+    ) = this.conditional(interactionEnabled) {
+        combinedClickable(
+            onClick = onClick,
+            onLongClick = onLongClick
+        )
     }
 
     override val isSelectable = true

@@ -2,8 +2,6 @@ package mega.privacy.android.app.presentation.meeting.chat.model.messages
 
 import android.content.Context
 import android.content.Intent
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,13 +25,11 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
-import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
-import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.chat.ChatFile
@@ -45,7 +41,6 @@ import java.io.File
  *
  * @param message [NodeAttachmentMessageView]
  */
-@OptIn(ExperimentalFoundationApi::class)
 data class NodeAttachmentUiMessage(
     override val message: NodeAttachmentMessage,
     override val reactions: List<UIReaction>,
@@ -53,8 +48,8 @@ data class NodeAttachmentUiMessage(
 
     @Composable
     override fun ContentComposable(
-        onLongClick: (TypedMessage) -> Unit,
         interactionEnabled: Boolean,
+        initialiseModifier: (onClick: () -> Unit) -> Modifier,
     ) {
         val viewModel: NodeAttachmentMessageViewModel = hiltViewModel()
         val chatViewModel: ChatViewModel = hiltViewModel()
@@ -119,12 +114,7 @@ data class NodeAttachmentUiMessage(
 
         NodeAttachmentMessageView(
             message = message,
-            modifier = Modifier.conditional(interactionEnabled) {
-                combinedClickable(
-                    onClick = onClick,
-                    onLongClick = { onLongClick(message) }
-                )
-            },
+            modifier = initialiseModifier(onClick),
             uiState = uiState,
         )
     }

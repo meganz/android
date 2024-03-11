@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,8 +14,6 @@ import mega.privacy.android.app.presentation.meeting.chat.view.message.voiceclip
 import mega.privacy.android.core.ui.controls.chat.messages.CoreVoiceClipMessageView
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
-import mega.privacy.android.core.ui.theme.extensions.conditional
-import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 
 /**
@@ -25,7 +21,6 @@ import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
  *
  * @property message [VoiceClipMessage]
  */
-@OptIn(ExperimentalFoundationApi::class)
 class VoiceClipUiMessage(
     override val message: VoiceClipMessage,
     override val reactions: List<UIReaction>,
@@ -33,8 +28,8 @@ class VoiceClipUiMessage(
 
     @Composable
     override fun ContentComposable(
-        onLongClick: (TypedMessage) -> Unit,
         interactionEnabled: Boolean,
+        initialiseModifier: (onClick: () -> Unit) -> Modifier,
     ) {
         val viewModel: VoiceClipMessageViewModel = hiltViewModel()
 
@@ -67,12 +62,7 @@ class VoiceClipUiMessage(
                 isPlaying = uiState.isPlaying,
                 onPlayClicked = onClick,
                 interactionEnabled = interactionEnabled,
-                modifier = Modifier.conditional(interactionEnabled) {
-                    combinedClickable(
-                        onClick = onClick,
-                        onLongClick = { onLongClick(message) },
-                    )
-                }
+                modifier = initialiseModifier(onClick)
             )
         }
     }

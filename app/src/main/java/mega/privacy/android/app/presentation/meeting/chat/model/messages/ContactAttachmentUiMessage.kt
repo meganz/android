@@ -1,8 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages
 
 import android.content.Context
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.SnackbarDuration
@@ -30,9 +28,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openSe
 import mega.privacy.android.core.ui.controls.chat.UiChatStatus
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
-import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
-import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.user.UserVisibility
 
 /**
@@ -40,9 +36,7 @@ import mega.privacy.android.domain.entity.user.UserVisibility
  *
  * @property message
  * @property showAvatar
- * @property showTime
  */
-@OptIn(ExperimentalFoundationApi::class)
 data class ContactAttachmentUiMessage(
     override val message: ContactAttachmentMessage,
     override val reactions: List<UIReaction>,
@@ -50,8 +44,8 @@ data class ContactAttachmentUiMessage(
 
     @Composable
     override fun ContentComposable(
-        onLongClick: (TypedMessage) -> Unit,
-        interactionEnabled: Boolean
+        interactionEnabled: Boolean,
+        initialiseModifier: (onClick: () -> Unit) -> Modifier,
     ) {
         val viewModel: ContactMessageViewModel = hiltViewModel()
         var status by remember { mutableStateOf<UiChatStatus?>(null) }
@@ -61,15 +55,15 @@ data class ContactAttachmentUiMessage(
         val snackbarHostState = LocalSnackBarHostState.current
         val onClick = {
             onUserClick(
-                message.contactHandle,
-                message.contactEmail,
-                message.contactUserName,
-                message.isContact,
-                context,
-                coroutineScope,
-                snackbarHostState,
-                viewModel::checkUser,
-                viewModel::inviteUser,
+                handle = message.contactHandle,
+                email = message.contactEmail,
+                name = message.contactUserName,
+                isContact = message.isContact,
+                context = context,
+                coroutineScope = coroutineScope,
+                snackbarHostState = snackbarHostState,
+                checkContact = viewModel::checkUser,
+                inviteUser = viewModel::inviteUser,
             )
         }
 
@@ -88,12 +82,7 @@ data class ContactAttachmentUiMessage(
             message = message,
             userName = userName,
             status = status,
-            modifier = Modifier.conditional(interactionEnabled) {
-                combinedClickable(
-                    onClick = onClick,
-                    onLongClick = { onLongClick(message) }
-                )
-            },
+            modifier = initialiseModifier(onClick),
         )
     }
 

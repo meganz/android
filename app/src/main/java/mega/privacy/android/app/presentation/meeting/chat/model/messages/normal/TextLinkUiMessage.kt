@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.model.messages.normal
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -23,9 +21,7 @@ import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReac
 import mega.privacy.android.core.ui.controls.dividers.DividerSpacing
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
-import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.domain.entity.RegexPatternType
-import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
 
 /**
@@ -33,15 +29,14 @@ import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
  * @property message Contact link message
  *
  */
-@OptIn(ExperimentalFoundationApi::class)
 data class TextLinkUiMessage(
     override val message: TextLinkMessage,
     override val reactions: List<UIReaction>,
 ) : AvatarMessage() {
     @Composable
     override fun ContentComposable(
-        onLongClick: (TypedMessage) -> Unit,
         interactionEnabled: Boolean,
+        initialiseModifier: (onClick: () -> Unit) -> Modifier,
     ) {
         val viewModel: ChatLinksMessageViewModel = hiltViewModel()
         val contactViewModel: ContactMessageViewModel = hiltViewModel()
@@ -97,24 +92,13 @@ data class TextLinkUiMessage(
         }
         ChatLinksMessageView(
             message = message,
-            modifier = Modifier.conditional(interactionEnabled) {
-                combinedClickable(
-                    onClick = { contentLinks.firstOrNull()?.onClick(context) },
-                    onLongClick = { onLongClick(message) }
-                )
-            },
+            modifier = initialiseModifier { contentLinks.firstOrNull()?.onClick(context) },
         ) {
             contentLinks.forEachIndexed { index, linkContent ->
                 key(linkContent.link) {
                     linkContent.SubContentComposable(
-                        modifier = Modifier.conditional(
-                            interactionEnabled
-                        ) {
-                            combinedClickable(
-                                onClick = { linkContent.onClick(context) },
-                                onLongClick = { onLongClick(message) }
-                            )
-                        })
+                        modifier = initialiseModifier { linkContent.onClick(context) },
+                    )
                 }
 
                 if (index != contentLinks.lastIndex) {
