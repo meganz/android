@@ -38,6 +38,7 @@ import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import mega.privacy.android.domain.usecase.videosection.GetSyncUploadsFolderIdsUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
+import mega.privacy.android.domain.usecase.videosection.RemoveVideosFromPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -77,8 +78,12 @@ class VideoSectionViewModelTest {
     private val removeVideoPlaylistsUseCase = mock<RemoveVideoPlaylistsUseCase>()
     private val updateVideoPlaylistTitleUseCase = mock<UpdateVideoPlaylistTitleUseCase>()
     private val getSyncUploadsFolderIdsUseCase = mock<GetSyncUploadsFolderIdsUseCase>()
+    private val removeVideosFromPlaylistUseCase = mock<RemoveVideosFromPlaylistUseCase>()
 
-    private val expectedVideo = mock<VideoUIEntity> { on { name }.thenReturn("video name") }
+    private val expectedVideo = mock<VideoUIEntity> {
+        on { name }.thenReturn("video name")
+        on { elementID }.thenReturn(1L)
+    }
     private val videoPlaylistUIEntity = mock<VideoPlaylistUIEntity> {
         on { title }.thenReturn("playlist")
         on { videos }.thenReturn(listOf(expectedVideo, expectedVideo))
@@ -114,7 +119,8 @@ class VideoSectionViewModelTest {
             getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
             removeVideoPlaylistsUseCase = removeVideoPlaylistsUseCase,
             updateVideoPlaylistTitleUseCase = updateVideoPlaylistTitleUseCase,
-            getSyncUploadsFolderIdsUseCase = getSyncUploadsFolderIdsUseCase
+            getSyncUploadsFolderIdsUseCase = getSyncUploadsFolderIdsUseCase,
+            removeVideosFromPlaylistUseCase = removeVideosFromPlaylistUseCase,
         )
     }
 
@@ -136,7 +142,8 @@ class VideoSectionViewModelTest {
             addVideosToPlaylistUseCase,
             getNextDefaultAlbumNameUseCase,
             updateVideoPlaylistTitleUseCase,
-            getSyncUploadsFolderIdsUseCase
+            getSyncUploadsFolderIdsUseCase,
+            removeVideosFromPlaylistUseCase
         )
     }
 
@@ -458,7 +465,7 @@ class VideoSectionViewModelTest {
                 assertThat(awaitItem().currentVideoPlaylist?.videos).isNotEmpty()
 
                 underTest.onVideoItemOfPlaylistClicked(expectedVideo, 0)
-                assertThat(awaitItem().selectedVideoHandlesOfPlaylist.size).isEqualTo(1)
+                assertThat(awaitItem().selectedVideoElementIDs.size).isEqualTo(1)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -475,7 +482,7 @@ class VideoSectionViewModelTest {
 
                 underTest.selectAllVideosOfPlaylist()
                 awaitItem().let { state ->
-                    assertThat(state.selectedVideoHandlesOfPlaylist.size).isEqualTo(2)
+                    assertThat(state.selectedVideoElementIDs.size).isEqualTo(2)
                 }
                 cancelAndIgnoreRemainingEvents()
             }
@@ -576,6 +583,49 @@ class VideoSectionViewModelTest {
                 assertThat(updated.isPlaylistProgressBarShown).isFalse()
                 assertThat(updated.currentVideoPlaylist?.title).isEqualTo(videoPlaylistUIEntity.title)
                 assertThat(updated.currentVideoPlaylist?.id).isEqualTo(videoPlaylistUIEntity.id)
+                underTest.clearNumberOfAddedVideos()
+                assertThat(awaitItem().numberOfAddedVideos).isEqualTo(0)
+            }
+        }
+
+    @Test
+    fun `test that the number of removed videos is correct when removing videos from a playlist`() =
+        runTest {
+            val testPlaylistID = NodeId(1L)
+            val testVideoElementIDs = listOf(1L, 2L, 3L)
+            val videoPlaylist = mock<VideoPlaylist> {
+                on { title }.thenReturn("playlist")
+                on { id }.thenReturn(NodeId(1L))
+            }
+            val videoPlaylistUIEntity = mock<VideoPlaylistUIEntity> {
+                on { title }.thenReturn("playlist")
+                on { id }.thenReturn(NodeId(0L))
+            }
+
+            whenever(
+                removeVideosFromPlaylistUseCase(
+                    testPlaylistID,
+                    testVideoElementIDs
+                )
+            ).thenReturn(
+                testVideoElementIDs.size
+            )
+            whenever(getVideoPlaylistsUseCase()).thenReturn(listOf(videoPlaylist, videoPlaylist))
+            whenever(videoPlaylistUIEntityMapper(videoPlaylist)).thenReturn(videoPlaylistUIEntity)
+
+            initUnderTest()
+            underTest.updateCurrentVideoPlaylist(videoPlaylistUIEntity)
+            underTest.removeVideosFromPlaylist(testPlaylistID, testVideoElementIDs)
+            underTest.state.drop(1).test {
+                val actual = awaitItem()
+                assertThat(actual.numberOfRemovedItems).isEqualTo(testVideoElementIDs.size)
+                val updated = awaitItem()
+                assertThat(updated.videoPlaylists).isNotEmpty()
+                assertThat(updated.isPlaylistProgressBarShown).isFalse()
+                assertThat(updated.currentVideoPlaylist?.title).isEqualTo(videoPlaylistUIEntity.title)
+                assertThat(updated.currentVideoPlaylist?.id).isEqualTo(videoPlaylistUIEntity.id)
+                underTest.clearNumberOfRemovedItems()
+                assertThat(awaitItem().numberOfRemovedItems).isEqualTo(0)
             }
         }
 
@@ -621,6 +671,32 @@ class VideoSectionViewModelTest {
             assertThat(awaitItem().shouldCreateVideoPlaylist).isTrue()
             underTest.setShouldCreateVideoPlaylist(false)
             assertThat(awaitItem().shouldCreateVideoPlaylist).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that the shouldDeleteVideosFromPlaylist is correctly updated`() = runTest {
+        initUnderTest()
+
+        underTest.state.test {
+            assertThat(awaitItem().shouldDeleteVideosFromPlaylist).isFalse()
+            underTest.setShouldDeleteVideosFromPlaylist(true)
+            assertThat(awaitItem().shouldDeleteVideosFromPlaylist).isTrue()
+            underTest.setShouldDeleteVideosFromPlaylist(false)
+            assertThat(awaitItem().shouldDeleteVideosFromPlaylist).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that the actionMode is correctly updated`() = runTest {
+        initUnderTest()
+
+        underTest.state.test {
+            assertThat(awaitItem().actionMode).isFalse()
+            underTest.setActionMode(true)
+            assertThat(awaitItem().actionMode).isTrue()
+            underTest.setActionMode(false)
+            assertThat(awaitItem().actionMode).isFalse()
         }
     }
 

@@ -9,8 +9,10 @@ internal class TypedVideoNodeMapper @Inject constructor() {
     operator fun invoke(
         fileNode: FileNode,
         duration: Int,
+        elementID: Long? = null,
     ) = TypedVideoNode(
         fileNode = fileNode,
         duration = duration.seconds,
+        elementID = elementID
     )
 }

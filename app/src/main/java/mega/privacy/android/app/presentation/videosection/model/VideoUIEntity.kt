@@ -16,6 +16,7 @@ import java.io.File
  * @property isFavourite the video if is Favourite
  * @property nodeAvailableOffline the video if is available for offline
  * @property isSharedItems the video if is share
+ * @property elementID the element id if the video is belong to a playlist
  * @property isSelected the video if is selected
  */
 data class VideoUIEntity(
@@ -29,5 +30,6 @@ data class VideoUIEntity(
     val isFavourite: Boolean = false,
     val nodeAvailableOffline: Boolean = false,
     val isSharedItems: Boolean = false,
+    val elementID: Long? = null,
     val isSelected: Boolean = false
 )

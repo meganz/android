@@ -185,7 +185,7 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                 videoSectionViewModel.state.map { it.selectedVideoHandles }.distinctUntilChanged(),
                 videoSectionViewModel.state.map { it.selectedVideoPlaylistHandles }
                     .distinctUntilChanged(),
-                videoSectionViewModel.state.map { it.selectedVideoHandlesOfPlaylist }
+                videoSectionViewModel.state.map { it.selectedVideoElementIDs }
                     .distinctUntilChanged()
             ).collectLatest { list ->
                 updateActionModeTitle(count = list.size)

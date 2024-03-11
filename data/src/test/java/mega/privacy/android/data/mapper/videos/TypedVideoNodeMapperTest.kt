@@ -2,7 +2,6 @@ package mega.privacy.android.data.mapper.videos
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.node.FileNode
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -22,12 +21,15 @@ class TypedVideoNodeMapperTest @Inject constructor() {
     fun `test that VideoNodeMapper can be mapped correctly`() {
         val expectedDuration = 1000
         val expectedFileNode = mock<FileNode>()
+        val expectedElementID = 1L
 
         underTest(
             fileNode = expectedFileNode,
             duration = expectedDuration,
+            elementID = expectedElementID
         ).let {
             assertThat(it.duration.inWholeSeconds).isEqualTo(expectedDuration)
+            assertThat(it.elementID).isEqualTo(expectedElementID)
         }
     }
 }

@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
@@ -9,6 +10,7 @@ import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.CreateSetElementListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.listener.RemoveSetElementListenerInterface
 import mega.privacy.android.data.listener.RemoveSetsListenerInterface
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.UserSetMapper
@@ -114,6 +116,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                         null
                     ),
                     duration = megaNode.duration,
+                    elementID = element.id()
                 )
             }
         }
@@ -172,6 +175,35 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
             }
         }
 
+    override suspend fun removeVideosFromPlaylist(
+        playlistID: NodeId,
+        videoElementIDs: List<Long>,
+    ) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                launch {
+                    val listener = RemoveSetElementListenerInterface(
+                        target = videoElementIDs.size,
+                        onCompletion = { success, _ ->
+                            continuation.resumeWith(Result.success(success))
+                        }
+                    )
+                    for (elementID in videoElementIDs) {
+                        megaApiGateway.removeSetElement(
+                            sid = playlistID.longValue,
+                            eid = elementID,
+                            listener = listener,
+                        )
+                    }
+                    continuation.invokeOnCancellation {
+                        megaApiGateway.removeRequestListener(
+                            listener
+                        )
+                    }
+                }
+            }
+        }
+
     override suspend fun addVideosToPlaylist(playlistID: NodeId, videoIDs: List<NodeId>) =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->
@@ -194,7 +226,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
 
     override suspend fun updateVideoPlaylistTitle(
         playlistID: NodeId,
-        newTitle: String
+        newTitle: String,
     ): String =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->

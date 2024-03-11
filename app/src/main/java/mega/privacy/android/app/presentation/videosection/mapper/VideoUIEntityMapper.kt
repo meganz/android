@@ -27,6 +27,7 @@ class VideoUIEntityMapper @Inject constructor(
         thumbnail = typedVideoNode.thumbnailPath?.let { File(it) },
         isFavourite = typedVideoNode.isFavourite,
         isSharedItems = typedVideoNode.exportedData != null,
-        nodeAvailableOffline = typedVideoNode.isAvailableOffline
+        nodeAvailableOffline = typedVideoNode.isAvailableOffline,
+        elementID = typedVideoNode.elementID
     )
 }

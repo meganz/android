@@ -30,7 +30,6 @@ import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElementList
 import nz.mega.sdk.MegaSetList
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -99,7 +98,7 @@ class VideoSectionRepositoryImplTest {
         whenever(megaApiGateway.searchByType(any(), any(), any(), any()))
             .thenReturn(listOf(mock(), mock()))
         whenever(megaLocalRoomGateway.getAllOfflineInfo()).thenReturn(emptyList())
-        whenever(typedVideoNodeMapper(any(), any())).thenReturn(mock())
+        whenever(typedVideoNodeMapper(any(), any(), any())).thenReturn(mock())
 
         val actual = underTest.getAllVideos(SortOrder.ORDER_MODIFICATION_DESC)
         assertThat(actual.isNotEmpty()).isTrue()
@@ -188,7 +187,7 @@ class VideoSectionRepositoryImplTest {
         whenever(megaApiGateway.getSets()).thenReturn(megaSetList)
         whenever(megaApiGateway.getSetElements(any())).thenReturn(megaSetElementList)
         whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(megaNode)
-        whenever(typedVideoNodeMapper(any(), any())).thenReturn(typedVideoNode)
+        whenever(typedVideoNodeMapper(any(), any(), any())).thenReturn(typedVideoNode)
     }
 
     @Test
@@ -320,6 +319,56 @@ class VideoSectionRepositoryImplTest {
             initUnderTest()
             val actual =
                 underTest.addVideosToPlaylist(playlistID = testPlaylistId, videoIDs = testVideoIDs)
+            assertThat(actual).isEqualTo(0)
+        }
+
+    @Test
+    fun `test that removeVideosFromPlaylist returns correctly`() =
+        runTest {
+            val testPlaylistId = NodeId(1L)
+            val testVideoElementIDs = listOf(1L, 2L)
+
+            whenever(megaApiGateway.removeSetElement(any(), any(), any())).thenAnswer {
+                (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock {
+                        on { errorCode }.thenReturn(MegaError.API_OK)
+                    }
+                )
+            }
+
+            initUnderTest()
+            val actual =
+                underTest.removeVideosFromPlaylist(
+                    playlistID = testPlaylistId,
+                    videoElementIDs = testVideoElementIDs
+                )
+            assertThat(actual).isEqualTo(2)
+        }
+
+    @Test
+    fun `test that removeVideosFromPlaylist returns 0 when removeSetElement returns a MegaError`() =
+        runTest {
+            val testPlaylistId = NodeId(1L)
+            val testVideoIDs = listOf(1L, 2L)
+
+            whenever(megaApiGateway.removeSetElement(any(), any(), any())).thenAnswer {
+                (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock {
+                        on { errorCode }.thenReturn(MegaError.API_EBLOCKED)
+                    }
+                )
+            }
+
+            initUnderTest()
+            val actual =
+                underTest.removeVideosFromPlaylist(
+                    playlistID = testPlaylistId,
+                    videoElementIDs = testVideoIDs
+                )
             assertThat(actual).isEqualTo(0)
         }
 
