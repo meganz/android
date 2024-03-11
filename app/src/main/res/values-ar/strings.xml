@@ -817,7 +817,7 @@
     <!-- Button to park an account -->
     <string name="park_account_button">ركن</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">هذه هي الخطوة الأخيرة لركن حسابك، يرجى إدخال كلمة المرور الجديدة. سيتم الاحتفاظ ببياناتك لمدة 60 يوماً على الأقل. إذا كنت تتذكر كلمة مرور حسابك المركون، يرجى التواصل معنا عبر البريد الالكتروني support&#64;mega.nz</string>
+    <string name="park_account_text_last_step">This is the last step to park your account, please enter your new password. Your data will be retained for at least 60&#160;days. If you recall your parked account’s password, please contact support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">أدخل كلمة مرور جديدة</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
@@ -2025,7 +2025,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">في المرة القادمة التي تسجل فيها الدخول الى حسابك سيطلب منك إدخال رمز من 6 أرقام ستزود به من تطبيق المصادقة الخاص بك.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">يرجى حفظ <b>مفتاح الاستعادة</b> الخاص بك في مكان آمن لتجنب المشاكل في حالة فقد الوصول إلى التطبيق الخاص بك أو إذا كنت ترغب في تعطيل المصادقة المزدوجة.</string>
+    <string name="recommendation_2fa_enabled">Please save your                                                                         <b>recovery key</b>                                                                         in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">الرمز غير صالح</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -6211,10 +6211,13 @@
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">السماح بالوصول إلى معرض الصور الخاص بك</string>
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">منح اذن الوصول</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">التحديث مطلوب</string>
+    <!-- The Body of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_message">انت لا تستخدم أحدث إصدار من تطبيقنا لذا لا يمكنك بدء المكالمات أو الانضمام إليها. قم بالتحديث الآن للمتابعة.</string>
+    <!-- Button text of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_update_button">تحديث</string>
+    <!-- Negative Button text of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_cancel_button">رفض</string>
     <!-- Title of the bottom panel when the only host left the call on meeting screen -->
     <string name="meeting_call_screen_title_of_bottom_panel_when_only_host_leave_the_meeting">تعيين مضيف لمغادرة المكالمة</string>
@@ -6231,7 +6234,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">تم إيقاف الترفيع مؤقتًا. شحن البطارية أقل من %1$d%% و ليست تُشحن الآن.</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">توقفت ترفيعات الكاميرا عن العمل. حاول إعادة تمكين ترفيعات الكاميرا لحلها. إذا استمرت المشكلة يرجى التواصل مع الدعم</string>
+    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="zero">ترفيعات الكاميرا قيد الإنجاز، %1$d ملف معلق</item>
@@ -6251,7 +6254,7 @@
         <item quantity="other">اكتملت عمليات ترفيعات الكاميرا، وتم ترفيع %1$d ملف</item>
     </plurals>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
-    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]باقتك المجانية لها حد 60 دقيقة للاجتماعات. يتمتع مستخدمو برو Pro بمكالمات غير محدودة وما يصل إلى 1000 مشارك.[/A] [B]قم بالترقية الآن.[/B]</string>
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Your free plan has a 60&#160;minute limit on meetings. Pro users have unlimited calls and up to 1000&#160;participants.[/A] [B]Upgrade now.[/B]</string>
     <!-- Bottom sheet button to hide a node/file -->
     <string name="general_hide_node">إخفاء</string>
     <!-- Bottom sheet button to unhide a node/file -->
@@ -6260,11 +6263,30 @@
     <string name="notifications_screen_notification_label_promo">ترويج</string>
     <!-- Promo notification section title for promo notification section -->
     <string name="notifications_screen_notification_section_title">عرض لفترة محدودة</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <!-- The title of the Dialog shown to Change the SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_title">Change SFU Server</string>
+    <!-- The body of the Dialog shown to Change the SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_subtitle">الافتراضي هو -1</string>
+    <!-- The placeholder text to prompt user to enter the SFU Server Id -->
     <string name="meetings_change_sfu_dialog_hint">أدخل معرف SFU</string>
+    <!-- Button text to change SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_action_button">تغيير</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
-    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">الباقات المجانية لها حد 60 دقيقة لكل اجتماع. [A]قم بالترقية الآن.[/A]</string>
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Free plans have a limit of 60&#160;minutes per meeting. [A]Upgrade now.[/A]</string>
+    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
+    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">You will be charged %1$s immediately and your subscription will automatically renew after 1&#160;month for %2$s per month. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">You will be charged %1$s immediately and your subscription will automatically renew after 12&#160;months for %2$s per year. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
+    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">You will be charged immediately and your subscription will automatically renew after 1&#160;month. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
+    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">You will be charged immediately and your subscription will automatically renew after 12&#160;months. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
+    <string name="account_business_account_deactivated_dialog_title">Business account deactivated</string>
+    <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->
+    <string name="account_business_account_deactivated_dialog_sub_user_body">Your Business account has been deactivated due to payment failure. You can only browse your data.\nAsk your Business account administrator to resolve the issue.</string>
+    <!-- The body of the Dialog shown to a suspended Business Account Administrator -->
+    <string name="account_business_account_deactivated_dialog_admin_body">Your Business account has been deactivated due to payment failure. You can only browse your data.\nTo make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
+    <!-- The button of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
+    <string name="account_business_account_deactivated_dialog_button">حسنًا، فهمت ذلك</string>
 </resources>
