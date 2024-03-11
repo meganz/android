@@ -34,5 +34,6 @@ data class TextLinkMessage(
     override val reactions: List<Reaction>,
     override val status: ChatMessageStatus,
     override val content: String,
+    override val rowId: Long,
     val links: List<LinkDetail>,
 ) : NormalMessage

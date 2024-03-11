@@ -13,7 +13,7 @@ import kotlin.time.Duration
  * @property fileType
  */
 @Polymorphic
-interface AttachmentMessage : TypedMessage {
+interface AttachmentMessage : UserMessage {
     val fileSize: Long
     val fileName: String
     val duration: Duration?

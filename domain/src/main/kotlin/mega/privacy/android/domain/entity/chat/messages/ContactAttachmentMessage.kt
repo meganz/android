@@ -26,9 +26,10 @@ data class ContactAttachmentMessage(
     override val reactions: List<Reaction>,
     override val status: ChatMessageStatus,
     override val content: String?,
+    override val rowId: Long,
     val contactEmail: String,
     val contactUserName: String,
     val contactHandle: Long,
     val isMe: Boolean,
     val isContact: Boolean,
-) : TypedMessage
+) : UserMessage

@@ -23,6 +23,7 @@ data class TextMessage(
     override val reactions: List<Reaction>,
     override val status: ChatMessageStatus,
     override val content: String,
+    override val rowId: Long,
     val hasOtherLink: Boolean,
     val isEdited: Boolean,
 ) : NormalMessage

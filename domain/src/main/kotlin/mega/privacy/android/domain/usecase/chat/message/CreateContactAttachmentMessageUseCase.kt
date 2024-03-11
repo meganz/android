@@ -34,6 +34,7 @@ internal class CreateContactAttachmentMessageUseCase @Inject constructor(
             contactHandle = contactHandle,
             isMe = contactHandle != -1L && getMyUserHandleUseCase() == contactHandle,
             isContact = isContact,
+            rowId = rowId,
         )
     }
 }

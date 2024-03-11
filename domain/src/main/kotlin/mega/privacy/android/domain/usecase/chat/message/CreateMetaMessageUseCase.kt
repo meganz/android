@@ -29,6 +29,7 @@ class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase
                 content = content.orEmpty(),
                 isEdited = isEdited,
                 status = status,
+                rowId = rowId,
             )
 
             ContainsMetaType.GEOLOCATION -> LocationMessage(
@@ -45,6 +46,7 @@ class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase
                 isEdited = isEdited,
                 status = status,
                 content = content,
+                rowId = rowId,
             )
 
             ContainsMetaType.GIPHY -> GiphyMessage(
@@ -60,6 +62,7 @@ class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase
                 reactions = reactions,
                 status = status,
                 content = content,
+                rowId = rowId,
             )
 
             else -> InvalidMetaMessage(
@@ -74,6 +77,7 @@ class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase
                 reactions = reactions,
                 status = status,
                 content = content,
+                rowId = rowId,
             )
         }
     }

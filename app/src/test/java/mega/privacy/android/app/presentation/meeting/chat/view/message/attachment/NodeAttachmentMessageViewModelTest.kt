@@ -451,6 +451,7 @@ class NodeAttachmentMessageViewModelTest {
             status = ChatMessageStatus.UNKNOWN,
             content = null,
             exists = true,
+            rowId = 1L,
         )
 }
 

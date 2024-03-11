@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.entity.chat.messages.normal
 
 import kotlinx.serialization.Polymorphic
-import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.domain.entity.chat.messages.UserMessage
 
 /**
  * Call message
@@ -9,4 +9,4 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
  * @property content Message content
  */
 @Polymorphic
-interface NormalMessage : TypedMessage
+interface NormalMessage : UserMessage

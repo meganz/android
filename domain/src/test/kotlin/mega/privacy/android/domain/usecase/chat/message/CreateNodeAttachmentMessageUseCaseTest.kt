@@ -94,7 +94,8 @@ class CreateNodeAttachmentMessageUseCaseTest {
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
                 content = null,
-                exists = exists
+                exists = exists,
+                rowId = rowId,
             )
         }
         whenever(doesNodeExistUseCase(fileNode.id)).thenReturn(exists)
