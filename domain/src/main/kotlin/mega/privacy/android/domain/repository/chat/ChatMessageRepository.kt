@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.domain.entity.chat.messages.UserMessage
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
@@ -498,4 +499,11 @@ interface ChatMessageRepository {
      * @param chatId
      */
     suspend fun clearChatPendingMessages(chatId: Long)
+
+    /**
+     * Remove sent message
+     *
+     * @param message
+     */
+    suspend fun removeSentMessage(message: UserMessage)
 }

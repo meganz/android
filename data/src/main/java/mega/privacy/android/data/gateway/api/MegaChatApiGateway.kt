@@ -1795,4 +1795,12 @@ interface MegaChatApiGateway {
         latitude: Float,
         img: String,
     ): MegaChatMessage?
+
+    /**
+     * Remove failed message
+     *
+     * @param chatId
+     * @param rowId
+     */
+    suspend fun removeFailedMessage(chatId: Long, rowId: Long)
 }

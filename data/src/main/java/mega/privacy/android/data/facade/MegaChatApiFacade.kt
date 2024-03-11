@@ -833,4 +833,8 @@ internal class MegaChatApiFacade @Inject constructor(
         latitude: Float,
         img: String,
     ): MegaChatMessage? = chatApi.editGeolocation(chatId, msgId, longitude, latitude, img)
+
+    override suspend fun removeFailedMessage(chatId: Long, rowId: Long) {
+        chatApi.removeUnsentMessage(chatId, rowId)
+    }
 }
