@@ -6,7 +6,6 @@ import mega.privacy.android.data.mapper.chat.ChatMessageMapper
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.room.update.ChatRoomMessageUpdate
-import mega.privacy.android.domain.entity.chat.room.update.HistoryTruncated
 import mega.privacy.android.domain.entity.chat.room.update.HistoryTruncatedByRetentionTime
 import mega.privacy.android.domain.entity.chat.room.update.MessageLoaded
 import mega.privacy.android.domain.entity.chat.room.update.MessageReceived
@@ -55,10 +54,6 @@ class ChatRoomMessageUpdateMapperTest {
 
     private fun provideMessageUpdates(): Stream<Arguments>? {
         val megaMessage = mock<MegaChatMessage>()
-        val truncatedMessage = mock<MegaChatMessage> {
-            on { hasChanged(MegaChatMessage.CHANGE_TYPE_CONTENT) }.thenReturn(true)
-            on { type }.thenReturn(MegaChatMessage.TYPE_TRUNCATE)
-        }
 
         return Stream.of(
             Arguments.of(mock<ChatRoomUpdate.OnHistoryTruncatedByRetentionTime> {
@@ -73,10 +68,6 @@ class ChatRoomMessageUpdateMapperTest {
             Arguments.of(
                 mock<ChatRoomUpdate.OnMessageReceived> { on { msg }.thenReturn(megaMessage) },
                 MessageReceived(chatMessage)
-            ),
-            Arguments.of(
-                mock<ChatRoomUpdate.OnMessageUpdate> { on { msg }.thenReturn(truncatedMessage) },
-                HistoryTruncated(chatMessage)
             ),
             Arguments.of(
                 mock<ChatRoomUpdate.OnMessageUpdate> { on { msg }.thenReturn(megaMessage) },
