@@ -3,6 +3,7 @@ variables:
 
 stages:
   - scan
+  - wait_for_jenkins # This is a workaround until DevOps moves our gitleaks step to Jenkins. This will not impact CI/CD times, as this is running in parallel.
 
 scan:
   stage: scan
@@ -11,3 +12,9 @@ scan:
     entrypoint: [""]
   script:
     - gitleaks detect -v --redact -c .gitleaks/gitleaks.toml
+
+wait_for_jenkins:
+  stage: wait_for_jenkins
+  script:
+    - echo "Waiting for Jenkins..."
+    - sleep 300  # 5 minutes
