@@ -14,6 +14,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.CanNotOpenFileDialog
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
+import mega.privacy.android.core.ui.model.MenuActionWithClick
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.mobile.analytics.event.ChatConversationOpenWithActionMenuItemEvent
@@ -28,6 +29,10 @@ internal class OpenWithMessageAction(
 ) {
     override fun shouldDisplayFor(messages: Set<TypedMessage>) =
         messages.size == 1 && messages.first().let { it is NodeAttachmentMessage && it.exists }
+    override fun toolbarItem(
+        messages: Set<TypedMessage>,
+        onClick: () -> Unit,
+    ): MenuActionWithClick? = null
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {

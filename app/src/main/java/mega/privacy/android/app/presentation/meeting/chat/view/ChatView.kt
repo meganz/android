@@ -384,6 +384,10 @@ internal fun ChatView(
     BackHandler(enabled = showEmojiPicker) {
         showEmojiPicker = false
     }
+    BackHandler(enabled = isSelectMode) {
+        isSelectMode = false
+        selectedMessages = emptySet()
+    }
     LaunchedEffect(isTextInputPressed) {
         if (isTextInputPressed) {
             showEmojiPicker = false
