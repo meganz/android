@@ -164,11 +164,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Sets the MegaApi::setSecureFlag
-     */
-    SetSecureFlag("Sets the secure flag value for MegaApi", false),
-
-    /**
      * Permanent logging toggle
      */
     PermanentLogging("Permanently enable logging, removing functionality to turn it on/off", true),

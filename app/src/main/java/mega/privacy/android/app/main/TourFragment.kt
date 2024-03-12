@@ -20,11 +20,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication.Companion.isLoggingOut
 import mega.privacy.android.app.R
@@ -32,18 +30,14 @@ import mega.privacy.android.app.TourImageAdapter
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.DialogRecoveryKeyBinding
 import mega.privacy.android.app.databinding.FragmentTourBinding
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestDialogFragment
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
-import mega.privacy.android.domain.usecase.account.SetSecureFlag
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * Tour Fragment.
@@ -56,12 +50,6 @@ class TourFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var joinMeetingAsGuestLauncher: ActivityResultLauncher<String>
-
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
-
-    @Inject
-    lateinit var setSecureFlag: SetSecureFlag
 
     private val selectedCircle by lazy {
         ContextCompat.getDrawable(requireContext(), R.drawable.selection_circle_page_adapter)
@@ -152,10 +140,6 @@ class TourFragment : Fragment() {
                     }
                 }
             })
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            setSecureFlag(getFeatureFlagValueUseCase(AppFeatures.SetSecureFlag))
         }
     }
 

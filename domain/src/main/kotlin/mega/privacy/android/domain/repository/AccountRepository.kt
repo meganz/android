@@ -380,13 +380,6 @@ interface AccountRepository {
     suspend fun upgradeSecurity()
 
     /**
-     * Sets the secure share flag to true or false
-     *
-     * @param enable : Boolean
-     */
-    suspend fun setSecureFlag(enable: Boolean)
-
-    /**
      * Monitor update upgrade security events set in app
      *
      * @return

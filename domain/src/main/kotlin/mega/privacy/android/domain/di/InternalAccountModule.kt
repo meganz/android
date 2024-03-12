@@ -13,7 +13,6 @@ import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
-import mega.privacy.android.domain.usecase.account.SetSecureFlag
 import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.UpgradeSecurity
 
@@ -70,9 +69,5 @@ internal abstract class InternalAccountModule {
         @Provides
         fun provideSetSecurityUpgradeInApp(accountRepository: AccountRepository): SetSecurityUpgradeInApp =
             SetSecurityUpgradeInApp(accountRepository::setUpgradeSecurity)
-
-        @Provides
-        fun provideSetSecureFlag(accountRepository: AccountRepository): SetSecureFlag =
-            SetSecureFlag(accountRepository::setSecureFlag)
     }
 }

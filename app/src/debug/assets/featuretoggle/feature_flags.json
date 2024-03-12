@@ -2,9 +2,5 @@
   {
     "name": "PermanentLogging",
     "value": true
-  },
-  {
-    "name": "SetSecureFlag",
-    "value": true
   }
 ]
