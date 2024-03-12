@@ -139,7 +139,7 @@ class PagedChatMessageRemoteMediatorTest {
     internal fun `test that message database is cleared when load type is refresh`() = runTest {
         underTest.load(LoadType.REFRESH, state)
 
-        verify(clearChatMessagesUseCase).invoke(chatId)
+        verify(clearChatMessagesUseCase).invoke(chatId, false)
     }
 
     @Test
