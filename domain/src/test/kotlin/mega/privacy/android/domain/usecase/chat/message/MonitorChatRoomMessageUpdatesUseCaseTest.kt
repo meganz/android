@@ -6,7 +6,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
-import mega.privacy.android.domain.entity.chat.room.update.HistoryTruncated
 import mega.privacy.android.domain.entity.chat.room.update.HistoryTruncatedByRetentionTime
 import mega.privacy.android.domain.entity.chat.room.update.MessageUpdate
 import mega.privacy.android.domain.repository.ChatRepository
@@ -84,8 +83,10 @@ class MonitorChatRoomMessageUpdatesUseCaseTest {
     @Test
     internal fun `test that messages are truncated if type is truncate`() = runTest {
         val chatId = 123L
-        val message = mock<ChatMessage>()
-        val update = HistoryTruncated(message)
+        val message = mock<ChatMessage> {
+            on { type } doReturn ChatMessageType.TRUNCATE
+        }
+        val update = MessageUpdate(message)
         chatRepository.stub {
             on { monitorMessageUpdates(chatId) } doReturn hotFlow(update)
         }
