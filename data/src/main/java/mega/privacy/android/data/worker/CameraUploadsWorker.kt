@@ -80,7 +80,6 @@ import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
-import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
@@ -109,6 +108,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SendBackupHeartBeatSync
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryNodeIdUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryNodeIdUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupHeartbeatStatusUseCase
@@ -149,8 +149,8 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase,
     private val isChargingRequiredUseCase: IsChargingRequiredUseCase,
     private val getUploadFolderHandleUseCase: GetUploadFolderHandleUseCase,
-    private val setSecondarySyncHandle: SetSecondarySyncHandle,
     private val setPrimaryNodeIdUseCase: SetPrimaryNodeIdUseCase,
+    private val setSecondaryNodeIdUseCase: SetSecondaryNodeIdUseCase,
     private val getDefaultNodeHandleUseCase: GetDefaultNodeHandleUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
@@ -713,7 +713,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                     createAndSetupSecondaryUploadFolder()
                 } else {
                     Timber.d("Secondary Handle retrieved from getSecondaryFolderHandle(): $secondaryHandle")
-                    setSecondarySyncHandle(secondaryHandle)
+                    setSecondaryNodeIdUseCase(NodeId(secondaryHandle))
                 }
             }
         }.onFailure {

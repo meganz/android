@@ -3,7 +3,6 @@ package mega.privacy.android.domain.usecase.camerauploads
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import javax.inject.Inject
 
@@ -18,7 +17,7 @@ class EstablishCameraUploadsSyncHandlesUseCase @Inject constructor(
     private val getCameraUploadsSyncHandlesUseCase: GetCameraUploadsSyncHandlesUseCase,
     private val isNodeInRubbishOrDeletedUseCase: IsNodeInRubbishOrDeletedUseCase,
     private val setPrimaryNodeIdUseCase: SetPrimaryNodeIdUseCase,
-    private val setSecondarySyncHandle: SetSecondarySyncHandle,
+    private val setSecondaryNodeIdUseCase: SetSecondaryNodeIdUseCase,
 ) {
 
     /**
@@ -31,8 +30,8 @@ class EstablishCameraUploadsSyncHandlesUseCase @Inject constructor(
         } ?: run {
             // When there are no handles received from the API, invalidate both Primary and
             // Secondary Sync Handles
-            setSecondarySyncHandle(cameraUploadRepository.getInvalidHandle())
             setPrimaryNodeIdUseCase(NodeId(cameraUploadRepository.getInvalidHandle()))
+            setSecondaryNodeIdUseCase(NodeId(cameraUploadRepository.getInvalidHandle()))
         }
     }
 
@@ -49,7 +48,7 @@ class EstablishCameraUploadsSyncHandlesUseCase @Inject constructor(
         if (!isNodeInRubbishOrDeletedUseCase(handle)) {
             when (cameraUploadFolderType) {
                 CameraUploadFolderType.Primary -> setPrimaryNodeIdUseCase(NodeId(handle))
-                CameraUploadFolderType.Secondary -> setSecondarySyncHandle(handle)
+                CameraUploadFolderType.Secondary -> setSecondaryNodeIdUseCase(NodeId(handle))
             }
         }
     }

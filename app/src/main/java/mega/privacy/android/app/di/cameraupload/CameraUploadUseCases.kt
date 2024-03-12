@@ -1,6 +1,5 @@
 package mega.privacy.android.app.di.cameraupload
 
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,9 +12,7 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
-import mega.privacy.android.domain.usecase.DefaultSetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
-import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 
 /**
  * Provides the use case implementation for camera upload
@@ -47,9 +44,4 @@ abstract class CameraUploadUseCases {
             CreateCameraUploadFolder(fileSystemRepository::createFolder)
     }
 
-    /**
-     * Provide the [SetSecondarySyncHandle] implementation
-     */
-    @Binds
-    abstract fun bindSetSecondarySyncHandle(setSecondarySyncHandle: DefaultSetSecondarySyncHandle): SetSecondarySyncHandle
 }

@@ -3,7 +3,6 @@ package mega.privacy.android.domain.usecase.camerauploads
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -30,7 +29,7 @@ class EstablishCameraUploadsSyncHandlesUseCaseTest {
     private val getCameraUploadsSyncHandlesUseCase = mock<GetCameraUploadsSyncHandlesUseCase>()
     private val isNodeInRubbishOrDeletedUseCase = mock<IsNodeInRubbishOrDeletedUseCase>()
     private val setSetPrimaryNodeIdUseCase = mock<SetPrimaryNodeIdUseCase>()
-    private val setSecondarySyncHandle = mock<SetSecondarySyncHandle>()
+    private val setSecondaryNodeIdUseCase = mock<SetSecondaryNodeIdUseCase>()
 
     @BeforeAll
     fun setUp() {
@@ -38,8 +37,8 @@ class EstablishCameraUploadsSyncHandlesUseCaseTest {
             cameraUploadRepository = cameraUploadRepository,
             getCameraUploadsSyncHandlesUseCase = getCameraUploadsSyncHandlesUseCase,
             isNodeInRubbishOrDeletedUseCase = isNodeInRubbishOrDeletedUseCase,
-            setSecondarySyncHandle = setSecondarySyncHandle,
             setPrimaryNodeIdUseCase = setSetPrimaryNodeIdUseCase,
+            setSecondaryNodeIdUseCase = setSecondaryNodeIdUseCase,
         )
     }
 
@@ -49,8 +48,8 @@ class EstablishCameraUploadsSyncHandlesUseCaseTest {
             cameraUploadRepository,
             getCameraUploadsSyncHandlesUseCase,
             isNodeInRubbishOrDeletedUseCase,
-            setSecondarySyncHandle,
             setSetPrimaryNodeIdUseCase,
+            setSecondaryNodeIdUseCase,
         )
     }
 
@@ -72,7 +71,7 @@ class EstablishCameraUploadsSyncHandlesUseCaseTest {
             verify(setSetPrimaryNodeIdUseCase).invoke(NodeId(testPair.first))
         }
         if (!secondaryHandleDeleted) {
-            verify(setSecondarySyncHandle).invoke(testPair.second)
+            verify(setSecondaryNodeIdUseCase).invoke(NodeId(testPair.second))
         }
     }
 
@@ -83,8 +82,8 @@ class EstablishCameraUploadsSyncHandlesUseCaseTest {
 
             underTest()
 
-            verify(setSecondarySyncHandle).invoke(cameraUploadRepository.getInvalidHandle())
             verify(setSetPrimaryNodeIdUseCase).invoke(NodeId(cameraUploadRepository.getInvalidHandle()))
+            verify(setSecondaryNodeIdUseCase).invoke(NodeId(cameraUploadRepository.getInvalidHandle()))
         }
 
     companion object {

@@ -1,10 +1,9 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import org.junit.Assert
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -17,20 +16,19 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SetupSecondaryFolderUseCaseTest {
     private lateinit var underTest: SetupSecondaryFolderUseCase
     private val invalidHandle = -1L
 
     private val cameraUploadRepository = mock<CameraUploadRepository>()
-    private val setSecondarySyncHandle = mock<SetSecondarySyncHandle>()
+    private val setSecondaryNodeIdUseCase = mock<SetSecondaryNodeIdUseCase>()
 
     @BeforeAll
     fun setUp() {
         underTest = SetupSecondaryFolderUseCase(
             cameraUploadRepository = cameraUploadRepository,
-            setSecondarySyncHandle = setSecondarySyncHandle
+            setSecondaryNodeIdUseCase = setSecondaryNodeIdUseCase,
         )
     }
 
@@ -38,7 +36,7 @@ class SetupSecondaryFolderUseCaseTest {
     fun resetMocks() {
         reset(
             cameraUploadRepository,
-            setSecondarySyncHandle,
+            setSecondaryNodeIdUseCase,
         )
     }
 
@@ -49,7 +47,7 @@ class SetupSecondaryFolderUseCaseTest {
             whenever(cameraUploadRepository.setupSecondaryFolder(any())).thenReturn(69L)
             whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(invalidHandle)
             underTest(any())
-            verify(setSecondarySyncHandle).invoke(result)
+            verify(setSecondaryNodeIdUseCase).invoke(NodeId(result))
         }
 
     @Test
@@ -60,7 +58,7 @@ class SetupSecondaryFolderUseCaseTest {
             underTest(any())
             verify(cameraUploadRepository).setupSecondaryFolder(any())
             verify(cameraUploadRepository).getInvalidHandle()
-            verifyNoInteractions(setSecondarySyncHandle)
+            verifyNoInteractions(setSecondaryNodeIdUseCase)
         }
 
     @Test

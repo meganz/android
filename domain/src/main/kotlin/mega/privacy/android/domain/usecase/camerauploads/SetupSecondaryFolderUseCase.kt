@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import javax.inject.Inject
 
 /**
@@ -10,7 +10,7 @@ import javax.inject.Inject
  */
 class SetupSecondaryFolderUseCase @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
-    private val setSecondarySyncHandle: SetSecondarySyncHandle,
+    private val setSecondaryNodeIdUseCase: SetSecondaryNodeIdUseCase,
 ) {
 
     /**
@@ -22,7 +22,7 @@ class SetupSecondaryFolderUseCase @Inject constructor(
         cameraUploadRepository.setupSecondaryFolder(secondaryHandle)
             .takeIf { it != cameraUploadRepository.getInvalidHandle() }
             ?.let {
-                setSecondarySyncHandle(it)
+                setSecondaryNodeIdUseCase(NodeId(it))
             }
     }
 }

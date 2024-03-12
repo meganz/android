@@ -13,7 +13,6 @@ import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
-import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.camerauploads.GetNodeByFingerprintUseCase
 import org.mockito.kotlin.mock
 
@@ -26,9 +25,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideGetNodeByFingerprint() = mock<GetNodeByFingerprintUseCase>()
-
-    @Provides
-    fun provideSetSecondarySyncHandle() = mock<SetSecondarySyncHandle>()
 
     @Provides
     fun provideIsNodeInRubbish() = mock<IsNodeInRubbish>()
