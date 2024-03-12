@@ -31,10 +31,8 @@ class InviteMessageAction(
     icon = R.drawable.ic_icon_plus_circle_medium_regular_outline,
     testTag = "action_invite"
 ) {
-    override fun shouldDisplayFor(messages: Set<TypedMessage>): Boolean =
-        messages.isNotEmpty() && messages.all {
-            it is ContactAttachmentMessage && !it.isMe && (!it.isContact || it.userHandle != -1L)
-        }
+    override fun shouldDisplayFor(messages: Set<TypedMessage>): Boolean = messages.isNotEmpty()
+            && messages.all { it is ContactAttachmentMessage && !it.isMe && !it.isContact }
 
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {

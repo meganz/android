@@ -509,7 +509,9 @@ internal fun ChatView(
                                 coroutineScope.launch { messageOptionsModalSheetState.hide() }
                             },
                             onMoreReactionsClicked = { showReactionPicker = true },
-                            actions = actions.filter { action ->
+                            actions =
+                            if (selectedMessages.isEmpty()) emptyList()
+                            else actions.filter { action ->
                                 action.appliesTo(selectedMessages)
                             }.map { action ->
                                 action.bottomSheetMenuItem(
