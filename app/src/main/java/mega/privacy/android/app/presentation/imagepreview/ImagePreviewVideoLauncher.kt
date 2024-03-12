@@ -10,7 +10,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.node.ImageNode
-import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
+import mega.privacy.android.domain.usecase.GetFileUrlByImageNodeUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
@@ -25,7 +25,7 @@ class ImagePreviewVideoLauncher @Inject constructor(
     private val getFingerprintUseCase: GetFingerprintUseCase,
     private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
     private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
-    private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
+    private val getFileUrlByImageNodeUseCase: GetFileUrlByImageNodeUseCase,
 ) {
 
     suspend fun launchVideoScreen(
@@ -93,17 +93,16 @@ class ImagePreviewVideoLauncher @Inject constructor(
     }
 
     private suspend fun updateIntent(
-        handle: Long,
-        name: String,
+        imageNode: ImageNode,
         intent: Intent,
     ): Intent {
         if (megaApiHttpServerIsRunningUseCase() == 0) {
             megaApiHttpServerStartUseCase()
             intent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
         }
-        getFileUrlByNodeHandleUseCase(handle)?.let { url ->
+        getFileUrlByImageNodeUseCase(imageNode)?.let { url ->
             Uri.parse(url)?.let { uri ->
-                intent.setDataAndType(uri, MimeTypeList.typeForName(name).type)
+                intent.setDataAndType(uri, MimeTypeList.typeForName(imageNode.name).type)
             }
         }
 
@@ -135,8 +134,7 @@ class ImagePreviewVideoLauncher @Inject constructor(
             }
             intent
         } ?: updateIntent(
-            handle = imageNode.id.longValue,
-            name = imageNode.name,
+            imageNode = imageNode,
             intent = intent,
         )
     }

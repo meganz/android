@@ -175,4 +175,11 @@ interface PhotosRepository {
         chatId: Long,
         messageId: Long,
     ): ImageNode?
+
+    /**
+     * Get link url by imageNode
+     *
+     * @param imageNode
+     */
+    suspend fun getHttpServerLocalLink(imageNode: ImageNode): String?
 }

@@ -921,6 +921,11 @@ internal class DefaultPhotosRepository @Inject constructor(
             }
         }
 
+    override suspend fun getHttpServerLocalLink(imageNode: ImageNode): String? =
+        withContext(ioDispatcher) {
+            megaApiFacade.httpServerGetLocalLink(MegaNode.unserialize(imageNode.serializedData))
+        }
+
     override fun clearCache() {
         isInitialized = false
 
