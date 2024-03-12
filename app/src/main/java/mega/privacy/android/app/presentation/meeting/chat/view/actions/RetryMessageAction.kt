@@ -14,7 +14,7 @@ internal class RetryMessageAction() : MessageAction(
     testTag = "action_retry",
 ) {
     override fun shouldDisplayFor(messages: Set<TypedMessage>) =
-        messages.all { it.status == ChatMessageStatus.SENDING_MANUAL }
+        messages.all { it.status == ChatMessageStatus.SENDING_MANUAL || it.status == ChatMessageStatus.SERVER_REJECTED }
 
     override val appliesToSendError = true
 

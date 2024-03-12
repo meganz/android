@@ -5,17 +5,23 @@ import kotlinx.serialization.Transient
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.PlayableFileTypeInfo
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
+import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
+import mega.privacy.android.domain.entity.node.NodeId
 import java.io.File
 
 /**
  * Pending attachment message
  * @property file
  * @property transferTag
+ * @property state
+ * @property nodeId
  */
 sealed interface PendingAttachmentMessage : AttachmentMessage {
     val file: File?
     val transferTag: Int?
+    val state: PendingMessageState
+    val nodeId: NodeId?
     override val isMine get() = true
     override val fileName get() = file?.name ?: ""
     override val fileSize get() = file?.length() ?: 0L
@@ -42,6 +48,8 @@ data class PendingFileAttachmentMessage(
     override val status: ChatMessageStatus,
     override val content: String?,
     override val transferTag: Int?,
+    override val state: PendingMessageState,
+    override val nodeId: NodeId?,
     val filePath: String,
 ) : PendingAttachmentMessage {
     @Transient
@@ -51,6 +59,7 @@ data class PendingFileAttachmentMessage(
 
 /**
  * Pending voice clip message
+ * @property filePath
  */
 @Serializable
 data class PendingVoiceClipMessage(
@@ -66,7 +75,10 @@ data class PendingVoiceClipMessage(
     override val status: ChatMessageStatus,
     override val content: String?,
     override val transferTag: Int?,
+    override val state: PendingMessageState,
+    override val nodeId: NodeId?,
+    val filePath: String,
 ) : PendingAttachmentMessage {
     @Transient
-    override val file = null
+    override val file = File(filePath)
 }

@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.chat.PendingMessage.Companion.UNKNOWN_
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.PendingVoiceClipMessage
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import java.io.File
@@ -37,8 +38,12 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
                 reactions = emptyList(),
                 status = this.getChatMessageStatus(),
                 content = null,
+                filePath = filePath,
                 fileType = fileSystemRepository.getFileTypeInfo(file),
-                transferTag = pendingMessage.transferTag.takeIf { it != UNKNOWN_TRANSFER_TAG },
+                transferTag = transferTag.takeIf { it != UNKNOWN_TRANSFER_TAG },
+                state = PendingMessageState.entries.firstOrNull { it.value == state }
+                    ?: PendingMessageState.UPLOADING,
+                nodeId = nodeHandle.takeIf { it != -1L }?.let { NodeId(it) },
             )
         } else {
             PendingFileAttachmentMessage(
@@ -54,7 +59,10 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
                 content = null,
                 filePath = filePath,
                 fileType = fileSystemRepository.getFileTypeInfo(file),
-                transferTag = pendingMessage.transferTag.takeIf { it != UNKNOWN_TRANSFER_TAG },
+                transferTag = transferTag.takeIf { it != UNKNOWN_TRANSFER_TAG },
+                state = PendingMessageState.entries.firstOrNull { it.value == state }
+                    ?: PendingMessageState.UPLOADING,
+                nodeId = nodeHandle.takeIf { it != -1L }?.let { NodeId(it) },
             )
         }
     }

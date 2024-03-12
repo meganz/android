@@ -80,6 +80,8 @@ class CreatePendingAttachmentMessageUseCaseTest {
             filePath = filePath,
             fileType = fileTypeInfo,
             transferTag = transferTag,
+            nodeId = null,
+            state = state,
         )
         val actual = underTest(pendingMessage)
         assertThat(actual).isEqualTo(expected)
@@ -122,6 +124,9 @@ class CreatePendingAttachmentMessageUseCaseTest {
             content = null,
             fileType = fileTypeInfo,
             transferTag = transferTag,
+            nodeId = null,
+            state = state,
+            filePath = filePath,
         )
         val actual = underTest(pendingMessage)
         assertThat(actual).isEqualTo(expected)
