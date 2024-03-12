@@ -2,6 +2,8 @@ package mega.privacy.android.domain.usecase.chat.message
 
 import mega.privacy.android.domain.entity.chat.room.update.HistoryTruncated
 import mega.privacy.android.domain.entity.chat.room.update.HistoryTruncatedByRetentionTime
+import mega.privacy.android.domain.entity.chat.room.update.MessageReceived
+import mega.privacy.android.domain.entity.chat.room.update.MessageUpdate
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.chat.message.paging.SaveChatMessagesUseCase
@@ -38,7 +40,7 @@ class MonitorChatRoomMessageUpdatesUseCase @Inject constructor(
                         saveChatMessagesUseCase(chatId, listOf(it.message))
                     }
 
-                    else -> {
+                    is MessageReceived, is MessageUpdate -> {
                         saveChatMessagesUseCase(chatId, listOf(it.message))
                     }
                 }

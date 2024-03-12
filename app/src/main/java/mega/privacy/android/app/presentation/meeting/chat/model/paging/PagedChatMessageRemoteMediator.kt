@@ -8,7 +8,9 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
+import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.domain.entity.chat.messages.paging.FetchMessagePageResponse
 import mega.privacy.android.domain.usecase.chat.message.paging.ClearChatMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.message.paging.FetchMessagePageUseCase
 import mega.privacy.android.domain.usecase.chat.message.paging.SaveChatMessagesUseCase
@@ -31,6 +33,7 @@ class PagedChatMessageRemoteMediator @AssistedInject constructor(
     @Assisted private val chatId: Long,
     @Assisted private val coroutineScope: CoroutineScope,
 ) : RemoteMediator<Int, TypedMessage>() {
+
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, TypedMessage>,
@@ -38,16 +41,33 @@ class PagedChatMessageRemoteMediator @AssistedInject constructor(
         return try {
             Timber.d("Paging mediator load: loadType : $loadType")
 
-            if (loadType == LoadType.REFRESH) clearChatMessagesUseCase(chatId)
+            if (loadType == LoadType.PREPEND) {
+                return MediatorResult.Success(endOfPaginationReached = true)
+            }
 
-            val response = fetchMessages(chatId, coroutineScope)
-            Timber.d("Paging mediator load: fetch messages response : $response")
-            saveMessages(chatId = response.chatId, messages = response.messages)
-            MediatorResult.Success(endOfPaginationReached = loadType == LoadType.PREPEND || response.loadResponse == ChatHistoryLoadStatus.NONE)
+            if (loadType == LoadType.REFRESH) {
+                clearChatMessagesUseCase(chatId)
+            }
+
+            val count = when (loadType) {
+                LoadType.REFRESH -> state.config.initialLoadSize
+                else -> state.config.pageSize
+            }
+
+            val messages = mutableListOf<ChatMessage>()
+            lateinit var response: FetchMessagePageResponse
+            while (messages.size < count) {
+                response = fetchMessages(chatId, coroutineScope)
+                Timber.d("Paging mediator load: fetch messages response : $response")
+                messages.addAll(response.messages)
+                if (response.loadResponse == ChatHistoryLoadStatus.NONE) break
+            }
+            saveMessages(chatId = chatId, messages = messages)
+
+            MediatorResult.Success(endOfPaginationReached = response.loadResponse == ChatHistoryLoadStatus.NONE)
         } catch (e: Exception) {
             Timber.e(e, "Paging mediator load: error")
             MediatorResult.Error(e)
         }
     }
-
 }

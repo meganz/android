@@ -9,9 +9,7 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.TerminalSeparatorType
 import androidx.paging.cachedIn
-import androidx.paging.insertFooterItem
 import androidx.paging.insertHeaderItem
 import androidx.paging.insertSeparators
 import androidx.paging.map
@@ -34,7 +32,6 @@ import mega.privacy.android.app.presentation.meeting.chat.mapper.ChatMessageDate
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ChatMessageTimeSeparatorMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.UiChatMessageMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
-import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.ChatHeaderMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.ChatUnreadHeaderMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.HeaderMessage
 import mega.privacy.android.app.utils.Constants
@@ -159,7 +156,7 @@ class MessageListViewModel @Inject constructor(
             Pager(
                 config = PagingConfig(
                     pageSize = 32,
-                    initialLoadSize = unreadCount.coerceAtLeast(32),
+                    initialLoadSize = unreadCount.coerceAtLeast(32 * 3), // recommend to load at least 3 pages
                 ),
                 remoteMediator = remoteMediator,
             ) {
@@ -175,19 +172,19 @@ class MessageListViewModel @Inject constructor(
                 pagingData.map {
                     uiChatMessageMapper(it)
                 }
-                    .insertSeparators(TerminalSeparatorType.SOURCE_COMPLETE) { before, after: UiChatMessage? ->
+                    .insertSeparators { before, after: UiChatMessage? ->
                         chatMessageTimeSeparatorMapper(
                             firstMessage = after,
                             secondMessage = before
                         )
                     }
-                    .insertSeparators(TerminalSeparatorType.SOURCE_COMPLETE) { before, after: UiChatMessage? ->
+                    .insertSeparators { before, after: UiChatMessage? ->
                         chatMessageDateSeparatorMapper(
                             firstMessage = after,
                             secondMessage = before
                         ) //Messages are passed in reverse order as the list is reversed in the ui
                     }
-                    .insertSeparators(TerminalSeparatorType.SOURCE_COMPLETE) { _, after: UiChatMessage? ->
+                    .insertSeparators { _, after: UiChatMessage? ->
                         if (unreadCount > 0
                             && after?.id == state.value.lastSeenMessageId
                             && after !is HeaderMessage
@@ -197,15 +194,11 @@ class MessageListViewModel @Inject constructor(
                         } else {
                             null
                         }
-                    }.insertFooterItem(
-                        item = ChatHeaderMessage(),
-                        terminalSeparatorType = TerminalSeparatorType.SOURCE_COMPLETE
-                    ).let { pagingDataWithoutPending ->
+                    }.let { pagingDataWithoutPending ->
                         pendingMessages.fold(pagingDataWithoutPending) { pagingData, pendingMessage ->
                             //pending messages always at the end (header because list is reversed in the ui)
                             pagingData.insertHeaderItem(
                                 item = pendingMessage,
-                                terminalSeparatorType = TerminalSeparatorType.SOURCE_COMPLETE
                             )
                         }
                     }

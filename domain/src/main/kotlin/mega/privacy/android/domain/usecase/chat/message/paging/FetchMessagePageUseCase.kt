@@ -37,12 +37,14 @@ class FetchMessagePageUseCase @Inject constructor(
             scope = coroutineScope, started = SharingStarted.Eagerly
         )
 
-        val messageResponse = coroutineScope.async { getMessageListUseCase(messageFlow) }
-        val loadResponse = coroutineScope.async { loadMessagesUseCase(chatId) }
-        return FetchMessagePageResponse(
-            chatId = chatId,
-            messages = messageResponse.await(),
-            loadResponse = loadResponse.await(),
-        )
+        return kotlinx.coroutines.coroutineScope {
+            val messageResponse = async { getMessageListUseCase(messageFlow) }
+            val loadResponse = async { loadMessagesUseCase(chatId) }
+            return@coroutineScope FetchMessagePageResponse(
+                chatId = chatId,
+                messages = messageResponse.await(),
+                loadResponse = loadResponse.await(),
+            )
+        }
     }
 }

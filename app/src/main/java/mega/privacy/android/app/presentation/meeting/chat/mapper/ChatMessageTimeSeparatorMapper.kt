@@ -5,6 +5,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatM
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.TimeHeaderUiMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ManagementUiChatMessage
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -42,7 +43,7 @@ class ChatMessageTimeSeparatorMapper @Inject constructor() {
         )
 
         if (firstMessage.userHandle != secondMessage.userHandle
-            || time.minus(firstMessageTime).seconds > 3.seconds
+            || time.minus(firstMessageTime).seconds > 3.minutes
         ) {
             return TimeHeaderUiMessage(
                 id = secondMessage.id,

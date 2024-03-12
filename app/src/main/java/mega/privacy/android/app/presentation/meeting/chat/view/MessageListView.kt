@@ -10,10 +10,10 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -30,6 +30,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewM
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.UIMessageState
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.ChatUnreadHeaderMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.management.ParticipantUiMessage
+import mega.privacy.android.app.presentation.meeting.chat.view.message.FirstMessageHeader
 import mega.privacy.android.core.ui.controls.chat.messages.LoadingMessagesHeader
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
@@ -81,9 +82,8 @@ internal fun MessageListView(
     val state by viewModel.state.collectAsStateWithLifecycle()
     onCanSelectChanged(pagingItems.itemSnapshotList.any { it?.isSelectable == true })
 
-    var isDataLoaded by remember {
-        mutableStateOf(false)
-    }
+    var isDataLoaded by remember { mutableStateOf(false) }
+    var unreadHeaderPosition by remember { mutableIntStateOf(0) }
 
     val screenHeight = with(LocalDensity.current) {
         LocalConfiguration.current.screenHeightDp.dp.toPx()
@@ -99,14 +99,19 @@ internal fun MessageListView(
         }
     }
 
-    LaunchedEffect(isDataLoaded) {
+    LaunchedEffect(unreadHeaderPosition) {
+        if (unreadHeaderPosition > 0) {
+            scrollState.scrollToItem(unreadHeaderPosition, -(screenHeight * 2 / 3).toInt())
+            viewModel.onScrolledToLastSeenMessage()
+        }
+    }
+
+    LaunchedEffect(pagingItems.itemSnapshotList.size) {
         if (!state.isJumpingToLastSeenMessage && (uiState.chat?.unreadCount ?: 0) > 0) {
             pagingItems.itemSnapshotList.indexOfFirst {
                 it is ChatUnreadHeaderMessage
             }.takeIf { it != -1 }?.let {
-                scrollState.scrollToItem(it, -(screenHeight * 2 / 3).toInt())
-                // make sure the list is scrolled to the correct position
-                viewModel.onScrolledToLastSeenMessage()
+                unreadHeaderPosition = it
                 pagingItems.itemSnapshotList.firstOrNull()?.id?.let { lastMessageId ->
                     viewModel.setMessageSeen(lastMessageId)
                 }
@@ -126,35 +131,20 @@ internal fun MessageListView(
         }
     }
 
-    LaunchedEffect(pagingItems) {
-        snapshotFlow { scrollState.firstVisibleItemIndex }
-            .collect {
-                if (it <= 1) {
-                    scrollState.scrollToItem(0)
-                }
-            }
+    if (pagingItems.loadState.prepend.endOfPaginationReached) {
+        isDataLoaded = true
     }
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        state = scrollState,
-        contentPadding = PaddingValues(bottom = bottomPadding.coerceAtLeast(12.dp)),
-        reverseLayout = true,
-    ) {
-
-
-        if (!isDataLoaded) {
-            item {
-                LoadingMessagesHeader()
-            }
-            if (
-                pagingItems.loadState.prepend.endOfPaginationReached
-                && pagingItems.loadState.mediator?.prepend?.endOfPaginationReached == true
-            ) {
-                isDataLoaded = true
-            }
-        } else {
+    if (!isDataLoaded) {
+        LoadingMessagesHeader()
+    } else {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            state = scrollState,
+            contentPadding = PaddingValues(bottom = bottomPadding.coerceAtLeast(12.dp)),
+            reverseLayout = true,
+        ) {
             items(
                 count = pagingItems.itemCount,
                 key = pagingItems.itemKey {
@@ -199,6 +189,12 @@ internal fun MessageListView(
                             onNotSentClick = onNotSentClick,
                         )
                     }
+                }
+            }
+            // fix issue empty header for empty group
+            if (pagingItems.loadState.mediator?.append?.endOfPaginationReached == true) {
+                item {
+                    FirstMessageHeader(uiState.title, uiState.scheduledMeeting)
                 }
             }
         }
