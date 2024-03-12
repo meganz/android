@@ -399,6 +399,7 @@ class ImagePreviewViewModel @Inject constructor(
                 imagePreviewMenuSource in listOf(
                     ImagePreviewMenuSource.ALBUM_SHARING,
                     ImagePreviewMenuSource.PUBLIC_FILE,
+                    ImagePreviewMenuSource.SHARED_FILES_HISTORY
                 ) -> node.serializedData?.let { getPublicNodeFromSerializedDataUseCase(it) }
 
                 else -> addImageTypeUseCase(node)

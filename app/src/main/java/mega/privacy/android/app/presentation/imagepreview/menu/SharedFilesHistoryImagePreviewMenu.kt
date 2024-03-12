@@ -2,11 +2,15 @@ package mega.privacy.android.app.presentation.imagepreview.menu
 
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import javax.inject.Inject
 
-internal class SharedFilesHistoryImagePreviewMenu @Inject constructor() : ImagePreviewMenu {
+internal class SharedFilesHistoryImagePreviewMenu @Inject constructor(
+    private val getNodeAccessPermission: GetNodeAccessPermission,
+) : ImagePreviewMenu {
     override suspend fun isInfoMenuVisible(imageNode: ImageNode): Boolean {
-        return true
+        return checkFullAccessPermission(imageNode)
     }
 
     override suspend fun isSlideshowMenuVisible(imageNode: ImageNode): Boolean {
@@ -88,4 +92,10 @@ internal class SharedFilesHistoryImagePreviewMenu @Inject constructor() : ImageP
     override suspend fun isMoveToRubbishBinMenuVisible(imageNode: ImageNode): Boolean {
         return false
     }
+
+    private suspend fun checkFullAccessPermission(
+        imageNode: ImageNode,
+    ) = getNodeAccessPermission(imageNode.id)?.let { accessPermission ->
+        accessPermission != AccessPermission.FULL
+    } ?: false
 }

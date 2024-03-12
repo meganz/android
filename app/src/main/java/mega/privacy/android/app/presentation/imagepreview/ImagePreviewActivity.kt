@@ -239,7 +239,7 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     private fun sendNodeToChat(imageNode: ImageNode) {
-        nodeAttacher.attachNode(imageNode.id.longValue)
+        nodeAttacher.attachNode(MegaNode.unserialize(imageNode.serializedData))
     }
 
     private fun getNodeLink(imageNode: ImageNode) {

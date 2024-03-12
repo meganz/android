@@ -292,6 +292,7 @@ internal fun ImagePreviewScreen(
                                 showMoreMenu = viewModel::isMoreMenuVisible,
                                 onClickBack = onClickBack,
                                 onClickSlideshow = onClickSlideshow,
+                                onClickForward = { onClickSendTo(imageNode) },
                                 onClickSaveToDevice = { onClickSaveToDevice(imageNode) },
                                 onClickGetLink = { onClickGetLink(imageNode) },
                                 onClickSendTo = { onClickSendTo(imageNode) },
@@ -600,6 +601,7 @@ private fun ImagePreviewTopBar(
     showMoreMenu: suspend (ImageNode) -> Boolean,
     onClickBack: () -> Unit,
     onClickSlideshow: () -> Unit,
+    onClickForward: () -> Unit,
     onClickSaveToDevice: () -> Unit,
     onClickGetLink: () -> Unit,
     onClickSendTo: () -> Unit,
@@ -656,7 +658,7 @@ private fun ImagePreviewTopBar(
             }
 
             if (isForwardMenuVisible) {
-                IconButton(onClick = onClickSlideshow) {
+                IconButton(onClick = onClickForward) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_forward),
                         contentDescription = null,
