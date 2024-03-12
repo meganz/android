@@ -63,6 +63,7 @@ class VideoPlaylistDetailViewTest {
         removedMessageShown: () -> Unit = {},
         numberOfRemovedItems: Int = 0,
         onPlayAllClicked: () -> Unit = {},
+        onUpdatedTitle: (String?) -> Unit = {},
     ) {
         composeTestRule.setContent {
             VideoPlaylistDetailView(
@@ -91,7 +92,8 @@ class VideoPlaylistDetailViewTest {
                 onDeleteVideosDialogPositiveButtonClicked = onDeleteVideosDialogPositiveButtonClicked,
                 removedMessageShown = removedMessageShown,
                 numberOfRemovedItems = numberOfRemovedItems,
-                onPlayAllClicked = onPlayAllClicked
+                onPlayAllClicked = onPlayAllClicked,
+                onUpdatedTitle = onUpdatedTitle
             )
         }
     }
@@ -214,7 +216,28 @@ class VideoPlaylistDetailViewTest {
     @Test
     fun `test that onPlayAllClicked is invoked when the play all button is clicked`() {
         val onPlayAllClicked = mock<() -> Unit>()
+        val expectedTitle = "new playlist"
+        val expectedTotalDuration = "10:00:00"
+        val expectedNumberOfVideos = 1
+
+        val testVideo = mock<VideoUIEntity> {
+            on { name }.thenReturn("video")
+        }
+
+        val playlist = VideoPlaylistUIEntity(
+            id = NodeId(1L),
+            title = expectedTitle,
+            cover = null,
+            creationTime = 0,
+            modificationTime = 0,
+            thumbnailList = null,
+            numberOfVideos = expectedNumberOfVideos,
+            totalDuration = expectedTotalDuration,
+            videos = listOf(testVideo)
+        )
+
         setComposeContent(
+            playlist = playlist,
             onPlayAllClicked = onPlayAllClicked
         )
 

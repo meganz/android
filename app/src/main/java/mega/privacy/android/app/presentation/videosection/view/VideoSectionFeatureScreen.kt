@@ -149,7 +149,8 @@ internal fun VideoSectionNavHost(
                     viewModel.removeVideosFromPlaylist(playlist.id, removedVideoIDs)
                     onActionModeFinished()
                 },
-                onPlayAllClicked = onPlayAllClicked
+                onPlayAllClicked = onPlayAllClicked,
+                onUpdatedTitle = viewModel::setUpdateToolbarTitle
             )
         }
     }

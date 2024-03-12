@@ -1089,6 +1089,20 @@ class VideoSectionViewModelTest {
             on { isSharedItems }.thenReturn(shared)
         }
 
+    @Test
+    fun `test that the updateToolbarTitle is updated correctly`() = runTest {
+        val expectedTitle = "title"
+        initUnderTest()
+
+        underTest.state.test {
+            assertThat(awaitItem().updateToolbarTitle).isNull()
+            underTest.setUpdateToolbarTitle(expectedTitle)
+            assertThat(awaitItem().updateToolbarTitle).isEqualTo(expectedTitle)
+            underTest.setUpdateToolbarTitle(null)
+            assertThat(awaitItem().updateToolbarTitle).isNull()
+        }
+    }
+
     companion object {
         @JvmField
         @RegisterExtension

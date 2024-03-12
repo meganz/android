@@ -89,6 +89,7 @@ fun VideoPlaylistDetailView(
     onDeleteVideosDialogPositiveButtonClicked: (VideoPlaylistUIEntity) -> Unit,
     onAddElementsClicked: () -> Unit,
     onPlayAllClicked: () -> Unit,
+    onUpdatedTitle: (String?) -> Unit,
     modifier: Modifier = Modifier,
     errorMessage: Int? = null,
     onClick: (item: VideoUIEntity, index: Int) -> Unit = { _, _ -> },
@@ -97,6 +98,16 @@ fun VideoPlaylistDetailView(
 ) {
     val items = playlist?.videos ?: emptyList()
     val lazyListState = rememberLazyListState()
+
+    val isInFirstItem by remember {
+        derivedStateOf {
+            lazyListState.firstVisibleItemIndex != 0
+        }
+    }
+
+    LaunchedEffect(isInFirstItem) {
+        onUpdatedTitle(if (isInFirstItem) playlist?.title else null)
+    }
 
     val snackBarHostState = remember { SnackbarHostState() }
     val isLight = MaterialTheme.colors.isLight
@@ -228,48 +239,60 @@ fun VideoPlaylistDetailView(
             }
         }
 
-
-        Column(modifier = modifier.padding(paddingValue)) {
-            VideoPlaylistHeaderView(
+        when {
+            items.isEmpty() -> VideoPlaylistEmptyView(
                 thumbnailList = playlist?.thumbnailList,
                 title = playlist?.title,
                 totalDuration = playlist?.totalDuration,
                 numberOfVideos = playlist?.numberOfVideos,
-                modifier = modifier.padding(16.dp),
-                onPlayAllClicked = onPlayAllClicked
-            )
-            MegaDivider(
-                dividerSpacing = DividerSpacing.Center,
-                modifier = modifier.padding(bottom = 16.dp)
-            )
-            when {
-                items.isEmpty() -> LegacyMegaEmptyView(
-                    modifier = modifier.testTag(VIDEO_PLAYLIST_DETAIL_EMPTY_VIEW_TEST_TAG),
-                    text = stringResource(id = R.string.homepage_empty_hint_video),
-                    imagePainter = painterResource(id = R.drawable.ic_homepage_empty_video)
+                onPlayAllClicked = {},
+                modifier = Modifier.testTag(
+                    VIDEO_PLAYLIST_DETAIL_EMPTY_VIEW_TEST_TAG
                 )
+            )
 
-                else -> {
-                    LazyColumn(state = lazyListState, modifier = modifier) {
-                        items(count = items.size, key = { items[it].id.longValue }) {
-                            val videoItem = items[it]
-                            VideoItemView(
-                                icon = iconPackR.drawable.ic_video_list,
-                                name = videoItem.name,
-                                fileSize = formatFileSize(videoItem.size, LocalContext.current),
-                                duration = videoItem.durationString,
-                                isFavourite = videoItem.isFavourite,
-                                isSelected = videoItem.isSelected,
-                                thumbnailData = if (videoItem.thumbnail?.exists() == true) {
-                                    videoItem.thumbnail
-                                } else {
-                                    ThumbnailRequest(videoItem.id)
-                                },
-                                nodeAvailableOffline = videoItem.nodeAvailableOffline,
-                                onClick = { onClick(videoItem, it) },
-                                onMenuClick = { onMenuClick(videoItem) },
-                                onLongClick = { onLongClick(videoItem, it) }
+            else -> {
+                LazyColumn(state = lazyListState, modifier = modifier.padding(paddingValue)) {
+                    item(
+                        key = "header"
+                    ) {
+                        Column {
+                            VideoPlaylistHeaderView(
+                                thumbnailList = playlist?.thumbnailList,
+                                title = playlist?.title,
+                                totalDuration = playlist?.totalDuration,
+                                numberOfVideos = playlist?.numberOfVideos,
+                                modifier = Modifier.padding(16.dp),
+                                onPlayAllClicked = onPlayAllClicked
                             )
+                            MegaDivider(
+                                dividerSpacing = DividerSpacing.Center,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            )
+                        }
+                    }
+                    items(count = items.size, key = { items[it].id.longValue }) {
+                        when {
+                            else -> {
+                                val videoItem = items[it]
+                                VideoItemView(
+                                    icon = iconPackR.drawable.ic_video_list,
+                                    name = videoItem.name,
+                                    fileSize = formatFileSize(videoItem.size, LocalContext.current),
+                                    duration = videoItem.durationString,
+                                    isFavourite = videoItem.isFavourite,
+                                    isSelected = videoItem.isSelected,
+                                    thumbnailData = if (videoItem.thumbnail?.exists() == true) {
+                                        videoItem.thumbnail
+                                    } else {
+                                        ThumbnailRequest(videoItem.id)
+                                    },
+                                    nodeAvailableOffline = videoItem.nodeAvailableOffline,
+                                    onClick = { onClick(videoItem, it) },
+                                    onMenuClick = { onMenuClick(videoItem) },
+                                    onLongClick = { onLongClick(videoItem, it) }
+                                )
+                            }
                         }
                     }
                 }
@@ -285,6 +308,37 @@ fun VideoPlaylistDetailView(
             onDeleteVideoPlaylistClicked = {
                 setShouldDeleteVideoPlaylistDialog(true)
             }
+        )
+    }
+}
+
+@Composable
+internal fun VideoPlaylistEmptyView(
+    thumbnailList: List<Any?>?,
+    title: String?,
+    totalDuration: String?,
+    numberOfVideos: Int?,
+    onPlayAllClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        VideoPlaylistHeaderView(
+            thumbnailList = thumbnailList,
+            title = title,
+            totalDuration = totalDuration,
+            numberOfVideos = numberOfVideos,
+            modifier = Modifier.padding(16.dp),
+            onPlayAllClicked = onPlayAllClicked
+        )
+        MegaDivider(
+            dividerSpacing = DividerSpacing.Center,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        LegacyMegaEmptyView(
+            modifier = Modifier
+                .fillMaxSize(),
+            text = stringResource(id = R.string.homepage_empty_hint_video),
+            imagePainter = painterResource(id = R.drawable.ic_homepage_empty_video)
         )
     }
 }
@@ -444,7 +498,8 @@ private fun VideoPlaylistDetailViewPreview() {
             onDeleteVideosDialogPositiveButtonClicked = {},
             removedMessageShown = {},
             numberOfRemovedItems = 0,
-            onPlayAllClicked = {}
+            onPlayAllClicked = {},
+            onUpdatedTitle = {}
         )
     }
 }

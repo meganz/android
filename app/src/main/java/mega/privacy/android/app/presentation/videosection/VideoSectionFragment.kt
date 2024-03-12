@@ -183,6 +183,15 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
         }
 
         viewLifecycleOwner.collectFlow(
+            videoSectionViewModel.state.map { it.updateToolbarTitle }.distinctUntilChanged(),
+        ) { title ->
+            (activity as? ManagerActivity)?.run {
+                setToolbarTitle(title ?: "")
+                invalidateOptionsMenu()
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(
             videoSectionViewModel.state.map { it.actionMode }.distinctUntilChanged()
         ) { isActionMode ->
             if (!isActionMode) {

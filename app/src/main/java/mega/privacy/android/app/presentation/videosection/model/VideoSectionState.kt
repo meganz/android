@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.SortOrder
  * @property deletedVideoPlaylistTitles the deleted video playlist titles
  * @property areVideoPlaylistsRemovedSuccessfully true if the video playlists are removed successfully
  * @property currentDestinationRoute the current destination route
+ * @property updateToolbarTitle true is to update toolbar title
  */
 data class VideoSectionState(
     val allVideos: List<VideoUIEntity> = emptyList(),
@@ -68,5 +69,6 @@ data class VideoSectionState(
     val shouldDeleteVideosFromPlaylist: Boolean = false,
     val deletedVideoPlaylistTitles: List<String> = emptyList(),
     val areVideoPlaylistsRemovedSuccessfully: Boolean = false,
-    val currentDestinationRoute: String? = null
+    val currentDestinationRoute: String? = null,
+    val updateToolbarTitle: String? = null,
 )

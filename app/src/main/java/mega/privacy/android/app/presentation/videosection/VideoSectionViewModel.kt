@@ -845,6 +845,10 @@ class VideoSectionViewModel @Inject constructor(
             )
         }
 
+    internal fun setUpdateToolbarTitle(value: String?) = _state.update {
+        it.copy(updateToolbarTitle = value)
+    }
+
     internal fun clearNumberOfAddedVideos() = _state.update { it.copy(numberOfAddedVideos = 0) }
 
     internal fun clearNumberOfRemovedItems() = _state.update { it.copy(numberOfRemovedItems = 0) }
