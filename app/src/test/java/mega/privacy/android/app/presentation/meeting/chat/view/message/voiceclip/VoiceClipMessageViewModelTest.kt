@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.VoiceClipMessage
 import mega.privacy.android.domain.entity.node.NodeId
@@ -30,6 +31,8 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 import java.util.stream.Stream
@@ -364,6 +367,47 @@ class VoiceClipMessageViewModelTest {
                 assertThat(actual.timestamp).isEqualTo(invalidTimeStamp)
                 assertThat(actual.loadProgress).isNull()
             }
+        }
+
+    @Test
+    fun `test that ui is updated to progress when user seek to a position`() =
+        runTest {
+            val msgId = voiceClipMessage.msgId
+            val progress = 0.5f
+            val fakeTimestamp = "00:03"
+            whenever(durationInSecondsTextMapper(any())).thenReturn(fakeTimestamp)
+            initUiStateFlow()
+            underTest.addVoiceClip(voiceClipMessage)
+            testScheduler.advanceUntilIdle()
+
+            underTest.onSeek(progress, msgId)
+
+            verify(voiceClipPlayer).seekTo(
+                key = msgId,
+                position = (voiceClipMessage.duration.inWholeMilliseconds * progress).toInt()
+            )
+            underTest.getUiStateFlow(msgId).test {
+                val actual = awaitItem()
+
+                assertThat(actual.playProgress).isEqualTo(Progress(progress))
+                assertThat(actual.timestamp).isEqualTo(fakeTimestamp)
+            }
+        }
+
+    @Test
+    fun `test that player seekTo() is not called when duration is missing in the message`() =
+        runTest {
+            val msgId = voiceClipMessage.msgId
+            val progress = 0.5f
+            val fakeTimestamp = "00:03"
+            whenever(durationInSecondsTextMapper(any())).thenReturn(fakeTimestamp)
+            initUiStateFlow()
+
+            testScheduler.advanceUntilIdle()
+
+            underTest.onSeek(progress, msgId)
+
+            verifyNoInteractions(voiceClipPlayer)
         }
 
     private fun setCacheFileNotExists() {

@@ -62,7 +62,8 @@ class VoiceClipUiMessage(
                 isPlaying = uiState.isPlaying,
                 onPlayClicked = onClick,
                 interactionEnabled = interactionEnabled,
-                modifier = initialiseModifier(onClick)
+                onSeek = { viewModel.onSeek(progress = it, msgId = msgId) },
+                modifier = initialiseModifier {/*voice clip message does not support general click*/ },
             )
         }
     }

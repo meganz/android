@@ -74,6 +74,7 @@ fun CoreVoiceClipMessageView(
     playProgress: Float? = null,
     isPlaying: Boolean = false,
     onPlayClicked: () -> Unit = {},
+    onSeek: (Float) -> Unit = {},
 ) {
     Box(
         modifier = modifier
@@ -111,6 +112,7 @@ fun CoreVoiceClipMessageView(
                 progressByMediaPlayer = playProgress,
                 modifier = Modifier.padding(start = 8.dp),
                 exists = exists,
+                onValueChange = onSeek,
             )
             TimestampText(isMe = isMe, timestamp = timestamp, exists = exists)
         }
@@ -175,7 +177,6 @@ private fun PlaySlider(
                 awaitPointerEventScope {
                     while (true) {
                         val event = awaitPointerEvent()
-
                         if (event.type == PointerEventType.Press) {
                             isFingerDown = true
                         } else if (event.type == PointerEventType.Release) {
@@ -188,6 +189,13 @@ private fun PlaySlider(
                         if (progressByUser != newProgress) {
                             progressByUser = newProgress
                             onValueChange(newProgress)
+                        }
+
+                        // If user is using the slider, consume the event to prevent parent to handle it.
+                        if (isFingerDown) {
+                            event.changes
+                                .first()
+                                .consume()
                         }
                     }
                 }

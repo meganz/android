@@ -170,12 +170,38 @@ class VoiceClipMessageViewModel @Inject constructor(
     }
 
     /**
+     * Handle when user seeks the voice clip message a new position.
+     *
+     * @param progress progress is a value between 0 and 1.
+     * @param msgId message id of the voice clip message.
+     */
+    fun onSeek(progress: Float, msgId: Long) = viewModelScope.launch {
+        runCatching {
+            val uiState = getMutableStateFlow(msgId)
+            val durationInMilliseconds =
+                uiState?.value?.voiceClipMessage?.duration?.inWholeMilliseconds
+                    ?: throw IllegalStateException("Voice clip message not found for msgId($msgId)")
+            voiceClipPlayer.seekTo(msgId, (durationInMilliseconds * progress).toInt())
+
+            uiState.update {
+                it.copy(
+                    playProgress = Progress(progress),
+                    timestamp = durationInSecondsTextMapper(
+                        (durationInMilliseconds * progress).toLong().milliseconds
+                    )
+                )
+            }
+        }.onFailure { Timber.e(it) }
+    }
+
+    /**
      * Handle when user clicks the button in voice clip to play or pause.
      *
      * @param msgId of the clicked voice clip message.
      */
     fun onPlayOrPauseClicked(msgId: Long) = viewModelScope.launch {
         runCatching {
+            Timber.d("onPlayOrPauseClicked msgId($msgId)")
             if (voiceClipPlayer.isPlaying(msgId)) {
                 pauseVoiceClip(msgId)
             } else {
@@ -187,7 +213,13 @@ class VoiceClipMessageViewModel @Inject constructor(
 
                 pauseOngoingVoiceClip()
 
-                val currentPos = voiceClipPlayer.getCurrentPosition(msgId)
+                val duration =
+                    getMutableStateFlow(msgId)?.value?.voiceClipMessage?.duration?.inWholeMilliseconds
+                        ?: 0L
+                val currentProgress =
+                    getMutableStateFlow(msgId)?.value?.playProgress?.floatValue ?: 0f
+                val currentPos = (duration * currentProgress).toInt()
+
                 voiceClipPlayer.play(
                     key = msgId,
                     path = voiceClipFile.absolutePath,
