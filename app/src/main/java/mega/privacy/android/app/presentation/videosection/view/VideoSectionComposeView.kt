@@ -149,11 +149,14 @@ internal fun VideoSectionComposeView(
         allLazyListState = allLazyListState,
         playlistsLazyListState = playlistsLazyListState,
         onTabSelected = { tab ->
-            videoSectionViewModel.onTabSelected(selectTab = tab)
-            coroutineScope.launch {
-                pagerState.scrollToPage(tab.ordinal)
+            if (!uiState.searchMode && !uiState.actionMode) {
+                videoSectionViewModel.onTabSelected(selectTab = tab)
+                coroutineScope.launch {
+                    pagerState.scrollToPage(tab.ordinal)
+                }
             }
-        }
+        },
+        swipeEnabled = !uiState.searchMode && !uiState.actionMode
     )
 }
 

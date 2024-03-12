@@ -35,6 +35,7 @@ import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
 @Composable
 internal fun VideoSectionBodyView(
     pagerState: PagerState,
+    swipeEnabled: Boolean,
     tabs: List<VideoSectionTab> = listOf(),
     allVideoView: @Composable () -> Unit = {},
     playlistsView: @Composable () -> Unit = {},
@@ -73,7 +74,8 @@ internal fun VideoSectionBodyView(
             tabs = tabs,
             pagerState = pagerState,
             allVideoView = allVideoView,
-            playlistsView = playlistsView
+            playlistsView = playlistsView,
+            swipeEnabled = swipeEnabled
         )
     }
 }
@@ -155,6 +157,7 @@ internal fun VideoSectionTabs(
 internal fun PagerView(
     tabs: List<VideoSectionTab>,
     pagerState: PagerState,
+    swipeEnabled: Boolean,
     allVideoView: @Composable () -> Unit,
     playlistsView: @Composable () -> Unit,
     modifier: Modifier = Modifier,
@@ -162,6 +165,7 @@ internal fun PagerView(
     HorizontalPager(
         state = pagerState,
         modifier = modifier,
+        userScrollEnabled = swipeEnabled
     ) { pageIndex ->
         when (tabs[pageIndex]) {
             VideoSectionTab.All -> allVideoView()
