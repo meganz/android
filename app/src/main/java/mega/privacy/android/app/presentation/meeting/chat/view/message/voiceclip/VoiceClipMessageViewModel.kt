@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
+import mega.privacy.android.domain.usecase.chat.message.UpdateDoesNotExistInMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodesUseCase
 import timber.log.Timber
 import java.io.File
@@ -37,6 +38,7 @@ class VoiceClipMessageViewModel @Inject constructor(
     private val getCacheFileUseCase: GetCacheFileUseCase,
     private val voiceClipPlayer: VoiceClipPlayer,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+    private val updateDoesNotExistInMessageUseCase: UpdateDoesNotExistInMessageUseCase,
 ) : ViewModel() {
 
     // key: msgId, value: ui state flow
@@ -63,8 +65,11 @@ class VoiceClipMessageViewModel @Inject constructor(
      */
     fun addVoiceClip(message: VoiceClipMessage) = viewModelScope.launch {
         getMutableStateFlow(message.msgId)?.update { state ->
+            val loadProgress = if (message.exists) state.loadProgress else null
+            val timestamp = if (message.exists) state.timestamp else null
             state.copy(
-                loadProgress = if (message.exists) Progress(0f) else null,
+                loadProgress = loadProgress,
+                timestamp = timestamp,
                 voiceClipMessage = message
             )
         }
@@ -120,7 +125,7 @@ class VoiceClipMessageViewModel @Inject constructor(
         )
             .onCompletion {
                 getMutableStateFlow(msgId)?.let {
-                    if (it.value.voiceClipMessage?.exists == false)
+                    if (it.value.timestamp == null && it.value.loadProgress == null)
                         return@onCompletion
 
                     it.update { state ->
@@ -160,10 +165,13 @@ class VoiceClipMessageViewModel @Inject constructor(
 
     private fun updateDoesNotExists(msgId: Long) {
         getMutableStateFlow(msgId)?.update {
-            val message = it.voiceClipMessage?.copy(exists = false)
+            it.voiceClipMessage?.let {
+                viewModelScope.launch {
+                    updateDoesNotExistInMessageUseCase(it.chatId, msgId)
+                }
+            }
             it.copy(
-                voiceClipMessage = message,
-                timestamp = "--:--",
+                timestamp = null,
                 loadProgress = null,
             )
         }

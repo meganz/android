@@ -139,4 +139,22 @@ interface ChatStorageGateway {
      * @param chatId
      */
     suspend fun clearChatPendingMessages(chatId: Long)
+
+    /**
+     * Update exists
+     *
+     * @param chatId Chat ID
+     * @param msgId Message ID
+     * @param exists True if the content in message exists
+     */
+    suspend fun updateExistsInMessage(chatId: Long, msgId: Long, exists: Boolean)
+
+    /**
+     * Get exists
+     *
+     * @param chatId Chat ID
+     * @param msgId Message ID
+     * @return True if the content in message exists
+     */
+    suspend fun getExistsInMessage(chatId: Long, msgId: Long): Boolean?
 }

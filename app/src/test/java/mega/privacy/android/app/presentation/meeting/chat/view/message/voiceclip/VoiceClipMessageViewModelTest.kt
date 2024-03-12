@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
+import mega.privacy.android.domain.usecase.chat.message.UpdateDoesNotExistInMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodesUseCase
 import org.junit.Rule
 import org.junit.jupiter.api.BeforeEach
@@ -71,10 +72,11 @@ class VoiceClipMessageViewModelTest {
     private val downloadNodesUseCase: DownloadNodesUseCase = mock()
     private val voiceClipPlayResultFlow: MutableSharedFlow<VoiceClipPlayState> = MutableSharedFlow()
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper = mock()
+    private val updateDoesNotExistInMessageUseCase =
+        mock<UpdateDoesNotExistInMessageUseCase>()
 
     private val cacheFileParentPath = "parent path"
     private val mockTimestamp = "00:03"
-    private val invalidTimeStamp = "--:--"
 
     @get:Rule
     var instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -85,7 +87,8 @@ class VoiceClipMessageViewModelTest {
             downloadNodesUseCase,
             getCacheFileUseCase,
             voiceClipPlayer,
-            durationInSecondsTextMapper
+            durationInSecondsTextMapper,
+            updateDoesNotExistInMessageUseCase,
         )
 
         whenever(getCacheFileUseCase(any(), any())).thenReturn(cacheFile)
@@ -111,6 +114,7 @@ class VoiceClipMessageViewModelTest {
             getCacheFileUseCase = getCacheFileUseCase,
             voiceClipPlayer = voiceClipPlayer,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
+            updateDoesNotExistInMessageUseCase = updateDoesNotExistInMessageUseCase,
         )
     }
 
@@ -129,8 +133,7 @@ class VoiceClipMessageViewModelTest {
         testScheduler.advanceUntilIdle()
         underTest.getUiStateFlow(voiceClipMessage.msgId).test {
             val actual = awaitItem()
-            assertThat(actual.voiceClipMessage?.exists).isFalse()
-            assertThat(actual.timestamp).isEqualTo(invalidTimeStamp)
+            assertThat(actual.timestamp).isNull()
             assertThat(actual.loadProgress).isNull()
         }
     }
@@ -144,7 +147,7 @@ class VoiceClipMessageViewModelTest {
         underTest.addVoiceClip(voiceClipMessage.copy(status = status))
         testScheduler.advanceUntilIdle()
         underTest.getUiStateFlow(voiceClipMessage.msgId).test {
-            assertThat(awaitItem().timestamp).isEqualTo(invalidTimeStamp)
+            assertThat(awaitItem().timestamp).isNull()
         }
     }
 
@@ -189,8 +192,7 @@ class VoiceClipMessageViewModelTest {
             )
             underTest.getUiStateFlow(voiceClipMessage.msgId).test {
                 val actual = awaitItem()
-                assertThat(actual.voiceClipMessage?.exists).isFalse()
-                assertThat(actual.timestamp).isEqualTo(invalidTimeStamp)
+                assertThat(actual.timestamp).isNull()
                 assertThat(actual.loadProgress).isNull()
             }
         }
@@ -213,8 +215,7 @@ class VoiceClipMessageViewModelTest {
             downloadNodeResultFlow.emit(MultiTransferEvent.InsufficientSpace)
             underTest.getUiStateFlow(voiceClipMessage.msgId).test {
                 val actual = awaitItem()
-                assertThat(actual.voiceClipMessage?.exists).isFalse()
-                assertThat(actual.timestamp).isEqualTo(invalidTimeStamp)
+                assertThat(actual.timestamp).isNull()
                 assertThat(actual.loadProgress).isNull()
             }
         }
@@ -241,8 +242,7 @@ class VoiceClipMessageViewModelTest {
             testScheduler.advanceUntilIdle()
             underTest.getUiStateFlow(voiceClipMessage.msgId).test {
                 val actual = awaitItem()
-                assertThat(actual.voiceClipMessage?.exists).isFalse()
-                assertThat(actual.timestamp).isEqualTo(invalidTimeStamp)
+                assertThat(actual.timestamp).isNull()
                 assertThat(actual.loadProgress).isNull()
             }
         }
@@ -336,8 +336,7 @@ class VoiceClipMessageViewModelTest {
             // verify
             underTest.getUiStateFlow(msgId).test {
                 val actual = awaitItem()
-                assertThat(actual.voiceClipMessage?.exists).isFalse()
-                assertThat(actual.timestamp).isEqualTo(invalidTimeStamp)
+                assertThat(actual.timestamp).isNull()
                 assertThat(actual.loadProgress).isNull()
             }
         }
@@ -363,8 +362,7 @@ class VoiceClipMessageViewModelTest {
             // verify
             underTest.getUiStateFlow(msgId).test {
                 val actual = awaitItem()
-                assertThat(actual.voiceClipMessage?.exists).isFalse()
-                assertThat(actual.timestamp).isEqualTo(invalidTimeStamp)
+                assertThat(actual.timestamp).isNull()
                 assertThat(actual.loadProgress).isNull()
             }
         }

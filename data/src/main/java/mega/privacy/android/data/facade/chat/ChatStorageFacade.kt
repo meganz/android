@@ -181,4 +181,11 @@ internal class ChatStorageFacade @Inject constructor(
     override suspend fun clearChatPendingMessages(chatId: Long) {
         database.pendingMessageDao().deleteAllForChat(chatId)
     }
+
+    override suspend fun updateExistsInMessage(chatId: Long, msgId: Long, exists: Boolean) {
+        database.typedMessageDao().updateExists(chatId, msgId, exists)
+    }
+
+    override suspend fun getExistsInMessage(chatId: Long, msgId: Long) =
+        database.typedMessageDao().getExists(chatId, msgId)
 }

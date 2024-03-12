@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.chat.message.paging
 
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
+import mega.privacy.android.domain.usecase.chat.message.GetExistsInMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.reactions.GetReactionsUseCase
 import mega.privacy.android.domain.usecase.node.DoesNodeExistUseCase
 import javax.inject.Inject
@@ -12,6 +13,7 @@ import javax.inject.Inject
 class CreateSaveMessageRequestUseCase @Inject constructor(
     private val getReactionsUseCase: GetReactionsUseCase,
     private val doesNodeExistUseCase: DoesNodeExistUseCase,
+    private val getExistsInMessageUseCase: GetExistsInMessageUseCase,
 ) {
 
     /**
@@ -46,7 +48,11 @@ class CreateSaveMessageRequestUseCase @Inject constructor(
                     emptyList()
                 }
                 val exists = chatMessage.nodeList.firstOrNull()?.let {
-                    if (isMine) doesNodeExistUseCase(it.id) else true
+                    if (isMine) {
+                        doesNodeExistUseCase(it.id)
+                    } else {
+                        getExistsInMessageUseCase(chatId, chatMessage.messageId)
+                    }
                 } ?: true
 
                 CreateTypedMessageRequest(

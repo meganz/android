@@ -467,4 +467,23 @@ class ChatMessageRepositoryImplTest {
 
         verify(megaChatApiGateway).removeFailedMessage(expectedChatId, expectedRowId)
     }
+
+    @Test
+    internal fun `test that update exists in message invokes gateway`() = runTest {
+        val chatId = 123L
+        val msgId = 456L
+        underTest.updateDoesNotExistInMessage(chatId, msgId)
+
+        verify(chatStorageGateway).updateExistsInMessage(chatId, msgId, false)
+    }
+
+    @Test
+    internal fun `test that get exists in message invokes gateway and returns correctly`() =
+        runTest {
+            val chatId = 123L
+            val msgId = 456L
+
+            whenever(chatStorageGateway.getExistsInMessage(chatId, msgId)).thenReturn(true)
+            assertThat(underTest.getExistsInMessage(chatId, msgId)).isTrue()
+        }
 }

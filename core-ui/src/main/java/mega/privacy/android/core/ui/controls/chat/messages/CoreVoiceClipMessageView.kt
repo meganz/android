@@ -49,6 +49,8 @@ internal const val VOICE_CLIP_MESSAGE_VIEW_PLAY_BUTTON_TEST_TAG =
 internal const val VOICE_CLIP_MESSAGE_VIEW_LOAD_PROGRESS_INDICATOR_TEST_TAG =
     "chat_voice_clip_message_view:load_progress_indicator"
 
+internal const val INVALID_TIMESTAMP = "--:--"
+
 
 /**
  * Compose view for voice clip message
@@ -66,7 +68,7 @@ internal const val VOICE_CLIP_MESSAGE_VIEW_LOAD_PROGRESS_INDICATOR_TEST_TAG =
 @Composable
 fun CoreVoiceClipMessageView(
     isMe: Boolean,
-    timestamp: String,
+    timestamp: String?,
     interactionEnabled: Boolean,
     modifier: Modifier = Modifier,
     exists: Boolean = true,
@@ -221,10 +223,10 @@ private fun PlaySlider(
 }
 
 @Composable
-private fun TimestampText(isMe: Boolean, timestamp: String, exists: Boolean) {
+private fun TimestampText(isMe: Boolean, timestamp: String?, exists: Boolean) {
     MegaText(
         modifier = Modifier.padding(start = 8.dp),
-        text = timestamp,
+        text = timestamp ?: INVALID_TIMESTAMP,
         textColor = when {
             !exists -> TextColor.Disabled
             isMe -> TextColor.Inverse

@@ -1,5 +1,6 @@
 package mega.privacy.android.data.database.entity.chat
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
@@ -48,9 +49,9 @@ import kotlin.time.Duration
  * @property changes List of changes.
  * @property isMine True if the message is mine, false otherwise.
  * @property shouldShowAvatar True if the avatar should be shown, false otherwise.
- * @property shouldShowTime True if the time should be shown, false otherwise.
  * @property textMessage Text message.
  * @property reactions list of [Reaction]
+ * @property exists whether the voice clip exists
  */
 @Entity(tableName = "typed_messages")
 @TypeConverters(TypedMessageEntityConverters::class)
@@ -86,6 +87,7 @@ data class TypedMessageEntity(
     val isMine: Boolean,
     val shouldShowAvatar: Boolean,
     val textMessage: String?,
-    val reactions: List<Reaction>
+    val reactions: List<Reaction>,
+    @ColumnInfo(name = "does_exist") val exists: Boolean,
 ) : ChatMessageInfo
 

@@ -56,7 +56,7 @@ class VoiceClipUiMessage(
             CoreVoiceClipMessageView(
                 isMe = isMine,
                 timestamp = uiState.timestamp,
-                exists = uiState.voiceClipMessage?.exists ?: exists,
+                exists = exists,
                 loadProgress = uiState.loadProgress?.floatValue,
                 playProgress = uiState.playProgress?.floatValue,
                 isPlaying = uiState.isPlaying,

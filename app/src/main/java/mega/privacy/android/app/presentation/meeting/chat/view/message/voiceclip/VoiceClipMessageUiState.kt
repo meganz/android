@@ -16,6 +16,6 @@ data class VoiceClipMessageUiState(
     val isPlaying: Boolean = false,
     val playProgress: Progress? = null,
     val loadProgress: Progress? = Progress(0f),
-    val timestamp: String = "--:--",
+    val timestamp: String? = null,
     val voiceClipMessage: VoiceClipMessage? = null,
 )

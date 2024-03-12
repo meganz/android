@@ -91,7 +91,7 @@ interface TypedMessageDao {
     suspend fun getMessageReactions(chatId: Long, msgId: Long): String?
 
     /**
-     * Insert message
+     * Update message reactions
      *
      * @param chatId Chat ID
      * @param msgId Message ID
@@ -117,4 +117,25 @@ interface TypedMessageDao {
      */
     @Query("SELECT messageId FROM typed_messages WHERE chatId = :chatId AND timestamp <= :truncateTimestamp")
     fun getMsgIdsByChatIdAndLatestDate(chatId: Long, truncateTimestamp: Long): List<Long>
+
+    /**
+     * Update message exists
+     *
+     * @param chatId Chat ID
+     * @param msgId Message ID
+     * @param exists If the content in message exists
+     */
+    @Query("UPDATE typed_messages SET does_exist = :exists WHERE chatId = :chatId AND messageId = :msgId")
+    suspend fun updateExists(chatId: Long, msgId: Long, exists: Boolean)
+
+
+    /**
+     * Get message exists.
+     *
+     * @param chatId Chat ID
+     * @param msgId Message ID
+     * @return True if the content in message exists
+     */
+    @Query("SELECT does_exist FROM typed_messages WHERE chatId = :chatId AND messageId = :msgId")
+    suspend fun getExists(chatId: Long, msgId: Long): Boolean?
 }

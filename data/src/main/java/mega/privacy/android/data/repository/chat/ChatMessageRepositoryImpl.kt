@@ -303,4 +303,15 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
             megaChatApiGateway.removeFailedMessage(chatId = message.chatId, rowId = message.rowId)
         }
     }
+
+    override suspend fun updateDoesNotExistInMessage(chatId: Long, msgId: Long) =
+        withContext(ioDispatcher) {
+            chatStorageGateway.updateExistsInMessage(chatId, msgId, false)
+        }
+
+    override suspend fun getExistsInMessage(chatId: Long, msgId: Long) =
+        withContext(ioDispatcher) {
+            chatStorageGateway.getExistsInMessage(chatId, msgId) ?: true
+        }
+
 }

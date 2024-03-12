@@ -48,7 +48,8 @@ class TypedMessageEntityMapper @Inject constructor() {
                 shouldShowAvatar = shouldShowAvatar,
                 isMine = isMine,
                 textMessage = textMessage,
-                reactions = reactions
+                reactions = reactions,
+                exists = exists,
             )
         }
 }

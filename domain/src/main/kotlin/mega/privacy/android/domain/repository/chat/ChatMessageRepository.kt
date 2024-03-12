@@ -506,4 +506,21 @@ interface ChatMessageRepository {
      * @param message
      */
     suspend fun removeSentMessage(message: UserMessage)
+
+    /**
+     * Update does not exists in message.
+     *
+     * @param chatId Chat id.
+     * @param msgId Message id.
+     */
+    suspend fun updateDoesNotExistInMessage(chatId: Long, msgId: Long)
+
+    /**
+     * Get exists in message
+     *
+     * @param chatId Chat id.
+     * @param msgId Message id.
+     * @return Whether the content in message exists.
+     */
+    suspend fun getExistsInMessage(chatId: Long, msgId: Long): Boolean
 }
