@@ -28,7 +28,6 @@ import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.contacts.list.data.ContactListState
 import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
-import mega.privacy.android.app.contacts.usecase.RemoveContactUseCase
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -41,6 +40,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
@@ -57,7 +57,7 @@ import javax.inject.Inject
  * @property getContactsUseCase         Use case to retrieve current contacts
  * @property getContactRequestsUseCase  Use case to retrieve contact requests
  * @property get1On1ChatIdUseCase   Use case to get current chat room for existing user
- * @property removeContactUseCase       Use case to remove existing contact
+ * @property removedContactByEmailUseCase       Use case to remove existing contact
  * @property passcodeManagement         [PasscodeManagement]
  * @property startChatCall              [StartChatCall]
  * @property chatApiGateway             [MegaChatApiGateway]
@@ -69,7 +69,7 @@ class ContactListViewModel @Inject constructor(
     private val getContactsUseCase: GetContactsUseCase,
     private val getContactRequestsUseCase: GetContactRequestsUseCase,
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
-    private val removeContactUseCase: RemoveContactUseCase,
+    private val removedContactByEmailUseCase: RemoveContactByEmailUseCase,
     private val startChatCall: StartChatCall,
     private val passcodeManagement: PasscodeManagement,
     private val chatApiGateway: MegaChatApiGateway,
@@ -224,12 +224,19 @@ class ContactListViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Remove contact
+     *
+     * @param megaUser MegaUser to be removed
+     */
     fun removeContact(megaUser: MegaUser) {
-        removeContactUseCase.remove(megaUser)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onError = Timber::e)
-            .addTo(composite)
+        viewModelScope.launch {
+            runCatching {
+                removedContactByEmailUseCase(megaUser.email)
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     fun setQuery(query: String?) {

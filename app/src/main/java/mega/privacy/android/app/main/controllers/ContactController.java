@@ -74,7 +74,7 @@ public class ContactController {
     }
 
     /**
-     * @deprecated Use {@link mega.privacy.android.app.contacts.usecase.RemoveContactUseCase} instead
+     * @deprecated Use {@link mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase} instead
      */
     @Deprecated
     public void removeContact(MegaUser c) {
