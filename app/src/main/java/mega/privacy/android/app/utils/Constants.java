@@ -25,13 +25,11 @@ public class Constants {
     public static final int REQUEST_CODE_SELECT_FILE = 1012;
     public static final int REQUEST_CODE_TREE = 1014;
     public static final int TAKE_PICTURE_PROFILE_CODE = 1015;
-    public static final int CHOOSE_PICTURE_PROFILE_CODE = 1016;
     public static final int REQUEST_INVITE_CONTACT_FROM_DEVICE = 1017;
     public static final int REQUEST_CREATE_CHAT = 1018;
     public static final int REQUEST_ADD_PARTICIPANTS = 1019;
     public static final int REQUEST_SEND_CONTACTS = 1021;
     public static final int REQUEST_CODE_SELECT_CHAT = 1025;
-    public static final int REQUEST_CODE_GET_CONTACTS = 1026;
     public static final int REQUEST_CODE_FILE_INFO = 1027;
     public static final int REQUEST_CODE_REFRESH_API_SERVER = 1028;
     public static final int REQUEST_CODE_DELETE_VERSIONS_HISTORY = 1029;
@@ -96,10 +94,6 @@ public class Constants {
     public static final int CONFIRM_EMAIL_FRAGMENT = 6002;
     public static final int CREATE_ACCOUNT_FRAGMENT = 604;
 
-    public static final int ACHIEVEMENTS_FRAGMENT = 8000;
-    public static final int BONUSES_FRAGMENT = 8001;
-    public static final int INVITE_FRIENDS_FRAGMENT = 8002;
-    public static final int INFO_ACHIEVEMENTS_FRAGMENT = 8003;
 
     public static final int UPDATE_ACCOUNT_DETAILS = 9003;
 
@@ -187,7 +181,6 @@ public class Constants {
     public static final String ACTION_SHOW_SETTINGS = "ACTION_SHOW_SETTINGS";
     public static final String ACTION_SHOW_SETTINGS_STORAGE = "ACTION_SHOW_SETTINGS_STORAGE";
     public static final String ACTION_PRE_OVERQUOTA_STORAGE = "PRE_OVERQUOTA_STORAGE";
-    public static final String ACTION_LOG_OUT = "ACTION_LOG_OUT";
     public static final String ACTION_LOG_IN = "ACTION_LOG_IN";
 
     public static final String OPENED_FROM_CHAT = "OPENED_FROM_CHAT";
@@ -220,7 +213,6 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS = "INTENT_UPDATE_ACCOUNT_DETAILS";
     public static final String BROADCAST_ACTION_INTENT_SETTINGS_UPDATED = "SETTINGS_UPDATED";
     public static final String BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED = "INTENT_SSL_VERIFICATION_FAILED";
-    public static final String BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE = "INTENT_SIGNAL_PRESENCE";
     public static final String BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED = "INTENT_VOICE_CLIP_DOWNLOADED";
 
     public static final String INTENT_EXTRA_KEY_PLACEHOLDER = "placeholder";
@@ -297,7 +289,6 @@ public class Constants {
     public static final int RECENTS_ADAPTER = 2024;
     public static final int LINKS_ADAPTER = 2025;
     public static final int AUDIO_BROWSE_ADAPTER = 2028;
-    public static final int AUDIO_SEARCH_ADAPTER = 2029;
     public static final int DOCUMENTS_BROWSE_ADAPTER = 2030;
     public static final int DOCUMENTS_SEARCH_ADAPTER = 2031;
     public static final int VIDEO_BROWSE_ADAPTER = 2032;
@@ -316,7 +307,6 @@ public class Constants {
     public static final int VIEWER_FROM_RECETS_BUCKET = 8;
     public static final int VIEWER_FROM_RECENT_ACTIONS = 10;
     public static final int VIEWER_FROM_CONTACT_FILE_LIST = 11;
-    public static final int VIEWER_FROM_FOLDER_LINK = 12;
     public static final int VIEWER_FROM_ZIP_BROWSER = 13;
     public static final int VIEWER_FROM_FILE_BROWSER = 14;
     public static final int VIEWER_FROM_BACKUPS = 15;
@@ -373,7 +363,6 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME = "MEGA Camera Uploads";
     public static final String NOTIFICATION_CHANNEL_CHAT_ID = "ChatNotification";
     public static final String NOTIFICATION_CHANNEL_CHAT_NAME = "MEGA Chat";
-    public static final String NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID = "ChatSummaryNotification";
     public static final String NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2 = "ChatSummaryNotificationV2";
     public static final String NOTIFICATION_CHANNEL_CHAT_SUMMARY_NAME = "MEGA Chat Summary";
     public static final String NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_ID = "ChatSummaryNotificationNoVibrate";
@@ -412,7 +401,6 @@ public class Constants {
     public static final String URL_E2EE = "https://mega.nz/security";
 
     public static final int MIN_ITEMS_SCROLLBAR = 30;
-    public static final int MIN_ITEMS_SCROLLBAR_CHAT = 20;
     public static final int MIN_ITEMS_SCROLLBAR_CONTACT = 20;
 
     public static final int MAX_AUTOAWAY_TIMEOUT = 1457; //in minute, the max value supported by SDK
@@ -737,12 +725,6 @@ public class Constants {
     };
 
     //Types of blocked accounts
-    public static final String ACCOUNT_NOT_BLOCKED = "0";
-    public static final String TOS_COPYRIGHT_ACCOUNT_BLOCK = "200";
-    public static final String TOS_NON_COPYRIGHT_ACCOUNT_BLOCK = "300";
-    public static final String DISABLED_BUSINESS_ACCOUNT_BLOCK = "400";
-    public static final String REMOVED_BUSINESS_ACCOUNT_BLOCK = "401";
-    public static final String SMS_VERIFICATION_ACCOUNT_BLOCK = "500";
     public static final String WEAK_PROTECTION_ACCOUNT_BLOCK = "700";
 
     public static final int INVALID_VALUE = -1;
@@ -761,8 +743,6 @@ public class Constants {
     public static final long AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS = 3000;
     public static final long MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS = 300;
 
-    public static final int MAX_BADGE_NUM = 9;
-
     /**
      * Event Keys
      */
@@ -770,15 +750,9 @@ public class Constants {
     public static final String EVENT_CHAT_STATUS_CHANGE = "chat_status_change";
     public static final String EVENT_HOMEPAGE_VISIBILITY = "homepage_visibility";
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY = "drag_to_exit_thumbnail_visibility";
-    public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION = "drag_to_exit_thumbnail_location";
     public static final String EVENT_DRAG_TO_EXIT_SCROLL = "drag_to_exit_scroll";
 
     public static final String KEY_IS_SHOWED_WARNING_MESSAGE = "is_showed_meeting_warning_message_";
-
-    /**
-     * In database, invalid value is defined as '-1'
-     */
-    public static final String INVALID_NON_NULL_VALUE = "-1";
 
     public static final String STRING_SEPARATOR = " · ";
 

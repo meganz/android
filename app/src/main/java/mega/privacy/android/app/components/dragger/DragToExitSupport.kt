@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.DisplayMetrics
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
@@ -13,15 +12,20 @@ import android.view.WindowMetrics
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
-import androidx.annotation.LayoutRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants.EVENT_DRAG_TO_EXIT_SCROLL
-import mega.privacy.android.app.utils.Constants.EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION
 import mega.privacy.android.app.utils.Constants.EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SCREEN_POSITION
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIEWER_FROM
@@ -64,16 +68,6 @@ class DragToExitSupport(
     /**
      * Wrap content view with draggable view.
      *
-     * @param layoutResID the content view layout resource id
-     * @return the wrapped view, should be set as Activity content view
-     */
-    fun wrapContentView(@LayoutRes layoutResID: Int): View {
-        return wrapContentView(LayoutInflater.from(context).inflate(layoutResID, null))
-    }
-
-    /**
-     * Wrap content view with draggable view.
-     *
      * @param contentView the content view
      * @return the wrapped view, should be set as Activity content view
      */
@@ -112,20 +106,20 @@ class DragToExitSupport(
         viewerFrom =
             intent?.getIntExtra(INTENT_EXTRA_KEY_VIEWER_FROM, INVALID_VALUE) ?: INVALID_VALUE
 
-        LiveEventBus.get(
-            EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION, ThumbnailLocationEvent::class.java
-        ).observe(lifecycleOwner) {
-            Timber.d("EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION ${it.viewerFrom} ${it.location.contentToString()}")
+        lifecycleOwner.lifecycleScope.launch {
+            thumbnailLocationFlow
+                .flowWithLifecycle(lifecycleOwner.lifecycle)
+                .onEach {
+                    Timber.d("thumbnail location changed: ${it.viewerFrom} ${it.location.contentToString()}")
+                }
+                .filter { it.viewerFrom == viewerFrom }
+                .collectLatest {
+                    val newLoc = intArrayOf(*it.location)
+                    newLoc[LOCATION_INDEX_LEFT] += newLoc[LOCATION_INDEX_WIDTH] / 2
+                    newLoc[LOCATION_INDEX_TOP] += newLoc[LOCATION_INDEX_HEIGHT] / 2
 
-            if (it.viewerFrom != viewerFrom) {
-                return@observe
-            }
-
-            val newLoc = intArrayOf(*it.location)
-            newLoc[LOCATION_INDEX_LEFT] += newLoc[LOCATION_INDEX_WIDTH] / 2
-            newLoc[LOCATION_INDEX_TOP] += newLoc[LOCATION_INDEX_HEIGHT] / 2
-
-            draggableView?.screenPosition = newLoc
+                    draggableView?.screenPosition = newLoc
+                }
         }
     }
 
@@ -267,22 +261,38 @@ class DragToExitSupport(
         currentHandle = handle
     }
 
+    /**
+     * Set the draggable value
+     *
+     * @param draggable
+     */
     fun setDraggable(draggable: Boolean) {
         draggableView?.draggable = draggable
     }
 
+    /**
+     * Set the draggable view's current view
+     *
+     * @param currentView
+     */
     fun setCurrentView(currentView: View?) {
         draggableView?.currentView = currentView
     }
 
-    fun setNormalizedScale(normalizedScale: Float) {
-        draggableView?.normalizedScale = normalizedScale
-    }
-
+    /**
+     * Notify the view position changes
+     *
+     * @param fractionScreen
+     */
     override fun onViewPositionChanged(fractionScreen: Float) {
         ivShadow?.alpha = 1 - fractionScreen
     }
 
+    /**
+     * Notify the drag activation changes
+     *
+     * @param activated
+     */
     override fun onDragActivated(activated: Boolean) {
         if (activated) {
             ivShadow?.isVisible = true
@@ -290,31 +300,64 @@ class DragToExitSupport(
         dragActivated?.invoke(activated)
     }
 
+    /**
+     * Show previous hidden thumbnail
+     */
     override fun showPreviousHiddenThumbnail() {
         LiveEventBus.get(
             EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY, ThumbnailVisibilityEvent::class.java
         ).post(ThumbnailVisibilityEvent(viewerFrom, currentHandle, true))
     }
 
+    /**
+     * Notify when the fade out animation finished
+     */
     override fun fadeOutFinish() {
         fadeOutFinishCallback?.invoke()
     }
 
+    /**
+     * Notify the drag's event changes
+     *
+     * @param draggableView nullable
+     * @param percentX
+     * @param percentY
+     */
     override fun onDrag(draggableView: DraggableView?, percentX: Float, percentY: Float) {
     }
 
+    /**
+     * Notify the drag started event
+     *
+     * @param draggableView nullable
+     * @param direction nullable
+     */
     override fun onDraggedStarted(draggableView: DraggableView?, direction: Direction?) {
     }
 
+    /**
+     * Notify the drag ended event
+     *
+     * @param draggableView nullable
+     * @param direction nullable
+     */
     override fun onDraggedEnded(draggableView: DraggableView?, direction: Direction?) {
     }
 
+    /**
+     * Notify the drag cancelled event
+     *
+     * @param draggableView nullable
+     */
     override fun onDragCancelled(draggableView: DraggableView?) {
         ivShadow?.isVisible = false
     }
 
     companion object {
         private const val ENTER_ANIMATION_DURATION_MS = 600L
+
+        private var thumbnailLocationFlow: MutableSharedFlow<ThumbnailLocationEvent> =
+            MutableSharedFlow()
 
         /**
          * Put thumbnail location on screen into viewer launch intent.
@@ -410,10 +453,14 @@ class DragToExitSupport(
 
                     val location = getThumbnailLocation(thumbnail)
                     if (!it.visible && location != null) {
-                        LiveEventBus.get(
-                            EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION,
-                            ThumbnailLocationEvent::class.java
-                        ).post(ThumbnailLocationEvent(viewerFrom, location))
+                        lifecycleOwner.lifecycleScope.launch {
+                            thumbnailLocationFlow.emit(
+                                ThumbnailLocationEvent(
+                                    viewerFrom = viewerFrom,
+                                    location = location
+                                )
+                            )
+                        }
                     }
                 }
             }
