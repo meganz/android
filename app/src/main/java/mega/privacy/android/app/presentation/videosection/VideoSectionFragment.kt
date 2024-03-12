@@ -50,10 +50,12 @@ import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
 import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
 import mega.privacy.android.app.utils.Constants.ORDER_VIDEO_PLAYLIST
+import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
@@ -261,7 +263,12 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                             activateVideoPlaylistActionMode(ACTION_TYPE_VIDEO_PLAYLIST_DETAIL)
                             videoSectionViewModel.onVideoItemOfPlaylistClicked(item, index)
                         },
-                        onActionModeFinished = { actionMode?.finish() }
+                        onActionModeFinished = { actionMode?.finish() },
+                        onPlayAllClicked = {
+                            uiState.currentVideoPlaylist?.videos?.firstOrNull()?.let {
+                                openVideoFile(activity = requireActivity(), item = it, index = 0)
+                            }
+                        }
                     )
                 }
             }
@@ -327,10 +334,29 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
         item: VideoUIEntity,
         index: Int,
     ) = Util.getMediaIntent(activity, item.name).apply {
+        val state = videoSectionViewModel.state.value
         putExtra(INTENT_EXTRA_KEY_POSITION, index)
         putExtra(INTENT_EXTRA_KEY_HANDLE, item.id.longValue)
         putExtra(INTENT_EXTRA_KEY_FILE_NAME, item.name)
-        putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, VIDEO_BROWSE_ADAPTER)
+        when (state.currentDestinationRoute) {
+            videoSectionRoute ->
+                if (state.searchMode) {
+                    putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, SEARCH_BY_ADAPTER)
+                    putExtra(
+                        INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH,
+                        state.allVideos.map { it.id.longValue }.toLongArray()
+                    )
+                } else {
+                    putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, VIDEO_BROWSE_ADAPTER)
+                }
+
+            videoPlaylistDetailRoute -> {
+                putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, SEARCH_BY_ADAPTER)
+                state.currentVideoPlaylist?.videos?.map { it.id.longValue }?.let {
+                    putExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH, it.toLongArray())
+                }
+            }
+        }
         putExtra(
             INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
             sortByHeaderViewModel.cloudSortOrder.value

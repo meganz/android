@@ -27,6 +27,7 @@ internal fun VideoSectionFeatureScreen(
     onPlaylistDetailItemLongClick: (item: VideoUIEntity, index: Int) -> Unit,
     onPlaylistItemLongClick: (VideoPlaylistUIEntity, index: Int) -> Unit,
     onActionModeFinished: () -> Unit,
+    onPlayAllClicked: () -> Unit,
     onPlaylistItemMenuClick: (VideoPlaylistUIEntity) -> Unit = {},
 ) {
     val navHostController = rememberNavController()
@@ -43,7 +44,8 @@ internal fun VideoSectionFeatureScreen(
         onPlaylistItemLongClick = onPlaylistItemLongClick,
         onAddElementsClicked = onAddElementsClicked,
         onPlaylistDetailLongClicked = onPlaylistDetailItemLongClick,
-        onActionModeFinished = onActionModeFinished
+        onActionModeFinished = onActionModeFinished,
+        onPlayAllClicked = onPlayAllClicked
     )
 }
 
@@ -59,6 +61,7 @@ internal fun VideoSectionNavHost(
     onAddElementsClicked: () -> Unit,
     onPlaylistDetailLongClicked: (item: VideoUIEntity, index: Int) -> Unit,
     onActionModeFinished: () -> Unit,
+    onPlayAllClicked: () -> Unit,
     modifier: Modifier,
     onPlaylistItemMenuClick: (VideoPlaylistUIEntity) -> Unit = {},
     viewModel: VideoSectionViewModel = hiltViewModel(),
@@ -146,6 +149,7 @@ internal fun VideoSectionNavHost(
                     viewModel.removeVideosFromPlaylist(playlist.id, removedVideoIDs)
                     onActionModeFinished()
                 },
+                onPlayAllClicked = onPlayAllClicked
             )
         }
     }

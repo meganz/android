@@ -6,11 +6,13 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.playlist.DETAIL_DELETE_VIDEOS_DIALOG_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG
+import mega.privacy.android.app.presentation.videosection.view.playlist.DETAIL_PLAY_ALL_BUTTON_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.PLAYLIST_TITLE_TEST_TAG
@@ -22,6 +24,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
 class VideoPlaylistDetailViewTest {
@@ -59,6 +62,7 @@ class VideoPlaylistDetailViewTest {
         onDeleteVideosDialogPositiveButtonClicked: (VideoPlaylistUIEntity) -> Unit = {},
         removedMessageShown: () -> Unit = {},
         numberOfRemovedItems: Int = 0,
+        onPlayAllClicked: () -> Unit = {},
     ) {
         composeTestRule.setContent {
             VideoPlaylistDetailView(
@@ -87,6 +91,7 @@ class VideoPlaylistDetailViewTest {
                 onDeleteVideosDialogPositiveButtonClicked = onDeleteVideosDialogPositiveButtonClicked,
                 removedMessageShown = removedMessageShown,
                 numberOfRemovedItems = numberOfRemovedItems,
+                onPlayAllClicked = onPlayAllClicked
             )
         }
     }
@@ -204,5 +209,16 @@ class VideoPlaylistDetailViewTest {
 
         composeTestRule.onNodeWithTag(DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG)
             .assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `test that onPlayAllClicked is invoked when the play all button is clicked`() {
+        val onPlayAllClicked = mock<() -> Unit>()
+        setComposeContent(
+            onPlayAllClicked = onPlayAllClicked
+        )
+
+        composeTestRule.onNodeWithTag(DETAIL_PLAY_ALL_BUTTON_TEST_TAG).performClick()
+        verify(onPlayAllClicked).invoke()
     }
 }

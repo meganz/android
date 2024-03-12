@@ -5,6 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -87,6 +88,7 @@ fun VideoPlaylistDetailView(
     onDeleteDialogPositiveButtonClicked: (List<VideoPlaylistUIEntity>) -> Unit,
     onDeleteVideosDialogPositiveButtonClicked: (VideoPlaylistUIEntity) -> Unit,
     onAddElementsClicked: () -> Unit,
+    onPlayAllClicked: () -> Unit,
     modifier: Modifier = Modifier,
     errorMessage: Int? = null,
     onClick: (item: VideoUIEntity, index: Int) -> Unit = { _, _ -> },
@@ -233,7 +235,8 @@ fun VideoPlaylistDetailView(
                 title = playlist?.title,
                 totalDuration = playlist?.totalDuration,
                 numberOfVideos = playlist?.numberOfVideos,
-                modifier = modifier.padding(16.dp)
+                modifier = modifier.padding(16.dp),
+                onPlayAllClicked = onPlayAllClicked
             )
             MegaDivider(
                 dividerSpacing = DividerSpacing.Center,
@@ -292,6 +295,7 @@ internal fun VideoPlaylistHeaderView(
     title: String?,
     totalDuration: String?,
     numberOfVideos: Int?,
+    onPlayAllClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
@@ -324,6 +328,8 @@ internal fun VideoPlaylistHeaderView(
             modifier = Modifier
                 .align(Alignment.End)
                 .padding(top = 16.dp)
+                .clickable { onPlayAllClicked() }
+                .testTag(DETAIL_PLAY_ALL_BUTTON_TEST_TAG)
         )
     }
 }
@@ -438,6 +444,7 @@ private fun VideoPlaylistDetailViewPreview() {
             onDeleteVideosDialogPositiveButtonClicked = {},
             removedMessageShown = {},
             numberOfRemovedItems = 0,
+            onPlayAllClicked = {}
         )
     }
 }
@@ -451,7 +458,8 @@ private fun VideoPlaylistHeaderViewPreview() {
             thumbnailList = listOf(null),
             title = "New Playlist",
             totalDuration = "00:00:00",
-            numberOfVideos = 0
+            numberOfVideos = 0,
+            onPlayAllClicked = {}
         )
     }
 }
@@ -500,6 +508,11 @@ const val DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
  * Test tag for delete videos dialog in detail page
  */
 const val DETAIL_DELETE_VIDEOS_DIALOG_TEST_TAG = "detail_delete_videos_dialog_test_tag"
+
+/**
+ * Test tag for play all button in detail page
+ */
+const val DETAIL_PLAY_ALL_BUTTON_TEST_TAG = "detail_play_all_button_test_tag"
 
 
 internal const val videoPlaylistDetailRoute = "videoSection/video_playlist/detail"
