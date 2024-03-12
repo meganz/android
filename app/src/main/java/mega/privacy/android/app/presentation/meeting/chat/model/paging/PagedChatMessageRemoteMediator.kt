@@ -46,7 +46,7 @@ class PagedChatMessageRemoteMediator @AssistedInject constructor(
             }
 
             if (loadType == LoadType.REFRESH) {
-                clearChatMessagesUseCase(chatId)
+                clearChatMessagesUseCase(chatId, false)
             }
 
             val count = when (loadType) {
