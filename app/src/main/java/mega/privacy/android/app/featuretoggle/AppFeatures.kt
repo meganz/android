@@ -38,7 +38,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     IncomingSharesCompose(
         "Enable new Incoming Shares Compose page (requires app restart)",
-        false
+        true
     ),
 
 
@@ -47,7 +47,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     OutgoingSharesCompose(
         "Enable new Outgoing Shares Compose page (requires app restart)",
-        false
+        true
     ),
 
 
@@ -56,7 +56,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     LinksCompose(
         "Enable new Shared Links Compose page (requires app restart)",
-        false
+        true
     ),
 
     /**

@@ -267,7 +267,7 @@ class LinksComposeFragment : Fragment() {
     private fun showOptionsMenuForItem(nodeUIItem: NodeUIItem<PublicLinkNode>) {
         (requireActivity() as ManagerActivity).showNodeOptionsPanel(
             nodeId = nodeUIItem.id,
-            mode = NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE
+            mode = NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE
         )
     }
 
@@ -572,6 +572,9 @@ class LinksComposeFragment : Fragment() {
                 )
 
                 // Slight customization for links page
+                control.move().isVisible = false
+                control.removeShare().isVisible = false
+                control.shareFolder().isVisible = false
                 if (selected.size > 1) {
                     control.removeLink().setVisible(true).showAsAction =
                         MenuItem.SHOW_AS_ACTION_ALWAYS
@@ -580,7 +583,9 @@ class LinksComposeFragment : Fragment() {
                         showAsAction = MenuItem.SHOW_AS_ACTION_NEVER
                     }
                 }
-
+                if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+                    control.copy().showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+                }
                 CloudStorageOptionControlUtil.applyControl(menu, control)
             }
             return true
