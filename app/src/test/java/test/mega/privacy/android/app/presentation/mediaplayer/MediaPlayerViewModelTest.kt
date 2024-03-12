@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.presentation.mediaplayer
 
-import com.google.common.truth.Truth
+import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.core.Completable
@@ -15,6 +16,7 @@ import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel
+import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
@@ -212,7 +214,7 @@ internal class MediaPlayerViewModelTest {
             )
             advanceUntilIdle()
             underTest.onSnackbarMessage().observeOnce {
-                Truth.assertThat(it).isEqualTo(R.string.context_correctly_copied)
+                assertThat(it).isEqualTo(R.string.context_correctly_copied)
             }
         }
 
@@ -246,9 +248,32 @@ internal class MediaPlayerViewModelTest {
             )
             advanceUntilIdle()
             underTest.onExceptionThrown().observeOnce {
-                Truth.assertThat(it).isEqualTo(runtimeException)
+                assertThat(it).isEqualTo(runtimeException)
             }
         }
+
+    @Test
+    fun `test that the metadata is updated correctly`() = runTest {
+        val metadata = Metadata(
+            title = "Title",
+            artist = "Artist",
+            album = "Album",
+            nodeName = "Node Name"
+        )
+        underTest.metadataState.test {
+            val initial = awaitItem()
+            assertThat(initial.title).isNull()
+            assertThat(initial.artist).isNull()
+            assertThat(initial.album).isNull()
+            assertThat(initial.nodeName).isEmpty()
+            underTest.updateMetaData(metadata)
+            val actual = awaitItem()
+            assertThat(actual.title).isEqualTo(metadata.title)
+            assertThat(actual.artist).isEqualTo(metadata.artist)
+            assertThat(actual.album).isEqualTo(metadata.album)
+            assertThat(actual.nodeName).isEqualTo(metadata.nodeName)
+        }
+    }
 
     companion object {
         @JvmField

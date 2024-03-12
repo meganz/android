@@ -9,7 +9,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.mediaplayer.trackinfo.AudioInfoView
-import mega.privacy.android.app.mediaplayer.trackinfo.AudioNodeInfo
 import mega.privacy.android.app.mediaplayer.trackinfo.AudioNodeInfoView
 import mega.privacy.android.app.mediaplayer.trackinfo.AudioTrackInfoView
 import mega.privacy.android.app.mediaplayer.trackinfo.Constants.AUDIO_ADDED_TEST_TAG
@@ -21,10 +20,10 @@ import mega.privacy.android.app.mediaplayer.trackinfo.Constants.AUDIO_LOCATION_T
 import mega.privacy.android.app.mediaplayer.trackinfo.Constants.AUDIO_SIZE_TEST_TAG
 import mega.privacy.android.app.mediaplayer.trackinfo.Constants.AUDIO_TITLE_TEST_TAG
 import mega.privacy.android.app.mediaplayer.trackinfo.Constants.OFFLINE_OPTION_TEST_TAG
+import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoState
 import mega.privacy.android.app.utils.LocationInfo
 import org.junit.Rule
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.*
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import java.io.File
@@ -43,32 +42,32 @@ internal class AudioTrackInfoViewKtTest {
     private val expectedLocationInfo = mock<LocationInfo> {
         on { location }.thenReturn(expectedLocationValue)
     }
-    private val expectedAddedValue = "Added test"
-    private val expectedLastModifiedValue = "Last modified test"
+    private val expectedAddedValue = 1L
+    private val expectedLastModifiedValue = 2L
     private val metadataValue = mock<Metadata> {
         on { title }.thenReturn(expectTitleString)
         on { album }.thenReturn(expectAlbumString)
         on { artist }.thenReturn(expectArtistString)
     }
-    private val metadata = Pair(metadataValue, expectedDuration)
 
-    private val audioNodeInfo = mock<AudioNodeInfo> {
+    private val trackInfoState = mock<TrackInfoState> {
         on { availableOffline }.thenReturn(false)
         on { size }.thenReturn(expectedSizeValue)
         on { location }.thenReturn(expectedLocationInfo)
         on { added }.thenReturn(expectedAddedValue)
         on { lastModified }.thenReturn(expectedLastModifiedValue)
+        on { durationString }.thenReturn(expectedDuration)
     }
 
     private fun setComposeContent(
-        audioNodeInfo: AudioNodeInfo? = null,
-        metadata: Pair<Metadata, String>? = null,
+        trackInfoState: TrackInfoState,
+        metadata: Metadata,
         onLocationClicked: (location: LocationInfo?) -> Unit = {},
         onCheckedChange: (isChecked: Boolean) -> Unit = {},
     ) {
         composeTestRule.setContent {
             AudioTrackInfoView(
-                audioNodeInfo = audioNodeInfo,
+                uiState = trackInfoState,
                 metadata = metadata,
                 onLocationClicked = onLocationClicked,
                 onCheckedChange = onCheckedChange
@@ -125,7 +124,7 @@ internal class AudioTrackInfoViewKtTest {
 
     @Test
     fun `test that views are displayed correctly when all values are not null`() {
-        setComposeContent(audioNodeInfo = audioNodeInfo, metadata = metadata)
+        setComposeContent(trackInfoState = trackInfoState, metadata = metadataValue)
 
         composeTestRule.onNodeWithTag(AUDIO_TITLE_TEST_TAG).assertExists()
             .assertTextEquals(expectTitleString)
@@ -141,10 +140,6 @@ internal class AudioTrackInfoViewKtTest {
             .assertTextEquals(expectedSizeValue)
         composeTestRule.onNodeWithTag(AUDIO_LOCATION_TEST_TAG, true).assertExists()
             .assertTextEquals(expectedLocationValue)
-        composeTestRule.onNodeWithTag(AUDIO_ADDED_TEST_TAG, true).assertExists()
-            .assertTextEquals(expectedAddedValue)
-        composeTestRule.onNodeWithTag(AUDIO_LAST_MODIFIED_TEST_TAG, true).assertExists()
-            .assertTextEquals(expectedLastModifiedValue)
     }
 
     @Test
@@ -167,11 +162,13 @@ internal class AudioTrackInfoViewKtTest {
 
     @Test
     fun `test that views are displayed correctly when all values of audio node info are not null`() {
+        val testValue = "added value"
+        val lastModifiedValue = "last modified value"
         setContentForAudioNodeInfoView(
             sizeValue = expectedSizeValue,
             locationValue = expectedLocationInfo,
-            addedValue = expectedAddedValue,
-            lastModifiedValue = expectedLastModifiedValue
+            addedValue = testValue,
+            lastModifiedValue = lastModifiedValue
         )
 
         composeTestRule.onNodeWithTag(OFFLINE_OPTION_TEST_TAG).onChildren()
@@ -181,8 +178,8 @@ internal class AudioTrackInfoViewKtTest {
         composeTestRule.onNodeWithTag(AUDIO_LOCATION_TEST_TAG).assertIsDisplayed()
             .assertTextEquals(expectedLocationValue)
         composeTestRule.onNodeWithTag(AUDIO_ADDED_TEST_TAG).assertIsDisplayed()
-            .assertTextEquals(expectedAddedValue)
+            .assertTextEquals(testValue)
         composeTestRule.onNodeWithTag(AUDIO_LAST_MODIFIED_TEST_TAG).assertIsDisplayed()
-            .assertTextEquals(expectedLastModifiedValue)
+            .assertTextEquals(lastModifiedValue)
     }
 }

@@ -11,12 +11,16 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.mediaplayer.model.MediaPlayerMenuClickedEvent
+import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
@@ -58,6 +62,23 @@ class MediaPlayerViewModel @Inject constructor(
      */
     val menuClickEventFlow = MutableSharedFlow<MediaPlayerMenuClickedEvent>()
 
+    private val _itemToRemove = MutableLiveData<Long>()
+
+    /**
+     * Removed item update
+     */
+    val itemToRemove: LiveData<Long> = _itemToRemove
+
+    private val _renameUpdate = MutableLiveData<MegaNode?>()
+
+    /**
+     * Rename update
+     */
+    val renameUpdate: LiveData<MegaNode?> = _renameUpdate
+
+    private val _metadataState = MutableStateFlow(Metadata(null, null, null, ""))
+    internal val metadataState: StateFlow<Metadata> = _metadataState
+
     /**
      * Update clicked event flow
      *
@@ -84,23 +105,11 @@ class MediaPlayerViewModel @Inject constructor(
         }
     }
 
-    fun getCollision(): LiveData<NameCollision> = collision
-    fun onSnackbarMessage(): LiveData<Int> = snackbarMessage
-    fun onExceptionThrown(): LiveData<Throwable> = throwable
+    internal fun getCollision(): LiveData<NameCollision> = collision
 
-    private val _itemToRemove = MutableLiveData<Long>()
+    internal fun onSnackbarMessage(): LiveData<Int> = snackbarMessage
 
-    /**
-     * Removed item update
-     */
-    val itemToRemove: LiveData<Long> = _itemToRemove
-
-    private val _renameUpdate = MutableLiveData<MegaNode?>()
-
-    /**
-     * Rename update
-     */
-    val renameUpdate: LiveData<MegaNode?> = _renameUpdate
+    internal fun onExceptionThrown(): LiveData<Throwable> = throwable
 
     /**
      * Rename update
@@ -278,4 +287,13 @@ class MediaPlayerViewModel @Inject constructor(
      */
     fun getNodeForAlbumSharing(handle: Long) =
         legacyPublicAlbumPhotoNodeProvider.getPublicNode(handle)
+
+    internal fun updateMetaData(metadata: Metadata) = _metadataState.update {
+        it.copy(
+            title = metadata.title,
+            artist = metadata.artist,
+            album = metadata.album,
+            nodeName = metadata.nodeName
+        )
+    }
 }

@@ -45,83 +45,25 @@ import mega.privacy.android.app.mediaplayer.trackinfo.Constants.AUDIO_SIZE_TEST_
 import mega.privacy.android.app.mediaplayer.trackinfo.Constants.AUDIO_TITLE_TEST_TAG
 import mega.privacy.android.app.mediaplayer.trackinfo.Constants.OFFLINE_OPTION_TEST_TAG
 import mega.privacy.android.app.utils.LocationInfo
+import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.shared.theme.MegaAppTheme
 import java.io.File
-
-internal object Constants {
-
-    /**
-     * Test tag for audio title
-     */
-    const val AUDIO_TITLE_TEST_TAG = "audio_title_test_tag"
-
-    /**
-     * Test tag for audio artist
-     */
-    const val AUDIO_ARTIST_TEST_TAG = "audio_artist_test_tag"
-
-    /**
-     * Test tag for audio album
-     */
-    const val AUDIO_ALBUM_TEST_TAG = "audio_album_test_tag"
-
-    /**
-     * Test tag for audio duration
-     */
-    const val AUDIO_DURATION_TEST_TAG = "audio_duration_test_tag"
-
-    /**
-     * Test tag for available offline option
-     */
-    const val OFFLINE_OPTION_TEST_TAG = "offline_option_test_tag"
-
-    /**
-     * Test tag for audio size
-     */
-    const val AUDIO_SIZE_TEST_TAG = "audio_size_test_tag"
-
-    /**
-     * Test tag for audio location
-     */
-    const val AUDIO_LOCATION_TEST_TAG = "audio_location_test_tag"
-
-    /**
-     * Test tag for audio added
-     */
-    const val AUDIO_ADDED_TEST_TAG = "audio_added_test_tag"
-
-    /**
-     * Test tag for audio last modified
-     */
-    const val AUDIO_LAST_MODIFIED_TEST_TAG = "audio_last_modified_test_tag"
-}
 
 /**
  * Audio track info view
  *
- * @param audioNodeInfo AudioNodeInfo
- * @param metadata Pair<Metadata, String>
+ * @param uiState TrackInfoState
+ * @param metadata Metadata
  * @param onLocationClicked the function for location clicked
  * @param onCheckedChange the function for switch checked changed
  */
 @Composable
 fun AudioTrackInfoView(
-    audioNodeInfo: AudioNodeInfo?,
-    metadata: Pair<Metadata, String>?,
+    uiState: TrackInfoState,
+    metadata: Metadata,
     onLocationClicked: (location: LocationInfo?) -> Unit,
     onCheckedChange: (isChecked: Boolean) -> Unit,
 ) {
-    val thumbnail = audioNodeInfo?.thumbnail
-    val titleString = metadata?.first?.title ?: metadata?.first?.nodeName
-    val artistString = metadata?.first?.artist
-    val albumString = metadata?.first?.album
-    val duration = metadata?.second
-    val isAvailableOffline = audioNodeInfo?.availableOffline
-    val sizeValue = audioNodeInfo?.size
-    val locationValue = audioNodeInfo?.location
-    val addedValue = audioNodeInfo?.added
-    val lastModifiedValue = audioNodeInfo?.lastModified
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -129,21 +71,21 @@ fun AudioTrackInfoView(
             .verticalScroll(rememberScrollState())
     ) {
         AudioInfoView(
-            thumbnail = thumbnail,
-            titleString = titleString,
-            artistString = artistString,
-            albumString = albumString,
-            duration = duration
+            thumbnail = uiState.thumbnail,
+            titleString = metadata.title ?: metadata.nodeName,
+            artistString = metadata.artist,
+            albumString = metadata.album,
+            duration = uiState.durationString
         )
 
         AudioNodeInfoView(
             onCheckedChange = onCheckedChange,
-            isEnabled = isAvailableOffline,
-            sizeValue = sizeValue,
-            locationValue = locationValue,
+            isEnabled = uiState.availableOffline,
+            sizeValue = uiState.size,
+            locationValue = uiState.location,
             onLocationClicked = onLocationClicked,
-            addedValue = addedValue,
-            lastModifiedValue = lastModifiedValue
+            addedValue = formatLongDateTime(uiState.added),
+            lastModifiedValue = formatLongDateTime(uiState.lastModified)
         )
     }
 }
@@ -392,4 +334,53 @@ private fun PreviewAudioNodeInfoView() {
             lastModifiedValue = "20 May 2017 12:48"
         )
     }
+}
+
+
+internal object Constants {
+
+    /**
+     * Test tag for audio title
+     */
+    const val AUDIO_TITLE_TEST_TAG = "audio_title_test_tag"
+
+    /**
+     * Test tag for audio artist
+     */
+    const val AUDIO_ARTIST_TEST_TAG = "audio_artist_test_tag"
+
+    /**
+     * Test tag for audio album
+     */
+    const val AUDIO_ALBUM_TEST_TAG = "audio_album_test_tag"
+
+    /**
+     * Test tag for audio duration
+     */
+    const val AUDIO_DURATION_TEST_TAG = "audio_duration_test_tag"
+
+    /**
+     * Test tag for available offline option
+     */
+    const val OFFLINE_OPTION_TEST_TAG = "offline_option_test_tag"
+
+    /**
+     * Test tag for audio size
+     */
+    const val AUDIO_SIZE_TEST_TAG = "audio_size_test_tag"
+
+    /**
+     * Test tag for audio location
+     */
+    const val AUDIO_LOCATION_TEST_TAG = "audio_location_test_tag"
+
+    /**
+     * Test tag for audio added
+     */
+    const val AUDIO_ADDED_TEST_TAG = "audio_added_test_tag"
+
+    /**
+     * Test tag for audio last modified
+     */
+    const val AUDIO_LAST_MODIFIED_TEST_TAG = "audio_last_modified_test_tag"
 }
