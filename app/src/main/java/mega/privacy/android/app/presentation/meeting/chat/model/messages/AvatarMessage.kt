@@ -125,7 +125,8 @@ abstract class AvatarMessage : UiChatMessage {
         )
     }
 
-    override val isSelectable = true
+    override val isSelectable
+        get() = !message.isNotSent()
 
     override fun key() = super.key() + "_${showAvatar}"
 }
