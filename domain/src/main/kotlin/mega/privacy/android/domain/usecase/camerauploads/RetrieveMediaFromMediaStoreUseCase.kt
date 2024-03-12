@@ -3,9 +3,11 @@ package mega.privacy.android.domain.usecase.camerauploads
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.yield
-import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
+import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsMedia
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
@@ -42,30 +44,33 @@ class RetrieveMediaFromMediaStoreUseCase @Inject constructor(
             cameraUploadRepository.getAllCameraUploadsRecords()
                 .partition { it.folderType == CameraUploadFolderType.Primary }
 
+        val semaphore = Semaphore(8)
         return@coroutineScope types.flatMap {
             cameraUploadRepository.getMediaList(
                 mediaStoreFileType = it,
                 selectionQuery = selectionQuery,
             ).map {
                 async {
-                    yield()
-                    runCatching {
-                        val exists = checkCameraUploadsRecordAlreadyExists(
-                            cameraUploadsMedia = it,
-                            recordsToCheck =
-                            if (folderType == CameraUploadFolderType.Primary)
-                                recordsInPrimaryFolder
-                            else recordsInSecondaryFolder,
-                        )
-                        if (!exists) {
-                            cameraUploadsRecordMapper(
-                                media = it,
-                                folderType = folderType,
-                                fileType = fileType,
-                                tempRoot = tempRoot,
+                    semaphore.withPermit {
+                        yield()
+                        runCatching {
+                            val exists = checkCameraUploadsRecordAlreadyExists(
+                                cameraUploadsMedia = it,
+                                recordsToCheck =
+                                if (folderType == CameraUploadFolderType.Primary)
+                                    recordsInPrimaryFolder
+                                else recordsInSecondaryFolder,
                             )
-                        } else null
-                    }.getOrNull()
+                            if (!exists) {
+                                cameraUploadsRecordMapper(
+                                    media = it,
+                                    folderType = folderType,
+                                    fileType = fileType,
+                                    tempRoot = tempRoot,
+                                )
+                            } else null
+                        }.getOrNull()
+                    }
                 }
             }.awaitAll().filterNotNull()
         }

@@ -3,6 +3,8 @@ package mega.privacy.android.domain.usecase.camerauploads
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.yield
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
@@ -27,19 +29,22 @@ class ExtractGpsCoordinatesUseCase @Inject constructor(
     suspend operator fun invoke(
         recordList: List<CameraUploadsRecord>,
     ): List<CameraUploadsRecord> = coroutineScope {
+        val semaphore = Semaphore(4)
         return@coroutineScope recordList.map { record ->
             async {
-                yield()
-                if (record.existingNodeId == null) {
-                    runCatching {
-                        getGPSCoordinatesUseCase(
-                            record.filePath,
-                            record.type == CameraUploadsRecordType.TYPE_VIDEO,
-                        )?.let { (latitude, longitude) ->
-                            record.copy(latitude = latitude, longitude = longitude)
-                        } ?: record
-                    }.getOrDefault(record)
-                } else record
+                semaphore.withPermit {
+                    yield()
+                    if (record.existingNodeId == null) {
+                        runCatching {
+                            getGPSCoordinatesUseCase(
+                                record.filePath,
+                                record.type == CameraUploadsRecordType.TYPE_VIDEO,
+                            )?.let { (latitude, longitude) ->
+                                record.copy(latitude = latitude, longitude = longitude)
+                            } ?: record
+                        }.getOrDefault(record)
+                    } else record
+                }
             }
         }.awaitAll()
     }

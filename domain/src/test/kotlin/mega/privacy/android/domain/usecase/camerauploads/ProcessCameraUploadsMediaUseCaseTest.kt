@@ -1,14 +1,11 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.CameraUploadsRecordType
+import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
-import mega.privacy.android.domain.usecase.camerauploads.mapper.CameraUploadsRecordMapper
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -26,7 +23,6 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProcessCameraUploadsMediaUseCaseTest {
 
@@ -37,7 +33,6 @@ class ProcessCameraUploadsMediaUseCaseTest {
     private val getMediaStoreFileTypesUseCase = mock<GetMediaStoreFileTypesUseCase>()
     private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
     private val retrieveMediaFromMediaStoreUseCase = mock<RetrieveMediaFromMediaStoreUseCase>()
-    private val cameraUploadsRecordMapper = mock<CameraUploadsRecordMapper>()
     private val saveCameraUploadsRecordUseCase = mock<SaveCameraUploadsRecordUseCase>()
 
     @BeforeAll
@@ -60,7 +55,6 @@ class ProcessCameraUploadsMediaUseCaseTest {
             getMediaStoreFileTypesUseCase,
             isSecondaryFolderEnabled,
             retrieveMediaFromMediaStoreUseCase,
-            cameraUploadsRecordMapper,
             saveCameraUploadsRecordUseCase,
         )
     }
