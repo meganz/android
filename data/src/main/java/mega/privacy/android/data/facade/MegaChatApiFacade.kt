@@ -834,6 +834,17 @@ internal class MegaChatApiFacade @Inject constructor(
         img: String,
     ): MegaChatMessage? = chatApi.editGeolocation(chatId, msgId, longitude, latitude, img)
 
+    override fun setLimitsInCall(
+        chatId: Long,
+        callDur: Long?,
+        numUsers: Long?,
+        numClients: Long?,
+        numClientsPerUser: Long?,
+        listener: MegaChatRequestListenerInterface?,
+    ) {
+        chatApi.setLimitsInCall(chatId, callDur, numUsers, numClients, numClientsPerUser, listener)
+    }
+
     override suspend fun removeFailedMessage(chatId: Long, rowId: Long) {
         chatApi.removeUnsentMessage(chatId, rowId)
     }

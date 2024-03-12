@@ -40,6 +40,8 @@ import mega.privacy.android.domain.entity.meeting.SubtitleCallType
  * @property showEndMeetingAsOnlyHostBottomPanel    True, show bottom sheet when the only host leaves the call. False otherwise
  * @property joinedAsGuest                          True, joined as guest. False, otherwise.
  * @property shouldFinish                           True, if the activity should finish. False, if not.
+ * @property minutesToEndMeeting                    Minutes to end the meeting
+ * @property showMeetingEndWarningDialog            True, show the dialog to warn the user that the meeting is going to end. False otherwise
  */
 data class InMeetingUiState(
     val error: Int? = null,
@@ -70,4 +72,6 @@ data class InMeetingUiState(
     val showEndMeetingAsOnlyHostBottomPanel: Boolean = false,
     val joinedAsGuest: Boolean = false,
     val shouldFinish: Boolean = false,
+    val minutesToEndMeeting: Int? = null,
+    val showMeetingEndWarningDialog: Boolean = false,
 )

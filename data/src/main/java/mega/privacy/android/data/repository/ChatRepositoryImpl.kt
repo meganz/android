@@ -1360,4 +1360,27 @@ internal class ChatRepositoryImpl @Inject constructor(
     override suspend fun setSFUid(sfuId: Int) = withContext(ioDispatcher) {
         megaChatApiGateway.setSFUid(sfuId)
     }
+
+    override suspend fun setLimitsInCall(
+        chatId: Long,
+        callDur: Long?,
+        numUsers: Long?,
+        numClients: Long?,
+        numClientsPerUser: Long?,
+    ) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getChatRequestListener("setLimitsInCall") {
+                Timber.d("setLimitsInCall: $it")
+            }
+            megaChatApiGateway.setLimitsInCall(
+                chatId,
+                callDur,
+                numUsers,
+                numClients,
+                numClientsPerUser,
+                listener
+            )
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
+        }
+    }
 }

@@ -983,4 +983,21 @@ interface ChatRepository {
      * @param sfuId New SFU id
      */
     suspend fun setSFUid(sfuId: Int)
+
+    /**
+     * Set limits in call
+     *
+     * @param chatId       Chat id
+     * @param callDur      Call duration in seconds
+     * @param numUsers     Number of users
+     * @param numClients   Number of clients
+     * @param numClientsPerUser Number of clients per user
+     */
+    suspend fun setLimitsInCall(
+        chatId: Long,
+        callDur: Long?,
+        numUsers: Long?,
+        numClients: Long?,
+        numClientsPerUser: Long?,
+    )
 }

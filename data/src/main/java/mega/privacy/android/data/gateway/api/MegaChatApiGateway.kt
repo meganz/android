@@ -1797,6 +1797,42 @@ interface MegaChatApiGateway {
     ): MegaChatMessage?
 
     /**
+     * Set limitations for a chat call in progress (like duration or max participants).
+     *
+     * Note: this method should be only used for test purpose
+     * The associated request type with this request is MegaChatRequest::TYPE_SET_LIMIT_CALL
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     * - MegaChatRequest::getMegaHandleList - Returns a MegaHandleList with 4 elements:
+     * + MegaHandleList::get(0) - returns callDur param
+     * + MegaHandleList::get(1) - returns numUsers param
+     * + MegaHandleList::get(2) - returns numClientsPerUser param
+     * + MegaHandleList::get(3) - returns numClients param
+     * Note: The indexes above, represents the same order in which params are added to MegaHandleList, at MegaChatApiImpl::setLimitsInCall.
+     *
+     * On the onRequestFinish error, the error code associated to the MegaChatError can be:
+     * - MegaChatError::ERROR_ARGS   - if specified chatid is invalid
+     * - MegaChatError::ERROR_ARGS   - if numClientsPerUser is greater than MegaChatCall::CALL_LIMIT_USERS_PER_CLIENT
+     * - MegaChatError::ERROR_NOENT  - if chatroom doesn't exists, or there's no a call in the specified chatroom
+     * - MegaChatError::ERROR_ACCESS - if call isn't in progress state, or our own privilege is different than MegaChatPeerList::PRIV_MODERATOR
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param callDur Maximum call duration, in seconds
+     * @param numUsers Maximum number of participants (users, not clients - one user may join with several clients), allowed to join the call
+     * @param numClients Maximum total number of clients allowed to be in the call at the same time. This doesn't include the clients in the waiting room
+     * @param numClientsPerUser Maximum number of clients with which a single user can join a call.
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun setLimitsInCall(
+        chatId: Long,
+        callDur: Long?,
+        numUsers: Long?,
+        numClients: Long?,
+        numClientsPerUser: Long?,
+        listener: MegaChatRequestListenerInterface?,
+    )
+
+    /**
      * Remove failed message
      *
      * @param chatId

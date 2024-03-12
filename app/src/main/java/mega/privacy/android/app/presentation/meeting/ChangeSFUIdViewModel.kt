@@ -24,6 +24,7 @@ class ChangeSFUIdViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 setSFUIdUseCase(sfuId)
+                Timber.d("SFU Id changed to $sfuId")
             }.onFailure {
                 Timber.e("Error changing SFU Id: $it")
             }

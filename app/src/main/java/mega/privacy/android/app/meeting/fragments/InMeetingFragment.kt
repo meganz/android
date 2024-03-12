@@ -26,6 +26,8 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -120,6 +122,7 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
+import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.meeting.AnotherCallType
 import mega.privacy.android.domain.entity.meeting.CallUIStatusType
@@ -224,6 +227,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     // Only me in the call Dialog
     private var onlyMeDialog: Dialog? = null
+
+    // Free limit upgrade dialog
+    private var freeLimitUpgradeDialog: Dialog? = null
+
 
     private var countDownTimerToEndCall: CountDownTimer? = null
 
@@ -687,6 +694,24 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         onEndForAllClick = inMeetingViewModel::endCallForAll,
                         onDismiss = inMeetingViewModel::hideBottomPanels
                     )
+                    if (state.showMeetingEndWarningDialog) {
+                        MegaAlertDialog(
+                            title = pluralStringResource(
+                                R.plurals.meetings_in_call_warning_dialog_title,
+                                inMeetingViewModel.state.value.minutesToEndMeeting ?: 1,
+                                inMeetingViewModel.state.value.minutesToEndMeeting ?: 1
+                            ),
+                            text = stringResource(id = R.string.meetings_in_call_warning_dialog_body),
+                            confirmButtonText = stringResource(id = R.string.meetings_in_call_warning_dialog_action_button),
+                            cancelButtonText = stringResource(id = R.string.meetings_in_call_warning_dialog_negative_button),
+                            onConfirm = {
+                                inMeetingViewModel.onMeetingEndWarningDialogDismissed()
+                            },
+                            onDismiss = {
+                                inMeetingViewModel.onMeetingEndWarningDialogDismissed()
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -1113,11 +1138,26 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 endMeetingAsModeratorDialog?.dismissAllowingStateLoss()
                 endMeetingAsModeratorDialog = null
             }
+            if (state.minutesToEndMeeting != null) {
+                callBanner?.apply {
+                    isVisible = true
+                    text = getString(
+                        R.string.meetings_in_call_warning_timer_message,
+                        TimeUtils.getMinutesAndSecondsFromMilliseconds(
+                            TimeUnit.MINUTES.toMillis(
+                                state.minutesToEndMeeting.toLong()
+                            )
+                        )
+                    )
+                }
+            } else {
+                callBanner?.isVisible = false
+            }
         }
 
         viewLifecycleOwner.collectFlow(sharedModel.state) { state: MeetingState ->
             Timber.d("Chat has changed")
-            inMeetingViewModel.setChatId(state.chatId, requireContext())
+            inMeetingViewModel.setChatId(state.chatId)
 
             if (state.shouldPinToSpeakerView) {
                 state.chatParticipantSelected?.let {
@@ -2487,7 +2527,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         session: MegaChatSession,
         isAudioChange: Boolean,
         isVideoChange: Boolean,
-        isPresentingChange: Boolean
+        isPresentingChange: Boolean,
     ) {
         Timber.d("Remote changes detected")
         gridViewCallFragment?.let {
@@ -2738,7 +2778,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun checkCallStarted(chatId: Long) {
         MegaApplication.getInstance().openCallService(chatId)
-        inMeetingViewModel.setCall(chatId, requireContext())
+        inMeetingViewModel.setCall(chatId)
         checkChildFragments()
         showMuteBanner()
     }
@@ -2766,7 +2806,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         super.onResume()
         MegaApplication.getInstance().startProximitySensor()
         checkChildFragments()
-        inMeetingViewModel.checkParticipantsList(requireContext())
+        inMeetingViewModel.checkParticipantsList()
     }
 
     override fun onPause() {

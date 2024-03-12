@@ -154,7 +154,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
         inMeetingViewModel = inMeetingFragment.inMeetingViewModel
 
-        inMeetingViewModel.setChatId(chatId, requireContext())
+        inMeetingViewModel.setChatId(chatId)
 
         if (inMeetingViewModel.getCall() == null || peerId == MEGACHAT_INVALID_HANDLE) {
             Timber.e("Error. Call doesn't exist")
