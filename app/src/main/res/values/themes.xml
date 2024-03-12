@@ -25,7 +25,7 @@
         <!-- colorSurface is mapped to the surface of components
         such as cards, sheets and menus. -->
         <!-- e.g. the color of the bottom sheet, overflow menu(with some auto-alpha?) -->
-        <item name="colorSurface">@color/white</item>
+        <item name="colorSurface">@color/app_background</item>
         <!-- colorError is used to indicate an error state for
         components such as text fields. -->
         <!-- e.g. the color of the invalid email address hint -->

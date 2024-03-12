@@ -367,7 +367,7 @@
     <!-- transfer over quota progress -->
     <color name="amber_700_amber_300">@color/amber_700</color>
 
-    <color name="homepage_background">#EEF2F1</color>
+    <color name="homepage_background">#F5F5F5</color>
 
     <color name="new_multiselect_color">#1A0ABFA5</color>
 
@@ -544,4 +544,5 @@
     <color name="grey_900_white">@color/grey_900</color>
     <color name="grey_700_white_alpha_075">@color/grey_700</color>
     <color name="light_grey">#EAEFEF</color>
+    <color name="app_background">@color/white</color>
 </resources>

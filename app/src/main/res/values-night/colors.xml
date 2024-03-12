@@ -352,4 +352,5 @@
     <color name="grey_900_white">@color/white</color>
     <color name="grey_700_white_alpha_075">@color/white_alpha_075</color>
     <color name="light_grey">#1FFFFFFF</color>
+    <color name="app_background">@color/dark_grey</color>
 </resources>

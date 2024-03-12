@@ -24,7 +24,7 @@
         <!-- e.g. the color of the bottom sheet, overflow menu (Set elevation or use the default elevation
           would automatically add a white overlay surface with default opacity. see:
            https://material.io/design/color/dark-theme.html#properties-->
-        <item name="colorSurface">@color/dark_grey</item>
+        <item name="colorSurface">@color/app_background</item>
 
         <!-- colorError is used to indicate an error state for components such as text fields.-->
         <!-- e.g. the color of the invalid email address hint -->
