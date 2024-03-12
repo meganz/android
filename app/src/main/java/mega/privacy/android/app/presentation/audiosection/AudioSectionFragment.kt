@@ -39,8 +39,10 @@ import mega.privacy.android.app.utils.Constants.AUDIO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
+import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.domain.entity.ThemeMode
@@ -206,7 +208,16 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
         putExtra(INTENT_EXTRA_KEY_POSITION, index)
         putExtra(INTENT_EXTRA_KEY_HANDLE, item.id.longValue)
         putExtra(INTENT_EXTRA_KEY_FILE_NAME, item.name)
-        putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, AUDIO_BROWSE_ADAPTER)
+        val state = audioSectionViewModel.state.value
+        if (state.searchMode) {
+            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, SEARCH_BY_ADAPTER)
+            putExtra(
+                INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH,
+                state.allAudios.map { it.id.longValue }.toLongArray()
+            )
+        } else {
+            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, AUDIO_BROWSE_ADAPTER)
+        }
         putExtra(
             INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
             sortByHeaderViewModel.cloudSortOrder.value
