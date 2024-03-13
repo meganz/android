@@ -10,14 +10,11 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.view.message.getMessageText
 import mega.privacy.android.core.ui.controls.chat.messages.LocationMessageView
-import mega.privacy.android.core.ui.controls.text.megaSpanStyle
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
@@ -64,10 +61,6 @@ private fun ChatLocationMessageView(
         title = getMessageText(
             message = stringResource(id = R.string.title_geolocation_message),
             isEdited = isEdited,
-            spansStyle = megaSpanStyle(
-                fontStyle = FontStyle.Italic,
-                color = TextColor.Disabled
-            )
         ),
         geolocation = geolocation,
         map = locationPreview,

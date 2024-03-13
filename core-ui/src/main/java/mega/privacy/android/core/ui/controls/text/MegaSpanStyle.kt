@@ -39,7 +39,7 @@ import mega.privacy.android.core.ui.theme.tokens.TextColor
  */
 @Composable
 fun megaSpanStyle(
-    color: TextColor = TextColor.Primary,
+    color: TextColor? = null,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontWeight: FontWeight? = null,
     fontStyle: FontStyle? = null,
@@ -55,7 +55,7 @@ fun megaSpanStyle(
     platformStyle: PlatformSpanStyle? = null,
     drawStyle: DrawStyle? = null,
 ) = SpanStyle(
-    color = MegaTheme.textColor(textColor = color),
+    color = color?.let { MegaTheme.textColor(textColor = color) } ?: Color.Unspecified,
     fontSize = fontSize,
     fontWeight = fontWeight,
     fontStyle = fontStyle,

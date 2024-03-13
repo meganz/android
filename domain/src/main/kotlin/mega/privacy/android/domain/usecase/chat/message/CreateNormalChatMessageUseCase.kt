@@ -35,6 +35,7 @@ class CreateNormalChatMessageUseCase @Inject constructor(
                         reactions = reactions,
                         status = status,
                         rowId = rowId,
+                        isEdited = isEdited,
                     )
 
                 else -> TextMessage(

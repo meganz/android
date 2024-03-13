@@ -6,7 +6,9 @@ import mega.privacy.android.domain.entity.chat.messages.UserMessage
 /**
  * Call message
  *
- * @property content Message content
+ * @property isEdited Whether the message is edited
  */
 @Polymorphic
-interface NormalMessage : UserMessage
+interface NormalMessage : UserMessage {
+    val isEdited: Boolean
+}

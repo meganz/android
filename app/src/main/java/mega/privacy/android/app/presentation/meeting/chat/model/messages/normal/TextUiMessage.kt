@@ -23,11 +23,9 @@ data class TextUiMessage(
     ) {
         ChatMessageTextView(
             message = message,
-            isEdited = message.isEdited,
             modifier = initialiseModifier {},
         )
     }
-
 
     override val showAvatar = message.shouldShowAvatar
     override val displayAsMine = message.isMine

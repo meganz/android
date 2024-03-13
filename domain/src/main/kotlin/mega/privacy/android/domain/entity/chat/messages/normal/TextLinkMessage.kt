@@ -15,7 +15,6 @@ import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
  * @property isMine
  * @property userHandle
  * @property shouldShowAvatar
- * @property shouldShowTime
  * @property reactions
  * @property content
  * @property links
@@ -35,5 +34,6 @@ data class TextLinkMessage(
     override val status: ChatMessageStatus,
     override val content: String,
     override val rowId: Long,
+    override val isEdited: Boolean,
     val links: List<LinkDetail>,
 ) : NormalMessage
