@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -103,7 +102,6 @@ class SearchActivityViewModel @Inject constructor(
         }.onFailure {
             Timber.e("Get search categories failed $it")
         }
-        performSearch()
     }
 
 
@@ -152,31 +150,30 @@ class SearchActivityViewModel @Inject constructor(
         }
     }
 
-    private suspend fun onSearchSuccess(searchResults: List<TypedNode>?) =
-        coroutineScope {
-            if (searchResults.isNullOrEmpty()) {
-                val emptyState = getEmptySearchState()
-                _state.update {
-                    it.copy(
-                        searchItemList = emptyList(),
-                        isSearching = false,
-                        emptyState = emptyState
-                    )
-                }
-            } else {
-                val nodeUIItems = searchResults.map { typedNode ->
-                    NodeUIItem(node = typedNode, isSelected = false)
-                }
-                _state.update { state ->
-                    val cloudSortOrder = getCloudSortOrder()
-                    state.copy(
-                        searchItemList = nodeUIItems,
-                        isSearching = false,
-                        sortOrder = cloudSortOrder
-                    )
-                }
+    private suspend fun onSearchSuccess(searchResults: List<TypedNode>?) {
+        if (searchResults.isNullOrEmpty()) {
+            val emptyState = getEmptySearchState()
+            _state.update {
+                it.copy(
+                    searchItemList = emptyList(),
+                    isSearching = false,
+                    emptyState = emptyState
+                )
+            }
+        } else {
+            val nodeUIItems = searchResults.map { typedNode ->
+                NodeUIItem(node = typedNode, isSelected = false)
+            }
+            _state.update { state ->
+                val cloudSortOrder = getCloudSortOrder()
+                state.copy(
+                    searchItemList = nodeUIItems,
+                    isSearching = false,
+                    sortOrder = cloudSortOrder
+                )
             }
         }
+    }
 
     private fun getEmptySearchState() = emptySearchViewMapper(
         isSearchChipEnabled = true,

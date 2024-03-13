@@ -31,7 +31,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  */
 data class SearchActivityState(
     val searchItemList: List<NodeUIItem<TypedNode>> = emptyList(),
-    val isSearching: Boolean = false,
+    val isSearching: Boolean = true,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
     val currentViewType: ViewType = ViewType.LIST,
     val searchQuery: String = "",
