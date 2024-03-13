@@ -20,11 +20,7 @@ internal class VideoPlaylistActionMode(
         return true
     }
 
-    override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        menu?.findItem(R.id.save_for_offline)?.isVisible =
-            actionType == ACTION_TYPE_VIDEO_PLAYLIST_DETAIL
-        return true
-    }
+    override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean = true
 
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         item?.let {
@@ -40,9 +36,6 @@ internal class VideoPlaylistActionMode(
     ) {
         managerActivity.lifecycleScope.launch {
             when (item.itemId) {
-                R.id.save_for_offline -> { //TODO save the videos for offline
-                }
-
                 R.id.select_all -> if (actionType == ACTION_TYPE_VIDEO_PLAYLIST_DETAIL) {
                     videoSectionViewModel.selectAllVideosOfPlaylist()
                 } else {
