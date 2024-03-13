@@ -106,6 +106,10 @@ import javax.inject.Inject
 /**
  * Fragment is for search
  */
+@Deprecated(
+    message = "This fragment is deprecated and parallel screen is created",
+    replaceWith = ReplaceWith("SearchActivity"),
+)
 @AndroidEntryPoint
 class SearchFragment : RotatableFragment() {
 

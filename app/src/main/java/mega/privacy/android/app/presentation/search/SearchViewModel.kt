@@ -47,6 +47,10 @@ import javax.inject.Inject
  * @param getCloudSortOrder Get the Cloud Sort Order
  * @param getParentNodeUseCase Get parent node for current node
  */
+@Deprecated(
+    message = "This View Model is deprecated and will be removed soon",
+    replaceWith = ReplaceWith("SearchActivityViewModel"),
+)
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
@@ -57,9 +61,8 @@ class SearchViewModel @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getParentNodeUseCase: GetParentNodeUseCase,
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase,
-    private val searchFilterMapper: SearchFilterMapper,
+    private val searchFilterMapper: SearchFilterMapper
 ) : ViewModel() {
 
     /**
@@ -113,32 +116,26 @@ class SearchViewModel @Inject constructor(
 
     private fun getSearchFilterCategories() {
         viewModelScope.launch {
-            runCatching {
-                getFeatureFlagValueUseCase(ABTestFeatures.nsf)
-            }.onSuccess { isEnabled ->
-                val shouldShow = isEnabled && arrayOf(
-                    DrawerItem.HOMEPAGE,
-                    DrawerItem.CLOUD_DRIVE
-                ).contains(state.value.searchDrawerItem)
-                _state.update { it.copy(showChips = shouldShow) }
-                if (shouldShow) {
-                    runCatching {
-                        getSearchCategoriesUseCase().map { searchFilterMapper(it) }
-                            .filterNot { it.filter == SearchCategory.ALL }
-                    }
-                        .onSuccess { filters ->
-                            _state.update {
-                                it.copy(
-                                    filters = filters,
-                                    selectedFilter = null
-                                )
-                            }
-                        }.onFailure {
-                            Timber.e("Get search categories failed $it")
-                        }
+            val shouldShow = arrayOf(
+                DrawerItem.HOMEPAGE,
+                DrawerItem.CLOUD_DRIVE
+            ).contains(state.value.searchDrawerItem)
+            _state.update { it.copy(showChips = shouldShow) }
+            if (shouldShow) {
+                runCatching {
+                    getSearchCategoriesUseCase().map { searchFilterMapper(it) }
+                        .filterNot { it.filter == SearchCategory.ALL }
                 }
-            }.onFailure {
-                Timber.e("Feature flag check failed $it")
+                    .onSuccess { filters ->
+                        _state.update {
+                            it.copy(
+                                filters = filters,
+                                selectedFilter = null
+                            )
+                        }
+                    }.onFailure {
+                        Timber.e("Get search categories failed $it")
+                    }
             }
         }
     }
