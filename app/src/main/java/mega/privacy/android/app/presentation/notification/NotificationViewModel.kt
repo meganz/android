@@ -17,15 +17,20 @@ import mega.privacy.android.domain.usecase.AcknowledgeUserAlertsUseCase
 import mega.privacy.android.domain.usecase.MonitorUserAlertsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.notifications.GetPromoNotificationsUseCase
+import mega.privacy.android.domain.usecase.notifications.SetLastReadNotificationUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * Notification view model
+ * NotificationViewModel
  *
- * @property acknowledgeUserAlertsUseCase
- * @property monitorUserAlertsUseCase
- * @property state
+ * @property acknowledgeUserAlertsUseCase Acknowledge user alerts use case
+ * @property monitorUserAlertsUseCase Monitor user alerts use case
+ * @property getPromoNotificationsUseCase Get promo notifications use case
+ * @property setLastReadNotificationUseCase Set last read notification use case
+ * @property getFeatureFlagValueUseCase Get feature flag value use case
+ * @property notificationMapper Notification mapper
+ * @constructor Create empty Notification view model
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -33,10 +38,12 @@ class NotificationViewModel @Inject constructor(
     private val acknowledgeUserAlertsUseCase: AcknowledgeUserAlertsUseCase,
     private val monitorUserAlertsUseCase: MonitorUserAlertsUseCase,
     private val getPromoNotificationsUseCase: GetPromoNotificationsUseCase,
+    private val setLastReadNotificationUseCase: SetLastReadNotificationUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val notificationMapper: NotificationMapper,
 ) : ViewModel() {
 
+    private var isPromoNotificationsEnabled = false
     private val _state = MutableStateFlow(NotificationState())
     val state = _state.asStateFlow()
 
@@ -58,7 +65,8 @@ class NotificationViewModel @Inject constructor(
 
     private suspend fun getPromoNotifications() {
         runCatching {
-            if (getFeatureFlagValueUseCase(AppFeatures.PromoNotifications)) {
+            isPromoNotificationsEnabled = getFeatureFlagValueUseCase(AppFeatures.PromoNotifications)
+            if (isPromoNotificationsEnabled) {
                 val promoNotifications = getPromoNotificationsUseCase()
                 _state.update { it.copy(promoNotifications = promoNotifications) }
             }
@@ -77,6 +85,27 @@ class NotificationViewModel @Inject constructor(
      *
      */
     fun onNotificationsLoaded() {
-        viewModelScope.launch { acknowledgeUserAlertsUseCase() }
+        viewModelScope.launch {
+            runCatching {
+                acknowledgeUserAlertsUseCase()
+            }.onFailure {
+                Timber.e("Failed to acknowledge user alerts with error: ${it.message}")
+            }
+        }
+        viewModelScope.launch {
+            if (isPromoNotificationsEnabled) {
+                val lastReadPromoNotificationID =
+                    state.value.promoNotifications.firstOrNull()?.promoID
+                lastReadPromoNotificationID?.let {
+                    launch {
+                        runCatching {
+                            setLastReadNotificationUseCase(it)
+                        }.onFailure {
+                            Timber.e("Failed to set last read notification with error: ${it.message}")
+                        }
+                    }
+                }
+            }
+        }
     }
 }

@@ -20,6 +20,7 @@ import mega.privacy.android.domain.usecase.AcknowledgeUserAlertsUseCase
 import mega.privacy.android.domain.usecase.MonitorUserAlertsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.notifications.GetPromoNotificationsUseCase
+import mega.privacy.android.domain.usecase.notifications.SetLastReadNotificationUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -30,6 +31,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
 
@@ -46,19 +48,9 @@ class NotificationViewModelTest {
     private val acknowledgeUserAlertsUseCase = mock<AcknowledgeUserAlertsUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getPromoNotificationsUseCase = mock<GetPromoNotificationsUseCase>()
+    private val setLastReadNotificationUseCase = mock<SetLastReadNotificationUseCase>()
     private val notificationMapper = mock<NotificationMapper>()
 
-    val defaultPromoNotification = PromoNotification(
-        promoID = 1,
-        title = "Title",
-        description = "Description",
-        imageName = "Image name",
-        imageURL = "https://www.mega.co.nz",
-        startTimeStamp = 1,
-        endTimeStamp = 1,
-        actionName = "Action name",
-        actionURL = "https://www.mega.co.nz"
-    )
 
     @BeforeEach
     fun resetMocks() {
@@ -67,6 +59,7 @@ class NotificationViewModelTest {
             acknowledgeUserAlertsUseCase,
             getFeatureFlagValueUseCase,
             getPromoNotificationsUseCase,
+            setLastReadNotificationUseCase,
             notificationMapper
         )
     }
@@ -76,6 +69,7 @@ class NotificationViewModelTest {
             acknowledgeUserAlertsUseCase = acknowledgeUserAlertsUseCase,
             monitorUserAlertsUseCase = monitorUserAlertsUseCase,
             getPromoNotificationsUseCase = getPromoNotificationsUseCase,
+            setLastReadNotificationUseCase = setLastReadNotificationUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             notificationMapper = notificationMapper,
         )
@@ -214,6 +208,42 @@ class NotificationViewModelTest {
                     times(0),
                     GetPromoNotificationsUseCase::invoke
                 )
+            }
+        }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that setLastReadNotificationUseCase is invoked based on feature flag value`(
+        featureFlag: Boolean,
+    ) =
+        runTest {
+            val expectedPromoNotification = PromoNotification(
+                promoID = 1,
+                title = "Title",
+                description = "Description",
+                imageName = "Image name",
+                imageURL = "https://www.mega.co.nz",
+                startTimeStamp = 1,
+                endTimeStamp = 1,
+                actionName = "Action name",
+                actionURL = "https://www.mega.co.nz"
+            )
+
+            whenever(notificationMapper(any())).thenReturn(mock())
+            whenever(getFeatureFlagValueUseCase(any())).thenReturn(featureFlag)
+            whenever(getPromoNotificationsUseCase()).thenReturn(listOf(expectedPromoNotification))
+            val alert = mock<IncomingPendingContactRequestAlert>()
+            whenever(monitorUserAlertsUseCase()).thenReturn(flowOf(listOf(alert)))
+            initViewModel()
+            underTest.onNotificationsLoaded()
+            scheduler.advanceUntilIdle()
+
+            if (featureFlag) {
+                verifyBlocking(setLastReadNotificationUseCase) {
+                    invoke(any())
+                }
+            } else {
+                verify(setLastReadNotificationUseCase, times(0)).invoke(any())
             }
         }
 

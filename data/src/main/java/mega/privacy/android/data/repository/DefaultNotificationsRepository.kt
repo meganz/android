@@ -355,6 +355,10 @@ internal class DefaultNotificationsRepository @Inject constructor(
                                 continuation.resumeWith(Result.success(request.number))
                             }
 
+                            MegaError.API_ENOENT -> {
+                                continuation.resumeWith(Result.success(0))
+                            }
+
                             else -> {
                                 Timber.e("Error getting last read notification: ${error.errorString}")
                                 continuation.failWithError(error, "getLastReadNotificationId")

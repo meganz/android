@@ -18,7 +18,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.domain.usecase.GetBackupsNode
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
@@ -60,7 +59,6 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.HasBackupsChildren
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
@@ -98,6 +96,7 @@ import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RemoveShareUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
+import mega.privacy.android.domain.usecase.notifications.GetNumUnreadPromoNotificationsUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
@@ -144,8 +143,8 @@ class ManagerViewModelTest {
     private val monitorSecurityUpgradeInApp = MutableStateFlow(false)
     private val getNumUnreadUserAlertsUseCase =
         mock<GetNumUnreadUserAlertsUseCase> { onBlocking { invoke() }.thenReturn(0) }
-    private val hasBackupsChildren =
-        mock<HasBackupsChildren> { onBlocking { invoke() }.thenReturn(false) }
+    private val getNumUnreadPromoNotificationsUseCase =
+        mock<GetNumUnreadPromoNotificationsUseCase>()
     private lateinit var monitorContactRequestUpdates: MutableStateFlow<List<ContactRequest>>
 
     private val initialIsFirsLoginValue = true
@@ -155,7 +154,6 @@ class ManagerViewModelTest {
             ManagerViewModel.isFirstLoginKey to initialIsFirsLoginValue
         )
     )
-    private val getBackupsNode = mock<GetBackupsNode> { onBlocking { invoke() }.thenReturn(null) }
     private val monitorStorageState = mock<MonitorStorageStateEventUseCase> {
         onBlocking { invoke() }.thenReturn(
             MutableStateFlow(
@@ -307,21 +305,17 @@ class ManagerViewModelTest {
             monitorContactUpdates = { monitorContactUpdates },
             monitorUserAlertUpdates = { monitorUserAlertUpdates },
             monitorContactRequestUpdates = { monitorContactRequestUpdates },
-            getBackupsNode = getBackupsNode,
             getNumUnreadUserAlertsUseCase = getNumUnreadUserAlertsUseCase,
-            hasBackupsChildren = hasBackupsChildren,
+            getNumUnreadPromoNotificationsUseCase = getNumUnreadPromoNotificationsUseCase,
             sendStatisticsMediaDiscoveryUseCase = sendStatisticsMediaDiscoveryUseCase,
             savedStateHandle = savedStateHandle,
             monitorStorageStateEventUseCase = monitorStorageState,
             monitorCameraUploadsFolderDestinationUseCase = monitorCameraUploadsFolderDestinationUpdateUseCase,
-            getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
-            getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
             getCloudSortOrder = getCloudSortOrder,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             getExtendedAccountDetail = mock(),
             getFullAccountInfoUseCase = getFullAccountInfoUseCase,
-            getActiveSubscriptionUseCase = mock(),
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getUnverifiedIncomingShares = getUnverifiedIncomingShares,
             getUnverifiedOutgoingShares = getUnverifiedOutgoingShares,
@@ -383,8 +377,6 @@ class ManagerViewModelTest {
     @BeforeEach
     fun reset() {
         reset(
-            getBackupsNode,
-            hasBackupsChildren,
             sendStatisticsMediaDiscoveryUseCase,
             isConnectedToInternetUseCase,
             getFullAccountInfoUseCase,
@@ -434,6 +426,7 @@ class ManagerViewModelTest {
         wheneverBlocking { getPrimarySyncHandleUseCase() }.thenReturn(0L)
         wheneverBlocking { getSecondarySyncHandleUseCase() }.thenReturn(0L)
         wheneverBlocking { getNumUnreadUserAlertsUseCase() }.thenReturn(0)
+        wheneverBlocking { getNumUnreadPromoNotificationsUseCase() }.thenReturn(0)
         wheneverBlocking { getIncomingContactRequestUseCase() }.thenReturn(emptyList())
         monitorContactRequestUpdates = MutableStateFlow(emptyList())
         monitorNodeUpdatesFakeFlow = MutableSharedFlow()
@@ -750,6 +743,7 @@ class ManagerViewModelTest {
             )
             whenever(getIncomingContactRequestUseCase()).thenReturn(contactRequests)
             whenever(getNumUnreadUserAlertsUseCase()).thenReturn(3)
+            whenever(getNumUnreadPromoNotificationsUseCase()).thenReturn(1)
             mutableMonitorUserAlertUpdates.emit(
                 listOf(
                     IncomingPendingContactRequestAlert(
@@ -789,6 +783,7 @@ class ManagerViewModelTest {
             )
             whenever(getIncomingContactRequestUseCase()).thenReturn(contactRequests)
             whenever(getNumUnreadUserAlertsUseCase()).thenReturn(3)
+            whenever(getNumUnreadPromoNotificationsUseCase()).thenReturn(1)
             monitorContactRequestUpdates.emit(contactRequests)
             advanceUntilIdle()
             verify(saveContactByEmailUseCase).invoke("sourceEmail@mega.co.nz")
@@ -812,6 +807,7 @@ class ManagerViewModelTest {
             )
             whenever(getIncomingContactRequestUseCase()).thenReturn(contactRequests)
             whenever(getNumUnreadUserAlertsUseCase()).thenReturn(3)
+            whenever(getNumUnreadPromoNotificationsUseCase()).thenReturn(1)
             monitorContactRequestUpdates.emit(contactRequests)
             advanceUntilIdle()
             verify(saveContactByEmailUseCase).invoke("targetEmail@mega.co.nz")
@@ -820,6 +816,9 @@ class ManagerViewModelTest {
     @Test
     fun `test that legacyNumUnreadUserAlerts update when there is accepted contact request event`() =
         runTest {
+            val expectedPromoNotificationsCount = 1
+            val expectedUserAlertsCount = 3
+            val expectedTotalCount = expectedPromoNotificationsCount + expectedUserAlertsCount
             advanceUntilIdle()
             assertThat(underTest.onGetNumUnreadUserAlerts().test().value().second).isEqualTo(0)
             val contactRequests = listOf(
@@ -836,15 +835,23 @@ class ManagerViewModelTest {
                 )
             )
             whenever(getIncomingContactRequestUseCase()).thenReturn(contactRequests)
-            whenever(getNumUnreadUserAlertsUseCase()).thenReturn(3)
+            whenever(getNumUnreadUserAlertsUseCase()).thenReturn(expectedUserAlertsCount)
+            whenever(getNumUnreadPromoNotificationsUseCase()).thenReturn(
+                expectedPromoNotificationsCount
+            )
             monitorContactRequestUpdates.emit(contactRequests)
             advanceUntilIdle()
-            assertThat(underTest.onGetNumUnreadUserAlerts().test().value().second).isEqualTo(3)
+            assertThat(underTest.onGetNumUnreadUserAlerts().test().value().second).isEqualTo(
+                expectedTotalCount
+            )
         }
 
     @Test
     fun `test that numUnreadUserAlerts update when there is accepted contact request event`() =
         runTest {
+            val expectedPromoNotificationsCount = 1
+            val expectedUserAlertsCount = 3
+            val expectedTotalCount = expectedPromoNotificationsCount + expectedUserAlertsCount
             advanceUntilIdle()
             assertThat(underTest.numUnreadUserAlerts.value.second).isEqualTo(0)
             val contactRequests = listOf(
@@ -861,10 +868,14 @@ class ManagerViewModelTest {
                 )
             )
             whenever(getIncomingContactRequestUseCase()).thenReturn(contactRequests)
-            whenever(getNumUnreadUserAlertsUseCase()).thenReturn(3)
+            whenever(getNumUnreadUserAlertsUseCase()).thenReturn(expectedUserAlertsCount)
+            whenever(getNumUnreadPromoNotificationsUseCase()).thenReturn(
+                expectedPromoNotificationsCount
+            )
+
             monitorContactRequestUpdates.emit(contactRequests)
             advanceUntilIdle()
-            assertThat(underTest.numUnreadUserAlerts.value.second).isEqualTo(3)
+            assertThat(underTest.numUnreadUserAlerts.value.second).isEqualTo(expectedTotalCount)
         }
 
     @Test

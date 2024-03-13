@@ -434,6 +434,24 @@ class DefaultNotificationsRepositoryTest {
         assertThat(result).isEqualTo(expectedId)
     }
 
+    @Test
+    fun `test that the last notification id is 0 when MegaError is API_ENOENT`() = runTest {
+        val expectedId = 0L
+        val megaApiJava = mock<MegaApiJava>()
+        val request = mock<MegaRequest> { on { number }.thenReturn(expectedId) }
+        val mock = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_ENOENT) }
+
+        whenever(notificationsGateway.getLastReadNotificationId(any())).thenAnswer {
+            (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                megaApiJava,
+                request,
+                mock
+            )
+        }
+        val result = underTest.getLastReadNotificationId()
+        assertThat(result).isEqualTo(expectedId)
+    }
+
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     @Nested
     inner class PushNotificationSettings {

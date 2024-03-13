@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.domain.usecase.GetBackupsNode
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
@@ -52,7 +51,6 @@ import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.HasBackupsChildren
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
@@ -68,10 +66,7 @@ import mega.privacy.android.domain.usecase.account.RenameRecoveryKeyFileUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
-import mega.privacy.android.domain.usecase.billing.GetActiveSubscriptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
@@ -98,6 +93,7 @@ import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RemoveShareUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
+import mega.privacy.android.domain.usecase.notifications.GetNumUnreadPromoNotificationsUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
@@ -115,50 +111,71 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * Manager view model
+ * ManagerViewModel
  *
- * @property monitorUserAlertUpdates
- * @property getBackupsNode
- * @property getNumUnreadUserAlertsUseCase
- * @property hasBackupsChildren
- * @property sendStatisticsMediaDiscoveryUseCase
- * @property savedStateHandle
- * @property monitorStorageStateEventUseCase
- * @param monitorCameraUploadsFolderDestinationUseCase
- * @property getPrimarySyncHandleUseCase
- * @property getSecondarySyncHandleUseCase
- * @property getCloudSortOrder
- * @property monitorConnectivityUseCase
- * @property getExtendedAccountDetail
- * @property getFullAccountInfoUseCase
- * @property getActiveSubscriptionUseCase
- * @property getFeatureFlagValueUseCase
- * @property getUnverifiedIncomingShares
- * @property getUnverifiedOutgoingShares
- * @property monitorUserUpdates
- * @property startCameraUploadUseCase
- * @property stopCameraUploadsUseCase
- * @property deleteOldestCompletedTransfersUseCase
- * @property getIncomingContactRequestsUseCase
- * @param monitorNodeUpdatesUseCase
- * @param monitorContactUpdates monitor contact update when credentials verification occurs to update shares count
- * @param monitorContactRequestUpdates
- * @param monitorFinishActivityUseCase
- * @param monitorOfflineNodeAvailabilityUseCase monitor the offline availability of the file to update the UI
- * @param getNumUnreadChatsUseCase  monitor number of unread chats
- * @property monitorBackupFolder
- * @property getScheduledMeetingByChat  [GetScheduledMeetingByChat]
- * @property getChatCallUseCase [GetChatCallUseCase]
- * @property startMeetingInWaitingRoomChatUseCase [StartMeetingInWaitingRoomChatUseCase]
- * @property answerChatCallUseCase [AnswerChatCallUseCase]
- * @property setChatVideoInDeviceUseCase [SetChatVideoInDeviceUseCase]
- * @property rtcAudioManagerGateway [RTCAudioManagerGateway]
- * @property chatManagement [ChatManagement]
- * @property passcodeManagement [PasscodeManagement]
- * @property monitorChatSessionUpdatesUseCase [MonitorChatSessionUpdatesUseCase]
- * @property hangChatCallUseCase [HangChatCallUseCase]
- * @property monitorCallRecordingConsentEventUseCase [MonitorCallRecordingConsentEventUseCase]
- * @property monitorCallEndedUseCase [MonitorCallEndedUseCase]
+ * @property monitorNodeUpdatesUseCase Use case for monitoring node updates.
+ * @property monitorContactUpdates Use case for monitoring contact updates.
+ * @property monitorUserAlertUpdates Use case for monitoring user alert updates.
+ * @property getNumUnreadUserAlertsUseCase Use case for getting the number of unread user alerts.
+ * @property getNumUnreadPromoNotificationsUseCase Use case for getting the number of unread promo notifications.
+ * @property sendStatisticsMediaDiscoveryUseCase Use case for sending media discovery statistics.
+ * @property savedStateHandle Saved state handle for saving and restoring state related to the ViewModel.
+ * @property monitorStorageStateEventUseCase Use case for monitoring storage state events.
+ * @property monitorCameraUploadsFolderDestinationUseCase Use case for monitoring camera uploads folder destination.
+ * @property getCloudSortOrder Use case for getting the cloud sort order.
+ * @property monitorConnectivityUseCase Use case for monitoring connectivity.
+ * @property isConnectedToInternetUseCase Use case for checking if the device is connected to the internet.
+ * @property getExtendedAccountDetail Use case for getting extended account details.
+ * @property getFullAccountInfoUseCase Use case for getting full account info.
+ * @property getFeatureFlagValueUseCase Use case for getting the value of a feature flag.
+ * @property getUnverifiedIncomingShares Use case for getting unverified incoming shares.
+ * @property getUnverifiedOutgoingShares Use case for getting unverified outgoing shares.
+ * @property monitorFinishActivityUseCase Use case for monitoring finish activity events.
+ * @property requireTwoFactorAuthenticationUseCase Use case for requiring two factor authentication.
+ * @property setCopyLatestTargetPathUseCase Use case for setting the latest target path for copy operations.
+ * @property setMoveLatestTargetPathUseCase Use case for setting the latest target path for move operations.
+ * @property monitorSecurityUpgradeInApp Use case for monitoring security upgrade in app.
+ * @property monitorUserUpdates Use case for monitoring user updates.
+ * @property establishCameraUploadsSyncHandlesUseCase Use case for establishing camera uploads sync handles.
+ * @property startCameraUploadUseCase Use case for starting camera uploads.
+ * @property stopCameraUploadsUseCase Use case for stopping camera uploads.
+ * @property saveContactByEmailUseCase Use case for saving a contact by email.
+ * @property createShareKeyUseCase Use case for creating a share key.
+ * @property getNodeByIdUseCase Use case for getting a node by its ID.
+ * @property deleteOldestCompletedTransfersUseCase Use case for deleting the oldest completed transfers.
+ * @property getIncomingContactRequestsUseCase Use case for getting incoming contact requests.
+ * @property monitorMyAccountUpdateUseCase Use case for monitoring my account updates.
+ * @property monitorUpdatePushNotificationSettingsUseCase Use case for monitoring update push notification settings.
+ * @property monitorOfflineNodeAvailabilityUseCase Use case for monitoring offline node availability.
+ * @property monitorChatArchivedUseCase Use case for monitoring chat archived events.
+ * @property restoreNodesUseCase Use case for restoring nodes.
+ * @property checkNodesNameCollisionUseCase Use case for checking nodes name collision.
+ * @property monitorBackupFolder Use case for monitoring backup folder.
+ * @property moveNodesToRubbishUseCase Use case for moving nodes to rubbish.
+ * @property deleteNodesUseCase Use case for deleting nodes.
+ * @property moveNodesUseCase Use case for moving nodes.
+ * @property copyNodesUseCase Use case for copying nodes.
+ * @property renameRecoveryKeyFileUseCase Use case for renaming recovery key file.
+ * @property removeShareUseCase Use case for removing shares.
+ * @property removeShareResultMapper Mapper for mapping the result of remove share operation.
+ * @property getNumUnreadChatsUseCase Use case for getting the number of unread chats.
+ * @property disableExportNodesUseCase Use case for disabling export nodes.
+ * @property removePublicLinkResultMapper Mapper for mapping the result of remove public link operation.
+ * @property dismissPsaUseCase Use case for dismissing PSA.
+ * @property getRootNodeUseCase Use case for getting the root node.
+ * @property getChatLinkContentUseCase Use case for getting the content of a chat link.
+ * @property getScheduledMeetingByChat Use case for getting a scheduled meeting by chat.
+ * @property getChatCallUseCase Use case for getting a chat call.
+ * @property startMeetingInWaitingRoomChatUseCase Use case for starting a meeting in waiting room chat.
+ * @property answerChatCallUseCase Use case for answering a chat call.
+ * @property setChatVideoInDeviceUseCase Use case for setting chat video in device.
+ * @property rtcAudioManagerGateway Gateway for RTC audio manager.
+ * @property chatManagement Management for chat.
+ * @property passcodeManagement Management for passcode.
+ * @property monitorSyncStalledIssuesUseCase Use case for monitoring sync stalled issues.
+ * @property monitorSyncsUseCase Use case for monitoring syncs.
+ * @property monitorChatSessionUpdatesUseCase Use case for monitoring chat session updates.
+ * @property hangChatCallUseCase Use case for hanging a chat call.
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -166,21 +183,17 @@ class ManagerViewModel @Inject constructor(
     monitorContactUpdates: MonitorContactUpdates,
     private val monitorUserAlertUpdates: MonitorUserAlertUpdates,
     monitorContactRequestUpdates: MonitorContactRequestUpdates,
-    private val getBackupsNode: GetBackupsNode,
     private val getNumUnreadUserAlertsUseCase: GetNumUnreadUserAlertsUseCase,
-    private val hasBackupsChildren: HasBackupsChildren,
+    private val getNumUnreadPromoNotificationsUseCase: GetNumUnreadPromoNotificationsUseCase,
     private val sendStatisticsMediaDiscoveryUseCase: SendStatisticsMediaDiscoveryUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     monitorCameraUploadsFolderDestinationUseCase: MonitorCameraUploadsFolderDestinationUseCase,
-    private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
-    private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val getExtendedAccountDetail: GetExtendedAccountDetail,
     private val getFullAccountInfoUseCase: GetFullAccountInfoUseCase,
-    private val getActiveSubscriptionUseCase: GetActiveSubscriptionUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getUnverifiedIncomingShares: GetUnverifiedIncomingShares,
     private val getUnverifiedOutgoingShares: GetUnverifiedOutgoingShares,
@@ -553,8 +566,10 @@ class ManagerViewModel @Inject constructor(
      */
     fun checkNumUnreadUserAlerts(type: UnreadUserAlertsCheckType) {
         viewModelScope.launch {
-            _numUnreadUserAlerts.update { Pair(type, getNumUnreadUserAlertsUseCase()) }
-            legacyNumUnreadUserAlerts.value = Pair(type, getNumUnreadUserAlertsUseCase())
+            val totalCount =
+                getNumUnreadUserAlertsUseCase() + getNumUnreadPromoNotificationsUseCase()
+            _numUnreadUserAlerts.update { Pair(type, totalCount) }
+            legacyNumUnreadUserAlerts.value = Pair(type, totalCount)
         }
     }
 
@@ -1008,7 +1023,8 @@ class ManagerViewModel @Inject constructor(
         NodeSourceType.LINKS -> linksParentHandle
         NodeSourceType.RUBBISH_BIN -> rubbishBinParentHandle
         NodeSourceType.BACKUPS -> backupsParentHandle
-        NodeSourceType.HOME, NodeSourceType.OTHER -> getRootNodeUseCase()?.id?.longValue ?: MegaApiJava.INVALID_HANDLE
+        NodeSourceType.HOME, NodeSourceType.OTHER -> getRootNodeUseCase()?.id?.longValue
+            ?: MegaApiJava.INVALID_HANDLE
     }
 
     /**
