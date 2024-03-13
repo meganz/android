@@ -6,6 +6,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.controls.text.megaSpanStyle
 
@@ -27,6 +28,7 @@ internal fun getMessageText(
             withStyle(
                 style = megaSpanStyle(
                     fontStyle = FontStyle.Italic,
+                    fontSize = 8.sp,
                 )
             ) {
                 append(stringResource(id = R.string.edited_message_text))
