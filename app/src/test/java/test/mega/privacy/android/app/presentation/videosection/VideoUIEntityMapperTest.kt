@@ -85,7 +85,7 @@ class VideoUIEntityMapperTest {
                 { assertThat(it.name).isEqualTo(expectedName) },
                 { assertThat(it.size).isEqualTo(expectedSize) },
                 { assertThat(it.durationString).isEqualTo(expectedDurationString) },
-                { assertThat(it.durationInMinutes).isEqualTo(10) },
+                { assertThat(it.duration).isEqualTo(expectedDurationTime) },
                 { assertThat(it.thumbnail?.path).isEqualTo(expectedThumbnail) },
                 { assertThat(it.nodeAvailableOffline).isEqualTo(expectedAvailableOffline) },
                 { assertThat(it.isFavourite).isEqualTo(expectedIsFavourite) },

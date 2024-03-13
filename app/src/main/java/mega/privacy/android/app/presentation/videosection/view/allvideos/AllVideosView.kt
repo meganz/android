@@ -69,10 +69,10 @@ internal fun AllVideosView(
     lazyListState: LazyListState,
     sortOrder: String,
     modifier: Modifier,
-    selectedLocationFilterOption: LocationFilterOption?,
-    selectedDurationFilterOption: DurationFilterOption?,
-    onLocationFilterItemClicked: (LocationFilterOption?) -> Unit,
-    onDurationFilterItemClicked: (DurationFilterOption?) -> Unit,
+    selectedLocationFilterOption: LocationFilterOption,
+    selectedDurationFilterOption: DurationFilterOption,
+    onLocationFilterItemClicked: (LocationFilterOption) -> Unit,
+    onDurationFilterItemClicked: (DurationFilterOption) -> Unit,
     onClick: (item: VideoUIEntity, index: Int) -> Unit,
     onMenuClick: (VideoUIEntity) -> Unit,
     onSortOrderClick: () -> Unit,
@@ -115,34 +115,35 @@ internal fun AllVideosView(
             val locationText = "Location"
             val durationText = "Duration"
 
+            val isAllLocations = selectedLocationFilterOption == LocationFilterOption.AllLocations
+            val isAllDurations = selectedDurationFilterOption == DurationFilterOption.AllDurations
+
             VideosFilterButtonView(
-                isLocationFilterSelected = selectedLocationFilterOption != null,
-                isDurationFilterSelected = selectedDurationFilterOption != null,
-                modifier = Modifier
-                    .padding(start = 10.dp, top = 10.dp, bottom = 10.dp)
-                    .testTag(VIDEOS_FILTER_BUTTON_VIEW_TEST_TAG),
+                isLocationFilterSelected = isAllLocations.not(),
+                isDurationFilterSelected = isAllDurations.not(),
+                modifier = Modifier.testTag(VIDEOS_FILTER_BUTTON_VIEW_TEST_TAG),
                 onDurationFilterClicked = {
-                    if (selectedDurationFilterOption == null) {
-                        coroutineScope.launch {
-                            durationModalSheetState.show()
-                        }
-                    } else {
-                        onDurationFilterItemClicked(null)
+                    coroutineScope.launch {
+                        durationModalSheetState.show()
                     }
                 },
                 onLocationFilterClicked = {
-                    if (selectedLocationFilterOption == null) {
-                        coroutineScope.launch {
-                            locationModalSheetState.show()
-                        }
-                    } else {
-                        onLocationFilterItemClicked(null)
+                    coroutineScope.launch {
+                        locationModalSheetState.show()
                     }
                 },
                 locationDefaultText = locationText,
                 durationDefaultText = durationText,
-                locationFilterSelectText = selectedLocationFilterOption?.title ?: locationText,
-                durationFilterSelectText = selectedDurationFilterOption?.title ?: durationText
+                locationFilterSelectText = if (isAllLocations) {
+                    locationText
+                } else {
+                    selectedLocationFilterOption.title
+                },
+                durationFilterSelectText = if (isAllDurations) {
+                    durationText
+                } else {
+                    selectedDurationFilterOption.title
+                }
             )
 
             when {
@@ -229,7 +230,7 @@ internal fun AllVideosView(
             options = LocationFilterOption.entries.map { option ->
                 VideosFilterOptionEntity(
                     option.ordinal,
-                    option.name,
+                    option.title,
                     option == selectedLocationFilterOption
                 )
             },
@@ -240,8 +241,9 @@ internal fun AllVideosView(
                 val locationOption =
                     if (item.id in LocationFilterOption.entries.indices) {
                         LocationFilterOption.entries.firstOrNull { it.ordinal == item.id }
+                            ?: LocationFilterOption.AllLocations
                     } else {
-                        null
+                        LocationFilterOption.AllLocations
                     }
                 onLocationFilterItemClicked(locationOption)
             }
@@ -266,8 +268,9 @@ internal fun AllVideosView(
                 val durationOption =
                     if (item.id in DurationFilterOption.entries.indices) {
                         DurationFilterOption.entries.firstOrNull { it.ordinal == item.id }
+                            ?: DurationFilterOption.AllDurations
                     } else {
-                        null
+                        DurationFilterOption.AllDurations
                     }
                 onDurationFilterItemClicked(durationOption)
             }
@@ -291,7 +294,7 @@ private fun AllVideosViewPreview() {
             onMenuClick = { },
             onSortOrderClick = { },
             onLongClick = { _, _ -> },
-            selectedLocationFilterOption = null,
+            selectedLocationFilterOption = LocationFilterOption.AllLocations,
             selectedDurationFilterOption = DurationFilterOption.MoreThan20,
             onLocationFilterItemClicked = { },
             onDurationFilterItemClicked = { }

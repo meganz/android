@@ -77,6 +77,11 @@ class VideosFilterButtonViewTest {
             .assertIsDisplayed()
         composeTestRule.onNodeWithTag(LOCATION_FILTER_BUTTON_TEXT_TEST_TAG, true)
             .assertTextEquals(testLocationSelectedText)
+        composeTestRule.onNodeWithContentDescription(
+            label = "Location filter selected icon",
+            useUnmergedTree = true
+        )
+            .assertIsDisplayed()
     }
 
     @Test
@@ -108,6 +113,10 @@ class VideosFilterButtonViewTest {
             .assertIsDisplayed()
         composeTestRule.onNodeWithTag(DURATION_FILTER_BUTTON_TEXT_TEST_TAG, true)
             .assertTextEquals(testDurationSelectedText)
+        composeTestRule.onNodeWithContentDescription(
+            label = "Duration filter selected icon",
+            useUnmergedTree = true
+        ).assertIsDisplayed()
     }
 
     @Test

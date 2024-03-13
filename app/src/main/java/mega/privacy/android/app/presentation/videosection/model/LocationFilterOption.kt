@@ -8,6 +8,11 @@ package mega.privacy.android.app.presentation.videosection.model
 enum class LocationFilterOption(val title: String) {
 
     /**
+     * All locations filter option.
+     */
+    AllLocations("All locations"),
+
+    /**
      * Cloud drive filter option.
      */
     CloudDrive("Cloud drive"),

@@ -32,17 +32,20 @@ internal fun VideosFilterBottomSheet(
     options: List<VideosFilterOptionEntity>,
     onItemSelected: (VideosFilterOptionEntity) -> Unit,
 ) {
-    BottomSheet(modalSheetState = modalSheetState,
+    BottomSheet(
+        modifier = modifier,
+        modalSheetState = modalSheetState,
         sheetBody = {
             Column {
                 MegaText(
-                    modifier = modifier.padding(16.dp),
+                    modifier = Modifier.padding(16.dp),
                     text = title,
                     textColor = TextColor.Primary
                 )
 
                 options.map { option ->
                     SettingsItemWithRadioButton(
+                        modifier = Modifier.padding(vertical = 5.dp),
                         title = option.title,
                         selected = option.isSelected,
                         onClick = { onItemSelected(option) }

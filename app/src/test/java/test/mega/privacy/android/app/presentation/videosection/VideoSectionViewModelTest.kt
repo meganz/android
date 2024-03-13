@@ -51,6 +51,8 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -908,11 +910,12 @@ class VideoSectionViewModelTest {
     @Test
     fun `test that the setLocationSelectedFilterOption is correctly updated`() = runTest {
         val locationOption = LocationFilterOption.CameraUploads
+        val allLocations = LocationFilterOption.AllLocations
         initUnderTest()
 
         underTest.state.test {
             awaitItem().let {
-                assertThat(it.locationSelectedFilterOption).isNull()
+                assertThat(it.locationSelectedFilterOption).isEqualTo(allLocations)
                 assertThat(it.isPendingRefresh).isFalse()
             }
             underTest.setLocationSelectedFilterOption(locationOption)
@@ -921,9 +924,9 @@ class VideoSectionViewModelTest {
                 assertThat(it.isPendingRefresh).isTrue()
                 assertThat(it.progressBarShowing).isTrue()
             }
-            underTest.setLocationSelectedFilterOption(null)
+            underTest.setLocationSelectedFilterOption(allLocations)
             awaitItem().let {
-                assertThat(it.locationSelectedFilterOption).isNull()
+                assertThat(it.locationSelectedFilterOption).isEqualTo(allLocations)
                 assertThat(it.isPendingRefresh).isTrue()
             }
         }
@@ -932,11 +935,12 @@ class VideoSectionViewModelTest {
     @Test
     fun `test that the setDurationSelectedFilterOption is correctly updated`() = runTest {
         val durationOption = DurationFilterOption.MoreThan20
+        val allDurations = DurationFilterOption.AllDurations
         initUnderTest()
 
         underTest.state.test {
             awaitItem().let {
-                assertThat(it.durationSelectedFilterOption).isNull()
+                assertThat(it.durationSelectedFilterOption).isEqualTo(allDurations)
                 assertThat(it.isPendingRefresh).isFalse()
             }
             underTest.setDurationSelectedFilterOption(durationOption)
@@ -945,9 +949,9 @@ class VideoSectionViewModelTest {
                 assertThat(it.isPendingRefresh).isTrue()
                 assertThat(it.progressBarShowing).isTrue()
             }
-            underTest.setDurationSelectedFilterOption(null)
+            underTest.setDurationSelectedFilterOption(allDurations)
             awaitItem().let {
-                assertThat(it.durationSelectedFilterOption).isNull()
+                assertThat(it.durationSelectedFilterOption).isEqualTo(allDurations)
                 assertThat(it.isPendingRefresh).isTrue()
             }
         }
@@ -962,9 +966,9 @@ class VideoSectionViewModelTest {
             val typedVideoNode2 = getTypedVideoNode(2)
             val typedVideoNode3 = getTypedVideoNode(3)
 
-            val videoOfDurationLessThan4 = getVideoUIEntityWithDuration(3)
-            val videoOfDurationBetween4And20 = getVideoUIEntityWithDuration(8)
-            val videoOfDurationMoreThan20 = getVideoUIEntityWithDuration(21)
+            val videoOfDurationLessThan4 = getVideoUIEntityWithDuration(3.minutes)
+            val videoOfDurationBetween4And20 = getVideoUIEntityWithDuration(8.minutes)
+            val videoOfDurationMoreThan20 = getVideoUIEntityWithDuration(21.minutes)
 
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
             whenever(getAllVideosUseCase()).thenReturn(
@@ -981,8 +985,39 @@ class VideoSectionViewModelTest {
                 val actual = awaitItem()
                 assertThat(actual.durationSelectedFilterOption).isEqualTo(durationOption)
                 assertThat(actual.allVideos.size).isEqualTo(1)
-                assertThat(actual.allVideos[0].durationInMinutes)
-                    .isEqualTo(videoOfDurationMoreThan20.durationInMinutes)
+                assertThat(actual.allVideos[0].duration)
+                    .isEqualTo(videoOfDurationMoreThan20.duration)
+            }
+        }
+
+    @Test
+    fun `test that the videos return correctly when the duration select option is AllDuration`() =
+        runTest {
+            val durationOption = DurationFilterOption.AllDurations
+
+            val typedVideoNode1 = getTypedVideoNode(1)
+            val typedVideoNode2 = getTypedVideoNode(2)
+            val typedVideoNode3 = getTypedVideoNode(3)
+
+            val videoOfDurationLessThan4 = getVideoUIEntityWithDuration(3.minutes)
+            val videoOfDurationBetween4And20 = getVideoUIEntityWithDuration(8.minutes)
+            val videoOfDurationMoreThan20 = getVideoUIEntityWithDuration(21.minutes)
+
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
+            whenever(getAllVideosUseCase()).thenReturn(
+                listOf(typedVideoNode1, typedVideoNode2, typedVideoNode3)
+            )
+            whenever(videoUIEntityMapper(typedVideoNode1)).thenReturn(videoOfDurationLessThan4)
+            whenever(videoUIEntityMapper(typedVideoNode2)).thenReturn(videoOfDurationBetween4And20)
+            whenever(videoUIEntityMapper(typedVideoNode3)).thenReturn(videoOfDurationMoreThan20)
+
+            underTest.setDurationSelectedFilterOption(durationOption)
+            underTest.refreshNodes()
+
+            underTest.state.drop(1).test {
+                val actual = awaitItem()
+                assertThat(actual.durationSelectedFilterOption).isEqualTo(durationOption)
+                assertThat(actual.allVideos.size).isEqualTo(3)
             }
         }
 
@@ -991,9 +1026,9 @@ class VideoSectionViewModelTest {
         on { name }.thenReturn("video name")
     }
 
-    private fun getVideoUIEntityWithDuration(minutes: Long) = mock<VideoUIEntity> {
+    private fun getVideoUIEntityWithDuration(value: Duration) = mock<VideoUIEntity> {
         on { name }.thenReturn("video name")
-        on { durationInMinutes }.thenReturn(minutes)
+        on { duration }.thenReturn(value)
     }
 
     @Test
@@ -1058,6 +1093,27 @@ class VideoSectionViewModelTest {
                     LocationFilterOption.CloudDrive
                 )
                 assertThat(actual.allVideos.size).isEqualTo(2)
+            }
+        }
+
+    @Test
+    fun `test that the videos return correctly when the location select option is AllLocations`() =
+        runTest {
+            val video1 = getVideoUIEntityWithParentIdAndShared(5)
+            val video2 = getVideoUIEntityWithParentIdAndShared(7)
+            val video3 = getVideoUIEntityWithParentIdAndShared(4)
+
+            initFilterOptionTestData(
+                LocationFilterOption.AllLocations,
+                listOf(video1, video2, video3)
+            )
+
+            underTest.state.drop(1).test {
+                val actual = awaitItem()
+                assertThat(actual.locationSelectedFilterOption).isEqualTo(
+                    LocationFilterOption.AllLocations
+                )
+                assertThat(actual.allVideos.size).isEqualTo(3)
             }
         }
 

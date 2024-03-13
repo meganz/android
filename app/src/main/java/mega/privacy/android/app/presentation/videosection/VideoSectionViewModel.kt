@@ -182,34 +182,42 @@ class VideoSectionViewModel @Inject constructor(
     private suspend fun getVideoUIEntityList() =
         getAllVideosUseCase().map { videoUIEntityMapper(it) }
 
-    private suspend fun List<VideoUIEntity>.filterVideosByLocation() =
-        _state.value.locationSelectedFilterOption?.let { locationOption ->
-            val syncUploadsFolderIds = getSyncUploadsFolderIdsUseCase()
-            filter {
-                when (locationOption) {
-                    LocationFilterOption.CloudDrive ->
-                        it.parentId.longValue !in syncUploadsFolderIds
+    private suspend fun List<VideoUIEntity>.filterVideosByLocation(): List<VideoUIEntity> {
+        val syncUploadsFolderIds = getSyncUploadsFolderIdsUseCase()
+        return filter {
+            when (_state.value.locationSelectedFilterOption) {
+                LocationFilterOption.AllLocations -> true
 
-                    LocationFilterOption.CameraUploads ->
-                        it.parentId.longValue in syncUploadsFolderIds
+                LocationFilterOption.CloudDrive ->
+                    it.parentId.longValue !in syncUploadsFolderIds
 
-                    LocationFilterOption.SharedItems -> it.isSharedItems
-                }
+                LocationFilterOption.CameraUploads ->
+                    it.parentId.longValue in syncUploadsFolderIds
+
+                LocationFilterOption.SharedItems -> it.isSharedItems
             }
-        } ?: this
+        }
+    }
+
 
     private fun List<VideoUIEntity>.filterVideosByDuration() =
-        _state.value.durationSelectedFilterOption?.let { durationOption ->
-            filter {
-                when (durationOption) {
-                    DurationFilterOption.LessThan4 -> it.durationInMinutes < 4
+        filter {
+            val seconds = it.duration.inWholeSeconds
+            val minutes = it.duration.inWholeMinutes
+            when (_state.value.durationSelectedFilterOption) {
+                DurationFilterOption.AllDurations -> true
 
-                    DurationFilterOption.Between4And20 -> it.durationInMinutes in 4..20
+                DurationFilterOption.LessThan10Seconds -> seconds < 10
 
-                    DurationFilterOption.MoreThan20 -> it.durationInMinutes > 20
-                }
+                DurationFilterOption.Between10And60Seconds -> seconds in 10..60
+
+                DurationFilterOption.Between1And4 -> minutes in 1..4
+
+                DurationFilterOption.Between4And20 -> minutes in 4..20
+
+                DurationFilterOption.MoreThan20 -> minutes > 20
             }
-        } ?: this
+        }
 
     internal fun markHandledPendingRefresh() = _state.update { it.copy(isPendingRefresh = false) }
 
@@ -827,7 +835,7 @@ class VideoSectionViewModel @Inject constructor(
         it.copy(currentDestinationRoute = route)
     }
 
-    internal fun setLocationSelectedFilterOption(locationFilterOption: LocationFilterOption?) =
+    internal fun setLocationSelectedFilterOption(locationFilterOption: LocationFilterOption) =
         _state.update {
             it.copy(
                 locationSelectedFilterOption = locationFilterOption,
@@ -836,7 +844,7 @@ class VideoSectionViewModel @Inject constructor(
             )
         }
 
-    internal fun setDurationSelectedFilterOption(durationFilterOption: DurationFilterOption?) =
+    internal fun setDurationSelectedFilterOption(durationFilterOption: DurationFilterOption) =
         _state.update {
             it.copy(
                 durationSelectedFilterOption = durationFilterOption,

@@ -6,10 +6,26 @@ package mega.privacy.android.app.presentation.videosection.model
  * @param title The title of the filter option.
  */
 enum class DurationFilterOption(val title: String) {
+
     /**
-     * Less than 4 minutes filter option.
+     * All durations filter option.
      */
-    LessThan4("Less than 4 minutes"),
+    AllDurations("All durations"),
+
+    /**
+     * Less than 10 seconds filter option.
+     */
+    LessThan10Seconds("Less than 10 seconds"),
+
+    /**
+     * Between 10 and 60 seconds filter option.
+     */
+    Between10And60Seconds("Between 10 and 60 seconds"),
+
+    /**
+     * Between 1 and 4 minutes filter option.
+     */
+    Between1And4("Between 1 and 4 minutes"),
 
     /**
      * Between 4 and 20 minutes filter option.
