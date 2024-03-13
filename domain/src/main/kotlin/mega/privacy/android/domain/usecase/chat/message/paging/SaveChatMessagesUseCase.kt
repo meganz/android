@@ -32,7 +32,7 @@ class SaveChatMessagesUseCase @Inject constructor(
             chatId = chatId,
             chatMessages = messages,
             currentUserHandle = currentUserHandle,
-            nextMessageUserHandle = nextMessage?.userHandle
+            nextMessage = nextMessage,
         )
 
         chatRepository.storeMessages(requestList)

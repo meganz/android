@@ -16,7 +16,7 @@ import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.ConnectionState
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.RichLinkConfig
-import mega.privacy.android.domain.entity.chat.messages.paging.MessagePagingInfo
+import mega.privacy.android.domain.entity.chat.messages.ChatMessageInfo
 import mega.privacy.android.domain.entity.chat.messages.reactions.ReactionUpdate
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.chat.notification.ChatMessageNotification
@@ -906,7 +906,7 @@ interface ChatRepository {
      * @param timestamp
      * @return next chronological message if it exists
      */
-    suspend fun getNextMessagePagingInfo(chatId: Long, timestamp: Long): MessagePagingInfo?
+    suspend fun getNextMessagePagingInfo(chatId: Long, timestamp: Long): ChatMessageInfo?
 
     /**
      * Monitor if chat is in joining state.

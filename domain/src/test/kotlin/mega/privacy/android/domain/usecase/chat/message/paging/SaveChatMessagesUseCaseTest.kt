@@ -52,7 +52,7 @@ class SaveChatMessagesUseCaseTest {
                 chatId = chatId,
                 chatMessages = emptyList(),
                 currentUserHandle = myUserHandle,
-                nextMessageUserHandle = null
+                nextMessage = null
             )
         }
 }

@@ -59,7 +59,6 @@ import mega.privacy.android.data.mapper.chat.messages.reactions.ReactionUpdateMa
 import mega.privacy.android.data.mapper.chat.paging.ChatGeolocationEntityMapper
 import mega.privacy.android.data.mapper.chat.paging.ChatNodeEntityListMapper
 import mega.privacy.android.data.mapper.chat.paging.GiphyEntityMapper
-import mega.privacy.android.data.mapper.chat.paging.MessagePagingInfoMapper
 import mega.privacy.android.data.mapper.chat.paging.RichPreviewEntityMapper
 import mega.privacy.android.data.mapper.chat.paging.TypedMessageEntityMapper
 import mega.privacy.android.data.mapper.chat.update.ChatRoomMessageUpdateMapper
@@ -76,7 +75,7 @@ import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.RichLinkConfig
-import mega.privacy.android.domain.entity.chat.messages.paging.MessagePagingInfo
+import mega.privacy.android.domain.entity.chat.messages.ChatMessageInfo
 import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessageRequest
 import mega.privacy.android.domain.entity.chat.notification.ChatMessageNotification
 import mega.privacy.android.domain.entity.chat.room.update.ChatRoomMessageUpdate
@@ -163,7 +162,6 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val databaseHandler: DatabaseHandler,
     private val chatStorageGateway: ChatStorageGateway,
     private val typedMessageEntityMapper: TypedMessageEntityMapper,
-    private val messagePagingInfoMapper: MessagePagingInfoMapper,
     private val richPreviewEntityMapper: RichPreviewEntityMapper,
     private val giphyEntityMapper: GiphyEntityMapper,
     private val chatGeolocationEntityMapper: ChatGeolocationEntityMapper,
@@ -1295,11 +1293,9 @@ internal class ChatRepositoryImpl @Inject constructor(
     override suspend fun getNextMessagePagingInfo(
         chatId: Long,
         timestamp: Long,
-    ): MessagePagingInfo? =
+    ): ChatMessageInfo? =
         withContext(ioDispatcher) {
-            chatStorageGateway.getNextMessage(chatId, timestamp)?.let {
-                messagePagingInfoMapper(it)
-            }
+            chatStorageGateway.getNextMessage(chatId, timestamp)
         }
 
     override fun monitorJoiningChat(chatId: Long) = joiningIdsFlow
