@@ -15,44 +15,66 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
+import mega.privacy.android.data.gateway.WorkerClassGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
-import mega.privacy.android.data.worker.CameraUploadsWorker
 import mega.privacy.android.data.worker.ChatUploadsWorker
 import mega.privacy.android.data.worker.DeleteOldestCompletedTransfersWorker
 import mega.privacy.android.data.worker.DownloadsWorker
 import mega.privacy.android.data.worker.NewMediaWorker
-import mega.privacy.android.data.worker.SyncHeartbeatCameraUploadWorker
 import mega.privacy.android.domain.monitoring.CrashReporter
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
- * Worker tags
+ * Tag identifying the Camera Uploads periodic worker when enqueued
  */
 private const val CAMERA_UPLOAD_TAG = "CAMERA_UPLOAD_TAG"
-private const val SINGLE_CAMERA_UPLOAD_TAG = "MEGA_SINGLE_CAMERA_UPLOAD_TAG"
-private const val HEART_BEAT_TAG = "HEART_BEAT_TAG"
-private const val SINGLE_HEART_BEAT_TAG = "SINGLE_HEART_BEAT_TAG"
 
 /**
- * Job time periods
+ * Tag identifying the Camera Uploads one-time worker when enqueued
  */
-private const val UP_TO_DATE_HEARTBEAT_INTERVAL: Long = 30 // Minutes
-private const val HEARTBEAT_FLEX_INTERVAL: Long = 20 // Minutes
-private const val CU_SCHEDULER_INTERVAL: Long = 60 // Minutes
-private const val SCHEDULER_FLEX_INTERVAL: Long = 50 // Minutes
+private const val SINGLE_CAMERA_UPLOAD_TAG = "MEGA_SINGLE_CAMERA_UPLOAD_TAG"
 
-internal class WorkManagerFacade @Inject constructor(
+/**
+ * Tag identifying the Heartbeat periodic worker when enqueued
+ */
+private const val HEART_BEAT_TAG = "HEART_BEAT_TAG"
+
+/**
+ * Interval in minutes to run the Heartbeat periodic worker worker
+ */
+private const val UP_TO_DATE_HEARTBEAT_INTERVAL: Long = 30
+
+/**
+ * Interval in minutes to run the Heartbeat periodic worker worker
+ */
+private const val HEARTBEAT_FLEX_INTERVAL: Long = 20
+
+/**
+ * Interval in minutes to run the Camera Uploads periodic worker
+ */
+private const val CU_SCHEDULER_INTERVAL: Long = 60
+
+/**
+ * Flex Interval in minutes to run the Camera Uploads periodic worker
+ */
+private const val SCHEDULER_FLEX_INTERVAL: Long = 50
+
+/**
+ * Responsible of managing the queue of workers in the WorkManager
+ */
+class WorkManagerGatewayImpl @Inject constructor(
     private val workManager: WorkManager,
     private val crashReporter: CrashReporter,
+    private val workerClassGateway: WorkerClassGateway,
 ) : WorkManagerGateway {
 
     override suspend fun enqueueDeleteOldestCompletedTransfersWorkRequest() {
         workManager.debugWorkInfo(crashReporter)
 
         val workRequest =
-            OneTimeWorkRequest.Builder(DeleteOldestCompletedTransfersWorker::class.java)
+            OneTimeWorkRequest.Builder(workerClassGateway.deleteOldestCompletedTransferWorkerClass)
                 .addTag(DeleteOldestCompletedTransfersWorker.DELETE_OLDEST_TRANSFERS_WORKER_TAG)
                 .build()
 
@@ -67,9 +89,10 @@ internal class WorkManagerFacade @Inject constructor(
     override suspend fun enqueueDownloadsWorkerRequest() {
         workManager.debugWorkInfo(crashReporter)
 
-        val request = OneTimeWorkRequest.Builder(DownloadsWorker::class.java)
-            .addTag(DownloadsWorker.SINGLE_DOWNLOAD_TAG)
-            .build()
+        val request =
+            OneTimeWorkRequest.Builder(workerClassGateway.downloadsWorkerClass)
+                .addTag(DownloadsWorker.SINGLE_DOWNLOAD_TAG)
+                .build()
         workManager
             .enqueueUniqueWork(
                 DownloadsWorker.SINGLE_DOWNLOAD_TAG,
@@ -81,9 +104,10 @@ internal class WorkManagerFacade @Inject constructor(
     override suspend fun enqueueChatUploadsWorkerRequest() {
         workManager.debugWorkInfo(crashReporter)
 
-        val request = OneTimeWorkRequest.Builder(ChatUploadsWorker::class.java)
-            .addTag(ChatUploadsWorker.SINGLE_CHAT_UPLOAD_TAG)
-            .build()
+        val request =
+            OneTimeWorkRequest.Builder(workerClassGateway.chatUploadsWorkerClass)
+                .addTag(ChatUploadsWorker.SINGLE_CHAT_UPLOAD_TAG)
+                .build()
         workManager
             .enqueueUniqueWork(
                 ChatUploadsWorker.SINGLE_CHAT_UPLOAD_TAG,
@@ -97,17 +121,30 @@ internal class WorkManagerFacade @Inject constructor(
 
         val tag = NewMediaWorker.NEW_MEDIA_WORKER_TAG
         if (forceEnqueue || !(isWorkerEnqueuedOrRunning(tag))) {
-            val workRequest = OneTimeWorkRequest.Builder(NewMediaWorker::class.java)
-                .setConstraints(
-                    Constraints.Builder()
-                        .addContentUriTrigger(MediaStore.Images.Media.INTERNAL_CONTENT_URI, true)
-                        .addContentUriTrigger(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, true)
-                        .addContentUriTrigger(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, true)
-                        .addContentUriTrigger(MediaStore.Video.Media.INTERNAL_CONTENT_URI, true)
-                        .build()
-                )
-                .addTag(NewMediaWorker.NEW_MEDIA_WORKER_TAG)
-                .build()
+            val workRequest =
+                OneTimeWorkRequest.Builder(workerClassGateway.newMediaWorkerClass)
+                    .setConstraints(
+                        Constraints.Builder()
+                            .addContentUriTrigger(
+                                MediaStore.Images.Media.INTERNAL_CONTENT_URI,
+                                true
+                            )
+                            .addContentUriTrigger(
+                                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                                true
+                            )
+                            .addContentUriTrigger(
+                                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                                true
+                            )
+                            .addContentUriTrigger(
+                                MediaStore.Video.Media.INTERNAL_CONTENT_URI,
+                                true
+                            )
+                            .build()
+                    )
+                    .addTag(NewMediaWorker.NEW_MEDIA_WORKER_TAG)
+                    .build()
             workManager.enqueue(workRequest)
         } else {
             Timber.d("New media worker is already running, cannot proceed with one time request")
@@ -120,43 +157,35 @@ internal class WorkManagerFacade @Inject constructor(
             workManager.debugWorkInfo(crashReporter)
 
             Timber.d("No CU periodic process currently running, proceed with one time request")
-            val cameraUploadWorkRequest = OneTimeWorkRequest.Builder(
-                CameraUploadsWorker::class.java
-            )
-                .addTag(SINGLE_CAMERA_UPLOAD_TAG)
-                .setBackoffCriteria(
-                    BackoffPolicy.LINEAR,
-                    10,
-                    TimeUnit.SECONDS
-                )
-                .build()
+            val cameraUploadWorkRequest =
+                OneTimeWorkRequest.Builder(workerClassGateway.cameraUploadsWorkerClass)
+                    .addTag(SINGLE_CAMERA_UPLOAD_TAG)
+                    .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.SECONDS)
+                    .build()
 
             workManager
                 .enqueueUniqueWork(
                     SINGLE_CAMERA_UPLOAD_TAG,
                     ExistingWorkPolicy.KEEP,
-                    cameraUploadWorkRequest
+                    cameraUploadWorkRequest,
                 ).await()
+
             Timber.d(
-                "CameraUpload Single Job Work Status: ${
-                    workManager.getWorkInfosByTag(SINGLE_CAMERA_UPLOAD_TAG)
+                "CameraUploads Unique Work Status: ${
+                    workManager.getWorkInfosByTag(CAMERA_UPLOAD_TAG).get()
                 }"
             )
             // If no CU periodic worker are currently running, cancel the worker
             // It will be rescheduled at the end of the one time request
             cancelPeriodicCameraUploadWorkRequest()
-            Timber.d("fireCameraUploadJob() SUCCESS")
         } else {
             Timber.d("CU periodic process currently running, cannot proceed with one time request")
-            Timber.d("fireCameraUploadJob() FAIL")
         }
     }
 
     override suspend fun stopCameraUploads() {
-        cancelUniqueCameraUploadWorkRequest()
+        cancelOneTimeCameraUploadWorkRequest()
         cancelPeriodicCameraUploadWorkRequest()
-
-        Timber.d("fireStopCameraUploadJob() SUCCESS")
     }
 
     override suspend fun scheduleCameraUploads() {
@@ -166,12 +195,13 @@ internal class WorkManagerFacade @Inject constructor(
 
         // periodic work that runs during the last 10 minutes of every one hour period
         val cameraUploadWorkRequest = PeriodicWorkRequest.Builder(
-            CameraUploadsWorker::class.java,
+            workerClassGateway.cameraUploadsWorkerClass,
             CU_SCHEDULER_INTERVAL,
             TimeUnit.MINUTES,
             SCHEDULER_FLEX_INTERVAL,
             TimeUnit.MINUTES
         )
+            .setNextScheduleTimeOverride(TimeUnit.MINUTES.toMillis(CU_SCHEDULER_INTERVAL))
             .addTag(CAMERA_UPLOAD_TAG)
             .build()
         workManager
@@ -181,11 +211,10 @@ internal class WorkManagerFacade @Inject constructor(
                 cameraUploadWorkRequest
             ).await()
         Timber.d(
-            "CameraUpload Schedule Work Status: ${
-                workManager.getWorkInfosByTag(CAMERA_UPLOAD_TAG)
+            "CameraUploads Periodic Work Status: ${
+                workManager.getWorkInfosByTag(CAMERA_UPLOAD_TAG).get()
             }"
         )
-        Timber.d("scheduleCameraUploadJob() SUCCESS")
     }
 
     /**
@@ -196,7 +225,7 @@ internal class WorkManagerFacade @Inject constructor(
 
         // periodic work that runs during the last 10 minutes of every half an hour period
         val cuSyncActiveHeartbeatWorkRequest = PeriodicWorkRequest.Builder(
-            SyncHeartbeatCameraUploadWorker::class.java,
+            workerClassGateway.syncHeartbeatCameraUploadWorkerClass,
             UP_TO_DATE_HEARTBEAT_INTERVAL,
             TimeUnit.MINUTES,
             HEARTBEAT_FLEX_INTERVAL,
@@ -212,22 +241,21 @@ internal class WorkManagerFacade @Inject constructor(
             ).await()
         Timber.d(
             "CameraUpload Schedule Heartbeat Work Status: ${
-                workManager.getWorkInfosByTag(HEART_BEAT_TAG)
+                workManager.getWorkInfosByTag(HEART_BEAT_TAG).get()
             }"
         )
-        Timber.d("scheduleCameraUploadSyncActiveHeartbeat() SUCCESS")
     }
 
     /**
      * Cancel all camera upload workers.
      * Cancel all camera upload sync heartbeat workers.
+     * Cancel new media worker.
      */
-    override suspend fun cancelCameraUploadAndHeartbeatWorkRequest() {
+    override suspend fun cancelCameraUploadsAndHeartbeatWorkRequest() {
         listOf(
             CAMERA_UPLOAD_TAG,
             SINGLE_CAMERA_UPLOAD_TAG,
             HEART_BEAT_TAG,
-            SINGLE_HEART_BEAT_TAG,
             NewMediaWorker.NEW_MEDIA_WORKER_TAG,
         ).forEach {
             workManager.cancelAllWorkByTag(it).await()
@@ -236,9 +264,9 @@ internal class WorkManagerFacade @Inject constructor(
     }
 
     /**
-     * Cancel the Camera Upload unique worker
+     * Cancel the Camera Upload one-time worker
      */
-    private suspend fun cancelUniqueCameraUploadWorkRequest() {
+    private suspend fun cancelOneTimeCameraUploadWorkRequest() {
         workManager
             .cancelAllWorkByTag(SINGLE_CAMERA_UPLOAD_TAG)
             .await()

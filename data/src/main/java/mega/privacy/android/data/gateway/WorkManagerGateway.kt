@@ -48,10 +48,10 @@ interface WorkManagerGateway {
     suspend fun scheduleCameraUploads()
 
     /**
-     * Cancel all camera upload workers.
-     * Cancel all camera upload sync heartbeat workers.
+     * Cancel all camera uploads workers.
+     * Cancel all camera uploads sync heartbeat workers.
      */
-    suspend fun cancelCameraUploadAndHeartbeatWorkRequest()
+    suspend fun cancelCameraUploadsAndHeartbeatWorkRequest()
 
     /**
      * Get CameraUploadsWorker Info

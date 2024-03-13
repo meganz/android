@@ -13,7 +13,7 @@ import timber.log.Timber
  * Worker to delete the oldest completed transfers
  */
 @HiltWorker
-internal class DeleteOldestCompletedTransfersWorker @AssistedInject constructor(
+class DeleteOldestCompletedTransfersWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,

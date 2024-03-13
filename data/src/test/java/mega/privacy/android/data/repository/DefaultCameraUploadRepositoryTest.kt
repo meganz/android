@@ -609,7 +609,7 @@ class DefaultCameraUploadRepositoryTest {
         @Test
         fun `test that the worker is called to stop camera uploads heartbeat workers`() = runTest {
             underTest.stopCameraUploadsAndBackupHeartbeat()
-            verify(workManagerGateway).cancelCameraUploadAndHeartbeatWorkRequest()
+            verify(workManagerGateway).cancelCameraUploadsAndHeartbeatWorkRequest()
         }
 
         @Test

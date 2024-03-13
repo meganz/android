@@ -387,7 +387,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     }
 
     override suspend fun stopCameraUploadsAndBackupHeartbeat() = withContext(ioDispatcher) {
-        workManagerGateway.cancelCameraUploadAndHeartbeatWorkRequest()
+        workManagerGateway.cancelCameraUploadsAndHeartbeatWorkRequest()
     }
 
     override suspend fun listenToNewMedia(forceEnqueue: Boolean) = withContext(ioDispatcher) {
