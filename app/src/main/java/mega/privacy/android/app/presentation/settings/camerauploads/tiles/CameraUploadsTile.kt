@@ -16,23 +16,19 @@ import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
- * Test Tags for the Camera Uploads Tile
- */
-internal const val CAMERA_UPLOADS_TILE = "camera_uploads_option:menu_action_list_tile"
-internal const val CAMERA_UPLOADS_TILE_SWITCH = "camera_uploads_option:mega_switch"
-
-/**
  * A [Composable] that displays a [MegaSwitch] to enable or disable Camera Uploads
  *
  * @param isChecked true if the [MegaSwitch] is checked
  * @param onCheckedChange Lambda to execute when the [MegaSwitch] checked state has changed
+ * @param modifier The [Modifier] class
  */
 @Composable
 internal fun CameraUploadsTile(
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(modifier) {
         MenuActionListTile(
             modifier = Modifier.testTag(CAMERA_UPLOADS_TILE),
             text = stringResource(R.string.section_photo_sync),
@@ -56,7 +52,7 @@ internal fun CameraUploadsTile(
  */
 @CombinedThemePreviews
 @Composable
-private fun CameraUploadsOptionPreview(
+private fun CameraUploadsTilePreview(
     @PreviewParameter(BooleanProvider::class) isChecked: Boolean,
 ) {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
@@ -66,3 +62,9 @@ private fun CameraUploadsOptionPreview(
         )
     }
 }
+
+/**
+ * Test Tags for the Camera Uploads Tile
+ */
+internal const val CAMERA_UPLOADS_TILE = "camera_uploads_option:menu_action_list_tile"
+internal const val CAMERA_UPLOADS_TILE_SWITCH = "camera_uploads_option:mega_switch"

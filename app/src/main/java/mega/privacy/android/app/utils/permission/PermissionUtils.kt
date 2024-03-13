@@ -22,7 +22,6 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
-import androidx.fragment.app.Fragment
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.presentation.permissions.NotificationsPermissionActivity
 
@@ -30,34 +29,11 @@ import mega.privacy.android.app.presentation.permissions.NotificationsPermission
  * Declare singleton PermissionUtils
  */
 object PermissionUtils {
-    const val TYPE_REQUIRE_PERMISSION = 0
-    const val TYPE_GRANTED = 1
-    const val TYPE_DENIED = 2
-    const val TYPE_NEVER_ASK_AGAIN = 3
 
     /**
      * Request code for requesting notifications permission.
      */
-    const val REQUEST_NOTIFICATIONS_PERMISSION = 6666
-
-    /**
-     * Checks all given permissions have been granted.
-     *
-     * @param grantResults results
-     * @return returns true if all permissions have been granted.
-     */
-    @JvmStatic
-    fun verifyPermissions(vararg grantResults: Int): Boolean {
-        if (grantResults.isEmpty()) {
-            return false
-        }
-        for (result in grantResults) {
-            if (result != PermissionChecker.PERMISSION_GRANTED) {
-                return false
-            }
-        }
-        return true
-    }
+    private const val REQUEST_NOTIFICATIONS_PERMISSION = 6666
 
     /**
      * Returns true if the Activity or Fragment has access to all given permissions.
@@ -323,26 +299,6 @@ object PermissionUtils {
     }
 
     /**
-     * Checks given permissions are needed to show rationale.
-     *
-     * @param fragment    fragment
-     * @param permissions permission list
-     * @return returns true if one of the permission is needed to show rationale.
-     */
-    @JvmStatic
-    fun shouldShowRequestPermissionRationale(
-        fragment: Fragment,
-        permissions: List<String>,
-    ): Boolean {
-        for (permission in permissions) {
-            if (fragment.shouldShowRequestPermissionRationale(permission)) {
-                return true
-            }
-        }
-        return false
-    }
-
-    /**
      * Check if the user ticket 'Don't ask again' and deny a permission request.
      * In this case, the system request permission dialog can no longer show up.
      *
@@ -415,52 +371,6 @@ object PermissionUtils {
     }
 
     /**
-     * Callback function for granting permissions for sub class
-     *
-     * @param permissions permission list
-     */
-    @JvmStatic
-    fun onRequiresPermission(
-        permissions: ArrayList<String>,
-        permissionCallbacks: PermissionCallbacks,
-    ) {
-        permissionCallbacks.onPermissionsCallback(TYPE_REQUIRE_PERMISSION, permissions)
-    }
-
-    /**
-     * Process when the user denies the permissions
-     *
-     * @param permissions permission list
-     */
-    @JvmStatic
-    fun onPermissionDenied(
-        permissions: ArrayList<String>,
-        permissionCallbacks: PermissionCallbacks,
-    ) {
-        permissionCallbacks.onPermissionsCallback(TYPE_DENIED, permissions)
-    }
-
-    /**
-     * Callback function that allow for continuation or cancellation of a permission request..
-     *
-     * @param request allow for continuation or cancellation of a permission request.
-     */
-    @JvmStatic
-    fun onShowRationale(request: PermissionRequest) {
-        request.proceed()
-    }
-
-    /**
-     * Callback function that will be called when the user denies the permissions and tickets "Never Ask Again" after calls requestPermissions()
-     *
-     * @param permissions permission list
-     */
-    @JvmStatic
-    fun onNeverAskAgain(permissions: ArrayList<String>, permissionCallbacks: PermissionCallbacks) {
-        permissionCallbacks.onPermissionsCallback(TYPE_NEVER_ASK_AGAIN, permissions)
-    }
-
-    /**
      * Has partial media permission
      * It returns true if the app has partial media permission but not full media permission
      *
@@ -478,11 +388,4 @@ object PermissionUtils {
                 && ContextCompat.checkSelfPermission(
             context, READ_MEDIA_VIDEO
         ) != PackageManager.PERMISSION_GRANTED
-
-    /**
-     * Callback interface to receive the results of permissions request
-     */
-    interface PermissionCallbacks {
-        fun onPermissionsCallback(requestType: Int, perms: ArrayList<String>)
-    }
 }
