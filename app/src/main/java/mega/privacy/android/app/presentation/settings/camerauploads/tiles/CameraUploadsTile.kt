@@ -7,12 +7,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.core.ui.controls.dividers.DividerType
+import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
@@ -32,8 +32,7 @@ internal fun CameraUploadsTile(
         MenuActionListTile(
             modifier = Modifier.testTag(CAMERA_UPLOADS_TILE),
             text = stringResource(R.string.section_photo_sync),
-            addSeparator = isChecked,
-            dividerPadding = 0.dp,
+            dividerType = if (isChecked) DividerType.FullSize else null,
             addIconPadding = false,
         ) {
             MegaSwitch(

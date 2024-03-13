@@ -31,7 +31,7 @@ import mega.privacy.android.app.presentation.notification.view.components.GreenI
 import mega.privacy.android.app.presentation.notification.view.components.NotificationDate
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.drawableId
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.core.ui.controls.dividers.DividerSpacing
+import mega.privacy.android.core.ui.controls.dividers.DividerType
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.core.ui.controls.text.MegaText
@@ -161,7 +161,7 @@ internal fun PromoNotificationItemView(
         }
         MegaDivider(
             modifier = Modifier.testTag(PROMO_NOTIFICATION_DIVIDER),
-            dividerSpacing = DividerSpacing.Full
+            dividerType = DividerType.FullSize
         )
     }
 }

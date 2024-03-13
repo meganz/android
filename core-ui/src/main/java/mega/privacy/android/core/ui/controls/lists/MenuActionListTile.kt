@@ -1,4 +1,4 @@
-package mega.privacy.android.legacy.core.ui.controls.lists
+package mega.privacy.android.core.ui.controls.lists
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -9,9 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,21 +19,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.core.ui.controls.dividers.DividerType
+import mega.privacy.android.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.core.ui.controls.text.LongTextBehaviour
+import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.MegaTheme
 import mega.privacy.android.core.ui.theme.extensions.conditional
-import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
-import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
+import mega.privacy.android.core.ui.theme.tokens.TextColor
 
 /**
  * Menu action list tile
@@ -59,7 +59,7 @@ fun MenuActionListTile(
         isDestructive = isDestructive,
         onActionClicked = onActionClicked,
         trailingItem = trailingItem,
-        addSeparator = false,
+        dividerType = null,
     )
 }
 
@@ -71,8 +71,7 @@ fun MenuActionListTile(
  * @param icon list icon if null the list will not be having prefix icon
  * @param addIconPadding should be true if we need to leave icon space before text
  * @param isDestructive if true the text will be displayed in destructive(red) colors
- * @param addSeparator if true divider will be drawn below the item
- * @param dividerPadding padding start for the divider below menu action
+ * @param dividerType type for the divider below menu action. Hidden if NULL
  * @param onActionClicked trigger item click on menu action
  * @param trailingItem composable widget which will be placed at the trailing end
  * @param modifier
@@ -84,8 +83,7 @@ fun MenuActionListTile(
     icon: Painter? = null,
     addIconPadding: Boolean = true,
     isDestructive: Boolean = false,
-    addSeparator: Boolean = true,
-    dividerPadding: Dp = 72.dp,
+    dividerType: DividerType? = DividerType.BigStartPadding,
     onActionClicked: (() -> Unit)? = null,
     trailingItem: (@Composable () -> Unit)? = null,
 ) {
@@ -110,28 +108,31 @@ fun MenuActionListTile(
                         .size(size = 24.dp),
                     painter = icon,
                     contentDescription = null,
-                    tint = if (isDestructive) MaterialTheme.colors.red_600_red_300 else MaterialTheme.colors.textColorSecondary,
+                    tint = if (isDestructive) {
+                        MegaTheme.colors.support.error
+                    } else {
+                        MegaTheme.colors.icon.secondary
+                    },
                 )
             }
             Box(modifier = Modifier.weight(1f)) {
-                Text(
+                MegaText(
                     modifier = Modifier
                         .testTag(MENU_ITEM_TEXT_TAG)
                         .conditional(icon == null && addIconPadding) {
                             padding(start = 56.dp)
                         },
                     text = text,
-                    style = MaterialTheme.typography.subtitle1.copy(
-                        color = if (isDestructive) MaterialTheme.colors.red_600_red_300 else MaterialTheme.colors.textColorPrimary,
-                    ),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                    textColor = if (isDestructive) TextColor.Error else TextColor.Primary,
+                    style = MaterialTheme.typography.subtitle1,
+                    overflow = LongTextBehaviour.Ellipsis(1)
                 )
             }
             trailingItem?.invoke()
         }
-        if (addSeparator) {
-            Divider(modifier = Modifier.padding(start = dividerPadding))
+
+        dividerType?.let {
+            MegaDivider(dividerType = it)
         }
     }
 }
@@ -145,7 +146,7 @@ internal const val MENU_ITEM_SWITCH_TAG = "menu_action:button_switch"
 private fun PreviewPreviewMegaMenuAction(
     @PreviewParameter(BooleanProvider::class) isDestructive: Boolean,
 ) {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
             icon = painterResource(id = R.drawable.ic_folder_list),
@@ -159,12 +160,13 @@ private fun PreviewPreviewMegaMenuAction(
 private fun PreviewMegaMenuActionWithSwitch(
     @PreviewParameter(BooleanProvider::class) hasSwitch: Boolean,
 ) {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
             icon = painterResource(id = R.drawable.ic_folder_list),
         ) {
-            MegaSwitch(
+            // The MegaSwitch from :core-ui is not ready yet. Please use it instead when it is ready.
+            Switch(
                 modifier = Modifier.testTag(MENU_ITEM_SWITCH_TAG),
                 checked = true,
                 onCheckedChange = {}
@@ -176,7 +178,7 @@ private fun PreviewMegaMenuActionWithSwitch(
 @CombinedThemePreviews
 @Composable
 private fun PreviewMegaMenuActionWithoutIcon() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
         )
@@ -186,7 +188,7 @@ private fun PreviewMegaMenuActionWithoutIcon() {
 @CombinedThemePreviews
 @Composable
 private fun PreviewMegaMenuActionWithTextButton() {
-    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
             icon = painterResource(id = R.drawable.ic_folder_list),
@@ -194,7 +196,7 @@ private fun PreviewMegaMenuActionWithTextButton() {
             Text(
                 text = "Button",
                 style = MaterialTheme.typography.button,
-                color = MaterialTheme.colors.secondary,
+                color = MegaTheme.colors.text.accent,
             )
         }
     }

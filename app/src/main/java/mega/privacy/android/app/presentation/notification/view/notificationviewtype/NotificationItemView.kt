@@ -29,7 +29,7 @@ import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.presentation.notification.view.components.GreenIconView
 import mega.privacy.android.app.presentation.notification.view.components.NotificationDate
 import mega.privacy.android.app.presentation.notification.view.components.NotificationSchedMeetingView
-import mega.privacy.android.core.ui.controls.dividers.DividerSpacing
+import mega.privacy.android.core.ui.controls.dividers.DividerType
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -109,7 +109,7 @@ internal fun NotificationItemView(
         )
         MegaDivider(
             modifier = Modifier.testTag(NOTIFICATION_DIVIDER),
-            dividerSpacing = DividerSpacing.Full
+            dividerType = DividerType.FullSize
         )
     }
 }

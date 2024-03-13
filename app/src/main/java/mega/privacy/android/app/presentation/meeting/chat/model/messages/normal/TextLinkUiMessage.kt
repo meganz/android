@@ -18,7 +18,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.message.link.Chat
 import mega.privacy.android.app.presentation.meeting.chat.view.message.link.ChatLinksMessageViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.message.link.LinkContent
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
-import mega.privacy.android.core.ui.controls.dividers.DividerSpacing
+import mega.privacy.android.core.ui.controls.dividers.DividerType
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.domain.entity.RegexPatternType
@@ -102,7 +102,7 @@ data class TextLinkUiMessage(
                 }
 
                 if (index != contentLinks.lastIndex) {
-                    MegaDivider(dividerSpacing = DividerSpacing.Full)
+                    MegaDivider(dividerType = DividerType.FullSize)
                 }
             }
         }

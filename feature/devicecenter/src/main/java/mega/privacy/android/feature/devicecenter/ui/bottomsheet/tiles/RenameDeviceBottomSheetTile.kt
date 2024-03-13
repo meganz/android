@@ -6,10 +6,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.feature.devicecenter.R
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
  * Test Tag for the Rename Device Bottom Sheet Tile
@@ -28,7 +28,7 @@ internal fun RenameDeviceBottomSheetTile(
 ) {
     MenuActionListTile(
         modifier = Modifier.testTag(BOTTOM_SHEET_TILE_RENAME_DEVICE),
-        addSeparator = false,
+        dividerType = null,
         text = stringResource(R.string.device_center_bottom_sheet_item_rename),
         icon = painterResource(id = R.drawable.ic_bottom_sheet_rename),
         onActionClicked = onActionClicked,

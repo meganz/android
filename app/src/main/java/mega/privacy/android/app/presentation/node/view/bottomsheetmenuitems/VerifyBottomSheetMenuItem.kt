@@ -6,6 +6,7 @@ import mega.privacy.android.app.presentation.contact.authenticitycredendials.Aut
 import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.node.model.menuaction.VerifyMenuAction
 import mega.privacy.android.app.presentation.search.navigation.cannotVerifyUserRoute
+import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.domain.entity.ShareData
@@ -14,7 +15,6 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
 import javax.inject.Inject
 
 /**
@@ -44,7 +44,7 @@ class VerifyBottomSheetMenuItem @Inject constructor(
                     navController = navController,
                     parentCoroutineScope = scope,
                 ),
-                addSeparator = false,
+                dividerType = null,
             )
         }
 

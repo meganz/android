@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.R
-import mega.privacy.android.core.ui.controls.dividers.DividerSpacing
+import mega.privacy.android.core.ui.controls.dividers.DividerType
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -61,14 +61,14 @@ fun BottomSheet(
     sheetBody: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     scrimColor: Color = Color.Black.copy(alpha = 0.5f),
-    dividerSpacing: DividerSpacing = DividerSpacing.StartSmall,
+    dividerType: DividerType = DividerType.SmallStartPadding,
     content: (@Composable () -> Unit)? = null,
 ) {
     BottomSheet(
         modalSheetState = modalSheetState,
         sheetBody = {
             sheetHeader()
-            MegaDivider(dividerSpacing = dividerSpacing)
+            MegaDivider(dividerType = dividerType)
             sheetBody()
         },
         modifier = modifier,

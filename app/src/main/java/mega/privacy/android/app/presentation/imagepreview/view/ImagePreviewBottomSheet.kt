@@ -2,6 +2,7 @@
 
 package mega.privacy.android.app.presentation.imagepreview.view
 
+import mega.privacy.android.icon.pack.R as Rpack
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,17 +34,16 @@ import coil.request.ImageRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import mega.privacy.android.app.R
-import mega.privacy.android.icon.pack.R as Rpack
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
 import mega.privacy.android.core.R.drawable.link_ic
+import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.controls.text.MiddleEllipsisText
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
 import nz.mega.sdk.MegaNode
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -51,7 +51,6 @@ import nz.mega.sdk.MegaNode
 internal fun ImagePreviewBottomSheet(
     modalSheetState: ModalBottomSheetState,
     imageNode: ImageNode,
-    isAvailableOffline: Boolean = false,
     showInfoMenu: suspend (ImageNode) -> Boolean,
     showFavouriteMenu: suspend (ImageNode) -> Boolean,
     showLabelMenu: suspend (ImageNode) -> Boolean,
@@ -75,6 +74,7 @@ internal fun ImagePreviewBottomSheet(
     showMoveToRubbishBin: suspend (ImageNode) -> Boolean,
     downloadImage: suspend (ImageNode) -> Flow<ImageResult>,
     getImageThumbnailPath: suspend (ImageResult?) -> String?,
+    isAvailableOffline: Boolean = false,
     onClickInfo: () -> Unit = {},
     onClickFavourite: () -> Unit = {},
     onClickLabel: () -> Unit = {},
@@ -209,7 +209,7 @@ internal fun ImagePreviewBottomSheet(
                         icon = painterResource(id = R.drawable.info_ic),
                         text = stringResource(id = R.string.general_info),
                         onActionClicked = onClickInfo,
-                        addSeparator = false,
+                        dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_INFO),
                     )
                 }
@@ -228,7 +228,7 @@ internal fun ImagePreviewBottomSheet(
                             stringResource(id = R.string.file_properties_favourite)
                         },
                         onActionClicked = onClickFavourite,
-                        addSeparator = false,
+                        dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_FAVOURITE),
                     )
                 }
@@ -238,7 +238,7 @@ internal fun ImagePreviewBottomSheet(
                         icon = painterResource(id = R.drawable.ic_label),
                         text = stringResource(id = R.string.file_properties_label),
                         onActionClicked = onClickLabel,
-                        addSeparator = false,
+                        dividerType = null,
                         trailingItem = {
                             if (imageNode.label != MegaNode.NODE_LBL_UNKNOWN) {
                                 Row {
@@ -270,7 +270,7 @@ internal fun ImagePreviewBottomSheet(
                         icon = painterResource(id = R.drawable.ic_taken_down_bottom_sheet),
                         text = stringResource(id = R.string.dispute_takendown_file),
                         onActionClicked = onClickDispute,
-                        addSeparator = false,
+                        dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_DISPUTE),
                     )
                 }
@@ -280,7 +280,7 @@ internal fun ImagePreviewBottomSheet(
                         icon = painterResource(id = R.drawable.ic_open_with),
                         text = stringResource(id = R.string.external_play),
                         onActionClicked = onClickOpenWith,
-                        addSeparator = false,
+                        dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_OPEN_WITH),
                     )
                 }
@@ -292,7 +292,7 @@ internal fun ImagePreviewBottomSheet(
                         icon = painterResource(id = R.drawable.ic_forward),
                         text = stringResource(id = R.string.forward_menu_item),
                         onActionClicked = onClickForward,
-                        addSeparator = false,
+                        dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_FORWARD),
                     )
                 }
@@ -302,7 +302,7 @@ internal fun ImagePreviewBottomSheet(
                         icon = painterResource(id = R.drawable.ic_save_to_device),
                         text = stringResource(id = R.string.general_save_to_device),
                         onActionClicked = onClickSaveToDevice,
-                        addSeparator = false,
+                        dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_SAVE_TO_DEVICE),
                     )
                 }
@@ -312,7 +312,7 @@ internal fun ImagePreviewBottomSheet(
                         icon = painterResource(id = R.drawable.ic_import_to_cloud_white),
                         text = stringResource(id = R.string.general_import),
                         onActionClicked = onClickImport,
-                        addSeparator = false,
+                        dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_IMPORT),
                     )
                 }
@@ -321,7 +321,7 @@ internal fun ImagePreviewBottomSheet(
                     MenuActionListTile(
                         text = stringResource(id = R.string.file_properties_available_offline),
                         icon = painterResource(id = R.drawable.ic_save_offline),
-                        addSeparator = false,
+                        dividerType = null,
                         modifier = Modifier.testTag(
                             IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_AVAILABLE_OFFLINE
                         ),
@@ -347,7 +347,7 @@ internal fun ImagePreviewBottomSheet(
                             )
                         },
                         onActionClicked = onClickGetLink,
-                        addSeparator = false,
+                        dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_GET_LINK),
                     )
                 }
@@ -357,7 +357,7 @@ internal fun ImagePreviewBottomSheet(
                         icon = painterResource(id = R.drawable.ic_remove_link),
                         text = stringResource(id = R.string.context_remove_link_menu),
                         onActionClicked = onClickRemoveLink,
-                        addSeparator = false,
+                        dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_REMOVE_LINK),
                     )
                 }
@@ -367,7 +367,7 @@ internal fun ImagePreviewBottomSheet(
                         icon = painterResource(id = R.drawable.ic_send_to_contact),
                         text = stringResource(id = R.string.context_send_file_to_chat),
                         onActionClicked = onClickSendToChat,
-                        addSeparator = false,
+                        dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_SEND_TO_CHAT),
                     )
                 }
@@ -377,7 +377,7 @@ internal fun ImagePreviewBottomSheet(
                         icon = painterResource(id = R.drawable.ic_social_share_white),
                         text = stringResource(id = R.string.general_share),
                         onActionClicked = onClickShare,
-                        addSeparator = false,
+                        dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_SHARE),
                     )
                 }
@@ -389,7 +389,7 @@ internal fun ImagePreviewBottomSheet(
                         icon = painterResource(id = R.drawable.ic_rename),
                         text = stringResource(id = R.string.context_rename),
                         onActionClicked = onClickRename,
-                        addSeparator = false,
+                        dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_RENAME),
                     )
                 }
@@ -399,7 +399,7 @@ internal fun ImagePreviewBottomSheet(
                         icon = painterResource(id = Rpack.drawable.ic_menu_hide),
                         text = stringResource(id = R.string.general_hide_node),
                         onActionClicked = onClickHide,
-                        addSeparator = false,
+                        dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_HIDE),
                     )
                 }
@@ -409,7 +409,7 @@ internal fun ImagePreviewBottomSheet(
                         icon = painterResource(id = Rpack.drawable.ic_menu_unhide),
                         text = stringResource(id = R.string.general_unhide_node),
                         onActionClicked = onClickUnhide,
-                        addSeparator = false,
+                        dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_UNHIDE),
                     )
                 }
@@ -419,7 +419,7 @@ internal fun ImagePreviewBottomSheet(
                         icon = painterResource(id = R.drawable.ic_move),
                         text = stringResource(id = R.string.general_move),
                         onActionClicked = onClickMove,
-                        addSeparator = false,
+                        dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_MOVE),
                     )
                 }
@@ -431,7 +431,7 @@ internal fun ImagePreviewBottomSheet(
                         icon = painterResource(id = R.drawable.ic_menu_copy),
                         text = stringResource(id = R.string.context_copy),
                         onActionClicked = onClickCopy,
-                        addSeparator = false,
+                        dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_COPY),
                     )
                 }
@@ -441,7 +441,7 @@ internal fun ImagePreviewBottomSheet(
                         icon = painterResource(id = R.drawable.ic_restore),
                         text = stringResource(id = R.string.context_restore),
                         onActionClicked = onClickRestore,
-                        addSeparator = false,
+                        dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_RESTORE),
                     )
                 }
@@ -452,7 +452,7 @@ internal fun ImagePreviewBottomSheet(
                         text = stringResource(id = R.string.context_remove),
                         isDestructive = true,
                         onActionClicked = onClickRemove,
-                        addSeparator = false,
+                        dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_REMOVE),
                     )
                 }
@@ -463,7 +463,7 @@ internal fun ImagePreviewBottomSheet(
                         text = stringResource(id = R.string.context_delete_offline),
                         onActionClicked = { onSwitchAvailableOffline(false) },
                         isDestructive = true,
-                        addSeparator = false,
+                        dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_REMOVE_OFFLINE),
                     )
                 }
@@ -473,7 +473,7 @@ internal fun ImagePreviewBottomSheet(
                         icon = painterResource(id = R.drawable.ic_rubbish_bin),
                         text = stringResource(id = R.string.context_move_to_trash),
                         onActionClicked = onClickMoveToRubbishBin,
-                        addSeparator = false,
+                        dividerType = null,
                         isDestructive = true,
                         modifier = Modifier.testTag(
                             IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_MOVE_TO_RUBBISH_BIN

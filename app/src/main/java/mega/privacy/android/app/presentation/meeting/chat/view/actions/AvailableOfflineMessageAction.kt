@@ -19,11 +19,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
 import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
+import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.model.MenuActionWithClick
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.mobile.analytics.event.ChatConversationAvailableOfflineActionMenuItemEvent
 import timber.log.Timber
 

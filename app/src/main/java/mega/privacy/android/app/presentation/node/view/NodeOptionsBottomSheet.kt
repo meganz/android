@@ -23,7 +23,7 @@ import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewMode
 import mega.privacy.android.app.presentation.view.extension.fileInfo
 import mega.privacy.android.app.presentation.view.extension.folderInfo
 import mega.privacy.android.app.presentation.view.extension.getIcon
-import mega.privacy.android.core.ui.controls.dividers.DividerSpacing
+import mega.privacy.android.core.ui.controls.dividers.DividerType
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.core.ui.controls.text.LongTextBehaviour
@@ -100,7 +100,7 @@ internal fun NodeOptionsBottomSheetContent(
         thumbnailData = node?.id?.let { ThumbnailRequest(it) },
         accessPermissionIcon = uiState.accessPermissionIcon,
     )
-    MegaDivider(dividerSpacing = DividerSpacing.StartSmall)
+    MegaDivider(dividerType = DividerType.SmallStartPadding)
     LazyColumn {
         sortedMap.value
             .forEachIndexed { index, actions ->
@@ -116,7 +116,7 @@ internal fun NodeOptionsBottomSheetContent(
                 if (index < uiState.actions.size - 1 && index != sortedMap.value.size - 1) {
                     item {
                         MegaDivider(
-                            dividerSpacing = DividerSpacing.StartBig,
+                            dividerType = DividerType.BigStartPadding,
                             modifier = Modifier.testTag("$DIVIDER_TAG$index")
                         )
                     }

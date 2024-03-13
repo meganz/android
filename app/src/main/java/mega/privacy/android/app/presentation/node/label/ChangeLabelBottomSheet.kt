@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.controls.dividers.DividerSpacing
+import mega.privacy.android.core.ui.controls.dividers.DividerType
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -69,7 +69,7 @@ private fun ChangeLabelBottomSheetContent(
             text = stringResource(id = R.string.title_label),
             textColor = TextColor.Secondary,
         )
-        MegaDivider(dividerSpacing = DividerSpacing.StartSmall)
+        MegaDivider(dividerType = DividerType.SmallStartPadding)
         LazyColumn {
             items(state.labelList.size) {
                 val label = state.labelList[it]

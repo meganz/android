@@ -9,9 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -54,7 +54,7 @@ internal fun RenameVideoPlaylistBottomSheetTile(
     onActionClicked: () -> Unit,
 ) {
     MenuActionListTile(
-        addSeparator = false,
+        dividerType = null,
         text = "Rename",
         icon = painterResource(id = iconPackR.drawable.ic_menu_rename),
         onActionClicked = onActionClicked,
@@ -66,7 +66,7 @@ internal fun DeleteVideoPlaylistBottomSheetTile(
     onActionClicked: () -> Unit,
 ) {
     MenuActionListTile(
-        addSeparator = false,
+        dividerType = null,
         text = "Delete playlist",
         icon = painterResource(id = iconPackR.drawable.ic_menu_move_to_rubbish),
         onActionClicked = onActionClicked,

@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReactionUser
-import mega.privacy.android.core.ui.controls.dividers.DividerSpacing
+import mega.privacy.android.core.ui.controls.dividers.DividerType
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.core.ui.controls.tab.MegaScrollableTabRow
 import mega.privacy.android.core.ui.controls.tab.TabPosition
@@ -126,7 +126,7 @@ fun ReactionsInfoView(
             }
         }
 
-        MegaDivider(dividerSpacing = DividerSpacing.Full)
+        MegaDivider(dividerType = DividerType.FullSize)
 
         HorizontalPager(
             modifier = Modifier.fillMaxWidth(),
@@ -179,7 +179,7 @@ fun ReactionsInfoView(
 
                         if (index < reaction.userList.size - 1) {
                             MegaDivider(
-                                DividerSpacing.Full,
+                                DividerType.FullSize,
                                 modifier = Modifier.padding(start = 56.dp)
                             )
                         }

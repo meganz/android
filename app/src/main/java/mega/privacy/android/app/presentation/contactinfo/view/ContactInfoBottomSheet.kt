@@ -9,9 +9,9 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
+import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
+import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
 
 /**
  * Contact info bottom sheet
@@ -45,7 +45,7 @@ internal fun ContactInfoBottomSheet(
                 MenuActionListTile(
                     text = stringResource(id = R.string.general_remove),
                     icon = painterResource(id = R.drawable.ic_remove),
-                    addSeparator = false,
+                    dividerType = null,
                     onActionClicked = {
                         coroutineScope.launch { modalSheetState.hide() }
                         updateNickName(null)

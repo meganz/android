@@ -48,7 +48,7 @@ import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIE
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VideoItemView
 import mega.privacy.android.core.formatter.formatFileSize
-import mega.privacy.android.core.ui.controls.dividers.DividerSpacing
+import mega.privacy.android.core.ui.controls.dividers.DividerType
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.core.ui.controls.text.MegaText
@@ -266,7 +266,7 @@ fun VideoPlaylistDetailView(
                                 onPlayAllClicked = onPlayAllClicked
                             )
                             MegaDivider(
-                                dividerSpacing = DividerSpacing.Center,
+                                dividerType = DividerType.Centered,
                                 modifier = Modifier.padding(bottom = 16.dp)
                             )
                         }
@@ -331,7 +331,7 @@ internal fun VideoPlaylistEmptyView(
             onPlayAllClicked = onPlayAllClicked
         )
         MegaDivider(
-            dividerSpacing = DividerSpacing.Center,
+            dividerType = DividerType.Centered,
             modifier = Modifier.padding(bottom = 16.dp)
         )
         LegacyMegaEmptyView(

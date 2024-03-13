@@ -8,12 +8,12 @@ import mega.privacy.android.app.presentation.node.model.mapper.NodeLabelResource
 import mega.privacy.android.app.presentation.node.model.menuaction.LabelMenuAction
 import mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems.components.LabelAccessoryView
 import mega.privacy.android.app.presentation.search.navigation.changeLabelBottomSheetRoute
+import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
 import java.io.File
 import javax.inject.Inject
 
@@ -43,7 +43,7 @@ class LabelBottomSheetMenuItem @Inject constructor(
                     navController = navController,
                     parentCoroutineScope = scope
                 ),
-                addSeparator = false,
+                dividerType = null,
                 trailingItem = {
                     val nodeLabel = nodeLabelMapper(selectedNode.label)
                     val resource = nodeLabel?.let {

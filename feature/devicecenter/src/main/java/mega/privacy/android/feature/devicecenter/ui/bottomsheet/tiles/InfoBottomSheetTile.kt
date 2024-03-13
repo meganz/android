@@ -6,10 +6,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.core.ui.controls.dividers.DividerType
+import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.feature.devicecenter.R
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
  * Test Tag for the Info Bottom Sheet Tile
@@ -21,18 +22,18 @@ internal const val BOTTOM_SHEET_TILE_INFO =
  * A [Composable] Bottom Sheet Tile that displays "Info"
  *
  * @param onActionClicked Lambda that is executed when the Tile is selected
- * @param addSeparator Adds a Divider at the bottom if true, and none if otherwise
+ * @param dividerType type for the divider at the bottom. Hidden if NULL
  */
 @Composable
 internal fun InfoBottomSheetTile(
     onActionClicked: () -> Unit,
-    addSeparator: Boolean = true,
+    dividerType: DividerType? = DividerType.BigStartPadding,
 ) {
     MenuActionListTile(
         modifier = Modifier.testTag(BOTTOM_SHEET_TILE_INFO),
         text = stringResource(R.string.device_center_bottom_sheet_item_info),
         icon = painterResource(id = R.drawable.ic_bottom_sheet_info),
-        addSeparator = addSeparator,
+        dividerType = dividerType,
         onActionClicked = onActionClicked,
     )
 }

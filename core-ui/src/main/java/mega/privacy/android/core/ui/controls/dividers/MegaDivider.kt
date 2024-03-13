@@ -10,25 +10,25 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.MegaTheme
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.MegaTheme
 
 /**
  * MegaDivider
  *
- * @param dividerSpacing [DividerSpacing]
+ * @param dividerType [DividerType]
  * @param modifier [Modifier]
  */
 @Composable
 fun MegaDivider(
-    dividerSpacing: DividerSpacing,
+    dividerType: DividerType,
     modifier: Modifier = Modifier,
 ) {
-    val finalModifier = when (dividerSpacing) {
-        DividerSpacing.Full -> modifier.fillMaxWidth()
-        DividerSpacing.StartSmall -> modifier.padding(start = 16.dp)
-        DividerSpacing.StartBig -> modifier.padding(start = 72.dp)
-        DividerSpacing.Center -> modifier.padding(horizontal = 16.dp)
+    val finalModifier = when (dividerType) {
+        DividerType.FullSize -> modifier.fillMaxWidth()
+        DividerType.SmallStartPadding -> modifier.padding(start = 16.dp)
+        DividerType.BigStartPadding -> modifier.padding(start = 72.dp)
+        DividerType.Centered -> modifier.padding(horizontal = 16.dp)
     }
     Divider(
         modifier = finalModifier,
@@ -38,48 +38,48 @@ fun MegaDivider(
 }
 
 /**
- * Spacing for divider
+ * Type of divider
  */
-enum class DividerSpacing {
+enum class DividerType {
     /**
-     * Length of divider in full width
+     * A full width divider
      */
-    Full,
+    FullSize,
 
     /**
-     * Length of divider beginning from small padding
+     * A divider with a small start padding. Default is 16.dp
      */
-    StartSmall,
+    SmallStartPadding,
 
     /**
-     * Length of divider beginning from big padding
+     * A divider with a big start padding. Default is 72.dp
      */
-    StartBig,
+    BigStartPadding,
 
     /**
-     * Length of divider beginning and ending from small padding
+     * A divider with horizontal padding. Default is 16.dp
      */
-    Center
+    Centered
 }
 
 
 @CombinedThemePreviews
 @Composable
 private fun PreviewMegaDivider(
-    @PreviewParameter(DividerSpacingProvider::class) spacing: DividerSpacing,
+    @PreviewParameter(DividerTypeProvider::class) spacing: DividerType,
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         MegaDivider(
-            dividerSpacing = spacing,
+            dividerType = spacing,
         )
     }
 }
 
-private class DividerSpacingProvider : PreviewParameterProvider<DividerSpacing> {
+private class DividerTypeProvider : PreviewParameterProvider<DividerType> {
     override val values = listOf(
-        DividerSpacing.Full,
-        DividerSpacing.StartSmall,
-        DividerSpacing.StartBig,
-        DividerSpacing.Center,
+        DividerType.FullSize,
+        DividerType.SmallStartPadding,
+        DividerType.BigStartPadding,
+        DividerType.Centered,
     ).asSequence()
 }

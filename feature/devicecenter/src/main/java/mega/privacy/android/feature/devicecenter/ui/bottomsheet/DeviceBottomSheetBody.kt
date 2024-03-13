@@ -10,7 +10,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import mega.privacy.android.core.ui.controls.dividers.DividerSpacing
+import mega.privacy.android.core.ui.controls.dividers.DividerType
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
@@ -64,7 +64,7 @@ internal fun DeviceBottomSheetBody(
             bodyIconColor = getStatusColor(device.status),
             nodeIconColor = getNodeIconColor(device.icon),
         )
-        MegaDivider(dividerSpacing = DividerSpacing.StartSmall)
+        MegaDivider(dividerType = DividerType.SmallStartPadding)
         // Display the Options depending on the Device type
         when (device) {
             is OwnDeviceUINode -> {

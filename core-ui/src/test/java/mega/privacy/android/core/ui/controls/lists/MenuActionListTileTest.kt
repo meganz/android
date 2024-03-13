@@ -1,5 +1,6 @@
-package mega.privacy.android.legacy.core.ui.controls.lists
+package mega.privacy.android.core.ui.controls.lists
 
+import androidx.compose.material.Switch
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -8,7 +9,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.core.R
-import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -36,13 +36,13 @@ class MenuActionListTileTest {
 
     @Test
     fun `test that MenuListViewItem displays text,icon,switch when we pass text,icon,switch to MenuListViewItem`() {
-        val switchTag = "Mega Switch"
+        val switchTag = "Switch"
         composeRule.setContent {
             MenuActionListTile(
                 text = "MenuListViewItem",
                 icon = painterResource(id = R.drawable.ic_favorite),
             ) {
-                MegaSwitch(
+                Switch(
                     modifier = Modifier.testTag(switchTag),
                     checked = true,
                     onCheckedChange = {}

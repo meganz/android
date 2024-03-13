@@ -26,10 +26,10 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
@@ -89,14 +89,14 @@ fun ChatAttachFileBottomSheet(
         MenuActionListTile(
             text = stringResource(id = R.string.attachment_upload_panel_from_cloud),
             icon = painterResource(id = R.drawable.ic_pick_cloud_drive),
-            addSeparator = false,
+            dividerType = null,
             onActionClicked = { openCloudDrivePicker(context, cloudDriveLauncher) },
             modifier = Modifier.testTag(TEST_TAG_SEND_FROM_CLOUD)
         )
         MenuActionListTile(
             text = stringResource(id = R.string.upload_files),
             icon = painterResource(id = R.drawable.ic_upload_file),
-            addSeparator = false,
+            dividerType = null,
             onActionClicked = { openFilePicker(localLauncher) },
             modifier = Modifier.testTag(TEST_TAG_SEND_FROM_LOCAL)
         )

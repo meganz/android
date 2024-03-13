@@ -1,13 +1,13 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
 import mega.privacy.android.app.presentation.node.model.menuaction.VersionsMenuAction
+import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionListTile
 import javax.inject.Inject
 
 /**
@@ -35,7 +35,7 @@ class VersionsBottomSheetMenuItem @Inject constructor(
                 icon = menuAction.getIconPainter(),
                 isDestructive = isDestructiveAction,
                 onActionClicked = onClick,
-                addSeparator = false,
+                dividerType = null,
                 trailingItem = {
                     MegaText(
                         text = selectedNode.versionCount.toString(),
