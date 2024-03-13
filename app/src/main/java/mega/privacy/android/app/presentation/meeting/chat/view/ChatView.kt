@@ -36,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -428,6 +429,8 @@ internal fun ChatView(
         mutableStateOf(null)
     }
 
+    var unreadMessageCount by remember { mutableIntStateOf(0) }
+
     with(uiState) {
         val addContactLauncher =
             rememberLauncherForActivityResult(
@@ -755,7 +758,7 @@ internal fun ChatView(
                         enter = fadeIn() + scaleIn(),
                         exit = fadeOut(),
                     ) {
-                        ScrollToBottomFab {
+                        ScrollToBottomFab(unreadCount = unreadMessageCount) {
                             coroutineScope.launch {
                                 scrollState.animateScrollToItem(0)
                             }
@@ -859,10 +862,12 @@ internal fun ChatView(
                                     selectItem = selectItem,
                                     deselectItem = deselectItem,
                                     selectMode = isSelectMode,
-                                    onNotSentClick = onNotSentClick
-                                )
+                                    onNotSentClick = onNotSentClick,
+                                    showUnreadIndicator = {
+                                        unreadMessageCount = it
+                                    }
+                                ),
                             )
-
                         },
                     )
                 }

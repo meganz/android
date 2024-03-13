@@ -1,60 +1,100 @@
 package mega.privacy.android.core.ui.controls.chat
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
+import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
+import mega.privacy.android.core.ui.theme.extensions.body4
+import mega.privacy.android.core.ui.theme.extensions.conditional
+import mega.privacy.android.core.ui.theme.tokens.TextColor
+
+
+internal const val SCROLL_TO_BOTTOM_FAB_TEST_TAG = "scroll_to_bottom_fab:fab"
 
 /**
  * Scroll to bottom fab
  *
  * @param modifier modifier
  * @param onClick click listener
+ * @param unreadCount unread count
  */
 @Composable
 fun ScrollToBottomFab(
+    unreadCount: Int,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    FloatingActionButton(
-        modifier = modifier
-            .size(40.dp),
-        onClick = onClick,
-        shape = CircleShape,
-        backgroundColor = MegaTheme.colors.icon.primary
-    ) {
-        Box(
+    Box(modifier = modifier) {
+        FloatingActionButton(
             modifier = Modifier
-                .fillMaxSize()
-                .border(1.dp, MegaTheme.colors.border.subtle, CircleShape)
+                .conditional(unreadCount > 0) {
+                    padding(top = 6.dp, start = 6.dp)
+                }
+                .size(40.dp)
+                .testTag(SCROLL_TO_BOTTOM_FAB_TEST_TAG),
+            onClick = onClick,
+            shape = CircleShape,
+            backgroundColor = MegaTheme.colors.icon.primary
         ) {
-            Icon(
-                modifier = modifier.align(Alignment.Center),
-                painter = painterResource(id = R.drawable.ic_arrow_down),
-                contentDescription = "Icon Arrow Down",
-                tint = MegaTheme.colors.icon.inverse
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .border(1.dp, MegaTheme.colors.border.subtle, CircleShape)
+            ) {
+                Icon(
+                    modifier = modifier.align(Alignment.Center),
+                    painter = painterResource(id = R.drawable.ic_arrow_down),
+                    contentDescription = "Icon Arrow Down",
+                    tint = MegaTheme.colors.icon.inverse
+                )
+            }
+        }
+        if (unreadCount > 0) {
+            MegaText(
+                modifier = Modifier
+                    .background(MegaTheme.colors.icon.primary, RoundedCornerShape(20.dp))
+                    .border(1.dp, MegaTheme.colors.border.subtle, RoundedCornerShape(20.dp))
+                    .padding(horizontal = 6.dp, vertical = 3.dp),
+                text = unreadCount.formatUnreadCount(), textColor = TextColor.Inverse,
+                style = MaterialTheme.typography.body4
             )
         }
     }
 }
 
+private fun Int.formatUnreadCount(): String = if (this > 99) "+99" else "$this"
+
 @CombinedThemePreviews
 @Composable
 private fun ScrollToBottomFabPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        ScrollToBottomFab(onClick = {})
+        ScrollToBottomFab(onClick = {}, unreadCount = 1)
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun ScrollToBottomFabPreviewLargeNumber() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        ScrollToBottomFab(onClick = {}, unreadCount = 199)
     }
 }

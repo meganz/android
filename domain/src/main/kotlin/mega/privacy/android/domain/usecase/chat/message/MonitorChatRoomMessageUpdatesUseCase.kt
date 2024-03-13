@@ -1,6 +1,8 @@
 package mega.privacy.android.domain.usecase.chat.message
 
+import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.domain.entity.chat.ChatMessageType
+import mega.privacy.android.domain.entity.chat.room.update.ChatRoomMessageUpdate
 import mega.privacy.android.domain.entity.chat.room.update.HistoryTruncatedByRetentionTime
 import mega.privacy.android.domain.entity.chat.room.update.MessageReceived
 import mega.privacy.android.domain.entity.chat.room.update.MessageUpdate
@@ -27,10 +29,13 @@ class MonitorChatRoomMessageUpdatesUseCase @Inject constructor(
      * Invoke
      *
      * @param chatId
+     * @param onEvent callback to be called when a message update is received and before saving it to the database
      */
-    suspend operator fun invoke(chatId: Long) {
+    suspend operator fun invoke(chatId: Long, onEvent: (ChatRoomMessageUpdate) -> Unit) {
         chatRepository.monitorMessageUpdates(chatId)
-            .collect {
+            .onEach {
+                onEvent(it)
+            }.collect {
                 when (it) {
                     is HistoryTruncatedByRetentionTime -> {
                         chatMessageRepository.truncateMessages(chatId, it.message.timestamp)

@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import kotlinx.coroutines.delay
 import mega.privacy.android.app.presentation.extensions.paging.printLoadStates
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewModel
@@ -33,6 +35,8 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.managem
 import mega.privacy.android.app.presentation.meeting.chat.view.message.FirstMessageHeader
 import mega.privacy.android.core.ui.controls.chat.messages.LoadingMessagesHeader
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
+import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import timber.log.Timber
 
@@ -55,6 +59,7 @@ internal fun MessageListView(
         selectedItems = parameter.selectedItems,
         selectItem = parameter.selectItem,
         deselectItem = parameter.deselectItem,
+        showUnreadIndicator = parameter.showUnreadIndicator,
     )
 }
 
@@ -74,6 +79,7 @@ internal fun MessageListView(
     selectedItems: Set<Long>,
     selectItem: (TypedMessage) -> Unit,
     deselectItem: (TypedMessage) -> Unit,
+    showUnreadIndicator: (Int) -> Unit,
     viewModel: MessageListViewModel = hiltViewModel(),
 ) {
     val pagingItems = viewModel.pagedMessages.collectAsLazyPagingItems()
@@ -81,6 +87,11 @@ internal fun MessageListView(
     Timber.d("Paging pagingItems count ${pagingItems.itemCount}")
     val state by viewModel.state.collectAsStateWithLifecycle()
     onCanSelectChanged(pagingItems.itemSnapshotList.any { it?.isSelectable == true })
+    val isBottomReached by remember {
+        derivedStateOf {
+            scrollState.firstVisibleItemIndex == 0 && scrollState.firstVisibleItemScrollOffset == 0
+        }
+    }
 
     var isDataLoaded by remember { mutableStateOf(false) }
     var unreadHeaderPosition by remember { mutableIntStateOf(0) }
@@ -99,6 +110,26 @@ internal fun MessageListView(
         }
     }
 
+    LaunchedEffect(isBottomReached) {
+        // if user is at the bottom, remove unread indicator
+        if (isBottomReached && pagingItems.itemCount > 0) {
+            viewModel.onScrollToLatestMessage()
+            showUnreadIndicator(0)
+        }
+    }
+
+    LaunchedEffect(state.receivedMessages) {
+        if (state.receivedMessages.isNotEmpty()) {
+            // auto scroll if user is at the bottom
+            if (isBottomReached) {
+                delay(300L)
+                scrollState.scrollToItem(0, 0)
+            } else { // otherwise show unread indicator
+                showUnreadIndicator(state.receivedMessages.size)
+            }
+        }
+    }
+
     LaunchedEffect(unreadHeaderPosition) {
         if (unreadHeaderPosition > 0) {
             scrollState.scrollToItem(unreadHeaderPosition, -(screenHeight * 2 / 3).toInt())
@@ -106,7 +137,7 @@ internal fun MessageListView(
         }
     }
 
-    LaunchedEffect(pagingItems.itemSnapshotList.size) {
+    LaunchedEffect(pagingItems.itemSnapshotList.lastOrNull()?.id, pagingItems.itemCount) {
         if (!state.isJumpingToLastSeenMessage && (uiState.chat?.unreadCount ?: 0) > 0) {
             pagingItems.itemSnapshotList.indexOfFirst {
                 it is ChatUnreadHeaderMessage
@@ -117,7 +148,15 @@ internal fun MessageListView(
                 }
             }
         }
-        viewModel.updateLatestMessageId(pagingItems.itemSnapshotList.firstOrNull()?.id ?: -1L)
+        val latestMessage = pagingItems.itemSnapshotList.firstOrNull()?.message
+        // auto scroll if you just sent a message
+        if (latestMessage?.isMine == true
+            && (latestMessage.status == ChatMessageStatus.SENDING || latestMessage is PendingAttachmentMessage)
+            && viewModel.latestMessageId.longValue != latestMessage.msgId
+        ) {
+            scrollState.scrollToItem(0, 0)
+        }
+        viewModel.updateLatestMessage(latestMessage)
     }
 
     LaunchedEffect(state.userUpdate) {
@@ -234,6 +273,6 @@ internal data class MessageListParameter(
     val selectedItems: Set<Long>,
     val selectItem: (TypedMessage) -> Unit,
     val deselectItem: (TypedMessage) -> Unit,
-) {
-}
+    val showUnreadIndicator: (Int) -> Unit,
+)
 

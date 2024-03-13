@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.meeting.chat.mapper.UiChatMessageMa
 import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -134,6 +135,53 @@ internal class MessageListViewModelTest {
         underTest.state.test {
             val actual = awaitItem()
             assertThat(actual.userUpdate).isEqualTo(userUpdate)
+        }
+    }
+
+    @Test
+    fun `test that updateLatestMessage update state correctly`() = runTest {
+        val messageId = 123L
+        val typedMessage = mock<TextMessage> {
+            on { msgId } doReturn messageId
+            on { isMine } doReturn true
+        }
+        underTest.updateLatestMessage(typedMessage)
+        assertThat(underTest.latestMessageId.longValue).isEqualTo(messageId)
+        underTest.state.test {
+            val actual = awaitItem()
+            assertThat(actual.lastSeenMessageId).isEqualTo(-1L)
+            assertThat(actual.extraUnreadCount).isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun `test that onUserUpdateHandled set userUpdate to null`() = runTest {
+        underTest.onUserUpdateHandled()
+        underTest.state.test {
+            val actual = awaitItem()
+            assertThat(actual.userUpdate).isNull()
+        }
+    }
+
+    @Test
+    fun `test that all received message clear when jump to latest message`() = runTest {
+        underTest.onScrollToLatestMessage()
+        underTest.state.test {
+            val actual = awaitItem()
+            assertThat(actual.receivedMessages).isEmpty()
+        }
+    }
+
+    @Test
+    fun `test that scrolled to the last seen message update state correctly`() = runTest {
+        underTest.state.test {
+            val actual = awaitItem()
+            assertThat(actual.isJumpingToLastSeenMessage).isFalse()
+        }
+        underTest.onScrolledToLastSeenMessage()
+        underTest.state.test {
+            val actual = awaitItem()
+            assertThat(actual.isJumpingToLastSeenMessage).isTrue()
         }
     }
 }

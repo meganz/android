@@ -35,6 +35,8 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatM
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.ChatUnreadHeaderMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.HeaderMessage
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.domain.entity.chat.room.update.MessageReceived
 import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
 import mega.privacy.android.domain.usecase.chat.message.GetLastMessageSeenIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.MonitorChatRoomMessageUpdatesUseCase
@@ -126,10 +128,21 @@ class MessageListViewModel @Inject constructor(
 
     private fun monitorMessageUpdates() {
         viewModelScope.launch {
-            runCatching { monitorChatRoomMessageUpdatesUseCase(chatId) }
-                .onFailure {
-                    Timber.e(it, "Monitor message updates threw an exception")
+            runCatching {
+                monitorChatRoomMessageUpdatesUseCase(chatId) {
+                    if (it is MessageReceived) {
+                        _state.update { state ->
+                            state.copy(
+                                receivedMessages = state.receivedMessages + it.message.messageId,
+                                extraUnreadCount = state.extraUnreadCount + 1
+                            )
+                        }
+                        setMessageSeen(it.message.messageId)
+                    }
                 }
+            }.onFailure {
+                Timber.e(it, "Monitor message updates threw an exception")
+            }
         }
     }
 
@@ -223,12 +236,16 @@ class MessageListViewModel @Inject constructor(
     }
 
     /**
-     * Update latest message id
+     * Update latest message
      *
-     * @param id
+     * @param message Message
      */
-    fun updateLatestMessageId(id: Long) {
-        latestMessageId.longValue = id
+    fun updateLatestMessage(message: TypedMessage?) {
+        latestMessageId.longValue = message?.msgId ?: -1L
+        if (message?.isMine == true) {
+            // if user sent a message, reset the extraUnreadCount and remove unread header
+            _state.update { state -> state.copy(extraUnreadCount = 0, lastSeenMessageId = -1) }
+        }
     }
 
     /**
@@ -267,5 +284,13 @@ class MessageListViewModel @Inject constructor(
      */
     fun onUserUpdateHandled() {
         _state.update { state -> state.copy(userUpdate = null) }
+    }
+
+    /**
+     * On show all messages
+     *
+     */
+    fun onScrollToLatestMessage() {
+        _state.update { state -> state.copy(receivedMessages = emptySet()) }
     }
 }
