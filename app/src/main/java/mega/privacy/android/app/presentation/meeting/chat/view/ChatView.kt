@@ -71,6 +71,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuActi
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageBottomSheetAction
 import mega.privacy.android.app.presentation.meeting.chat.saver.ChatSavers
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.MessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.ChatAppBar
@@ -518,14 +519,17 @@ internal fun ChatView(
                             else actions.filter { action ->
                                 action.appliesTo(selectedMessages)
                             }.map { action ->
-                                action.bottomSheetMenuItem(
-                                    messages = selectedMessages,
-                                    hideBottomSheet = {
-                                        coroutineScope.launch {
-                                            messageOptionsModalSheetState.hide()
-                                        }
-                                    },
-                                    setAction = { pendingAction = it }
+                                MessageBottomSheetAction(
+                                    action.bottomSheetMenuItem(
+                                        messages = selectedMessages,
+                                        hideBottomSheet = {
+                                            coroutineScope.launch {
+                                                messageOptionsModalSheetState.hide()
+                                            }
+                                        },
+                                        setAction = { pendingAction = it }
+                                    ),
+                                    action.group
                                 )
                             },
                             sheetState = messageOptionsModalSheetState,

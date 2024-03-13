@@ -18,6 +18,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.namecollision.NameCollisionActivity
 import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFileExplorerActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openNameCollisionActivity
@@ -35,6 +36,7 @@ internal class ImportMessageAction(
     text = R.string.general_import,
     icon = R.drawable.ic_cloud_upload_medium_regular_outline,
     testTag = "import_node",
+    group = MessageActionGroup.Transfer,
 ) {
     override fun shouldDisplayFor(messages: Set<TypedMessage>) = messages.isNotEmpty()
             && messages.all { it is NodeAttachmentMessage && it.exists }

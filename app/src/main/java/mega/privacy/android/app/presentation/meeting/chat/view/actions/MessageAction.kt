@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import mega.privacy.android.core.ui.controls.dividers.DividerType
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
 import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.model.MenuActionWithClick
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
@@ -20,11 +20,13 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
  * @property text
  * @property icon
  * @property testTag
+ * @property group
  */
 abstract class MessageAction(
     @StringRes val text: Int,
     @DrawableRes val icon: Int,
     private val testTag: String,
+    val group: MessageActionGroup,
 ) {
 
     /**
@@ -129,18 +131,9 @@ abstract class MessageAction(
                 .testTag(bottomSheetItemTestTag)
                 .clickable { onClick() },
             isDestructive = isBottomSheetItemDestructive(),
-            dividerType = if (showBottomSheetItemSeparator(message)) {
-                DividerType.BigStartPadding
-            } else {
-                null
-            },
+            dividerType = null,
         )
     }
-
-    /**
-     * Show bottom sheet item separator.
-     */
-    protected open fun showBottomSheetItemSeparator(message: TypedMessage): Boolean = true
 
 
     /**

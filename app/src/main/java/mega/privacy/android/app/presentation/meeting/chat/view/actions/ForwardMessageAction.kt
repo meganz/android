@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatPicker
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
@@ -31,6 +32,7 @@ internal class ForwardMessageAction(
     text = R.string.forward_menu_item,
     icon = CoreResources.drawable.ic_arrow_corner_right,
     testTag = "action_forward",
+    group = MessageActionGroup.Share,
 ) {
     override fun shouldDisplayFor(messages: Set<TypedMessage>) = messages.isNotEmpty()
             && messages.none { it is ManagementMessage || it is InvalidMessage || it is InvalidMetaMessage || it is PendingAttachmentMessage }

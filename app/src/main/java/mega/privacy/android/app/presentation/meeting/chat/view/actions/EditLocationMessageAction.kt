@@ -6,6 +6,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatLocationView
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
@@ -17,6 +18,7 @@ internal class EditLocationMessageAction(
     text = R.string.title_edit_profile_info,
     icon = R.drawable.ic_pen_2_medium_regular_outline,
     testTag = "action_edit",
+    group = MessageActionGroup.Modify,
 ) {
 
     override fun shouldDisplayFor(messages: Set<TypedMessage>): Boolean =

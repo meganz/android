@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.mobile.analytics.event.ChatConversationDownloadActionMenuEvent
@@ -14,6 +15,7 @@ internal class SaveToDeviceMessageAction(
     text = R.string.general_save_to_device,
     icon = mega.privacy.android.icon.pack.R.drawable.ic_menu_download,
     testTag = "save_to_device",
+    group = MessageActionGroup.Transfer,
 ) {
     override fun shouldDisplayFor(messages: Set<TypedMessage>) = messages.isNotEmpty() &&
             messages.all { it is NodeAttachmentMessage && it.exists }

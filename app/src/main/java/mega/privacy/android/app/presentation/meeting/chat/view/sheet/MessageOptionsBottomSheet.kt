@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageBottomSheetAction
 import mega.privacy.android.core.ui.controls.chat.MegaEmojiPickerView
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.AddReactionsSheetItem
 import mega.privacy.android.core.ui.controls.dividers.DividerType
@@ -32,7 +33,7 @@ fun MessageOptionsBottomSheet(
     showReactionPicker: Boolean,
     onReactionClicked: (String) -> Unit,
     onMoreReactionsClicked: () -> Unit,
-    actions: List<@Composable () -> Unit>,
+    actions: List<MessageBottomSheetAction>,
     modifier: Modifier = Modifier,
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
 ) {
@@ -57,8 +58,15 @@ fun MessageOptionsBottomSheet(
                 onMoreReactionsClicked = onMoreReactionsClicked,
                 modifier = Modifier.padding(8.dp),
             )
-            MegaDivider(dividerType = DividerType.FullSize)
-            actions.forEach { it() }
+
+            var group = if (actions.isNotEmpty()) actions.first().group else null
+            actions.forEach {
+                if (group != it.group) {
+                    MegaDivider(dividerType = DividerType.BigStartPadding)
+                    group = it.group
+                }
+                it.view()
+            }
         }
     }
     AnimatedVisibility(visible = showReactionPicker) {

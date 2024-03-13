@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
 import mega.privacy.android.core.ui.model.MenuActionWithClick
 import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
@@ -17,7 +18,8 @@ internal class SelectMessageAction(
 ) : MessageAction(
     text = R.string.general_select,
     icon = R.drawable.ic_check_circle_medium_regular_outline,
-    testTag = "action_select"
+    testTag = "action_select",
+    group = MessageActionGroup.Select,
 ) {
     override fun shouldDisplayFor(messages: Set<TypedMessage>) = messages.size == 1
             && messages.first() !is ManagementMessage

@@ -26,37 +26,62 @@ import mega.privacy.android.app.presentation.meeting.chat.view.actions.ShareMess
 @Module
 @InstallIn(FragmentComponent::class)
 internal class MessageActionModule {
+
+    /**
+     * MessageActionGroup.Open
+     */
+
     @Provides
     @IntoSet
     fun provideOpenWithMessageAction(): (ChatViewModel) -> MessageAction =
         { vm -> OpenWithMessageAction(vm) }
+
+    /**
+     * MessageActionGroup.Share
+     */
 
     @Provides
     @IntoSet
     fun provideForwardActionFactory(): (ChatViewModel) -> MessageAction =
         { vm -> ForwardMessageAction(vm) }
 
+    @Provides
+    @IntoSet
+    fun provideShareActionFactory(): (ChatViewModel) -> MessageAction =
+        { _ -> ShareMessageAction() }
+
+    /**
+     * MessageActionGroup.Contact
+     */
+
+    @Provides
+    @IntoSet
+    fun provideContactInfoActionFactory(): (ChatViewModel) -> MessageAction =
+        { vm -> ContactInfoMessageAction(vm) }
+
+
+    @Provides
+    @IntoSet
+    fun provideSendMessageActionFactory(): (ChatViewModel) -> MessageAction =
+        { vm -> SendMessageAction(vm) }
 
     @Provides
     @IntoSet
     fun provideInviteActionFactory(): (ChatViewModel) -> MessageAction =
         { vm -> InviteMessageAction(vm) }
 
-
-    @Provides
-    @IntoSet
-    fun provideShareActionFactory(): (ChatViewModel) -> MessageAction =
-        { _ -> ShareMessageAction() }
+    /**
+     * MessageActionGroup.Select
+     */
 
     @Provides
     @IntoSet
     fun provideSelectActionFactory(): (ChatViewModel) -> MessageAction =
         { vm -> SelectMessageAction(vm) }
 
-    @Provides
-    @IntoSet
-    fun provideImportActionFactory(): (ChatViewModel) -> MessageAction =
-        { _ -> ImportMessageAction() }
+    /**
+     * MessageActionGroup.Modify
+     */
 
     @Provides
     @IntoSet
@@ -73,16 +98,14 @@ internal class MessageActionModule {
     fun provideCopyActionFactory(): (ChatViewModel) -> MessageAction =
         { _ -> CopyMessageAction() }
 
-    @Provides
-    @IntoSet
-    fun provideContactInfoActionFactory(): (ChatViewModel) -> MessageAction =
-        { vm -> ContactInfoMessageAction(vm) }
-
+    /**
+     * MessageActionGroup.Transfer
+     */
 
     @Provides
     @IntoSet
-    fun provideSendMessageActionFactory(): (ChatViewModel) -> MessageAction =
-        { vm -> SendMessageAction(vm) }
+    fun provideImportActionFactory(): (ChatViewModel) -> MessageAction =
+        { _ -> ImportMessageAction() }
 
     @Provides
     @IntoSet
@@ -94,10 +117,18 @@ internal class MessageActionModule {
     fun provideAvailableOfflineActionFactory(): (ChatViewModel) -> MessageAction =
         { vm -> AvailableOfflineMessageAction(vm) }
 
+    /**
+     * MessageActionGroup.Retry
+     */
+
     @Provides
     @IntoSet
     fun provideRetryActionFactory(): (ChatViewModel) -> MessageAction =
         { RetryMessageAction() }
+
+    /**
+     * MessageActionGroup.Delete
+     */
 
     @Provides
     @IntoSet

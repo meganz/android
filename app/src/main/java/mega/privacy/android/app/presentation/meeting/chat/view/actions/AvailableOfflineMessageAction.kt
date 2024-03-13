@@ -17,6 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
 import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
@@ -35,6 +36,7 @@ internal class AvailableOfflineMessageAction(
     text = R.string.file_properties_available_offline,
     icon = mega.privacy.android.icon.pack.R.drawable.ic_menu_available_offline,
     testTag = "available_offline",
+    group = MessageActionGroup.Transfer,
 ) {
     override fun shouldDisplayFor(messages: Set<TypedMessage>) =
         messages.size == 1 && messages.first().let { it is NodeAttachmentMessage && it.exists }
@@ -55,6 +57,7 @@ internal class AvailableOfflineMessageAction(
             modifier = Modifier
                 .testTag(bottomSheetItemTestTag)
                 .clickable(onClick = onClick),
+            dividerType = null,
             trailingItem = {
                 MegaSwitch(
                     modifier = Modifier

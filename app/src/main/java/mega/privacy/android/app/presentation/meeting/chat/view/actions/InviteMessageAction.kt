@@ -13,6 +13,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.extension.toString
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.InviteUserAsContactResult
+import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.ContactAttachmentMessageViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openSentRequests
 import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
@@ -29,7 +30,8 @@ class InviteMessageAction(
 ) : MessageAction(
     text = R.string.contact_invite,
     icon = R.drawable.ic_icon_plus_circle_medium_regular_outline,
-    testTag = "action_invite"
+    testTag = "action_invite",
+    group = MessageActionGroup.Contact,
 ) {
     override fun shouldDisplayFor(messages: Set<TypedMessage>): Boolean = messages.isNotEmpty()
             && messages.all { it is ContactAttachmentMessage && !it.isMe && !it.isContact }
