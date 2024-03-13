@@ -190,12 +190,12 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     }
 
     private void bindHeader(ViewHolderPhoneContacts holder, InvitationContactInfo contact) {
-        holder.headerTextView.setText(contact.getName());
+        holder.headerTextView.setText(contact.getContactName());
     }
 
     private void bindContact(ViewHolderPhoneContacts holder, InvitationContactInfo contact, boolean isMegaContact) {
         holder.displayLabel = contact.getDisplayInfo();
-        holder.contactName = contact.getName();
+        holder.contactName = contact.getContactName();
         holder.contactId = contact.getId();
         holder.contactNameTextView.setText(holder.contactName);
         holder.displayLabelTextView.setText(holder.displayLabel);
@@ -213,7 +213,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
             // create default one if unable to get user pre-set avatar
             if (bitmap == null) {
                 Timber.d("create default avatar as unable to get user pre-set one");
-                bitmap = getDefaultAvatar(contact.getAvatarColor(), contact.getName(), AVATAR_SIZE, true, false);
+                bitmap = getDefaultAvatar(contact.getAvatarColor(), contact.getContactName(), AVATAR_SIZE, true, false);
             }
             contact.setBitmap(bitmap);
             holder.imageView.setImageBitmap(bitmap);

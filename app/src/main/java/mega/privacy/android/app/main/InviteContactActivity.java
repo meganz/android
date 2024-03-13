@@ -337,6 +337,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         };
         megaApi.contactLinkCreate(false, getContactLinkCallback);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Timber.d("onCreateOptionsMenu");
@@ -727,7 +728,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     @Override
     public void onItemClick(int position) {
         InvitationContactInfo invitationContactInfo = invitationContactsAdapter.getItem(position);
-        Timber.d("on Item click at %d name is %s", position, invitationContactInfo.getName());
+        Timber.d("on Item click at %d name is %s", position, invitationContactInfo.getContactName());
         if (invitationContactInfo.hasMultipleContactInfos()) {
             this.currentSelected = invitationContactInfo;
             listDialog = new ContactInfoListDialog(this, invitationContactInfo, this);
@@ -753,7 +754,11 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         Timber.d("megaContactToContactInfo %s", localContacts.size());
         ArrayList<InvitationContactInfo> result = new ArrayList<>();
         if (localContacts.size() > 0) {
-            InvitationContactInfo megaContactHeader = new InvitationContactInfo(ID_PHONE_CONTACTS_HEADER, getString(R.string.contacts_phone), TYPE_PHONE_CONTACT_HEADER);
+            InvitationContactInfo megaContactHeader = new InvitationContactInfo(
+                    ID_PHONE_CONTACTS_HEADER,
+                    getString(R.string.contacts_phone),
+                    TYPE_PHONE_CONTACT_HEADER
+            );
             result.add(megaContactHeader);
         } else {
             return result;
@@ -774,7 +779,14 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
             ContactsFilter.filterOutPendingContacts(megaApi, emailList);
             phoneNumberList.addAll(emailList);
             if (phoneNumberList.size() > 0) {
-                InvitationContactInfo info = new InvitationContactInfo(id, name, TYPE_PHONE_CONTACT, phoneNumberList, phoneNumberList.get(0), defaultLocalContactAvatarColor);
+                InvitationContactInfo info = new InvitationContactInfo(
+                        id,
+                        name,
+                        TYPE_PHONE_CONTACT,
+                        phoneNumberList,
+                        phoneNumberList.get(0),
+                        defaultLocalContactAvatarColor
+                );
                 result.add(info);
             }
         }
@@ -825,49 +837,25 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         }
     }
 
-    @SuppressLint("StaticFieldLeak")
-    private class FilterContactsTask extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            Timber.d("FilterContactsTask doInBackground");
-            String query = inputString == null ? null : inputString.toLowerCase();
-            ArrayList<InvitationContactInfo> phoneContacts = new ArrayList<>();
-
-            if (query != null && !query.equals("")) {
-                for (int i = 0; i < totalContacts.size(); i++) {
-                    InvitationContactInfo invitationContactInfo = totalContacts.get(i);
-                    int type = invitationContactInfo.getType();
-                    String name = invitationContactInfo.getName().toLowerCase();
-                    String nameWithoutSpace = name.replaceAll("\\s", "");
-                    String displayLabel = invitationContactInfo.getDisplayInfo().toLowerCase().replaceAll("\\s", "");
-
-                    if (name.contains(query) || displayLabel.contains(query) || nameWithoutSpace.contains(query)) {
-                        if (type == TYPE_PHONE_CONTACT) {
-                            phoneContacts.add(invitationContactInfo);
-                        } 
-                    }
-                }
-                filteredContacts.clear();
-
-                //add header
-                if (phoneContacts.size() > 0) {
-                    filteredContacts.add(new InvitationContactInfo(ID_PHONE_CONTACTS_HEADER, getString(R.string.contacts_phone), TYPE_PHONE_CONTACT_HEADER));
-                    filteredContacts.addAll(phoneContacts);
-                }
+    private void refreshAddedContactsView(boolean shouldScroll) {
+        Timber.d("refreshAddedContactsView");
+        itemContainer.removeAllViews();
+        for (int i = 0; i < addedContacts.size(); i++) {
+            InvitationContactInfo invitationContactInfo = addedContacts.get(i);
+            String name = invitationContactInfo.getContactName();
+            String displayedLabel;
+            if (TextUtils.isEmpty(name)) {
+                displayedLabel = invitationContactInfo.getDisplayInfo();
             } else {
-                filteredContacts.clear();
-                filteredContacts.addAll(totalContacts);
+                displayedLabel = name;
             }
-
-            return null;
+            itemContainer.addView(createContactTextView(displayedLabel, i));
         }
-
-        @Override
-        protected void onPostExecute(Void voids) {
-            Timber.d("onPostExecute FilterContactsTask");
-            refreshList();
-            visibilityFastScroller();
+        itemContainer.invalidate();
+        if (shouldScroll) {
+            refreshHorizontalScrollView();
+        } else {
+            scrollView.clearFocus();
         }
     }
 
@@ -924,26 +912,15 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         }
     }
 
-    private void refreshAddedContactsView(boolean shouldScroll) {
-        Timber.d("refreshAddedContactsView");
-        itemContainer.removeAllViews();
-        for (int i = 0; i < addedContacts.size(); i++) {
-            InvitationContactInfo invitationContactInfo = addedContacts.get(i);
-            String name = invitationContactInfo.getName();
-            String displayedLabel;
-            if (TextUtils.isEmpty(name)) {
-                displayedLabel = invitationContactInfo.getDisplayInfo();
-            } else {
-                displayedLabel = name;
+    private boolean isContactAdded(InvitationContactInfo invitationContactInfo) {
+        Timber.d("isContactAdded contact name is %s", invitationContactInfo.getContactName());
+        for (InvitationContactInfo addedContact : addedContacts) {
+            if (addedContact.getId() == invitationContactInfo.getId() &&
+                    addedContact.getDisplayInfo().equalsIgnoreCase(invitationContactInfo.getDisplayInfo())) {
+                return true;
             }
-            itemContainer.addView(createContactTextView(displayedLabel, i));
         }
-        itemContainer.invalidate();
-        if (shouldScroll) {
-            refreshHorizontalScrollView();
-        } else {
-            scrollView.clearFocus();
-        }
+        return false;
     }
 
     private void refreshInviteContactButton() {
@@ -955,15 +932,33 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         enableFabButton(addedContacts.size() > 0 && isStringValidNow);
     }
 
-    private boolean isContactAdded(InvitationContactInfo invitationContactInfo) {
-        Timber.d("isContactAdded contact name is %s", invitationContactInfo.getName());
-        for (InvitationContactInfo addedContact : addedContacts) {
-            if (addedContact.getId() == invitationContactInfo.getId() &&
-                    addedContact.getDisplayInfo().equalsIgnoreCase(invitationContactInfo.getDisplayInfo())) {
-                return true;
+    private void addContactInfo(String inputString, int type) {
+        Timber.d("addContactInfo inputString is %s type is %d", inputString, type);
+        InvitationContactInfo info = null;
+        if (type == TYPE_MANUAL_INPUT_EMAIL) {
+            info = InvitationContactInfo.createManualInput(
+                    inputString,
+                    TYPE_MANUAL_INPUT_EMAIL,
+                    defaultLocalContactAvatarColor
+            );
+        } else if (type == TYPE_MANUAL_INPUT_PHONE) {
+            info = InvitationContactInfo.createManualInput(
+                    inputString,
+                    TYPE_MANUAL_INPUT_PHONE,
+                    defaultLocalContactAvatarColor
+            );
+        }
+        if (info != null) {
+            int index = isUserEnteredContactExistInList(info);
+            RecyclerView.ViewHolder holder = recyclerViewList.findViewHolderForAdapterPosition(index);
+            if (index >= 0 && holder != null) {
+                holder.itemView.performClick();
+            } else if (!isContactAdded(info)) {
+                addedContacts.add(info);
+                refreshAddedContactsView(true);
             }
         }
-        return false;
+        setTitleAB();
     }
 
     private void refreshList() {
@@ -1102,25 +1097,56 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         showSnackbar(Constants.SNACKBAR_TYPE, scrollView, message, -1);
     }
 
-    private void addContactInfo(String inputString, int type) {
-        Timber.d("addContactInfo inputString is %s type is %d", inputString, type);
-        InvitationContactInfo info = null;
-        if (type == TYPE_MANUAL_INPUT_EMAIL) {
-            info = InvitationContactInfo.createManualInputEmail(inputString, defaultLocalContactAvatarColor);
-        } else if (type == TYPE_MANUAL_INPUT_PHONE) {
-            info = InvitationContactInfo.createManualInputPhone(inputString, defaultLocalContactAvatarColor);
-        }
-        if (info != null) {
-            int index = isUserEnteredContactExistInList(info);
-            RecyclerView.ViewHolder holder = recyclerViewList.findViewHolderForAdapterPosition(index);
-            if (index >= 0 && holder != null) {
-                holder.itemView.performClick();
-            } else if (!isContactAdded(info)) {
-                addedContacts.add(info);
-                refreshAddedContactsView(true);
+    @SuppressLint("StaticFieldLeak")
+    private class FilterContactsTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Timber.d("FilterContactsTask doInBackground");
+            String query = inputString == null ? null : inputString.toLowerCase();
+            ArrayList<InvitationContactInfo> phoneContacts = new ArrayList<>();
+
+            if (query != null && !query.equals("")) {
+                for (int i = 0; i < totalContacts.size(); i++) {
+                    InvitationContactInfo invitationContactInfo = totalContacts.get(i);
+                    int type = invitationContactInfo.getType();
+                    String name = invitationContactInfo.getContactName().toLowerCase();
+                    String nameWithoutSpace = name.replaceAll("\\s", "");
+                    String displayLabel = invitationContactInfo.getDisplayInfo().toLowerCase().replaceAll("\\s", "");
+
+                    if (name.contains(query) || displayLabel.contains(query) || nameWithoutSpace.contains(query)) {
+                        if (type == TYPE_PHONE_CONTACT) {
+                            phoneContacts.add(invitationContactInfo);
+                        }
+                    }
+                }
+                filteredContacts.clear();
+
+                //add header
+                if (phoneContacts.size() > 0) {
+                    filteredContacts.add(
+                            new InvitationContactInfo(
+                                    ID_PHONE_CONTACTS_HEADER,
+                                    getString(R.string.contacts_phone),
+                                    TYPE_PHONE_CONTACT_HEADER
+                            )
+                    );
+                    filteredContacts.addAll(phoneContacts);
+                }
+            } else {
+                filteredContacts.clear();
+                filteredContacts.addAll(totalContacts);
             }
+
+            return null;
         }
-        setTitleAB();
+
+        @Override
+        protected void onPostExecute(Void voids) {
+            Timber.d("onPostExecute FilterContactsTask");
+            refreshList();
+            visibilityFastScroller();
+        }
     }
 
     private int isUserEnteredContactExistInList(InvitationContactInfo userEnteredInfo) {

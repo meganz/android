@@ -100,7 +100,7 @@ public class ContactInfoListDialog {
 
         listView.setAdapter(new ContactInfoAdapter(current.getFilteredContactInfos(), added));
         dialog = new MaterialAlertDialogBuilder(context)
-                .setTitle(current.getName())
+                .setTitle(current.getContactName())
                 .setView(contentView)
                 .setCancelable(false)
                 .setPositiveButton(context.getString(R.string.general_ok), (dialog, which) -> {
