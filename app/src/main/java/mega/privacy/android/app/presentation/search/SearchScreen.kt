@@ -87,6 +87,7 @@ fun SearchScreen(
         updateFilter = searchActivityViewModel::updateFilter,
         trackAnalytics = trackAnalytics,
         updateSearchQuery = searchActivityViewModel::updateSearchQuery,
+        onTypeFilterItemClicked = searchActivityViewModel::setTypeSelectedFilterOption,
         clearSelection = searchActivityViewModel::clearSelection,
         onBackPressed = onBackPressed,
         navHostController = navHostController,

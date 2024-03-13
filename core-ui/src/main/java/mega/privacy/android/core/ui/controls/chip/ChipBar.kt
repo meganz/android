@@ -6,6 +6,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
@@ -34,6 +35,7 @@ fun ChipBar(
 ) {
     Row(
         modifier = modifier
+            .fillMaxWidth()
             .wrapContentHeight()
             .horizontalScroll(scrollState)
             .padding(vertical = 8.dp, horizontal = 16.dp)

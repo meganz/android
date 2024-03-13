@@ -1,0 +1,78 @@
+package test.mega.privacy.android.app.presentation.search
+
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.app.presentation.search.view.DropdownChipToolbar
+import mega.privacy.android.app.presentation.search.view.TYPE_DROPDOWN_CHIP_TEST_TAG
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.Mockito
+import org.mockito.kotlin.verify
+
+@RunWith(AndroidJUnit4::class)
+class DropdownChipToolbarTest {
+    @get:Rule
+    val composeTestRule = createComposeRule()
+
+    private fun setComposeContent(
+        isTypeFilterSelected: Boolean = false,
+        typeFilterTitle: String = "",
+        selectedTypeFilterTitle: String = "",
+        onTypeFilterClicked: () -> Unit = {},
+    ) {
+        composeTestRule.setContent {
+            DropdownChipToolbar(
+                isTypeFilterSelected = isTypeFilterSelected,
+                typeFilterTitle = typeFilterTitle,
+                selectedTypeFilterTitle = selectedTypeFilterTitle,
+                onTypeFilterClicked = onTypeFilterClicked,
+            )
+        }
+    }
+
+    @Test
+    fun `test that type filter is displayed correctly when filter is not selected`() {
+        val typeTitle = "Type"
+        val selectedTypeTitle = "Videos"
+        setComposeContent(
+            typeFilterTitle = typeTitle,
+            selectedTypeFilterTitle = selectedTypeTitle,
+        )
+
+        composeTestRule.onNodeWithTag(TYPE_DROPDOWN_CHIP_TEST_TAG, true)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TYPE_DROPDOWN_CHIP_TEST_TAG, true)
+            .assertTextEquals(typeTitle)
+    }
+
+    @Test
+    fun `test that type filter is displayed correctly when filter is selected`() {
+        val typeTitle = "Type"
+        val selectedTypeTitle = "Videos"
+        setComposeContent(
+            isTypeFilterSelected = true,
+            typeFilterTitle = typeTitle,
+            selectedTypeFilterTitle = selectedTypeTitle,
+        )
+
+        composeTestRule.onNodeWithTag(TYPE_DROPDOWN_CHIP_TEST_TAG, true)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TYPE_DROPDOWN_CHIP_TEST_TAG, true)
+            .assertTextEquals(selectedTypeTitle)
+    }
+
+    @Test
+    fun `test that onClicked is invoked when filter is clicked`() {
+        val onTypeFilterClicked: () -> Unit = Mockito.mock()
+        setComposeContent(onTypeFilterClicked = onTypeFilterClicked)
+
+        composeTestRule.onNodeWithContentDescription("Dropdown Chip").performClick()
+        verify(onTypeFilterClicked).invoke()
+    }
+}

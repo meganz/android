@@ -13,21 +13,24 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.app.extensions.updateItemAt
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
 import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
 import mega.privacy.android.app.presentation.search.model.SearchActivityState
 import mega.privacy.android.app.presentation.search.model.SearchFilter
+import mega.privacy.android.app.presentation.search.model.TypeFilterOption
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.NodeSourceType.OTHER
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.SearchCategory
-import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.entity.node.NodeSourceType.OTHER
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.search.GetSearchCategoriesUseCase
 import mega.privacy.android.domain.usecase.search.SearchNodesUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -38,6 +41,7 @@ import javax.inject.Inject
 
 /**
  * SearchActivity View Model
+ * @property getFeatureFlagValueUseCase [GetFeatureFlagValueUseCase]
  * @property monitorNodeUpdatesUseCase [MonitorNodeUpdatesUseCase]
  * @property searchNodesUseCase [SearchNodesUseCase]
  * @property getSearchCategoriesUseCase [GetSearchCategoriesUseCase]
@@ -51,6 +55,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SearchActivityViewModel @Inject constructor(
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val searchNodesUseCase: SearchNodesUseCase,
     private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase,
@@ -85,9 +90,24 @@ class SearchActivityViewModel @Inject constructor(
         stateHandle.get<Long>(SearchActivity.PARENT_HANDLE) ?: MegaApiJava.INVALID_HANDLE
 
     init {
+        checkDropdownChipsFlag()
         monitorNodeUpdatesForSearch()
         initializeSearch()
         checkViewType()
+    }
+
+    private fun checkDropdownChipsFlag() {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.DropdownChips)
+            }.onSuccess { flag ->
+                _state.update {
+                    it.copy(dropdownChipsEnabled = flag)
+                }
+            }.onFailure {
+                Timber.e("Get feature flag failed $it")
+            }
+        }
     }
 
     private fun initializeSearch() {
@@ -283,6 +303,18 @@ class SearchActivityViewModel @Inject constructor(
         val index =
             _state.value.searchItemList.indexOfFirst { it.node.id.longValue == nodeUIItem.id.longValue }
         updateNodeSelection(nodeUIItem = nodeUIItem, index = index)
+    }
+
+    /**
+     * Updates the type filter with the selected option
+     */
+    fun setTypeSelectedFilterOption(typeFilterOption: TypeFilterOption?) {
+        _state.update {
+            it.copy(
+                typeSelectedFilterOption = typeFilterOption,
+            )
+        }
+        // TODO search with filter
     }
 
     /**

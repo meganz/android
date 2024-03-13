@@ -194,6 +194,11 @@ enum class AppFeatures(override val description: String, private val defaultValu
     SearchWithChips("Advanced search implementation in clean architecture", false),
 
     /**
+     * Search implementation with dropdown chips
+     */
+    DropdownChips("Search implementation with dropdown chips and bottom sheet", false),
+
+    /**
      * In-App Ads toggle
      */
     InAppAdvertisement("Enable In-App Ads", true),

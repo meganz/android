@@ -28,6 +28,7 @@ import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
@@ -51,6 +52,7 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SearchActivityViewModelTest {
     private lateinit var underTest: SearchActivityViewModel
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase = mock()
@@ -84,6 +86,7 @@ class SearchActivityViewModelTest {
 
     private fun initViewModel() {
         underTest = SearchActivityViewModel(
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             setViewType = setViewType,
             monitorViewType = monitorViewType,

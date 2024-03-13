@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 
 /**
  * State for SearchActivity
+ * @property dropdownChipsEnabled are new dropdown chips enabled via feature flag
  * @property searchItemList list of search items in [TypedNode]
  * @property isSearching to show loading or not
  * @property sortOrder [SortOrder] to display nodes
@@ -22,6 +23,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property errorMessageId error message id to be shown on UI
  * @property filters search filter categories
  * @property selectedFilter selected filter which is enabled on chips
+ * @property typeSelectedFilterOption the type selected filter option
  * @property nodeSourceType type of Node Source
  * @property emptyState empty state to be shown on UI
  * @property toolbarMenuItems list of [ToolbarMenuItem] to be shown on toolbar
@@ -30,6 +32,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property moveRequestResult result of move request
  */
 data class SearchActivityState(
+    val dropdownChipsEnabled: Boolean = false,
     val searchItemList: List<NodeUIItem<TypedNode>> = emptyList(),
     val isSearching: Boolean = true,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
@@ -40,6 +43,7 @@ data class SearchActivityState(
     @StringRes val errorMessageId: Int? = null,
     val filters: List<SearchFilter> = emptyList(),
     val selectedFilter: SearchFilter? = null,
+    val typeSelectedFilterOption: TypeFilterOption? = null,
     val emptyState: Pair<Int, String>? = null,
     val toolbarMenuItems: List<ToolbarMenuItem> = emptyList(),
     val nodeSourceType: NodeSourceType = NodeSourceType.OTHER,
