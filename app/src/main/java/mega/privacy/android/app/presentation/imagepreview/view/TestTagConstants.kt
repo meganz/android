@@ -47,6 +47,10 @@ internal const val IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_SHARE =
     "image_preview_bottom_sheet_option:menu_action_list_tile_share"
 internal const val IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_RENAME =
     "image_preview_bottom_sheet_option:menu_action_list_tile_rename"
+internal const val IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_HIDE =
+    "image_preview_bottom_sheet_option:menu_action_list_tile_hide"
+internal const val IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_UNHIDE =
+    "image_preview_bottom_sheet_option:menu_action_list_tile_unhide"
 internal const val IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_MOVE =
     "image_preview_bottom_sheet_option:menu_action_list_tile_move"
 internal const val IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_COPY =

@@ -57,6 +57,14 @@ internal class ZipImagePreviewMenu @Inject constructor() : ImagePreviewMenu {
         return false
     }
 
+    override suspend fun isHideMenuVisible(imageNode: ImageNode): Boolean {
+        return false
+    }
+
+    override suspend fun isUnhideMenuVisible(imageNode: ImageNode): Boolean {
+        return false
+    }
+
     override suspend fun isMoveMenuVisible(imageNode: ImageNode): Boolean {
         return false
     }

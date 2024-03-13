@@ -29,6 +29,10 @@ interface ImagePreviewMenu {
 
     suspend fun isRenameMenuVisible(imageNode: ImageNode): Boolean
 
+    suspend fun isHideMenuVisible(imageNode: ImageNode): Boolean
+
+    suspend fun isUnhideMenuVisible(imageNode: ImageNode): Boolean
+
     suspend fun isMoveMenuVisible(imageNode: ImageNode): Boolean
 
     suspend fun isCopyMenuVisible(imageNode: ImageNode): Boolean

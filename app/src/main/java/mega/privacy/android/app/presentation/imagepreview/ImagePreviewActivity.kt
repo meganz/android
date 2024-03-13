@@ -127,6 +127,8 @@ class ImagePreviewActivity : BaseActivity() {
                     onClickSendTo = ::sendNodeToChat,
                     onClickShare = ::shareNode,
                     onClickRename = ::renameNode,
+                    onClickHide = ::hideNode,
+                    onClickUnhide = ::unhideNode,
                     onClickMove = ::moveNode,
                     onClickCopy = ::copyNode,
                     onClickRestore = ::restoreNode,
@@ -253,6 +255,14 @@ class ImagePreviewActivity : BaseActivity() {
     private fun renameNode(imageNode: ImageNode) {
         val node = MegaNode.unserialize(imageNode.serializedData)
         MegaNodeDialogUtil.showRenameNodeDialog(this, node, this, null)
+    }
+
+    private fun hideNode(imageNode: ImageNode) {
+        viewModel.hideNode(nodeId = imageNode.id)
+    }
+
+    private fun unhideNode(imageNode: ImageNode) {
+        viewModel.unhideNode(nodeId = imageNode.id)
     }
 
     private fun moveNode(imageNode: ImageNode) {

@@ -106,6 +106,8 @@ internal fun ImagePreviewScreen(
     onClickSendTo: (ImageNode) -> Unit = {},
     onClickShare: (ImageNode) -> Unit = {},
     onClickRename: (ImageNode) -> Unit = {},
+    onClickHide: (ImageNode) -> Unit = {},
+    onClickUnhide: (ImageNode) -> Unit = {},
     onClickMove: (ImageNode) -> Unit = {},
     onClickCopy: (ImageNode) -> Unit = {},
     onClickRestore: (ImageNode) -> Unit = {},
@@ -340,6 +342,8 @@ internal fun ImagePreviewScreen(
                     showSendToChatMenu = viewModel::isSendToChatMenuVisible,
                     showShareMenu = viewModel::isShareMenuVisible,
                     showRenameMenu = viewModel::isRenameMenuVisible,
+                    showHideMenu = viewModel::isHideMenuVisible,
+                    showUnhideMenu = viewModel::isUnhideMenuVisible,
                     showMoveMenu = viewModel::isMoveMenuVisible,
                     showCopyMenu = viewModel::isCopyMenuVisible,
                     showRestoreMenu = viewModel::isRestoreMenuVisible,
@@ -402,6 +406,14 @@ internal fun ImagePreviewScreen(
                     },
                     onClickRename = {
                         onClickRename(currentImageNode)
+                        hideBottomSheet(coroutineScope, modalSheetState)
+                    },
+                    onClickHide = {
+                        onClickHide(currentImageNode)
+                        hideBottomSheet(coroutineScope, modalSheetState)
+                    },
+                    onClickUnhide = {
+                        onClickUnhide(currentImageNode)
                         hideBottomSheet(coroutineScope, modalSheetState)
                     },
                     onClickMove = {

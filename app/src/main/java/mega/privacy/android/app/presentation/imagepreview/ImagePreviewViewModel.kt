@@ -37,6 +37,7 @@ import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.favourites.AddFavouritesUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
@@ -90,6 +91,7 @@ class ImagePreviewViewModel @Inject constructor(
     private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase,
     private val resetTotalDownloadsUseCase: ResetTotalDownloadsUseCase,
     private val deleteNodesUseCase: DeleteNodesUseCase,
+    private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
         get() = savedStateHandle[IMAGE_NODE_FETCHER_SOURCE] ?: ImagePreviewFetcherSource.TIMELINE
@@ -234,6 +236,16 @@ class ImagePreviewViewModel @Inject constructor(
 
     suspend fun isRenameMenuVisible(imageNode: ImageNode): Boolean {
         return menu?.isRenameMenuVisible(imageNode) ?: false
+    }
+
+    suspend fun isHideMenuVisible(imageNode: ImageNode): Boolean {
+        return getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+                && menu?.isHideMenuVisible(imageNode) ?: false
+    }
+
+    suspend fun isUnhideMenuVisible(imageNode: ImageNode): Boolean {
+        return getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+                && menu?.isUnhideMenuVisible(imageNode) ?: false
     }
 
     suspend fun isMoveMenuVisible(imageNode: ImageNode): Boolean {
@@ -667,6 +679,20 @@ class ImagePreviewViewModel @Inject constructor(
         _state.update {
             it.copy(showDeletedMessage = false)
         }
+    }
+
+    /**
+     * Hide the node (mark as sensitive)
+     */
+    fun hideNode(nodeId: NodeId) = viewModelScope.launch {
+        updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = true)
+    }
+
+    /**
+     * Unhide the node (unmark as sensitive)
+     */
+    fun unhideNode(nodeId: NodeId) = viewModelScope.launch {
+        updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = false)
     }
 
     companion object {

@@ -33,6 +33,7 @@ import coil.request.ImageRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.R as Rpack
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
 import mega.privacy.android.core.R.drawable.link_ic
@@ -63,6 +64,8 @@ internal fun ImagePreviewBottomSheet(
     showSendToChatMenu: suspend (ImageNode) -> Boolean,
     showShareMenu: suspend (ImageNode) -> Boolean,
     showRenameMenu: suspend (ImageNode) -> Boolean,
+    showHideMenu: suspend (ImageNode) -> Boolean,
+    showUnhideMenu: suspend (ImageNode) -> Boolean,
     showMoveMenu: suspend (ImageNode) -> Boolean,
     showCopyMenu: suspend (ImageNode) -> Boolean,
     showRestoreMenu: suspend (ImageNode) -> Boolean,
@@ -86,6 +89,8 @@ internal fun ImagePreviewBottomSheet(
     onClickSendToChat: () -> Unit = {},
     onClickShare: () -> Unit = {},
     onClickRename: () -> Unit = {},
+    onClickHide: () -> Unit = {},
+    onClickUnhide: () -> Unit = {},
     onClickMove: () -> Unit = {},
     onClickCopy: () -> Unit = {},
     onClickRestore: () -> Unit = {},
@@ -158,6 +163,14 @@ internal fun ImagePreviewBottomSheet(
 
             val isRenameMenuVisible by produceState(false, imageNode) {
                 value = showRenameMenu(imageNode)
+            }
+
+            val isHideMenuVisible by produceState(false, imageNode) {
+                value = showHideMenu(imageNode)
+            }
+
+            val isUnhideMenuVisible by produceState(false, imageNode) {
+                value = showUnhideMenu(imageNode)
             }
 
             val isMoveMenuVisible by produceState(false, imageNode) {
@@ -378,6 +391,26 @@ internal fun ImagePreviewBottomSheet(
                         onActionClicked = onClickRename,
                         addSeparator = false,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_RENAME),
+                    )
+                }
+
+                if (isHideMenuVisible) {
+                    MenuActionListTile(
+                        icon = painterResource(id = Rpack.drawable.ic_menu_hide),
+                        text = stringResource(id = R.string.general_hide_node),
+                        onActionClicked = onClickHide,
+                        addSeparator = false,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_HIDE),
+                    )
+                }
+
+                if (isUnhideMenuVisible) {
+                    MenuActionListTile(
+                        icon = painterResource(id = Rpack.drawable.ic_menu_unhide),
+                        text = stringResource(id = R.string.general_unhide_node),
+                        onActionClicked = onClickUnhide,
+                        addSeparator = false,
+                        modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_UNHIDE),
                     )
                 }
 

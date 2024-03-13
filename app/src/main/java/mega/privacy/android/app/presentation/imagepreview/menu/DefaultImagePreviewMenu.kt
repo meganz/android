@@ -57,6 +57,14 @@ internal class DefaultImagePreviewMenu @Inject constructor() : ImagePreviewMenu 
         return true
     }
 
+    override suspend fun isHideMenuVisible(imageNode: ImageNode): Boolean {
+        return !imageNode.isMarkedSensitive
+    }
+
+    override suspend fun isUnhideMenuVisible(imageNode: ImageNode): Boolean {
+        return imageNode.isMarkedSensitive
+    }
+
     override suspend fun isMoveMenuVisible(imageNode: ImageNode): Boolean {
         return true
     }
