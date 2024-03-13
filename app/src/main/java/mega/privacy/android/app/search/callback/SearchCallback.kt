@@ -2,7 +2,6 @@ package mega.privacy.android.app.search.callback
 
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
-import java.util.ArrayList
 
 /**
  * Class containing callbacks related to search actions.
@@ -44,6 +43,6 @@ class SearchCallback {
          *
          * @param searchedNodes Searched nodes.
          */
-        fun finishSearch(searchedNodes: ArrayList<MegaNode>)
+        fun finishSearch(searchedNodes: List<MegaNode>)
     }
 }

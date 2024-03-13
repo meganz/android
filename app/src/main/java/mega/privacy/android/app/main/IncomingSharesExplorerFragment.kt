@@ -12,17 +12,19 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentFileexplorerlistBinding
+import mega.privacy.android.app.domain.usecase.search.GetSearchFromMegaNodeParentUseCase
+import mega.privacy.android.app.domain.usecase.search.GetSearchInSharesNodesUseCase
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.COPY
@@ -32,8 +34,6 @@ import mega.privacy.android.app.main.adapters.MegaExplorerAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.search.callback.SearchCallback
-import mega.privacy.android.app.search.usecase.SearchNodesUseCase
-import mega.privacy.android.app.search.usecase.SearchNodesUseCase.Companion.TYPE_INCOMING_EXPLORER
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.app.utils.TextUtil
@@ -41,9 +41,9 @@ import mega.privacy.android.app.utils.Util.getPreferences
 import mega.privacy.android.app.utils.Util.isScreenInPortrait
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
@@ -55,13 +55,25 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface,
-    SearchCallback.View, SearchCallback.Data {
+    SearchCallback.View {
 
     /**
-     * [SearchNodesUseCase] injection
+     * [GetSearchFromMegaNodeParentUseCase]
      */
     @Inject
-    lateinit var searchNodesUseCase: SearchNodesUseCase
+    lateinit var getSearchFromMegaNodeParentUseCase: GetSearchFromMegaNodeParentUseCase
+
+    /**
+     * [GetSearchInSharesNodesUseCase]
+     */
+    @Inject
+    lateinit var getSearchInSharesNodesUseCase: GetSearchInSharesNodesUseCase
+
+    /**
+     * [CancelCancelTokenUseCase]
+     */
+    @Inject
+    lateinit var cancelCancelTokenUseCase: CancelCancelTokenUseCase
 
     /**
      * [MegaApiAndroid] injection
@@ -106,8 +118,6 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
 
     private var orderParent = MegaApiAndroid.ORDER_DEFAULT_ASC
     private var order = MegaApiAndroid.ORDER_DEFAULT_ASC
-
-    private var searchCancelToken: MegaCancelToken? = null
 
     private var shouldResetNodes = true
     private var hasWritePermissions = true
@@ -308,14 +318,18 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
         when {
             modeCloud == FileExplorerActivity.UPLOAD ->
                 binding.actionText.text = getString(R.string.context_upload)
+
             modeCloud == FileExplorerActivity.IMPORT ->
                 binding.actionText.text = getString(R.string.add_to_cloud)
+
             isMultiselect() -> {
                 binding.actionText.text = getString(R.string.context_send)
                 activateButton(adapter.getSelectedItemCount() > 0)
             }
+
             modeCloud == FileExplorerActivity.SELECT ->
                 binding.optionsExplorerLayout.isVisible = false
+
             else -> binding.actionText.text = getString(R.string.general_select)
         }
 
@@ -332,7 +346,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         emptyRootText = TextUtil.formatEmptyScreenText(
             requireContext(),
-            getString(R.string.context_empty_cloud_drive)
+            getString(R.string.context_empty_incoming)
         )
         emptyGeneralText = TextUtil.formatEmptyScreenText(
             requireContext(),
@@ -565,6 +579,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
                         }
                     }
                 }
+
                 selectFile -> {
                     if (fileExplorerActivity.isMultiselect) {
                         if (adapter.getSelectedItemCount() == 0) {
@@ -621,6 +636,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
                 fileExplorerActivity.invalidateOptionsMenu()
                 return 3
             }
+
             fileExplorerActivity.deepBrowserTree > 0 -> {
                 parentHandle = adapter.parentHandle
                 megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle))
@@ -656,6 +672,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
                     return 2
                 }
             }
+
             else -> {
                 recyclerView.isVisible = true
                 binding.fileListEmptyImage.isVisible = false
@@ -780,31 +797,29 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
         if (searchString == null || !shouldResetNodes) {
             return
         }
-        searchCancelToken = initNewSearch()
-        searchCancelToken?.let {
-            disposable?.dispose()
-            disposable = searchNodesUseCase.get(query = searchString,
-                parentHandleSearch = INVALID_HANDLE,
-                parentHandle = parentHandle,
-                searchType = TYPE_INCOMING_EXPLORER,
-                megaCancelToken = it)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    { searchedNodes ->
-                        finishSearch(searchedNodes)
-                    },
-                    { throwable ->
-                        Timber.e(throwable)
-                    }
-                )
+        initNewSearch()
+        lifecycleScope.launch {
+            runCatching {
+                if (parentHandle == INVALID_HANDLE)
+                    getSearchInSharesNodesUseCase(searchString)
+                else
+                    getSearchFromMegaNodeParentUseCase(
+                        searchString,
+                        INVALID_HANDLE,
+                        parent = megaApi.getNodeByHandle(parentHandle),
+                        null
+                    )
+            }.onSuccess { searchedNodes ->
+                finishSearch(searchedNodes)
+            }.onFailure { throwable ->
+                Timber.e(throwable)
+            }
         }
     }
 
-    override fun initNewSearch(): MegaCancelToken {
+    private fun initNewSearch() {
         updateSearchProgressView(true)
         cancelSearch()
-        return MegaCancelToken.createInstance()
     }
 
     override fun updateSearchProgressView(inProgress: Boolean) {
@@ -814,11 +829,13 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
         recyclerView.isVisible = !inProgress
     }
 
-    override fun cancelSearch() {
-        searchCancelToken?.cancel()
+    private fun cancelSearch() {
+        lifecycleScope.launch {
+            cancelCancelTokenUseCase()
+        }
     }
 
-    override fun finishSearch(searchedNodes: ArrayList<MegaNode>) {
+    override fun finishSearch(searchedNodes: List<MegaNode>) {
         updateSearchProgressView(false)
         setSearchNodes(searchedNodes)
     }

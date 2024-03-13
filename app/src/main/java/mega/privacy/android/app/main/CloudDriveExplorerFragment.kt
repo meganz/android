@@ -18,9 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.launchIn
@@ -31,6 +29,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentFileexplorerlistBinding
+import mega.privacy.android.app.domain.usecase.search.GetSearchFromMegaNodeParentUseCase
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.CLOUD_FRAGMENT
@@ -38,8 +37,6 @@ import mega.privacy.android.app.main.adapters.MegaExplorerAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.search.callback.SearchCallback
-import mega.privacy.android.app.search.usecase.SearchNodesUseCase
-import mega.privacy.android.app.search.usecase.SearchNodesUseCase.Companion.TYPE_CLOUD_EXPLORER
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
@@ -51,10 +48,10 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
-import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.util.Stack
@@ -64,14 +61,19 @@ import javax.inject.Inject
  * The fragment for cloud drive explorer
  */
 @AndroidEntryPoint
-class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, SearchCallback.View,
-    SearchCallback.Data {
+class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, SearchCallback.View {
 
     /**
-     * [SearchNodesUseCase]
+     * [GetSearchFromMegaNodeParentUseCase]
      */
     @Inject
-    lateinit var searchNodesUseCase: SearchNodesUseCase
+    lateinit var getSearchFromMegaNodeParentUseCase: GetSearchFromMegaNodeParentUseCase
+
+    /**
+     * [CancelCancelTokenUseCase]
+     */
+    @Inject
+    lateinit var cancelCancelTokenUseCase: CancelCancelTokenUseCase
 
     /**
      * [DatabaseHandler]
@@ -124,7 +126,6 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
 
     private var order = ORDER_DEFAULT_ASC
 
-    private var searchCancelToken: MegaCancelToken? = null
     private var shouldResetNodes = true
 
     private var emptyRootText: Spanned? = null
@@ -826,33 +827,26 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
         }
         if (parentHandle == INVALID_HANDLE)
             setParentHandle(megaApi.rootNode?.handle ?: INVALID_HANDLE)
-
-        megaApi.getNodeByHandle(parentHandle)?.let {
-            searchCancelToken = initNewSearch()
-            searchCancelToken?.let {
-                disposable?.dispose()
-                disposable = searchNodesUseCase.get(
+        lifecycleScope.launch {
+            initNewSearch()
+            runCatching {
+                getSearchFromMegaNodeParentUseCase(
                     query = searchString,
                     parentHandleSearch = INVALID_HANDLE,
-                    parentHandle = parentHandle,
-                    searchType = TYPE_CLOUD_EXPLORER,
-                    megaCancelToken = it
+                    parent = megaApi.getNodeByHandle(parentHandle),
+                    searchFilter = null
                 )
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ searchedNodes ->
-                        finishSearch(searchedNodes)
-                    }, { throwable ->
-                        Timber.e(throwable)
-                    })
+            }.onSuccess {
+                finishSearch(it)
+            }.onFailure {
+                Timber.e(it)
             }
-        } ?: Timber.w("Parent null when search")
+        }
     }
 
-    override fun initNewSearch(): MegaCancelToken {
+    private fun initNewSearch() {
         updateSearchProgressView(true)
         cancelSearch()
-        return MegaCancelToken.createInstance()
     }
 
     override fun updateSearchProgressView(inProgress: Boolean) {
@@ -862,11 +856,13 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
         recyclerView.isVisible = !inProgress
     }
 
-    override fun cancelSearch() {
-        searchCancelToken?.cancel()
+    private fun cancelSearch() {
+        lifecycleScope.launch {
+            cancelCancelTokenUseCase()
+        }
     }
 
-    override fun finishSearch(searchedNodes: ArrayList<MegaNode>) {
+    override fun finishSearch(searchedNodes: List<MegaNode>) {
         updateSearchProgressView(false)
         setSearchNodes(searchedNodes)
     }
