@@ -3,6 +3,7 @@ package mega.privacy.android.app.uploadFolder.usecase
 import android.content.Context
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
 import mega.privacy.android.app.data.extensions.getInfo
@@ -10,18 +11,16 @@ import mega.privacy.android.app.namecollision.data.NameCollisionChoice
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.list.data.UploadFolderResult
-import mega.privacy.android.app.usecase.CreateFolderUseCase
-import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
-import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.exception.EmptySearchException
 import mega.privacy.android.domain.exception.FolderNameNullException
-import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaNode
+import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
+import mega.privacy.android.domain.usecase.node.DoesNodeExistUseCase
+import mega.privacy.android.domain.usecase.node.GetChildNodeUseCase
 import timber.log.Timber
 import java.security.InvalidParameterException
 import java.util.Locale
@@ -29,16 +28,11 @@ import javax.inject.Inject
 
 /**
  * Use case to manage the content of a folder which is going to be uploaded.
- *
- * @property megaApi                MegaApi required to make the requests to the SDK.
- * @property createFolderUseCase    Use case for creating folders.
- * @property getNodeUseCase         Use case for getting nodes.
- * @property uploadUseCase          Use case for uploading files.
  */
 class GetFolderContentUseCase @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid,
-    private val createFolderUseCase: CreateFolderUseCase,
-    private val getNodeUseCase: GetNodeUseCase,
+    private val doesNodeExistUseCase: DoesNodeExistUseCase,
+    private val getChildNodeUseCase: GetChildNodeUseCase,
+    private val createFolderNodeUseCase: CreateFolderNodeUseCase,
     private val uploadUseCase: UploadUseCase,
 ) {
 
@@ -105,14 +99,14 @@ class GetFolderContentUseCase @Inject constructor(
      * Gets the content to upload.
      *
      * @param context       Context required to get the absolute path.
-     * @param parentNode    MegaNode in which the content will be uploaded.
+     * @param parentNodeId  NodeId in which the content will be uploaded.
      * @param folderItem    Item to be managed.
      * @param renameName    A valid name if the file has to be uploaded with a different name, null otherwise.
      * @return Single with a list of UploadFolderResult.
      */
     private fun getContentToUpload(
         context: Context,
-        parentNode: MegaNode?,
+        parentNodeId: NodeId,
         folderItem: FolderContent.Data,
         renameName: String? = null,
     ): Single<ArrayList<UploadFolderResult>> =
@@ -125,20 +119,17 @@ class GetFolderContentUseCase @Inject constructor(
             }
 
             if (folderItem.isFolder) {
-                var newParentNode = megaApi.getChildNode(parentNode, folderName)
-
-                if (newParentNode == null) {
-                    createFolderUseCase.create(parentNode, folderName).blockingSubscribeBy(
-                        onError = { error -> emitter.onError(error) },
-                        onSuccess = { resultNode -> newParentNode = resultNode }
-                    )
-                }
-
-                if (newParentNode == null) {
+                val newParentNodeId = runBlocking {
+                    runCatching {
+                        getChildNodeUseCase(parentNodeId, folderName)?.id
+                            ?: createFolderNodeUseCase(folderName, parentNodeId)
+                    }.onFailure { error ->
+                        emitter.onError(error)
+                    }.getOrNull()
+                } ?: run {
                     if (!emitter.isDisposed) {
                         emitter.onError(MegaNodeException.ParentDoesNotExistException())
                     }
-
                     return@create
                 }
 
@@ -148,7 +139,7 @@ class GetFolderContentUseCase @Inject constructor(
                     onError = { error -> emitter.onError(error) },
                     onSuccess = { folderContent ->
                         folderContent.forEach { item ->
-                            getContentToUpload(context, newParentNode, item)
+                            getContentToUpload(context, newParentNodeId, item)
                                 .blockingSubscribeBy(
                                     onError = { error ->
                                         Timber.w(
@@ -174,7 +165,7 @@ class GetFolderContentUseCase @Inject constructor(
                             name = folderName,
                             size = folderItem.size,
                             lastModified = folderItem.lastModified,
-                            parentHandle = parentNode?.handle,
+                            parentHandle = parentNodeId.longValue,
                             renameName = renameName
                         )
                     )
@@ -226,21 +217,27 @@ class GetFolderContentUseCase @Inject constructor(
      * Gets the content to upload.
      *
      * @param context               Context required to get the absolute path.
-     * @param parentNodeHandle      Handle of the parent node in which the content will be uploaded.
+     * @param parentNodeId      Handle of the parent node in which the content will be uploaded.
      * @param pendingUploads        List of the pending uploads.
      * @param collisionsResolution  List of collisions already resolved.
      * @return Single with the size of uploaded items.
      */
     fun getContentToUpload(
         context: Context,
-        parentNodeHandle: Long,
+        parentNodeId: NodeId,
         pendingUploads: List<FolderContent.Data>,
         collisionsResolution: List<NameCollisionResult>?,
     ): Single<Int> =
         Single.create { emitter ->
-            val parentNode = getNodeUseCase.get(parentNodeHandle).blockingGetOrNull()
+            val parentNodeExists = runBlocking {
+                runCatching {
+                    doesNodeExistUseCase(parentNodeId)
+                }.onFailure { error ->
+                    emitter.onError(error)
+                }.getOrNull()
+            }
 
-            if (parentNode == null) {
+            if (parentNodeExists == false) {
                 emitter.onError(MegaNodeException.ParentDoesNotExistException())
                 return@create
             }
@@ -255,7 +252,7 @@ class GetFolderContentUseCase @Inject constructor(
 
                     getContentToUpload(
                         context = context,
-                        parentNode = parentNode,
+                        parentNodeId = parentNodeId,
                         folderItem = upload
                     ).blockingSubscribeBy(
                         onError = { error -> Timber.w(error, "Ignored error") },
@@ -287,7 +284,7 @@ class GetFolderContentUseCase @Inject constructor(
 
                                 getContentToUpload(
                                     context = context,
-                                    parentNode = parentNode,
+                                    parentNodeId = parentNodeId,
                                     folderItem = upload,
                                     renameName
                                 ).blockingSubscribeBy(
@@ -304,7 +301,7 @@ class GetFolderContentUseCase @Inject constructor(
                     } else {
                         getContentToUpload(
                             context = context,
-                            parentNode = parentNode,
+                            parentNodeId = parentNodeId,
                             folderItem = upload
                         ).blockingSubscribeBy(
                             onError = { error -> Timber.w(error, "Ignored error") },

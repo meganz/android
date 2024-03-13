@@ -25,6 +25,7 @@ import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.usecase.GetFolderContentUseCase
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.EmptyFolderException
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
@@ -440,7 +441,7 @@ class UploadFolderViewModel @Inject constructor(
         transfersManagement.setIsProcessingFolders(true)
         getContentDisposable = getFolderContentUseCase.getContentToUpload(
             context,
-            parentHandle,
+            NodeId(parentHandle),
             pendingUploads,
             collisionsResolution
         ).subscribeOn(Schedulers.io())
