@@ -566,10 +566,19 @@ class ManagerViewModel @Inject constructor(
      */
     fun checkNumUnreadUserAlerts(type: UnreadUserAlertsCheckType) {
         viewModelScope.launch {
-            val totalCount =
-                getNumUnreadUserAlertsUseCase() + getNumUnreadPromoNotificationsUseCase()
-            _numUnreadUserAlerts.update { Pair(type, totalCount) }
-            legacyNumUnreadUserAlerts.value = Pair(type, totalCount)
+            runCatching {
+                val promoNotificationCount =
+                    if (getFeatureFlagValueUseCase(AppFeatures.PromoNotifications))
+                        getNumUnreadPromoNotificationsUseCase()
+                    else
+                        0
+                val totalCount =
+                    getNumUnreadUserAlertsUseCase() + promoNotificationCount
+                _numUnreadUserAlerts.update { Pair(type, totalCount) }
+                legacyNumUnreadUserAlerts.value = Pair(type, totalCount)
+            }.onFailure {
+                Timber.e("Failed to get the number of unread user alerts or promo notifications with error: $it")
+            }
         }
     }
 
