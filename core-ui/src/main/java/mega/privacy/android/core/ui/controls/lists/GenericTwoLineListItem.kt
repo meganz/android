@@ -1,5 +1,6 @@
 package mega.privacy.android.core.ui.controls.lists
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,7 @@ import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
+import mega.privacy.android.core.ui.theme.extensions.conditional
 
 /**
  * Generic two line list item
@@ -37,10 +39,11 @@ import mega.privacy.android.core.ui.theme.MegaTheme
  * @param subTitleSuffixIcons Subtitle suffix
  * @param titleIcons Title icons
  * @param trailingIcons Body suffix
+ * @param onItemClicked An optional item click listener
  */
 
 @Composable
-internal fun GenericTwoLineListItem(
+fun GenericTwoLineListItem(
     title: String,
     modifier: Modifier = Modifier,
     subtitle: String? = null,
@@ -49,6 +52,7 @@ internal fun GenericTwoLineListItem(
     subTitleSuffixIcons: @Composable (RowScope.() -> Unit)? = null,
     titleIcons: @Composable (RowScope.() -> Unit)? = null,
     trailingIcons: @Composable (RowScope.() -> Unit)? = null,
+    onItemClicked: (() -> Unit)? = null,
 ) {
     GenericTwoLineListItem(
         title = {
@@ -79,6 +83,7 @@ internal fun GenericTwoLineListItem(
         subTitleSuffixIcons = subTitleSuffixIcons,
         titleIcons = titleIcons,
         trailingIcons = trailingIcons,
+        onItemClicked = onItemClicked,
     )
 }
 
@@ -93,6 +98,7 @@ internal fun GenericTwoLineListItem(
  * @param subTitleSuffixIcons Subtitle suffix
  * @param titleIcons Title icons
  * @param trailingIcons Body suffix
+ * @param onItemClicked An optional item click listener
  */
 @Composable
 internal fun GenericTwoLineListItem(
@@ -104,10 +110,16 @@ internal fun GenericTwoLineListItem(
     subTitleSuffixIcons: @Composable (RowScope.() -> Unit)? = null,
     titleIcons: @Composable (RowScope.() -> Unit)? = null,
     trailingIcons: @Composable (RowScope.() -> Unit)? = null,
+    onItemClicked: (() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .conditional(onItemClicked != null) {
+                clickable {
+                    onItemClicked?.invoke()
+                }
+            }
             .padding(horizontal = 12.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
