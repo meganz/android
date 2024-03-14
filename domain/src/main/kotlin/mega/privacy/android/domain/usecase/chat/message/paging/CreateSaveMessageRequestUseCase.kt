@@ -75,10 +75,14 @@ class CreateSaveMessageRequestUseCase @Inject constructor(
             }
             acc
         }.apply {
-            if (last().userHandle == nextMessageUserHandle) removeLast()
+            if (lastMessageMatchesNext(nextMessageUserHandle)) removeLast()
             removeIf { it.userHandle == currentUserHandle }
         }.map { it.messageId }
         .toSet()
+
+    private fun MutableList<ChatMessage>.lastMessageMatchesNext(
+        nextMessageUserHandle: Long?,
+    ) = nextMessageUserHandle != null && lastOrNull()?.userHandle == nextMessageUserHandle
 
     private suspend fun ChatMessage.getReactions(
         chatId: Long,

@@ -330,4 +330,16 @@ class CreateSaveMessageRequestUseCaseTest {
         )
         assertThat(actual.map { it.exists }).containsExactly(exists)
     }
+
+    @Test
+    internal fun `test that an empty list completes successfully`() = runTest {
+        val actual = underTest(
+            chatId = chatId,
+            chatMessages = emptyList(),
+            currentUserHandle = myHandle,
+            nextMessage = null,
+        )
+
+        assertThat(actual).isEmpty()
+    }
 }

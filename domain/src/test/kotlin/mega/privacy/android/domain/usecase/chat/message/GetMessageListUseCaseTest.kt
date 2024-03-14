@@ -113,4 +113,19 @@ class GetMessageListUseCaseTest {
         assertThat(underTest(flow)).hasSize(expectedCount)
     }
 
+    @Test
+    internal fun `test that an empty list is returned if the first message is null`() = runTest {
+        val flow = flow {
+            emit(null)
+            awaitCancellation()
+        }
+
+        initUseCase()
+
+        val actual = underTest(flow)
+
+        assertThat(actual).isNotNull()
+        assertThat(actual).isEmpty()
+    }
+
 }

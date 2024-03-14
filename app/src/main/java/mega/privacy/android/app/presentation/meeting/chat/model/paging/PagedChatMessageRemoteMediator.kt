@@ -62,7 +62,9 @@ class PagedChatMessageRemoteMediator @AssistedInject constructor(
                 messages.addAll(response.messages)
                 if (response.loadResponse == ChatHistoryLoadStatus.NONE) break
             }
-            saveMessages(chatId = chatId, messages = messages)
+            runCatching { saveMessages(chatId = chatId, messages = messages) }.onFailure {
+                Timber.e(it, "Failed to save chat messages")
+            }
 
             MediatorResult.Success(endOfPaginationReached = response.loadResponse == ChatHistoryLoadStatus.NONE)
         } catch (e: Exception) {
