@@ -543,6 +543,10 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         fileGateway.isFileUri(uriString)
     }
 
+    override suspend fun isFilePath(path: String) = withContext(ioDispatcher) {
+        fileGateway.isFilePath(path)
+    }
+
     override suspend fun getFileFromFileUri(uriString: String) = withContext(ioDispatcher) {
         fileGateway.getFileFromUriFile(uriString)
     }

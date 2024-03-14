@@ -98,12 +98,12 @@ class UploadFilesUseCaseTest {
     @ValueSource(booleans = [true, false])
     fun `test that repository start upload is called with the proper priority`(priority: Boolean) =
         runTest {
-            underTest(listOf(file), parentId, null, priority, false).test {
+            underTest(mapOf(file to null), parentId, null, priority, false).test {
 
                 verify(transferRepository).startUpload(
-                    DESTINATION_PATH_FOLDER,
+                    ABSOLUTE_PATH,
                     parentId,
-                    file.name,
+                    null,
                     MODIFIED_TIME_SECS,
                     null,
                     false,
@@ -119,14 +119,14 @@ class UploadFilesUseCaseTest {
         appData: TransferAppData?,
     ) = runTest {
         underTest(
-            listOf(file), parentId, appData,
+            mapOf(file to null), parentId, appData,
             isHighPriority = false,
             isSourceTemporary = false
         ).test {
             verify(transferRepository).startUpload(
-                DESTINATION_PATH_FOLDER,
+                ABSOLUTE_PATH,
                 parentId,
-                file.name,
+                null,
                 MODIFIED_TIME_SECS,
                 appData,
                 isSourceTemporary = false,
@@ -142,14 +142,14 @@ class UploadFilesUseCaseTest {
         appData: TransferAppData.ChatTransferAppData,
     ) = runTest {
         underTest(
-            listOf(file), parentId, appData,
+            mapOf(file to null), parentId, appData,
             isSourceTemporary = false,
             isHighPriority = false
         ).test {
             verify(transferRepository).startUploadForChat(
-                DESTINATION_PATH_FOLDER,
+                ABSOLUTE_PATH,
                 parentId,
-                file.name,
+                null,
                 appData,
                 isSourceTemporary = false,
             )
@@ -175,15 +175,15 @@ class UploadFilesUseCaseTest {
     fun `test that repository start upload is invoked for each nodeId when start upload is invoked`() =
         runTest {
             underTest(
-                fileNodes, parentId, null,
+                fileNodesAndNullNames, parentId, null,
                 isHighPriority = false,
                 isSourceTemporary = false
             ).test {
-                fileNodes.forEach { file ->
+                fileNodesAndNullNames.keys.forEach { file ->
                     verify(transferRepository).startUpload(
-                        DESTINATION_PATH_FOLDER,
+                        file.absolutePath,
                         parentId,
-                        file.name,
+                        null,
                         MODIFIED_TIME_SECS,
                         null,
                         isSourceTemporary = false,
@@ -200,7 +200,7 @@ class UploadFilesUseCaseTest {
         runTest {
             stubDelay()
             underTest(
-                fileNodes, parentId, null,
+                fileNodesAndNullNames, parentId, null,
                 isHighPriority = false, isSourceTemporary = false
             ).test {
                 cancel()
@@ -214,7 +214,7 @@ class UploadFilesUseCaseTest {
         runTest {
             stubDelay()
             underTest(
-                fileNodes, parentId, null,
+                fileNodesAndNullNames, parentId, null,
                 isHighPriority = false,
                 isSourceTemporary = false
             ).test {
@@ -229,7 +229,7 @@ class UploadFilesUseCaseTest {
         runTest {
             stubDelay()
             underTest(
-                fileNodes, parentId, null,
+                fileNodesAndNullNames, parentId, null,
                 isHighPriority = false,
                 isSourceTemporary = false
             ).test {
@@ -243,12 +243,12 @@ class UploadFilesUseCaseTest {
         runTest {
             stubSingleEvents()
             underTest(
-                fileNodes, parentId, null,
+                fileNodesAndNullNames, parentId, null,
                 isHighPriority = false,
                 isSourceTemporary = false
             )
                 .filterIsInstance<MultiTransferEvent.SingleTransferEvent>().test {
-                    repeat(fileNodes.size) {
+                    repeat(fileNodesAndNullNames.size) {
                         assertThat(awaitItem().transferEvent)
                             .isInstanceOf(TransferEvent.TransferStartEvent::class.java)
                         assertThat(awaitItem().transferEvent)
@@ -266,7 +266,7 @@ class UploadFilesUseCaseTest {
         runTest {
             stubSingleEvents()
             underTest(
-                fileNodes, parentId, null,
+                fileNodesAndNullNames, parentId, null,
                 isHighPriority = false,
                 isSourceTemporary = false
             )
@@ -275,7 +275,7 @@ class UploadFilesUseCaseTest {
                 }
             verify(
                 addOrUpdateActiveTransferUseCase,
-                Times(fileNodes.size * 3)
+                Times(fileNodesAndNullNames.size * 3)
             ).invoke(any())
         }
 
@@ -284,7 +284,7 @@ class UploadFilesUseCaseTest {
         runTest {
             stubSingleEvents()
             underTest(
-                fileNodes, parentId, null,
+                fileNodesAndNullNames, parentId, null,
                 isHighPriority = false,
                 isSourceTemporary = false
             )
@@ -293,17 +293,53 @@ class UploadFilesUseCaseTest {
                 }
             verify(
                 handleSDCardEventUseCase,
-                Times(fileNodes.size * 3)
+                Times(fileNodesAndNullNames.size * 3)
             ).invoke(any())
         }
 
+    @Test
+    fun `test that fileName is used in startUpload when is not null`() = runTest {
+        val name = "RenamedFile"
+        underTest(mapOf(file to name), parentId, null, false, false).test {
+
+            verify(transferRepository).startUpload(
+                ABSOLUTE_PATH,
+                parentId,
+                name,
+                MODIFIED_TIME_SECS,
+                null,
+                false,
+                false,
+            )
+            awaitComplete()
+        }
+    }
+
+    @ParameterizedTest(name = "appdata: \"{0}\"")
+    @MethodSource("provideChatAppData")
+    fun `test that fileName is used in startUploadForChat when is not null`(
+        appData: TransferAppData.ChatTransferAppData
+    ) = runTest {
+        val name = "RenamedFile"
+        underTest(mapOf(file to name), parentId, appData, false, false).test {
+            verify(transferRepository).startUploadForChat(
+                ABSOLUTE_PATH,
+                parentId,
+                name,
+                appData,
+                isSourceTemporary = false,
+            )
+            awaitComplete()
+        }
+    }
+
     private fun stubDelay() {
-        fileNodes.forEach { file ->
+        fileNodesAndNullNames.keys.forEach { file ->
             whenever(
                 transferRepository.startUpload(
-                    DESTINATION_PATH_FOLDER,
+                    file.absolutePath,
                     parentId,
-                    file.name,
+                    null,
                     MODIFIED_TIME_SECS,
                     null,
                     isSourceTemporary = false,
@@ -322,12 +358,12 @@ class UploadFilesUseCaseTest {
             mock<TransferEvent.TransferUpdateEvent> { on { it.transfer }.thenReturn(transfer) },
             mock<TransferEvent.TransferFinishEvent> { on { it.transfer }.thenReturn(transfer) },
         )
-        fileNodes.forEach { file ->
+        fileNodesAndNullNames.keys.forEach { file ->
             whenever(
                 transferRepository.startUpload(
-                    DESTINATION_PATH_FOLDER,
+                    file.absolutePath,
                     parentId,
-                    file.name,
+                    null,
                     MODIFIED_TIME_SECS,
                     null,
                     isSourceTemporary = false,
@@ -341,19 +377,19 @@ class UploadFilesUseCaseTest {
     companion object {
         private val file = mock<File> {
             on { name }.thenReturn(FILE_NAME)
-            on { absolutePath }.thenReturn(DESTINATION_PATH_FOLDER)
+            on { absolutePath }.thenReturn(ABSOLUTE_PATH)
             on { lastModified() }.thenReturn(MODIFIED_TIME_MILLIS)
         }
-        private val fileNodes = (0L..10L).map { nodeId ->
+        private val fileNodesAndNullNames = (0L..10L).map { nodeId ->
             mock<File> {
                 on { name }.thenReturn("$FILE_NAME$nodeId")
-                on { absolutePath }.thenReturn(DESTINATION_PATH_FOLDER)
+                on { absolutePath }.thenReturn("$ABSOLUTE_PATH$nodeId")
                 on { lastModified() }.thenReturn(MODIFIED_TIME_MILLIS)
             }
-        }
+        }.associateWith { null }
         private val parentId = NodeId(1L)
 
-        private const val DESTINATION_PATH_FOLDER = "root/parent/destination"
+        private const val ABSOLUTE_PATH = "root/parent/destination/File"
         private const val FILE_NAME = "File"
         private const val MODIFIED_TIME_MILLIS = 1000L
         private const val MODIFIED_TIME_SECS = 1L

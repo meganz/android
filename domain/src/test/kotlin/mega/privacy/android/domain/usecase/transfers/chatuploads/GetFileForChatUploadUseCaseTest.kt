@@ -37,6 +37,16 @@ class GetFileForChatUploadUseCaseTest {
         )
         whenever(fileSystemRepository.isFileUri(any())).thenReturn(false)
         whenever(fileSystemRepository.isContentUri(any())).thenReturn(false)
+        whenever(fileSystemRepository.isFilePath(any())).thenReturn(false)
+    }
+
+    @Test
+    fun `test that file is returned if path represents an existing file`() = runTest {
+        val path = "/file.txt"
+        val file = mock<File>()
+        whenever(fileSystemRepository.isFilePath(path)).thenReturn(true)
+        whenever(fileSystemRepository.getFileByPath(path)).thenReturn(file)
+        assertThat(underTest.invoke(path)).isEqualTo(file)
     }
 
     @Test

@@ -44,6 +44,7 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
                 state = PendingMessageState.entries.firstOrNull { it.value == state }
                     ?: PendingMessageState.UPLOADING,
                 nodeId = nodeHandle.takeIf { it != -1L }?.let { NodeId(it) },
+                fileName = name ?: file.name,
             )
         } else {
             PendingFileAttachmentMessage(
@@ -63,6 +64,8 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
                 state = PendingMessageState.entries.firstOrNull { it.value == state }
                     ?: PendingMessageState.UPLOADING,
                 nodeId = nodeHandle.takeIf { it != -1L }?.let { NodeId(it) },
+                fileSize = fileSystemRepository.getTotalSize(file),
+                fileName = name ?: file.name,
             )
         }
     }

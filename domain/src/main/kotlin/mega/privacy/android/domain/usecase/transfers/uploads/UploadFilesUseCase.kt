@@ -36,8 +36,8 @@ class UploadFilesUseCase @Inject constructor(
     /**
      * Invoke
      *
-     * @param files files and / or folders to be uploaded
-     * @param parentFolderId destination folder id where [files] will be uploaded
+     * @param filesAndNames files and / or folders to be uploaded, associated with the desired node's name or null if there are no changes
+     * @param parentFolderId destination folder id where [filesAndNames] will be uploaded
      * @param appData Custom app data to save in the MegaTransfer object.
      * @param isSourceTemporary Whether the temporary file or folder that is created for upload should be deleted or not
      * @param isHighPriority Whether the file or folder should be placed on top of the upload queue or not, chat uploads are always priority regardless of this parameter
@@ -45,21 +45,21 @@ class UploadFilesUseCase @Inject constructor(
      * @return a flow of [MultiTransferEvent]s to monitor the download state and progress
      */
     operator fun invoke(
-        files: List<File>,
+        filesAndNames: Map<File, String?>,
         parentFolderId: NodeId,
         appData: TransferAppData?,
         isHighPriority: Boolean,
         isSourceTemporary: Boolean = false,
     ): Flow<MultiTransferEvent> {
         return super.commonInvoke(
-            items = files,
+            items = filesAndNames.keys.toList(),
             null,
         ) { file ->
             if (appData is TransferAppData.ChatTransferAppData) {
                 transferRepository.startUploadForChat(
                     localPath = file.absolutePath,
                     parentNodeId = parentFolderId,
-                    fileName = file.name,
+                    fileName = filesAndNames[file],
                     appData = appData,
                     isSourceTemporary = isSourceTemporary,
                 )
@@ -67,7 +67,7 @@ class UploadFilesUseCase @Inject constructor(
                 transferRepository.startUpload(
                     localPath = file.absolutePath,
                     parentNodeId = parentFolderId,
-                    fileName = file.name,
+                    fileName = filesAndNames[file],
                     modificationTime = file.lastModified() / 1000,
                     appData = appData,
                     isSourceTemporary = isSourceTemporary,

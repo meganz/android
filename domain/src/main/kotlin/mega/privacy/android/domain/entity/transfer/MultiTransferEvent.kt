@@ -29,7 +29,7 @@ sealed interface MultiTransferEvent {
     ) :
         MultiTransferEvent {
         /**
-         * return true if this event represents a finish processing event
+         * return true if this event represents a finish processing event (or already finished)
          */
         val isFinishScanningEvent by lazy {
             with(transferEvent) {

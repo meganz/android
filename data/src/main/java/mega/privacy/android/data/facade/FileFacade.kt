@@ -331,6 +331,8 @@ class FileFacade @Inject constructor(
 
     override suspend fun isFileUri(uriString: String) = uriString.toUri().scheme == "file"
 
+    override suspend fun isFilePath(path: String) = File(path).isFile
+
     override suspend fun getFileFromUriFile(uriString: String): File =
         uriString.toUri().toFile()
 

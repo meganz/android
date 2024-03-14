@@ -12,21 +12,32 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ShareTextInfo
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
+import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -43,6 +54,10 @@ class FileExplorerViewModel @Inject constructor(
     private val getCopyLatestTargetPathUseCase: GetCopyLatestTargetPathUseCase,
     private val getMoveLatestTargetPathUseCase: GetMoveLatestTargetPathUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val attachNodeUseCase: AttachNodeUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val sendChatAttachmentsUseCase: SendChatAttachmentsUseCase,
 ) : ViewModel() {
 
     private var dataAlreadyRequested = false
@@ -336,5 +351,48 @@ class FileExplorerViewModel @Inject constructor(
      */
     fun resetMoveTargetPathState() {
         _moveTargetPathFlow.value = null
+    }
+
+    /**
+     * Upload files and nodes to the specified chats if the NewChatActivity feature flag is true, otherwise it invokes [toDoIfFalse]
+     * In both cases, it will call [toDoAfter] after starting the upload
+     */
+    fun uploadFilesToChatIfFeatureFlagIsTrue(
+        chatIds: List<Long>,
+        filePaths: List<String>,
+        nodeIds: List<NodeId>,
+        toDoIfFalse: () -> Unit,
+        toDoAfter: () -> Unit,
+    ) {
+        viewModelScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)) {
+                chatIds.forEach {
+                    attachNodes(it, nodeIds)
+                    attachFiles(it, filePaths)
+                }
+            } else {
+                toDoIfFalse()
+            }
+            toDoAfter()
+        }
+    }
+
+    private suspend fun attachFiles(chatId: Long, filePaths: List<String>) {
+        val filePathsWithNames =
+            filePaths.associateWith { fileNames.value?.get(it.split(File.separator).last()) }
+        sendChatAttachmentsUseCase(chatId, filePathsWithNames)
+            .catch { Timber.e("Error attaching files", it) }
+            .collect()
+    }
+
+    private suspend fun attachNodes(chatId: Long, nodes: List<NodeId>) {
+        nodes
+            .mapNotNull { runCatching { getNodeByIdUseCase(it) }.getOrNull() }
+            .filterIsInstance<FileNode>()
+            .forEach {
+                runCatching {
+                    attachNodeUseCase(chatId, it as TypedFileNode)
+                }.onFailure { Timber.e("Error attaching a node", it) }
+            }
     }
 }

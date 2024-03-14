@@ -20,9 +20,11 @@ class GetFileForChatUploadUseCase @Inject constructor(
      * @param uriOrPathString a string representing the Uri
      */
     suspend operator fun invoke(uriOrPathString: String): File? {
-        val file = File(uriOrPathString)
         return when {
-            file.isFile && file.exists() -> file
+            fileSystemRepository.isFilePath(uriOrPathString) -> {
+                fileSystemRepository.getFileByPath(uriOrPathString)
+            }
+
             fileSystemRepository.isFileUri(uriOrPathString) -> {
                 fileSystemRepository.getFileFromFileUri(uriOrPathString)
             }

@@ -100,6 +100,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.qualifier.LoginMutex
 import nz.mega.sdk.MegaApiJava
@@ -1484,60 +1485,64 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             return
         }
 
-        checkNotificationsPermission(this)
-        val intent = Intent(this, ChatUploadService::class.java)
-
-        if (notEmptyAttachedNodes) {
-            // There are exist files and files for upload
-            val attachNodeHandles = LongArray(attachNodes.size)
-
-            for (i in attachNodes.indices) {
-                attachNodeHandles[i] = attachNodes[i].handle
-            }
-
-            intent.putExtra(ChatUploadService.EXTRA_ATTACH_FILES, attachNodeHandles)
-        }
-        val attachIdChats = LongArray(chatListItems.size)
-
-        for (i in chatListItems.indices) {
-            attachIdChats[i] = chatListItems[i].chatId
-        }
-
-        intent.putExtra(ChatUploadService.EXTRA_ATTACH_CHAT_IDS, attachIdChats)
-
         val infoToShare = if (notEmptyUploadInfo) uploadInfos else filePreparedInfos
-        val idPendMsgs = LongArray(uploadInfos.size * chatListItems.size)
-        val filesToUploadFingerPrint = HashMap<String, String>()
-        var pos = 0
+        val chatIds = chatListItems.map { it.chatId }
+        val nodeHandles = attachNodes.map { it.handle }
+        val nodeIds = nodeHandles.map { NodeId(it) }
+        val files = infoToShare?.map { it.fileAbsolutePath } ?: emptyList()
+        checkNotificationsPermission(this)
+        viewModel.uploadFilesToChatIfFeatureFlagIsTrue(chatIds, files, nodeIds,
+            toDoAfter = {
+                openManagerAndFinish()
+            },
+            toDoIfFalse = {
+                val intent = Intent(this, ChatUploadService::class.java)
 
-        for (info in infoToShare ?: return) {
-            val fingerprint = megaApi.getFingerprint(info.fileAbsolutePath)
+                if (notEmptyAttachedNodes) {
+                    // There are exist files and files for upload
+                    intent.putExtra(
+                        ChatUploadService.EXTRA_ATTACH_FILES, nodeHandles.toLongArray()
+                    )
+                }
+                intent.putExtra(ChatUploadService.EXTRA_ATTACH_CHAT_IDS, chatIds.toLongArray())
 
-            if (fingerprint == null) {
-                Timber.w("Error, fingerprint == NULL is not possible to access file for some reason")
-                continue
+                val idPendMsgs = LongArray(uploadInfos.size * chatListItems.size)
+                val filesToUploadFingerPrint = HashMap<String, String>()
+                var pos = 0
+
+                for (info in infoToShare ?: return@uploadFilesToChatIfFeatureFlagIsTrue) {
+                    val fingerprint = megaApi.getFingerprint(info.fileAbsolutePath)
+
+                    if (fingerprint == null) {
+                        Timber.w("Error, fingerprint == NULL is not possible to access file for some reason")
+                        continue
+                    }
+
+                    filesToUploadFingerPrint[fingerprint] = info.fileAbsolutePath
+
+                    for (item in chatListItems) {
+                        val pendingMsg = ChatUtil.createAttachmentPendingMessage(
+                            item.chatId,
+                            info.fileAbsolutePath, info.getTitle(), true
+                        )
+
+                        idPendMsgs[pos] = pendingMsg.id
+                        pos++
+                    }
+                }
+                intent.apply {
+                    putExtra(ChatUploadService.EXTRA_NAME_EDITED, viewModel.fileNames.value)
+                    putExtra(
+                        ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS,
+                        filesToUploadFingerPrint
+                    )
+                    putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs)
+                    putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true)
+                    putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesNode?.serialize())
+                }
+                startService(intent)
             }
-
-            filesToUploadFingerPrint[fingerprint] = info.fileAbsolutePath
-
-            for (item in chatListItems) {
-                val pendingMsg = ChatUtil.createAttachmentPendingMessage(
-                    item.chatId,
-                    info.fileAbsolutePath, info.getTitle(), true
-                )
-
-                idPendMsgs[pos] = pendingMsg.id
-                pos++
-            }
-        }
-
-        intent.putExtra(ChatUploadService.EXTRA_NAME_EDITED, viewModel.fileNames.value)
-        intent.putExtra(ChatUploadService.EXTRA_UPLOAD_FILES_FINGERPRINTS, filesToUploadFingerPrint)
-        intent.putExtra(ChatUploadService.EXTRA_PEND_MSG_IDS, idPendMsgs)
-        intent.putExtra(ChatUploadService.EXTRA_COMES_FROM_FILE_EXPLORER, true)
-        intent.putExtra(ChatUploadService.EXTRA_PARENT_NODE, myChatFilesNode?.serialize())
-        startService(intent)
-        openManagerAndFinish()
+        )
     }
 
     private fun openManagerAndFinish() {

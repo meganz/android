@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.transfers.chatuploads
 
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onEach
@@ -8,12 +9,15 @@ import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.chat.FoldersNotAllowedAsChatUploadException
+import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.shared.AbstractStartTransfersWithWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.UploadFilesUseCase
 import java.io.File
 import javax.inject.Inject
+import kotlin.coroutines.coroutineContext
 
 /**
  * Start uploading a list of files and folders to the chat uploads folder with the corresponding pending message id in their app data
@@ -29,6 +33,8 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
     private val isChatUploadsWorkerStartedUseCase: IsChatUploadsWorkerStartedUseCase,
     private val compressFileForChatUseCase: CompressFileForChatUseCase,
     private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
+    private val chatMessageRepository: ChatMessageRepository,
+    private val fileSystemRepository: FileSystemRepository,
     cancelCancelTokenUseCase: CancelCancelTokenUseCase,
 ) : AbstractStartTransfersWithWorkerUseCase(cancelCancelTokenUseCase) {
 
@@ -42,28 +48,26 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
         file: File,
         pendingMessageId: Long,
     ): Flow<MultiTransferEvent> = flow {
-        val fileList = listOf(file).filter {
-            if (it.isFile) {
-                true
-            } else {
-                emit(
-                    MultiTransferEvent.TransferNotStarted(
-                        it,
-                        FoldersNotAllowedAsChatUploadException()
-                    )
+        if (!fileSystemRepository.isFilePath(file.path)) {
+            emit(
+                MultiTransferEvent.TransferNotStarted(
+                    file,
+                    FoldersNotAllowedAsChatUploadException()
                 )
-                false
-            }
-        }.map {
-            runCatching { compressFileForChatUseCase(it) }.getOrNull() ?: it
+            )
+            return@flow
         }
-
+        val filesAndNames = mapOf(
+            (runCatching { compressFileForChatUseCase(file) }.getOrNull() ?: file)
+                    to chatMessageRepository.getPendingMessage(pendingMessageId)?.name
+        )
+        coroutineContext.ensureActive()
         val chatFilesFolderId = getMyChatsFilesFolderIdUseCase()
         val appData = TransferAppData.ChatUpload(pendingMessageId)
         startTransfersAndWorker(
             doTransfers = {
                 uploadFilesUseCase(
-                    fileList, chatFilesFolderId, appData, false
+                    filesAndNames, chatFilesFolderId, appData, false
                 ).onEach {
                     //update transfer tag on Start event
                     ((it as? MultiTransferEvent.SingleTransferEvent)?.transferEvent as? TransferEvent.TransferStartEvent)?.transfer?.tag?.let { transferTag ->

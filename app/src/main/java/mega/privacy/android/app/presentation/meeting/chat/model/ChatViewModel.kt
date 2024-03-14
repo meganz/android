@@ -1093,7 +1093,7 @@ class ChatViewModel @Inject constructor(
 
     private fun onAttachFiles(files: List<String>, isVoiceClip: Boolean) {
         viewModelScope.launch {
-            sendChatAttachmentsUseCase(chatId, files, isVoiceClip)
+            sendChatAttachmentsUseCase(chatId, files.associateWith { null }, isVoiceClip)
                 .catch { Timber.e(it) }
                 .collect {
                     if (it is MultiTransferEvent.TransferNotStarted<*>) {

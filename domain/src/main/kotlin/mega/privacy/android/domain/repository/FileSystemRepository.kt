@@ -323,6 +323,11 @@ interface FileSystemRepository {
     suspend fun isFileUri(uriString: String): Boolean
 
     /**
+     * @return true if the [path] represents a file, not a folder
+     */
+    suspend fun isFilePath(path: String): Boolean
+
+    /**
      * Get the file represented by [uriString]
      *
      * @param uriString must be a file uri (file://...)

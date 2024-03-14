@@ -23,8 +23,6 @@ sealed interface PendingAttachmentMessage : AttachmentMessage {
     val state: PendingMessageState
     val nodeId: NodeId?
     override val isMine get() = true
-    override val fileName get() = file?.name ?: ""
-    override val fileSize get() = file?.length() ?: 0L
     override val duration get() = (fileType as? PlayableFileTypeInfo)?.duration
     override val rowId get() = -1L
     override fun isNotSent() = true // pending messages are not sent by definition
@@ -50,6 +48,8 @@ data class PendingFileAttachmentMessage(
     override val transferTag: Int?,
     override val state: PendingMessageState,
     override val nodeId: NodeId?,
+    override val fileName: String,
+    override val fileSize: Long,
     val filePath: String,
 ) : PendingAttachmentMessage {
     @Transient
@@ -77,8 +77,10 @@ data class PendingVoiceClipMessage(
     override val transferTag: Int?,
     override val state: PendingMessageState,
     override val nodeId: NodeId?,
+    override val fileName: String,
     val filePath: String,
 ) : PendingAttachmentMessage {
     @Transient
     override val file = File(filePath)
+    override val fileSize = 0L //we don't need it in voice clips
 }

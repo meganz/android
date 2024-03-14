@@ -2403,7 +2403,7 @@ internal class ChatViewModelTest {
                     on { toString() } doReturn "file$index"
                 }
             }
-            val expected = files.map { it.toString() }
+            val expected = files.associate { it.toString() to null }
             underTest.onAttachFiles(files)
             verify(sendChatAttachmentsUseCase).invoke(chatId, expected, false)
         }
@@ -2932,7 +2932,7 @@ internal class ChatViewModelTest {
             runTest {
                 underTest.onVoiceClipRecordEvent(VoiceClipRecordEvent.Start)
                 underTest.onVoiceClipRecordEvent(VoiceClipRecordEvent.Finish)
-                verify(sendChatAttachmentsUseCase).invoke(chatId, listOf(path), true)
+                verify(sendChatAttachmentsUseCase).invoke(chatId, mapOf(path to null), true)
             }
     }
 

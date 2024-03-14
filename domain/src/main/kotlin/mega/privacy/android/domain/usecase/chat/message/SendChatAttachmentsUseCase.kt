@@ -25,17 +25,21 @@ class SendChatAttachmentsUseCase @Inject constructor(
      * Invoke
      *
      * @param chatId the id of the chat where these files will be attached
-     * @param uris String representation of the files,
+     * @param urisWithNames String representation of the files associated with the desired node's name or null if there are no changes
+     * @param isVoiceClip
      */
-    operator fun invoke(chatId: Long, uris: List<String>, isVoiceClip: Boolean = false) =
+    operator fun invoke(
+        chatId: Long,
+        urisWithNames: Map<String, String?>,
+        isVoiceClip: Boolean = false,
+    ) =
         flow {
             emitAll(
                 //each file is sent as a single message in parallel
-                uris
-                    .mapNotNull { uriString ->
-                        getFileForChatUploadUseCase(uriString)
-                    }
-                    .map { file ->
+                urisWithNames.mapKeys {
+                    getFileForChatUploadUseCase(it.key)
+                }.mapNotNull { (file, name) ->
+                    file?.let {
                         val pendingMessageId = chatMessageRepository.savePendingMessage(
                             SavePendingMessageRequest(
                                 chatId = chatId,
@@ -47,12 +51,13 @@ class SendChatAttachmentsUseCase @Inject constructor(
                                 filePath = file.path,
                                 nodeHandle = -1,
                                 fingerprint = null,
-                                name = file.name,
+                                name = name,
                                 transferTag = -1,
                             )
                         ).id
                         startChatUploadsWithWorkerUseCase(file, pendingMessageId)
-                    }.merge()
+                    }
+                }.merge()
             )
         }
 }
