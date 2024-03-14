@@ -457,6 +457,9 @@ class MyAccountActivity : PasscodeActivity(),
                 showErrorAlert(state.errorMessage)
                 viewModel.resetErrorMessage()
             }
+            if (state.isBusinessAccount || viewModel.isProFlexiAccount()) {
+                refreshMenuOptionsVisibility()
+            }
         }
     }
 
