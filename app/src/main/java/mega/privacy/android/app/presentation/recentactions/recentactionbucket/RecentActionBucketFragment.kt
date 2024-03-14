@@ -57,6 +57,7 @@ import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.VIEWER_FROM_RECETS_BUCKET
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
+import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
 import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
@@ -397,10 +398,15 @@ class RecentActionBucketFragment : Fragment() {
     ) = viewLifecycleOwner.lifecycleScope.launch {
         val handles = getNodesHandles(true)
         val intent = if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
+            val menuOptionSource = if (megaApi.getRootParentNode(node).isShared) {
+                ImagePreviewMenuSource.SHARED_ITEMS
+            } else {
+                ImagePreviewMenuSource.DEFAULT
+            }
             ImagePreviewActivity.createIntent(
                 context = requireContext(),
                 imageSource = ImagePreviewFetcherSource.DEFAULT,
-                menuOptionsSource = ImagePreviewMenuSource.DEFAULT,
+                menuOptionsSource = menuOptionSource,
                 anchorImageNodeId = NodeId(node.handle),
                 params = mapOf(DefaultImageNodeFetcher.NODE_IDS to handles),
             )

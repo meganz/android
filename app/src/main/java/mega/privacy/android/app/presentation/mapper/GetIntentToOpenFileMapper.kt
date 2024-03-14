@@ -244,12 +244,20 @@ class GetIntentToOpenFileMapper @Inject constructor(
 
         } else if (MimeTypeList.typeForName(fileNode.name).isImage) {
             if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview) && viewType == FILE_BROWSER_ADAPTER) {
+                val parentNodeHandle = fileNode.parentId.longValue
+                val menuOptionsSource = getNodeByHandle(parentNodeHandle)?.let { node ->
+                    if (node.isShared) {
+                        ImagePreviewMenuSource.SHARED_ITEMS
+                    } else {
+                        ImagePreviewMenuSource.CLOUD_DRIVE
+                    }
+                } ?: ImagePreviewMenuSource.CLOUD_DRIVE
                 ImagePreviewActivity.createIntent(
                     context = activity,
                     imageSource = ImagePreviewFetcherSource.CLOUD_DRIVE,
-                    menuOptionsSource = ImagePreviewMenuSource.CLOUD_DRIVE,
+                    menuOptionsSource = menuOptionsSource,
                     anchorImageNodeId = fileNode.id,
-                    params = mapOf(CloudDriveImageNodeFetcher.PARENT_ID to fileNode.parentId.longValue),
+                    params = mapOf(CloudDriveImageNodeFetcher.PARENT_ID to parentNodeHandle),
                 )
             } else if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview) && viewType == RUBBISH_BIN_ADAPTER) {
                 ImagePreviewActivity.createIntent(
