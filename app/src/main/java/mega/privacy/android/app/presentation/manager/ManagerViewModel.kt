@@ -301,6 +301,27 @@ class ManagerViewModel @Inject constructor(
      */
     val stalledIssuesCount = _stalledIssuesCount.asStateFlow()
 
+    private val _numUnreadUserAlerts = MutableStateFlow(
+        Pair(
+            UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE,
+            0
+        )
+    )
+
+    private val legacyNumUnreadUserAlerts = SingleLiveEvent<Pair<UnreadUserAlertsCheckType, Int>>()
+
+    /**
+     * The number of unread user alerts
+     */
+    val numUnreadUserAlerts = _numUnreadUserAlerts.asStateFlow()
+
+    private val _showPromoTag = MutableStateFlow(false)
+
+    /**
+     * The state of the promo tag
+     */
+    val showPromoTag = _showPromoTag.asStateFlow()
+
     /**
      * Is network connected
      */
@@ -539,20 +560,6 @@ class ManagerViewModel @Inject constructor(
         _state.update { it.copy(nodeUpdateReceived = update) }
     }
 
-    private val _numUnreadUserAlerts = MutableStateFlow(
-        Pair(
-            UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE,
-            0
-        )
-    )
-
-    private val legacyNumUnreadUserAlerts = SingleLiveEvent<Pair<UnreadUserAlertsCheckType, Int>>()
-
-    /**
-     * The number of unread user alerts
-     */
-    val numUnreadUserAlerts = _numUnreadUserAlerts.asStateFlow()
-
     /**
      * Notifies about the number of unread user alerts once.
      *
@@ -576,6 +583,7 @@ class ManagerViewModel @Inject constructor(
                     getNumUnreadUserAlertsUseCase() + promoNotificationCount
                 _numUnreadUserAlerts.update { Pair(type, totalCount) }
                 legacyNumUnreadUserAlerts.value = Pair(type, totalCount)
+                _showPromoTag.value = promoNotificationCount > 0
             }.onFailure {
                 Timber.e("Failed to get the number of unread user alerts or promo notifications with error: $it")
             }

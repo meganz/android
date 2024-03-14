@@ -213,6 +213,21 @@
                     android:text="@string/title_properties_chat_contact_notifications"
                     android:textAppearance="?attr/textAppearanceSubtitle2" />
 
+                <TextView
+                    android:id="@+id/notification_section_promo_tag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="5dp"
+                    android:background="@drawable/rounded_new_label"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="3dp"
+                    android:text="@string/notifications_screen_notification_label_promo"
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2"
+                    android:textColor="@color/white_dark_grey"
+                    android:visibility="gone"/>
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"

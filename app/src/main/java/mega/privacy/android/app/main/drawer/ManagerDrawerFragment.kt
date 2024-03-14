@@ -176,6 +176,9 @@ internal class ManagerDrawerFragment : Fragment() {
         viewLifecycleOwner.collectFlow(managerViewModel.stalledIssuesCount) { stalledIssuesCount ->
             setSyncStatus(stalledIssuesCount)
         }
+        viewLifecycleOwner.collectFlow(managerViewModel.showPromoTag) { showPromoTag ->
+            binding.notificationSectionPromoTag.isVisible = showPromoTag
+        }
     }
 
     private fun registerView() {

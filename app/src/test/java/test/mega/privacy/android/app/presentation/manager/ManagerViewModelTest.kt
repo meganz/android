@@ -24,6 +24,7 @@ import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
+import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -117,7 +118,9 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -878,6 +881,22 @@ class ManagerViewModelTest {
             assertThat(underTest.numUnreadUserAlerts.value.second).isEqualTo(expectedTotalCount)
         }
 
+    @ParameterizedTest(name = "test that when getNumUnreadPromoNotificationsUseCase returns {0} and PromoNotifications feature flag is set to {1} then showPromoTag is updated to {2}")
+    @MethodSource("provideShowPromoTagParameters")
+    fun `test that showPromoTag is updated when there is a change in the number of unread promo notifications`(
+        promoNotificationsCount: Int,
+        featureFlagValue: Boolean,
+        expectedShowPromoTag: Boolean,
+    ) = runTest {
+        val expectedUserAlertsCount = 3
+        whenever(getNumUnreadPromoNotificationsUseCase()).thenReturn(promoNotificationsCount)
+        whenever(getFeatureFlagValueUseCase(any())).thenReturn(featureFlagValue)
+        whenever(getNumUnreadUserAlertsUseCase()).thenReturn(expectedUserAlertsCount)
+        underTest.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE)
+        advanceUntilIdle()
+        assertThat(underTest.showPromoTag.value).isEqualTo(expectedShowPromoTag)
+    }
+
     @Test
     fun `test that an exception from get full account info is not propagated`() = runTest {
         whenever(getFullAccountInfoUseCase()).thenAnswer { throw MegaException(1, "It's broken") }
@@ -1302,6 +1321,13 @@ class ManagerViewModelTest {
             assertThat(awaitItem().deviceCenterPreviousBottomNavigationItem).isEqualTo(previousItem)
         }
     }
+
+    private fun provideShowPromoTagParameters() = listOf(
+        Arguments.of(0, false, false),
+        Arguments.of(0, true, false),
+        Arguments.of(1, false, false),
+        Arguments.of(2, true, true),
+    )
 
     companion object {
         @JvmField
