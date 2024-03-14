@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.videosection.view
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -81,10 +80,13 @@ internal fun VideoSectionNavHost(
         navHostController.popBackStack()
     }
 
-    val route = navHostController.currentDestination?.route
-
-    LaunchedEffect(route) {
-        route?.let { viewModel.setCurrentDestinationRoute(it) }
+    navHostController.addOnDestinationChangedListener { _, destination, _ ->
+        destination.route?.let { route ->
+            viewModel.setCurrentDestinationRoute(route)
+            if (route != videoPlaylistDetailRoute) {
+                viewModel.updateCurrentVideoPlaylist(null)
+            }
+        }
     }
 
     NavHost(

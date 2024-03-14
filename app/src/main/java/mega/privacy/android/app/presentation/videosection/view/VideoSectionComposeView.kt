@@ -49,10 +49,6 @@ internal fun VideoSectionComposeView(
         tabState.tabs.size
     }
 
-    LaunchedEffect(Unit) {
-        videoSectionViewModel.updateCurrentVideoPlaylist(null)
-    }
-
     LaunchedEffect(pagerState.currentPage) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
             videoSectionViewModel.onTabSelected(selectTab = tabState.tabs[page])

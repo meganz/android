@@ -179,16 +179,13 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
             videoSectionViewModel.state.map { it.currentDestinationRoute }.distinctUntilChanged(),
             minActiveState = Lifecycle.State.CREATED
         ) { route ->
-            route?.let { updateToolbarWhenDestinationChanged(it) }
+            route?.let { updateToolbarWhenDestinationChanged(isAddMenu = true) }
         }
 
         viewLifecycleOwner.collectFlow(
             videoSectionViewModel.state.map { it.updateToolbarTitle }.distinctUntilChanged(),
         ) { title ->
-            (activity as? ManagerActivity)?.run {
-                setToolbarTitle(title ?: "")
-                invalidateOptionsMenu()
-            }
+            updateToolbarWhenDestinationChanged(title = title)
         }
 
         viewLifecycleOwner.collectFlow(
@@ -424,7 +421,11 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
         )
     }
 
-    private fun updateToolbarWhenDestinationChanged(route: String) {
+    private fun updateToolbarWhenDestinationChanged(
+        title: String? = null,
+        isAddMenu: Boolean = false,
+    ) {
+        val route = videoSectionViewModel.state.value.currentDestinationRoute ?: return
         (activity as? ManagerActivity)?.let { managerActivity ->
             when (route) {
                 videoSectionRoute -> {
@@ -433,8 +434,10 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                 }
 
                 videoPlaylistDetailRoute -> {
-                    managerActivity.addMenuProvider(playlistMenuMoreProvider)
-                    managerActivity.setToolbarTitle("")
+                    if (isAddMenu) {
+                        managerActivity.addMenuProvider(playlistMenuMoreProvider)
+                    }
+                    managerActivity.setToolbarTitle(title ?: "")
                 }
             }
             managerActivity.invalidateOptionsMenu()
