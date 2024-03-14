@@ -4,6 +4,7 @@ import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.app.presentation.search.navigation.searchFolderShareDialog
 import mega.privacy.android.core.ui.model.MenuAction
@@ -36,7 +37,10 @@ class ShareFolderToolbarMenuItem @Inject constructor(
         noNodeTakenDown: Boolean,
         allFileNodes: Boolean,
         resultCount: Int,
-    ) = noNodeTakenDown && selectedNodes.isNotEmpty() && selectedNodes.first() is FolderNode
+    ) = noNodeTakenDown && selectedNodes.run {
+        isNotEmpty() && first() is FolderNode
+                && none { it.isOutShare() }.takeIf { size > 1 } ?: true
+    }
 
     override fun getOnClick(
         selectedNodes: List<TypedNode>,

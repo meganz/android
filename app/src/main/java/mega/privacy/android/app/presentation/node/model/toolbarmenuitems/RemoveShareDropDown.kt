@@ -28,7 +28,9 @@ class RemoveShareDropDown @Inject constructor(
         noNodeTakenDown: Boolean,
         allFileNodes: Boolean,
         resultCount: Int,
-    ): Boolean = selectedNodes.isNotEmpty() && selectedNodes.all { it.isOutShare() }
+    ): Boolean = selectedNodes.run {
+        isNotEmpty() && any { it.isOutShare() }
+    }
 
     override val menuAction = RemoveShareDropdownMenuAction()
 

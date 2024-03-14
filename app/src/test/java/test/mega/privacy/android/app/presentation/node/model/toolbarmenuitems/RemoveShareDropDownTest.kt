@@ -12,7 +12,7 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class RemoveToolbarMenuItemShareDropDownTest {
+class RemoveShareDropDownTest {
 
     private val underTest = RemoveShareDropDown(mock())
 
@@ -49,6 +49,6 @@ class RemoveToolbarMenuItemShareDropDownTest {
     private fun provideArguments() = Stream.of(
         Arguments.of(emptyList<TypedFolderNode>(), false),
         Arguments.of(sharedFolders, true),
-        Arguments.of(mixedFoldersList, false)
+        Arguments.of(mixedFoldersList, true)
     )
 }

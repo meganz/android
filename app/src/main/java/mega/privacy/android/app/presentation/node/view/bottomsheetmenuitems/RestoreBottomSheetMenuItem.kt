@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.presentation.mapper.RestoreNodeResultMapper
@@ -56,6 +57,7 @@ class RestoreBottomSheetMenuItem @Inject constructor(
                     checkNodesNameCollisionUseCase(restoreMap, NodeNameCollisionType.RESTORE)
                 }.onSuccess { result ->
                     if (result.conflictNodes.isNotEmpty()) {
+                        parentCoroutineScope.ensureActive()
                         actionHandler(menuAction, node)
                     }
                     if (result.noConflictNodes.isNotEmpty()) {
