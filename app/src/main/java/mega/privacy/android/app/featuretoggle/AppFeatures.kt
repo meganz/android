@@ -215,8 +215,9 @@ enum class AppFeatures(override val description: String, private val defaultValu
 
     /**
      * To switch into new chat activity
+     * Enabled version 11.10
      */
-    NewChatActivity("Enable new chat activity", false),
+    NewChatActivity("Enable new chat activity", true),
 
     /**
      * Call unlimited for pro users
