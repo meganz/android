@@ -17,6 +17,7 @@ import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.node.ImageNodeFileMapper
+import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.photos.ContentConsumptionMegaStringMapMapper
 import mega.privacy.android.data.mapper.photos.TimelineFilterPreferencesJSONMapper
 import mega.privacy.android.data.wrapper.DateUtilWrapper
@@ -63,6 +64,7 @@ class DefaultPhotosRepositoryTest {
     private val videoMapper: VideoMapper = ::createVideo
     private val fileTypeInfoMapper: FileTypeInfoMapper = ::mapFileTypeInfo
     private val imageNodeFileMapper: ImageNodeFileMapper = mock()
+    private val megaNodeMapper: MegaNodeMapper = mock()
     private val timelineFilterPreferencesJSONMapper: TimelineFilterPreferencesJSONMapper = mock()
     private val contentConsumptionMegaStringMapMapper: ContentConsumptionMegaStringMapMapper =
         mock()
@@ -280,6 +282,7 @@ class DefaultPhotosRepositoryTest {
         imageNodeMapper = mock(),
         cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway,
         sortOrderIntMapper = mock(),
+        megaNodeMapper = megaNodeMapper
     )
 
     private fun createMegaNode(

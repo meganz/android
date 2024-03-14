@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
 import java.io.File
@@ -177,9 +178,9 @@ interface PhotosRepository {
     ): ImageNode?
 
     /**
-     * Get link url by imageNode
+     * Get link url by typedFileNode
      *
-     * @param imageNode
+     * @param typedFileNode
      */
-    suspend fun getHttpServerLocalLink(imageNode: ImageNode): String?
+    suspend fun getHttpServerLocalLink(typedFileNode: TypedFileNode): String?
 }

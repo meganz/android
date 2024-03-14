@@ -63,8 +63,6 @@ class ImagePreviewActivity : BaseActivity() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
-    @Inject
-    lateinit var imagePreviewVideoLauncher: ImagePreviewVideoLauncher
     private val selectMoveFolderLauncher: ActivityResultLauncher<LongArray> =
         registerForActivityResult(
             SelectFolderToMoveActivityContract(),
@@ -300,9 +298,9 @@ class ImagePreviewActivity : BaseActivity() {
 
     private fun playVideo(imageNode: ImageNode) {
         lifecycleScope.launch {
-            imagePreviewVideoLauncher.launchVideoScreen(
+            viewModel.playVideo(
+                this@ImagePreviewActivity,
                 imageNode = imageNode,
-                context = this@ImagePreviewActivity,
             )
         }
     }

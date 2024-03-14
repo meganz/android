@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase
 
-import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.repository.PhotosRepository
 import javax.inject.Inject
 
@@ -12,11 +12,12 @@ class GetFileUrlByImageNodeUseCase @Inject constructor(
 ) {
 
     /**
-     * Get file url by imageNode
+     * Get file url by typedImageNode
      *
-     * @param imageNode
+     * @param typedFileNode
      * @return local link
      */
-    suspend operator fun invoke(imageNode: ImageNode) =
-        photosRepository.getHttpServerLocalLink(imageNode = imageNode)
+    suspend operator fun invoke(typedFileNode: TypedFileNode): String? {
+        return photosRepository.getHttpServerLocalLink(typedFileNode = typedFileNode)
+    }
 }

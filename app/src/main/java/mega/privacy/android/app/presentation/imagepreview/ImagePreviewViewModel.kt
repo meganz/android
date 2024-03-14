@@ -92,6 +92,7 @@ class ImagePreviewViewModel @Inject constructor(
     private val resetTotalDownloadsUseCase: ResetTotalDownloadsUseCase,
     private val deleteNodesUseCase: DeleteNodesUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
+    private val imagePreviewVideoLauncher: ImagePreviewVideoLauncher,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
         get() = savedStateHandle[IMAGE_NODE_FETCHER_SOURCE] ?: ImagePreviewFetcherSource.TIMELINE
@@ -693,6 +694,17 @@ class ImagePreviewViewModel @Inject constructor(
      */
     fun unhideNode(nodeId: NodeId) = viewModelScope.launch {
         updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = false)
+    }
+
+    fun playVideo(
+        context: Context,
+        imageNode: ImageNode,
+    ) = viewModelScope.launch {
+        imagePreviewVideoLauncher.launchVideoScreen(
+            context = context,
+            imageNode = imageNode,
+            source = imagePreviewFetcherSource
+        )
     }
 
     companion object {

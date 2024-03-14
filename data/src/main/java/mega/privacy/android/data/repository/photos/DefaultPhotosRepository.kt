@@ -38,6 +38,7 @@ import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.node.ImageNodeFileMapper
 import mega.privacy.android.data.mapper.node.ImageNodeMapper
+import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.photos.ContentConsumptionMegaStringMapMapper
 import mega.privacy.android.data.mapper.photos.TimelineFilterPreferencesJSONMapper
 import mega.privacy.android.data.wrapper.DateUtilWrapper
@@ -51,6 +52,7 @@ import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
@@ -89,6 +91,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val imageNodeMapper: ImageNodeMapper,
     private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway,
     private val sortOrderIntMapper: SortOrderIntMapper,
+    private val megaNodeMapper: MegaNodeMapper,
 ) : PhotosRepository {
     @Volatile
     private var isInitialized: Boolean = false
@@ -921,9 +924,9 @@ internal class DefaultPhotosRepository @Inject constructor(
             }
         }
 
-    override suspend fun getHttpServerLocalLink(imageNode: ImageNode): String? =
+    override suspend fun getHttpServerLocalLink(typedFileNode: TypedFileNode): String? =
         withContext(ioDispatcher) {
-            megaApiFacade.httpServerGetLocalLink(MegaNode.unserialize(imageNode.serializedData))
+            megaNodeMapper(typedFileNode)?.let { megaApiFacade.httpServerGetLocalLink(it) }
         }
 
     override fun clearCache() {
