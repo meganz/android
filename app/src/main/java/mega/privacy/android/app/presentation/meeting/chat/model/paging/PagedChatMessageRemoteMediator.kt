@@ -7,6 +7,7 @@ import androidx.paging.RemoteMediator
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.isActive
 import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
@@ -15,6 +16,7 @@ import mega.privacy.android.domain.usecase.chat.message.paging.ClearChatMessages
 import mega.privacy.android.domain.usecase.chat.message.paging.FetchMessagePageUseCase
 import mega.privacy.android.domain.usecase.chat.message.paging.SaveChatMessagesUseCase
 import timber.log.Timber
+import kotlin.coroutines.coroutineContext
 
 /**
  * Paged chat message remote mediator
@@ -56,7 +58,7 @@ class PagedChatMessageRemoteMediator @AssistedInject constructor(
 
             val messages = mutableListOf<ChatMessage>()
             lateinit var response: FetchMessagePageResponse
-            while (messages.size < count) {
+            while (messages.size < count && coroutineContext.isActive) {
                 response = fetchMessages(chatId, coroutineScope)
                 Timber.d("Paging mediator load: fetch messages response : $response")
                 messages.addAll(response.messages)

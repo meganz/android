@@ -194,6 +194,7 @@ internal class MegaChatApiFacade @Inject constructor(
             }
         }
 
+        chatApi.closeChatRoom(chatId, listener)
         val opened = chatApi.openChatRoom(chatId, listener)
         Timber.d("Open chat room $chatId: $opened")
 
