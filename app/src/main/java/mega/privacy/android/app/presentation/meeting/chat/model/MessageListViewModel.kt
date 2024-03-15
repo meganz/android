@@ -166,22 +166,26 @@ class MessageListViewModel @Inject constructor(
     private val pagedFlow = unreadCount
         .filterNotNull()
         .flatMapLatest { unreadCount ->
-            Pager(
-                config = PagingConfig(
-                    pageSize = 32,
-                    initialLoadSize = unreadCount.coerceAtLeast(32 * 3), // recommend to load at least 3 pages
-                ),
-                remoteMediator = remoteMediator,
-            ) {
-                getChatPagingSourceUseCase(chatId)
-            }.flow.cachedIn(viewModelScope).combine(
+            combine(
+                // 1- paged messages
+                Pager(
+                    config = PagingConfig(
+                        pageSize = 32,
+                        initialLoadSize = unreadCount.coerceAtLeast(32 * 3), // recommend to load at least 3 pages
+                    ),
+                    remoteMediator = remoteMediator,
+                ) {
+                    getChatPagingSourceUseCase(chatId)
+                }.flow.cachedIn(viewModelScope), //this cachedIn is needed to avoid to collect twice from pageEventFlow (which is illegal) within the combine operator
+                // 2- pending messages
                 monitorPendingMessagesUseCase(chatId).map { pendingMessages ->
                     pendingMessages.map { pendingMessage ->
                         uiChatMessageMapper(
                             pendingMessage
                         )
                     }
-                }) { pagingData, pendingMessages ->
+                }
+            ) { pagingData, pendingMessages ->
                 pagingData.map {
                     uiChatMessageMapper(it)
                 }
@@ -216,7 +220,7 @@ class MessageListViewModel @Inject constructor(
                         }
                     }
             }
-        }
+        }.cachedIn(viewModelScope) //this cachedIn is to avoid losing the resulting on rotation
 
     /**
      * Paged messages
