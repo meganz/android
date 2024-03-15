@@ -8,8 +8,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
-import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
+import mega.privacy.android.core.ui.preview.CountProvider
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
@@ -25,7 +25,6 @@ fun DeleteMessagesConfirmationDialog(
         id = if (messagesCount == 1) R.string.confirmation_delete_one_message
         else R.string.confirmation_delete_several_messages
     ),
-    text = "",
     cancelButtonText = stringResource(id = R.string.button_cancel),
     confirmButtonText = stringResource(id = R.string.context_remove),
     onDismiss = onDismiss,
@@ -36,11 +35,11 @@ fun DeleteMessagesConfirmationDialog(
 @CombinedTextAndThemePreviews
 @Composable
 private fun DeleteMessagesConfirmationDialogPreview(
-    @PreviewParameter(BooleanProvider::class) isMeeting: Boolean,
+    @PreviewParameter(CountProvider::class) messagesCount: Int,
 ) {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
-        ClearChatConfirmationDialog(
-            isMeeting = isMeeting,
+        DeleteMessagesConfirmationDialog(
+            messagesCount = messagesCount,
             onDismiss = {},
             onConfirm = {},
         )

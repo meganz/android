@@ -17,7 +17,7 @@ import mega.privacy.android.core.ui.utils.composeLet
 
 @Composable
 internal fun BaseMegaAlertDialog(
-    text: String,
+    text: String?,
     confirmButtonText: String,
     cancelButtonText: String?,
     onConfirm: () -> Unit,
@@ -28,7 +28,7 @@ internal fun BaseMegaAlertDialog(
     dismissOnClickOutside: Boolean = true,
     dismissOnBackPress: Boolean = true,
 ) = BaseMegaAlertDialog(
-    content = {
+    content = text?.composeLet {
         Text(
             text = text,
             style = MaterialTheme.typography.subtitle1,
@@ -48,12 +48,12 @@ internal fun BaseMegaAlertDialog(
 
 @Composable
 internal fun BaseMegaAlertDialog(
-    content: @Composable (() -> Unit),
     confirmButtonText: String,
     cancelButtonText: String?,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    content: @Composable (() -> Unit)? = null,
     title: String? = null,
     onCancel: () -> Unit = onDismiss,
     dismissOnClickOutside: Boolean = true,
@@ -76,7 +76,11 @@ internal fun BaseMegaAlertDialog(
             )
         }
     },
-    onDismiss, modifier, title, dismissOnClickOutside, dismissOnBackPress
+    onDismiss = onDismiss,
+    modifier = modifier,
+    title = title,
+    dismissOnClickOutside = dismissOnClickOutside,
+    dismissOnBackPress = dismissOnBackPress
 )
 
 @Composable
@@ -96,15 +100,20 @@ internal fun BaseMegaAlertDialog(
             color = MegaTheme.colors.text.secondary
         )
     },
-    buttons, onDismiss, modifier, title, dismissOnClickOutside, dismissOnBackPress
+    buttons = buttons,
+    onDismiss = onDismiss,
+    modifier = modifier,
+    title = title,
+    dismissOnClickOutside = dismissOnClickOutside,
+    dismissOnBackPress = dismissOnBackPress
 )
 
 @Composable
 private fun BaseMegaAlertDialog(
-    text: @Composable (() -> Unit),
     buttons: @Composable (() -> Unit),
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    text: @Composable (() -> Unit)? = null,
     title: String? = null,
     dismissOnClickOutside: Boolean = true,
     dismissOnBackPress: Boolean = true,
