@@ -7,12 +7,11 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsState
+import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsUiState
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
@@ -67,12 +66,12 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(SettingsCameraUploadsState())
+    private val _uiState = MutableStateFlow(SettingsCameraUploadsUiState())
 
     /**
-     * The State of Settings Camera Uploads
+     * The Settings Camera Uploads UI State
      */
-    val state: StateFlow<SettingsCameraUploadsState> = _state.asStateFlow()
+    val uiState = _uiState.asStateFlow()
 
     init {
         initializeSettings()
@@ -90,7 +89,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 val isMediaUploadsEnabled = async { isSecondaryFolderEnabled() }
                 val uploadConnectionType = async { getUploadConnectionType() }
 
-                _state.update {
+                _uiState.update {
                     it.copy(
                         isCameraUploadsEnabled = isCameraUploadsEnabled.await(),
                         isMediaUploadsEnabled = isMediaUploadsEnabled.await(),
@@ -130,7 +129,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                     } else {
                         // Camera Uploads is currently disabled. Check if the Media Permissions have
                         // been granted before continuing the process
-                        _state.update { it.copy(requestPermissions = triggered) }
+                        _uiState.update { it.copy(requestPermissions = triggered) }
                     }
                 } else {
                     Timber.d("User must be connected to the Internet to update the Camera Uploads state")
@@ -149,7 +148,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
      * @param isEnabled true if Camera Uploads is enabled
      */
     private fun setCameraUploadsEnabled(isEnabled: Boolean) {
-        _state.update {
+        _uiState.update {
             it.copy(
                 isCameraUploadsEnabled = isEnabled,
                 isMediaUploadsEnabled = if (isEnabled) it.isMediaUploadsEnabled else false,
@@ -162,35 +161,35 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
      * Administrator can access his/her Camera Uploads content, continue the process
      */
     fun onBusinessAccountPromptAcknowledged() {
-        _state.update { it.copy(showBusinessAccountPrompt = false) }
+        _uiState.update { it.copy(showBusinessAccountPrompt = false) }
         enableCameraUploads()
     }
 
     /**
      * When the Business Account User dismisses the prompt informing that the Business Account
      * Administrator can access his/her Camera Uploads content, reset the value of
-     * [SettingsCameraUploadsState.showBusinessAccountPrompt]
+     * [SettingsCameraUploadsUiState.showBusinessAccountPrompt]
      */
     fun onBusinessAccountPromptDismissed() {
-        _state.update { it.copy(showBusinessAccountPrompt = false) }
+        _uiState.update { it.copy(showBusinessAccountPrompt = false) }
     }
 
     /**
      * When the Suspended Business Account Sub-User dismisses the prompt informing that Camera Uploads
      * cannot be enabled, reset the value of
-     * [SettingsCameraUploadsState.showBusinessAccountSubUserSuspendedPrompt]
+     * [SettingsCameraUploadsUiState.showBusinessAccountSubUserSuspendedPrompt]
      */
     fun onBusinessAccountSubUserSuspendedPromptAcknowledged() {
-        _state.update { it.copy(showBusinessAccountSubUserSuspendedPrompt = false) }
+        _uiState.update { it.copy(showBusinessAccountSubUserSuspendedPrompt = false) }
     }
 
     /**
      * When the Suspended Business Account Administrator dismisses the prompt informing that Camera
      * Uploads cannot be enabled, reset the value of
-     * [SettingsCameraUploadsState.showBusinessAccountAdministratorSuspendedPrompt]
+     * [SettingsCameraUploadsUiState.showBusinessAccountAdministratorSuspendedPrompt]
      */
     fun onBusinessAccountAdministratorSuspendedPromptAcknowledged() {
-        _state.update { it.copy(showBusinessAccountAdministratorSuspendedPrompt = false) }
+        _uiState.update { it.copy(showBusinessAccountAdministratorSuspendedPrompt = false) }
     }
 
     /**
@@ -206,18 +205,18 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                     EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS -> enableCameraUploads()
                     EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT -> {
                         // The User is under a Business Account and is not suspended
-                        _state.update { it.copy(showBusinessAccountPrompt = true) }
+                        _uiState.update { it.copy(showBusinessAccountPrompt = true) }
                     }
 
                     EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT -> {
                         // The Business Account Sub-User has been suspended
-                        _state.update { it.copy(showBusinessAccountSubUserSuspendedPrompt = true) }
+                        _uiState.update { it.copy(showBusinessAccountSubUserSuspendedPrompt = true) }
                     }
 
                     EnableCameraUploadsStatus.SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT,
                     -> {
                         // The Business Account Administrator has been suspended
-                        _state.update { it.copy(showBusinessAccountAdministratorSuspendedPrompt = true) }
+                        _uiState.update { it.copy(showBusinessAccountAdministratorSuspendedPrompt = true) }
                     }
                 }
             }.onFailure {
@@ -248,7 +247,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
      * functionality is enabled
      */
     fun onSettingsScreenPaused() {
-        if (_state.value.isCameraUploadsEnabled) {
+        if (_uiState.value.isCameraUploadsEnabled) {
             viewModelScope.launch {
                 runCatching {
                     startCameraUploadUseCase()
@@ -263,22 +262,22 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Updates the value of [SettingsCameraUploadsState.showMediaPermissionsRationale]
+     * Updates the value of [SettingsCameraUploadsUiState.showMediaPermissionsRationale]
      *
      * @param showRationale true if the Media Permissions rationale should be shown
      */
     fun onMediaPermissionsRationaleStateChanged(showRationale: Boolean) {
-        _state.update { it.copy(showMediaPermissionsRationale = showRationale) }
+        _uiState.update { it.copy(showMediaPermissionsRationale = showRationale) }
     }
 
     /**
-     * Updates the value of [SettingsCameraUploadsState.requestPermissions]
+     * Updates the value of [SettingsCameraUploadsUiState.requestPermissions]
      *
      * @param newState The new State Event. If triggered, this will perform a Camera Uploads
      * permissions request
      */
     fun onRequestPermissionsStateChanged(newState: StateEvent) {
-        _state.update { it.copy(requestPermissions = newState) }
+        _uiState.update { it.copy(requestPermissions = newState) }
     }
 
     /**
@@ -293,7 +292,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 setCameraUploadsByWifiUseCase(uploadConnectionType == UploadConnectionType.WIFI)
                 stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
             }.onSuccess {
-                _state.update {
+                _uiState.update {
                     it.copy(uploadConnectionType = uploadConnectionType)
                 }
             }.onFailure { exception ->

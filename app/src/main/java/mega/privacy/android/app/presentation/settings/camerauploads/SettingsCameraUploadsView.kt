@@ -26,7 +26,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.account.business.BusinessAccountSuspendedDialog
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.CameraUploadsBusinessAccountDialog
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.HowToUploadDialog
-import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsState
+import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsUiState
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.app.presentation.settings.camerauploads.permissions.CameraUploadsPermissionsHandler
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.CameraUploadsTile
@@ -40,7 +40,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 /**
  * A Composable that holds views displaying the main Settings Camera Uploads screen
  *
- * @param uiState The Settings Camera Uploads State
+ * @param uiState The Settings Camera Uploads UI State
  * @param onBusinessAccountAdministratorSuspendedPromptAcknowledged Lambda to execute when the
  * Suspended Business Account Administrator acknowledges that Camera Uploads cannot be enabled until
  * the specific issue has been resolved
@@ -64,7 +64,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  */
 @Composable
 internal fun SettingsCameraUploadsView(
-    uiState: SettingsCameraUploadsState,
+    uiState: SettingsCameraUploadsUiState,
     onBusinessAccountAdministratorSuspendedPromptAcknowledged: () -> Unit,
     onBusinessAccountPromptAcknowledged: () -> Unit,
     onBusinessAccountPromptDismissed: () -> Unit,
@@ -163,12 +163,12 @@ internal fun SettingsCameraUploadsView(
 /**
  * A Composable Preview for [SettingsCameraUploadsView]
  *
- * @param uiState The [SettingsCameraUploadsState]
+ * @param uiState The [SettingsCameraUploadsUiState]
  */
 @CombinedThemePreviews
 @Composable
 private fun SettingsCameraUploadsViewPreview(
-    @PreviewParameter(SettingsCameraUploadsViewParameterProvider::class) uiState: SettingsCameraUploadsState,
+    @PreviewParameter(SettingsCameraUploadsViewParameterProvider::class) uiState: SettingsCameraUploadsUiState,
 ) {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         SettingsCameraUploadsView(
@@ -188,13 +188,13 @@ private fun SettingsCameraUploadsViewPreview(
 }
 
 private class SettingsCameraUploadsViewParameterProvider
-    : PreviewParameterProvider<SettingsCameraUploadsState> {
-    override val values: Sequence<SettingsCameraUploadsState>
+    : PreviewParameterProvider<SettingsCameraUploadsUiState> {
+    override val values: Sequence<SettingsCameraUploadsUiState>
         get() = sequenceOf(
             // Initial Configuration - Camera Uploads Disabled
-            SettingsCameraUploadsState(),
+            SettingsCameraUploadsUiState(),
             // Camera Uploads Enabled
-            SettingsCameraUploadsState(isCameraUploadsEnabled = true)
+            SettingsCameraUploadsUiState(isCameraUploadsEnabled = true)
         )
 
 }

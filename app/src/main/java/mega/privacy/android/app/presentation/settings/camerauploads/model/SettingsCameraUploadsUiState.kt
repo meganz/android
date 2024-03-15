@@ -20,7 +20,7 @@ import de.palm.composestateevents.consumed
  * need to be granted should be shown
  * @property uploadConnectionType Determines the connection type for uploading content in Camera Uploads
  */
-internal data class SettingsCameraUploadsState(
+internal data class SettingsCameraUploadsUiState(
     val isCameraUploadsEnabled: Boolean = false,
     val isMediaUploadsEnabled: Boolean = false,
     val requestPermissions: StateEvent = consumed,

@@ -10,7 +10,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.SETTINGS_CAM
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsView
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.CAMERA_UPLOADS_BUSINESS_ACCOUNT_DIALOG
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.HOW_TO_UPLOAD_DIALOG
-import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsState
+import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsUiState
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.CAMERA_UPLOADS_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.HOW_TO_UPLOAD_TILE
 import org.junit.Rule
@@ -86,7 +86,7 @@ internal class SettingsCameraUploadsViewTest {
     ) {
         composeTestRule.setContent {
             SettingsCameraUploadsView(
-                uiState = SettingsCameraUploadsState(
+                uiState = SettingsCameraUploadsUiState(
                     isCameraUploadsEnabled = isCameraUploadsEnabled,
                     showBusinessAccountPrompt = showBusinessAccountPrompt,
                     showBusinessAccountAdministratorSuspendedPrompt = showBusinessAccountAdministratorSuspendedPrompt,
@@ -108,7 +108,6 @@ internal class SettingsCameraUploadsViewTest {
 
     private fun testInitialCameraUploadsConfiguration() {
         composeTestRule.onNodeWithTag(SETTINGS_CAMERA_UPLOADS_TOOLBAR).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(CAMERA_UPLOADS_TILE).assertIsDisplayed()
         composeTestRule.onNodeWithTag(CAMERA_UPLOADS_TILE).assertIsDisplayed()
     }
 }

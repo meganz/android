@@ -161,7 +161,7 @@ internal class SettingsCameraUploadsViewModelTest {
             // when the ViewModel function is called
             verify(isCameraUploadsEnabledUseCase, times(2)).invoke()
             verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.StopAndDisable)
-            underTest.state.test {
+            underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.isCameraUploadsEnabled).isFalse()
                 assertThat(state.isMediaUploadsEnabled).isFalse()
@@ -203,7 +203,7 @@ internal class SettingsCameraUploadsViewModelTest {
 
                 underTest.onCameraUploadsStateChanged(newState = true)
 
-                underTest.state.test {
+                underTest.uiState.test {
                     val state = awaitItem()
                     assertThat(state.requestPermissions).isEqualTo(triggered)
                 }
@@ -218,7 +218,7 @@ internal class SettingsCameraUploadsViewModelTest {
 
             underTest.onMediaPermissionsRationaleStateChanged(showRationale = showRationale)
 
-            underTest.state.test {
+            underTest.uiState.test {
                 assertThat(awaitItem().showMediaPermissionsRationale).isEqualTo(
                     showRationale
                 )
@@ -233,7 +233,7 @@ internal class SettingsCameraUploadsViewModelTest {
 
                 underTest.onRequestPermissionsStateChanged(newState = newState)
 
-                underTest.state.test {
+                underTest.uiState.test {
                     assertThat(awaitItem().requestPermissions).isEqualTo(newState)
                 }
             }
@@ -287,7 +287,7 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.onMediaPermissionsGranted()
 
                 verify(setupCameraUploadsSettingUseCase).invoke(isEnabled = true)
-                underTest.state.test {
+                underTest.uiState.test {
                     val state = awaitItem()
                     assertThat(state.isCameraUploadsEnabled).isTrue()
                     assertThat(state.isMediaUploadsEnabled).isTrue()
@@ -304,7 +304,7 @@ internal class SettingsCameraUploadsViewModelTest {
 
                 underTest.onMediaPermissionsGranted()
 
-                underTest.state.test {
+                underTest.uiState.test {
                     assertThat(awaitItem().showBusinessAccountPrompt).isTrue()
                 }
             }
@@ -317,7 +317,7 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.onBusinessAccountPromptAcknowledged()
 
                 verify(setupCameraUploadsSettingUseCase).invoke(isEnabled = true)
-                underTest.state.test {
+                underTest.uiState.test {
                     val state = awaitItem()
                     assertThat(state.showBusinessAccountPrompt).isFalse()
                     assertThat(state.isCameraUploadsEnabled).isTrue()
@@ -336,7 +336,7 @@ internal class SettingsCameraUploadsViewModelTest {
                     resId = R.string.general_error,
                     snackbarDuration = MegaSnackbarDuration.Long,
                 )
-                underTest.state.test {
+                underTest.uiState.test {
                     assertThat(awaitItem().showBusinessAccountPrompt).isFalse()
                 }
             }
@@ -348,7 +348,7 @@ internal class SettingsCameraUploadsViewModelTest {
 
                 underTest.onBusinessAccountPromptDismissed()
 
-                underTest.state.test {
+                underTest.uiState.test {
                     assertThat(awaitItem().showBusinessAccountPrompt).isFalse()
                 }
             }
@@ -363,7 +363,7 @@ internal class SettingsCameraUploadsViewModelTest {
 
                 underTest.onMediaPermissionsGranted()
 
-                underTest.state.test {
+                underTest.uiState.test {
                     assertThat(awaitItem().showBusinessAccountSubUserSuspendedPrompt).isTrue()
                 }
             }
@@ -375,7 +375,7 @@ internal class SettingsCameraUploadsViewModelTest {
 
                 underTest.onBusinessAccountSubUserSuspendedPromptAcknowledged()
 
-                underTest.state.test {
+                underTest.uiState.test {
                     assertThat(awaitItem().showBusinessAccountSubUserSuspendedPrompt).isFalse()
                 }
             }
@@ -390,7 +390,7 @@ internal class SettingsCameraUploadsViewModelTest {
 
                 underTest.onMediaPermissionsGranted()
 
-                underTest.state.test {
+                underTest.uiState.test {
                     assertThat(awaitItem().showBusinessAccountAdministratorSuspendedPrompt).isTrue()
                 }
             }
@@ -402,7 +402,7 @@ internal class SettingsCameraUploadsViewModelTest {
 
                 underTest.onBusinessAccountAdministratorSuspendedPromptAcknowledged()
 
-                underTest.state.test {
+                underTest.uiState.test {
                     assertThat(awaitItem().showBusinessAccountAdministratorSuspendedPrompt).isFalse()
                 }
             }
@@ -479,7 +479,7 @@ internal class SettingsCameraUploadsViewModelTest {
 
             verify(setCameraUploadsByWifiUseCase).invoke(uploadConnectionType == UploadConnectionType.WIFI)
             verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
-            underTest.state.test {
+            underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.uploadConnectionType).isEqualTo(uploadConnectionType)
             }

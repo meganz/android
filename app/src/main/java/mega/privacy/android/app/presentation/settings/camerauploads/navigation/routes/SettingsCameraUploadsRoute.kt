@@ -16,7 +16,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCame
 internal fun SettingsCameraUploadsRoute(
     viewModel: SettingsCameraUploadsViewModel = hiltViewModel(),
 ) {
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     SettingsCameraUploadsView(
         uiState = uiState,
         onBusinessAccountAdministratorSuspendedPromptAcknowledged = viewModel::onBusinessAccountAdministratorSuspendedPromptAcknowledged,
