@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteOpenHelper
 import mega.privacy.android.data.database.dao.ChatMessageMetaDao
 import mega.privacy.android.data.database.dao.ChatNodeDao
 import mega.privacy.android.data.database.dao.PendingMessageDao
@@ -15,6 +16,12 @@ import mega.privacy.android.data.database.entity.chat.NodeMessageCrossRef
 import mega.privacy.android.data.database.entity.chat.PendingMessageEntity
 import mega.privacy.android.data.database.entity.chat.RichPreviewEntity
 import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
+
+/**
+ * Chat database name
+
+ */
+const val CHAT_DATABASE_NAME = "chat_database"
 
 /**
  * In memory chat database
@@ -33,7 +40,7 @@ import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
     ],
     version = 1,
 )
-abstract class InMemoryChatDatabase : RoomDatabase() {
+abstract class ChatDatabase : RoomDatabase() {
 
     /**
      * Typed message dao
@@ -56,11 +63,16 @@ abstract class InMemoryChatDatabase : RoomDatabase() {
     abstract fun pendingMessageDao(): PendingMessageDao
 
     companion object {
-        fun create(context: Context): InMemoryChatDatabase {
-            return Room.inMemoryDatabaseBuilder(
-                context,
-                InMemoryChatDatabase::class.java
-            ).build()
-        }
+        fun init(
+            context: Context,
+            factory: SupportSQLiteOpenHelper.Factory,
+        ): ChatDatabase = Room.databaseBuilder(
+            context,
+            ChatDatabase::class.java,
+            CHAT_DATABASE_NAME
+        ).openHelperFactory(factory).build()
     }
+
+    fun inMemoryInit(context: Context): ChatDatabase =
+        Room.inMemoryDatabaseBuilder(context, ChatDatabase::class.java).build()
 }

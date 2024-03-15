@@ -15,7 +15,8 @@ import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.database.MegaDatabase
 import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.data.database.SQLCipherManager
-import mega.privacy.android.data.database.chat.InMemoryChatDatabase
+import mega.privacy.android.data.database.chat.CHAT_DATABASE_NAME
+import mega.privacy.android.data.database.chat.ChatDatabase
 import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
@@ -36,24 +37,40 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 internal object RoomDatabaseModule {
+
+    @Provides
+    @Singleton
+    @Named("database_passphrase")
+    fun provideDatabasePassphrase(
+        sqlCipherManager: SQLCipherManager,
+    ): ByteArray? {
+        return try {
+            val passphrase = sqlCipherManager.getPassphrase()
+            sqlCipherManager.migrateToSecureDatabase(MegaDatabaseConstant.DATABASE_NAME, passphrase)
+            sqlCipherManager.migrateToSecureDatabase(CHAT_DATABASE_NAME, passphrase)
+            passphrase
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to migrate database to secure database")
+            sqlCipherManager.destructSecureDatabase(MegaDatabaseConstant.DATABASE_NAME)
+            sqlCipherManager.destructSecureDatabase(CHAT_DATABASE_NAME)
+            null
+        }
+    }
+
     @Provides
     @Singleton
     internal fun provideMegaDatabase(
         @ApplicationContext applicationContext: Context,
         legacyDatabaseMigration: LegacyDatabaseMigration,
-        sqlCipherManager: SQLCipherManager,
+        @Named("database_passphrase") passphrase: ByteArray?,
     ): MegaDatabase {
-        return try {
-            val passphrase = sqlCipherManager.getPassphrase()
-            sqlCipherManager.migrateToSecureDatabase(MegaDatabaseConstant.DATABASE_NAME, passphrase)
+        return if (passphrase != null) {
             MegaDatabase.init(
                 applicationContext,
-                SupportFactory(passphrase),
+                SupportFactory(passphrase, null, false),
                 legacyDatabaseMigration
             )
-        } catch (e: Exception) {
-            Timber.e(e, "Failed to migrate database to secure database")
-            sqlCipherManager.destructSecureDatabase(MegaDatabaseConstant.DATABASE_NAME)
+        } else {
             MegaDatabase.init(
                 applicationContext,
                 FrameworkSQLiteOpenHelperFactory(),
@@ -66,8 +83,19 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun provideChatDatabase(
         @ApplicationContext applicationContext: Context,
-    ): InMemoryChatDatabase {
-        return InMemoryChatDatabase.create(applicationContext)
+        @Named("database_passphrase") passphrase: ByteArray?,
+    ): ChatDatabase {
+        return if (passphrase != null) {
+            ChatDatabase.init(
+                applicationContext,
+                SupportFactory(passphrase, null, false),
+            )
+        } else {
+            ChatDatabase.init(
+                applicationContext,
+                FrameworkSQLiteOpenHelperFactory(),
+            )
+        }
     }
 
     @Provides
@@ -161,7 +189,7 @@ internal object RoomDatabaseModule {
 
     @Provides
     @Singleton
-    internal fun provideTypedMessageRequestDao(chatDatabase: InMemoryChatDatabase): TypedMessageDao =
+    internal fun provideTypedMessageRequestDao(chatDatabase: ChatDatabase): TypedMessageDao =
         chatDatabase.typedMessageDao()
 
 }

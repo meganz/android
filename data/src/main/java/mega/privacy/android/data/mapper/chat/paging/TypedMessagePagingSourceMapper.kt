@@ -3,7 +3,7 @@ package mega.privacy.android.data.mapper.chat.paging
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.room.InvalidationTracker
-import mega.privacy.android.data.database.chat.InMemoryChatDatabase
+import mega.privacy.android.data.database.chat.ChatDatabase
 import mega.privacy.android.data.database.entity.chat.MetaTypedMessageEntity
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import timber.log.Timber
@@ -16,7 +16,7 @@ import javax.inject.Inject
  */
 class TypedMessagePagingSourceMapper @Inject constructor(
     private val metaTypedEntityTypedMessageMapper: MetaTypedEntityTypedMessageMapper,
-    private val database: InMemoryChatDatabase,
+    private val database: ChatDatabase,
 ) {
 
     /**
@@ -36,7 +36,7 @@ class TypedMessagePagingSourceMapper @Inject constructor(
     internal class MappingPagingSource(
         private val originalSource: PagingSource<Int, MetaTypedMessageEntity>,
         private val metaTypedMessageEntityMapper: MetaTypedEntityTypedMessageMapper,
-        database: InMemoryChatDatabase,
+        database: ChatDatabase,
     ) : PagingSource<Int, TypedMessage>() {
 
         private val invalidationObserver: InvalidationTracker.Observer =

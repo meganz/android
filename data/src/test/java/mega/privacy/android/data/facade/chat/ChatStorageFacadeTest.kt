@@ -1,7 +1,7 @@
 package mega.privacy.android.data.facade.chat
 
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.database.chat.InMemoryChatDatabase
+import mega.privacy.android.data.database.chat.ChatDatabase
 import mega.privacy.android.data.database.dao.PendingMessageDao
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateAndNodeHandleRequest
@@ -20,7 +20,7 @@ import org.mockito.kotlin.whenever
 class ChatStorageFacadeTest {
     private lateinit var underTest: ChatStorageFacade
 
-    val database = mock<InMemoryChatDatabase>()
+    val database = mock<ChatDatabase>()
 
     @BeforeAll
     fun setUp() {

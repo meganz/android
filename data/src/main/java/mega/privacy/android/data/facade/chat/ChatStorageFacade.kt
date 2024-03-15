@@ -2,7 +2,7 @@ package mega.privacy.android.data.facade.chat
 
 import androidx.room.withTransaction
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.data.database.chat.InMemoryChatDatabase
+import mega.privacy.android.data.database.chat.ChatDatabase
 import mega.privacy.android.data.database.dao.ChatMessageMetaDao
 import mega.privacy.android.data.database.dao.ChatNodeDao
 import mega.privacy.android.data.database.entity.chat.ChatGeolocationEntity
@@ -28,7 +28,7 @@ import javax.inject.Inject
  * @property database In memory chat database
  */
 internal class ChatStorageFacade @Inject constructor(
-    private val database: InMemoryChatDatabase,
+    private val database: ChatDatabase,
 ) : ChatStorageGateway {
 
     /**
