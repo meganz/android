@@ -14,6 +14,7 @@ import mega.privacy.android.data.database.entity.chat.RichPreviewEntity
 import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
 import mega.privacy.android.data.gateway.chat.ChatStorageGateway
 import mega.privacy.android.domain.entity.chat.ChatMessageType
+import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateAndNodeHandleRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
@@ -137,6 +138,9 @@ internal class ChatStorageFacade @Inject constructor(
 
     override suspend fun getPendingMessage(pendingMessageId: Long): PendingMessageEntity? =
         database.pendingMessageDao().get(pendingMessageId)
+
+    override suspend fun getPendingMessagesByState(state: PendingMessageState): List<PendingMessageEntity> =
+        database.pendingMessageDao().getByState(state)
 
     override suspend fun getMessageIdsByType(chatId: Long, type: ChatMessageType): List<Long> =
         database.typedMessageDao().getMessageIdsByType(chatId, type)

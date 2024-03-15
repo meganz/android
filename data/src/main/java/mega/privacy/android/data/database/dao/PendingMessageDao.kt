@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.database.entity.chat.PendingMessageEntity
+import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateAndNodeHandleRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageTransferTagRequest
@@ -66,6 +67,12 @@ interface PendingMessageDao {
 
     @Query("SELECT * FROM pending_messages WHERE pendingMessageId = :id")
     suspend fun get(id: Long): PendingMessageEntity?
+
+    /**
+     * Get all pending messages in a specific state
+     */
+    @Query("SELECT * FROM pending_messages where state = :state")
+    suspend fun getByState(state: PendingMessageState): List<PendingMessageEntity>
 
     /**
      * Fetch pending messages for chat

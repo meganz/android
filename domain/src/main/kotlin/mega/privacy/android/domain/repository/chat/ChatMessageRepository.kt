@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.PendingMessage
+import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.UserMessage
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
@@ -319,6 +320,11 @@ interface ChatMessageRepository {
      * @return a pending messages with [pendingMessageId] or null if not found
      */
     suspend fun getPendingMessage(pendingMessageId: Long): PendingMessage?
+
+    /**
+     * Get all pending messages in a specific state
+     */
+    suspend fun getPendingMessagesByState(state: PendingMessageState): List<PendingMessage>
 
     /**
      * Delete pending message

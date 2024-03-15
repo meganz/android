@@ -21,6 +21,7 @@ import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.PendingMessage
+import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.UserMessage
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageRequest
@@ -204,6 +205,13 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
     override suspend fun getPendingMessage(pendingMessageId: Long): PendingMessage? =
         withContext(ioDispatcher) {
             chatStorageGateway.getPendingMessage(pendingMessageId)?.let {
+                pendingMessageMapper(it)
+            }
+        }
+
+    override suspend fun getPendingMessagesByState(state: PendingMessageState): List<PendingMessage> =
+        withContext(ioDispatcher) {
+            chatStorageGateway.getPendingMessagesByState(state).map {
                 pendingMessageMapper(it)
             }
         }

@@ -21,6 +21,7 @@ import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.PendingMessage
+import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.UserMessage
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
@@ -36,6 +37,8 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
@@ -343,6 +346,18 @@ class ChatMessageRepositoryImplTest {
         val actual = underTest.getPendingMessage(pendingMessageId)
         assertThat(actual).isEqualTo(expected)
     }
+
+    @ParameterizedTest
+    @EnumSource(PendingMessageState::class)
+    fun `test that getPendingMessagesByState returns the mapped entities from gateway`(state: PendingMessageState) =
+        runTest {
+            val entity = mock<PendingMessageEntity>()
+            val expected = mock<PendingMessage>()
+            whenever(chatStorageGateway.getPendingMessagesByState(state)).thenReturn(listOf(entity))
+            whenever(pendingMessageMapper(entity)).thenReturn(expected)
+            val actual = underTest.getPendingMessagesByState(state)
+            assertThat(actual).isEqualTo(listOf(expected))
+        }
 
     @Test
     fun `test that get message ids by type invokes chat storage gateway correctly`() = runTest {

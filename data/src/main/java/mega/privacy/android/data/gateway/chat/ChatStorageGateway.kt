@@ -10,6 +10,7 @@ import mega.privacy.android.data.database.entity.chat.PendingMessageEntity
 import mega.privacy.android.data.database.entity.chat.RichPreviewEntity
 import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
 import mega.privacy.android.domain.entity.chat.ChatMessageType
+import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageRequest
 
 /**
@@ -97,6 +98,11 @@ interface ChatStorageGateway {
      * @return a pending messages with [pendingMessageId] or null if not found
      */
     suspend fun getPendingMessage(pendingMessageId: Long): PendingMessageEntity?
+
+    /**
+     * Get all pending messages in a specific state
+     */
+    suspend fun getPendingMessagesByState(state: PendingMessageState): List<PendingMessageEntity>
 
     /**
      * Get message ids by type
