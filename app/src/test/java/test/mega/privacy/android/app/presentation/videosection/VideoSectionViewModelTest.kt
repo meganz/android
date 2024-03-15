@@ -37,6 +37,7 @@ import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCa
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import mega.privacy.android.domain.usecase.videosection.GetSyncUploadsFolderIdsUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
+import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideosFromPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
@@ -81,6 +82,9 @@ class VideoSectionViewModelTest {
     private val updateVideoPlaylistTitleUseCase = mock<UpdateVideoPlaylistTitleUseCase>()
     private val getSyncUploadsFolderIdsUseCase = mock<GetSyncUploadsFolderIdsUseCase>()
     private val removeVideosFromPlaylistUseCase = mock<RemoveVideosFromPlaylistUseCase>()
+    private val monitorVideoPlaylistSetsUpdateUseCase =
+        mock<MonitorVideoPlaylistSetsUpdateUseCase>()
+    private val fakeMonitorVideoPlaylistSetsUpdateFlow = MutableSharedFlow<List<Long>>()
 
     private val expectedVideo = mock<VideoUIEntity> {
         on { name }.thenReturn("video name")
@@ -96,6 +100,9 @@ class VideoSectionViewModelTest {
         wheneverBlocking { monitorNodeUpdatesUseCase() }.thenReturn(fakeMonitorNodeUpdatesFlow)
         wheneverBlocking { monitorOfflineNodeUpdatesUseCase() }.thenReturn(
             fakeMonitorOfflineNodeUpdatesFlow
+        )
+        wheneverBlocking { monitorVideoPlaylistSetsUpdateUseCase() }.thenReturn(
+            fakeMonitorVideoPlaylistSetsUpdateFlow
         )
         wheneverBlocking { getVideoPlaylistsUseCase() }.thenReturn(listOf())
         initUnderTest()
@@ -123,6 +130,7 @@ class VideoSectionViewModelTest {
             updateVideoPlaylistTitleUseCase = updateVideoPlaylistTitleUseCase,
             getSyncUploadsFolderIdsUseCase = getSyncUploadsFolderIdsUseCase,
             removeVideosFromPlaylistUseCase = removeVideosFromPlaylistUseCase,
+            monitorVideoPlaylistSetsUpdateUseCase = monitorVideoPlaylistSetsUpdateUseCase,
         )
     }
 
@@ -145,7 +153,8 @@ class VideoSectionViewModelTest {
             getNextDefaultAlbumNameUseCase,
             updateVideoPlaylistTitleUseCase,
             getSyncUploadsFolderIdsUseCase,
-            removeVideosFromPlaylistUseCase
+            removeVideosFromPlaylistUseCase,
+            monitorVideoPlaylistSetsUpdateUseCase
         )
     }
 
@@ -1158,6 +1167,21 @@ class VideoSectionViewModelTest {
             assertThat(awaitItem().updateToolbarTitle).isNull()
         }
     }
+
+    @Test
+    fun `test that state is updated correctly when monitorVideoPlaylistSetsUpdateUseCase is triggered`() =
+        runTest {
+            initVideoPlaylistsReturned()
+            initUnderTest()
+            testScheduler.advanceUntilIdle()
+
+            underTest.state.drop(1).test {
+                fakeMonitorVideoPlaylistSetsUpdateFlow.emit(listOf(1L, 2L, 3L))
+                val actual = awaitItem()
+                assertThat(actual.videoPlaylists.size).isEqualTo(2)
+                assertThat(actual.isPlaylistProgressBarShown).isFalse()
+            }
+        }
 
     companion object {
         @JvmField

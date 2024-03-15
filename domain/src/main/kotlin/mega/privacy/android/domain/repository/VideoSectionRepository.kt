@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.repository
 
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
@@ -66,4 +67,11 @@ interface VideoSectionRepository {
      * @return updated title
      */
     suspend fun updateVideoPlaylistTitle(playlistID: NodeId, newTitle: String): String
+
+    /**
+     * Monitor video playlist sets update
+     *
+     * @return a flow of all new video playlist set ids update
+     */
+    fun monitorVideoPlaylistSetsUpdate(): Flow<List<Long>>
 }

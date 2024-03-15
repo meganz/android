@@ -46,6 +46,7 @@ import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCa
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import mega.privacy.android.domain.usecase.videosection.GetSyncUploadsFolderIdsUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
+import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideosFromPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
@@ -79,6 +80,7 @@ class VideoSectionViewModel @Inject constructor(
     private val updateVideoPlaylistTitleUseCase: UpdateVideoPlaylistTitleUseCase,
     private val getSyncUploadsFolderIdsUseCase: GetSyncUploadsFolderIdsUseCase,
     private val removeVideosFromPlaylistUseCase: RemoveVideosFromPlaylistUseCase,
+    private val monitorVideoPlaylistSetsUpdateUseCase: MonitorVideoPlaylistSetsUpdateUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VideoSectionState())
 
@@ -102,6 +104,20 @@ class VideoSectionViewModel @Inject constructor(
 
     init {
         refreshNodesIfAnyUpdates()
+        viewModelScope.launch {
+            monitorVideoPlaylistSetsUpdateUseCase().conflate()
+                .catch {
+                    Timber.e(it)
+                }.collect {
+                    if (it.isNotEmpty()) {
+                        if (_state.value.currentVideoPlaylist != null) {
+                            refreshVideoPlaylistsWithUpdateCurrentVideoPlaylist()
+                        } else {
+                            loadVideoPlaylists()
+                        }
+                    }
+                }
+        }
     }
 
     private fun refreshNodesIfAnyUpdates() {
