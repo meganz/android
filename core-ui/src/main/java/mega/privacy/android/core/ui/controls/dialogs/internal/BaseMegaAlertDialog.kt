@@ -1,6 +1,7 @@
 package mega.privacy.android.core.ui.controls.dialogs.internal
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.LocalAbsoluteElevation
 import androidx.compose.material.MaterialTheme
@@ -13,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.theme.MegaTheme
+import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.core.ui.utils.composeLet
 
 @Composable
@@ -125,6 +127,10 @@ private fun BaseMegaAlertDialog(
             Text(
                 modifier = Modifier
                     .testTag(TITLE_TAG)
+                    .conditional(text == null) {
+                        // For dialog without text, add padding to the bottom of the title
+                        padding(bottom = 18.dp)
+                    }
                     .fillMaxWidth(),
                 text = it,
                 style = MaterialTheme.typography.h6,
