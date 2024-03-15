@@ -157,39 +157,20 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * When the Business Account User acknowledges the prompt informing that the Business Account
-     * Administrator can access his/her Camera Uploads content, continue the process
+     * When the Business Account Sub-User acknowledges the prompt informing that the Business Account
+     * Administrator can access the content in Camera Uploads, dismiss the prompt and enable Camera
+     * Uploads
      */
-    fun onBusinessAccountPromptAcknowledged() {
-        _uiState.update { it.copy(showBusinessAccountPrompt = false) }
+    fun onRegularBusinessAccountSubUserPromptAcknowledged() {
+        _uiState.update { it.copy(businessAccountPromptType = null) }
         enableCameraUploads()
     }
 
     /**
-     * When the Business Account User dismisses the prompt informing that the Business Account
-     * Administrator can access his/her Camera Uploads content, reset the value of
-     * [SettingsCameraUploadsUiState.showBusinessAccountPrompt]
+     * Reset the value of [SettingsCameraUploadsUiState.businessAccountPromptType]
      */
     fun onBusinessAccountPromptDismissed() {
-        _uiState.update { it.copy(showBusinessAccountPrompt = false) }
-    }
-
-    /**
-     * When the Suspended Business Account Sub-User dismisses the prompt informing that Camera Uploads
-     * cannot be enabled, reset the value of
-     * [SettingsCameraUploadsUiState.showBusinessAccountSubUserSuspendedPrompt]
-     */
-    fun onBusinessAccountSubUserSuspendedPromptAcknowledged() {
-        _uiState.update { it.copy(showBusinessAccountSubUserSuspendedPrompt = false) }
-    }
-
-    /**
-     * When the Suspended Business Account Administrator dismisses the prompt informing that Camera
-     * Uploads cannot be enabled, reset the value of
-     * [SettingsCameraUploadsUiState.showBusinessAccountAdministratorSuspendedPrompt]
-     */
-    fun onBusinessAccountAdministratorSuspendedPromptAcknowledged() {
-        _uiState.update { it.copy(showBusinessAccountAdministratorSuspendedPrompt = false) }
+        _uiState.update { it.copy(businessAccountPromptType = null) }
     }
 
     /**
@@ -201,23 +182,10 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             runCatching {
                 checkEnableCameraUploadsStatusUseCase()
             }.onSuccess { cameraUploadsStatus ->
-                when (cameraUploadsStatus) {
-                    EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS -> enableCameraUploads()
-                    EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT -> {
-                        // The User is under a Business Account and is not suspended
-                        _uiState.update { it.copy(showBusinessAccountPrompt = true) }
-                    }
-
-                    EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT -> {
-                        // The Business Account Sub-User has been suspended
-                        _uiState.update { it.copy(showBusinessAccountSubUserSuspendedPrompt = true) }
-                    }
-
-                    EnableCameraUploadsStatus.SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT,
-                    -> {
-                        // The Business Account Administrator has been suspended
-                        _uiState.update { it.copy(showBusinessAccountAdministratorSuspendedPrompt = true) }
-                    }
+                if (cameraUploadsStatus == EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS) {
+                    enableCameraUploads()
+                } else {
+                    _uiState.update { it.copy(businessAccountPromptType = cameraUploadsStatus) }
                 }
             }.onFailure {
                 Timber.e("An error occurred when checking the Camera Uploads status:\n$it")

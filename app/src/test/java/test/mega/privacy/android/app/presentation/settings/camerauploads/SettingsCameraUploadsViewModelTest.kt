@@ -277,7 +277,7 @@ internal class SettingsCameraUploadsViewModelTest {
             }
 
         @Test
-        fun `test that camera uploads is finally enabled when there are no account issues`() =
+        fun `test that camera uploads is immediately enabled when the user is on a regular or active business administrator account`() =
             runTest {
                 whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(
                     EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
@@ -295,7 +295,7 @@ internal class SettingsCameraUploadsViewModelTest {
             }
 
         @Test
-        fun `test that a business account prompt is shown when the user is on any active business account type`() =
+        fun `test that a business account prompt is shown when the business account sub user is active`() =
             runTest {
                 whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(
                     EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
@@ -305,21 +305,34 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.onMediaPermissionsGranted()
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().showBusinessAccountPrompt).isTrue()
+                    assertThat(awaitItem().businessAccountPromptType).isEqualTo(
+                        EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
+                    )
                 }
             }
 
         @Test
-        fun `test that acknowledging the business account prompt dismisses it and finally enables camera uploads`() =
+        fun `test that the business account prompt is dismissed`() = runTest {
+            initializeUnderTest()
+
+            underTest.onBusinessAccountPromptDismissed()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().businessAccountPromptType).isNull()
+            }
+        }
+
+        @Test
+        fun `test that the business account prompt is dismissed and camera uploads is enabled when the active business account sub user acknowledges it`() =
             runTest {
                 initializeUnderTest()
 
-                underTest.onBusinessAccountPromptAcknowledged()
+                underTest.onRegularBusinessAccountSubUserPromptAcknowledged()
 
                 verify(setupCameraUploadsSettingUseCase).invoke(isEnabled = true)
                 underTest.uiState.test {
                     val state = awaitItem()
-                    assertThat(state.showBusinessAccountPrompt).isFalse()
+                    assertThat(state.businessAccountPromptType).isNull()
                     assertThat(state.isCameraUploadsEnabled).isTrue()
                     assertThat(state.isMediaUploadsEnabled).isTrue()
                 }
@@ -331,81 +344,33 @@ internal class SettingsCameraUploadsViewModelTest {
                 whenever(setupCameraUploadsSettingUseCase(any())).thenThrow(RuntimeException())
                 initializeUnderTest()
 
-                assertDoesNotThrow { underTest.onBusinessAccountPromptAcknowledged() }
+                assertDoesNotThrow { underTest.onRegularBusinessAccountSubUserPromptAcknowledged() }
                 verify(snackBarHandler).postSnackbarMessage(
                     resId = R.string.general_error,
                     snackbarDuration = MegaSnackbarDuration.Long,
                 )
                 underTest.uiState.test {
-                    assertThat(awaitItem().showBusinessAccountPrompt).isFalse()
+                    assertThat(awaitItem().businessAccountPromptType).isNull()
                 }
             }
 
-        @Test
-        fun `test that the business account prompt is dismissed if the user does not acknowledge it`() =
-            runTest {
-                initializeUnderTest()
+        @ParameterizedTest(name = "when the camera uploads status is {0}")
+        @EnumSource(
+            value = EnableCameraUploadsStatus::class,
+            names = ["SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT", "SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT"]
+        )
+        fun `test that a suspended business account prompt is shown`(
+            cameraUploadsStatus: EnableCameraUploadsStatus,
+        ) = runTest {
+            whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(cameraUploadsStatus)
+            initializeUnderTest()
 
-                underTest.onBusinessAccountPromptDismissed()
+            underTest.onMediaPermissionsGranted()
 
-                underTest.uiState.test {
-                    assertThat(awaitItem().showBusinessAccountPrompt).isFalse()
-                }
+            underTest.uiState.test {
+                assertThat(awaitItem().businessAccountPromptType).isEqualTo(cameraUploadsStatus)
             }
-
-        @Test
-        fun `test that a suspended business account sub user prompt is shown`() =
-            runTest {
-                whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(
-                    EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT
-                )
-                initializeUnderTest()
-
-                underTest.onMediaPermissionsGranted()
-
-                underTest.uiState.test {
-                    assertThat(awaitItem().showBusinessAccountSubUserSuspendedPrompt).isTrue()
-                }
-            }
-
-        @Test
-        fun `test that acknowledging the suspended business account sub user prompt dismisses it`() =
-            runTest {
-                initializeUnderTest()
-
-                underTest.onBusinessAccountSubUserSuspendedPromptAcknowledged()
-
-                underTest.uiState.test {
-                    assertThat(awaitItem().showBusinessAccountSubUserSuspendedPrompt).isFalse()
-                }
-            }
-
-        @Test
-        fun `test that a suspended business account administrator prompt is shown`() =
-            runTest {
-                whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(
-                    EnableCameraUploadsStatus.SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT
-                )
-                initializeUnderTest()
-
-                underTest.onMediaPermissionsGranted()
-
-                underTest.uiState.test {
-                    assertThat(awaitItem().showBusinessAccountAdministratorSuspendedPrompt).isTrue()
-                }
-            }
-
-        @Test
-        fun `test that acknowledging the suspended business account administrator prompt dismisses it`() =
-            runTest {
-                initializeUnderTest()
-
-                underTest.onBusinessAccountAdministratorSuspendedPromptAcknowledged()
-
-                underTest.uiState.test {
-                    assertThat(awaitItem().showBusinessAccountAdministratorSuspendedPrompt).isFalse()
-                }
-            }
+        }
 
         @Test
         fun `test that camera uploads is not started when camera uploads is disabled and the user pauses the settings screen`() =

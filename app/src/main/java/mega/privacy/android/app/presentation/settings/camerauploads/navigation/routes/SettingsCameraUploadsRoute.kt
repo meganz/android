@@ -19,14 +19,12 @@ internal fun SettingsCameraUploadsRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     SettingsCameraUploadsView(
         uiState = uiState,
-        onBusinessAccountAdministratorSuspendedPromptAcknowledged = viewModel::onBusinessAccountAdministratorSuspendedPromptAcknowledged,
-        onBusinessAccountPromptAcknowledged = viewModel::onBusinessAccountPromptAcknowledged,
         onBusinessAccountPromptDismissed = viewModel::onBusinessAccountPromptDismissed,
-        onBusinessAccountSubUserSuspendedPromptAcknowledged = viewModel::onBusinessAccountSubUserSuspendedPromptAcknowledged,
         onCameraUploadsStateChanged = viewModel::onCameraUploadsStateChanged,
         onHowToUploadPromptOptionSelected = viewModel::onHowToUploadPromptOptionSelected,
         onMediaPermissionsGranted = viewModel::onMediaPermissionsGranted,
         onMediaPermissionsRationaleStateChanged = viewModel::onMediaPermissionsRationaleStateChanged,
+        onRegularBusinessAccountSubUserPromptAcknowledged = viewModel::onRegularBusinessAccountSubUserPromptAcknowledged,
         onRequestPermissionsStateChanged = viewModel::onRequestPermissionsStateChanged,
         onSettingsScreenPaused = viewModel::onSettingsScreenPaused,
     )

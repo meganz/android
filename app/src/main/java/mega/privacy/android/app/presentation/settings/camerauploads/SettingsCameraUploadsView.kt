@@ -23,8 +23,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import de.palm.composestateevents.StateEvent
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.account.business.BusinessAccountSuspendedDialog
-import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.CameraUploadsBusinessAccountDialog
+import mega.privacy.android.app.presentation.settings.camerauploads.business.BusinessAccountPromptHandler
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.HowToUploadDialog
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsUiState
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
@@ -41,22 +40,17 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  * A Composable that holds views displaying the main Settings Camera Uploads screen
  *
  * @param uiState The Settings Camera Uploads UI State
- * @param onBusinessAccountAdministratorSuspendedPromptAcknowledged Lambda to execute when the
- * Suspended Business Account Administrator acknowledges that Camera Uploads cannot be enabled until
- * the specific issue has been resolved
- * @param onBusinessAccountPromptAcknowledged Lambda to execute when the User acknowledges that the
- * Business Account Administrator can access his/her Camera Uploads content
  * @param onBusinessAccountPromptDismissed Lambda to execute when the User dismisses the Business
  * Account prompt
- * @param onBusinessAccountSubUserSuspendedPromptAcknowledged Lambda to execute when the
- * Suspended Business Account Sub-User acknowledges that Camera Uploads cannot be enabled until
- * the specific issue has been resolved
  * @param onCameraUploadsStateChanged Lambda to execute when the Camera Uploads state changes
  * @param onHowToUploadPromptOptionSelected Lambda to execute when the User selects a new
  * [UploadConnectionType] from the How to Upload prompt
  * @param onMediaPermissionsGranted Lambda to execute when the User has granted the Media Permissions
  * @param onMediaPermissionsRationaleStateChanged Lambda to execute when the Media Permissions needs
  * to be shown (true) or hidden (false)
+ * @param onRegularBusinessAccountSubUserPromptAcknowledged Lambda to execute when the Business
+ * Account Sub-User acknowledges that the Business Account Administrator can access the content
+ * in Camera Uploads
  * @param onRequestPermissionsStateChanged Lambda to execute whether a Camera Uploads permissions
  * request should be done (triggered) or not (consumed)
  * @param onSettingsScreenPaused Lambda to execute when the User triggers onPause() in the Settings
@@ -65,14 +59,12 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 @Composable
 internal fun SettingsCameraUploadsView(
     uiState: SettingsCameraUploadsUiState,
-    onBusinessAccountAdministratorSuspendedPromptAcknowledged: () -> Unit,
-    onBusinessAccountPromptAcknowledged: () -> Unit,
     onBusinessAccountPromptDismissed: () -> Unit,
-    onBusinessAccountSubUserSuspendedPromptAcknowledged: () -> Unit,
     onCameraUploadsStateChanged: (Boolean) -> Unit,
     onHowToUploadPromptOptionSelected: (UploadConnectionType) -> Unit,
     onMediaPermissionsGranted: () -> Unit,
     onMediaPermissionsRationaleStateChanged: (Boolean) -> Unit,
+    onRegularBusinessAccountSubUserPromptAcknowledged: () -> Unit,
     onRequestPermissionsStateChanged: (StateEvent) -> Unit,
     onSettingsScreenPaused: () -> Unit,
 ) {
@@ -110,26 +102,11 @@ internal fun SettingsCameraUploadsView(
                 onMediaPermissionsRationaleStateChanged = onMediaPermissionsRationaleStateChanged,
                 onRequestPermissionsStateChanged = onRequestPermissionsStateChanged,
             )
-            if (uiState.showBusinessAccountPrompt) {
-                CameraUploadsBusinessAccountDialog(
-                    onAlertAcknowledged = onBusinessAccountPromptAcknowledged,
-                    onAlertDismissed = onBusinessAccountPromptDismissed,
-                )
-            }
-            if (uiState.showBusinessAccountSubUserSuspendedPrompt) {
-                BusinessAccountSuspendedDialog(
-                    isBusinessAdministratorAccount = false,
-                    onAlertAcknowledged = onBusinessAccountSubUserSuspendedPromptAcknowledged,
-                    onAlertDismissed = onBusinessAccountSubUserSuspendedPromptAcknowledged,
-                )
-            }
-            if (uiState.showBusinessAccountAdministratorSuspendedPrompt) {
-                BusinessAccountSuspendedDialog(
-                    isBusinessAdministratorAccount = true,
-                    onAlertAcknowledged = onBusinessAccountAdministratorSuspendedPromptAcknowledged,
-                    onAlertDismissed = onBusinessAccountAdministratorSuspendedPromptAcknowledged,
-                )
-            }
+            BusinessAccountPromptHandler(
+                businessAccountPromptType = uiState.businessAccountPromptType,
+                onRegularBusinessAccountSubUserPromptAcknowledged = onRegularBusinessAccountSubUserPromptAcknowledged,
+                onBusinessAccountPromptDismissed = onBusinessAccountPromptDismissed,
+            )
             if (showHowToUploadPrompt) {
                 HowToUploadDialog(
                     currentUploadConnectionType = uiState.uploadConnectionType,
@@ -173,10 +150,8 @@ private fun SettingsCameraUploadsViewPreview(
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         SettingsCameraUploadsView(
             uiState = uiState,
-            onBusinessAccountAdministratorSuspendedPromptAcknowledged = {},
-            onBusinessAccountPromptAcknowledged = {},
+            onRegularBusinessAccountSubUserPromptAcknowledged = {},
             onBusinessAccountPromptDismissed = {},
-            onBusinessAccountSubUserSuspendedPromptAcknowledged = {},
             onCameraUploadsStateChanged = {},
             onHowToUploadPromptOptionSelected = {},
             onMediaPermissionsGranted = {},
