@@ -11,6 +11,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -19,7 +20,16 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
 
+internal const val TEST_TAG_FIRST_MESSAGE_HEADER_TITLE = "first_message_header_title:title"
+internal const val TEST_TAG_FIRST_MESSAGE_HEADER_SUBTITLE = "first_message_header_title:subtitle"
 
+/**
+ * First message header title
+ *
+ * @param title
+ * @param modifier
+ * @param subtitle
+ */
 @Composable
 fun FirstMessageHeaderTitle(
     title: String,
@@ -28,6 +38,7 @@ fun FirstMessageHeaderTitle(
 ) {
     Column(modifier = modifier) {
         Text(
+            modifier = Modifier.testTag(TEST_TAG_FIRST_MESSAGE_HEADER_TITLE),
             text = title,
             color = MegaTheme.colors.text.primary,
             style = MaterialTheme.typography.body1,
@@ -35,6 +46,7 @@ fun FirstMessageHeaderTitle(
         )
         subtitle?.let {
             Text(
+                modifier = Modifier.testTag(TEST_TAG_FIRST_MESSAGE_HEADER_SUBTITLE),
                 text = it,
                 color = MegaTheme.colors.text.secondary,
                 style = MaterialTheme.typography.body2,
@@ -42,6 +54,11 @@ fun FirstMessageHeaderTitle(
         }
     }
 }
+
+internal const val TEST_TAG_FIRST_MESSAGE_SUBTITLE_WITH_ICON_TEXT =
+    "first_message_subtitle_with_icon:text"
+internal const val TEST_TAG_FIRST_MESSAGE_SUBTITLE_WITH_ICON =
+    "first_message_subtitle_with_icon:icon"
 
 @Composable
 fun FirstMessageHeaderSubtitleWithIcon(
@@ -54,13 +71,13 @@ fun FirstMessageHeaderSubtitleWithIcon(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            modifier = Modifier.size(16.dp),
+            modifier = Modifier.size(16.dp).testTag(TEST_TAG_FIRST_MESSAGE_SUBTITLE_WITH_ICON),
             painter = painterResource(id = iconRes),
             tint = MegaTheme.colors.icon.primary,
             contentDescription = null,
         )
         Text(
-            modifier = Modifier.padding(start = 8.dp),
+            modifier = Modifier.padding(start = 8.dp).testTag(TEST_TAG_FIRST_MESSAGE_SUBTITLE_WITH_ICON_TEXT),
             text = subtitle,
             color = MegaTheme.colors.text.primary,
             style = MaterialTheme.typography.body1,

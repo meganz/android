@@ -43,10 +43,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -221,7 +224,8 @@ internal fun ChatView(
 @OptIn(
     ExperimentalMaterialApi::class,
     ExperimentalPermissionsApi::class,
-    ExperimentalLayoutApi::class
+    ExperimentalLayoutApi::class,
+    ExperimentalComposeUiApi::class
 )
 @Composable
 internal fun ChatView(
@@ -489,6 +493,9 @@ internal fun ChatView(
         }
 
         BottomSheet(
+            modifier = Modifier.semantics {
+                testTagsAsResourceId = true
+            },
             modalSheetState = when {
                 isFileModalShown -> fileModalSheetState
                 isMessageOptionsModalShown -> messageOptionsModalSheetState

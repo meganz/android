@@ -405,6 +405,11 @@ internal fun BaseMegaAppBar(
     )
 }
 
+/**
+ * Mega App Bar Title Test Tag
+ */
+const val MEGA_APP_BAR_TITLE_TEST_TAG = "mega_app_bar_title:text"
+
 @Composable
 internal fun MegaAppBarTitle(title: String, modifier: Modifier = Modifier, maxLines: Int = 1) =
     Text(
@@ -413,7 +418,7 @@ internal fun MegaAppBarTitle(title: String, modifier: Modifier = Modifier, maxLi
         overflow = TextOverflow.Ellipsis,
         color = LocalMegaAppBarColors.current.titleColor,
         style = MaterialTheme.typography.subtitle1,
-        modifier = modifier
+        modifier = modifier.testTag(MEGA_APP_BAR_TITLE_TEST_TAG)
     )
 
 @Composable
