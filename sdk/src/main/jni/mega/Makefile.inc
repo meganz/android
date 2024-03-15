@@ -63,6 +63,7 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/mega_evt_tls.cpp \
     sdk/src/mega_ccronexpr.cpp\
     sdk/src/raid.cpp \
+    sdk/src/raidproxy.cpp \
     sdk/src/testhooks.cpp \
     sdk/src/heartbeats.cpp \
     sdk/src/textchat.cpp \
@@ -124,6 +125,7 @@ HEADERS= sdk/include/mega.h \
 	    sdk/include/mega/mega_evt_tls.h \
 	    sdk/include/mega/mega_evt_queue.h \
 	    sdk/include/mega/raid.h \
+        sdk/include/mega/raidproxy.h \
 		sdk/include/mega/testhooks.h \
 		sdk/include/mega/heartbeats.h \
 		sdk/include/mega/textchat.h \
