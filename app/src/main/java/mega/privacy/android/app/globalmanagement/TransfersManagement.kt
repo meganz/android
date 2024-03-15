@@ -352,16 +352,25 @@ class TransfersManagement @Inject constructor(
                             tryToStartForegroundService(downloadServiceIntent)
                         }
                     }
-                }
 
-                @Suppress("DEPRECATION")
-                if (megaApi.numPendingUploads > 0) {
-                    val uploadServiceIntent = Intent(context, UploadService::class.java)
-                        .setAction(Constants.ACTION_RESTART_SERVICE)
 
-                    val chatUploadServiceIntent = Intent(context, ChatUploadService::class.java)
-                        .setAction(Constants.ACTION_RESTART_SERVICE)
-                    tryToStartForegroundService(uploadServiceIntent, chatUploadServiceIntent)
+                    @Suppress("DEPRECATION")
+                    if (megaApi.numPendingUploads > 0) {
+                        val uploadServiceIntent = Intent(context, UploadService::class.java)
+                            .setAction(Constants.ACTION_RESTART_SERVICE)
+                        if (!getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)) {
+                            val chatUploadServiceIntent =
+                                Intent(context, ChatUploadService::class.java)
+                                    .setAction(Constants.ACTION_RESTART_SERVICE)
+
+                            tryToStartForegroundService(
+                                uploadServiceIntent,
+                                chatUploadServiceIntent
+                            )
+                        } else {
+                            tryToStartForegroundService(uploadServiceIntent)
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 Timber.w(e, "Exception checking pending transfers")

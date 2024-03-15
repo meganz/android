@@ -44,6 +44,7 @@ import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadWorkerUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.jupiter.api.BeforeEach
@@ -93,6 +94,7 @@ internal class LoginViewModelTest {
     private val monitorAccountBlockedUseCase = mock<MonitorAccountBlockedUseCase>()
     private val getTimelinePhotosUseCase = mock<GetTimelinePhotosUseCase>()
     private val startDownloadWorkerUseCase = mock<StartDownloadWorkerUseCase>()
+    private val startChatUploadsWorkerUseCase = mock<StartChatUploadsWorkerUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -125,6 +127,7 @@ internal class LoginViewModelTest {
             monitorAccountBlockedUseCase = monitorAccountBlockedUseCase,
             getTimelinePhotosUseCase = getTimelinePhotosUseCase,
             startDownloadWorkerUseCase = startDownloadWorkerUseCase,
+            startChatUploadsWorkerUseCase = startChatUploadsWorkerUseCase,
             loginMutex = mock()
         )
     }
