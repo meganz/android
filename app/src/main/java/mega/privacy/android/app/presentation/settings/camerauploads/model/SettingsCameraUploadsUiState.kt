@@ -13,8 +13,6 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
  * @property isMediaUploadsEnabled true if Media Uploads is enabled
  * @property requestPermissions State Event that triggers a request to grant Camera Uploads
  * permissions
- * @property showMediaPermissionsRationale true if a Rationale explaining why the Media Permissions
- * need to be granted should be shown
  * @property uploadConnectionType Determines the connection type for uploading content in Camera Uploads
  */
 internal data class SettingsCameraUploadsUiState(
@@ -22,6 +20,5 @@ internal data class SettingsCameraUploadsUiState(
     val isCameraUploadsEnabled: Boolean = false,
     val isMediaUploadsEnabled: Boolean = false,
     val requestPermissions: StateEvent = consumed,
-    val showMediaPermissionsRationale: Boolean = false,
     val uploadConnectionType: UploadConnectionType = UploadConnectionType.WIFI,
 )

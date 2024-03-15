@@ -230,15 +230,6 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Updates the value of [SettingsCameraUploadsUiState.showMediaPermissionsRationale]
-     *
-     * @param showRationale true if the Media Permissions rationale should be shown
-     */
-    fun onMediaPermissionsRationaleStateChanged(showRationale: Boolean) {
-        _uiState.update { it.copy(showMediaPermissionsRationale = showRationale) }
-    }
-
-    /**
      * Updates the value of [SettingsCameraUploadsUiState.requestPermissions]
      *
      * @param newState The new State Event. If triggered, this will perform a Camera Uploads

@@ -13,7 +13,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,11 +30,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.Medi
  * A Composable that checks the Camera Uploads permissions necessary to run the feature
  *
  * @param requestPermissions State Event to request the Camera Uploads permissions
- * @param showMediaPermissionsRationale true if a Rationale explaining why the Media Permissions
- * need to be granted should be shown
  * @param onMediaPermissionsGranted Lambda to execute when the User has granted the Media Permissions
- * @param onMediaPermissionsRationaleStateChanged Lambda to execute when the Media Permissions needs
- * to be shown (true) or hidden (false)
  * @param onRequestPermissionsStateChanged Lambda to execute whether a Camera Uploads permissions
  * request should be done (triggered) or not (consumed)
  * @param modifier The [Modifier] class
@@ -40,12 +38,12 @@ import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.Medi
 @Composable
 internal fun CameraUploadsPermissionsHandler(
     requestPermissions: StateEvent,
-    showMediaPermissionsRationale: Boolean,
     onMediaPermissionsGranted: () -> Unit,
-    onMediaPermissionsRationaleStateChanged: (Boolean) -> Unit,
     onRequestPermissionsStateChanged: (StateEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var showMediaPermissionsRationale by rememberSaveable { mutableStateOf(false) }
+
     val context = LocalContext.current
     var requestPermissionsTimestamp by remember { mutableLongStateOf(0L) }
     val permissionsLauncher = rememberLauncherForActivityResult(
@@ -60,7 +58,7 @@ internal fun CameraUploadsPermissionsHandler(
                 context.navigateToAppSettings()
             } else {
                 // Show the Rationale
-                onMediaPermissionsRationaleStateChanged.invoke(true)
+                showMediaPermissionsRationale = true
             }
         }
     }
@@ -77,9 +75,9 @@ internal fun CameraUploadsPermissionsHandler(
             onMediaAccessGranted = {
                 requestPermissionsTimestamp = System.currentTimeMillis()
                 onRequestPermissionsStateChanged.invoke(triggered)
-                onMediaPermissionsRationaleStateChanged.invoke(false)
+                showMediaPermissionsRationale = false
             },
-            onMediaAccessDenied = { onMediaPermissionsRationaleStateChanged.invoke(false) },
+            onMediaAccessDenied = { showMediaPermissionsRationale = false },
         )
     }
 }

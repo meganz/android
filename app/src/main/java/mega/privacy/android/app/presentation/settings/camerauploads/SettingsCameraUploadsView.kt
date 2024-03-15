@@ -46,8 +46,6 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  * @param onHowToUploadPromptOptionSelected Lambda to execute when the User selects a new
  * [UploadConnectionType] from the How to Upload prompt
  * @param onMediaPermissionsGranted Lambda to execute when the User has granted the Media Permissions
- * @param onMediaPermissionsRationaleStateChanged Lambda to execute when the Media Permissions needs
- * to be shown (true) or hidden (false)
  * @param onRegularBusinessAccountSubUserPromptAcknowledged Lambda to execute when the Business
  * Account Sub-User acknowledges that the Business Account Administrator can access the content
  * in Camera Uploads
@@ -63,7 +61,6 @@ internal fun SettingsCameraUploadsView(
     onCameraUploadsStateChanged: (Boolean) -> Unit,
     onHowToUploadPromptOptionSelected: (UploadConnectionType) -> Unit,
     onMediaPermissionsGranted: () -> Unit,
-    onMediaPermissionsRationaleStateChanged: (Boolean) -> Unit,
     onRegularBusinessAccountSubUserPromptAcknowledged: () -> Unit,
     onRequestPermissionsStateChanged: (StateEvent) -> Unit,
     onSettingsScreenPaused: () -> Unit,
@@ -97,9 +94,7 @@ internal fun SettingsCameraUploadsView(
             CameraUploadsPermissionsHandler(
                 modifier = Modifier.padding(padding),
                 requestPermissions = uiState.requestPermissions,
-                showMediaPermissionsRationale = uiState.showMediaPermissionsRationale,
                 onMediaPermissionsGranted = onMediaPermissionsGranted,
-                onMediaPermissionsRationaleStateChanged = onMediaPermissionsRationaleStateChanged,
                 onRequestPermissionsStateChanged = onRequestPermissionsStateChanged,
             )
             BusinessAccountPromptHandler(
@@ -155,7 +150,6 @@ private fun SettingsCameraUploadsViewPreview(
             onCameraUploadsStateChanged = {},
             onHowToUploadPromptOptionSelected = {},
             onMediaPermissionsGranted = {},
-            onMediaPermissionsRationaleStateChanged = {},
             onRequestPermissionsStateChanged = {},
             onSettingsScreenPaused = {},
         )

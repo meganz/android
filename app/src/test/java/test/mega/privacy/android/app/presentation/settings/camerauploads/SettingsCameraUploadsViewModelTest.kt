@@ -35,7 +35,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -208,22 +207,6 @@ internal class SettingsCameraUploadsViewModelTest {
                     assertThat(state.requestPermissions).isEqualTo(triggered)
                 }
             }
-
-        @ParameterizedTest(name = "show media permissions rationale: {0}")
-        @ValueSource(booleans = [true, false])
-        fun `test that the media permissions rationale is shown or hidden`(
-            showRationale: Boolean,
-        ) = runTest {
-            initializeUnderTest()
-
-            underTest.onMediaPermissionsRationaleStateChanged(showRationale = showRationale)
-
-            underTest.uiState.test {
-                assertThat(awaitItem().showMediaPermissionsRationale).isEqualTo(
-                    showRationale
-                )
-            }
-        }
 
         @ParameterizedTest(name = "new request permissions state event: {0}")
         @MethodSource("provideNewRequestPermissionsStateEventParams")

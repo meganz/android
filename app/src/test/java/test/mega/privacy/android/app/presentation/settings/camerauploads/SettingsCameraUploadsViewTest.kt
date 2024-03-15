@@ -64,7 +64,6 @@ internal class SettingsCameraUploadsViewTest {
                 onCameraUploadsStateChanged = {},
                 onHowToUploadPromptOptionSelected = {},
                 onMediaPermissionsGranted = {},
-                onMediaPermissionsRationaleStateChanged = {},
                 onRegularBusinessAccountSubUserPromptAcknowledged = {},
                 onRequestPermissionsStateChanged = {},
                 onSettingsScreenPaused = {},
