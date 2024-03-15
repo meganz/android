@@ -71,7 +71,6 @@ import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirect
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
-import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
@@ -98,6 +97,7 @@ import mega.privacy.android.domain.usecase.camerauploads.ProcessCameraUploadsMed
 import mega.privacy.android.domain.usecase.camerauploads.RenameCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SendBackupHeartBeatSyncUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderLocalPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryNodeIdUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
@@ -160,8 +160,8 @@ class CameraUploadsWorkerTest {
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase = mock()
     private val isChargingRequiredUseCase: IsChargingRequiredUseCase = mock()
     private val getUploadFolderHandleUseCase: GetUploadFolderHandleUseCase = mock()
-    private val setPrimarySyncHandle: SetPrimarySyncHandle = mock()
     private val setSecondarySyncHandle: SetSecondarySyncHandle = mock()
+    private val setPrimaryNodeIdUseCase: SetPrimaryNodeIdUseCase = mock()
     private val getDefaultNodeHandleUseCase: GetDefaultNodeHandleUseCase = mock()
     private val monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
@@ -264,8 +264,8 @@ class CameraUploadsWorkerTest {
                 setSecondaryFolderLocalPathUseCase = setSecondaryFolderLocalPathUseCase,
                 isChargingRequiredUseCase = isChargingRequiredUseCase,
                 getUploadFolderHandleUseCase = getUploadFolderHandleUseCase,
-                setPrimarySyncHandle = setPrimarySyncHandle,
                 setSecondarySyncHandle = setSecondarySyncHandle,
+                setPrimaryNodeIdUseCase = setPrimaryNodeIdUseCase,
                 getDefaultNodeHandleUseCase = getDefaultNodeHandleUseCase,
                 ioDispatcher = ioDispatcher,
                 monitorPausedTransfersUseCase = monitorPausedTransfersUseCase,

@@ -13,10 +13,8 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
-import mega.privacy.android.domain.usecase.DefaultSetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.DefaultSetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
-import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 
 /**
@@ -48,12 +46,6 @@ abstract class CameraUploadUseCases {
         fun provideCreateCameraUploadFolder(fileSystemRepository: FileSystemRepository): CreateCameraUploadFolder =
             CreateCameraUploadFolder(fileSystemRepository::createFolder)
     }
-
-    /**
-     * Provide the [SetPrimarySyncHandle] implementation
-     */
-    @Binds
-    abstract fun bindSetPrimarySyncHandle(setPrimarySyncHandle: DefaultSetPrimarySyncHandle): SetPrimarySyncHandle
 
     /**
      * Provide the [SetSecondarySyncHandle] implementation

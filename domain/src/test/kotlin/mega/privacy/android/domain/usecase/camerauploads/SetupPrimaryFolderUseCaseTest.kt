@@ -1,10 +1,9 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import org.junit.Assert
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -17,20 +16,19 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SetupPrimaryFolderUseCaseTest {
     private lateinit var underTest: SetupPrimaryFolderUseCase
     private val invalidHandle = -1L
 
     private val cameraUploadRepository = mock<CameraUploadRepository>()
-    private val setPrimarySyncHandle = mock<SetPrimarySyncHandle>()
+    private val setPrimaryNodeIdUseCase = mock<SetPrimaryNodeIdUseCase>()
 
     @BeforeAll
     fun setUp() {
         underTest = SetupPrimaryFolderUseCase(
             cameraUploadRepository = cameraUploadRepository,
-            setPrimarySyncHandle = setPrimarySyncHandle
+            setPrimaryNodeIdUseCase = setPrimaryNodeIdUseCase
         )
     }
 
@@ -38,7 +36,7 @@ class SetupPrimaryFolderUseCaseTest {
     fun resetMocks() {
         reset(
             cameraUploadRepository,
-            setPrimarySyncHandle,
+            setPrimaryNodeIdUseCase,
         )
     }
 
@@ -49,7 +47,7 @@ class SetupPrimaryFolderUseCaseTest {
             whenever(cameraUploadRepository.setupPrimaryFolder(any())).thenReturn(69L)
             whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(invalidHandle)
             underTest(any())
-            verify(setPrimarySyncHandle).invoke(result)
+            verify(setPrimaryNodeIdUseCase).invoke(NodeId(result))
         }
 
     @Test
@@ -60,7 +58,7 @@ class SetupPrimaryFolderUseCaseTest {
             underTest(any())
             verify(cameraUploadRepository).setupPrimaryFolder(any())
             verify(cameraUploadRepository).getInvalidHandle()
-            verifyNoInteractions(setPrimarySyncHandle)
+            verifyNoInteractions(setPrimaryNodeIdUseCase)
         }
 
     @Test
