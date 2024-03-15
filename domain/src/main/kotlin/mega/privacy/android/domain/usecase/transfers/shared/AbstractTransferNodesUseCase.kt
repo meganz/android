@@ -83,8 +83,6 @@ abstract class AbstractTransferNodesUseCase<T, R>(
             }
             .buffer(capacity = Channel.UNLIMITED)
             .transform { event ->
-                emit(event)
-
                 if (event is MultiTransferEvent.SingleTransferEvent) {
                     if (event.transferEvent is TransferEvent.TransferStartEvent) {
                         rootTags += event.transferEvent.transfer.tag
@@ -122,6 +120,7 @@ abstract class AbstractTransferNodesUseCase<T, R>(
                         }
                     }
                 }
+                emit(event)
             }.onCompletion {
                 runCatching { cancelCancelTokenUseCase() }
             }.cancellable()

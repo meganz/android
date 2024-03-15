@@ -32,6 +32,10 @@ abstract class AbstractStartTransfersWithWorkerUseCase(
             //emitting a FinishProcessingTransfers can cause a terminal event in the collector (firstOrNull for instance), so we need to start the worker before emitting it
             if (finished) {
                 startWorker()
+                if (event !is MultiTransferEvent.ScanningFoldersFinished) {
+                    //this is just in case the event was lost for some reason and we are finishing by a SingleTransferEvent
+                    emit(MultiTransferEvent.ScanningFoldersFinished(0, 0))
+                }
             }
             emit(event)
             return@transformWhile !finished
