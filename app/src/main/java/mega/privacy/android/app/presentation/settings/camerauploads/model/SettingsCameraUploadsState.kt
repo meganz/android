@@ -18,6 +18,7 @@ import de.palm.composestateevents.consumed
  * the Business Account Administrator has been suspended
  * @property showMediaPermissionsRationale true if a Rationale explaining why the Media Permissions
  * need to be granted should be shown
+ * @property uploadConnectionType Determines the connection type for uploading content in Camera Uploads
  */
 internal data class SettingsCameraUploadsState(
     val isCameraUploadsEnabled: Boolean = false,
@@ -27,4 +28,5 @@ internal data class SettingsCameraUploadsState(
     val showBusinessAccountSubUserSuspendedPrompt: Boolean = false,
     val showBusinessAccountAdministratorSuspendedPrompt: Boolean = false,
     val showMediaPermissionsRationale: Boolean = false,
+    val uploadConnectionType: UploadConnectionType = UploadConnectionType.WIFI,
 )

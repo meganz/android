@@ -13,15 +13,18 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsState
+import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
@@ -34,12 +37,14 @@ import javax.inject.Inject
  *
  * @property checkEnableCameraUploadsStatusUseCase Checks the Camera Uploads status and determine if it
  * can be ran
+ * @property isCameraUploadsByWifiUseCase Checks whether Camera Uploads can only be run on Wi-Fi / Wi-Fi or Mobile Data
  * @property isCameraUploadsEnabledUseCase Checks if Camera Uploads (the Primary Folder) is enabled
  * or not
  * @property isConnectedToInternetUseCase Checks if the User is connected to the Internet or not
  * @property isSecondaryFolderEnabled Checks if Media Uploads (the Secondary Folder) is enabled or not
  * @property listenToNewMediaUseCase Listens to new Photos and Videos captured by the Device
  * @property preparePrimaryFolderPathUseCase Prepares the Primary Folder path
+ * @property setCameraUploadsByWifiUseCase Sets whether Camera Uploads can only run through Wi-Fi / Wi-Fi or Mobile Data
  * @property setupCameraUploadsSettingUseCase If true, this enables Camera Uploads. Otherwise, the
  * feature is disabled
  * @property snackBarHandler Handler to display a Snackbar
@@ -49,11 +54,13 @@ import javax.inject.Inject
 @HiltViewModel
 internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val checkEnableCameraUploadsStatusUseCase: CheckEnableCameraUploadsStatusUseCase,
+    private val isCameraUploadsByWifiUseCase: IsCameraUploadsByWifiUseCase,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
     private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
     private val preparePrimaryFolderPathUseCase: PreparePrimaryFolderPathUseCase,
+    private val setCameraUploadsByWifiUseCase: SetCameraUploadsByWifiUseCase,
     private val setupCameraUploadsSettingUseCase: SetupCameraUploadsSettingUseCase,
     private val snackBarHandler: SnackBarHandler,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
@@ -81,11 +88,13 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
 
                 val isCameraUploadsEnabled = async { isCameraUploadsEnabledUseCase() }
                 val isMediaUploadsEnabled = async { isSecondaryFolderEnabled() }
+                val uploadConnectionType = async { getUploadConnectionType() }
 
                 _state.update {
                     it.copy(
                         isCameraUploadsEnabled = isCameraUploadsEnabled.await(),
-                        isMediaUploadsEnabled = isMediaUploadsEnabled.await()
+                        isMediaUploadsEnabled = isMediaUploadsEnabled.await(),
+                        uploadConnectionType = uploadConnectionType.await(),
                     )
                 }
             }.onFailure {
@@ -93,6 +102,16 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Retrieves the current Upload Connection Type
+     *
+     * @return [UploadConnectionType.WIFI] if Camera Uploads will only upload content over Wi-Fi
+     * [UploadConnectionType.WIFI_OR_MOBILE_DATA] if Camera Uploads can upload content either on
+     * Wi-Fi or Mobile Data
+     */
+    private suspend fun getUploadConnectionType() =
+        if (isCameraUploadsByWifiUseCase()) UploadConnectionType.WIFI else UploadConnectionType.WIFI_OR_MOBILE_DATA
 
     /**
      * Performs specific actions when the Camera Uploads state changes
@@ -260,6 +279,28 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
      */
     fun onRequestPermissionsStateChanged(newState: StateEvent) {
         _state.update { it.copy(requestPermissions = newState) }
+    }
+
+    /**
+     * Configures the new [UploadConnectionType] when uploading Camera Uploads content. Doing this
+     * stops the ongoing Camera Uploads process
+     *
+     * @param uploadConnectionType The new [UploadConnectionType]
+     */
+    fun onHowToUploadPromptOptionSelected(uploadConnectionType: UploadConnectionType) {
+        viewModelScope.launch {
+            runCatching {
+                setCameraUploadsByWifiUseCase(uploadConnectionType == UploadConnectionType.WIFI)
+                stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
+            }.onSuccess {
+                _state.update {
+                    it.copy(uploadConnectionType = uploadConnectionType)
+                }
+            }.onFailure { exception ->
+                Timber.e("An error occurred when changing the Upload Option:\n$exception")
+                showGenericErrorSnackbar()
+            }
+        }
     }
 
     /**
