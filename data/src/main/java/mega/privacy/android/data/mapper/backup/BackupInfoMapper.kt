@@ -9,14 +9,14 @@ import javax.inject.Inject
  *
  * @property backupInfoHeartbeatStatusMapper [BackupInfoHeartbeatStatusMapper]
  * @property backupInfoStateMapper [BackupInfoStateMapper]
- * @property backupInfoSubStateMapper [BackupInfoSubStateMapper]
+ * @property syncErrorMapper [SyncErrorMapper]
  * @property backupInfoTypeMapper [BackupInfoTypeMapper]
  * @property backupInfoUserAgentMapper [BackupInfoUserAgentMapper]
  */
 internal class BackupInfoMapper @Inject constructor(
     private val backupInfoHeartbeatStatusMapper: BackupInfoHeartbeatStatusMapper,
     private val backupInfoStateMapper: BackupInfoStateMapper,
-    private val backupInfoSubStateMapper: BackupInfoSubStateMapper,
+    private val syncErrorMapper: SyncErrorMapper,
     private val backupInfoTypeMapper: BackupInfoTypeMapper,
     private val backupInfoUserAgentMapper: BackupInfoUserAgentMapper,
 ) {
@@ -36,7 +36,7 @@ internal class BackupInfoMapper @Inject constructor(
             deviceId = megaBackupInfo.deviceId(),
             userAgent = backupInfoUserAgentMapper(megaBackupInfo.deviceUserAgent()),
             state = backupInfoStateMapper(megaBackupInfo.state()),
-            subState = backupInfoSubStateMapper(megaBackupInfo.substate()),
+            subState = syncErrorMapper(megaBackupInfo.substate()),
             extraInfo = megaBackupInfo.extra(),
             name = megaBackupInfo.name(),
             timestamp = megaBackupInfo.ts(),

@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.devicecenter.data.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.domain.entity.backup.BackupInfoSubState
+import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import org.junit.jupiter.api.BeforeAll
@@ -90,27 +90,27 @@ internal class DeviceNodeStatusMapperTest {
         Arguments.of(
             listOf<DeviceFolderNode>(
                 mock { on { status }.thenReturn(DeviceCenterNodeStatus.Paused) },
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Overquota(BackupInfoSubState.STORAGE_OVERQUOTA)) }
+                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Overquota(SyncError.STORAGE_OVERQUOTA)) }
             ),
             DeviceCenterNodeStatus.Paused,
         ),
         Arguments.of(
             listOf<DeviceFolderNode>(
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Overquota(BackupInfoSubState.STORAGE_OVERQUOTA)) },
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Blocked(BackupInfoSubState.ACCOUNT_BLOCKED)) }
+                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Overquota(SyncError.STORAGE_OVERQUOTA)) },
+                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Blocked(SyncError.ACCOUNT_BLOCKED)) }
             ),
             DeviceCenterNodeStatus.Overquota(null),
         ),
         Arguments.of(
             listOf<DeviceFolderNode>(
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Blocked(BackupInfoSubState.ACCOUNT_BLOCKED)) },
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Error(BackupInfoSubState.INSUFFICIENT_DISK_SPACE)) },
+                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Blocked(SyncError.ACCOUNT_BLOCKED)) },
+                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Error(SyncError.INSUFFICIENT_DISK_SPACE)) },
             ),
             DeviceCenterNodeStatus.Blocked(null),
         ),
         Arguments.of(
             listOf<DeviceFolderNode>(
-                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Error(BackupInfoSubState.INSUFFICIENT_DISK_SPACE)) },
+                mock { on { status }.thenReturn(DeviceCenterNodeStatus.Error(SyncError.INSUFFICIENT_DISK_SPACE)) },
                 mock { on { status }.thenReturn(DeviceCenterNodeStatus.UpToDate) }
             ),
             DeviceCenterNodeStatus.Error(null),

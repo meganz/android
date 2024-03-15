@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.backup
 
+import mega.privacy.android.domain.entity.sync.SyncError
+
 /**
  * Data class representing the User's Backup information from the "sf" API Call. This class is
  * mapped from nz.mega.sdk.MegaBackupInfo
@@ -12,7 +14,7 @@ package mega.privacy.android.domain.entity.backup
  * @property userAgent Any of the [BackupInfoUserAgent] values, which associates the Device where the
  * Backup originated
  * @property state Any of the [BackupInfoState] values
- * @property subState Any of the [BackupInfoSubState] values
+ * @property subState Any of the [SyncError] values
  * @property extraInfo The extra information used as a source for extracting other details
  * @property name The Backup Name
  * @property timestamp The Backup Timestamp reported by Heartbeats, measured in seconds
@@ -31,7 +33,7 @@ data class BackupInfo(
     val deviceId: String?,
     val userAgent: BackupInfoUserAgent,
     val state: BackupInfoState,
-    val subState: BackupInfoSubState,
+    val subState: SyncError,
     val extraInfo: String?,
     val name: String?,
     val timestamp: Long,

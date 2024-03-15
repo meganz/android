@@ -1,6 +1,6 @@
 package mega.privacy.android.feature.devicecenter.domain.entity
 
-import mega.privacy.android.domain.entity.backup.BackupInfoSubState
+import mega.privacy.android.domain.entity.sync.SyncError
 
 /**
  * Sealed class representing the Status of each Device Center Node
@@ -47,21 +47,21 @@ sealed class DeviceCenterNodeStatus(val priority: Int) {
      *
      * @property errorSubState The corresponding Error Sub State
      */
-    data class Error(val errorSubState: BackupInfoSubState?) : DeviceCenterNodeStatus(6)
+    data class Error(val errorSubState: SyncError?) : DeviceCenterNodeStatus(6)
 
     /**
      * The Device is Blocked
      *
      * @property errorSubState The corresponding Error Sub State
      */
-    data class Blocked(val errorSubState: BackupInfoSubState?) : DeviceCenterNodeStatus(7)
+    data class Blocked(val errorSubState: SyncError?) : DeviceCenterNodeStatus(7)
 
     /**
      * The Device is Overquota
      *
      * @property errorSubState The corresponding Error Sub State
      */
-    data class Overquota(val errorSubState: BackupInfoSubState?) : DeviceCenterNodeStatus(8)
+    data class Overquota(val errorSubState: SyncError?) : DeviceCenterNodeStatus(8)
 
     /**
      * The Device is Paused

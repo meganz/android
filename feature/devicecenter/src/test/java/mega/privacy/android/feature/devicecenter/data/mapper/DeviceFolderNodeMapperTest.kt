@@ -4,9 +4,9 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.backup.BackupInfo
 import mega.privacy.android.domain.entity.backup.BackupInfoHeartbeatStatus
 import mega.privacy.android.domain.entity.backup.BackupInfoState
-import mega.privacy.android.domain.entity.backup.BackupInfoSubState
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.backup.BackupInfoUserAgent
+import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import nz.mega.sdk.MegaApiJava
@@ -70,7 +70,7 @@ internal class DeviceFolderNodeMapperTest {
         val backupName = "Backup One"
         val backupType = BackupInfoType.CAMERA_UPLOADS
         val backupUserAgent = BackupInfoUserAgent.ANDROID
-        val backupSubState = BackupInfoSubState.STORAGE_OVERQUOTA
+        val backupSubState = SyncError.STORAGE_OVERQUOTA
         val backupRootHandle = 789012L
         val localPath = "storage/emulated/0/DCIM/Camera"
         val backupInfoList = listOf<BackupInfo>(
@@ -78,7 +78,7 @@ internal class DeviceFolderNodeMapperTest {
                 on { id }.thenReturn(backupId)
                 on { name }.thenReturn(backupName)
                 on { state }.thenReturn(backupState)
-                on { subState }.thenReturn(BackupInfoSubState.STORAGE_OVERQUOTA)
+                on { subState }.thenReturn(SyncError.STORAGE_OVERQUOTA)
                 on { type }.thenReturn(backupType)
                 on { rootHandle }.thenReturn(backupRootHandle)
                 on { userAgent }.thenReturn(backupUserAgent)
@@ -101,11 +101,11 @@ internal class DeviceFolderNodeMapperTest {
 
     @ParameterizedTest(name = "and backup sub state is {0}")
     @EnumSource(
-        value = BackupInfoSubState::class,
+        value = SyncError::class,
         names = ["ACCOUNT_EXPIRED", "ACCOUNT_BLOCKED", "NO_SYNC_ERROR"],
     )
     fun `test that the mapped device folder has a blocked status when the backup state is failed`(
-        backupSubState: BackupInfoSubState,
+        backupSubState: SyncError,
     ) {
         val backupId = 123456L
         val backupName = "Backup One"
@@ -141,11 +141,11 @@ internal class DeviceFolderNodeMapperTest {
 
     @ParameterizedTest(name = "and backup sub state is {0}")
     @EnumSource(
-        value = BackupInfoSubState::class,
+        value = SyncError::class,
         names = ["ACCOUNT_EXPIRED", "ACCOUNT_BLOCKED", "NO_SYNC_ERROR"],
     )
     fun `test that the mapped device folder has a blocked status when the backup state is temporary disabled`(
-        backupSubState: BackupInfoSubState,
+        backupSubState: SyncError,
     ) {
         val backupId = 123456L
         val backupName = "Backup One"
@@ -181,12 +181,12 @@ internal class DeviceFolderNodeMapperTest {
 
     @ParameterizedTest(name = "and backup sub state is {0}")
     @EnumSource(
-        value = BackupInfoSubState::class,
+        value = SyncError::class,
         names = ["ACCOUNT_EXPIRED", "ACCOUNT_BLOCKED", "NO_SYNC_ERROR", "STORAGE_OVERQUOTA"],
         mode = EnumSource.Mode.EXCLUDE,
     )
     fun `test that the mapped device folder has an error status when the backup state is failed`(
-        backupSubState: BackupInfoSubState,
+        backupSubState: SyncError,
     ) {
         val backupId = 123456L
         val backupName = "Backup One"
@@ -222,12 +222,12 @@ internal class DeviceFolderNodeMapperTest {
 
     @ParameterizedTest(name = "and backup sub state is {0}")
     @EnumSource(
-        value = BackupInfoSubState::class,
+        value = SyncError::class,
         names = ["ACCOUNT_EXPIRED", "ACCOUNT_BLOCKED", "NO_SYNC_ERROR", "STORAGE_OVERQUOTA"],
         mode = EnumSource.Mode.EXCLUDE,
     )
     fun `test that the mapped device folder has an error status when the backup state is temporary disabled`(
-        backupSubState: BackupInfoSubState,
+        backupSubState: SyncError,
     ) {
         val backupId = 123456L
         val backupName = "Backup One"

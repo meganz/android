@@ -4,9 +4,9 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.backup.BackupInfo
 import mega.privacy.android.domain.entity.backup.BackupInfoHeartbeatStatus
 import mega.privacy.android.domain.entity.backup.BackupInfoState
-import mega.privacy.android.domain.entity.backup.BackupInfoSubState
 import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.backup.BackupInfoUserAgent
+import mega.privacy.android.domain.entity.sync.SyncError
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaBackupInfo
 import nz.mega.sdk.MegaSync
@@ -29,7 +29,7 @@ internal class BackupInfoMapperTest {
 
     private val backupInfoHeartbeatStatusMapper = mock<BackupInfoHeartbeatStatusMapper>()
     private val backupInfoStateMapper = mock<BackupInfoStateMapper>()
-    private val backupInfoSubStateMapper = mock<BackupInfoSubStateMapper>()
+    private val syncErrorMapper = mock<SyncErrorMapper>()
     private val backupInfoTypeMapper = mock<BackupInfoTypeMapper>()
     private val backupInfoUserAgentMapper = mock<BackupInfoUserAgentMapper>()
 
@@ -55,7 +55,7 @@ internal class BackupInfoMapperTest {
     // Mapper converted values
     private val expectedHeartbeatStatus = BackupInfoHeartbeatStatus.UPTODATE
     private val expectedState = BackupInfoState.ACTIVE
-    private val expectedSubState = BackupInfoSubState.NO_SYNC_ERROR
+    private val expectedSubState = SyncError.NO_SYNC_ERROR
     private val expectedType = BackupInfoType.CAMERA_UPLOADS
     private val expectedUserAgent = BackupInfoUserAgent.ANDROID
 
@@ -64,7 +64,7 @@ internal class BackupInfoMapperTest {
         underTest = BackupInfoMapper(
             backupInfoHeartbeatStatusMapper = backupInfoHeartbeatStatusMapper,
             backupInfoStateMapper = backupInfoStateMapper,
-            backupInfoSubStateMapper = backupInfoSubStateMapper,
+            syncErrorMapper = syncErrorMapper,
             backupInfoTypeMapper = backupInfoTypeMapper,
             backupInfoUserAgentMapper = backupInfoUserAgentMapper,
         )
@@ -75,7 +75,7 @@ internal class BackupInfoMapperTest {
         reset(
             backupInfoHeartbeatStatusMapper,
             backupInfoStateMapper,
-            backupInfoSubStateMapper,
+            syncErrorMapper,
             backupInfoTypeMapper,
             backupInfoUserAgentMapper,
         )
@@ -89,7 +89,7 @@ internal class BackupInfoMapperTest {
             expectedHeartbeatStatus
         )
         whenever(backupInfoStateMapper(sdkState)).thenReturn(expectedState)
-        whenever(backupInfoSubStateMapper(sdkSubState)).thenReturn(expectedSubState)
+        whenever(syncErrorMapper(sdkSubState)).thenReturn(expectedSubState)
         whenever(backupInfoTypeMapper(sdkType)).thenReturn(expectedType)
         whenever(backupInfoUserAgentMapper(deviceUserAgent)).thenReturn(expectedUserAgent)
 
@@ -102,7 +102,7 @@ internal class BackupInfoMapperTest {
         verifyNoInteractions(
             backupInfoHeartbeatStatusMapper,
             backupInfoStateMapper,
-            backupInfoSubStateMapper,
+            syncErrorMapper,
             backupInfoTypeMapper,
             backupInfoUserAgentMapper,
         )

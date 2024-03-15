@@ -1,10 +1,10 @@
-package mega.privacy.android.domain.entity.backup
+package mega.privacy.android.domain.entity.sync
 
 /**
  * Enum class representing the different Backup Sub States mapped from
  * nz.mega.sdk.MegaBackupInfo.substate, which also references nz.mega.sdk.MegaSync.Error
  */
-enum class BackupInfoSubState {
+enum class SyncError {
 
     /**
      * Represents a Sub State that has no Error

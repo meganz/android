@@ -3,8 +3,8 @@ package mega.privacy.android.feature.devicecenter.data.mapper
 import mega.privacy.android.domain.entity.backup.BackupInfo
 import mega.privacy.android.domain.entity.backup.BackupInfoHeartbeatStatus
 import mega.privacy.android.domain.entity.backup.BackupInfoState
-import mega.privacy.android.domain.entity.backup.BackupInfoSubState
 import mega.privacy.android.domain.entity.backup.BackupInfoType
+import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceFolderNode
 import nz.mega.sdk.MegaApiJava
@@ -91,7 +91,7 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
     private fun BackupInfo.isOverquota() = state in listOf(
         BackupInfoState.FAILED,
         BackupInfoState.TEMPORARY_DISABLED,
-    ) && subState == BackupInfoSubState.STORAGE_OVERQUOTA
+    ) && subState == SyncError.STORAGE_OVERQUOTA
 
     /**
      * Checks whether the Backup is Blocked or not
@@ -102,9 +102,9 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
         BackupInfoState.FAILED,
         BackupInfoState.TEMPORARY_DISABLED,
     ) && subState in listOf(
-        BackupInfoSubState.ACCOUNT_EXPIRED,
-        BackupInfoSubState.ACCOUNT_BLOCKED,
-        BackupInfoSubState.NO_SYNC_ERROR
+        SyncError.ACCOUNT_EXPIRED,
+        SyncError.ACCOUNT_BLOCKED,
+        SyncError.NO_SYNC_ERROR
     )
 
     /**
@@ -116,10 +116,10 @@ internal class DeviceFolderNodeMapper @Inject constructor() {
         BackupInfoState.FAILED,
         BackupInfoState.TEMPORARY_DISABLED,
     ) && subState !in listOf(
-        BackupInfoSubState.ACCOUNT_EXPIRED,
-        BackupInfoSubState.ACCOUNT_BLOCKED,
-        BackupInfoSubState.NO_SYNC_ERROR,
-        BackupInfoSubState.STORAGE_OVERQUOTA
+        SyncError.ACCOUNT_EXPIRED,
+        SyncError.ACCOUNT_BLOCKED,
+        SyncError.NO_SYNC_ERROR,
+        SyncError.STORAGE_OVERQUOTA
     )
 
     /**

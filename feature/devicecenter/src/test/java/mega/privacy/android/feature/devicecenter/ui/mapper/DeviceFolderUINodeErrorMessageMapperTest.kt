@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.devicecenter.ui.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.domain.entity.backup.BackupInfoSubState
+import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.feature.devicecenter.R
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -27,7 +27,7 @@ internal class DeviceFolderUINodeErrorMessageMapperTest {
     @ParameterizedTest(name = "when the error sub state is {0}, then the expected string res is {1}")
     @MethodSource("provideParameters")
     fun `test that the mapping is correct`(
-        errorSubState: BackupInfoSubState,
+        errorSubState: SyncError,
         expectedStringRes: Int?,
     ) {
         assertThat(underTest(errorSubState)).isEqualTo(expectedStringRes)
@@ -35,184 +35,184 @@ internal class DeviceFolderUINodeErrorMessageMapperTest {
 
     @Test
     fun `test that a non matching sub state returns a default string res`() {
-        assertThat(underTest(BackupInfoSubState.UNKNOWN_BACKUP_INFO_SUB_STATE)).isEqualTo(R.string.device_center_list_view_item_sub_state_message_unknown_error)
+        assertThat(underTest(SyncError.UNKNOWN_BACKUP_INFO_SUB_STATE)).isEqualTo(R.string.device_center_list_view_item_sub_state_message_unknown_error)
     }
 
     private fun provideParameters() = Stream.of(
         Arguments.of(
-            BackupInfoSubState.NO_SYNC_ERROR,
+            SyncError.NO_SYNC_ERROR,
             null,
         ),
         Arguments.of(
-            BackupInfoSubState.UNKNOWN_ERROR,
+            SyncError.UNKNOWN_ERROR,
             R.string.device_center_list_view_item_sub_state_message_unknown_error,
         ),
         Arguments.of(
-            BackupInfoSubState.UNSUPPORTED_FILE_SYSTEM,
+            SyncError.UNSUPPORTED_FILE_SYSTEM,
             R.string.device_center_list_view_item_sub_state_unsupported_file_system,
         ),
         Arguments.of(
-            BackupInfoSubState.INVALID_REMOTE_TYPE,
+            SyncError.INVALID_REMOTE_TYPE,
             R.string.device_center_list_view_item_sub_state_invalid_remote_type,
         ),
         Arguments.of(
-            BackupInfoSubState.INVALID_LOCAL_TYPE,
+            SyncError.INVALID_LOCAL_TYPE,
             R.string.device_center_list_view_item_sub_state_invalid_local_type,
         ),
         Arguments.of(
-            BackupInfoSubState.INITIAL_SCAN_FAILED,
+            SyncError.INITIAL_SCAN_FAILED,
             R.string.device_center_list_view_item_sub_state_initial_scan_failed,
         ),
         Arguments.of(
-            BackupInfoSubState.LOCAL_PATH_TEMPORARY_UNAVAILABLE,
+            SyncError.LOCAL_PATH_TEMPORARY_UNAVAILABLE,
             R.string.device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now,
         ),
         Arguments.of(
-            BackupInfoSubState.LOCAL_PATH_UNAVAILABLE,
+            SyncError.LOCAL_PATH_UNAVAILABLE,
             R.string.device_center_list_view_item_sub_state_message_cannot_locate_local_drive,
         ),
         Arguments.of(
-            BackupInfoSubState.REMOTE_NODE_NOT_FOUND,
+            SyncError.REMOTE_NODE_NOT_FOUND,
             R.string.device_center_list_view_item_sub_state_remote_node_not_found,
         ),
         Arguments.of(
-            BackupInfoSubState.STORAGE_OVERQUOTA,
+            SyncError.STORAGE_OVERQUOTA,
             R.string.device_center_list_view_item_sub_state_storage_overquota,
         ),
         Arguments.of(
-            BackupInfoSubState.ACCOUNT_EXPIRED,
+            SyncError.ACCOUNT_EXPIRED,
             R.string.device_center_list_view_item_sub_state_account_expired,
         ),
         Arguments.of(
-            BackupInfoSubState.FOREIGN_TARGET_OVERSTORAGE,
+            SyncError.FOREIGN_TARGET_OVERSTORAGE,
             R.string.device_center_list_view_item_sub_state_foreign_target_overshare,
         ),
         Arguments.of(
-            BackupInfoSubState.REMOTE_PATH_HAS_CHANGED,
+            SyncError.REMOTE_PATH_HAS_CHANGED,
             R.string.device_center_list_view_item_sub_state_remote_path_has_changed,
         ),
         Arguments.of(
-            BackupInfoSubState.SHARE_NON_FULL_ACCESS,
+            SyncError.SHARE_NON_FULL_ACCESS,
             R.string.device_center_list_view_item_sub_state_share_non_full_access,
         ),
         Arguments.of(
-            BackupInfoSubState.LOCAL_FILESYSTEM_MISMATCH,
+            SyncError.LOCAL_FILESYSTEM_MISMATCH,
             R.string.device_center_list_view_item_sub_state_local_filesystem_mismatch,
         ),
         Arguments.of(
-            BackupInfoSubState.PUT_NODES_ERROR,
+            SyncError.PUT_NODES_ERROR,
             R.string.device_center_list_view_item_sub_state_put_nodes_error,
         ),
         Arguments.of(
-            BackupInfoSubState.ACTIVE_SYNC_BELOW_PATH,
+            SyncError.ACTIVE_SYNC_BELOW_PATH,
             R.string.device_center_list_view_item_sub_state_active_sync_below_path,
         ),
         Arguments.of(
-            BackupInfoSubState.ACTIVE_SYNC_ABOVE_PATH,
+            SyncError.ACTIVE_SYNC_ABOVE_PATH,
             R.string.device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder,
         ),
         Arguments.of(
-            BackupInfoSubState.REMOTE_NODE_MOVED_TO_RUBBISH,
+            SyncError.REMOTE_NODE_MOVED_TO_RUBBISH,
             R.string.device_center_list_view_item_sub_state_message_node_in_rubbish_bin,
         ),
         Arguments.of(
-            BackupInfoSubState.REMOTE_NODE_INSIDE_RUBBISH,
+            SyncError.REMOTE_NODE_INSIDE_RUBBISH,
             R.string.device_center_list_view_item_sub_state_message_node_in_rubbish_bin,
         ),
         Arguments.of(
-            BackupInfoSubState.VBOXSHAREDFOLDER_UNSUPPORTED,
+            SyncError.VBOXSHAREDFOLDER_UNSUPPORTED,
             R.string.device_center_list_view_item_sub_state_vboxsharedfolder_unsupported,
         ),
         Arguments.of(
-            BackupInfoSubState.LOCAL_PATH_SYNC_COLLISION,
+            SyncError.LOCAL_PATH_SYNC_COLLISION,
             R.string.device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder,
         ),
         Arguments.of(
-            BackupInfoSubState.ACCOUNT_BLOCKED,
+            SyncError.ACCOUNT_BLOCKED,
             R.string.device_center_list_view_item_sub_state_account_blocked,
         ),
         Arguments.of(
-            BackupInfoSubState.UNKNOWN_TEMPORARY_ERROR,
+            SyncError.UNKNOWN_TEMPORARY_ERROR,
             R.string.device_center_list_view_item_sub_state_unknown_temporary_error,
         ),
         Arguments.of(
-            BackupInfoSubState.TOO_MANY_ACTION_PACKETS,
+            SyncError.TOO_MANY_ACTION_PACKETS,
             R.string.device_center_list_view_item_sub_state_too_many_action_packets,
         ),
         Arguments.of(
-            BackupInfoSubState.LOGGED_OUT,
+            SyncError.LOGGED_OUT,
             R.string.device_center_list_view_item_sub_state_logged_out,
         ),
         Arguments.of(
-            BackupInfoSubState.BACKUP_MODIFIED,
+            SyncError.BACKUP_MODIFIED,
             R.string.device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes,
         ),
         Arguments.of(
-            BackupInfoSubState.BACKUP_SOURCE_NOT_BELOW_DRIVE,
+            SyncError.BACKUP_SOURCE_NOT_BELOW_DRIVE,
             R.string.device_center_list_view_item_sub_state_backup_source_not_below_drive,
         ),
         Arguments.of(
-            BackupInfoSubState.SYNC_CONFIG_WRITE_FAILURE,
+            SyncError.SYNC_CONFIG_WRITE_FAILURE,
             R.string.device_center_list_view_item_sub_state_message_folder_backup_issue,
         ),
         Arguments.of(
-            BackupInfoSubState.ACTIVE_SYNC_SAME_PATH,
+            SyncError.ACTIVE_SYNC_SAME_PATH,
             R.string.device_center_list_view_item_sub_state_active_sync_same_path,
         ),
         Arguments.of(
-            BackupInfoSubState.COULD_NOT_MOVE_CLOUD_NODES,
+            SyncError.COULD_NOT_MOVE_CLOUD_NODES,
             R.string.device_center_list_view_item_sub_state_could_not_move_cloud_nodes,
         ),
         Arguments.of(
-            BackupInfoSubState.COULD_NOT_CREATE_IGNORE_FILE,
+            SyncError.COULD_NOT_CREATE_IGNORE_FILE,
             R.string.device_center_list_view_item_sub_state_could_not_create_ignore_file,
         ),
         Arguments.of(
-            BackupInfoSubState.SYNC_CONFIG_READ_FAILURE,
+            SyncError.SYNC_CONFIG_READ_FAILURE,
             R.string.device_center_list_view_item_sub_state_sync_config_read_failure,
         ),
         Arguments.of(
-            BackupInfoSubState.UNKNOWN_DRIVE_PATH,
+            SyncError.UNKNOWN_DRIVE_PATH,
             R.string.device_center_list_view_item_sub_state_unknown_drive_path,
         ),
         Arguments.of(
-            BackupInfoSubState.INVALID_SCAN_INTERVAL,
+            SyncError.INVALID_SCAN_INTERVAL,
             R.string.device_center_list_view_item_sub_state_invalid_scan_interval,
         ),
         Arguments.of(
-            BackupInfoSubState.NOTIFICATION_SYSTEM_UNAVAILABLE,
+            SyncError.NOTIFICATION_SYSTEM_UNAVAILABLE,
             R.string.device_center_list_view_item_sub_state_notification_system_unavailable,
         ),
         Arguments.of(
-            BackupInfoSubState.UNABLE_TO_ADD_WATCH,
+            SyncError.UNABLE_TO_ADD_WATCH,
             R.string.device_center_list_view_item_sub_state_unable_to_add_watch,
         ),
         Arguments.of(
-            BackupInfoSubState.UNABLE_TO_RETRIEVE_ROOT_FSID,
+            SyncError.UNABLE_TO_RETRIEVE_ROOT_FSID,
             R.string.device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid,
         ),
         Arguments.of(
-            BackupInfoSubState.UNABLE_TO_OPEN_DATABASE,
+            SyncError.UNABLE_TO_OPEN_DATABASE,
             R.string.device_center_list_view_item_sub_state_message_folder_backup_issue,
         ),
         Arguments.of(
-            BackupInfoSubState.INSUFFICIENT_DISK_SPACE,
+            SyncError.INSUFFICIENT_DISK_SPACE,
             R.string.device_center_list_view_item_sub_state_insufficient_disk_space,
         ),
         Arguments.of(
-            BackupInfoSubState.FAILURE_ACCESSING_PERSISTENT_STORAGE,
+            SyncError.FAILURE_ACCESSING_PERSISTENT_STORAGE,
             R.string.device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid,
         ),
         Arguments.of(
-            BackupInfoSubState.MISMATCH_OF_ROOT_FSID,
+            SyncError.MISMATCH_OF_ROOT_FSID,
             R.string.device_center_list_view_item_sub_state_message_folder_backup_issue,
         ),
         Arguments.of(
-            BackupInfoSubState.FILESYSTEM_FILE_IDS_ARE_UNSTABLE,
+            SyncError.FILESYSTEM_FILE_IDS_ARE_UNSTABLE,
             R.string.device_center_list_view_item_sub_state_message_folder_backup_issue,
         ),
         Arguments.of(
-            BackupInfoSubState.FILESYSTEM_ID_UNAVAILABLE,
+            SyncError.FILESYSTEM_ID_UNAVAILABLE,
             R.string.device_center_list_view_item_sub_state_message_folder_backup_issue,
         ),
     )
