@@ -28,6 +28,7 @@ class VideoUIEntityMapper @Inject constructor(
         isFavourite = typedVideoNode.isFavourite,
         isSharedItems = typedVideoNode.exportedData != null,
         nodeAvailableOffline = typedVideoNode.isAvailableOffline,
+        label = typedVideoNode.label,
         elementID = typedVideoNode.elementID
     )
 }

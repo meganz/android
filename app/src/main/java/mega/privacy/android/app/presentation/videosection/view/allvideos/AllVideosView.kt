@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -31,6 +32,7 @@ import mega.privacy.android.app.presentation.videosection.model.DurationFilterOp
 import mega.privacy.android.app.presentation.videosection.model.LocationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideosFilterOptionEntity
+import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -38,6 +40,7 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.shared.theme.MegaAppTheme
+import nz.mega.sdk.MegaNode
 
 /**
  * Test tag for the videos progress bar.
@@ -207,6 +210,13 @@ internal fun AllVideosView(
                                 duration = videoItem.durationString,
                                 isFavourite = videoItem.isFavourite,
                                 isSelected = videoItem.isSelected,
+                                isSharedWithPublicLink = videoItem.isSharedItems,
+                                labelColor = if (videoItem.label != MegaNode.NODE_LBL_UNKNOWN)
+                                    colorResource(
+                                        id = MegaNodeUtil.getNodeLabelColor(
+                                            videoItem.label
+                                        )
+                                    ) else null,
                                 thumbnailData = if (videoItem.thumbnail?.exists() == true) {
                                     videoItem.thumbnail
                                 } else {

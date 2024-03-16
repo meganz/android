@@ -17,6 +17,7 @@ import kotlin.time.Duration
  * @property isFavourite the video if is Favourite
  * @property nodeAvailableOffline the video if is available for offline
  * @property isSharedItems the video if is share
+ * @property label the video's label
  * @property elementID the element id if the video is belong to a playlist
  * @property isSelected the video if is selected
  */
@@ -31,6 +32,7 @@ data class VideoUIEntity(
     val isFavourite: Boolean = false,
     val nodeAvailableOffline: Boolean = false,
     val isSharedItems: Boolean = false,
+    val label: Int = 0,
     val elementID: Long? = null,
     val isSelected: Boolean = false
 )

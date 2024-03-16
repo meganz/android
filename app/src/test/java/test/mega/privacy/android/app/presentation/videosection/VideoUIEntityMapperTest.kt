@@ -31,6 +31,7 @@ class VideoUIEntityMapperTest {
     private val expectedDurationTime = 10.minutes
     private val expectedIsFavourite = false
     private val expectedElementID = 2L
+    private val expectedLabel = 1
     private val expectedExportedData = mock<ExportedData>()
 
     @BeforeAll
@@ -71,6 +72,7 @@ class VideoUIEntityMapperTest {
         on { thumbnailPath }.thenReturn(expectedThumbnail)
         on { exportedData }.thenReturn(exportData)
         on { elementID }.thenReturn(expectedElementID)
+        on { label }.thenReturn(expectedLabel)
     }
 
     private fun assertMappedVideoUIEntity(
@@ -90,7 +92,8 @@ class VideoUIEntityMapperTest {
                 { assertThat(it.nodeAvailableOffline).isEqualTo(expectedAvailableOffline) },
                 { assertThat(it.isFavourite).isEqualTo(expectedIsFavourite) },
                 { assertThat(it.isSharedItems).isEqualTo(expectedIsShared) },
-                { assertThat(it.elementID).isEqualTo(expectedElementID) }
+                { assertThat(it.elementID).isEqualTo(expectedElementID) },
+                { assertThat(it.label).isEqualTo(expectedLabel) }
             )
         }
     }
