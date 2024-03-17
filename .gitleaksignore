@@ -179,3 +179,4 @@ app/src/test/java/test/mega/privacy/android/app/presentation/testpassword/TestPa
 data/src/test/java/mega/privacy/android/data/repository/DefaultAccountRepositoryTest.kt:hashicorp-tf-password:1384
 data/src/test/java/mega/privacy/android/data/repository/DefaultAccountRepositoryTest.kt:hashicorp-tf-password:1411
 data/src/test/java/mega/privacy/android/data/repository/DefaultAccountRepositoryTest.kt:hashicorp-tf-password:1438
+app/src/main/java/mega/privacy/android/app/utils/Constants.java:hashicorp-tf-password:73
