@@ -19,7 +19,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.devicecenter.domain.usecase.GetDevicesUseCase
 import mega.privacy.android.feature.devicecenter.ui.mapper.DeviceUINodeListMapper
-import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterState
+import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUiState
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
@@ -43,12 +43,12 @@ internal class DeviceCenterViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(DeviceCenterState())
+    private val _state = MutableStateFlow(DeviceCenterUiState())
 
     /**
      * The State of [DeviceCenterScreen]
      */
-    val state: StateFlow<DeviceCenterState> = _state.asStateFlow()
+    val state: StateFlow<DeviceCenterUiState> = _state.asStateFlow()
 
     private var monitorConnectivityJob: Job? = null
 
@@ -158,13 +158,13 @@ internal class DeviceCenterViewModel @Inject constructor(
     }
 
     /**
-     * Acknowledges that [DeviceCenterState.exitFeature] has been triggered, and therefore resets
+     * Acknowledges that [DeviceCenterUiState.exitFeature] has been triggered, and therefore resets
      * its value
      */
     fun resetExitFeature() = _state.update { it.copy(exitFeature = consumed) }
 
     /**
-     * Updates the value of [DeviceCenterState.menuClickedDevice]
+     * Updates the value of [DeviceCenterUiState.menuClickedDevice]
      *
      * @param menuClickedDevice The [DeviceUINode] whose Context Menu is clicked
      */
@@ -172,7 +172,7 @@ internal class DeviceCenterViewModel @Inject constructor(
         _state.update { it.copy(menuClickedDevice = menuClickedDevice) }
 
     /**
-     * Updates the value of [DeviceCenterState.deviceToRename]
+     * Updates the value of [DeviceCenterUiState.deviceToRename]
      *
      * @param deviceToRename The Device to be renamed by the User
      */
@@ -180,7 +180,7 @@ internal class DeviceCenterViewModel @Inject constructor(
         _state.update { it.copy(deviceToRename = deviceToRename) }
 
     /**
-     * Resets the value of [DeviceCenterState.deviceToRename] back to null
+     * Resets the value of [DeviceCenterUiState.deviceToRename] back to null
      */
     fun resetDeviceToRename() = _state.update { it.copy(deviceToRename = null) }
 
@@ -197,7 +197,7 @@ internal class DeviceCenterViewModel @Inject constructor(
     }
 
     /**
-     * Notifies [DeviceCenterState.renameDeviceSuccess] that it has been consumed
+     * Notifies [DeviceCenterUiState.renameDeviceSuccess] that it has been consumed
      */
     fun resetRenameDeviceSuccessEvent() =
         _state.update { it.copy(renameDeviceSuccess = consumed) }
@@ -239,6 +239,12 @@ internal class DeviceCenterViewModel @Inject constructor(
     fun onSearchClicked() {
         _state.update { it.copy(searchWidgetState = SearchWidgetState.EXPANDED) }
     }
+
+    fun onInfoClicked(selectedItem: DeviceUINode) =
+        _state.update { it.copy(infoSelectedItem = selectedItem) }
+
+    fun onInfoBackPressHandle() =
+        _state.update { it.copy(infoSelectedItem = null) }
 
     companion object {
         /**

@@ -23,8 +23,9 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property searchQuery The search query
  * @property filteredUiItems The list of [DeviceCenterUINode] objects that are filtered based on the search query
  * @property searchWidgetState The state of the search widget
+ * @property infoSelectedItem The item selected to show its Info
  */
-data class DeviceCenterState(
+data class DeviceCenterUiState(
     val devices: List<DeviceCenterUINode> = emptyList(),
     val isCameraUploadsEnabled: Boolean = false,
     val isInitialLoadingFinished: Boolean = false,
@@ -37,6 +38,7 @@ data class DeviceCenterState(
     val searchQuery: String = "",
     val filteredUiItems: List<DeviceCenterUINode>? = null,
     val searchWidgetState: SearchWidgetState = SearchWidgetState.COLLAPSED,
+    val infoSelectedItem: DeviceCenterUINode? = null,
 ) {
     val itemsToDisplay: List<DeviceCenterUINode> = selectedDevice?.folders ?: devices
 }

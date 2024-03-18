@@ -102,8 +102,9 @@ internal fun DeviceCenterListViewItem(
             },
             onInfoClicked = if (uiNode is DeviceUINode) {
                 null
-            } else { ->
-                // TODO When the Info page is done
+            } else {
+                // TODO When the Info page for Folders is done
+                null
             },
         )
         CustomDivider(

@@ -17,6 +17,7 @@ import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.body.OtherDeviceBottomSheetBody
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.body.OwnDeviceBottomSheetBody
+import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OtherDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
@@ -43,6 +44,7 @@ internal const val BOTTOM_SHEET_HEADER =
  * @param onCameraUploadsClicked Lambda that is executed when the "Camera uploads" Tile is selected
  * @param onRenameDeviceClicked Lambda that is executed when the "Rename" Tile is selected
  * @param onInfoClicked Lambda that is executed when the "Info" Tile is selected
+ * @param onBottomSheetDismissed Lambda that is executed when the bottom sheet is dismissed
  */
 @Composable
 internal fun DeviceBottomSheetBody(
@@ -50,7 +52,7 @@ internal fun DeviceBottomSheetBody(
     isCameraUploadsEnabled: Boolean,
     onCameraUploadsClicked: () -> Unit,
     onRenameDeviceClicked: (DeviceUINode) -> Unit,
-    onInfoClicked: () -> Unit,
+    onInfoClicked: (DeviceUINode) -> Unit,
     onBottomSheetDismissed: () -> Unit,
 ) {
     Column(Modifier.testTag(BOTTOM_SHEET_CONTAINER)) {
@@ -80,7 +82,7 @@ internal fun DeviceBottomSheetBody(
                     },
                     onInfoClicked = {
                         onBottomSheetDismissed()
-                        onInfoClicked.invoke()
+                        onInfoClicked(device)
                     },
                 )
             }
@@ -93,7 +95,7 @@ internal fun DeviceBottomSheetBody(
                     },
                     onInfoClicked = {
                         onBottomSheetDismissed()
-                        onInfoClicked.invoke()
+                        onInfoClicked(device)
                     },
                 )
             }

@@ -7,7 +7,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.BOTTOM_SHEET_CONTAINER
 import mega.privacy.android.feature.devicecenter.ui.lists.loading.DEVICE_CENTER_LOADING_SCREEN
-import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterState
+import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUiState
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OtherDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
@@ -38,7 +38,7 @@ internal class DeviceCenterScreenTest {
             status = DeviceCenterUINodeStatus.UpToDate,
             folders = emptyList(),
         )
-        val uiState = DeviceCenterState(
+        val uiState = DeviceCenterUiState(
             devices = listOf(ownDeviceUINode),
             isInitialLoadingFinished = true,
         )
@@ -53,6 +53,7 @@ internal class DeviceCenterScreenTest {
                 onNonBackupFolderClicked = {},
                 onNonBackupFolderMenuClicked = {},
                 onCameraUploadsClicked = {},
+                onInfoOptionClicked = {},
                 onRenameDeviceOptionClicked = {},
                 onRenameDeviceCancelled = {},
                 onRenameDeviceSuccessful = {},
@@ -69,7 +70,7 @@ internal class DeviceCenterScreenTest {
 
     @Test
     fun `test that nothing is displayed if the user backup information is empty`() {
-        val uiState = DeviceCenterState(isInitialLoadingFinished = true)
+        val uiState = DeviceCenterUiState(isInitialLoadingFinished = true)
         composeTestRule.setContent {
             DeviceCenterScreen(
                 uiState = uiState,
@@ -81,6 +82,7 @@ internal class DeviceCenterScreenTest {
                 onNonBackupFolderClicked = {},
                 onNonBackupFolderMenuClicked = {},
                 onCameraUploadsClicked = {},
+                onInfoOptionClicked = {},
                 onRenameDeviceOptionClicked = {},
                 onRenameDeviceCancelled = {},
                 onRenameDeviceSuccessful = {},
@@ -107,7 +109,7 @@ internal class DeviceCenterScreenTest {
             status = DeviceCenterUINodeStatus.UpToDate,
             folders = emptyList(),
         )
-        val uiState = DeviceCenterState(
+        val uiState = DeviceCenterUiState(
             devices = listOf(ownDeviceUINode),
             isInitialLoadingFinished = true,
             menuClickedDevice = ownDeviceUINode,
@@ -123,6 +125,7 @@ internal class DeviceCenterScreenTest {
                 onNonBackupFolderClicked = {},
                 onNonBackupFolderMenuClicked = {},
                 onCameraUploadsClicked = {},
+                onInfoOptionClicked = {},
                 onRenameDeviceOptionClicked = {},
                 onRenameDeviceCancelled = {},
                 onRenameDeviceSuccessful = {},
@@ -146,7 +149,7 @@ internal class DeviceCenterScreenTest {
             status = DeviceCenterUINodeStatus.UpToDate,
             folders = emptyList(),
         )
-        val uiState = DeviceCenterState(
+        val uiState = DeviceCenterUiState(
             devices = listOf(ownDeviceUINode),
             isInitialLoadingFinished = true,
             isNetworkConnected = true,
@@ -162,6 +165,7 @@ internal class DeviceCenterScreenTest {
                 onNonBackupFolderClicked = {},
                 onNonBackupFolderMenuClicked = {},
                 onCameraUploadsClicked = {},
+                onInfoOptionClicked = {},
                 onRenameDeviceOptionClicked = {},
                 onRenameDeviceCancelled = {},
                 onRenameDeviceSuccessful = {},
@@ -186,7 +190,7 @@ internal class DeviceCenterScreenTest {
             status = DeviceCenterUINodeStatus.UpToDate,
             folders = emptyList(),
         )
-        val uiState = DeviceCenterState(
+        val uiState = DeviceCenterUiState(
             devices = listOf(otherDeviceUINode),
             isInitialLoadingFinished = true,
             isNetworkConnected = true,
@@ -202,6 +206,7 @@ internal class DeviceCenterScreenTest {
                 onNonBackupFolderClicked = {},
                 onNonBackupFolderMenuClicked = {},
                 onCameraUploadsClicked = {},
+                onInfoOptionClicked = {},
                 onRenameDeviceOptionClicked = {},
                 onRenameDeviceCancelled = {},
                 onRenameDeviceSuccessful = {},
@@ -233,7 +238,7 @@ internal class DeviceCenterScreenTest {
             status = DeviceCenterUINodeStatus.UpToDate,
             folders = emptyList(),
         )
-        val uiState = DeviceCenterState(
+        val uiState = DeviceCenterUiState(
             devices = listOf(ownDeviceUINode, otherDeviceUINode),
             isInitialLoadingFinished = true,
             isNetworkConnected = true,
@@ -249,6 +254,7 @@ internal class DeviceCenterScreenTest {
                 onNonBackupFolderClicked = {},
                 onNonBackupFolderMenuClicked = {},
                 onCameraUploadsClicked = {},
+                onInfoOptionClicked = {},
                 onRenameDeviceOptionClicked = {},
                 onRenameDeviceCancelled = {},
                 onRenameDeviceSuccessful = {},
@@ -281,7 +287,7 @@ internal class DeviceCenterScreenTest {
             status = DeviceCenterUINodeStatus.UpToDate,
             folders = listOf(ownDeviceFolderUINode),
         )
-        val uiState = DeviceCenterState(
+        val uiState = DeviceCenterUiState(
             devices = listOf(ownDeviceUINode),
             isInitialLoadingFinished = true,
             selectedDevice = ownDeviceUINode,
@@ -297,6 +303,7 @@ internal class DeviceCenterScreenTest {
                 onNonBackupFolderClicked = {},
                 onNonBackupFolderMenuClicked = {},
                 onCameraUploadsClicked = {},
+                onInfoOptionClicked = {},
                 onRenameDeviceOptionClicked = {},
                 onRenameDeviceCancelled = {},
                 onRenameDeviceSuccessful = {},
@@ -316,7 +323,7 @@ internal class DeviceCenterScreenTest {
     fun `test that the loading screen is shown`() {
         composeTestRule.setContent {
             DeviceCenterScreen(
-                uiState = DeviceCenterState(isNetworkConnected = true),
+                uiState = DeviceCenterUiState(isNetworkConnected = true),
                 snackbarHostState = SnackbarHostState(),
                 onDeviceClicked = {},
                 onDeviceMenuClicked = {},
@@ -325,6 +332,7 @@ internal class DeviceCenterScreenTest {
                 onNonBackupFolderClicked = {},
                 onNonBackupFolderMenuClicked = {},
                 onCameraUploadsClicked = {},
+                onInfoOptionClicked = {},
                 onRenameDeviceOptionClicked = {},
                 onRenameDeviceCancelled = {},
                 onRenameDeviceSuccessful = {},
@@ -343,7 +351,7 @@ internal class DeviceCenterScreenTest {
     fun `test that the no network state is shown`() {
         composeTestRule.setContent {
             DeviceCenterScreen(
-                uiState = DeviceCenterState(),
+                uiState = DeviceCenterUiState(),
                 snackbarHostState = SnackbarHostState(),
                 onDeviceClicked = {},
                 onDeviceMenuClicked = {},
@@ -352,6 +360,7 @@ internal class DeviceCenterScreenTest {
                 onNonBackupFolderClicked = {},
                 onNonBackupFolderMenuClicked = {},
                 onCameraUploadsClicked = {},
+                onInfoOptionClicked = {},
                 onRenameDeviceOptionClicked = {},
                 onRenameDeviceCancelled = {},
                 onRenameDeviceSuccessful = {},
@@ -375,7 +384,7 @@ internal class DeviceCenterScreenTest {
             status = DeviceCenterUINodeStatus.CameraUploadsDisabled,
             folders = emptyList(),
         )
-        val uiState = DeviceCenterState(
+        val uiState = DeviceCenterUiState(
             devices = listOf(ownDeviceUINode),
             isCameraUploadsEnabled = false,
             isInitialLoadingFinished = true,
@@ -393,6 +402,7 @@ internal class DeviceCenterScreenTest {
                 onNonBackupFolderClicked = {},
                 onNonBackupFolderMenuClicked = {},
                 onCameraUploadsClicked = {},
+                onInfoOptionClicked = {},
                 onRenameDeviceOptionClicked = {},
                 onRenameDeviceCancelled = {},
                 onRenameDeviceSuccessful = {},
@@ -412,7 +422,7 @@ internal class DeviceCenterScreenTest {
     fun `test that no results found state is shown`() {
         composeTestRule.setContent {
             DeviceCenterScreen(
-                uiState = DeviceCenterState(
+                uiState = DeviceCenterUiState(
                     isInitialLoadingFinished = true,
                     searchQuery = "testing",
                     filteredUiItems = emptyList(),
@@ -427,6 +437,7 @@ internal class DeviceCenterScreenTest {
                 onNonBackupFolderClicked = {},
                 onNonBackupFolderMenuClicked = {},
                 onCameraUploadsClicked = {},
+                onInfoOptionClicked = {},
                 onRenameDeviceOptionClicked = {},
                 onRenameDeviceCancelled = {},
                 onRenameDeviceSuccessful = {},

@@ -11,12 +11,12 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 
 /**
- * Test class for [DeviceCenterState]
+ * Test class for [DeviceCenterUiState]
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class DeviceCenterStateTest {
+internal class DeviceCenterUiStateTest {
 
-    private lateinit var underTest: DeviceCenterState
+    private lateinit var underTest: DeviceCenterUiState
 
     private val ownDeviceFolderUINode = NonBackupDeviceFolderUINode(
         id = "ABCD-EFGH",
@@ -40,7 +40,7 @@ internal class DeviceCenterStateTest {
         selectedDevice: DeviceUINode?,
         expectedItemsToDisplay: List<DeviceCenterUINode>,
     ) {
-        underTest = DeviceCenterState(
+        underTest = DeviceCenterUiState(
             devices = listOf(ownDeviceUINode),
             selectedDevice = selectedDevice,
         )

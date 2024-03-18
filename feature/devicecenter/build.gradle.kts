@@ -72,6 +72,7 @@ tasks.withType<Test> {
 }
 
 dependencies {
+    implementation(project(":core:formatter"))
     lintChecks(project(":lint"))
 
     implementation(project(":analytics"))
