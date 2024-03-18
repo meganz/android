@@ -163,4 +163,9 @@ interface ChatStorageGateway {
      * @return True if the content in message exists
      */
     suspend fun getExistsInMessage(chatId: Long, msgId: Long): Boolean?
+
+    /**
+     * Clear all typed messages
+     */
+    suspend fun clearAllData()
 }

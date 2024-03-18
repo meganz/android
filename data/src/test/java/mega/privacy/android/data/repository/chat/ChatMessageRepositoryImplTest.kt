@@ -501,4 +501,11 @@ class ChatMessageRepositoryImplTest {
             whenever(chatStorageGateway.getExistsInMessage(chatId, msgId)).thenReturn(true)
             assertThat(underTest.getExistsInMessage(chatId, msgId)).isTrue()
         }
+
+    @Test
+    internal fun `test that clear all data invokes gateway`() = runTest {
+        underTest.clearAllData()
+
+        verify(chatStorageGateway).clearAllData()
+    }
 }

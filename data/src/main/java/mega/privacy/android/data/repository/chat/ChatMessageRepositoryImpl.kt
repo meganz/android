@@ -322,4 +322,7 @@ internal class ChatMessageRepositoryImpl @Inject constructor(
             chatStorageGateway.getExistsInMessage(chatId, msgId) ?: true
         }
 
+    override suspend fun clearAllData() = withContext(ioDispatcher) {
+        chatStorageGateway.clearAllData()
+    }
 }

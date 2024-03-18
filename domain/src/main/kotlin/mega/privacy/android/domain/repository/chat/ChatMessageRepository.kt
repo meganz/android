@@ -529,4 +529,9 @@ interface ChatMessageRepository {
      * @return Whether the content in message exists.
      */
     suspend fun getExistsInMessage(chatId: Long, msgId: Long): Boolean
+
+    /**
+     * Clear all data from chat database
+     */
+    suspend fun clearAllData()
 }
