@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
@@ -47,7 +48,8 @@ abstract class AbstractTransferNodesUseCase<T, R>(
     ): Flow<MultiTransferEvent> {
         val alreadyScanned = mutableSetOf<R>()
         val scannedFiles = mutableSetOf<R>()
-        val alreadyDownloadedFiles = mutableSetOf<R>()
+        val alreadyTransferredFiles = mutableSetOf<R>()
+        val alreadyTransferredNodeIds = mutableSetOf<NodeId>()
         val allIds = items.map(::generateIdFromItem)
         var scanningFinishedSend = false
         return channelFlow {
@@ -96,7 +98,8 @@ abstract class AbstractTransferNodesUseCase<T, R>(
                         val id = generateIdFromTransferEvent(event.transferEvent)
                         scannedFiles.add(id)
                         if (event.isAlreadyTransferredEvent) {
-                            alreadyDownloadedFiles.add(id)
+                            alreadyTransferredFiles.add(id)
+                            alreadyTransferredNodeIds.add(NodeId(event.transferEvent.transfer.nodeHandle))
                         }
                     }
                     //check if is a single node scanning finish event
@@ -113,7 +116,8 @@ abstract class AbstractTransferNodesUseCase<T, R>(
                                 emit(
                                     MultiTransferEvent.ScanningFoldersFinished(
                                         scannedFiles.size,
-                                        alreadyDownloadedFiles.size
+                                        alreadyTransferredFiles.size,
+                                        alreadyTransferredNodeIds,
                                     )
                                 )
                             }

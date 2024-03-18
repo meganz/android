@@ -12,6 +12,7 @@ import mega.privacy.android.domain.exception.chat.FoldersNotAllowedAsChatUploadE
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.shared.AbstractStartTransfersWithWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.UploadFilesUseCase
@@ -35,6 +36,7 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
     private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
     private val chatMessageRepository: ChatMessageRepository,
     private val fileSystemRepository: FileSystemRepository,
+    private val attachNodeWithPendingMessageUseCase: AttachNodeWithPendingMessageUseCase,
     cancelCancelTokenUseCase: CancelCancelTokenUseCase,
 ) : AbstractStartTransfersWithWorkerUseCase(cancelCancelTokenUseCase) {
 
@@ -68,13 +70,24 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
             doTransfers = {
                 uploadFilesUseCase(
                     filesAndNames, chatFilesFolderId, appData, false
-                ).onEach {
+                ).onEach { event ->
                     //update transfer tag on Start event
-                    ((it as? MultiTransferEvent.SingleTransferEvent)?.transferEvent as? TransferEvent.TransferStartEvent)?.transfer?.tag?.let { transferTag ->
+                    ((event as? MultiTransferEvent.SingleTransferEvent)?.transferEvent as? TransferEvent.TransferStartEvent)?.transfer?.tag?.let { transferTag ->
                         updatePendingMessageUseCase(
                             UpdatePendingMessageTransferTagRequest(pendingMessageId, transferTag)
                         )
                     }
+                    //attach it if already uploaded
+                    (event as? MultiTransferEvent.ScanningFoldersFinished)
+                        ?.alreadyTransferredIds
+                        ?.firstOrNull()
+                        ?.takeIf { it.longValue != -1L }
+                        ?.let { alreadyTransferredNodeId ->
+                            attachNodeWithPendingMessageUseCase(
+                                pendingMessageId,
+                                alreadyTransferredNodeId
+                            )
+                        }
                 }
             },
             startWorker = {

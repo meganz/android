@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.transfer
 
 import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.entity.node.NodeId
 
 /**
  * Events for transfers (Upload or Download) that may involve more than one file or folder
@@ -76,9 +77,14 @@ sealed interface MultiTransferEvent {
     /**
      * All transfers has been scanned by the sdk, starting from this event transfers can be retried by sdk if the app is closed
      * @property scannedFiles the amount of files scanned for the transfer of the involved nodes
-     * @property alreadyDownloadedFiles the amount of already downloaded files
+     * @property alreadyTransferred the amount of already transferred files
+     * @property alreadyTransferredIds the ids of the nodes already transferred
      */
-    data class ScanningFoldersFinished(val scannedFiles: Int, val alreadyDownloadedFiles: Int) :
+    data class ScanningFoldersFinished(
+        val scannedFiles: Int,
+        val alreadyTransferred: Int,
+        val alreadyTransferredIds: Set<NodeId>,
+    ) :
         MultiTransferEvent
 
     /**

@@ -11,12 +11,16 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.PendingMessage
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageTransferTagRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
+import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
+import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.UploadFilesUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -48,6 +52,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
     private val updatePendingMessageUseCase = mock<UpdatePendingMessageUseCase>()
     private val chatMessageRepository = mock<ChatMessageRepository>()
     private val fileSystemRepository = mock<FileSystemRepository>()
+    private val attachNodeWithPendingMessageUseCase = mock<AttachNodeWithPendingMessageUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -60,6 +65,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
             updatePendingMessageUseCase,
             chatMessageRepository,
             fileSystemRepository,
+            attachNodeWithPendingMessageUseCase,
             cancelCancelTokenUseCase,
         )
     }
@@ -75,6 +81,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
             updatePendingMessageUseCase,
             chatMessageRepository,
             fileSystemRepository,
+            attachNodeWithPendingMessageUseCase,
             cancelCancelTokenUseCase,
         )
         commonStub()
@@ -203,6 +210,51 @@ class StartChatUploadsWithWorkerUseCaseTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that pending message tag is updated when start event is received`() = runTest {
+        val file = mockFile()
+        val pendingMessageId = 15L
+        val transferTag = 12
+        val transfer = mock<Transfer> {
+            on { it.tag } doReturn transferTag
+        }
+        val event = MultiTransferEvent.SingleTransferEvent(
+            TransferEvent.TransferStartEvent(transfer), 0, 0
+        )
+        whenever(
+            uploadFilesUseCase(any(), NodeId(any()), any(), any(), any())
+        ) doReturn flowOf(event)
+
+        underTest(file, pendingMessageId).test {
+            verify(updatePendingMessageUseCase).invoke(
+                UpdatePendingMessageTransferTagRequest(pendingMessageId, transferTag)
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that pending message node is attached if already uploaded event is received`() =
+        runTest {
+            val file = mockFile()
+            val pendingMessageId = 15L
+            val nodeHandle = 12L
+            val event = MultiTransferEvent.ScanningFoldersFinished(
+                1, 1, setOf(NodeId(nodeHandle))
+            )
+            whenever(
+                uploadFilesUseCase(any(), NodeId(any()), any(), any(), any())
+            ) doReturn flowOf(event)
+
+            underTest(file, pendingMessageId).test {
+                verify(attachNodeWithPendingMessageUseCase).invoke(
+                    pendingMessageId,
+                    NodeId(nodeHandle)
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     private fun mockFile() = mock<File> {
         on { isDirectory }.thenReturn(false)

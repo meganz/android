@@ -289,7 +289,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                         exception = lastError?.takeIf { terminalEvent == null },
                         totalNodes = nodes.size,
                         totalFiles = finishedEvent?.scannedFiles ?: 0,
-                        totalAlreadyDownloaded = finishedEvent?.alreadyDownloadedFiles ?: 0,
+                        totalAlreadyDownloaded = finishedEvent?.alreadyTransferred ?: 0,
                     )
                 }
             }

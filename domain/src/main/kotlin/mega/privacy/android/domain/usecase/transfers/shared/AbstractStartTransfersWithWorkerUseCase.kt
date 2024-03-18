@@ -34,7 +34,7 @@ abstract class AbstractStartTransfersWithWorkerUseCase(
                 startWorker()
                 if (event !is MultiTransferEvent.ScanningFoldersFinished) {
                     //this is just in case the event was lost for some reason and we are finishing by a SingleTransferEvent
-                    emit(MultiTransferEvent.ScanningFoldersFinished(0, 0))
+                    emit(MultiTransferEvent.ScanningFoldersFinished(0, 0, emptySet()))
                 }
             }
             emit(event)
