@@ -21,7 +21,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
@@ -29,7 +28,6 @@ import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
-import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
@@ -65,9 +63,6 @@ class StartDownloadComponentViewModelTest {
 
     private val getOfflinePathForNodeUseCase: GetOfflinePathForNodeUseCase = mock()
     private val startDownloadsWithWorkerUseCase: StartDownloadsWithWorkerUseCase = mock()
-    private val saveOfflineNodeInformationUseCase: SaveOfflineNodeInformationUseCase = mock()
-    private val broadcastOfflineFileAvailabilityUseCase: BroadcastOfflineFileAvailabilityUseCase =
-        mock()
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val clearActiveTransfersIfFinishedUseCase =
         mock<ClearActiveTransfersIfFinishedUseCase>()
@@ -103,8 +98,6 @@ class StartDownloadComponentViewModelTest {
             getOrCreateStorageDownloadLocationUseCase,
             getFilePreviewDownloadPathUseCase,
             startDownloadsWithWorkerUseCase,
-            saveOfflineNodeInformationUseCase,
-            broadcastOfflineFileAvailabilityUseCase,
             clearActiveTransfersIfFinishedUseCase,
             isConnectedToInternetUseCase,
             totalFileSizeOfNodesUseCase,
@@ -129,8 +122,6 @@ class StartDownloadComponentViewModelTest {
             getOrCreateStorageDownloadLocationUseCase,
             startDownloadsWithWorkerUseCase,
             getOfflinePathForNodeUseCase,
-            saveOfflineNodeInformationUseCase,
-            broadcastOfflineFileAvailabilityUseCase,
             isConnectedToInternetUseCase,
             node,
             parentNode,

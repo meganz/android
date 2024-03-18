@@ -1,18 +1,15 @@
 package mega.privacy.android.domain.usecase.offline
 
 import kotlinx.coroutines.flow.firstOrNull
-import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import javax.inject.Inject
 
 /**
- * Save the [OfflineNodeInformation] of this node, also all needed ancestors recursively and all children if it's a folder
+ * Save the [OfflineNodeInformation] of this node, also all needed ancestors recursively
  */
 class SaveOfflineNodeInformationUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
@@ -29,15 +26,11 @@ class SaveOfflineNodeInformationUseCase @Inject constructor(
         val driveRootNode = nodeRepository.getRootNode()?.id ?: NodeId(-1L)
         nodeRepository.getNodeById(nodeId)?.let { node ->
             //we need to save parents before the node itself
-            val offlineInfoId = saveNodeAndItsParentsRecursively(
+            saveNodeAndItsParentsRecursively(
                 currentNode = node,
                 driveRootNodeId = driveRootNode,
                 backupRootNodeId = backupRootNodeId,
             )
-            //and then node's children
-            if (node is FolderNode) {
-                saveChildrenRecursively(node, offlineInfoId)
-            }
         }
     }
 
@@ -77,29 +70,4 @@ class SaveOfflineNodeInformationUseCase @Inject constructor(
             }
         }
     }
-
-    /**
-     * Save offline information of all children and sub-children of this folder.
-     * When a folder node is saved offline, all its children needs to be saved.
-     */
-    private suspend fun saveChildrenRecursively(folderNode: FolderNode, offlineInfoId: Long?) {
-        folderNode.fetchChildren(SortOrder.ORDER_NONE).filterNot { node ->
-            //no need to save empty folders.
-            isEmptyFolder(node)
-        }.forEach { node ->
-            val currentOfflineInfoId =
-                nodeRepository.getOfflineNodeInformation(node.id)?.id?.toLong()
-                    ?: nodeRepository.saveOfflineNodeInformation(
-                        getOfflineNodeInformationUseCase(node),
-                        offlineInfoId
-                    )
-
-            if (node is FolderNode) {
-                saveChildrenRecursively(node, currentOfflineInfoId)
-            }
-        }
-    }
-
-    private fun isEmptyFolder(node: UnTypedNode) =
-        node is FolderNode && node.childFileCount == 0 && node.childFolderCount == 0
 }

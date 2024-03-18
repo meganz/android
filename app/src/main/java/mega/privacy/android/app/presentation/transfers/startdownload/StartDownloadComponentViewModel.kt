@@ -31,7 +31,6 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
@@ -39,7 +38,6 @@ import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
-import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
@@ -63,8 +61,6 @@ internal class StartDownloadComponentViewModel @Inject constructor(
     private val getOrCreateStorageDownloadLocationUseCase: GetOrCreateStorageDownloadLocationUseCase,
     private val getFilePreviewDownloadPathUseCase: GetFilePreviewDownloadPathUseCase,
     private val startDownloadsWithWorkerUseCase: StartDownloadsWithWorkerUseCase,
-    private val saveOfflineNodeInformationUseCase: SaveOfflineNodeInformationUseCase,
-    private val broadcastOfflineFileAvailabilityUseCase: BroadcastOfflineFileAvailabilityUseCase,
     private val clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val totalFileSizeOfNodesUseCase: TotalFileSizeOfNodesUseCase,
@@ -243,10 +239,6 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                 getPath = {
                     getOfflinePathForNodeUseCase(node)
                 },
-                toDoAfterProcessing = {
-                    saveOfflineNodeInformationUseCase(node.id)
-                    broadcastOfflineFileAvailabilityUseCase(node.id.longValue)
-                }
             )
         }
     }
@@ -257,7 +249,6 @@ internal class StartDownloadComponentViewModel @Inject constructor(
     private suspend fun startDownloadNodes(
         nodes: List<TypedNode>,
         isHighPriority: Boolean,
-        toDoAfterProcessing: (suspend () -> Unit)? = null,
         getPath: suspend () -> String?,
     ) {
         clearActiveTransfersIfFinishedUseCase(TransferType.DOWNLOAD)
@@ -276,7 +267,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                 startDownloadsWithWorkerUseCase(
                     destinationPath = path,
                     nodes = nodes,
-                    isHighPriority = isHighPriority
+                    isHighPriority = isHighPriority,
                 ).catch {
                     lastError = it
                     Timber.e(it)
@@ -288,7 +279,6 @@ internal class StartDownloadComponentViewModel @Inject constructor(
             }
         monitorFinish()
         checkRating()
-        if (terminalEvent is MultiTransferEvent.ScanningFoldersFinished) toDoAfterProcessing?.invoke()
         _uiState.updateEventAndClearProgress(
             when (terminalEvent) {
                 MultiTransferEvent.InsufficientSpace -> StartDownloadTransferEvent.Message.NotSufficientSpace
@@ -318,6 +308,11 @@ internal class StartDownloadComponentViewModel @Inject constructor(
      */
     fun cancelCurrentJob() {
         currentInProgressJob?.cancel()
+        _uiState.update {
+            it.copy(
+                jobInProgressState = null,
+            )
+        }
     }
 
     /**
@@ -416,6 +411,10 @@ internal class StartDownloadComponentViewModel @Inject constructor(
     }
 
     private var monitorFinishJob: Job? = null
+
+    /**
+     * Monitor finish to send the corresponding event (will display a "Download Finished" snackbar or similar)
+     */
     private fun monitorFinish() {
         if (monitorFinishJob == null) {
             monitorFinishJob = viewModelScope.launch {

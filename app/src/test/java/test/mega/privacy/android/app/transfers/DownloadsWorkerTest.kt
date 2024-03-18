@@ -13,7 +13,7 @@ import androidx.work.impl.utils.WorkForegroundUpdater
 import androidx.work.impl.utils.futures.SettableFuture
 import androidx.work.impl.utils.taskexecutor.WorkManagerTaskExecutor
 import androidx.work.workDataOf
-import com.google.common.truth.Truth.*
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -42,6 +42,7 @@ import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfers
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.HandleAvailableOfflineEventUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
 import org.junit.After
@@ -74,6 +75,7 @@ class DownloadsWorkerTest {
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val addOrUpdateActiveTransferUseCase = mock<AddOrUpdateActiveTransferUseCase>()
     private val handleSDCardEventUseCase = mock<HandleSDCardEventUseCase>()
+    private val handleAvailableOfflineEventUseCase = mock<HandleAvailableOfflineEventUseCase>()
     private val monitorOngoingActiveTransfersUseCase =
         mock<MonitorOngoingActiveTransfersUseCase>()
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
@@ -130,6 +132,7 @@ class DownloadsWorkerTest {
             transfersFinishedNotificationMapper = transfersFinishedNotificationMapper,
             handleSDCardEventUseCase = handleSDCardEventUseCase,
             scanMediaFileUseCase = scanMediaFileUseCase,
+            handleAvailableOfflineEventUseCase = handleAvailableOfflineEventUseCase,
         )
     }
 
@@ -294,6 +297,13 @@ class DownloadsWorkerTest {
         underTest.onTransferEventReceived(event)
         verify(handleSDCardEventUseCase).invoke(event)
     }
+
+    fun `test that handleAvailableOfflineEventUseCase is invoked when finish event is received`() =
+        runTest {
+            val event = mock<TransferEvent.TransferFinishEvent>()
+            underTest.onTransferEventReceived(event)
+            verify(handleAvailableOfflineEventUseCase).invoke(event)
+        }
 
     @Test
     fun `test that file is scanned by scanMediaFileUseCase once download is finished`() = runTest {

@@ -21,6 +21,7 @@ import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfers
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.HandleAvailableOfflineEventUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
 import timber.log.Timber
@@ -48,6 +49,7 @@ class DownloadsWorker @AssistedInject constructor(
     private val transfersFinishedNotificationMapper: TransfersFinishedNotificationMapper,
     private val handleSDCardEventUseCase: HandleSDCardEventUseCase,
     private val scanMediaFileUseCase: ScanMediaFileUseCase,
+    private val handleAvailableOfflineEventUseCase: HandleAvailableOfflineEventUseCase,
 ) : AbstractTransfersWorker(
     context,
     workerParams,
@@ -78,6 +80,7 @@ class DownloadsWorker @AssistedInject constructor(
 
     override suspend fun onTransferEventReceived(event: TransferEvent) {
         handleSDCardEventUseCase(event)
+        handleAvailableOfflineEventUseCase(event)
         if (event is TransferEvent.TransferFinishEvent) {
             runCatching {
                 scanMediaFileUseCase(arrayOf(event.transfer.localPath), arrayOf(""))
