@@ -122,11 +122,11 @@ class QRCodeViewModelTest {
             val initialState = awaitItem()
             with(initialState) {
                 assertThat(myQRCodeState).isEqualTo(MyCodeUIState.Idle)
-                assertThat(resultMessage).isInstanceOf(consumed<Pair<Int, Array<Any>>>().javaClass)
-                assertThat(inviteContactResult).isInstanceOf(consumed<InviteContactRequest>().javaClass)
-                assertThat(scannedContactLinkResult).isInstanceOf(consumed<ScannedContactLinkResult>().javaClass)
-                assertThat(uploadFile).isInstanceOf(consumed<Pair<File, Long>>().javaClass)
-                assertThat(showCollision).isInstanceOf(consumed<NameCollision>().javaClass)
+                assertThat(resultMessage).isInstanceOf(consumed().javaClass)
+                assertThat(inviteContactResult).isInstanceOf(consumed().javaClass)
+                assertThat(scannedContactLinkResult).isInstanceOf(consumed().javaClass)
+                assertThat(uploadFile).isInstanceOf(consumed().javaClass)
+                assertThat(showCollision).isInstanceOf(consumed().javaClass)
                 assertThat(scannedContactEmail).isNull()
                 assertThat(scannedContactAvatarContent).isNull()
             }

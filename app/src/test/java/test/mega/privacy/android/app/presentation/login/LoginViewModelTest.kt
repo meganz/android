@@ -2,6 +2,7 @@ package test.mega.privacy.android.app.presentation.login
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -165,7 +166,7 @@ internal class LoginViewModelTest {
                 assertThat(isPendingToShowFragment).isNull()
                 assertThat(enabledFlags).isEmpty()
                 assertThat(isCheckingSignupLink).isFalse()
-                assertThat(snackbarMessage).isInstanceOf(consumed<Int>().javaClass)
+                assertThat(snackbarMessage).isInstanceOf(consumed().javaClass)
             }
         }
     }
@@ -229,13 +230,13 @@ internal class LoginViewModelTest {
             whenever(isConnectedToInternetUseCase()).thenReturn(false)
 
             with(underTest) {
-                state.map { it.snackbarMessage }.distinctUntilChanged()
+                state.map { it.snackbarMessage }
                     .test {
-                        assertThat(awaitItem()).isInstanceOf(consumed<Int>().javaClass)
+                        assertThat(awaitItem()).isInstanceOf(consumed().javaClass)
                         onEmailChanged("test@test.com")
-                        assertThat(awaitItem()).isInstanceOf(consumed<Int>().javaClass)
+                        assertThat(awaitItem()).isInstanceOf(consumed().javaClass)
                         onPasswordChanged("Password")
-                        assertThat(awaitItem()).isInstanceOf(consumed<Int>().javaClass)
+                        assertThat(awaitItem()).isInstanceOf(consumed().javaClass)
                         onLoginClicked(false)
                         assertThat(awaitItem()).isInstanceOf(triggered(R.string.error_server_connection_problem).javaClass)
                     }
@@ -256,7 +257,7 @@ internal class LoginViewModelTest {
                 assertThat(awaitItem().emailError).isNull()
                 assertThat(awaitItem().passwordError).isNull()
                 assertThat(awaitItem().ongoingTransfersExist).isNull()
-                assertThat(awaitItem().snackbarMessage).isInstanceOf(consumed<Int>().javaClass)
+                assertThat(awaitItem().snackbarMessage).isInstanceOf(consumed().javaClass)
             }
         }
     }

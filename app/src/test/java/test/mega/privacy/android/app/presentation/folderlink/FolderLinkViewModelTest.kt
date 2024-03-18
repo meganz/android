@@ -207,8 +207,8 @@ class FolderLinkViewModelTest {
             assertThat(initial.selectedNodeCount).isEqualTo(0)
             assertThat(initial.finishActivity).isFalse()
             assertThat(initial.importNode).isNull()
-            assertThat(initial.openFile).isInstanceOf(consumed<Intent>().javaClass)
-            assertThat(initial.downloadNodes).isInstanceOf(consumed<List<MegaNode>>().javaClass)
+            assertThat(initial.openFile).isInstanceOf(consumed().javaClass)
+            assertThat(initial.downloadNodes).isInstanceOf(consumed().javaClass)
             assertThat(initial.selectImportLocation).isEqualTo(consumed)
             assertThat(initial.errorDialogTitle).isEqualTo(-1)
             assertThat(initial.errorDialogContent).isEqualTo(-1)
@@ -479,7 +479,7 @@ class FolderLinkViewModelTest {
         underTest.state.test {
             underTest.resetOpenFile()
             val newValue = expectMostRecentItem()
-            assertThat(newValue.openFile).isInstanceOf(consumed<Intent>().javaClass)
+            assertThat(newValue.openFile).isInstanceOf(consumed().javaClass)
         }
     }
 
@@ -488,7 +488,7 @@ class FolderLinkViewModelTest {
         underTest.state.test {
             underTest.resetDownloadNode()
             val newValue = expectMostRecentItem()
-            assertThat(newValue.downloadNodes).isInstanceOf(consumed<List<MegaNode>>().javaClass)
+            assertThat(newValue.downloadNodes).isInstanceOf(consumed().javaClass)
         }
     }
 

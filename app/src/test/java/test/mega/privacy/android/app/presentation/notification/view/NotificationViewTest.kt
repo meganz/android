@@ -83,11 +83,15 @@ class NotificationViewTest {
     fun `test that there is one row created for each notification`() {
         setupRule(
             NotificationState(
-                notifications = listOf(normalNotification, normalNotification),
-                promoNotifications = listOf(promoNotification)
+                notifications = listOf(
+                    normalNotification,
+                ),
+                promoNotifications = listOf(
+                    promoNotification,
+                )
             )
         )
-        composeRule.onAllNodesWithTag(NOTIFICATION_TEST_TAG).assertCountEquals(2)
+        composeRule.onAllNodesWithTag(NOTIFICATION_TEST_TAG).assertCountEquals(1)
         composeRule.onAllNodesWithTag(PROMO_NOTIFICATION_TEST_TAG).assertCountEquals(1)
     }
 

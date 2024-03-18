@@ -31,85 +31,85 @@ internal interface ImagePreviewModule {
     @Binds
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.DEFAULT)
-    fun DefaultImageNodeFetcher.bindDefaultFetcher(): ImageNodeFetcher
+    fun bindDefaultFetcher(fetcher: DefaultImageNodeFetcher): ImageNodeFetcher
 
     @Binds
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.TIMELINE)
-    fun TimelineImageNodeFetcher.bindTimelineFetcher(): ImageNodeFetcher
+    fun bindTimelineFetcher(fetcher: TimelineImageNodeFetcher): ImageNodeFetcher
 
     @Binds
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.ALBUM_CONTENT)
-    fun AlbumContentImageNodeFetcher.bindAlbumContentFetcher(): ImageNodeFetcher
+    fun bindAlbumContentFetcher(fetcher: AlbumContentImageNodeFetcher): ImageNodeFetcher
 
     @Binds
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.MEDIA_DISCOVERY)
-    fun MediaDiscoveryImageNodeFetcher.bindMediaDiscoveryFetcher(): ImageNodeFetcher
+    fun bindMediaDiscoveryFetcher(fetcher: MediaDiscoveryImageNodeFetcher): ImageNodeFetcher
 
     @Binds
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.CLOUD_DRIVE)
-    fun CloudDriveImageNodeFetcher.bindCloudDriveFetcher(): ImageNodeFetcher
+    fun bindCloudDriveFetcher(fetcher: CloudDriveImageNodeFetcher): ImageNodeFetcher
 
     @Binds
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.ALBUM_SHARING)
-    fun AlbumSharingImageNodeFetcher.bindAlbumSharingFetcher(): ImageNodeFetcher
+    fun bindAlbumSharingFetcher(fetcher: AlbumSharingImageNodeFetcher): ImageNodeFetcher
 
     @Binds
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.OFFLINE)
-    fun OfflineImageNodeFetcher.bindOfflineFetcher(): ImageNodeFetcher
+    fun bindOfflineFetcher(fetcher: OfflineImageNodeFetcher): ImageNodeFetcher
 
     @Binds
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.FAVOURITE)
-    fun FavouriteImageNodeFetcher.bindFavouriteFetcher(): ImageNodeFetcher
+    fun bindFavouriteFetcher(fetcher: FavouriteImageNodeFetcher): ImageNodeFetcher
 
     @Binds
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.PUBLIC_FILE)
-    fun PublicFileImageNodeFetcher.bindPublicFileFetcher(): ImageNodeFetcher
+    fun bindPublicFileFetcher(fetcher: PublicFileImageNodeFetcher): ImageNodeFetcher
 
     @Binds
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.FOLDER_LINK)
-    fun FolderLinkImageNodeFetcher.bindFolderLinkFetcher(): ImageNodeFetcher
+    fun bindFolderLinkFetcher(fetcher: FolderLinkImageNodeFetcher): ImageNodeFetcher
 
     @Binds
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.FOLDER_LINK_MEDIA_DISCOVERY)
-    fun FolderLinkMediaDiscoveryImageNodeFetcher.bindFolderLinkMediaDiscoveryFetcher(): ImageNodeFetcher
+    fun bindFolderLinkMediaDiscoveryFetcher(fetcher: FolderLinkMediaDiscoveryImageNodeFetcher): ImageNodeFetcher
 
     @Binds
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.SHARED_ITEMS)
-    fun SharedItemsImageNodeFetcher.bindSharedItemsFetcher(): ImageNodeFetcher
+    fun bindSharedItemsFetcher(fetcher: SharedItemsImageNodeFetcher): ImageNodeFetcher
 
     @Binds
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.BACKUPS)
-    fun BackupsImageNodeFetcher.bindBackupsFetcher(): ImageNodeFetcher
+    fun bindBackupsFetcher(fetcher: BackupsImageNodeFetcher): ImageNodeFetcher
 
     @Binds
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.RUBBISH_BIN)
-    fun RubbishBinImageNodeFetcher.bindRubbishBinFetcher(): ImageNodeFetcher
+    fun bindRubbishBinFetcher(fetcher: RubbishBinImageNodeFetcher): ImageNodeFetcher
 
     @Binds
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.ZIP)
-    fun ZipImageNodeFetcher.bindZipFetcher(): ImageNodeFetcher
+    fun bindZipFetcher(fetcher: ZipImageNodeFetcher): ImageNodeFetcher
 
     @Binds
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.CONTACT_FILE_LIST)
-    fun ContactFileListImageNodeFetcher.bindContactFileListFetcher(): ImageNodeFetcher
+    fun bindContactFileListFetcher(fetcher: ContactFileListImageNodeFetcher): ImageNodeFetcher
 
     @Binds
     @IntoMap
     @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.SHARED_FILES_HISTORY)
-    fun SharedFilesHistoryImageNodeFetcher.bindSharedFilesHistoryFetcher(): ImageNodeFetcher
+    fun bindSharedFilesHistoryFetcher(fetcher: SharedFilesHistoryImageNodeFetcher): ImageNodeFetcher
 }

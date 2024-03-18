@@ -1,7 +1,8 @@
 apply(from = "tools/util.gradle")
 plugins {
     // change it following kotlin version, see here https://github.com/google/ksp/releases
-    id("com.google.devtools.ksp") version "1.9.21-1.0.16" apply false
+    id("com.google.devtools.ksp") version "1.9.22-1.0.17" apply false
+    id("org.jetbrains.kotlin.android") version "1.9.22" apply false
 }
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {

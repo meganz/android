@@ -87,6 +87,11 @@ tasks.withType<Test> {
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
 }
 
+android.testVariants.all {
+    compileConfiguration.exclude(group = "com.google.guava", module = "listenablefuture")
+    runtimeConfiguration.exclude(group = "com.google.guava", module = "listenablefuture")
+}
+
 dependencies {
     implementation(project(":domain"))
 

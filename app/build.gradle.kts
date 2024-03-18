@@ -23,7 +23,7 @@ configurations {
 }
 
 jacoco {
-    toolVersion = "0.8.8"
+    toolVersion = "0.8.11"
 }
 
 android {
@@ -446,7 +446,7 @@ dependencies {
 
     // Kotlin + coroutines
     // Java Code Coverage
-    jacocoAnt("org.jacoco:org.jacoco.ant:0.8.8:nodeps")
+    jacocoAnt("org.jacoco:org.jacoco.ant:0.8.11:nodeps")
 
     // Testing dependencies
     testImplementation(testlib.bundles.unit.test)
@@ -572,7 +572,7 @@ tasks.register("instrumentClasses") {
             )
             "instrument"("destdir" to outputDir) {
                 "fileset"(
-                    "dir" to "${buildDir.path}/intermediates/javac/gmsDebug/classes",
+                    "dir" to "${buildDir.path}/intermediates/javac/gmsDebug/compileGmsDebugJavaWithJavac/classes",
                     "excludes" to excludesPattern
                 )
                 "fileset"(
@@ -608,7 +608,7 @@ tasks.register("createUnitTestCoverageReport") {
                 }
                 "structure"("name" to "Coverage") {
                     "classfiles" {
-                        "fileset"("dir" to "${buildDir.path}/intermediates/javac/gmsDebug/classes")
+                        "fileset"("dir" to "${buildDir.path}/intermediates/javac/gmsDebug/compileGmsDebugJavaWithJavac/classes")
                         "fileset"("dir" to "${buildDir.path}/tmp/kotlin-classes/gmsDebug")
                     }
                     "sourcefiles" {

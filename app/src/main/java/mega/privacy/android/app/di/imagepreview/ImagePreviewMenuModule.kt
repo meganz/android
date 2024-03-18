@@ -31,85 +31,85 @@ internal interface ImagePreviewMenuModule {
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.DEFAULT)
-    fun DefaultImagePreviewMenu.bindDefaultMenu(): ImagePreviewMenu
+    fun bindDefaultMenu(menu: DefaultImagePreviewMenu): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.TIMELINE)
-    fun TimelineImagePreviewMenu.bindTimelineImagePreviewMenu(): ImagePreviewMenu
+    fun bindTimelineImagePreviewMenu(menu: TimelineImagePreviewMenu): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.ALBUM_CONTENT)
-    fun AlbumContentImagePreviewMenu.bindAlbumContentImagePreviewMenu(): ImagePreviewMenu
+    fun bindAlbumContentImagePreviewMenu(menu: AlbumContentImagePreviewMenu): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.MEDIA_DISCOVERY)
-    fun MediaDiscoveryImagePreviewMenu.bindMediaDiscoveryMenu(): ImagePreviewMenu
+    fun bindMediaDiscoveryMenu(menu: MediaDiscoveryImagePreviewMenu): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.CLOUD_DRIVE)
-    fun CloudDriveImagePreviewMenu.bindCloudDriveMenu(): ImagePreviewMenu
+    fun bindCloudDriveMenu(menu: CloudDriveImagePreviewMenu): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.ALBUM_SHARING)
-    fun AlbumSharingImagePreviewMenu.bindAlbumSharingMenu(): ImagePreviewMenu
+    fun bindAlbumSharingMenu(menu: AlbumSharingImagePreviewMenu): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.OFFLINE)
-    fun OfflineImagePreviewMenu.bindOfflineMenu(): ImagePreviewMenu
+    fun bindOfflineMenu(menu: OfflineImagePreviewMenu): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.FAVOURITE)
-    fun FavouriteImagePreviewMenu.bindFavouriteMenu(): ImagePreviewMenu
+    fun bindFavouriteMenu(menu: FavouriteImagePreviewMenu): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.FILE)
-    fun FileImagePreviewMenu.bindFileMenu(): ImagePreviewMenu
+    fun bindFileMenu(menu: FileImagePreviewMenu): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.PUBLIC_FILE)
-    fun PublicFileImagePreviewMenu.bindPublicFileMenu(): ImagePreviewMenu
+    fun bindPublicFileMenu(menu: PublicFileImagePreviewMenu): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.FOLDER_LINK)
-    fun FolderLinkImagePreviewMenu.bindFolderLinkMenu(): ImagePreviewMenu
+    fun bindFolderLinkMenu(menu: FolderLinkImagePreviewMenu): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.SHARED_ITEMS)
-    fun SharedItemsImagePreviewMenu.bindSharedItemsMenu(): ImagePreviewMenu
+    fun bindSharedItemsMenu(menu: SharedItemsImagePreviewMenu): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.BACKUPS)
-    fun BackupsImagePreviewMenu.bindBackupsMenu(): ImagePreviewMenu
+    fun bindBackupsMenu(menu: BackupsImagePreviewMenu): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.RUBBISH_BIN)
-    fun RubbishBinImagePreviewMenu.bindRubbishBinMenu(): ImagePreviewMenu
+    fun bindRubbishBinMenu(menu: RubbishBinImagePreviewMenu): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.ZIP)
-    fun ZipImagePreviewMenu.bindZipMenu(): ImagePreviewMenu
+    fun bindZipMenu(menu: ZipImagePreviewMenu): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.CONTACT_FILE_LIST)
-    fun ContactFileListImagePreviewMenu.bindContactFileListMenu(): ImagePreviewMenu
+    fun bindContactFileListMenu(menu: ContactFileListImagePreviewMenu): ImagePreviewMenu
 
     @Binds
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.SHARED_FILES_HISTORY)
-    fun SharedFilesHistoryImagePreviewMenu.bindSharedFilesHistoryMenu(): ImagePreviewMenu
+    fun bindSharedFilesHistoryMenu(menu: SharedFilesHistoryImagePreviewMenu): ImagePreviewMenu
 }

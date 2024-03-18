@@ -118,8 +118,8 @@ class FileLinkViewModelTest {
             assertThat(initial.askForDecryptionDialog).isFalse()
             assertThat(initial.collision).isNull()
             assertThat(initial.copySuccess).isFalse()
-            assertThat(initial.openFile).isInstanceOf(consumed<Intent>().javaClass)
-            assertThat(initial.downloadFile).isInstanceOf(consumed<Intent>().javaClass)
+            assertThat(initial.openFile).isInstanceOf(consumed().javaClass)
+            assertThat(initial.downloadFile).isInstanceOf(consumed().javaClass)
         }
     }
 
@@ -232,7 +232,7 @@ class FileLinkViewModelTest {
         underTest.state.test {
             underTest.resetOpenFile()
             val newValue = expectMostRecentItem()
-            assertThat(newValue.openFile).isInstanceOf(consumed<Intent>().javaClass)
+            assertThat(newValue.openFile).isInstanceOf(consumed().javaClass)
         }
     }
 
@@ -312,7 +312,7 @@ class FileLinkViewModelTest {
             underTest.state.test {
                 underTest.resetDownloadFile()
                 val newValue = expectMostRecentItem()
-                assertThat(newValue.downloadFile).isInstanceOf(consumed<MegaNode>().javaClass)
+                assertThat(newValue.downloadFile).isInstanceOf(consumed().javaClass)
             }
         }
 
@@ -322,7 +322,7 @@ class FileLinkViewModelTest {
             underTest.state.test {
                 underTest.resetDownloadFile()
                 val newValue = expectMostRecentItem()
-                assertThat(newValue.overQuotaError).isInstanceOf(consumed<StorageState>().javaClass)
+                assertThat(newValue.overQuotaError).isInstanceOf(consumed().javaClass)
             }
         }
 
