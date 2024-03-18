@@ -49,6 +49,6 @@ class RemoveShareDropDownTest {
     private fun provideArguments() = Stream.of(
         Arguments.of(emptyList<TypedFolderNode>(), false),
         Arguments.of(sharedFolders, true),
-        Arguments.of(mixedFoldersList, true)
+        Arguments.of(mixedFoldersList, false)
     )
 }

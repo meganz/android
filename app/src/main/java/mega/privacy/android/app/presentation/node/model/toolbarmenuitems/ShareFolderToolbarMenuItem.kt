@@ -38,8 +38,7 @@ class ShareFolderToolbarMenuItem @Inject constructor(
         allFileNodes: Boolean,
         resultCount: Int,
     ) = noNodeTakenDown && selectedNodes.run {
-        isNotEmpty() && first() is FolderNode
-                && none { it.isOutShare() }.takeIf { size > 1 } ?: true
+        isNotEmpty() && all { it is FolderNode } && any { it.isOutShare() }
     }
 
     override fun getOnClick(

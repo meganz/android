@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.presentation.node.model.toolbarmenuitems
 
 import com.google.common.truth.Truth
+import mega.privacy.android.app.presentation.extensions.isOutShare
 import mega.privacy.android.app.presentation.node.model.menuaction.ShareFolderMenuAction
 import mega.privacy.android.app.presentation.node.model.toolbarmenuitems.ShareFolderToolbarMenuItem
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -26,7 +27,10 @@ class ShareFolderToolbarMenuItemTest {
         on { isTakenDown }.thenReturn(false)
     }
     private val oneFolderNodeSelected = mock<TypedFolderNode>()
-    private val multipleNodes = listOf(oneFileNodeSelected, oneFolderNodeSelected)
+    private val sharedFolderNode = mock<TypedFolderNode> {
+        on { isOutShare() }.thenReturn(true)
+    }
+    private val multipleNodes = listOf(oneFileNodeSelected, oneFolderNodeSelected, sharedFolderNode)
 
     @ParameterizedTest(name = "when noNodeTakenDown: {0} and selected nodes are {1} then visibility is {2}")
     @MethodSource("provideArguments")
@@ -51,7 +55,9 @@ class ShareFolderToolbarMenuItemTest {
         Arguments.of(false, multipleNodes, false),
         Arguments.of(true, multipleNodes, false),
         Arguments.of(true, listOf(oneFileNodeSelected), false),
-        Arguments.of(true, listOf(oneFolderNodeSelected), true),
-        Arguments.of(false, listOf(oneFolderNodeSelected), false)
+        Arguments.of(true, listOf(sharedFolderNode), true),
+        Arguments.of(true, listOf(oneFolderNodeSelected), false),
+        Arguments.of(false, listOf(oneFolderNodeSelected), false),
+        Arguments.of(true, listOf(sharedFolderNode, oneFolderNodeSelected), true),
     )
 }

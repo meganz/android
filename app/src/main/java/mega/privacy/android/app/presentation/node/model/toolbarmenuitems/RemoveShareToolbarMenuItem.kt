@@ -28,7 +28,10 @@ class RemoveShareToolbarMenuItem @Inject constructor(
         noNodeTakenDown: Boolean,
         allFileNodes: Boolean,
         resultCount: Int,
-    ): Boolean = selectedNodes.isNotEmpty() && selectedNodes.all { it.isOutShare() }
+    ): Boolean = selectedNodes.run {
+        isNotEmpty() && all { it.isOutShare() }
+    }
+
 
     override val menuAction = RemoveShareMenuAction(150)
 
@@ -39,9 +42,7 @@ class RemoveShareToolbarMenuItem @Inject constructor(
         navController: NavHostController,
         parentScope: CoroutineScope,
     ): () -> Unit = {
-        val nodeList = selectedNodes.map {
-            it.id
-        }
+        val nodeList = selectedNodes.map { it.id }
         runCatching { stringWithDelimitersMapper(nodeList) }
             .onSuccess {
                 navController.navigate(
