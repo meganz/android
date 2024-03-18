@@ -35,7 +35,7 @@ class DocumentSectionViewModelTest {
     private lateinit var underTest: DocumentSectionViewModel
 
     private val getAllDocumentsUseCase = mock<GetAllDocumentsUseCase>()
-    private val documentUIEntityMapper = mock<DocumentUiEntityMapper>()
+    private val documentUiEntityMapper = mock<DocumentUiEntityMapper>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
@@ -44,8 +44,9 @@ class DocumentSectionViewModelTest {
     private val fakeMonitorOfflineNodeUpdatesFlow = MutableSharedFlow<List<Offline>>()
     private val fakeMonitorViewTypeFlow = MutableSharedFlow<ViewType>()
 
-    private val expectedDocument: DocumentUiEntity =
-        mock { on { name }.thenReturn("document name") }
+
+    private val expectedDocument =
+        mock<DocumentUiEntity> { on { name }.thenReturn("document name") }
 
     @BeforeEach
     fun setUp() {
@@ -61,7 +62,7 @@ class DocumentSectionViewModelTest {
     private fun initUnderTest() {
         underTest = DocumentSectionViewModel(
             getAllDocumentsUseCase = getAllDocumentsUseCase,
-            documentUIEntityMapper = documentUIEntityMapper,
+            documentUiEntityMapper = documentUiEntityMapper,
             getCloudSortOrder = getCloudSortOrder,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
@@ -73,7 +74,7 @@ class DocumentSectionViewModelTest {
     fun resetMocks() {
         reset(
             getAllDocumentsUseCase,
-            documentUIEntityMapper,
+            documentUiEntityMapper,
             getCloudSortOrder,
             monitorNodeUpdatesUseCase,
             monitorOfflineNodeUpdatesUseCase,
@@ -111,7 +112,7 @@ class DocumentSectionViewModelTest {
     private suspend fun initDocumentNodeListReturned() {
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
         whenever(getAllDocumentsUseCase()).thenReturn(listOf(mock(), mock()))
-        whenever(documentUIEntityMapper(any())).thenReturn(expectedDocument)
+        whenever(documentUiEntityMapper(any())).thenReturn(expectedDocument)
     }
 
     @Test
@@ -120,6 +121,40 @@ class DocumentSectionViewModelTest {
             underTest.uiState.drop(1).test {
                 fakeMonitorViewTypeFlow.emit(ViewType.GRID)
                 assertThat(awaitItem().currentViewType).isEqualTo(ViewType.GRID)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the state is correctly updated when monitorNodeUpdatesUseCase is triggered`() =
+        runTest {
+            initDocumentNodeListReturned()
+
+            initUnderTest()
+
+            underTest.uiState.drop(1).test {
+                fakeMonitorNodeUpdatesFlow.emit(NodeUpdate(emptyMap()))
+                val actual = awaitItem()
+                assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
+                assertThat(actual.allDocuments.size).isEqualTo(2)
+                assertThat(actual.isLoading).isEqualTo(false)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the state is correctly updated when monitorOfflineNodeUpdatesUseCase is triggered`() =
+        runTest {
+            initDocumentNodeListReturned()
+
+            initUnderTest()
+
+            underTest.uiState.drop(1).test {
+                fakeMonitorOfflineNodeUpdatesFlow.emit(emptyList())
+                val actual = awaitItem()
+                assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
+                assertThat(actual.allDocuments.size).isEqualTo(2)
+                assertThat(actual.isLoading).isEqualTo(false)
                 cancelAndIgnoreRemainingEvents()
             }
         }

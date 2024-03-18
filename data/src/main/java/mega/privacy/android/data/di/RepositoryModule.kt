@@ -37,6 +37,7 @@ import mega.privacy.android.data.repository.DefaultSupportRepository
 import mega.privacy.android.data.repository.DefaultTimeSystemRepository
 import mega.privacy.android.data.repository.DefaultTransfersRepository
 import mega.privacy.android.data.repository.DefaultVerificationRepository
+import mega.privacy.android.data.repository.DocumentSectionRepositoryImpl
 import mega.privacy.android.data.repository.EnvironmentRepositoryImpl
 import mega.privacy.android.data.repository.FileLinkRepositoryImpl
 import mega.privacy.android.data.repository.FileSystemRepositoryImpl
@@ -86,6 +87,7 @@ import mega.privacy.android.domain.repository.ChatParticipantsRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ClipboardRepository
 import mega.privacy.android.domain.repository.ContactsRepository
+import mega.privacy.android.domain.repository.DocumentSectionRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
@@ -339,6 +341,9 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindAudioSectionRepository(implementation: AudioSectionRepositoryImpl): AudioSectionRepository
+
+    @Binds
+    abstract fun bindDocumentSectionRepository(implementation: DocumentSectionRepositoryImpl): DocumentSectionRepository
 
     @Binds
     @Singleton

@@ -27,7 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DocumentSectionViewModel @Inject constructor(
     private val getAllDocumentsUseCase: GetAllDocumentsUseCase,
-    private val documentUIEntityMapper: DocumentUiEntityMapper,
+    private val documentUiEntityMapper: DocumentUiEntityMapper,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
@@ -70,7 +70,7 @@ class DocumentSectionViewModel @Inject constructor(
         }
 
     private suspend fun getDocumentUIEntityList() = getAllDocumentsUseCase().map {
-        documentUIEntityMapper(it)
+        documentUiEntityMapper(it)
     }
 
     private fun List<DocumentUiEntity>.updateOriginalData() = also { data ->
