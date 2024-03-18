@@ -10,10 +10,12 @@ import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.impl.WorkDatabase
 import androidx.work.impl.utils.WorkForegroundUpdater
+import androidx.work.impl.utils.futures.SettableFuture
 import androidx.work.impl.utils.taskexecutor.WorkManagerTaskExecutor
 import androidx.work.workDataOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -25,12 +27,16 @@ import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
+import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
+import mega.privacy.android.domain.usecase.chat.message.CheckFinishedChatUploadsUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
@@ -42,6 +48,7 @@ import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUs
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -78,6 +85,7 @@ class ChatUploadsWorkerTest {
     private val chatUploadNotificationMapper = mock<ChatUploadNotificationMapper>()
     private val chatMessageRepository = mock<ChatMessageRepository>()
     private val updatePendingMessageUseCase = mock<UpdatePendingMessageUseCase>()
+    private val checkFinishedChatUploadsUseCase = mock<CheckFinishedChatUploadsUseCase>()
 
     @Before
     fun init() {
@@ -120,6 +128,7 @@ class ChatUploadsWorkerTest {
             chatUploadNotificationMapper,
             attachNodeWithPendingMessageUseCase,
             updatePendingMessageUseCase,
+            checkFinishedChatUploadsUseCase,
         )
     }
 
@@ -166,6 +175,22 @@ class ChatUploadsWorkerTest {
         )
     }
 
+    @Test
+    fun `test that correctActiveTransfersUseCase is invoked when the worker starts doing work`() =
+        runTest {
+            commonStub()
+            underTest.doWork()
+            verify(correctActiveTransfersUseCase).invoke(TransferType.CHAT_UPLOAD)
+        }
+
+    @Test
+    fun `test that checkFinishedChatUploadsUseCase is invoked when the worker starts doing work`() =
+        runTest {
+            commonStub()
+            underTest.doWork()
+            verify(checkFinishedChatUploadsUseCase).invoke()
+        }
+
     private suspend fun commonStub(withError: Boolean = false): TransferEvent.TransferFinishEvent {
         val appData = TransferAppData.ChatUpload(PENDING_MSG_ID)
         val transfer = mock<Transfer> {
@@ -182,6 +207,18 @@ class ChatUploadsWorkerTest {
             on { this.chatId } doReturn CHAT_ID
         }
         whenever(chatMessageRepository.getPendingMessage(PENDING_MSG_ID)).thenReturn(pendingMsg)
+        val totals = mock<ActiveTransferTotals> {
+            on { transferredBytes }.thenReturn(100L)
+            on { totalBytes }.thenReturn(200L)
+            on { hasCompleted() }.thenReturn(false)
+            on { hasOngoingTransfers() }.thenReturn(true)
+        }
+        whenever(monitorOngoingActiveTransfersUseCase(TransferType.CHAT_UPLOAD)) doReturn (flowOf(
+            MonitorOngoingActiveTransfersResult(totals, paused = false, overQuota = false)
+        ))
+        whenever(workProgressUpdater.updateProgress(any(), any(), any()))
+            .thenReturn(SettableFuture.create<Void?>().also { it.set(null) })
+        whenever(areNotificationsEnabledUseCase()).thenReturn(false)
         return finishEvent
     }
 }

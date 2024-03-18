@@ -80,6 +80,11 @@ abstract class AbstractTransfersWorker(
         null
 
     /**
+     * Event to do extra work on starting the worker, just after correctActiveTransfersUseCase
+     */
+    open suspend fun onStart() {}
+
+    /**
      * Event to do extra work on each transfer event
      */
     open suspend fun onTransferEventReceived(event: TransferEvent) {}
@@ -92,6 +97,7 @@ abstract class AbstractTransfersWorker(
         withContext(ioDispatcher) {
             val monitorJob = monitorTransferEvents(this)
             correctActiveTransfersUseCase(type) //to be sure we haven't missed any event before monitoring them
+            onStart()
             monitorOngoingActiveTransfersUseCase(type)
                 .catch { Timber.e("${this@AbstractTransfersWorker::class.java.simpleName}error: $it") }
                 .onEach { (transferTotals, paused, _) ->

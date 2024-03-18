@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pendingMessageId
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
+import mega.privacy.android.domain.usecase.chat.message.CheckFinishedChatUploadsUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
@@ -50,6 +51,7 @@ class ChatUploadsWorker @AssistedInject constructor(
     private val chatUploadNotificationMapper: ChatUploadNotificationMapper,
     private val attachNodeWithPendingMessageUseCase: AttachNodeWithPendingMessageUseCase,
     private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
+    private val checkFinishedChatUploadsUseCase: CheckFinishedChatUploadsUseCase,
 ) : AbstractTransfersWorker(
     context,
     workerParams,
@@ -72,6 +74,10 @@ class ChatUploadsWorker @AssistedInject constructor(
         activeTransferTotals: ActiveTransferTotals,
         paused: Boolean,
     ) = chatUploadNotificationMapper(activeTransferTotals, null, paused)
+
+    override suspend fun onStart() {
+        checkFinishedChatUploadsUseCase()
+    }
 
     override suspend fun onTransferEventReceived(event: TransferEvent) {
         event.transfer.pendingMessageId()?.let { pendingMessageId ->
