@@ -27,6 +27,7 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
@@ -103,7 +104,10 @@ class GlobalListener @Inject constructor(
                 .catch { Timber.e(it) }
                 .collect {
                     runCatching {
-                        val notifications = getNotificationCountUseCase(false)
+                        val notifications = getNotificationCountUseCase(
+                            withChatNotifications = false,
+                            promoFeatureFlag = AppFeatures.PromoNotifications
+                        )
                         broadcastHomeBadgeCountUseCase(notifications)
                     }.getOrElse { Timber.e(it) }
                 }
@@ -166,7 +170,12 @@ class GlobalListener @Inject constructor(
     }
 
     private fun notifyNotificationCountChange() = applicationScope.launch {
-        val notificationCount = runCatching { getNotificationCountUseCase(false) }
+        val notificationCount = runCatching {
+            getNotificationCountUseCase(
+                withChatNotifications = false,
+                promoFeatureFlag = AppFeatures.PromoNotifications
+            )
+        }
             .getOrNull() ?: 0
 
         broadcastHomeBadgeCountUseCase(notificationCount)
