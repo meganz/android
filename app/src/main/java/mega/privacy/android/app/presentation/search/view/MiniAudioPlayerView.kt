@@ -5,8 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -25,10 +25,10 @@ import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
  */
 @Composable
 fun MiniAudioPlayerView(modifier: Modifier, lifecycle: Lifecycle) {
-    var audioPlayerInitialized by rememberSaveable {
+    var audioPlayerInitialized by remember {
         mutableStateOf(false)
     }
-    var audioPlayerHeight by rememberSaveable {
+    var audioPlayerHeight by remember {
         mutableIntStateOf(0)
     }
     val scope = rememberCoroutineScope()
