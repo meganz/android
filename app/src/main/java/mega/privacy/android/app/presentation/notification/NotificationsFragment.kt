@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.notification
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +23,7 @@ import mega.privacy.android.app.presentation.notification.view.NotificationView
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.theme.MegaAppTheme
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -71,7 +74,13 @@ class NotificationsFragment : Fragment() {
                     notification.onClick(it)
                 },
                 onPromoNotificationClick = { promoNotification ->
-                    //Handle promo notification click
+                    val intent =
+                        Intent(Intent.ACTION_VIEW, Uri.parse(promoNotification.actionURL))
+                    if (intent.resolveActivity(requireActivity().packageManager) != null) {
+                        startActivity(intent)
+                    } else {
+                        Timber.d("No Application found to can handle promo notification intent")
+                    }
                 },
                 onNotificationsLoaded = {
                     viewModel.onNotificationsLoaded()
