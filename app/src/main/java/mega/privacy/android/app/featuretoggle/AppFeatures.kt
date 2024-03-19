@@ -76,14 +76,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables revamp CU interface
-     */
-    NewCU(
-        "Enables revamp CU interface",
-        false,
-    ),
-
-    /**
      * Enables prefetch timeline photos as soon initialization screen completed
      */
     PrefetchTimeline(

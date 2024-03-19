@@ -43,7 +43,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.LegacyCameraUploadsPreferencesActivity
 import mega.privacy.android.app.extensions.navigateToAppSettings
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_PHOTOS_SLOT_ID
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -119,17 +118,6 @@ class PhotosFragment : Fragment() {
     private lateinit var timelineActionModeCallback: TimelineActionModeCallback
     private lateinit var albumsActionModeCallback: AlbumsActionModeCallback
 
-    private val legacyCameraUploadsPermissionsLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            with(timelineViewModel) {
-                if (isEnableCameraUploadsViewShown() && doesAccountHavePhotos()) {
-                    shouldEnableCUPage(false)
-                    managerActivity.refreshPhotosFragment()
-                }
-                handlePermissionsResult()
-            }
-        }
-
     private val cameraUploadsPermissionsLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             timelineViewModel.handleCameraUploadsPermissionsResult()
@@ -141,8 +129,6 @@ class PhotosFragment : Fragment() {
 
     @Inject
     lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
-
-    private var isNewCUEnabled: Boolean = false
 
     private val cameraUploadsPermissions: Array<String> by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -171,14 +157,10 @@ class PhotosFragment : Fragment() {
         managerActivity = activity as ManagerActivity
         timelineActionModeCallback = TimelineActionModeCallback(this)
         albumsActionModeCallback = AlbumsActionModeCallback(this)
-        lifecycleScope.launch {
-            isNewCUEnabled = getFeatureFlagUseCase(AppFeatures.NewCU)
-            if (isNewCUEnabled) {
-                activity?.invalidateMenu()
-                initializeCameraUploads()
-                timelineViewModel.syncCameraUploadsStatus()
-            }
-        }
+
+        activity?.invalidateMenu()
+        initializeCameraUploads()
+        timelineViewModel.syncCameraUploadsStatus()
     }
 
     private fun initializeCameraUploads() {
@@ -207,9 +189,7 @@ class PhotosFragment : Fragment() {
                         timelineViewModel = timelineViewModel,
                         albumsViewModel = albumsViewModel,
                         photoDownloaderViewModel = photoDownloaderViewModel,
-                        onCameraUploadsClicked = ::onCameraUploadsButtonClicked,
                         onEnableCameraUploads = ::enableCameraUploads,
-                        onNavigatePhotosFilter = ::openFilterFragment,
                         onNavigateAlbumContent = ::openAlbum,
                         onNavigateAlbumPhotosSelection = ::openAlbumPhotosSelection,
                         onZoomIn = ::handleZoomIn,
@@ -315,8 +295,6 @@ class PhotosFragment : Fragment() {
     }
 
     private fun handleCameraUploadsMenu(state: TimelineViewState) {
-        if (!isNewCUEnabled) return
-
         // CU warning menu
         val showCameraUploadsWarning = state.showCameraUploadsWarning
         this.menu?.findItem(R.id.action_cu_status_warning)?.isVisible =
@@ -334,9 +312,9 @@ class PhotosFragment : Fragment() {
     }
 
     private fun handleFilterIcons(timelineViewState: TimelineViewState) {
-        this.menu?.findItem(R.id.action_photos_filter)?.isVisible = isNewCUEnabled &&
-                timelineViewState.applyFilterMediaType != ApplyFilterMediaType.ALL_MEDIA_IN_CD_AND_CU &&
-                photosViewModel.state.value.selectedTab != PhotosTab.Albums
+        this.menu?.findItem(R.id.action_photos_filter)?.isVisible =
+            timelineViewState.applyFilterMediaType != ApplyFilterMediaType.ALL_MEDIA_IN_CD_AND_CU &&
+                    photosViewModel.state.value.selectedTab != PhotosTab.Albums
     }
 
     /**
@@ -411,14 +389,6 @@ class PhotosFragment : Fragment() {
                     || timelineViewModel.state.value.enableCameraUploadPageShowing
         photosViewModel.setMenuShowing(isShowMenu)
 
-        menu?.findItem(R.id.action_zoom_in)?.let {
-            it.isEnabled = state.enableZoomIn
-            it.icon?.alpha = if (state.enableZoomIn) 255 else 125
-        }
-        menu?.findItem(R.id.action_zoom_out)?.let {
-            it.isEnabled = state.enableZoomOut
-            it.icon?.alpha = if (state.enableZoomOut) 255 else 125
-        }
         menu?.findItem(R.id.action_photos_sortby)?.let {
             it.isEnabled = state.enableSortOption
             val color = if (Util.isDarkMode(requireContext())) {
@@ -457,14 +427,12 @@ class PhotosFragment : Fragment() {
     internal fun handleMenuIcons(isShowing: Boolean) {
         handleCameraUploadsMenu(timelineViewModel.state.value)
 
-        this.menu?.findItem(R.id.action_zoom_in)?.isVisible = isShowing && !isNewCUEnabled
-        this.menu?.findItem(R.id.action_zoom_out)?.isVisible = isShowing && !isNewCUEnabled
         this.menu?.findItem(R.id.action_photos_filter_secondary)?.isVisible = isShowing
         this.menu?.findItem(R.id.action_photos_sortby)?.isVisible = isShowing
-        this.menu?.findItem(R.id.action_zoom_in_secondary)?.isVisible = isShowing && isNewCUEnabled
-        this.menu?.findItem(R.id.action_zoom_out_secondary)?.isVisible = isShowing && isNewCUEnabled
+        this.menu?.findItem(R.id.action_zoom_in)?.isVisible = isShowing
+        this.menu?.findItem(R.id.action_zoom_out)?.isVisible = isShowing
         this.menu?.findItem(R.id.action_cu_settings)?.isVisible =
-            isShowing && !timelineViewModel.state.value.enableCameraUploadButtonShowing && isNewCUEnabled
+            isShowing && !timelineViewModel.state.value.enableCameraUploadButtonShowing
     }
 
     private fun openCameraUploadsSettings() {
@@ -484,14 +452,6 @@ class PhotosFragment : Fragment() {
         val zoomInValid = timelineViewModel.state.value.enableZoomIn
         val zoomOutValid = timelineViewModel.state.value.enableZoomOut
         val enableSortOption = timelineViewModel.state.value.enableSortOption
-        menu.findItem(R.id.action_zoom_in)?.let {
-            it.isEnabled = zoomInValid
-            it.icon?.alpha = if (zoomInValid) 255 else 125
-        }
-        menu.findItem(R.id.action_zoom_out)?.let {
-            it.isEnabled = zoomOutValid
-            it.icon?.alpha = if (zoomOutValid) 255 else 125
-        }
         menu.findItem(R.id.action_photos_sortby)?.let {
             val color = if (Util.isDarkMode(requireContext())) {
                 Color.argb(38, 255, 255, 255)
@@ -514,7 +474,7 @@ class PhotosFragment : Fragment() {
             }
         }
 
-        menu.findItem(R.id.action_zoom_in_secondary)?.let {
+        menu.findItem(R.id.action_zoom_in)?.let {
             it.isEnabled = zoomInValid
             it.title = SpannableString(it.title.toString()).apply {
                 if (zoomInValid) return@apply
@@ -534,7 +494,7 @@ class PhotosFragment : Fragment() {
             }
         }
 
-        menu.findItem(R.id.action_zoom_out_secondary)?.let {
+        menu.findItem(R.id.action_zoom_out)?.let {
             it.isEnabled = zoomOutValid
             it.title = SpannableString(it.title.toString()).apply {
                 if (zoomOutValid) return@apply
@@ -607,16 +567,6 @@ class PhotosFragment : Fragment() {
 
             R.id.action_cu_status_warning -> {
                 checkCameraUploadsPermissions(showAction = true)
-                true
-            }
-
-            R.id.action_zoom_in_secondary -> { // +
-                handleZoomIn()
-                true
-            }
-
-            R.id.action_zoom_out_secondary -> { // -
-                handleZoomOut()
                 true
             }
 
@@ -718,26 +668,6 @@ class PhotosFragment : Fragment() {
     fun enableCameraUploads() {
         timelineViewModel.enableCU()
         managerActivity.refreshPhotosFragment()
-    }
-
-    /**
-     * Performs actions when the Button to enable Camera Uploads has been clicked
-     */
-    private fun onCameraUploadsButtonClicked() {
-        initializeCameraUploads()
-
-        // Check and request the needed permissions
-        if (PermissionUtils.hasPermissions(context, *cameraUploadsPermissions)) {
-            with(timelineViewModel) {
-                if (isEnableCameraUploadsViewShown()) {
-                    shouldEnableCUPage(false)
-                    managerActivity.refreshPhotosFragment()
-                }
-                handleEnableCameraUploads()
-            }
-        } else {
-            legacyCameraUploadsPermissionsLauncher.launch(cameraUploadsPermissions)
-        }
     }
 
     /**

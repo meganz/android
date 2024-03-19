@@ -37,7 +37,6 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewS
 @Composable
 fun EmptyState(
     timelineViewState: TimelineViewState = TimelineViewState(),
-    isNewCUEnabled: Boolean,
     setEnableCUPage: (Boolean) -> Unit = {},
     onEnableCameraUploads: () -> Unit = {},
 ) {
@@ -55,7 +54,7 @@ fun EmptyState(
             EmptyStateContent(timelineViewState)
         }
 
-        if (enableCameraUploadButtonShowing && isNewCUEnabled) {
+        if (enableCameraUploadButtonShowing) {
             NewEnableCameraUploadsButton(
                 onClick = onEnableCameraUploads,
             )
@@ -67,7 +66,7 @@ fun EmptyState(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            if (enableCameraUploadButtonShowing && isNewCUEnabled) {
+            if (enableCameraUploadButtonShowing) {
                 NewEnableCameraUploadsButton(
                     onClick = onEnableCameraUploads,
                 )

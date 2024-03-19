@@ -6,11 +6,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,18 +23,14 @@ import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
 import mega.privacy.android.app.presentation.photos.timeline.view.EmptyState
-import mega.privacy.android.app.presentation.photos.timeline.view.EnableCU
 import mega.privacy.android.app.presentation.photos.timeline.view.EnableCameraUploadsScreen
 import mega.privacy.android.app.presentation.photos.timeline.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.timeline.view.TimelineView
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUploadVideos
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUseCellularConnection
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.shouldEnableCUPage
 import mega.privacy.android.app.presentation.photos.view.PhotosBodyView
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.CameraUploadsBusinessAccountDialog
-import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -55,9 +47,7 @@ fun PhotosScreen(
     timelineViewModel: TimelineViewModel,
     albumsViewModel: AlbumsViewModel,
     photoDownloaderViewModel: PhotoDownloaderViewModel,
-    onCameraUploadsClicked: () -> Unit,
     onEnableCameraUploads: () -> Unit,
-    onNavigatePhotosFilter: () -> Unit,
     onNavigateAlbumContent: (UIAlbum) -> Unit,
     onNavigateAlbumPhotosSelection: (AlbumId) -> Unit,
     onZoomIn: () -> Unit,
@@ -82,12 +72,6 @@ fun PhotosScreen(
 
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
-
-    var isNewCUFlagReady by remember { mutableStateOf(false) }
-    val isNewCUEnabled by produceState(initialValue = false) {
-        value = getFeatureFlagUseCase(AppFeatures.NewCU)
-        isNewCUFlagReady = true
-    }
 
     LaunchedEffect(pagerState.currentPage) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
@@ -116,55 +100,39 @@ fun PhotosScreen(
                 timelineViewState = timelineViewState,
                 photoDownload = photoDownloaderViewModel::downloadPhoto,
                 lazyGridState = timelineLazyGridState,
-                onTextButtonClick = onCameraUploadsClicked,
-                onFilterFabClick = onNavigatePhotosFilter,
                 onCardClick = timelineViewModel::onCardClick,
                 onTimeBarTabSelected = timelineViewModel::onTimeBarTabSelected,
                 enableCUView = {
-                    if (isNewCUEnabled) {
-                        EnableCameraUploadsScreen(
-                            onEnable = onNavigateCameraUploadsSettings,
-                        )
-                    } else {
-                        EnableCU(
-                            timelineViewState = timelineViewState,
-                            onUploadVideosChanged = timelineViewModel::setCUUploadVideos,
-                            onUseCellularConnectionChanged = timelineViewModel::setCUUseCellularConnection,
-                            enableCUClick = onCameraUploadsClicked,
-                        )
-                    }
+                    EnableCameraUploadsScreen(
+                        onEnable = onNavigateCameraUploadsSettings,
+                    )
                 },
                 photosGridView = {
-                    if (isNewCUFlagReady) {
-                        PhotosGridView(
-                            modifier = Modifier
-                                .photosZoomGestureDetector(
-                                    onZoomIn = onZoomIn,
-                                    onZoomOut = onZoomOut,
-                                ),
-                            timelineViewState = timelineViewState,
-                            downloadPhoto = photoDownloaderViewModel::downloadPhoto,
-                            lazyGridState = timelineLazyGridState,
-                            onClick = timelineViewModel::onClick,
-                            onLongPress = timelineViewModel::onLongPress,
-                            isNewCUEnabled = isNewCUEnabled,
-                            onEnableCameraUploads = onNavigateCameraUploadsSettings,
-                            onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
-                            onCloseCameraUploadsLimitedAccess = {
-                                timelineViewModel.setCameraUploadsLimitedAccess(false)
-                            }
-                        )
-                    }
+                    PhotosGridView(
+                        modifier = Modifier
+                            .photosZoomGestureDetector(
+                                onZoomIn = onZoomIn,
+                                onZoomOut = onZoomOut,
+                            ),
+                        timelineViewState = timelineViewState,
+                        downloadPhoto = photoDownloaderViewModel::downloadPhoto,
+                        lazyGridState = timelineLazyGridState,
+                        onClick = timelineViewModel::onClick,
+                        onLongPress = timelineViewModel::onLongPress,
+                        onEnableCameraUploads = onNavigateCameraUploadsSettings,
+                        onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
+                        onCloseCameraUploadsLimitedAccess = {
+                            timelineViewModel.setCameraUploadsLimitedAccess(false)
+                        }
+                    )
                 },
                 emptyView = {
                     EmptyState(
                         timelineViewState = timelineViewState,
-                        isNewCUEnabled = isNewCUEnabled,
                         setEnableCUPage = timelineViewModel::shouldEnableCUPage,
                         onEnableCameraUploads = onNavigateCameraUploadsSettings,
                     )
                 },
-                isNewCUEnabled = isNewCUEnabled,
                 onClickCameraUploadsSync = { /* TODO */ },
                 onClickCameraUploadsUploading = {
                     timelineViewModel.setCameraUploadsMessage(

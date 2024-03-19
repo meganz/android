@@ -47,7 +47,6 @@ fun PhotosGridView(
     timelineViewState: TimelineViewState = TimelineViewState(),
     downloadPhoto: PhotoDownload,
     lazyGridState: LazyGridState = rememberLazyGridState(),
-    isNewCUEnabled: Boolean,
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
     onEnableCameraUploads: () -> Unit,
@@ -64,7 +63,7 @@ fun PhotosGridView(
     }
 
     LaunchedEffect(timelineViewState.isCameraUploadsLimitedAccess) {
-        if (timelineViewState.isCameraUploadsLimitedAccess && isNewCUEnabled) {
+        if (timelineViewState.isCameraUploadsLimitedAccess) {
             lazyGridState.scrollToItem(0)
         }
     }
@@ -75,7 +74,7 @@ fun PhotosGridView(
             .fillMaxSize(),
         state = lazyGridState,
     ) {
-        if (timelineViewState.isCameraUploadsLimitedAccess && isNewCUEnabled) {
+        if (timelineViewState.isCameraUploadsLimitedAccess) {
             item(
                 key = "camera-uploads-limited-access-banner",
                 span = { GridItemSpan(maxLineSpan) },
@@ -87,7 +86,7 @@ fun PhotosGridView(
             }
         }
 
-        if (timelineViewState.enableCameraUploadButtonShowing && !timelineViewState.showCameraUploadsWarning && timelineViewState.selectedPhotoCount == 0 && isNewCUEnabled) {
+        if (timelineViewState.enableCameraUploadButtonShowing && !timelineViewState.showCameraUploadsWarning && timelineViewState.selectedPhotoCount == 0) {
             item(
                 key = "enable-camera-uploads-banner",
                 span = { GridItemSpan(maxLineSpan) },
