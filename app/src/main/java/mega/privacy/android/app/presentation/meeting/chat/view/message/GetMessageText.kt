@@ -204,28 +204,42 @@ private fun String.getFormat(formatList: List<Format>, index: Int, formatType: F
 
         val breaksSimpleFormat = !isMultiQuote && substring(index, endIndex).contains('\n')
         val isEndOfText = endIndex == this.length - formatCharsSize
-        val nextIndexAfterFormat = endIndex + formatCharsSize
-        val isValidFormat = !breaksSimpleFormat && (isEndOfText
-                || this[nextIndexAfterFormat] == ' '
-                || this[nextIndexAfterFormat] == '\n')
+        var indexBeforeFormat = endIndex - 1
+        var indexAfterFormat = endIndex + formatCharsSize
+        val isValidFormat = !breaksSimpleFormat
+                && this[indexBeforeFormat] != ' '
+                && this[indexBeforeFormat] != '\n'
+                && (isEndOfText
+                || this[indexAfterFormat] == ' '
+                || this[indexAfterFormat] == '\n')
 
-        if (isValidFormat) {
-            val formatTypeList = buildList {
-                add(formatType)
+        if (!isValidFormat) {
+            return@let null
+        }
 
-                if (!isMultiQuote) {
-                    var newStartIndex = index + 1
-                    var newEndIndex = endIndex - 1
-                    var newFormat = findExtraFormatTypes(this@getFormat, newStartIndex, newEndIndex)
+        val formatTypeList = buildList {
+            add(formatType)
 
-                    while (newFormat != null) {
-                        add(newFormat)
-                        newStartIndex += 1
-                        newEndIndex -= 1
-                        newFormat = findExtraFormatTypes(this@getFormat, newStartIndex, newEndIndex)
-                    }
+            if (!isMultiQuote) {
+                var newStartIndex = index + 1
+                var newEndIndex = endIndex - 1
+                var newFormat = findExtraFormatTypes(this@getFormat, newStartIndex, newEndIndex)
+
+                while (newFormat != null) {
+                    add(newFormat)
+                    newStartIndex += 1
+                    newEndIndex -= 1
+                    newFormat = findExtraFormatTypes(this@getFormat, newStartIndex, newEndIndex)
                 }
             }
+        }
+
+        indexAfterFormat = index + formatTypeList.size
+        indexBeforeFormat = endIndex - formatTypeList.size
+
+        if (this[indexAfterFormat] != ' ' && this[indexAfterFormat] != '\n'
+            && this[indexBeforeFormat] != ' ' && this[indexBeforeFormat] != '\n'
+        ) {
             Format(
                 formatStart = index,
                 formatEnd = endIndex,
