@@ -337,6 +337,15 @@ class MeetingActivityViewModel @Inject constructor(
                 _state.update { it.copy(subscriptionPlan = currentSubscriptionPlan) }
             }
         }
+        viewModelScope.launch {
+            getFeatureFlagValue(AppFeatures.CallUnlimitedProPlan).let { flag ->
+                _state.update { state ->
+                    state.copy(
+                        isCallUnlimitedProPlanFeatureFlagEnabled = flag,
+                    )
+                }
+            }
+        }
 
         LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
             .observeForever(audioOutputStateObserver)
@@ -404,11 +413,14 @@ class MeetingActivityViewModel @Inject constructor(
         firstName: String,
         lastName: String,
         meetingLink: String,
-        meetingName: String
+        meetingName: String,
     ) =
         _state.update { state ->
             state.copy(
-                guestFirstName = firstName, guestLastName = lastName, meetingLink = meetingLink, meetingName = meetingName
+                guestFirstName = firstName,
+                guestLastName = lastName,
+                meetingLink = meetingLink,
+                meetingName = meetingName
             )
         }
 

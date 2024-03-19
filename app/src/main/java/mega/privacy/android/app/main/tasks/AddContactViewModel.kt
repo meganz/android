@@ -40,6 +40,16 @@ class AddContactViewModel @Inject constructor(
             )
             _state.update { it.copy(enabledFeatureFlags = enabledFeatures) }
         }
+
+        viewModelScope.launch {
+            getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan).let { flag ->
+                _state.update { state ->
+                    state.copy(
+                        isCallUnlimitedProPlanFeatureFlagEnabled = flag,
+                    )
+                }
+            }
+        }
     }
 
     /**

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main;
 
+import static mega.privacy.android.app.presentation.meeting.model.MeetingState.FREE_PLAN_PARTICIPANTS_LIMIT;
 import static mega.privacy.android.app.utils.CallUtil.isNecessaryDisableLocalCamera;
 import static mega.privacy.android.app.utils.CallUtil.showConfirmationOpenCamera;
 import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_QR;
@@ -121,6 +122,7 @@ import mega.privacy.android.app.main.adapters.ShareContactsAdapter;
 import mega.privacy.android.app.main.adapters.ShareContactsHeaderAdapter;
 import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.tasks.AddContactViewModel;
+import mega.privacy.android.app.presentation.meeting.view.ParticipantsLimitWarningView;
 import mega.privacy.android.app.presentation.qrcode.QRCodeActivity;
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity;
 import mega.privacy.android.app.psa.PsaWebBrowser;
@@ -239,6 +241,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     private RelativeLayout relativeLayout;
 
+    private ParticipantsLimitWarningView participantsLimitWarningView;
+
     private ArrayList<String> savedaddedContacts = new ArrayList<>();
 
     private MenuItem sendInvitationMenuItem;
@@ -336,7 +340,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     }
 
     @Override
-    public void onGlobalSyncStateChanged(@NonNull MegaApiJava api) {}
+    public void onGlobalSyncStateChanged(@NonNull MegaApiJava api) {
+    }
 
     private class GetPhoneContactsTask extends AsyncTask<Void, Void, Void> {
 
@@ -1593,6 +1598,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         aB.setTitle("");
         aB.setSubtitle("");
 
+        participantsLimitWarningView = findViewById(R.id.participants_limit_warning_view);
+
         relativeLayout = (RelativeLayout) findViewById(R.id.relative_container_add_contact);
 
         fabButton = (FloatingActionButton) findViewById(R.id.fab_button_next);
@@ -1755,7 +1762,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             allowAddParticipantsSwitch.setChecked(isAllowAddParticipantsEnabled);
             onlyCreateGroup = savedInstanceState.getBoolean("onlyCreateGroup", false);
             isWarningMessageShown = savedInstanceState.getBoolean("warningBannerShown", false);
-            mWarningMessage.setVisibility( isWarningMessageShown&& isContactVerificationOn ? View.VISIBLE : View.GONE);
+            mWarningMessage.setVisibility(isWarningMessageShown && isContactVerificationOn ? View.VISIBLE : View.GONE);
             if (contactType == CONTACT_TYPE_MEGA || contactType == CONTACT_TYPE_BOTH) {
                 savedaddedContacts = savedInstanceState.getStringArrayList("savedaddedContacts");
 
@@ -1984,7 +1991,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         }
         adapterShare.setContacts(addedContactsShare);
         isWarningMessageShown = checkForUnVerifiedContacts();
-        mWarningMessage.setVisibility( isWarningMessageShown&& isContactVerificationOn ? View.VISIBLE : View.GONE);
+        mWarningMessage.setVisibility(isWarningMessageShown && isContactVerificationOn ? View.VISIBLE : View.GONE);
         if (adapterShare.getItemCount() - 1 >= 0) {
             mLayoutManager.scrollToPosition(adapterShare.getItemCount() - 1);
         }
@@ -2366,7 +2373,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
                 if (chat != null) {
                     long participantsCount = chat.getPeerCount();
-
+                    boolean isModerator = chat.getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR;
+                    showParticipantsLimitWarning(participantsCount, isModerator);
                     for (int i = 0; i < contactsMEGA.size(); i++) {
                         if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
 
@@ -2461,6 +2469,15 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                     }
                 }
             }
+        }
+    }
+
+    private void showParticipantsLimitWarning(long participantsCount, boolean isModerator) {
+        if (viewModel.getState().getValue().isCallUnlimitedProPlanFeatureFlagEnabled() && isFromMeeting && participantsCount >= FREE_PLAN_PARTICIPANTS_LIMIT) {
+            participantsLimitWarningView.setModerator(isModerator);
+            participantsLimitWarningView.setVisibility(View.VISIBLE);
+        } else {
+            participantsLimitWarningView.setVisibility(View.GONE);
         }
     }
 

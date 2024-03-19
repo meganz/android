@@ -34,8 +34,8 @@ import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsBottomPanelView
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
+import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
 
 /**
@@ -799,4 +799,3 @@ class BottomFloatingPanelViewHolder(
         private const val FAB_TINT_COLOR_END = 1.0F
     }
 }
-

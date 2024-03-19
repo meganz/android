@@ -14,13 +14,20 @@
 		android:layout_height="wrap_content"
 		android:minHeight="?attr/actionBarSize" />
 
+	<mega.privacy.android.app.presentation.meeting.view.ParticipantsLimitWarningView
+		android:id="@+id/participants_limit_warning_view"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/add_contact_toolbar"
+		/>
+
 
 	<LinearLayout
 		android:id="@+id/add_contacts_container"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:orientation="vertical"
-		android:layout_below="@+id/add_contact_toolbar">
+		android:layout_below="@+id/participants_limit_warning_view">
 
 
 		<LinearLayout
@@ -254,7 +261,7 @@
 		android:id="@+id/new_group_layout"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_below="@+id/add_contact_toolbar"
+		android:layout_below="@+id/participants_limit_warning_view"
 		android:visibility="visible">
 
 		<LinearLayout

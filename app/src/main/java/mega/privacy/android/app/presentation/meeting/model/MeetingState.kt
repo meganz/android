@@ -61,6 +61,7 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property guestFirstName                             Guest first name
  * @property guestLastName                              Guest last name
  * @property meetingName                                Meeting name
+ * @property isCallUnlimitedProPlanFeatureFlagEnabled   True, if Call Unlimited Pro Plan feature flag enabled. False, otherwise.
  */
 data class MeetingState(
     val chatId: Long = -1L,
@@ -108,6 +109,7 @@ data class MeetingState(
     val guestFirstName: String = "",
     val guestLastName: String = "",
     val meetingName: String = "",
+    val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
 ) {
     /**
      * Check if waiting room is opened
@@ -170,4 +172,29 @@ data class MeetingState(
         participantsSection == ParticipantsSection.InCallSection ||
                 (participantsSection == ParticipantsSection.NotInCallSection && chatParticipantsNotInCall.isNotEmpty()) ||
                 (participantsSection == ParticipantsSection.WaitingRoomSection && chatParticipantsInWaitingRoom.isNotEmpty())
+
+    /**
+     * Check user free plan
+     *
+     * @return True, if has free plan. False, if has pro plan.
+     */
+    private fun hasFreePlan() = subscriptionPlan == AccountType.FREE
+
+    /**
+     * Should show free plan limit warning
+     */
+    fun shouldShowParticipantsLimitWarning() = isCallUnlimitedProPlanFeatureFlagEnabled &&
+            hasFreePlan() && chatParticipantsInCall.size >= FREE_PLAN_PARTICIPANTS_LIMIT
+
+    /**
+     * Check if user is moderator
+     */
+    val isModerator = myPermission == ChatRoomPermission.Moderator
+
+    companion object {
+        /**
+         * Free plan participants limit
+         */
+        const val FREE_PLAN_PARTICIPANTS_LIMIT = 100
+    }
 }
