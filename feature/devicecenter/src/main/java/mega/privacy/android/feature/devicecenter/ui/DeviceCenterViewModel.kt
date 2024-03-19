@@ -19,6 +19,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.devicecenter.domain.usecase.GetDevicesUseCase
 import mega.privacy.android.feature.devicecenter.ui.mapper.DeviceUINodeListMapper
+import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUiState
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
@@ -240,7 +241,7 @@ internal class DeviceCenterViewModel @Inject constructor(
         _state.update { it.copy(searchWidgetState = SearchWidgetState.EXPANDED) }
     }
 
-    fun onInfoClicked(selectedItem: DeviceUINode) =
+    fun onInfoClicked(selectedItem: DeviceCenterUINode) =
         _state.update { it.copy(infoSelectedItem = selectedItem) }
 
     fun onInfoBackPressHandle() =

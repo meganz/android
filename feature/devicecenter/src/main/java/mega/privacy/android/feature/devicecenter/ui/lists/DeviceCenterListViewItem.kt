@@ -43,12 +43,8 @@ internal const val DEVICE_CENTER_LIST_VIEW_ITEM_DIVIDER_TAG =
  * @param onDeviceMenuClicked Lambda that performs a specific action when a Device's Menu Icon is
  * clicked
  * @param onBackupFolderClicked Lambda that performs a specific action when a Backup Folder is clicked
- * @param onBackupFolderMenuClicked Lambda that performs a specific action when a Backup Folder's
- * Menu Icon is clicked
  * @param onNonBackupFolderClicked Lambda that performs a specific action when a Non Backup Folder
  * is clicked
- * @param onNonBackupFolderMenuClicked Lambda that performs a specific action when a Non Backup Folder's
- * Menu icon is clicked
  */
 @Composable
 internal fun DeviceCenterListViewItem(
@@ -56,9 +52,8 @@ internal fun DeviceCenterListViewItem(
     onDeviceClicked: (DeviceUINode) -> Unit = {},
     onDeviceMenuClicked: (DeviceUINode) -> Unit = {},
     onBackupFolderClicked: (BackupDeviceFolderUINode) -> Unit = {},
-    onBackupFolderMenuClicked: (BackupDeviceFolderUINode) -> Unit = {},
     onNonBackupFolderClicked: (NonBackupDeviceFolderUINode) -> Unit = {},
-    onNonBackupFolderMenuClicked: (NonBackupDeviceFolderUINode) -> Unit = {},
+    onInfoClicked: (DeviceCenterUINode) -> Unit = {},
 ) {
     ConstraintLayout(
         modifier = Modifier
@@ -102,9 +97,8 @@ internal fun DeviceCenterListViewItem(
             },
             onInfoClicked = if (uiNode is DeviceUINode) {
                 null
-            } else {
-                // TODO When the Info page for Folders is done
-                null
+            } else { ->
+                onInfoClicked(uiNode)
             },
         )
         CustomDivider(

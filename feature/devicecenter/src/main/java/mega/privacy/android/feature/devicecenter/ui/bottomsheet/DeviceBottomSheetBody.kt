@@ -17,7 +17,6 @@ import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.body.OtherDeviceBottomSheetBody
 import mega.privacy.android.feature.devicecenter.ui.bottomsheet.body.OwnDeviceBottomSheetBody
-import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OtherDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode

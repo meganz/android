@@ -23,8 +23,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.formatter.formatFileSize
+import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.core.ui.controls.text.MegaText
@@ -82,6 +84,16 @@ private fun DeviceCenterInfoScreenContent(
         modifier = modifier.fillMaxSize()
     ) {
         IconAndTitleRow(icon = uiState.icon, name = uiState.name)
+        if (uiState.creationTime > 0) {
+            InfoRow(
+                title = "Added", info = formatModifiedDate(
+                    locale = java.util.Locale(
+                        Locale.current.language, Locale.current.region
+                    ),
+                    modificationTime = uiState.creationTime,
+                )
+            )
+        }
         if (uiState.numberOfFolders > 0 || uiState.numberOfFiles > 0) {
             val content = when {
                 uiState.numberOfFolders != 0 && uiState.numberOfFiles != 0 -> pluralStringResource(
@@ -176,15 +188,33 @@ private fun InfoRow(
 
 @CombinedThemePreviews
 @Composable
-private fun DeviceCenterInfoScreenPreview() {
+private fun DeviceCenterInfoScreenDevicePreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterInfoScreen(
             uiState = DeviceCenterInfoUiState(
                 icon = R.drawable.ic_device_pc,
-                name = "Device/Folder name",
+                name = "Device name",
                 numberOfFiles = 6,
                 numberOfFolders = 5,
-                totalSizeInBytes = 23552,
+                totalSizeInBytes = 23552L,
+            ),
+            onBackPressHandled = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun DeviceCenterInfoScreenFolderPreview() {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        DeviceCenterInfoScreen(
+            uiState = DeviceCenterInfoUiState(
+                icon = R.drawable.ic_device_folder,
+                name = "Folder name",
+                numberOfFiles = 6,
+                numberOfFolders = 5,
+                totalSizeInBytes = 23552L,
+                creationTime = 1699454365L,
             ),
             onBackPressHandled = {},
         )

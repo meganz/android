@@ -2,7 +2,6 @@ package mega.privacy.android.navigation
 
 import android.app.Activity
 import android.content.Context
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 
 /**
@@ -60,29 +59,5 @@ interface AppNavigator {
         messageId: Long? = null,
         isOverQuota: Int? = null,
         flags: Int = 0,
-    )
-
-    /**
-     * Shows the legacy Bottom Sheet with specific Options depending on the type of Device Center
-     * Folder
-     *
-     * @param activity the Activity
-     * @param isBackupsFolder true if this is a Backups Folder, and false if otherwise
-     * @param nodeName the Node Name
-     * @param nodeHandle the Node Handle
-     * @param nodeStatus the Node Status
-     * @param nodeStatusColorInt an optional Text Color for the Node Status, represented as an [Int]
-     * @param nodeIcon the Node Icon as an [Int]
-     * @param nodeStatusIcon an optional Icon for the Node Status, represented as an [Int]
-     */
-    fun openDeviceCenterFolderNodeOptions(
-        activity: Activity,
-        isBackupsFolder: Boolean,
-        nodeName: String,
-        nodeHandle: Long,
-        nodeStatus: String,
-        nodeStatusColorInt: Int? = null,
-        @DrawableRes nodeIcon: Int,
-        @DrawableRes nodeStatusIcon: Int? = null,
     )
 }

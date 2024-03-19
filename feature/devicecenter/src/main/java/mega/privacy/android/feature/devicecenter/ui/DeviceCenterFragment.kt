@@ -17,7 +17,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -35,8 +34,8 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.feature.devicecenter.navigation.deviceCenterInfoNavGraph
 import mega.privacy.android.feature.devicecenter.navigation.deviceCenterRoute
+import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceMenuAction
-import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.DeviceCenterDeviceOptionsButtonEvent
@@ -132,19 +131,6 @@ class DeviceCenterFragment : Fragment() {
                                 errorMessage = backupFolderUINode.status.localizedErrorMessage,
                             )
                         },
-                        onBackupFolderMenuClicked = { backupDeviceFolderUINode ->
-                            megaNavigator.openDeviceCenterFolderNodeOptions(
-                                activity = this@DeviceCenterFragment.activity
-                                    ?: return@DeviceCenterScreen,
-                                isBackupsFolder = true,
-                                nodeName = backupDeviceFolderUINode.name,
-                                nodeHandle = backupDeviceFolderUINode.rootHandle,
-                                nodeStatus = getString(backupDeviceFolderUINode.status.name),
-                                nodeStatusColorInt = backupDeviceFolderUINode.status.legacyColor?.toArgb(),
-                                nodeIcon = backupDeviceFolderUINode.icon.iconRes,
-                                nodeStatusIcon = backupDeviceFolderUINode.status.icon,
-                            )
-                        },
                         onNonBackupFolderClicked = { nonBackupDeviceFolderUINode ->
                             Analytics.tracker.trackEvent(
                                 DeviceCenterItemClickedEvent(
@@ -157,19 +143,6 @@ class DeviceCenterFragment : Fragment() {
                                     ?: return@DeviceCenterScreen,
                                 nodeHandle = nonBackupDeviceFolderUINode.rootHandle,
                                 errorMessage = nonBackupDeviceFolderUINode.status.localizedErrorMessage,
-                            )
-                        },
-                        onNonBackupFolderMenuClicked = { nonBackupDeviceFolderUINode ->
-                            megaNavigator.openDeviceCenterFolderNodeOptions(
-                                activity = this@DeviceCenterFragment.activity
-                                    ?: return@DeviceCenterScreen,
-                                isBackupsFolder = false,
-                                nodeName = nonBackupDeviceFolderUINode.name,
-                                nodeHandle = nonBackupDeviceFolderUINode.rootHandle,
-                                nodeStatus = getString(nonBackupDeviceFolderUINode.status.name),
-                                nodeStatusColorInt = nonBackupDeviceFolderUINode.status.legacyColor?.toArgb(),
-                                nodeIcon = nonBackupDeviceFolderUINode.icon.iconRes,
-                                nodeStatusIcon = nonBackupDeviceFolderUINode.status.icon,
                             )
                         },
                         onInfoOptionClicked = viewModel::onInfoClicked,
@@ -223,7 +196,7 @@ class DeviceCenterFragment : Fragment() {
                         ) {
                             deviceCenterInfoNavGraph(
                                 navController = animatedNavController,
-                                selectedItem = uiState.infoSelectedItem as DeviceUINode,
+                                selectedItem = uiState.infoSelectedItem as DeviceCenterUINode,
                                 onBackPressHandled = viewModel::onInfoBackPressHandle
                             )
                         }

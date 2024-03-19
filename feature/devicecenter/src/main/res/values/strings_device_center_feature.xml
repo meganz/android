@@ -185,4 +185,6 @@
         <item quantity="one">%1$d folder&#160;·&#160;</item>
         <item quantity="other">%1$d folders&#160;·&#160;</item>
     </plurals>
+    <!-- Header of the Info view field for the date and time a folder was added -->
+    <string name="device_center_info_added">Added</string>
 </resources>

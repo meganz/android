@@ -21,6 +21,6 @@ data class NonBackupDeviceFolderUINode(
     override val name: String,
     override val icon: DeviceCenterUINodeIcon,
     override val status: DeviceCenterUINodeStatus,
-    val rootHandle: Long,
+    override val rootHandle: Long,
     val localFolderPath: String
 ) : DeviceFolderUINode

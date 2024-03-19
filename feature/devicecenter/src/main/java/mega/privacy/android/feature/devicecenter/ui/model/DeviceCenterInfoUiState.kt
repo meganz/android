@@ -11,6 +11,7 @@ import mega.privacy.android.feature.devicecenter.R
  * @property numberOfFiles The number of files this item and its sub-folders has
  * @property numberOfFolders The number of folders and sub-folders this item has, including itself
  * @property totalSizeInBytes The size of the item in bytes
+ * @property creationTime The creation time
  */
 data class DeviceCenterInfoUiState(
     @DrawableRes val icon: Int = R.drawable.ic_device_folder,
@@ -18,4 +19,5 @@ data class DeviceCenterInfoUiState(
     val numberOfFiles: Int = 0,
     val numberOfFolders: Int = 0,
     val totalSizeInBytes: Long = 0,
+    val creationTime: Long = 0,
 )
