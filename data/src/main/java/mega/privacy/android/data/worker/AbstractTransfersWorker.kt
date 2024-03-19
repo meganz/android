@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -158,9 +159,10 @@ abstract class AbstractTransfersWorker(
                 }
         }
 
-    private fun stopService(monitorJob: Job) {
-        notificationManager.cancel(updateNotificationId)
+    private suspend fun stopService(monitorJob: Job) {
         monitorJob.cancel()
+        yield()
+        notificationManager.cancel(updateNotificationId)
     }
 
     @SuppressLint("MissingPermission")
