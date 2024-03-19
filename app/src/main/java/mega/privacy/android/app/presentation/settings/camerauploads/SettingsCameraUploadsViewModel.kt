@@ -11,19 +11,24 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.settings.camerauploads.mapper.UploadOptionUiItemMapper
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsUiState
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
+import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadOptionUiItem
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
@@ -36,6 +41,8 @@ import javax.inject.Inject
  *
  * @property checkEnableCameraUploadsStatusUseCase Checks the Camera Uploads status and determine if it
  * can be ran
+ * @property deleteCameraUploadsTemporaryRootDirectoryUseCase Deletes the temporary Camera Uploads Cache Folder
+ * @property getUploadOptionUseCase Gets the type of content being uploaded by Camera Uploads
  * @property isCameraUploadsByWifiUseCase Checks whether Camera Uploads can only be run on Wi-Fi / Wi-Fi or Mobile Data
  * @property isCameraUploadsEnabledUseCase Checks if Camera Uploads (the Primary Folder) is enabled
  * or not
@@ -44,15 +51,19 @@ import javax.inject.Inject
  * @property listenToNewMediaUseCase Listens to new Photos and Videos captured by the Device
  * @property preparePrimaryFolderPathUseCase Prepares the Primary Folder path
  * @property setCameraUploadsByWifiUseCase Sets whether Camera Uploads can only run through Wi-Fi / Wi-Fi or Mobile Data
+ * @property setUploadOptionUseCase Sets the new type of content being uploaded by Camera Uploads
  * @property setupCameraUploadsSettingUseCase If true, this enables Camera Uploads. Otherwise, the
  * feature is disabled
  * @property snackBarHandler Handler to display a Snackbar
  * @property startCameraUploadUseCase Starts the Camera Uploads operation
  * @property stopCameraUploadsUseCase Stops the Camera Uploads operation
+ * @property uploadOptionUiItemMapper UI Mapper that maps the Upload Option into [UploadOptionUiItem]
  */
 @HiltViewModel
 internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val checkEnableCameraUploadsStatusUseCase: CheckEnableCameraUploadsStatusUseCase,
+    private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase,
+    private val getUploadOptionUseCase: GetUploadOptionUseCase,
     private val isCameraUploadsByWifiUseCase: IsCameraUploadsByWifiUseCase,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
@@ -60,10 +71,12 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
     private val preparePrimaryFolderPathUseCase: PreparePrimaryFolderPathUseCase,
     private val setCameraUploadsByWifiUseCase: SetCameraUploadsByWifiUseCase,
+    private val setUploadOptionUseCase: SetUploadOptionUseCase,
     private val setupCameraUploadsSettingUseCase: SetupCameraUploadsSettingUseCase,
     private val snackBarHandler: SnackBarHandler,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
+    private val uploadOptionUiItemMapper: UploadOptionUiItemMapper,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsCameraUploadsUiState())
@@ -87,17 +100,19 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
 
                 val isCameraUploadsEnabled = async { isCameraUploadsEnabledUseCase() }
                 val isMediaUploadsEnabled = async { isSecondaryFolderEnabled() }
+                val uploadOption = async { getUploadOptionUseCase() }
                 val uploadConnectionType = async { getUploadConnectionType() }
 
                 _uiState.update {
                     it.copy(
                         isCameraUploadsEnabled = isCameraUploadsEnabled.await(),
                         isMediaUploadsEnabled = isMediaUploadsEnabled.await(),
+                        uploadOptionUiItem = uploadOptionUiItemMapper(uploadOption.await()),
                         uploadConnectionType = uploadConnectionType.await(),
                     )
                 }
-            }.onFailure {
-                Timber.e("An error occurred when initializing Settings Camera Uploads:\n$it")
+            }.onFailure { exception ->
+                Timber.e("An error occurred when initializing Settings Camera Uploads", exception)
             }
         }
     }
@@ -135,8 +150,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                     Timber.d("User must be connected to the Internet to update the Camera Uploads state")
                     showGenericErrorSnackbar()
                 }
-            }.onFailure {
-                Timber.e("An error occurred when changing the Camera Uploads state:\n$it")
+            }.onFailure { exception ->
+                Timber.e("An error occurred when changing the Camera Uploads state", exception)
                 showGenericErrorSnackbar()
             }
         }
@@ -187,8 +202,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 } else {
                     _uiState.update { it.copy(businessAccountPromptType = cameraUploadsStatus) }
                 }
-            }.onFailure {
-                Timber.e("An error occurred when checking the Camera Uploads status:\n$it")
+            }.onFailure { exception ->
+                Timber.e("An error occurred when checking the Camera Uploads status", exception)
                 showGenericErrorSnackbar()
             }
         }
@@ -203,8 +218,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             runCatching {
                 setupCameraUploadsSettingUseCase(isEnabled = true)
                 setCameraUploadsEnabled(true)
-            }.onFailure {
-                Timber.e("An error occurred when enabling Camera Uploads:\n$it")
+            }.onFailure { exception ->
+                Timber.e("An error occurred when enabling Camera Uploads", exception)
                 showGenericErrorSnackbar()
             }
         }
@@ -220,8 +235,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 runCatching {
                     startCameraUploadUseCase()
                     listenToNewMediaUseCase(forceEnqueue = false)
-                }.onFailure {
-                    Timber.e("An error occurred when starting Camera Uploads:\n$it")
+                }.onFailure { exception ->
+                    Timber.e("An error occurred when starting Camera Uploads", exception)
                 }
             }
         } else {
@@ -250,12 +265,29 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             runCatching {
                 setCameraUploadsByWifiUseCase(uploadConnectionType == UploadConnectionType.WIFI)
                 stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
-            }.onSuccess {
                 _uiState.update {
                     it.copy(uploadConnectionType = uploadConnectionType)
                 }
             }.onFailure { exception ->
-                Timber.e("An error occurred when changing the Upload Option:\n$exception")
+                Timber.e("An error occurred when changing the Upload Connection Type", exception)
+                showGenericErrorSnackbar()
+            }
+        }
+    }
+
+    /**
+     * Configures the new type of content being uploaded by Camera Uploads. Doing this stops the
+     * ongoing Camera Uploads process and clears the internal Cache
+     */
+    fun onUploadOptionUiItemSelected(uploadOptionUiItem: UploadOptionUiItem) {
+        viewModelScope.launch {
+            runCatching {
+                setUploadOptionUseCase(uploadOptionUiItem.uploadOption)
+                deleteCameraUploadsTemporaryRootDirectoryUseCase()
+                stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
+                _uiState.update { it.copy(uploadOptionUiItem = uploadOptionUiItem) }
+            }.onFailure { exception ->
+                Timber.e("An error occurred when changing the Upload Option", exception)
                 showGenericErrorSnackbar()
             }
         }

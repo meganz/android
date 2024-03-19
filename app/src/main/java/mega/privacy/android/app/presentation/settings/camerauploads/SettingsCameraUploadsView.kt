@@ -24,11 +24,14 @@ import androidx.lifecycle.LifecycleOwner
 import de.palm.composestateevents.StateEvent
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.business.BusinessAccountPromptHandler
+import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.FileUploadDialog
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.HowToUploadDialog
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsUiState
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
+import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadOptionUiItem
 import mega.privacy.android.app.presentation.settings.camerauploads.permissions.CameraUploadsPermissionsHandler
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.CameraUploadsTile
+import mega.privacy.android.app.presentation.settings.camerauploads.tiles.FileUploadTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.HowToUploadTile
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
@@ -53,6 +56,8 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  * request should be done (triggered) or not (consumed)
  * @param onSettingsScreenPaused Lambda to execute when the User triggers onPause() in the Settings
  * screen
+ * @param onUploadOptionUiItemSelected Lambda to execute when the User selects a new
+ * [UploadOptionUiItem] from the File Upload prompt
  */
 @Composable
 internal fun SettingsCameraUploadsView(
@@ -64,10 +69,12 @@ internal fun SettingsCameraUploadsView(
     onRegularBusinessAccountSubUserPromptAcknowledged: () -> Unit,
     onRequestPermissionsStateChanged: (StateEvent) -> Unit,
     onSettingsScreenPaused: () -> Unit,
+    onUploadOptionUiItemSelected: (UploadOptionUiItem) -> Unit,
 ) {
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
 
+    var showFileUploadPrompt by rememberSaveable { mutableStateOf(false) }
     var showHowToUploadPrompt by rememberSaveable { mutableStateOf(false) }
 
     // When the User triggers the onPause Lifecycle Event, check if Camera Uploads can be started
@@ -102,6 +109,16 @@ internal fun SettingsCameraUploadsView(
                 onRegularBusinessAccountSubUserPromptAcknowledged = onRegularBusinessAccountSubUserPromptAcknowledged,
                 onBusinessAccountPromptDismissed = onBusinessAccountPromptDismissed,
             )
+            if (showFileUploadPrompt) {
+                FileUploadDialog(
+                    currentUploadOptionUiItem = uiState.uploadOptionUiItem,
+                    onOptionSelected = { newUploadOptionUiItem ->
+                        showFileUploadPrompt = false
+                        onUploadOptionUiItemSelected.invoke(newUploadOptionUiItem)
+                    },
+                    onDismissRequest = { showFileUploadPrompt = false },
+                )
+            }
             if (showHowToUploadPrompt) {
                 HowToUploadDialog(
                     currentUploadConnectionType = uiState.uploadConnectionType,
@@ -125,6 +142,10 @@ internal fun SettingsCameraUploadsView(
                     HowToUploadTile(
                         uploadConnectionType = uiState.uploadConnectionType,
                         onItemClicked = { showHowToUploadPrompt = true },
+                    )
+                    FileUploadTile(
+                        uploadOptionUiItem = uiState.uploadOptionUiItem,
+                        onItemClicked = { showFileUploadPrompt = true },
                     )
                 }
             }
@@ -152,6 +173,7 @@ private fun SettingsCameraUploadsViewPreview(
             onMediaPermissionsGranted = {},
             onRequestPermissionsStateChanged = {},
             onSettingsScreenPaused = {},
+            onUploadOptionUiItemSelected = {},
         )
     }
 }

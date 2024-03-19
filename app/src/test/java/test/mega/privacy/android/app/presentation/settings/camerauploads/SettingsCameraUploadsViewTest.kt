@@ -7,9 +7,11 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.settings.camerauploads.SETTINGS_CAMERA_UPLOADS_TOOLBAR
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsView
+import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.FILE_UPLOAD_DIALOG
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.HOW_TO_UPLOAD_DIALOG
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsUiState
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.CAMERA_UPLOADS_TILE
+import mega.privacy.android.app.presentation.settings.camerauploads.tiles.FILE_UPLOAD_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.HOW_TO_UPLOAD_TILE
 import org.junit.Rule
 import org.junit.Test
@@ -37,6 +39,7 @@ internal class SettingsCameraUploadsViewTest {
 
         testInitialCameraUploadsConfiguration()
         composeTestRule.onNodeWithTag(HOW_TO_UPLOAD_TILE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(FILE_UPLOAD_TILE).assertIsDisplayed()
     }
 
     @Test
@@ -50,6 +53,19 @@ internal class SettingsCameraUploadsViewTest {
         }
 
         composeTestRule.onNodeWithTag(HOW_TO_UPLOAD_DIALOG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the file upload prompt is shown when the user clicks the file upload tile`() {
+        initializeComposeContent(isCameraUploadsEnabled = true)
+        testInitialCameraUploadsConfiguration()
+
+        composeTestRule.onNodeWithTag(FILE_UPLOAD_TILE).apply {
+            assertIsDisplayed()
+            performClick()
+        }
+
+        composeTestRule.onNodeWithTag(FILE_UPLOAD_DIALOG).assertIsDisplayed()
     }
 
     private fun initializeComposeContent(
@@ -67,6 +83,7 @@ internal class SettingsCameraUploadsViewTest {
                 onRegularBusinessAccountSubUserPromptAcknowledged = {},
                 onRequestPermissionsStateChanged = {},
                 onSettingsScreenPaused = {},
+                onUploadOptionUiItemSelected = {},
             )
         }
     }

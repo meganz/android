@@ -8,19 +8,25 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
+import mega.privacy.android.app.presentation.settings.camerauploads.mapper.UploadOptionUiItemMapper
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
+import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadOptionUiItem
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
+import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
@@ -35,6 +41,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -55,6 +62,9 @@ internal class SettingsCameraUploadsViewModelTest {
 
     private val checkEnableCameraUploadsStatusUseCase =
         mock<CheckEnableCameraUploadsStatusUseCase>()
+    private val deleteCameraUploadsTemporaryRootDirectoryUseCase =
+        mock<DeleteCameraUploadsTemporaryRootDirectoryUseCase>()
+    private val getUploadOptionUseCase = mock<GetUploadOptionUseCase>()
     private val isCameraUploadsByWifiUseCase = mock<IsCameraUploadsByWifiUseCase>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
@@ -62,15 +72,19 @@ internal class SettingsCameraUploadsViewModelTest {
     private val listenToNewMediaUseCase = mock<ListenToNewMediaUseCase>()
     private val preparePrimaryFolderPathUseCase = mock<PreparePrimaryFolderPathUseCase>()
     private val setCameraUploadsByWifiUseCase = mock<SetCameraUploadsByWifiUseCase>()
+    private val setUploadOptionUseCase = mock<SetUploadOptionUseCase>()
     private val setupCameraUploadsSettingUseCase = mock<SetupCameraUploadsSettingUseCase>()
     private val snackBarHandler = mock<SnackBarHandler>()
     private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
     private val stopCameraUploadsUseCase = mock<StopCameraUploadsUseCase>()
+    private val uploadOptionUiItemMapper = Mockito.spy(UploadOptionUiItemMapper())
 
     @BeforeEach
     fun resetMocks() {
         reset(
             checkEnableCameraUploadsStatusUseCase,
+            deleteCameraUploadsTemporaryRootDirectoryUseCase,
+            getUploadOptionUseCase,
             isCameraUploadsByWifiUseCase,
             isCameraUploadsEnabledUseCase,
             isConnectedToInternetUseCase,
@@ -78,6 +92,7 @@ internal class SettingsCameraUploadsViewModelTest {
             listenToNewMediaUseCase,
             preparePrimaryFolderPathUseCase,
             setCameraUploadsByWifiUseCase,
+            setUploadOptionUseCase,
             setupCameraUploadsSettingUseCase,
             snackBarHandler,
             startCameraUploadUseCase,
@@ -92,13 +107,17 @@ internal class SettingsCameraUploadsViewModelTest {
         isCameraUploadsByWifi: Boolean = true,
         isCameraUploadsEnabled: Boolean = true,
         isMediaUploadsEnabled: Boolean = true,
+        uploadOption: UploadOption = UploadOption.PHOTOS,
     ) {
         whenever(isCameraUploadsByWifiUseCase()).thenReturn(isCameraUploadsByWifi)
         whenever(isCameraUploadsEnabledUseCase()).thenReturn(isCameraUploadsEnabled)
         whenever(isSecondaryFolderEnabled()).thenReturn(isMediaUploadsEnabled)
+        whenever(getUploadOptionUseCase()).thenReturn(uploadOption)
 
         underTest = SettingsCameraUploadsViewModel(
             checkEnableCameraUploadsStatusUseCase = checkEnableCameraUploadsStatusUseCase,
+            deleteCameraUploadsTemporaryRootDirectoryUseCase = deleteCameraUploadsTemporaryRootDirectoryUseCase,
+            getUploadOptionUseCase = getUploadOptionUseCase,
             isCameraUploadsByWifiUseCase = isCameraUploadsByWifiUseCase,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
@@ -106,10 +125,12 @@ internal class SettingsCameraUploadsViewModelTest {
             listenToNewMediaUseCase = listenToNewMediaUseCase,
             preparePrimaryFolderPathUseCase = preparePrimaryFolderPathUseCase,
             setCameraUploadsByWifiUseCase = setCameraUploadsByWifiUseCase,
+            setUploadOptionUseCase = setUploadOptionUseCase,
             setupCameraUploadsSettingUseCase = setupCameraUploadsSettingUseCase,
             snackBarHandler = snackBarHandler,
             startCameraUploadUseCase = startCameraUploadUseCase,
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,
+            uploadOptionUiItemMapper = uploadOptionUiItemMapper,
         )
     }
 
@@ -393,8 +414,9 @@ internal class SettingsCameraUploadsViewModelTest {
     }
 
     /**
-     * The Test Group that verifies behaviors when changing how content is being uploaded in Camera
-     * Uploads. The functionality is triggered when the User clicks the How to Upload Tile
+     * The Test Group that verifies behaviors when changing the Internet Connection Type used by Camera
+     * Uploads to upload content. The functionality is triggered when the User clicks the How to
+     * Upload Tile
      */
     @Nested
     @DisplayName("How to Upload")
@@ -430,6 +452,45 @@ internal class SettingsCameraUploadsViewModelTest {
             underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.uploadConnectionType).isEqualTo(uploadConnectionType)
+            }
+        }
+    }
+
+    /**
+     * The Test Group that verifies behaviors when changing the type of content being uploaded by
+     * Camera Uploads. The functionality is triggered when the User clicks the File Upload Tile
+     */
+    @Nested
+    @DisplayName("File Upload")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    internal inner class FileUpload {
+        @Test
+        fun `test that an error snackbar is displayed when changing the upload option ui item throws an exception`() =
+            runTest {
+                initializeUnderTest()
+                whenever(setUploadOptionUseCase(any())).thenThrow(RuntimeException())
+
+                assertDoesNotThrow { underTest.onUploadOptionUiItemSelected(UploadOptionUiItem.PhotosOnly) }
+                verify(snackBarHandler).postSnackbarMessage(
+                    resId = R.string.general_error,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
+
+        @ParameterizedTest(name = "new upload option ui item: {0}")
+        @EnumSource(UploadOptionUiItem::class)
+        fun `test that changing the upload option ui item clears the internal cache and stops camera uploads`(
+            uploadOptionUiItem: UploadOptionUiItem,
+        ) = runTest {
+            initializeUnderTest()
+
+            underTest.onUploadOptionUiItemSelected(uploadOptionUiItem)
+
+            verify(setUploadOptionUseCase).invoke(uploadOptionUiItem.uploadOption)
+            verify(deleteCameraUploadsTemporaryRootDirectoryUseCase).invoke()
+            verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
+            underTest.uiState.test {
+                assertThat(awaitItem().uploadOptionUiItem).isEqualTo(uploadOptionUiItem)
             }
         }
     }
