@@ -50,6 +50,17 @@ internal fun PromoNotificationItemView(
     onClick: () -> Unit,
 ) {
     val hasPreview = notification.imageURL.isNotBlank()
+    val timeText = TimeUtils.formatTime(notification.endTimeStamp)
+    val dateText = TimeUtils.formatDateAndTime(
+        LocalContext.current,
+        notification.endTimeStamp,
+        TimeUtils.DATE_SHORT_FORMAT
+    )
+    val dateAndTimeString = stringResource(
+        id = R.string.notifications_screen_notification_promo_expiration_time,
+        dateText,
+        timeText
+    )
     Column(modifier = modifier
         .clickable { onClick() }
         .background(color = MaterialTheme.colors.grey_020_grey_800)
@@ -96,13 +107,8 @@ internal fun PromoNotificationItemView(
                     )
                 }
                 if (!hasPreview) {
-                    val dateText = TimeUtils.formatDateAndTime(
-                        LocalContext.current,
-                        notification.endTimeStamp,
-                        TimeUtils.DATE_LONG_FORMAT
-                    )
                     NotificationDate(
-                        dateText = dateText,
+                        dateText = dateAndTimeString,
                         modifier = Modifier
                             .padding(top = 5.dp, bottom = 12.dp)
                             .testTag(
@@ -144,14 +150,8 @@ internal fun PromoNotificationItemView(
                     .testTag(PROMO_PREVIEW_TEST_TAG),
                 contentScale = ContentScale.FillWidth,
             )
-
-            val dateText = TimeUtils.formatDateAndTime(
-                LocalContext.current,
-                notification.endTimeStamp,
-                TimeUtils.DATE_LONG_FORMAT
-            )
             NotificationDate(
-                dateText = dateText,
+                dateText = dateAndTimeString,
                 modifier = Modifier
                     .padding(start = 16.dp, top = 12.dp, bottom = 12.dp)
                     .testTag(
