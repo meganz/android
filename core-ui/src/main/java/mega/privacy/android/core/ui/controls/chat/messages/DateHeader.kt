@@ -9,11 +9,18 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
 
+/**
+ * Date header
+ *
+ * @param dateString
+ * @param modifier
+ */
 @Composable
 fun DateHeader(
     dateString: String,
@@ -23,7 +30,8 @@ fun DateHeader(
         Text(
             modifier = Modifier
                 .padding(top = 8.dp, bottom = 16.dp)
-                .align(Alignment.Center),
+                .align(Alignment.Center)
+                .testTag(TEST_TAG_DATE_HEADER_TIME),
             text = dateString,
             style = MaterialTheme.typography.subtitle2,
             color = MegaTheme.colors.text.secondary
@@ -38,3 +46,5 @@ private fun PreviewDateHeader() {
         DateHeader(dateString = "Friday, Nov 14, 2023")
     }
 }
+
+internal const val TEST_TAG_DATE_HEADER_TIME = "date_header:time"

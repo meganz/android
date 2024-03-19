@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.controls.chat.ChatStatusIcon
@@ -87,7 +88,9 @@ fun ContactMessageContentView(
             }
             status?.let {
                 ChatStatusIcon(
-                    modifier = Modifier.align(Alignment.TopEnd),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .testTag(TEST_TAG_CONTACT_MESSAGE_CONTENT_VIEW_STATUS_ICON),
                     status = status
                 )
             }
@@ -95,10 +98,12 @@ fun ContactMessageContentView(
 
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(
+                modifier = Modifier.testTag(TEST_TAG_CONTACT_MESSAGE_CONTENT_VIEW_USER_NAME),
                 text = userName,
                 style = MaterialTheme.typography.subtitle1,
             )
             Text(
+                modifier = Modifier.testTag(TEST_TAG_CONTACT_MESSAGE_CONTENT_VIEW_EMAIL),
                 text = email,
                 style = MaterialTheme.typography.subtitle2,
             )
@@ -130,3 +135,10 @@ private fun ContactAttachmentMessageViewPreview(
         )
     }
 }
+
+internal const val TEST_TAG_CONTACT_MESSAGE_CONTENT_VIEW_STATUS_ICON =
+    "contact_message_content_view:status_icon"
+internal const val TEST_TAG_CONTACT_MESSAGE_CONTENT_VIEW_USER_NAME =
+    "contact_message_content_view:user_name"
+internal const val TEST_TAG_CONTACT_MESSAGE_CONTENT_VIEW_EMAIL =
+    "contact_message_content_view:email"

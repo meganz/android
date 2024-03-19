@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -62,7 +63,8 @@ fun RichLinkContentView(
                         modifier = Modifier
                             .align(Alignment.Center)
                             .size(if (isFullImage) 80.dp else 48.dp)
-                            .clip(RoundedCornerShape(6.dp)),
+                            .clip(RoundedCornerShape(6.dp))
+                            .testTag(TEST_TAG_RICH_LINK_CONTENT_VIEW_IMAGE),
                         painter = it,
                         contentDescription = "Image",
                         contentScale = ContentScale.Crop
@@ -73,6 +75,7 @@ fun RichLinkContentView(
                 modifier = Modifier,
             ) {
                 Text(
+                    modifier = Modifier.testTag(TEST_TAG_RICH_LINK_CONTENT_VIEW_TITLE),
                     text = contentTitle,
                     style = MaterialTheme.typography.subtitle2,
                     overflow = TextOverflow.Ellipsis,
@@ -80,7 +83,9 @@ fun RichLinkContentView(
                 )
                 contentDescription?.let {
                     Text(
-                        modifier = Modifier.padding(top = 4.dp),
+                        modifier = Modifier
+                            .padding(top = 4.dp)
+                            .testTag(TEST_TAG_RICH_LINK_CONTENT_VIEW_DESCRIPTION),
                         text = contentDescription,
                         style = MaterialTheme.typography.caption,
                         overflow = TextOverflow.Ellipsis,
@@ -95,14 +100,18 @@ fun RichLinkContentView(
         ) {
             icon?.let {
                 Image(
-                    modifier = Modifier.size(16.dp),
+                    modifier = Modifier
+                        .size(16.dp)
+                        .testTag(TEST_TAG_RICH_LINK_CONTENT_VIEW_ICON),
                     painter = it,
                     contentDescription = "Image",
                     contentScale = ContentScale.Crop
                 )
             }
             Text(
-                modifier = Modifier.padding(start = 12.dp),
+                modifier = Modifier
+                    .padding(start = 12.dp)
+                    .testTag(TEST_TAG_RICH_LINK_CONTENT_VIEW_HOST),
                 text = host,
                 style = MaterialTheme.typography.caption
             )
@@ -127,3 +136,10 @@ private fun RichLinkContentViewPreview() {
         }
     }
 }
+
+internal const val TEST_TAG_RICH_LINK_CONTENT_VIEW_IMAGE = "rich_link_content_view:image"
+internal const val TEST_TAG_RICH_LINK_CONTENT_VIEW_ICON = "rich_link_content_view:icon"
+internal const val TEST_TAG_RICH_LINK_CONTENT_VIEW_TITLE = "rich_link_content_view:title"
+internal const val TEST_TAG_RICH_LINK_CONTENT_VIEW_DESCRIPTION =
+    "rich_link_content_view:description"
+internal const val TEST_TAG_RICH_LINK_CONTENT_VIEW_HOST = "rich_link_content_view:host"

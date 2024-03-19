@@ -10,6 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.preview.BooleanProvider
@@ -17,6 +18,7 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
 import mega.privacy.android.core.ui.theme.extensions.body4
+
 
 /**
  * Time header
@@ -44,13 +46,16 @@ fun TimeHeader(
     ) {
         userName?.let {
             Text(
-                modifier = Modifier.padding(end = 4.dp),
+                modifier = Modifier
+                    .padding(end = 4.dp)
+                    .testTag(TEST_TAG_TIME_HEADER_USER_NAME),
                 text = it,
                 style = MaterialTheme.typography.caption,
                 color = MegaTheme.colors.text.primary
             )
         }
         Text(
+            modifier = Modifier.testTag(TEST_TAG_TIME_HEADER_TIME),
             text = timeString,
             style = MaterialTheme.typography.body4,
             color = MegaTheme.colors.text.secondary
@@ -71,3 +76,6 @@ private fun PreviewTimeHeader(
         )
     }
 }
+
+internal const val TEST_TAG_TIME_HEADER_USER_NAME = "time_header:user_name"
+internal const val TEST_TAG_TIME_HEADER_TIME = "time_header:time"

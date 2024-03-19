@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -25,6 +26,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.appbar.LocalMegaAppBarColors
@@ -131,6 +134,7 @@ private fun IconButtonForAction(
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun DropDown(
     actions: List<MenuAction>,
@@ -150,6 +154,9 @@ private fun DropDown(
         )
 
         DropdownMenu(
+            modifier = Modifier.semantics {
+                testTagsAsResourceId = true
+            },
             expanded = showMoreMenu,
             onDismissRequest = {
                 showMoreMenu = false

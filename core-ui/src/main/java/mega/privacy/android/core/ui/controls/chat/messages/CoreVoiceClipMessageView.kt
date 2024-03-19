@@ -44,13 +44,7 @@ import mega.privacy.android.core.ui.theme.extensions.body4
 import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 
-internal const val VOICE_CLIP_MESSAGE_VIEW_PLAY_BUTTON_TEST_TAG =
-    "chat_voice_clip_message_view:play_button"
-internal const val VOICE_CLIP_MESSAGE_VIEW_LOAD_PROGRESS_INDICATOR_TEST_TAG =
-    "chat_voice_clip_message_view:load_progress_indicator"
-
 internal const val INVALID_TIMESTAMP = "--:--"
-
 
 /**
  * Compose view for voice clip message
@@ -175,6 +169,7 @@ private fun PlaySlider(
         horizontalArrangement = Arrangement.spacedBy(2.dp),
         modifier = modifier
             .size(width = widthInDp.dp, height = heightInDp.dp)
+            .testTag(VOICE_CLIP_MESSAGE_VIEW_SLIDER_TEST_TAG)
             .pointerInput(null) {
                 awaitPointerEventScope {
                     while (true) {
@@ -225,7 +220,9 @@ private fun PlaySlider(
 @Composable
 private fun TimestampText(isMe: Boolean, timestamp: String?, exists: Boolean) {
     MegaText(
-        modifier = Modifier.padding(start = 8.dp),
+        modifier = Modifier
+            .padding(start = 8.dp)
+            .testTag(VOICE_CLIP_MESSAGE_VIEW_TIMESTAMP_TEST_TAG),
         text = timestamp ?: INVALID_TIMESTAMP,
         textColor = when {
             !exists -> TextColor.Disabled
@@ -342,3 +339,11 @@ private class Provider : PreviewParameterProvider<VoiceClipMessageViewPreviewPar
         )
 }
 
+internal const val VOICE_CLIP_MESSAGE_VIEW_PLAY_BUTTON_TEST_TAG =
+    "chat_voice_clip_message_view:play_button"
+internal const val VOICE_CLIP_MESSAGE_VIEW_LOAD_PROGRESS_INDICATOR_TEST_TAG =
+    "chat_voice_clip_message_view:load_progress_indicator"
+
+internal const val VOICE_CLIP_MESSAGE_VIEW_TIMESTAMP_TEST_TAG =
+    "chat_voice_clip_message_view:timestamp"
+internal const val VOICE_CLIP_MESSAGE_VIEW_SLIDER_TEST_TAG = "chat_voice_clip_message_view:slider"

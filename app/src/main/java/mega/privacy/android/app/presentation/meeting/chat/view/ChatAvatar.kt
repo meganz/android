@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -36,6 +37,10 @@ fun ChatAvatar(
             .build(),
         contentDescription = "Avatar",
         contentScale = ContentScale.Inside,
-        modifier = modifier.size(24.dp)
+        modifier = modifier
+            .size(24.dp)
+            .testTag(TEST_TAG_CHAT_AVATAR_IMAGE)
     )
 }
+
+internal const val TEST_TAG_CHAT_AVATAR_IMAGE = "chat_avatar:image"
