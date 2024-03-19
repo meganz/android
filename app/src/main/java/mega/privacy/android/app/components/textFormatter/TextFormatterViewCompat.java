@@ -13,6 +13,10 @@ import mega.privacy.android.app.components.CustomTypefaceSpan;
 import static mega.privacy.android.app.components.textFormatter.TextFormatterUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 
+/**
+ * @deprecated Use Composable GetMessageText.toFormattedText instead.
+ */
+@Deprecated
 public class TextFormatterViewCompat {
     private static final int GENERAL_FLAG = 18;
     private static final int NUM_CHAR_MONOSPACE = 2;
@@ -23,7 +27,9 @@ public class TextFormatterViewCompat {
      *
      * @param text The text without format.
      * @return The formatted text.
+     * @deprecated Use Composable GetMessageText.toFormattedText instead.
      */
+    @Deprecated
     public static CharSequence getFormattedText(String text) {
         if (isTextEmpty(text))
             return null;
@@ -35,7 +41,9 @@ public class TextFormatterViewCompat {
      * Method that controls a TextView, to format the text it contains.
      *
      * @param textView The TextView.
+     * @deprecated Use Composable GetMessageText.toFormattedText instead.
      */
+    @Deprecated
     public static void applyFormatting(final TextView textView) {
         TextWatcher mEditTextWatcher = new TextWatcher() {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
