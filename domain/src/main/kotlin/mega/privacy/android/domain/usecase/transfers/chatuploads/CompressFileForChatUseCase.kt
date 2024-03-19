@@ -24,11 +24,18 @@ class CompressFileForChatUseCase @Inject constructor(
                 downscaleImageForChatUseCase(original)
             }
 
-            isVideoFileUseCase(path) -> {
+            isVideoFileUseCase(path) && VIDEO_COMPRESSION_ISSUE_FIXED -> {
                 compressVideoForChatUseCase(original)
             }
 
             else -> null
         }
+    }
+
+    companion object {
+        /**
+         * Video compression has an issue with landscape videos, this flag will be removed once solved
+         */
+        internal const val VIDEO_COMPRESSION_ISSUE_FIXED = false
     }
 }
