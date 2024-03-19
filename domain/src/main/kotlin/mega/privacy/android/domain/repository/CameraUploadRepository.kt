@@ -263,11 +263,6 @@ interface CameraUploadRepository {
     ): List<CameraUploadsMedia>
 
     /**
-     * clear all the contents of Internal cache directory
-     */
-    suspend fun clearCacheDirectory()
-
-    /**
      * Convert Base 64 string to handle
      */
     suspend fun convertBase64ToHandle(base64: String): Long

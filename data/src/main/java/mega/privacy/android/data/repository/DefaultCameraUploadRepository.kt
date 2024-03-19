@@ -15,7 +15,6 @@ import mega.privacy.android.data.R
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
-import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.CameraUploadsMediaGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
@@ -64,7 +63,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
     private val megaApiGateway: MegaApiGateway,
     private val cameraUploadsMediaGateway: CameraUploadsMediaGateway,
-    private val cacheGateway: CacheGateway,
     private val heartbeatStatusIntMapper: HeartbeatStatusIntMapper,
     private val mediaStoreFileTypeUriMapper: MediaStoreFileTypeUriMapper,
     private val appEventGateway: AppEventGateway,
@@ -343,10 +341,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             }
             return@let Pair(primaryHandle, secondaryHandle)
         }
-    }
-
-    override suspend fun clearCacheDirectory() = withContext(ioDispatcher) {
-        cacheGateway.clearCacheDirectory()
     }
 
     override suspend fun convertBase64ToHandle(base64: String): Long = withContext(ioDispatcher) {

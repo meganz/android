@@ -7,9 +7,7 @@ import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.di.GetNodeModule
-import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 
 /**
@@ -26,13 +24,5 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideIsNodeInRubbish(nodeRepository: NodeRepository): IsNodeInRubbish =
             IsNodeInRubbish(nodeRepository::isNodeInRubbish)
-
-        /**
-         * Provide the [ClearCacheDirectory] implementation
-         */
-        @Provides
-        fun provideClearCacheDirectory(cameraUploadRepository: CameraUploadRepository): ClearCacheDirectory =
-            ClearCacheDirectory(cameraUploadRepository::clearCacheDirectory)
     }
-
 }

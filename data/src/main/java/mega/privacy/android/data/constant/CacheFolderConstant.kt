@@ -31,5 +31,8 @@ object CacheFolderConstant {
      */
     const val QR_FOLDER = "qrMEGA"
 
+    /**
+     * Camera Uploads Cache Folder
+     */
     const val CAMERA_UPLOADS_CACHE_FOLDER = "cu"
 }

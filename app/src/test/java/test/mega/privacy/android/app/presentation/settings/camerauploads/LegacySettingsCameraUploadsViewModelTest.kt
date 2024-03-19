@@ -20,13 +20,13 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
-import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
+import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableMediaUploadsSettingsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
@@ -98,7 +98,8 @@ internal class LegacySettingsCameraUploadsViewModelTest {
     private val areUploadFileNamesKeptUseCase = mock<AreUploadFileNamesKeptUseCase>()
     private val checkEnableCameraUploadsStatusUseCase =
         mock<CheckEnableCameraUploadsStatusUseCase>()
-    private val clearCacheDirectory = mock<ClearCacheDirectory>()
+    private val deleteCameraUploadsTemporaryRootDirectoryUseCase =
+        mock<DeleteCameraUploadsTemporaryRootDirectoryUseCase>()
     private val disableMediaUploadsSettingsUseCase = mock<DisableMediaUploadsSettingsUseCase>()
     private val getPrimaryFolderPathUseCase = mock<GetPrimaryFolderPathUseCase>()
     private val getUploadOptionUseCase = mock<GetUploadOptionUseCase>()
@@ -154,7 +155,7 @@ internal class LegacySettingsCameraUploadsViewModelTest {
             areLocationTagsEnabledUseCase,
             areUploadFileNamesKeptUseCase,
             checkEnableCameraUploadsStatusUseCase,
-            clearCacheDirectory,
+            deleteCameraUploadsTemporaryRootDirectoryUseCase,
             disableMediaUploadsSettingsUseCase,
             getPrimaryFolderPathUseCase,
             getUploadOptionUseCase,
@@ -210,7 +211,7 @@ internal class LegacySettingsCameraUploadsViewModelTest {
             areLocationTagsEnabledUseCase = areLocationTagsEnabledUseCase,
             areUploadFileNamesKeptUseCase = areUploadFileNamesKeptUseCase,
             checkEnableCameraUploadsStatusUseCase = checkEnableCameraUploadsStatusUseCase,
-            clearCacheDirectory = clearCacheDirectory,
+            deleteCameraUploadsTemporaryRootDirectoryUseCase = deleteCameraUploadsTemporaryRootDirectoryUseCase,
             disableMediaUploadsSettingsUseCase = disableMediaUploadsSettingsUseCase,
             getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
             getUploadOptionUseCase = getUploadOptionUseCase,
@@ -429,7 +430,7 @@ internal class LegacySettingsCameraUploadsViewModelTest {
 
             underTest.changeUploadOption(uploadOption)
 
-            verify(clearCacheDirectory).invoke()
+            verify(deleteCameraUploadsTemporaryRootDirectoryUseCase).invoke()
             verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
             underTest.state.test {
                 assertThat(awaitItem().uploadOption).isEqualTo(uploadOption)
@@ -516,7 +517,7 @@ internal class LegacySettingsCameraUploadsViewModelTest {
             assertThat(awaitItem().primaryFolderPath).isEqualTo(newPrimaryFolderPath)
         }
         verify(setPrimaryFolderPathUseCase).invoke(newPrimaryFolderPath)
-        verify(clearCacheDirectory).invoke()
+        verify(deleteCameraUploadsTemporaryRootDirectoryUseCase).invoke()
         verify(clearCameraUploadsRecordUseCase).invoke(listOf(CameraUploadFolderType.Primary))
         verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
     }

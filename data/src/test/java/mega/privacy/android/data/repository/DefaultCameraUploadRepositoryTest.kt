@@ -99,7 +99,6 @@ class DefaultCameraUploadRepositoryTest {
         underTest = DefaultCameraUploadRepository(
             localStorageGateway = localStorageGateway,
             megaApiGateway = megaApiGateway,
-            cacheGateway = mock(),
             cameraUploadsMediaGateway = cameraUploadsMediaGateway,
             workManagerGateway = workManagerGateway,
             heartbeatStatusIntMapper = heartbeatStatusIntMapper,

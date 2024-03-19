@@ -10,7 +10,6 @@ import mega.privacy.android.app.utils.wrapper.CameraEnumeratorWrapper
 import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
-import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.camerauploads.GetNodeByFingerprintUseCase
 import org.mockito.kotlin.mock
@@ -27,9 +26,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideIsNodeInRubbish() = mock<IsNodeInRubbish>()
-
-    @Provides
-    fun provideClearCacheDirectory() = mock<ClearCacheDirectory>()
 
     @Provides
     fun provideNotificationHelper() = mock<CameraUploadsNotificationManagerWrapper>()

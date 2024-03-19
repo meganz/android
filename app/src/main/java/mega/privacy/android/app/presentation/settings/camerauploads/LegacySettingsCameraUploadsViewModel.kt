@@ -22,7 +22,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
-import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.backup.MonitorBackupInfoTypeUseCase
@@ -30,6 +29,7 @@ import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpi
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
+import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableMediaUploadsSettingsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
@@ -81,8 +81,8 @@ import javax.inject.Inject
  * @property areLocationTagsEnabledUseCase When uploading Photos, this checks whether Location Tags should be embedded in each Photo or not
  * @property areUploadFileNamesKeptUseCase Checks whether the File Names are kept or not when uploading content
  * @property checkEnableCameraUploadsStatusUseCase Checks the Camera Uploads status before enabling
- * @property clearCacheDirectory Clears all the contents of the internal cache directory
- * @property disableMediaUploadSettings Disables Media Uploads by manipulating a certain value in the database
+ * @property deleteCameraUploadsTemporaryRootDirectoryUseCase Deletes the temporary Camera Uploads Cache Folder
+ * @property disableMediaUploadsSettingsUseCase Disables Media Uploads by manipulating a certain value in the database
  * @property getPrimaryFolderPathUseCase Retrieves the Primary Folder path
  * @property getUploadOptionUseCase Retrieves the upload option of Camera Uploads
  * @property getUploadVideoQualityUseCase Retrieves the Video Quality of Videos to be uploaded
@@ -118,7 +118,7 @@ class LegacySettingsCameraUploadsViewModel @Inject constructor(
     private val areLocationTagsEnabledUseCase: AreLocationTagsEnabledUseCase,
     private val areUploadFileNamesKeptUseCase: AreUploadFileNamesKeptUseCase,
     private val checkEnableCameraUploadsStatusUseCase: CheckEnableCameraUploadsStatusUseCase,
-    private val clearCacheDirectory: ClearCacheDirectory,
+    private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase,
     private val disableMediaUploadsSettingsUseCase: DisableMediaUploadsSettingsUseCase,
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
     private val getUploadOptionUseCase: GetUploadOptionUseCase,
@@ -400,7 +400,7 @@ class LegacySettingsCameraUploadsViewModel @Inject constructor(
             runCatching {
                 setUploadOptionUseCase(uploadOption)
                 refreshUploadOption()
-                clearCacheDirectory()
+                deleteCameraUploadsTemporaryRootDirectoryUseCase()
                 stopCameraUploads()
             }.onFailure {
                 Timber.e(it)
@@ -491,7 +491,7 @@ class LegacySettingsCameraUploadsViewModel @Inject constructor(
             runCatching {
                 if (isPrimaryFolderPathValidUseCase(newPath)) {
                     newPath?.let { setPrimaryFolderPathUseCase(it) }
-                    clearCacheDirectory()
+                    deleteCameraUploadsTemporaryRootDirectoryUseCase()
                     clearCameraUploadsRecordUseCase(listOf(CameraUploadFolderType.Primary))
                     stopCameraUploads()
                     _state.update { it.copy(primaryFolderPath = newPath.orEmpty()) }
