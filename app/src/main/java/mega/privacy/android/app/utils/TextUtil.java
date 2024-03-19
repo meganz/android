@@ -18,8 +18,6 @@ import timber.log.Timber;
 
 public class TextUtil {
 
-    private static final String COPIED = "Copied Text";
-
     public static boolean isTextEmpty(String string) {
         return string == null || string.isEmpty() || string.trim().isEmpty();
     }
@@ -110,34 +108,16 @@ public class TextUtil {
         return HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
     }
 
+    /**
+     * Check email validity
+     *
+     * @param str Email
+     * @return Boolean
+     * @deprecated <p> Use {@link mega.privacy.android.domain.usecase.contact.IsEmailValidUseCase} instead.
+     */
+    @Deprecated
     public static boolean isEmail(String str) {
         return !isTextEmpty(str) && EMAIL_ADDRESS.matcher(str).matches();
-    }
-
-    /**
-     * Formats a String of notification screen.
-     *
-     * @param context Current Context object, to get a resource(for example, color)
-     *                should not use application context, need to pass it from the caller.
-     * @param text    The text to format.
-     * @return The string formatted.
-     */
-    public static Spanned replaceFormatNotificationText(Context context, String text) {
-        try {
-            text = text.replace("[A]", "<font color='"
-                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
-                    + "'>");
-            text = text.replace("[/A]", "</font>");
-            text = text.replace("[B]", "<font color='"
-                    + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
-                    + "'>");
-
-            text = text.replace("[/B]", "</font>");
-        } catch (Exception e) {
-            Timber.w(e, "Error replacing text. ");
-        }
-
-        return HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY);
     }
 
     /**
@@ -186,20 +166,6 @@ public class TextUtil {
     public static Spanned formatEmptyScreenText(Context context, String textToShow) {
         String colorStart = ColorUtils.getColorHexString(context, R.color.grey_900_grey_100);
         String colorEnd = ColorUtils.getColorHexString(context, R.color.grey_300_grey_600);
-        return replaceFormatText(textToShow, colorStart, colorEnd);
-    }
-
-    /**
-     * Formats a String of recent chats empty screen.
-     *
-     * @param context    Current Context object, to get a resource(for example, color)
-     *                   should not use application context, need to pass it from the caller.
-     * @param textToShow The text to format.
-     * @return The string formatted.
-     */
-    public static Spanned formatEmptyRecentChatsScreenText(Context context, String textToShow) {
-        String colorStart = ColorUtils.getColorHexString(context, R.color.grey_300_grey_600);
-        String colorEnd = ColorUtils.getColorHexString(context, R.color.grey_900_grey_100);
         return replaceFormatText(textToShow, colorStart, colorEnd);
     }
 
