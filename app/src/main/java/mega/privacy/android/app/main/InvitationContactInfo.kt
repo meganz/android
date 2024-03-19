@@ -19,9 +19,9 @@ import kotlinx.parcelize.Parcelize
  */
 @Parcelize
 data class InvitationContactInfo @JvmOverloads constructor(
-    val id: Long,
+    val id: Long = 0L,
     private val name: String = "",
-    val type: Int,
+    val type: Int = 0,
     val filteredContactInfos: List<String> = emptyList(),
     var displayInfo: String = "",
     val avatarColor: Int = 0,
@@ -55,21 +55,6 @@ data class InvitationContactInfo @JvmOverloads constructor(
 
     override fun toString(): String =
         "\n{id=$id, isHighlighted=$isHighlighted, type=$type, bitmap=$bitmap, name='$name', displayInfo='$displayInfo', handle='$handle', avatarColor='$avatarColor'}"
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-
-        if (other == null || javaClass != other.javaClass) return false
-
-        val info = other as InvitationContactInfo
-        return id == info.id && displayInfo == info.displayInfo
-    }
-
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + displayInfo.hashCode()
-        return result
-    }
 
     companion object {
         /**

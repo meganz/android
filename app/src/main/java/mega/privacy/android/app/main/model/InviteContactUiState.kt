@@ -4,8 +4,9 @@ import mega.privacy.android.domain.entity.Feature
 
 /**
  * State for invite Contact
+ *
  * @property enabledFeatureFlags Set of enabled feature flags
  */
-data class InviteContactState(
+data class InviteContactUiState(
     val enabledFeatureFlags: Set<Feature> = emptySet(),
 )
