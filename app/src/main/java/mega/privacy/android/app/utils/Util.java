@@ -216,6 +216,14 @@ public class Util {
         return null;
     }
 
+    /**
+     * Indicates whether the device is currently roaming on this network
+     *
+     * @param context
+     * @return Boolean. True if the device is currently roaming on this network otherwise false
+     * @deprecated <p> Use {@link mega.privacy.android.domain.usecase.environment.IsConnectivityInRoamingStateUseCase} instead.
+     */
+    @Deprecated
     public static boolean isRoaming(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (cm != null) {
