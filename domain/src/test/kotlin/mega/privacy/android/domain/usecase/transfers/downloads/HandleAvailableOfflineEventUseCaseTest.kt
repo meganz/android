@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.offline.IsOfflineTransferUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
 import org.junit.jupiter.api.AfterEach
@@ -26,6 +27,8 @@ class HandleAvailableOfflineEventUseCaseTest {
 
     private val isOfflineTransferUseCase = mock<IsOfflineTransferUseCase>()
     private val saveOfflineNodeInformationUseCase = mock<SaveOfflineNodeInformationUseCase>()
+    private val broadcastOfflineFileAvailabilityUseCase =
+        mock<BroadcastOfflineFileAvailabilityUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -33,6 +36,7 @@ class HandleAvailableOfflineEventUseCaseTest {
         underTest = HandleAvailableOfflineEventUseCase(
             isOfflineTransferUseCase,
             saveOfflineNodeInformationUseCase,
+            broadcastOfflineFileAvailabilityUseCase,
         )
     }
 
@@ -41,6 +45,7 @@ class HandleAvailableOfflineEventUseCaseTest {
         reset(
             isOfflineTransferUseCase,
             saveOfflineNodeInformationUseCase,
+            broadcastOfflineFileAvailabilityUseCase,
         )
     }
 
@@ -106,6 +111,22 @@ class HandleAvailableOfflineEventUseCaseTest {
             underTest(event)
 
             verifyNoInteractions(saveOfflineNodeInformationUseCase)
+        }
+
+    @Test
+    fun `test that broadcastOfflineFileAvailabilityUseCase is invoked when a finish event for an offline download transfer is received`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { it.nodeHandle } doReturn nodeId
+            }
+            val event = mock<TransferEvent.TransferFinishEvent> {
+                on { it.transfer } doReturn transfer
+            }
+            whenever(isOfflineTransferUseCase(transfer)) doReturn true
+
+            underTest(event)
+
+            verify(broadcastOfflineFileAvailabilityUseCase).invoke(nodeId)
         }
 
     private fun provideNotFinishEvents(): List<TransferEvent> {

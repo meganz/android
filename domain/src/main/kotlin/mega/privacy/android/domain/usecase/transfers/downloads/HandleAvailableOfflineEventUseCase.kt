@@ -5,6 +5,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.offline.IsOfflineTransferUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
 import javax.inject.Inject
@@ -16,6 +17,7 @@ import javax.inject.Inject
 class HandleAvailableOfflineEventUseCase @Inject constructor(
     private val isOfflineTransferUseCase: IsOfflineTransferUseCase,
     private val saveOfflineNodeInformationUseCase: SaveOfflineNodeInformationUseCase,
+    private val broadcastOfflineFileAvailabilityUseCase: BroadcastOfflineFileAvailabilityUseCase,
 ) {
     /**
      * Invoke
@@ -28,6 +30,7 @@ class HandleAvailableOfflineEventUseCase @Inject constructor(
                     if (isOfflineTransferUseCase(event.transfer)) {
                         event.transfer.nodeHandle.takeIf { it != -1L }?.let {
                             saveOfflineNodeInformationUseCase(NodeId(it))
+                            broadcastOfflineFileAvailabilityUseCase(it)
                         }
                     }
                 }
