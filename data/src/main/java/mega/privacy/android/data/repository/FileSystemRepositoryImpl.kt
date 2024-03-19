@@ -216,19 +216,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun getOfflineBackupsPath() =
         withContext(ioDispatcher) { fileGateway.getOfflineFilesBackupsRootPath() }
 
-    override suspend fun createFolder(name: String) = withContext(ioDispatcher) {
-        val megaNode = megaApiGateway.getRootNode()
-        megaNode?.let { parentMegaNode ->
-            suspendCancellableCoroutine { continuation ->
-                val listener = continuation.getRequestListener("createFolder") { it.nodeHandle }
-                megaApiGateway.createFolder(name, parentMegaNode, listener)
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
-            }
-        }
-    }
-
     override suspend fun setMyChatFilesFolder(nodeHandle: Long) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("setMyChatFilesFolder") {

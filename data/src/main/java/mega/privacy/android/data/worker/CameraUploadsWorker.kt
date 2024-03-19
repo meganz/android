@@ -76,7 +76,6 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
-import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
@@ -85,6 +84,7 @@ import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
+import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableMediaUploadsSettingsUseCase
@@ -161,7 +161,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val handleLocalIpChangeUseCase: HandleLocalIpChangeUseCase,
     private val cancelAllUploadTransfersUseCase: CancelAllUploadTransfersUseCase,
-    private val createCameraUploadFolder: CreateCameraUploadFolder,
+    private val createFolderNodeUseCase: CreateFolderNodeUseCase,
     private val setupPrimaryFolderUseCase: SetupPrimaryFolderUseCase,
     private val setupSecondaryFolderUseCase: SetupSecondaryFolderUseCase,
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
@@ -1172,10 +1172,15 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @throws Exception if the creation of the primary upload folder failed
      */
     private suspend fun createAndSetupPrimaryUploadFolder() {
-        createCameraUploadFolder(context.getString(R.string.section_photo_sync))?.let {
-            Timber.d("Primary Folder successfully created with handle $it. Setting up Primary Folder")
-            setupPrimaryFolderUseCase(it)
-        } ?: throw Exception("Failed to create primary upload folder")
+        runCatching {
+            createFolderNodeUseCase(context.getString(R.string.section_photo_sync)).let {
+                Timber.d("Primary Folder successfully created with NodeId $it. Setting up Primary Folder")
+                setupPrimaryFolderUseCase(it.longValue)
+            }
+        }.onFailure {
+            throw Exception("Failed to create primary upload folder", it)
+        }
+
     }
 
     /**
@@ -1185,10 +1190,14 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @throws Exception if the creation of the secondary upload folder failed
      */
     private suspend fun createAndSetupSecondaryUploadFolder() {
-        createCameraUploadFolder(context.getString(R.string.section_secondary_media_uploads))?.let {
-            Timber.d("Secondary Folder successfully created with handle $it. Setting up Secondary Folder")
-            setupSecondaryFolderUseCase(it)
-        } ?: throw Exception("Failed to create secondary upload folder")
+        runCatching {
+            createFolderNodeUseCase(context.getString(R.string.section_secondary_media_uploads)).let {
+                Timber.d("Secondary Folder successfully created with handle $it. Setting up Secondary Folder")
+                setupSecondaryFolderUseCase(it.longValue)
+            }
+        }.onFailure {
+            throw Exception("Failed to create secondary upload folder", it)
+        }
     }
 
     /**

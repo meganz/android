@@ -34,11 +34,6 @@ interface FileSystemRepository {
     suspend fun getOfflineBackupsPath(): String
 
     /**
-     * Create Folder
-     */
-    suspend fun createFolder(name: String): Long?
-
-    /**
      * Downloads a file node in background.
      *
      * @param viewerNode File node to download.

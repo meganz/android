@@ -1048,6 +1048,60 @@ class NodeRepositoryImplTest {
         assertThat(underTest.doesNodeExist(node)).isFalse()
     }
 
+    @ParameterizedTest(name = "when parentNode handle is {0}")
+    @MethodSource("provideNodeId")
+    fun `test that the NodeId of the node is returned when createFolder is called`(
+        parentNodeId: NodeId?,
+    ) = runTest {
+        val folderName = "folderName"
+        val result = NodeId(1L)
+        val parentMegaNode = mock<MegaNode>()
+        when (parentNodeId) {
+            null -> whenever(megaApiGateway.getRootNode()).thenReturn(parentMegaNode)
+            else -> whenever(megaApiGateway.getMegaNodeByHandle(parentNodeId.longValue))
+                .thenReturn(parentMegaNode)
+        }
+        whenever(megaApiGateway.createFolder(eq(folderName), eq(parentMegaNode), any()))
+            .thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = mock {
+                        on { nodeHandle }.thenReturn(result.longValue)
+                    },
+                    error = mock {
+                        on { errorCode }.thenReturn(
+                            MegaError.API_OK
+                        )
+                    },
+                )
+            }
+
+        val actual = underTest.createFolder(folderName, parentNodeId)
+
+        assertThat(actual).isEqualTo(result)
+    }
+
+    @ParameterizedTest(name = "when parentNode handle is {0}")
+    @MethodSource("provideNodeId")
+    fun `test that an illegal argument exception is thrown when the parent node cannot be found`(
+        parentNodeId: NodeId?,
+    ) = runTest {
+        val folderName = "folderName"
+        when (parentNodeId) {
+            null -> whenever(megaApiGateway.getRootNode()).thenReturn(null)
+            else -> whenever(megaApiGateway.getMegaNodeByHandle(parentNodeId.longValue))
+                .thenReturn(null)
+        }
+        assertThrows<IllegalArgumentException> {
+            underTest.createFolder(folderName, parentNodeId)
+        }
+    }
+
+    private fun provideNodeId() = Stream.of(
+        Arguments.of(null),
+        Arguments.of(NodeId(2L)),
+    )
+
     companion object {
         private const val nodeHandle = 1L
         private val nodeId = NodeId(nodeHandle)

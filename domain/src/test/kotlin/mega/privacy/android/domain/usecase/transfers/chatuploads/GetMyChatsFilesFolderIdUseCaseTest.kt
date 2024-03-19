@@ -6,16 +6,19 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.lang.IllegalArgumentException
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetMyChatsFilesFolderIdUseCaseTest {
@@ -24,10 +27,12 @@ class GetMyChatsFilesFolderIdUseCaseTest {
     private val fileSystemRepository = mock<FileSystemRepository>()
     private val nodeRepository = mock<NodeRepository>()
     private val chatRepository = mock<ChatRepository>()
+    private val createFolderNodeUseCase = mock<CreateFolderNodeUseCase>()
 
     @BeforeAll
     fun setup() {
         underTest = GetMyChatsFilesFolderIdUseCase(
+            createFolderNodeUseCase,
             fileSystemRepository,
             nodeRepository,
             chatRepository,
@@ -40,6 +45,7 @@ class GetMyChatsFilesFolderIdUseCaseTest {
             fileSystemRepository,
             nodeRepository,
             chatRepository,
+            createFolderNodeUseCase,
         )
 
     @Test
@@ -66,13 +72,13 @@ class GetMyChatsFilesFolderIdUseCaseTest {
         stubFolderCreation(folderName = folderName)
         underTest()
         verify(chatRepository).getDefaultChatFolderName()
-        verify(fileSystemRepository).createFolder(folderName)
+        verify(createFolderNodeUseCase).invoke(folderName)
     }
 
     @Test
     fun `test that exception is thrown when create folder fails`() = runTest {
         stubFolderCreation()
-        whenever(fileSystemRepository.createFolder(any())).thenReturn(null)
+        whenever(createFolderNodeUseCase(any(), anyOrNull())).thenThrow(IllegalArgumentException())
         assertThrows<Exception> {
             underTest()
         }
@@ -91,6 +97,6 @@ class GetMyChatsFilesFolderIdUseCaseTest {
         whenever(fileSystemRepository.getMyChatsFilesFolderId()).thenReturn(null)
         whenever(chatRepository.getDefaultChatFolderName()).thenReturn(folderName)
         whenever(fileSystemRepository.setMyChatFilesFolder(any())).thenReturn(handle)
-        whenever(fileSystemRepository.createFolder(any())).thenReturn(handle)
+        whenever(createFolderNodeUseCase(any(), anyOrNull())).thenReturn(NodeId(handle))
     }
 }

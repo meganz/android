@@ -8,10 +8,8 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.di.GetNodeModule
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
-import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 
 /**
@@ -35,13 +33,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideClearCacheDirectory(cameraUploadRepository: CameraUploadRepository): ClearCacheDirectory =
             ClearCacheDirectory(cameraUploadRepository::clearCacheDirectory)
-
-        /**
-         * Provide the [CreateCameraUploadFolder] implementation
-         */
-        @Provides
-        fun provideCreateCameraUploadFolder(fileSystemRepository: FileSystemRepository): CreateCameraUploadFolder =
-            CreateCameraUploadFolder(fileSystemRepository::createFolder)
     }
 
 }

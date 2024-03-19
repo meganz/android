@@ -1058,4 +1058,24 @@ internal class NodeRepositoryImpl @Inject constructor(
             Timber.e(it)
         }.getOrNull()
     }
+
+    override suspend fun createFolder(name: String, parentNodeId: NodeId?) =
+        withContext(ioDispatcher) {
+            val parentMegaNode = when (parentNodeId) {
+                null -> megaApiGateway.getRootNode()
+                else -> megaApiGateway.getMegaNodeByHandle(parentNodeId.longValue)
+            }
+
+            requireNotNull(parentMegaNode) { "Parent node not found" }
+
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("createFolder") {
+                    NodeId(it.nodeHandle)
+                }
+                megaApiGateway.createFolder(name, parentMegaNode, listener)
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
 }

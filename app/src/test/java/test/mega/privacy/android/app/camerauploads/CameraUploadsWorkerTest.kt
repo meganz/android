@@ -66,7 +66,6 @@ import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
-import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
@@ -75,6 +74,7 @@ import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
+import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableMediaUploadsSettingsUseCase
@@ -171,7 +171,7 @@ class CameraUploadsWorkerTest {
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val handleLocalIpChangeUseCase: HandleLocalIpChangeUseCase = mock()
     private val cancelAllUploadTransfersUseCase: CancelAllUploadTransfersUseCase = mock()
-    private val createCameraUploadFolder: CreateCameraUploadFolder = mock()
+    private val createFolderNodeUseCase: CreateFolderNodeUseCase = mock()
     private val setupPrimaryFolderUseCase: SetupPrimaryFolderUseCase = mock()
     private val setupSecondaryFolderUseCase: SetupSecondaryFolderUseCase = mock()
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase =
@@ -276,7 +276,7 @@ class CameraUploadsWorkerTest {
                 monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
                 handleLocalIpChangeUseCase = handleLocalIpChangeUseCase,
                 cancelAllUploadTransfersUseCase = cancelAllUploadTransfersUseCase,
-                createCameraUploadFolder = createCameraUploadFolder,
+                createFolderNodeUseCase = createFolderNodeUseCase,
                 setupPrimaryFolderUseCase = setupPrimaryFolderUseCase,
                 setupSecondaryFolderUseCase = setupSecondaryFolderUseCase,
                 establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
@@ -1147,7 +1147,7 @@ class CameraUploadsWorkerTest {
                 .thenReturn(-1L)
             whenever(getDefaultNodeHandleUseCase(context.getString(R.string.section_photo_sync)))
                 .thenReturn(-1L)
-            whenever(createCameraUploadFolder(context.getString(R.string.section_photo_sync)))
+            whenever(createFolderNodeUseCase(context.getString(R.string.section_photo_sync)))
                 .thenThrow(RuntimeException())
 
             val result = underTest.doWork()
@@ -1171,7 +1171,7 @@ class CameraUploadsWorkerTest {
                 .thenReturn(-1L)
             whenever(getDefaultNodeHandleUseCase(context.getString(R.string.section_secondary_media_uploads)))
                 .thenReturn(-1L)
-            whenever(createCameraUploadFolder(context.getString(R.string.section_secondary_media_uploads)))
+            whenever(createFolderNodeUseCase(context.getString(R.string.section_secondary_media_uploads)))
                 .thenThrow(RuntimeException())
 
             val result = underTest.doWork()
@@ -1194,7 +1194,7 @@ class CameraUploadsWorkerTest {
             whenever(isNodeInRubbishOrDeletedUseCase(1111L)).thenReturn(true)
             whenever(getDefaultNodeHandleUseCase(context.getString(R.string.section_photo_sync)))
                 .thenReturn(1111L)
-            whenever(createCameraUploadFolder(context.getString(R.string.section_photo_sync)))
+            whenever(createFolderNodeUseCase(context.getString(R.string.section_photo_sync)))
                 .thenThrow(RuntimeException())
 
             val result = underTest.doWork()
@@ -1219,7 +1219,7 @@ class CameraUploadsWorkerTest {
             whenever(isNodeInRubbishOrDeletedUseCase(2222L)).thenReturn(true)
             whenever(getDefaultNodeHandleUseCase(context.getString(R.string.section_secondary_media_uploads)))
                 .thenReturn(2222L)
-            whenever(createCameraUploadFolder(context.getString(R.string.section_secondary_media_uploads)))
+            whenever(createFolderNodeUseCase(context.getString(R.string.section_secondary_media_uploads)))
                 .thenThrow(RuntimeException())
 
             val result = underTest.doWork()

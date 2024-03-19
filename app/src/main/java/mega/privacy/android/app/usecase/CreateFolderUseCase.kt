@@ -16,6 +16,10 @@ import javax.inject.Inject
  *
  * @property megaApi    MegaApiAndroid instance to create folders.
  */
+@Deprecated(
+    message = "This class should be removed once [GetFolderContentUseCase] is refactored from RxJava to coroutines",
+    replaceWith = ReplaceWith("CreateFolderNodeUseCase")
+)
 class CreateFolderUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
 ) {
@@ -43,8 +47,10 @@ class CreateFolderUseCase @Inject constructor(
                         error.errorCode == API_OK && nodeHandle != null -> {
                             emitter.onSuccess(nodeHandle)
                         }
+
                         error.errorCode == API_EEXIST -> megaApi.getChildNode(parent, folderName)
                             ?.let { emitter.onSuccess(it) }
+
                         else -> emitter.onError(error.toMegaException())
                     }
                 })

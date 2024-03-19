@@ -736,4 +736,14 @@ interface NodeRepository {
      * @return local link [String]
      */
     suspend fun getLocalLink(node: TypedNode): String?
+
+    /**
+     * Create a Folder
+     *
+     * @param name the name of the folder
+     * @param parentNodeId Parent node id under which the folder should be created
+     *                   If null, the folder will be created in the root folder
+     * @return the handle of the new folder
+     */
+    suspend fun createFolder(name: String, parentNodeId: NodeId?): NodeId
 }
