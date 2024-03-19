@@ -47,7 +47,7 @@ class PromoNotificationItemViewTest {
             promoID = 1,
             title = "Title",
             description = "Description",
-            imageName = "Image name",
+            iconURL = "https://www.mega.co.nz",
             imageURL = "https://www.mega.co.nz",
             startTimeStamp = 1,
             endTimeStamp = 1,
@@ -75,7 +75,7 @@ class PromoNotificationItemViewTest {
             promoID = 1,
             title = "Title",
             description = "Description",
-            imageName = "Image name",
+            iconURL = "",
             imageURL = "https://www.mega.co.nz",
             startTimeStamp = 1,
             endTimeStamp = 1,
@@ -85,7 +85,8 @@ class PromoNotificationItemViewTest {
 
         setupRule(notification)
 
-        composeRule.onNodeWithTag(PROMO_PREVIEW_TEST_TAG, useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithTag(PROMO_PREVIEW_TEST_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
         composeRule.onNodeWithTag(PROMO_NOTIFICATION_ICON_TEST_TAG).assertDoesNotExist()
 
     }
@@ -96,7 +97,7 @@ class PromoNotificationItemViewTest {
             promoID = 1,
             title = "Title",
             description = "Description",
-            imageName = "Image name",
+            iconURL = "https://www.mega.co.nz",
             imageURL = "",
             startTimeStamp = 1,
             endTimeStamp = 1,
@@ -110,12 +111,12 @@ class PromoNotificationItemViewTest {
     }
 
     @Test
-    fun `test that promo notification icon is not displayed when imageURL is not empty`() {
+    fun `test that promo notification icon is NOT displayed when imageURL is not empty`() {
         val notification = PromoNotification(
             promoID = 1,
             title = "Title",
             description = "Description",
-            imageName = "Image name",
+            iconURL = "https://www.mega.co.nz",
             imageURL = "https://www.mega.co.nz",
             startTimeStamp = 1,
             endTimeStamp = 1,
@@ -127,6 +128,8 @@ class PromoNotificationItemViewTest {
         composeRule.onNodeWithTag(PROMO_NOTIFICATION_ICON_TEST_TAG).assertDoesNotExist()
         composeRule.onNodeWithTag(PROMO_NOTIFICATION_DATE_WITH_NO_PREVIEW_TEST_TAG)
             .assertDoesNotExist()
+        composeRule.onNodeWithTag(PROMO_PREVIEW_TEST_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
         composeRule.onNodeWithTag(
             PROMO_NOTIFICATION_DATE_WITH_PREVIEW_TEST_TAG,
             useUnmergedTree = true
@@ -140,7 +143,33 @@ class PromoNotificationItemViewTest {
             promoID = 1,
             title = "Title",
             description = "Description",
-            imageName = "Image name",
+            iconURL = "https://www.mega.co.nz",
+            imageURL = "",
+            startTimeStamp = 1,
+            endTimeStamp = 1,
+            actionName = "Action name",
+            actionURL = "https://www.mega.co.nz"
+        )
+
+        setupRule(notification)
+        composeRule.onNodeWithTag(PROMO_NOTIFICATION_ICON_TEST_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(PROMO_NOTIFICATION_DATE_WITH_PREVIEW_TEST_TAG)
+            .assertDoesNotExist()
+        composeRule.onNodeWithTag(
+            PROMO_NOTIFICATION_DATE_WITH_NO_PREVIEW_TEST_TAG,
+            useUnmergedTree = true
+        )
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that promo notification icon is not displayed when iconURL and imageURL are empty`() {
+        val notification = PromoNotification(
+            promoID = 1,
+            title = "Title",
+            description = "Description",
+            iconURL = "",
             imageURL = "",
             startTimeStamp = 1,
             endTimeStamp = 1,
@@ -157,6 +186,7 @@ class PromoNotificationItemViewTest {
             useUnmergedTree = true
         )
             .assertIsDisplayed()
+        composeRule.onNodeWithTag(PROMO_PREVIEW_TEST_TAG).assertDoesNotExist()
     }
 
     @Test
@@ -165,7 +195,7 @@ class PromoNotificationItemViewTest {
             promoID = 1,
             title = "Title",
             description = "Description",
-            imageName = "Image name",
+            iconURL = "https://www.mega.co.nz",
             imageURL = "https://www.mega.co.nz",
             startTimeStamp = 1,
             endTimeStamp = 1,
@@ -184,7 +214,7 @@ class PromoNotificationItemViewTest {
             promoID = 1,
             title = "Title",
             description = "",
-            imageName = "Image name",
+            iconURL = "https://www.mega.co.nz",
             imageURL = "https://www.mega.co.nz",
             startTimeStamp = 1,
             endTimeStamp = 1,

@@ -99,11 +99,11 @@ class GetNotificationCountUseCaseTest {
     }
 
     companion object {
-        val promoNotification = PromoNotification(
+        private val promoNotification = PromoNotification(
             promoID = 1,
             title = "Title",
             description = "Description",
-            imageName = "Image name",
+            iconURL = "https://www.mega.co.nz",
             imageURL = "https://www.mega.co.nz",
             startTimeStamp = 1,
             endTimeStamp = 1,
