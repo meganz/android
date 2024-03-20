@@ -1,6 +1,8 @@
 package mega.privacy.android.core.ui.controls.chat
 
 import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -19,6 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -46,7 +51,9 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import mega.privacy.android.core.R
+import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.controls.tooltips.Tooltip
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -126,6 +133,7 @@ fun VoiceClipRecorderView(
         VoiceClipRecorderState()
     ),
     onVoiceClipEvent: (VoiceClipRecordEvent) -> Unit = {},
+    onNavigateToAppSettings: () -> Unit = {},
 ) {
     val show = voiceClipRecorderState.value.show
     val density = LocalDensity.current
@@ -145,6 +153,24 @@ fun VoiceClipRecorderView(
     var actualViewWidth by remember(show) { mutableIntStateOf(screenWidth) }
     val audioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
     val showTapAndHoldTooltip = remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val snackbarHostState = LocalSnackBarHostState.current
+    val recordAudioPermissionsLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (!isGranted) {
+            coroutineScope.launch {
+                val result = snackbarHostState?.showSnackbar(
+                    context.getString(R.string.chat_microphone_permissions_denied_for_voice_clip),
+                    context.getString(R.string.general_allow),
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    onNavigateToAppSettings()
+                }
+            }
+        }
+    }
 
     Tooltip(
         expanded = showTapAndHoldTooltip,
@@ -162,7 +188,7 @@ fun VoiceClipRecorderView(
                     timerRunning = true
                     sendEvent(VoiceClipRecordEvent.Start, onVoiceClipEvent, voiceClipRecorderState)
                 } else {
-                    audioPermissionState.launchPermissionRequest()
+                    recordAudioPermissionsLauncher.launch(Manifest.permission.RECORD_AUDIO)
                     voiceClipRecorderState.value = VoiceClipRecorderState(show = false)
                     return
                 }

@@ -13,6 +13,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -22,6 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.UserTypingView
 import mega.privacy.android.core.ui.controls.chat.ChatInputTextToolbar
@@ -131,6 +133,7 @@ fun ChatBottomBarContent(
     onVoiceClipEvent: (VoiceClipRecordEvent) -> Unit = {},
     focusRequester: FocusRequester = remember { FocusRequester() },
 ) {
+    val context = LocalContext.current
     Column {
         UserTypingView(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -156,6 +159,7 @@ fun ChatBottomBarContent(
             editMessageContent = uiState.editingMessageContent,
             onCloseEditing = onCloseEditing,
             onVoiceClipEvent = onVoiceClipEvent,
+            onNavigateToAppSettings = { context.navigateToAppSettings() },
             focusRequester = focusRequester,
         )
     }

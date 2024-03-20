@@ -85,6 +85,7 @@ fun ChatInputTextToolbar(
     editMessageContent: String? = null,
     onCloseEditing: () -> Unit = {},
     onVoiceClipEvent: (VoiceClipRecordEvent) -> Unit = {},
+    onNavigateToAppSettings: () -> Unit = {},
     focusRequester: FocusRequester = remember { FocusRequester() },
 ) {
     var isInputExpanded by rememberSaveable { mutableStateOf(false) }
@@ -130,6 +131,7 @@ fun ChatInputTextToolbar(
         VoiceClipRecorderView(
             voiceClipRecorderState = voiceClipRecorderState,
             onVoiceClipEvent = onVoiceClipEvent,
+            onNavigateToAppSettings = onNavigateToAppSettings,
         )
         Column {
             Row {

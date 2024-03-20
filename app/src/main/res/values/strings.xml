@@ -5360,4 +5360,6 @@
     <string name="settings_camera_uploads_video_quality_dialog_option_high">High</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos are automatically uploaded by Camera Uploads without any Video Compression -->
     <string name="settings_camera_uploads_video_quality_dialog_option_original">Original</string>
+    <!-- Warning shown when the recording of audio permission is required for sending a voice clip and it has been denied by the user -->
+    <string name="chat_microphone_permissions_denied_for_voice_clip">You denied MEGA access to your microphone. If you’d like to record a voice clip, allow MEGA permission to do so.</string>
 </resources>
