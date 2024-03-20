@@ -14,6 +14,13 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
  */
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
+    /**
+     * Enables new document section flag
+     */
+    NewDocumentSection(
+        "Enable new document section flag",
+        false
+    ),
 
     /**
      * Enables the Hidden Nodes feature

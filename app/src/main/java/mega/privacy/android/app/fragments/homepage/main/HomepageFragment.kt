@@ -10,7 +10,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.view.Window
 import androidx.appcompat.app.AlertDialog
@@ -141,29 +140,6 @@ class HomepageFragment : Fragment() {
     }
 
     var isFabExpanded = false
-
-    /** The click listener for clicking on the file category buttons.
-     *  Clicking to navigate to corresponding fragments */
-    private val categoryClickListener = OnClickListener {
-        with(viewDataBinding.category) {
-            val direction = when (it) {
-                categoryFavourites -> HomepageFragmentDirections.actionHomepageFragmentToFavourites()
-                categoryDocument -> {
-                    Analytics.tracker.trackEvent(HomeScreenDocsTilePressedEvent)
-                    HomepageFragmentDirections.actionHomepageFragmentToDocumentsFragment()
-                }
-
-                else -> return@with
-            }
-
-            findNavController().run {
-                // Determine current destination whether is HomePageFragment
-                if (currentDestination?.id == R.id.homepageFragment) {
-                    navigate(direction)
-                }
-            }
-        }
-    }
 
     private val pageChangeCallback by lazy {
         object : ViewPager2.OnPageChangeCallback() {
@@ -504,14 +480,45 @@ class HomepageFragment : Fragment() {
      * Set the click listeners for file categories buttons
      */
     private fun setupCategories() {
-        viewDataBinding.category.categoryFavourites.setOnClickListener(categoryClickListener)
-        viewDataBinding.category.categoryDocument.setOnClickListener(categoryClickListener)
+        viewDataBinding.category.categoryFavourites.setOnClickListener {
+            clickFavouritesSectionTile()
+        }
+        viewDataBinding.category.categoryDocument.setOnClickListener {
+            viewLifecycleOwner.lifecycleScope.launch {
+                clickDocumentSectionTileAndAnalysis()
+            }
+        }
         viewDataBinding.category.categoryAudio.setOnClickListener {
             clickAudioSectionTileAndAnalysis()
         }
         viewDataBinding.category.categoryVideo.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
                 clickVideoSectionTileAndAnalysis()
+            }
+        }
+    }
+
+    private fun clickFavouritesSectionTile() {
+        findNavController().run {
+            if (currentDestination?.id == R.id.homepageFragment) {
+                navigate(HomepageFragmentDirections.actionHomepageFragmentToFavourites())
+            }
+        }
+    }
+
+    private suspend fun clickDocumentSectionTileAndAnalysis() {
+        Analytics.tracker.trackEvent(HomeScreenDocsTilePressedEvent)
+        findNavController().run {
+            if (currentDestination?.id == R.id.homepageFragment) {
+                val destination =
+                    if (getFeatureFlagValueUseCase(AppFeatures.NewDocumentSection)) {
+                        HomepageFragmentDirections.actionHomepageFragmentToDocumentSectionFragment()
+                    } else {
+                        HomepageFragmentDirections.actionHomepageFragmentToDocumentsFragment()
+                    }
+                currentDestination?.getAction(destination.actionId)?.let {
+                    navigate(destination.actionId)
+                }
             }
         }
     }
