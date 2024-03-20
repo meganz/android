@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -31,6 +32,7 @@ import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterInfoUiState
@@ -83,7 +85,11 @@ private fun DeviceCenterInfoScreenContent(
     Column(
         modifier = modifier.fillMaxSize()
     ) {
-        IconAndTitleRow(icon = uiState.icon, name = uiState.name)
+        IconAndTitleRow(
+            icon = uiState.icon,
+            applySecondaryColorIconTint = uiState.applySecondaryColorIconTint,
+            name = uiState.name
+        )
         if (uiState.creationTime > 0) {
             InfoRow(
                 title = "Added", info = formatModifiedDate(
@@ -133,6 +139,7 @@ private fun DeviceCenterInfoScreenContent(
 @Composable
 private fun IconAndTitleRow(
     @DrawableRes icon: Int,
+    applySecondaryColorIconTint: Boolean,
     name: String,
     modifier: Modifier = Modifier,
 ) {
@@ -151,6 +158,13 @@ private fun IconAndTitleRow(
                 .testTag(DEVICE_CENTER_INFO_VIEW_ICON_TAG),
             painter = painterResource(id = icon),
             contentDescription = "Item icon",
+            colorFilter = if (applySecondaryColorIconTint) {
+                // Temporary fix in order to fix icon color until we change to the new icon set.
+                // Will be removed soon
+                ColorFilter.tint(MaterialTheme.colors.textColorSecondary)
+            } else {
+                null
+            }
         )
 
         MegaText(
@@ -193,6 +207,7 @@ private fun DeviceCenterInfoScreenDevicePreview() {
         DeviceCenterInfoScreen(
             uiState = DeviceCenterInfoUiState(
                 icon = R.drawable.ic_device_pc,
+                applySecondaryColorIconTint = true,
                 name = "Device name",
                 numberOfFiles = 6,
                 numberOfFolders = 5,
