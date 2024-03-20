@@ -46,7 +46,13 @@ internal class DeviceCenterInfoViewModel @Inject constructor(
     private fun loadInfo() {
         selectedItem?.let { item ->
             with(item) {
-                _state.update { it.copy(name = name, icon = icon.iconRes) }
+                _state.update {
+                    it.copy(
+                        name = name,
+                        icon = icon.iconRes,
+                        applySecondaryColorIconTint = item is DeviceUINode
+                    )
+                }
 
                 when (item) {
                     is DeviceUINode -> {
