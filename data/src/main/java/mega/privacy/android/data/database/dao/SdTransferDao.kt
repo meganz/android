@@ -12,6 +12,9 @@ internal interface SdTransferDao {
     @Query("SELECT * FROM ${MegaDatabaseConstant.TABLE_SD_TRANSFERS}")
     fun getAllSdTransfers(): Flow<List<SdTransferEntity>>
 
+    @Query("SELECT * FROM ${MegaDatabaseConstant.TABLE_SD_TRANSFERS} WHERE sdtransfertag = :tag")
+    suspend fun getSdTransferByTag(tag: Int): SdTransferEntity?
+
     @Insert
     suspend fun insertSdTransfer(entity: SdTransferEntity)
 

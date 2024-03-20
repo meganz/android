@@ -56,6 +56,11 @@ fun AppDataOwner.pendingMessageId() =
 fun AppDataOwner.getSDCardTransferPath() = getSDCardDownloadAppData()?.targetPath
 
 /**
+ * Get the sdcard transfer target uri, if the transfer is a sdcard transfer
+ */
+fun AppDataOwner.getSDCardTransferUri() = getSDCardDownloadAppData()?.targetUri
+
+/**
  * @return TransferAppData.SdCardDownload associated to this transfer if it's a SdCard download transfer, null otherwise.
  */
 fun AppDataOwner.getSDCardDownloadAppData(): TransferAppData.SdCardDownload? =

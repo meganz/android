@@ -633,4 +633,17 @@ internal class MegaLocalRoomFacadeTest {
                 awaitComplete()
             }
         }
+
+    @Test
+    fun `test that getSdTransferByTag returns mapped transfer from dao`() = runTest {
+        val tag = 1
+        val sdTransferEntity = mock<SdTransferEntity>()
+        whenever(sdTransferDao.getSdTransferByTag(tag)) doReturn sdTransferEntity
+        val expected = mock<SdTransfer>()
+        whenever(sdTransferModelMapper(sdTransferEntity)) doReturn expected
+
+        val actual = underTest.getSdTransferByTag(tag)
+
+        assertThat(actual).isEqualTo(expected)
+    }
 }

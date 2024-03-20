@@ -649,6 +649,10 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun getAllSdTransfers(): List<SdTransfer> =
         megaLocalRoomGateway.getAllSdTransfers()
 
+    override suspend fun getSdTransferByTag(tag: Int): SdTransfer? = withContext(ioDispatcher) {
+        megaLocalRoomGateway.getSdTransferByTag(tag)
+    }
+
     override suspend fun deleteSdTransferByTag(tag: Int) {
         megaLocalRoomGateway.deleteSdTransferByTag(tag)
     }

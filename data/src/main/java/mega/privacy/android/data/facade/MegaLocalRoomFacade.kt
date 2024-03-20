@@ -210,6 +210,11 @@ internal class MegaLocalRoomFacade @Inject constructor(
         return entities.map { sdTransferModelMapper(it) }
     }
 
+    override suspend fun getSdTransferByTag(tag: Int): SdTransfer? =
+        sdTransferDao.getSdTransferByTag(tag)?.let {
+            sdTransferModelMapper(it)
+        }
+
     override suspend fun insertSdTransfer(transfer: SdTransfer) =
         sdTransferDao.insertSdTransfer(sdTransferEntityMapper(transfer))
 

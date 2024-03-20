@@ -463,6 +463,13 @@ interface TransferRepository {
     suspend fun getAllSdTransfers(): List<SdTransfer>
 
     /**
+     * Get sd transfers by tag
+     *
+     * @return the sd transfer with this tag or null if not found
+     */
+    suspend fun getSdTransferByTag(tag: Int): SdTransfer?
+
+    /**
      * Insert sd transfer
      *
      * @param transfer sd Transfer
