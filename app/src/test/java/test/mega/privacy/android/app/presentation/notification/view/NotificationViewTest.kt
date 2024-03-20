@@ -43,7 +43,7 @@ class NotificationViewTest {
         promoID = 1,
         title = "Title",
         description = "Description",
-        iconURL = "https://www.mega.co.nz",
+        imageName = "Image name",
         imageURL = "https://www.mega.co.nz",
         startTimeStamp = 1,
         endTimeStamp = 1,
