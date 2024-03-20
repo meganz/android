@@ -21,11 +21,6 @@ internal class RetryMessageAction : MessageAction(
 
     override val appliesToSendError = true
 
-    override fun toolbarItem(
-        messages: Set<TypedMessage>,
-        onClick: () -> Unit,
-    ): MenuActionWithClick? = null
-
     @Composable
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
         val sendErrorViewModel: SendErrorViewModel = viewModel()

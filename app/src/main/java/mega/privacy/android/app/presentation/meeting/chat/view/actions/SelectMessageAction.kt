@@ -24,7 +24,6 @@ internal class SelectMessageAction(
     override fun shouldDisplayFor(messages: Set<TypedMessage>) = messages.size == 1
             && messages.first() !is ManagementMessage
             && messages.first() !is InvalidMetaMessage
-            && messages.first() !is PendingAttachmentMessage
             && messages.first() !is InvalidMessage
 
     override fun toolbarItem(

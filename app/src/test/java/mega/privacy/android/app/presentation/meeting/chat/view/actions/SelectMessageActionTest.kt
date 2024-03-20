@@ -102,8 +102,8 @@ class SelectMessageActionTest {
     }
 
     @Test
-    fun `test that action does not apply to pending messages`() {
-        assertThat(underTest.appliesTo(setOf(mock<PendingFileAttachmentMessage>()))).isFalse()
+    fun `test that action applies to pending messages`() {
+        assertThat(underTest.appliesTo(setOf(mock<PendingFileAttachmentMessage>()))).isTrue()
     }
 
     @Test
