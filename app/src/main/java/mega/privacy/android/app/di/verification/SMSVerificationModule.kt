@@ -11,12 +11,10 @@ import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerifi
 import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerificationTextErrorMapperImpl
 import mega.privacy.android.domain.repository.VerificationRepository
 import mega.privacy.android.domain.usecase.GetCountryCallingCodes
-import mega.privacy.android.domain.usecase.GetCurrentCountryCode
 import mega.privacy.android.domain.usecase.IsSMSVerificationShown
 import mega.privacy.android.domain.usecase.SetSMSVerificationShown
 import mega.privacy.android.domain.usecase.verification.DefaultMonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.DefaultMonitorVerifiedPhoneNumber
-import mega.privacy.android.domain.usecase.verification.FormatPhoneNumber
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.MonitorVerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumber
@@ -30,12 +28,21 @@ import mega.privacy.android.domain.usecase.verification.VerifyPhoneNumber
 @InstallIn(SingletonComponent::class)
 abstract class SMSVerificationModule {
 
+    /**
+     * bind [DefaultMonitorVerifiedPhoneNumber]
+     */
     @Binds
     abstract fun bindMonitorVerifiedPhoneNumber(implementation: DefaultMonitorVerifiedPhoneNumber): MonitorVerifiedPhoneNumber
 
+    /**
+     * bind [SmsVerificationTextErrorMapperImpl]
+     */
     @Binds
     abstract fun bindSmsVerificationTextErrorMapper(implementation: SmsVerificationTextErrorMapperImpl): SmsVerificationTextErrorMapper
 
+    /**
+     * bind [DefaultMonitorVerificationStatus]
+     */
     @Binds
     abstract fun bindMonitorVerificationStatus(implementation: DefaultMonitorVerificationStatus): MonitorVerificationStatus
 
@@ -82,22 +89,10 @@ abstract class SMSVerificationModule {
             ResetSMSVerifiedPhoneNumber(repository::resetSMSVerifiedPhoneNumber)
 
         /**
-         * Provides the Use Case [GetCurrentCountryCode]
+         * Provides the use case [VerifyPhoneNumber]
          */
-        @Provides
-        fun provideGetCurrentCountryCode(repository: VerificationRepository): GetCurrentCountryCode =
-            GetCurrentCountryCode(repository::getCurrentCountryCode)
-
         @Provides
         fun provideVerifyPhoneNumber(repository: VerificationRepository): VerifyPhoneNumber =
             VerifyPhoneNumber(repository::verifyPhoneNumber)
-
-        /**
-         * Provides the Use Case [FormatPhoneNumber]
-         */
-        @Provides
-        fun provideFormatPhoneNumber(repository: VerificationRepository): FormatPhoneNumber =
-            FormatPhoneNumber(repository::formatPhoneNumber)
-
     }
 }

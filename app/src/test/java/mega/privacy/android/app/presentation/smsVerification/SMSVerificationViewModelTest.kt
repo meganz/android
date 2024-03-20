@@ -13,10 +13,10 @@ import mega.privacy.android.app.presentation.verification.model.mapper.SMSVerifi
 import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerificationTextErrorMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.GetCountryCallingCodes
-import mega.privacy.android.domain.usecase.GetCurrentCountryCode
+import mega.privacy.android.domain.usecase.GetCurrentCountryCodeUseCase
 import mega.privacy.android.domain.usecase.SetSMSVerificationShown
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
-import mega.privacy.android.domain.usecase.verification.FormatPhoneNumber
+import mega.privacy.android.domain.usecase.verification.GetFormattedPhoneNumberUseCase
 import mega.privacy.android.domain.usecase.verification.SendSMSVerificationCode
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -42,9 +42,9 @@ class SMSVerificationViewModelTest {
     private val sendSMSVerificationCode: SendSMSVerificationCode = mock()
     private val smsVerificationTextMapper: SMSVerificationTextMapper = mock()
     private val smsVerificationTextErrorMapper: SmsVerificationTextErrorMapper = mock()
-    private val getCurrentCountryCode: GetCurrentCountryCode = mock()
+    private val getCurrentCountryCodeUseCase: GetCurrentCountryCodeUseCase = mock()
     private val savedState: SavedStateHandle = mock()
-    private val formatPhoneNumber: FormatPhoneNumber = mock()
+    private val getFormattedPhoneNumberUseCase: GetFormattedPhoneNumberUseCase = mock()
     private val logoutUseCase: LogoutUseCase = mock()
 
     private val countryCallingCodes = listOf("BD:880,", "AU:61,", "NZ:64,", "IN:91,")
@@ -59,7 +59,7 @@ class SMSVerificationViewModelTest {
 
     private fun initViewModel() {
         runBlocking {
-            whenever(getCurrentCountryCode()).thenReturn(countryCode)
+            whenever(getCurrentCountryCodeUseCase()).thenReturn(countryCode)
             whenever(smsVerificationTextMapper(any())).thenReturn(getInitialState())
             whenever(savedState.get<String>(COUNTRY_CODE)).thenReturn(countryCode)
             whenever(savedState.get<String>(COUNTRY_NAME)).thenReturn(countryName)
@@ -70,8 +70,8 @@ class SMSVerificationViewModelTest {
             setSMSVerificationShown = setSMSVerificationShown,
             getCountryCallingCodes = getCountryCallingCodes,
             sendSMSVerificationCode = sendSMSVerificationCode,
-            getCurrentCountryCode = getCurrentCountryCode,
-            formatPhoneNumber = formatPhoneNumber,
+            getCurrentCountryCodeUseCase = getCurrentCountryCodeUseCase,
+            getFormattedPhoneNumberUseCase = getFormattedPhoneNumberUseCase,
             savedState = savedState,
             smsVerificationTextMapper = smsVerificationTextMapper,
             smsVerificationTextErrorMapper = smsVerificationTextErrorMapper,
@@ -137,7 +137,7 @@ class SMSVerificationViewModelTest {
                 isNextEnabled = true,
                 phoneNumber = phoneNumber
             )
-        whenever(formatPhoneNumber(any(), any())).thenReturn(phoneNumber)
+        whenever(getFormattedPhoneNumberUseCase(any(), any())).thenReturn(phoneNumber)
         whenever(sendSMSVerificationCode(phoneNumber)).thenReturn(Unit)
         underTest.setPhoneNumber(phoneNumber)
         underTest.validatePhoneNumber()

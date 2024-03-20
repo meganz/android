@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.environment
+package mega.privacy.android.domain.usecase
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
@@ -7,28 +7,30 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.NullSource
 import org.junit.jupiter.params.provider.ValueSource
-import org.mockito.kotlin.mock
+import org.mockito.Mockito.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class IsConnectivityInRoamingStateUseCaseTest {
+class GetCurrentCountryCodeUseCaseTest {
 
-    private lateinit var underTest: IsConnectivityInRoamingStateUseCase
+    private lateinit var underTest: GetCurrentCountryCodeUseCase
 
     private val verificationRepository: VerificationRepository = mock()
 
     @BeforeEach
     fun setup() {
-        underTest = IsConnectivityInRoamingStateUseCase(verificationRepository)
+        underTest = GetCurrentCountryCodeUseCase(verificationRepository)
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that the use case returns the same roaming value as the repository`(expected: Boolean) =
+    @ValueSource(strings = ["62"])
+    @NullSource
+    fun `test that the use case returns the same country code value as the repository`(expected: String?) =
         runTest {
-            whenever(verificationRepository.isRoaming()).thenReturn(expected)
+            whenever(verificationRepository.getCurrentCountryCode()).thenReturn(expected)
 
             val actual = underTest()
 

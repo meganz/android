@@ -16,10 +16,10 @@ import mega.privacy.android.app.presentation.verification.model.SMSVerificationU
 import mega.privacy.android.app.presentation.verification.model.mapper.SMSVerificationTextMapper
 import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerificationTextErrorMapper
 import mega.privacy.android.domain.usecase.GetCountryCallingCodes
-import mega.privacy.android.domain.usecase.GetCurrentCountryCode
+import mega.privacy.android.domain.usecase.GetCurrentCountryCodeUseCase
 import mega.privacy.android.domain.usecase.SetSMSVerificationShown
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
-import mega.privacy.android.domain.usecase.verification.FormatPhoneNumber
+import mega.privacy.android.domain.usecase.verification.GetFormattedPhoneNumberUseCase
 import mega.privacy.android.domain.usecase.verification.SendSMSVerificationCode
 import timber.log.Timber
 import java.util.Locale
@@ -33,8 +33,8 @@ class SMSVerificationViewModel @Inject constructor(
     private val setSMSVerificationShown: SetSMSVerificationShown,
     private val getCountryCallingCodes: GetCountryCallingCodes,
     private val sendSMSVerificationCode: SendSMSVerificationCode,
-    private val getCurrentCountryCode: GetCurrentCountryCode,
-    private val formatPhoneNumber: FormatPhoneNumber,
+    private val getCurrentCountryCodeUseCase: GetCurrentCountryCodeUseCase,
+    private val getFormattedPhoneNumberUseCase: GetFormattedPhoneNumberUseCase,
     private val savedState: SavedStateHandle,
     private val smsVerificationTextMapper: SMSVerificationTextMapper,
     private val smsVerificationTextErrorMapper: SmsVerificationTextErrorMapper,
@@ -64,7 +64,7 @@ class SMSVerificationViewModel @Inject constructor(
 
     private suspend fun updateInferredCode() {
         runCatching {
-            val inferredCountryCode = getCurrentCountryCode()
+            val inferredCountryCode = getCurrentCountryCodeUseCase()
             inferredCountryCode?.let {
                 _uiState.value = _uiState.value.copy(
                     inferredCountryCode = inferredCountryCode,
@@ -256,7 +256,7 @@ class SMSVerificationViewModel @Inject constructor(
     private suspend fun getFormattedPhoneNumber() = with(_uiState.value) {
         Timber.d("Selected Country Code $selectedCountryCode")
         runCatching {
-            formatPhoneNumber(
+            getFormattedPhoneNumberUseCase(
                 phoneNumber,
                 selectedCountryCode
             )

@@ -886,7 +886,7 @@ public class Util {
      *
      * @param megaApi
      * @return true if exist ongoing transfers, false otherwise
-     * @deprecated In favour of {@link mega.privacy.android.domain.usecase.transfer.OngoingTransfersExistUseCase} use case.
+     * @deprecated In favour of {@link mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase} use case.
      */
     @Deprecated
     public static boolean existOngoingTransfers(MegaApiAndroid megaApi) {
@@ -1078,6 +1078,15 @@ public class Util {
         return PhoneNumberUtils.formatNumberToE164(phoneNumber, countryCode);
     }
 
+    /**
+     * Get normalized phone number by network
+     *
+     * @param context
+     * @param phoneNumber
+     * @return String. Normalized phone number
+     * @deprecated <p> Use {@link mega.privacy.android.domain.usecase.contact.GetNormalizedPhoneNumberByNetworkUseCase} instead.
+     */
+    @Deprecated
     public static String normalizePhoneNumberByNetwork(Context context, String phoneNumber) {
         String countryCode = getCountryCodeByNetwork(context);
         if (countryCode == null) {
