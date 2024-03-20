@@ -18,6 +18,7 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
 import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
+import mega.privacy.android.app.presentation.search.mapper.TypeFilterToSearchMapper
 import mega.privacy.android.app.presentation.search.model.SearchActivityState
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.model.TypeFilterOption
@@ -46,6 +47,7 @@ import javax.inject.Inject
  * @property searchNodesUseCase [SearchNodesUseCase]
  * @property getSearchCategoriesUseCase [GetSearchCategoriesUseCase]
  * @property searchFilterMapper [SearchFilterMapper]
+ * @property typeFilterToSearchMapper [TypeFilterToSearchMapper]
  * @property emptySearchViewMapper [EmptySearchViewMapper]
  * @property cancelCancelTokenUseCase [CancelCancelTokenUseCase]
  * @property setViewType [SetViewType]
@@ -60,6 +62,7 @@ class SearchActivityViewModel @Inject constructor(
     private val searchNodesUseCase: SearchNodesUseCase,
     private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase,
     private val searchFilterMapper: SearchFilterMapper,
+    private val typeFilterToSearchMapper: TypeFilterToSearchMapper,
     private val emptySearchViewMapper: EmptySearchViewMapper,
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
     private val setViewType: SetViewType,
@@ -111,7 +114,7 @@ class SearchActivityViewModel @Inject constructor(
     }
 
     private fun initializeSearch() {
-        _state.update { it.copy(nodeSourceType = nodeSourceType) }
+        _state.update { it.copy(nodeSourceType = nodeSourceType, typeSelectedFilterOption = null) }
         runCatching {
             getSearchCategoriesUseCase().map { searchFilterMapper(it) }
                 .filterNot { it.filter == SearchCategory.ALL }
@@ -143,13 +146,23 @@ class SearchActivityViewModel @Inject constructor(
         searchJob = viewModelScope.launch {
             runCatching {
                 cancelCancelTokenUseCase()
-                searchNodesUseCase(
-                    query = state.value.searchQuery,
-                    parentHandle = parentHandle,
-                    nodeSourceType = nodeSourceType,
-                    isFirstLevel = isFirstLevel,
-                    searchCategory = state.value.selectedFilter?.filter ?: SearchCategory.ALL
-                )
+                if (state.value.dropdownChipsEnabled) {
+                    searchNodesUseCase(
+                        query = state.value.searchQuery,
+                        parentHandle = parentHandle,
+                        nodeSourceType = nodeSourceType,
+                        isFirstLevel = isFirstLevel,
+                        searchCategory = typeFilterToSearchMapper(state.value.typeSelectedFilterOption)
+                    )
+                } else {
+                    searchNodesUseCase(
+                        query = state.value.searchQuery,
+                        parentHandle = parentHandle,
+                        nodeSourceType = nodeSourceType,
+                        isFirstLevel = isFirstLevel,
+                        searchCategory = state.value.selectedFilter?.filter ?: SearchCategory.ALL
+                    )
+                }
             }.onSuccess {
                 onSearchSuccess(it)
             }.onFailure { ex ->
@@ -195,11 +208,20 @@ class SearchActivityViewModel @Inject constructor(
         }
     }
 
-    private fun getEmptySearchState() = emptySearchViewMapper(
-        isSearchChipEnabled = true,
-        category = state.value.selectedFilter?.filter,
-        searchQuery = state.value.searchQuery
-    )
+    private fun getEmptySearchState() =
+        if (state.value.dropdownChipsEnabled) {
+            emptySearchViewMapper(
+                isSearchChipEnabled = true,
+                category = typeFilterToSearchMapper(state.value.typeSelectedFilterOption),
+                searchQuery = state.value.searchQuery
+            )
+        } else {
+            emptySearchViewMapper(
+                isSearchChipEnabled = true,
+                category = state.value.selectedFilter?.filter,
+                searchQuery = state.value.searchQuery
+            )
+        }
 
     /**
      * Update search filter on selection
@@ -314,7 +336,7 @@ class SearchActivityViewModel @Inject constructor(
                 typeSelectedFilterOption = typeFilterOption,
             )
         }
-        // TODO search with filter
+        viewModelScope.launch { performSearch() }
     }
 
     /**

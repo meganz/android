@@ -13,6 +13,7 @@ import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.search.SearchActivityViewModel
 import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
 import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
+import mega.privacy.android.app.presentation.search.mapper.TypeFilterToSearchMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
@@ -59,6 +60,7 @@ class SearchActivityViewModelTest {
     private val searchNodesUseCase: SearchNodesUseCase = mock()
     private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase = mock()
     private val searchFilterMapper: SearchFilterMapper = mock()
+    private val typeFilterToSearchMapper: TypeFilterToSearchMapper= mock()
     private val emptySearchViewMapper: EmptySearchViewMapper = mock()
     private val stateHandle: SavedStateHandle = mock()
     private val setViewType: SetViewType = mock()
@@ -96,6 +98,7 @@ class SearchActivityViewModelTest {
             searchNodesUseCase = searchNodesUseCase,
             getSearchCategoriesUseCase = getSearchCategoriesUseCase,
             searchFilterMapper = searchFilterMapper,
+            typeFilterToSearchMapper = typeFilterToSearchMapper,
             emptySearchViewMapper = emptySearchViewMapper,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
         )
