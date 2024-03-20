@@ -772,7 +772,7 @@
     <!-- Button to park an account -->
     <string name="park_account_button">放置</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">これは、あなたのアカウントをそのままにしておくための最後のステップです。新しいパスワードを入力してください。あなたのデータは少なくとも60&#160;日間は保持されます。そのままにしておいたアカウントのパスワードを思い出された場合は、support&#64;mega.nzまでご連絡ください。</string>
+    <string name="park_account_text_last_step">これは、あなたのアカウントをそのままにしておくための最後のステップです。新しいパスワードを入力してください。あなたのデータは少なくとも60日間は保持されます。そのままにしておいたアカウントのパスワードを思い出された場合は、support&#64;mega.nzまでご連絡ください。</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">新しいパスワードを入力</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
@@ -1810,7 +1810,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">次回アカウントにログインすると、オーセンティケータアプリで提供される6桁のコードを入力するよう求められます。</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Please save your                                                                         <b>recovery key</b>                                                                         in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
+    <string name="recommendation_2fa_enabled">アプリへのアクセスができなくなったり、二要素認証を無効にしたい場合の問題を回避するために、<b>回復キー</b>安全な場所に保存してください。</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">コードが無効です</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -4540,7 +4540,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;自動バックアップ</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Liteでは最大90日、Pro&#160;I、II、IIIでは最大180日巻き戻し</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Liteでは削除されたデータを最大90日、Pro&#160;I、II、IIIでは最大180日巻き戻し</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;ごみ箱を空にするのを7日から10年の間でスケジュールする</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5069,7 +5069,7 @@
         <item quantity="other">カメラアップロードが完了しました。%1$d個のファイルがアップロードされました。</item>
     </plurals>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
-    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]無料プランではミーティングに60&#160;分の制限があります。Proユーザー様は無制限の通話と、最大1000&#160;人の参加者まで可能です。[/A][B]ぜひ今すぐアップグレードしてください。[/B]</string>
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]無料プランではミーティングに60分の制限があります。Proユーザー様は無制限の通話と、最大1000人の参加者まで可能です。[/A][B]ぜひ今すぐアップグレードしてください。[/B]</string>
     <!-- Bottom sheet button to hide a node/file -->
     <string name="general_hide_node">隠す</string>
     <!-- Bottom sheet button to unhide a node/file -->
@@ -5079,7 +5079,7 @@
     <!-- Promo notification section title for promo notification section -->
     <string name="notifications_screen_notification_section_title">期間限定オファー</string>
     <!-- The title of the Dialog shown to Change the SFU Server Id  -->
-    <string name="meetings_change_sfu_dialog_title">Change SFU Server</string>
+    <string name="meetings_change_sfu_dialog_title">SFUサーバーの変更</string>
     <!-- The body of the Dialog shown to Change the SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_subtitle">デフォルトは-1です</string>
     <!-- The placeholder text to prompt user to enter the SFU Server Id -->
@@ -5087,7 +5087,7 @@
     <!-- Button text to change SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_action_button">変更</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
-    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">無料プランでは、1回のミーティングあたり60&#160;分の制限があります。[A]ぜひ今すぐアップグレードしてください。[/A]</string>
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">無料プランでは、1回のミーティングあたり60分の制限があります。[A]ぜひ今すぐアップグレードしてください。[/A]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_monthly_with_price">すぐに%1$sが請求され、お客様のサブスクリプションは1&#160;か月後に月額%2$sで自動的に更新されます。Google Playアカウントには、各請求期間の終了から24時間以内に更新料金が請求されます。サブスクリプションをキャンセルするには、請求期間が終了する少なくとも24&#160;時間前に、[A]Google&#160;Play[/A]のサブスクリプション経由でMEGA&#160;Proサブスクリプションの自動更新を無効にする必要があります。\nアカウントをアップグレードすると、MEGAの[B]ご利用規約[/B]および[C]プライバシーポリシー[/C]に同意されたことになります。</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
@@ -5104,4 +5104,26 @@
     <string name="account_business_account_deactivated_dialog_admin_body">お支払いに失敗されたため、お客様のビジネスアカウントが無効になりました。データの閲覧のみが可能です。\nお支払いを行ってサブスクリプションを再有効化するには、ブラウザからMEGAにログインしてください。</string>
     <!-- The button of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_button">はい、わかりました。</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to host call or meetings without any restrictions. -->
+    <string name="account_upgrade_account_description_feature_meetings">&#8226;&#160;無制限の参加者と時間制限なしで、通話やミーティングを開催できます。</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to use MEGA VPN product. -->
+    <string name="account_upgrade_account_description_feature_vpn">&#8226;&#160;当社の高速VPNでオンラインでのプライバシーを確​​保</string>
+    <!-- The body of the Dialog shown to upgrade meeting from the free version -->
+    <string name="meetings_in_call_warning_dialog_body">もっと時間がご必要です？Proプランをご利用いただくと無制限の通話をお楽しみいただけます。</string>
+    <!-- The action button text of the Dialog shown to upgrade meeting from the free version -->
+    <string name="meetings_in_call_warning_dialog_action_button">アップグレード</string>
+    <!-- The negative button text of the Dialog shown to upgrade meeting from the free version -->
+    <string name="meetings_in_call_warning_dialog_negative_button">今はやめます</string>
+    <!-- The snackbar message of the time left for the current free call -->
+    <string name="meetings_in_call_warning_timer_message">この無料通話は%s分後に終了します</string>
+    <!-- The title of the Dialog shown to upgrade meeting from the free version -->
+    <plurals name="meetings_in_call_warning_dialog_title">
+        <item quantity="other">無料通話は%d分後に終了します</item>
+    </plurals>
+    <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
+    <string name="notifications_screen_notification_promo_expiration_time">%1$s %2$sに期限切れになります</string>
+    <!-- Warning Message and upgrade link for organiser for Free Call -->
+    <string name="meetings_free_call_organiser_number_of_participants_warning">[A]As a free user, you can only add up to 100 participants to this call. Need more?[/A]&#160;[B]Upgrade now[/B]</string>
+    <!-- Warning Message for non organiser for Free Call -->
+    <string name="meetings_free_call_non_organiser_number_of_participants_warning">通話に参加できる参加者は100名のみです。追加の参加者は、チャットの送信と読み取りのみが可能になります。主催者にこの制限を解除するよう依頼してください。</string>
 </resources>

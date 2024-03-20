@@ -165,7 +165,7 @@
     <!-- when the user tries to share something to MEGA without being logged -->
     <string name="login_before_share">Conectați-vă pentru a partaja cu MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
-    <string name="reg_link_expired">Linkul tău de confirmare nu mai este valid. Este posibil ca contul tău să fie deja activat sau s-ar putea să fi anulat înregistrarea.</string>
+    <string name="reg_link_expired">Confirmarea link-ului dvs. nu mai este valabil. Este posibil ca contul dvs. să fie deja activat sau este posibil să vă fi anulat înregistrarea.</string>
     <!-- First Name of the user -->
     <string name="first_name_text">Prenume</string>
     <!-- Last name of the user -->
@@ -437,9 +437,9 @@
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Abonamentul dvs. nu a fost anulat. Oferiți un motiv pentru anulare</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
-    <string name="message_user_purchased_subscription_down_grade">Noul tău abonament se va aplica odată ce cel actual expiră, noul preț va fi perceput la acel moment.</string>
+    <string name="message_user_purchased_subscription_down_grade">Noul dvs. abonament va intra în vigoare odată ce expiră cel curent, noul preț va fi taxat în acel moment.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
-    <string name="message_user_payment_pending">Abonamentul tău se va aplica odată ce plata va fi procesată de Google.</string>
+    <string name="message_user_payment_pending">Abonamentul dvs. va intra în vigoare odată ce plata este procesată de Google.</string>
     <!--  -->
     <string name="subscription_type_monthly">Lunar</string>
     <!--  -->
@@ -511,9 +511,9 @@
     <!-- title of the notification when camera upload is initializing -->
     <string name="settings_camera_notif_initializing_title">Se inițializează Încărcări cameră</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
-    <string name="camera_notif_primary_local_unavailable">Încărcările cameră au fost dezactivate. Folderul tău local este indisponibil.</string>
+    <string name="camera_notif_primary_local_unavailable">Încărcări camere au fost dezactivate. Folderul dvs. local nu este disponibil.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
-    <string name="camera_notif_secondary_local_unavailable">Încărcările media au fost dezactivate. Folderul tău local este indisponibil.</string>
+    <string name="camera_notif_secondary_local_unavailable">Încărcările media au fost dezactivate. Folderul dvs. local nu este disponibil.</string>
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">Înfățișare</string>
     <!-- settings of the Features section -->
@@ -553,7 +553,7 @@
     <!-- Hint text of the region edittext for choosing dial code. -->
     <string name="sms_region_label">Regiune</string>
     <!-- place holder for enter mobile number field -->
-    <string name="verify_account_phone_number_placeholder">Numărul tău de telefon</string>
+    <string name="verify_account_phone_number_placeholder">Numărul dvs. de telefon</string>
     <!-- Button label - go to previous page -->
     <string name="general_back_button">Înapoi</string>
     <!-- button label - quite sms verification use case -->
@@ -585,7 +585,7 @@
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_error_invalid_code">Cod greșit. Vă rugăm să încercați din nou sau să retrimiteți.</string>
     <!-- verify phone number successfully -->
-    <string name="verify_account_successfully">Numărul tău de telefon a fost verificat</string>
+    <string name="verify_account_successfully">Numărul dvs. de telefon a fost confirmat</string>
     <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
     <string-array name="settings_storage_download_location_array">
         <item>Stocare internă</item>
@@ -742,7 +742,7 @@
     <!-- Summary of the preference Recovery key on Settings section -->
     <string name="backup_second_paragraph">Exportarea cheii de recuperare și păstrarea ei într-o locație securizată îți dă posibilitatea să setezi o parolă nouă fără pierderea datelor.</string>
     <!-- Third paragraph of the screen to backup the master key -->
-    <string name="backup_third_paragraph">Un atacator extern nu poate obține acces la contul tău doar cu cheia ta. O resetare a parolei necesită atât cheia, cât și acces la adresa ta de e-mail.</string>
+    <string name="backup_third_paragraph">Un atacator extern nu poate obține acces la contul dvs. doar cu cheia dvs. O resetare a parolei necesită atât cheia, cât și accesul la adresa dvs. de e-mail.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
     <string name="backup_action">Copiază cheia de recuperare în clipboard sau salveaz-o ca fișier text.</string>
     <!-- Action of a button to save something -->
@@ -790,7 +790,7 @@
     <!-- Button to park an account -->
     <string name="park_account_button">Parchează</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">This is the last step to park your account, please enter your new password. Your data will be retained for at least 60&#160;days. If you recall your parked account’s password, please contact support&#64;mega.nz</string>
+    <string name="park_account_text_last_step">Acesta este ultimul pas pentru a vă parca contul, vă rugăm să introduceți noua parolă. Datele dvs. vor fi păstrate timp de cel puțin 60 de zile. Dacă vă amintiți parola contului parcat, contactați support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">Introduceți o parolă nouă</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
@@ -1058,7 +1058,7 @@
     <!-- Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="manual_resume_alert">Transferuri puse pe pauză. Atinge pentru a relua.</string>
     <!-- message shown when the status of the user coudn’t be changed -->
-    <string name="changing_status_error">Eroare. Statusul tău nu a fost schimbat</string>
+    <string name="changing_status_error">Eroare. Statutul dvs. nu a fost schimbat</string>
     <!-- message shown when a chat has not been created -->
     <string name="create_chat_error">A apărut o eroare la crearea chatului</string>
     <!-- settings of the chat to choose the status -->
@@ -1163,7 +1163,7 @@
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
     <string name="general_allow">Permite</string>
     <!-- Dialog to confirm the action of enabling logs -->
-    <string name="enable_log_text_dialog">Jurnalele pot conține informații legate de contul tău</string>
+    <string name="enable_log_text_dialog">Jurnalele pot conține informații legate de contul dvs.</string>
     <!-- Dialog to confirm the reconnect action -->
     <string name="confirmation_to_reconnect">Conexiunea la rețea recuperată. Te conectezi la MEGA?</string>
     <!-- Error when a message cannot be edited -->
@@ -1874,11 +1874,11 @@
     <!-- Title of setting Two-Factor Authentication -->
     <string name="settings_2fa">Autentificare cu doi factori</string>
     <!-- Subtitle of setting Two-Factor Authentication when the preference is disabled -->
-    <string name="setting_subtitle_2fa">Autentificarea cu doi factori reprezintă un al doilea strat de securitate pentru contul tău.</string>
+    <string name="setting_subtitle_2fa">Autentificarea cu doi factori este un al doilea nivel de securitate pentru contul dvs.</string>
     <!-- Title of the screen Two-Factor Authentication -->
     <string name="title_2fa">De ce ai nevoie de autentificarea cu doi factori?</string>
     <!--  -->
-    <string name="two_factor_authentication_explain">Autentificarea cu doi factori reprezintă un al doilea strat de securitate pentru contul tău. Ceea ce înseamnă că, chiar dacă cineva îți cunoaște parola, nu îți poate accesa contul fără să aibă acces la codul din șase cifre la care doar tu ai acces.</string>
+    <string name="two_factor_authentication_explain">Autentificarea cu doi factori este un al doilea nivel de securitate pentru contul dvs. Ceea ce înseamnă că, chiar dacă cineva îți cunoaște parola, nu o poate accesa, fără a avea acces și la codul din 6 cifre la care ai acces doar tu.</string>
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
     <string name="button_setup_2fa">Începe configurarea</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
@@ -1896,7 +1896,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Data viitoare când vă conectați la contul dvs., vi se va cere să introduceți un cod de 6 cifre furnizat de aplicația dvs. de autentificare.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Please save your                                                                         <b>recovery key</b>                                                                         in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
+    <string name="recommendation_2fa_enabled">Salvează-ți <b>cheia de recuperare</b> într-o locație sigură, pentru a evita problemele în cazul în care pierdeți accesul la aplicația dvs. sau dacă doriți să dezactivați autentificarea cu doi factori.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Cod nevalid</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2120,7 +2120,7 @@
     <!-- Label shown the total space and the used space in an account -->
     <string name="used_space">[A]%1$s [/A][B]din %2$s folosiți[/B]</string>
     <!-- Text of the alert dialog when the user is changing the API URL to staging -->
-    <string name="staging_api_url_text">Sigur vrei să schimbi pe un server de test? Contul tău poate suferi probleme irecuperabile.</string>
+    <string name="staging_api_url_text">Sunteți sigur că doriți să treceți la un server de testare? Contul dvs. poate suferi probleme ireversibile.</string>
     <!-- Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
     <string name="title_confirmation_open_camera_on_chat">Deschizi camera?</string>
     <!-- Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
@@ -2238,9 +2238,9 @@
     <!-- Subtitle of the historic notification for an account deleted -->
     <string name="subtitle_account_notification_deleted">[B]Contul [/B][A]%s[/A][B] a fost șters.[/B]</string>
     <!-- Subtitle of file takedown historic notification -->
-    <string name="subtitle_file_takedown_notification">[A]Fișierul tău partajat public [/A][B]%s[/B] a fost eliminat.</string>
+    <string name="subtitle_file_takedown_notification">[A]Fișierul dvs. partajat public [/A][B]%s[/B] a fost eliminat.</string>
     <!-- Subtitle of folder takedown historic notification -->
-    <string name="subtitle_folder_takedown_notification">[A]Folderul tău partajat public [/A][B]%s[/B] a fost eliminat.</string>
+    <string name="subtitle_folder_takedown_notification">[A]Folderul dvs. partajat public [/A][B]%s[/B] a fost eliminat.</string>
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Contestă eliminarea</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
@@ -2252,9 +2252,9 @@
         <item quantity="other">%d de fișiere nu au fost descărcate deoarece au încălcat Termenii de utilizare a serviciului.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
-    <string name="subtitle_file_takedown_reinstated_notification">[A]Fișierul tău partajat public [/A][B]%s[/B] a fost restabilit.</string>
+    <string name="subtitle_file_takedown_reinstated_notification">[A]Fișierul dvs. partajat public [/A][B]%s[/B] a fost restabilit.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
-    <string name="subtitle_folder_takedown_reinstated_notification">[A]Folderul tău partajat public [/A][B]%s[/B] a fost restabilit.</string>
+    <string name="subtitle_folder_takedown_reinstated_notification">[A]Folderul dvs. partajat public [/A][B]%s[/B] a fost restabilit.</string>
     <!-- Title of the historic notification for outgoing contact requests -->
     <string name="title_outgoing_contact_request">Cerere trimisă</string>
     <!-- Title of the historic notification for incoming contact requests -->
@@ -2276,7 +2276,7 @@
     <!-- Subtitle of the historic notification for incoming contact request declined -->
     <string name="subtitle_incoming_contact_request_denied">[B]Cererea de contact de la [/B][A]%s [/A][B]a fost respinsă[/B]</string>
     <!-- Subtitle of the Upgrade account section -->
-    <string name="type_of_my_account">Contul tău actual este [A]%s[/A]</string>
+    <string name="type_of_my_account">Contul dvs. actual este [A]%s[/A]</string>
     <!-- Footnote to clarify the storage space is subject to the achievement program -->
     <string name="footnote_achievements">Obiectul participării tale în programul nostru de realizări.</string>
     <!-- Title label for the current payment method during account upgrading -->
@@ -2400,7 +2400,7 @@
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Descoperă cu ușurință contactele din agenda de adrese pe MEGA.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
-    <string name="allow_access_contact_explanation">MEGA nu va folosi aceste date în alt scop și nu va interacționa niciodată cu contactele tale fără consimțământul tău.</string>
+    <string name="allow_access_contact_explanation">MEGA nu va folosi aceste date în niciun alt scop și nu va interacționa niciodată cu contactele dvs. fără consimțământul dvs.</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">Permiteți accesul la microfon pentru a efectua apeluri criptate.</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
@@ -2706,7 +2706,7 @@
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">Transfer</string>
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
-    <string name="error_remove_business_contact">Nu poți elimina pe %1$s de la contacte, deoarece face parte din contul tău business.</string>
+    <string name="error_remove_business_contact">Nu puteți elimina %1$s ca contact, deoarece fac parte din contul dvs. Business.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">A apărut o problemă cu ultima plată. Vă rugăm să accesați MEGA folosind un browser desktop pentru mai multe informații.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
@@ -2716,7 +2716,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">În prezent, contul tău este [B]suspendat[/B]. Poți răsfoi numai prin datele tale.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">MEGA nu îți poate accesa datele. Cu toate acestea, administratorul contului tău business îți poate accesa Încărcări cameră.</string>
+    <string name="camera_uploads_business_alert">MEGA nu vă poate accesa datele. Cu toate acestea, administratorul contului dvs. Business poate accesa Încărcările camerei.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Ceva a mers prost</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -2742,7 +2742,7 @@
     <!-- Title of an alert screen indicating the user has to verify their email -->
     <string name="verify_email_label">Verifică adresa de e-mail</string>
     <!-- Text informing user that their account has been suspended -->
-    <string name="account_temporarily_suspended">Contul tău a fost blocat temporar pentru siguranța ta.</string>
+    <string name="account_temporarily_suspended">Contul dvs. a fost blocat temporar pentru siguranța dvs.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
     <string name="verify_email_and_follow_steps">Vă rugăm să urmați pașii din [A]e-mail de confirmare[/A] pentru a vă debloca contul.</string>
     <!-- Question which takes the user to a help screen -->
@@ -2754,9 +2754,9 @@
     <!-- Title of a helping view about locked accounts -->
     <string name="locked_accounts_label">Conturi blocate</string>
     <!-- Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description -->
-    <string name="locked_accounts_text_1">Este posibil să folosești aceeași parolă pentru contul tău MEGA ca și pentru alte servicii și că cel puțin unul dintre aceste alte servicii a suferit o încălcare a securității datelor.</string>
+    <string name="locked_accounts_text_1">Este posibil să utilizați aceeași parolă pentru contul dvs. MEGA ca și pentru alte servicii și că cel puțin unul dintre aceste alte servicii a suferit o încălcare a datelor.</string>
     <!-- Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description -->
-    <string name="locked_accounts_text_2">Parola ta s-a scurs și acum este folosită de persoane rău-intenționate pentru a se autentifica în conturile tale, inclusiv, dar nu numai, în contul tău MEGA.</string>
+    <string name="locked_accounts_text_2">Parola dvs. s-a scurs și este acum folosită de actori răi pentru a vă conecta la conturile dvs., inclusiv, dar fără a se limita la, contul dvs. MEGA.</string>
     <!-- Button to add a nickname for a user -->
     <string name="add_nickname">Setează un pseudonim</string>
     <!-- Button to update a nickname for a user -->
@@ -2872,7 +2872,7 @@
     <!-- Option in bottom sheet dialog for removing the associated phone number of current account. -->
     <string name="title_remove_phone_number">Elimină numărul de telefon</string>
     <!-- Message showing to explain what will happen when the operation of -->
-    <string name="modify_phone_number_message">Această operație îți va elimina numărul de telefon actual și va începe procesul de asociere a unui nou număr de telefon cu contul tău.</string>
+    <string name="modify_phone_number_message">Această operație va elimina numărul dvs. de telefon curent și va începe procesul de asociere a unui nou număr de telefon cu contul dvs.</string>
     <!-- Message for action to remove the registered phone number. -->
     <string name="remove_phone_number_message">Acest lucru va elimina numărul de telefon asociat din cont. Dacă ulterior alegi să adaugi un număr de telefon, ți se va cere să îl verifici.</string>
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
@@ -3240,7 +3240,7 @@
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
     <!-- Title of Add phone number option in My account section -->
-    <string name="add_phone_label">Adaugă numărul tău de telefon</string>
+    <string name="add_phone_label">Adăugați numărul dvs. de telefon</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
     <string name="backup_recovery_key_subtitle">Îți mai aduci aminte parola?\nMEGA nu îți poate reseta parola dacă o uiți.</string>
     <!-- Action to change name -->
@@ -4026,7 +4026,7 @@
     <!-- Dialog confirmation text for removing photos in an album -->
     <string name="photos_album_remove_from_album_confirmation_text">Elimini din album?</string>
     <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
-    <string name="settings_camera_uploads_grant_media_permissions_body">Pentru a activa Încărcări cameră, acordă-i lui MEGA acces la fotografiile și alte tipuri media de pe dispozitivul tău.</string>
+    <string name="settings_camera_uploads_grant_media_permissions_body">Pentru a activa încărcările camerei, acordați MEGA acces la fotografiile și alte suporturi media de pe dispozitiv dvs..</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
     <string name="settings_camera_uploads_grant_media_permissions_positive_button">Acordă acces</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
@@ -4582,7 +4582,7 @@
     <!-- This is the title of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_title">Actualizare de securitate pentru cont</string>
     <!-- This is the body of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_content">Actualizăm securitatea contului tău. Ar trebui să vezi acest mesaj doar o singură dată. Dacă l-ai mai văzut înainte, asigură-te mai întâi că a fost pentru acest cont și nu pentru un alt cont MEGA pe care îl ai.\n\nDacă ești sigur(ă) și este a doua oară când vezi acest mesaj pentru acest cont, nu mai folosi acest cont.</string>
+    <string name="shared_items_security_upgrade_dialog_content">Îți actualizăm securitatea contului. Ar trebui să vedeți acest mesaj o singură dată. Dacă l-ați mai văzut înainte, asigurați-vă mai întâi că a fost pentru acest cont și nu pentru un alt cont MEGA pe care îl aveți.\n\nDacă sunteți sigur și este a doua oară când vedeți acest mesaj pentru acest cont, nu mai utilizați acest cont.</string>
     <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
     <plurals name="cloud_drive_undecrypted_file">
         <item quantity="one">[Fișier nedecriptat]</item>
@@ -4966,7 +4966,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Backupuri automate</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Derulați înapoi până la 90 de zile pe Pro&#160;Lite și până la 180 de zile pe Pro&#160;I, II și III</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Derulează înapoi până la 90 de zile de date șterse pe Pro&#160;Lite și până la 180 de zile pe Pro&#160;I, II și III</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Planifică golirea coșurilor de gunoi între 7 zile și 10 ani</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5529,7 +5529,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Încărcarea întreruptă. Baterie este sub %1$d&#160;%% și nu se încarcă.</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support.</string>
+    <string name="photos_camera_uploads_general_issue">Încărcări camere au încetat să funcționeze. Încercați să reactivați încărcările camerei pentru a o rezolva. Dacă problema persistă, contactați asistență.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Încărcări cameră în desfășurare, %1$d&#160;fișier în așteptare</item>
@@ -5543,17 +5543,17 @@
         <item quantity="other">Încărcări cameră complete, %1$d de fișiere încărcate</item>
     </plurals>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
-    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Your free plan has a 60&#160;minute limit on meetings. Pro users have unlimited calls and up to 1000&#160;participants.[/A] [B]Upgrade now.[/B]</string>
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Abonamentul dvs. gratuit are o limită de 60 de minute pentru întâlniri. Utilizatorii Pro au apeluri nelimitate și până la 1000 de participanți.[/A] [B]Upgradați acum.[/B]</string>
     <!-- Bottom sheet button to hide a node/file -->
     <string name="general_hide_node">Ascunde</string>
     <!-- Bottom sheet button to unhide a node/file -->
-    <string name="general_unhide_node">Afișare.</string>
+    <string name="general_unhide_node">Afișare</string>
     <!-- Promo label for promo notification section -->
     <string name="notifications_screen_notification_label_promo">Promoție</string>
     <!-- Promo notification section title for promo notification section -->
     <string name="notifications_screen_notification_section_title">Ofertă de timp limitat</string>
     <!-- The title of the Dialog shown to Change the SFU Server Id  -->
-    <string name="meetings_change_sfu_dialog_title">Change SFU Server</string>
+    <string name="meetings_change_sfu_dialog_title">Schimbați serverul SFU</string>
     <!-- The body of the Dialog shown to Change the SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_subtitle">Implicit este -1</string>
     <!-- The placeholder text to prompt user to enter the SFU Server Id -->
@@ -5561,21 +5561,45 @@
     <!-- Button text to change SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_action_button">Schimbă</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
-    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Free plans have a limit of 60&#160;minutes per meeting. [A]Upgrade now.[/A]</string>
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Abonamentele gratuite au o limită de 60 de minute pe întâlnire. [A]Upgradați acum.[/A]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">You will be charged %1$s immediately and your subscription will automatically renew after 1&#160;month for %2$s per month. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">Veți fi taxat %1$s imediat și abonamentul dvs. se va reînnoi automat după 1 lună pentru %2$s pe lună. Contul dvs. Google&#160;Play va fi taxat pentru reînnoire în termen de 24 de ore de la sfârșitul fiecărei perioade de facturare. Pentru a vă anula abonamentul, trebuie să dezactivați reînnoirea automată a abonamentului MEGA&#160;Pro cu cel puțin 24 de ore înainte de sfârșitul perioadei de facturare prin Abonamente în [A]Google&#160;Play[/A].\nPrin actualizarea contului dvs., sunteți de acord cu MEGA [B]Termenii de utilizare a serviciului[/B] și [C]Politica de confidențialitate[/C].</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">You will be charged %1$s immediately and your subscription will automatically renew after 12&#160;months for %2$s per year. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">Veți fi taxat %1$s imediat iar abonamentul dvs. se va reînnoi automat după 12&#160;luni la %2$s pe an. Contul dvs. Google&#160;Play va fi taxat pentru reînnoire în termen de 24 de ore de la sfârșitul fiecărei perioade de facturare. Pentru a vă anula abonamentul, trebuie să dezactivați reînnoirea automată a abonamentului MEGA&#160;Pro cu cel puțin 24 de ore înainte de sfârșitul perioadei de facturare prin Abonamente în [A]Google&#160;Play[/A].\nPrin actualizarea contului dvs., sunteți de acord cu MEGA [B]Termenii de utilizare a serviciului[/B] și [C]Politica de confidențialitate[/C].</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">You will be charged immediately and your subscription will automatically renew after 1&#160;month. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">Veți fi taxat imediat, iar abonamentul dvs. se va reînnoi automat după 1&#160;lună. Contul dvs. Google&#160;Play va fi taxat pentru reînnoire în termen de 24 de ore de la sfârșitul fiecărei perioade de facturare. Pentru a vă anula abonamentul, trebuie să dezactivați reînnoirea automată a abonamentului MEGA&#160;Pro cu cel puțin 24 de ore înainte de sfârșitul perioadei de facturare prin Abonamente în [A]Google&#160;Play[/A].\nPrin actualizarea contului dvs., sunteți de acord cu MEGA [B]Termenii de utilizare a serviciului[/B] și [C]Politica de confidențialitate[/C].</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">You will be charged immediately and your subscription will automatically renew after 12&#160;months. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">Veți fi taxat imediat, iar abonamentul dvs. se va reînnoi automat după 12&#160;luni. Contul dvs. Google&#160;Play va fi taxat pentru reînnoire în termen de 24 de ore de la sfârșitul fiecărei perioade de facturare. Pentru a vă anula abonamentul, trebuie să dezactivați reînnoirea automată a abonamentului MEGA&#160;Pro cu cel puțin 24 de ore înainte de sfârșitul perioadei de facturare prin Abonamente în [A]Google&#160;Play[/A].\nPrin actualizarea contului dvs., sunteți de acord cu MEGA [B]Termenii de utilizare a serviciului[/B] și [C]Politica de confidențialitate[/C].</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
-    <string name="account_business_account_deactivated_dialog_title">Business account deactivated</string>
+    <string name="account_business_account_deactivated_dialog_title">Contul Business a fost dezactivat</string>
     <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->
-    <string name="account_business_account_deactivated_dialog_sub_user_body">Your Business account has been deactivated due to payment failure. You can only browse your data.\nAsk your Business account administrator to resolve the issue.</string>
+    <string name="account_business_account_deactivated_dialog_sub_user_body">Contul dvs. Business a fost dezactivat din cauza eșecului plății. Puteți doar să vă consultați datele dvs.\nSolicitați administratorului contului dvs. Business să rezolve problema.</string>
     <!-- The body of the Dialog shown to a suspended Business Account Administrator -->
-    <string name="account_business_account_deactivated_dialog_admin_body">Your Business account has been deactivated due to payment failure. You can only browse your data.\nTo make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
+    <string name="account_business_account_deactivated_dialog_admin_body">Contul dvs. Business a fost dezactivat din cauza eșecului plății. Puteți doar să vă consultați datele dvs.\nPentru a efectua o plată și a reactiva abonamentul, conectați-vă la MEGA printr-un browser.</string>
     <!-- The button of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_button">OK, am înțeles</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to host call or meetings without any restrictions. -->
+    <string name="account_upgrade_account_description_feature_meetings">&#8226;&#160;Găzduiți apeluri și întâlniri cu participanți nelimitați și fără restricții de timp.</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to use MEGA VPN product. -->
+    <string name="account_upgrade_account_description_feature_vpn">&#8226;&#160;Rămâneți privat online cu VPN-ul nostru de mare viteză</string>
+    <!-- The body of the Dialog shown to upgrade meeting from the free version -->
+    <string name="meetings_in_call_warning_dialog_body">Aveți nevoie de mai mult timp? Abonamentele&#160;Pro au apeluri nelimitate.</string>
+    <!-- The action button text of the Dialog shown to upgrade meeting from the free version -->
+    <string name="meetings_in_call_warning_dialog_action_button">Upgradează</string>
+    <!-- The negative button text of the Dialog shown to upgrade meeting from the free version -->
+    <string name="meetings_in_call_warning_dialog_negative_button">Nu acum</string>
+    <!-- The snackbar message of the time left for the current free call -->
+    <string name="meetings_in_call_warning_timer_message">Acest apel gratuit se va încheia în %s</string>
+    <!-- The title of the Dialog shown to upgrade meeting from the free version -->
+    <plurals name="meetings_in_call_warning_dialog_title">
+        <item quantity="one">Acest apel gratuit se va încheia în %d&#160;minută</item>
+        <item quantity="few">Acest apel gratuit se va încheia în %d&#160;minute</item>
+        <item quantity="other">Acest apel gratuit se va încheia în %d de minute</item>
+    </plurals>
+    <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
+    <string name="notifications_screen_notification_promo_expiration_time">Expiră la %1$s la ora %2$s</string>
+    <!-- Warning Message and upgrade link for organiser for Free Call -->
+    <string name="meetings_free_call_organiser_number_of_participants_warning">[A]As a free user, you can only add up to 100 participants to this call. Need more?[/A]&#160;[B]Upgrade now[/B]</string>
+    <!-- Warning Message for non organiser for Free Call -->
+    <string name="meetings_free_call_non_organiser_number_of_participants_warning">Doar 100 de participanți se pot alătura apelului. Orice participanți suplimentari vor putea trimite și citi doar chat-uri. Solicitați organizatorului să elimine această restricție.</string>
 </resources>

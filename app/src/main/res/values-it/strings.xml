@@ -790,7 +790,7 @@
     <!-- Button to park an account -->
     <string name="park_account_button">Parcheggia</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">This is the last step to park your account, please enter your new password. Your data will be retained for at least 60&#160;days. If you recall your parked account’s password, please contact support&#64;mega.nz</string>
+    <string name="park_account_text_last_step">Questo è l’ultimo step per parcheggiare il tuo account, per favore inserisci la tua nuova password. I tuoi dati verranno mantenuti per almeno 60 giorni. Se recuperi la vecchia password del tuo account parcheggiato, contatta support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">Inserisci la nuova password</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
@@ -1896,7 +1896,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">La prossima volta che effettuerai l’accesso al tuo account ti verrà chiesto di inserire il codice di 6 cifre che ti è stato fornito dall\’app di autenticazione.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Please save your                                                                         <b>recovery key</b>                                                                         in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
+    <string name="recommendation_2fa_enabled">Salva la tua <b>Chiave di Recupero</b> in un luogo sicuro, per evitare problemi nel caso in cui perdessi l\’accesso alla tua app, o se desideri disabilitare l\’autenticazione a due fattori.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Codice non valido</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -4966,7 +4966,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Backup automatici</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Ripristina fino a 90 giorni su Pro&#160;Lite e fino a 180 giorni su Pro&#160;I, II, e III</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Ripristina dati eliminati fino a 90 giorni su Pro&#160;Lite e fino a 180 giorni su Pro&#160;I, II, e III</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Pulizia regolare del Cestino programmabile tra 7 giorni e 10 anni</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5529,7 +5529,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Caricamento in pausa. Batteria inferiore al %1$d%% e non in carica.</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support.</string>
+    <string name="photos_camera_uploads_general_issue">I Caricamenti da fotocamera hanno smesso di funzionare. Prova a riattivare i Caricamenti da fotocamera per risolvere il problema. Se il problema persiste, contatta il supporto.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Caricamenti da fotocamera in corso, %1$d file in attesa</item>
@@ -5543,7 +5543,7 @@
         <item quantity="other">Caricamenti da fotocamera completati, %1$d file caricati</item>
     </plurals>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
-    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Your free plan has a 60&#160;minute limit on meetings. Pro users have unlimited calls and up to 1000&#160;participants.[/A] [B]Upgrade now.[/B]</string>
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Il tuo piano gratuito prevede un limite di 60 minuti per i meeting. Gli utenti Pro hanno chiamate illimitate e fino a 1000 partecipanti.[/A] [B]Effettua l\’upgrade adesso.[/B]</string>
     <!-- Bottom sheet button to hide a node/file -->
     <string name="general_hide_node">Nascondi</string>
     <!-- Bottom sheet button to unhide a node/file -->
@@ -5553,7 +5553,7 @@
     <!-- Promo notification section title for promo notification section -->
     <string name="notifications_screen_notification_section_title">Offerta a tempo limitato</string>
     <!-- The title of the Dialog shown to Change the SFU Server Id  -->
-    <string name="meetings_change_sfu_dialog_title">Change SFU Server</string>
+    <string name="meetings_change_sfu_dialog_title">Cambia server SFU</string>
     <!-- The body of the Dialog shown to Change the SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_subtitle">Il valore predefinito è -1</string>
     <!-- The placeholder text to prompt user to enter the SFU Server Id -->
@@ -5561,21 +5561,44 @@
     <!-- Button text to change SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_action_button">Cambia</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
-    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Free plans have a limit of 60&#160;minutes per meeting. [A]Upgrade now.[/A]</string>
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">I piani gratuiti hanno un limite di 60 minuti per meeting. [A]Effettua l\’upgrade adesso.[/A]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">You will be charged %1$s immediately and your subscription will automatically renew after 1&#160;month for %2$s per month. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">Ti verrà addebitato %1$s immediatamente e l\’abbonamento si rinnoverà automaticamente dopo 1&#160;mese al costo di %2$s al mese. Il rinnovo verrà addebitato sul tuo account Google&#160;Play entro 24&#160;ore dalla fine di ogni periodo di fatturazione. Per annullare l\’abbonamento, devi disattivare il rinnovo automatico dell\’abbonamento MEGA&#160;Pro almeno 24&#160;ore prima della fine del periodo di fatturazione tramite Abbonamenti nel [A]Google&#160;Play[/A].\nEffettuando l\’upgrade del tuo account, accetti i [B]Termini di servizio[/B] e la [C]Politica sulla privacy[/C] di MEGA.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">You will be charged %1$s immediately and your subscription will automatically renew after 12&#160;months for %2$s per year. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">Ti verrà addebitato %1$s immediatamente e l\’abbonamento si rinnoverà automaticamente dopo 12&#160;mesi al costo di %2$s all\’anno. Il rinnovo verrà addebitato sul tuo account Google&#160;Play entro 24&#160;ore dalla fine di ogni periodo di fatturazione. Per annullare l\’abbonamento, devi disattivare il rinnovo automatico dell\’abbonamento MEGA&#160;Pro almeno 24&#160;ore prima della fine del periodo di fatturazione tramite Abbonamenti nel [A]Google&#160;Play[/A].\nEffettuando l\’upgrade del tuo account, accetti i [B]Termini di servizio[/B] e la [C]Politica sulla privacy[/C] di MEGA.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">You will be charged immediately and your subscription will automatically renew after 1&#160;month. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">L\’addebito avverrà immediatamente e l\’abbonamento si rinnoverà automaticamente dopo 1&#160;mese. Il tuo account Google&#160;Play riceverà un addebito per il rinnovo entro le 24&#160;ore precedenti la fine del periodo di fatturazione. Per annullare il tuo abbonamento, devi disattivare il rinnovo automatico del tuo abbonamento MEGA&#160;Pro almeno 24&#160;ore prima della fine del periodo di fatturazione tramite Abbonamenti nel [A]Google&#160;Play[/A].\nEffettuando l\’upgrade del tuo account, accetti i [B]Termini di Servizio[/B] e la [C]Politica sulla privacy[/C] di MEGA.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">You will be charged immediately and your subscription will automatically renew after 12&#160;months. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">L\’addebito avverrà immediatamente e l\’abbonamento si rinnoverà automaticamente dopo 12&#160;mesi. Il tuo account Google&#160;Play riceverà un addebito per il rinnovo entro le 24&#160;ore precedenti la fine del periodo di fatturazione. Per annullare il tuo abbonamento, devi disattivare il rinnovo automatico del tuo abbonamento MEGA&#160;Pro almeno 24&#160;ore prima della fine del periodo di fatturazione tramite Abbonamenti nel [A]Google&#160;Play[/A].\nEffettuando l\’upgrade del tuo account, accetti i [B]Termini di Servizio[/B] e la [C]Politica sulla privacy[/C] di MEGA.</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
-    <string name="account_business_account_deactivated_dialog_title">Business account deactivated</string>
+    <string name="account_business_account_deactivated_dialog_title">Account Business disattivato</string>
     <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->
-    <string name="account_business_account_deactivated_dialog_sub_user_body">Your Business account has been deactivated due to payment failure. You can only browse your data.\nAsk your Business account administrator to resolve the issue.</string>
+    <string name="account_business_account_deactivated_dialog_sub_user_body">Il tuo account Business è stato disattivato a causa di un mancato pagamento. Puoi solo visualizzare i tuoi dati.\nChiedi all\’amministratore del tuo account Business di risolvere il problema.</string>
     <!-- The body of the Dialog shown to a suspended Business Account Administrator -->
-    <string name="account_business_account_deactivated_dialog_admin_body">Your Business account has been deactivated due to payment failure. You can only browse your data.\nTo make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
+    <string name="account_business_account_deactivated_dialog_admin_body">Il tuo account Business è stato disattivato a causa del fallimento del pagamento. Puoi solo visualizzare i tuoi dati.\nPer effettuare un pagamento e riattivare il tuo abbonamento, effettua il login in MEGA tramite browser.</string>
     <!-- The button of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_button">OK, capito</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to host call or meetings without any restrictions. -->
+    <string name="account_upgrade_account_description_feature_meetings">&#8226;&#160;Ospita chiamate e meeting con partecipanti illimitati e nessuna limitazione sulla durata.</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to use MEGA VPN product. -->
+    <string name="account_upgrade_account_description_feature_vpn">&#8226;&#160;Rimani nel privato anche quando sei online grazie alla nostra VPN ad alta velocità</string>
+    <!-- The body of the Dialog shown to upgrade meeting from the free version -->
+    <string name="meetings_in_call_warning_dialog_body">Hai bisogno di più tempo? I piani Pro prevedono chiamate illimitate.</string>
+    <!-- The action button text of the Dialog shown to upgrade meeting from the free version -->
+    <string name="meetings_in_call_warning_dialog_action_button">Effettua l’upgrade</string>
+    <!-- The negative button text of the Dialog shown to upgrade meeting from the free version -->
+    <string name="meetings_in_call_warning_dialog_negative_button">Non adesso</string>
+    <!-- The snackbar message of the time left for the current free call -->
+    <string name="meetings_in_call_warning_timer_message">This free call will end in %s</string>
+    <!-- The title of the Dialog shown to upgrade meeting from the free version -->
+    <plurals name="meetings_in_call_warning_dialog_title">
+        <item quantity="one">Your free call will end in %d minute</item>
+        <item quantity="other">Your free call will end in %d minutes</item>
+    </plurals>
+    <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
+    <string name="notifications_screen_notification_promo_expiration_time">Scade il giorno %1$s alle ore %2$s</string>
+    <!-- Warning Message and upgrade link for organiser for Free Call -->
+    <string name="meetings_free_call_organiser_number_of_participants_warning">[A]As a free user, you can only add up to 100 participants to this call. Need more?[/A]&#160;[B]Upgrade now[/B]</string>
+    <!-- Warning Message for non organiser for Free Call -->
+    <string name="meetings_free_call_non_organiser_number_of_participants_warning">Only 100 participants can join the call. Any additional participants will only be able to send and read chats. Ask the organiser to remove this restriction.</string>
 </resources>

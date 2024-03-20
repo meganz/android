@@ -1810,7 +1810,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">다음번 로그인 때 당신의 인증기 앱에서 생성된 6자리 코드를 요구합니다.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Please save your                                                                         <b>recovery key</b>                                                                         in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
+    <string name="recommendation_2fa_enabled">앱에 대한 접근을 잃었을 때의 문제를 피하거나, 2단계 인증을 비활성화 하고 싶은 경우를 대비하여, <b>복구 키</b>를 안전한 곳에 저장하세요.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">잘못된 코드</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -4540,7 +4540,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;자동 백업</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Lite는 최대 90일, Pro&#160;I, II, 그리고 III은 최대 180일 되돌리기</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Lite는 최대 90일, Pro&#160;I, II, 그리고 III은 최대 180일의 삭제한 데이터 되돌리기</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;7일과 10년 사이의 휴지통 비우기 예약</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5104,4 +5104,27 @@
     <string name="account_business_account_deactivated_dialog_admin_body">비즈니스 계정이 결제 실패로 인하여 비활성화 되었습니다. 데이터 탐색만 할 수 있습니다.\n결제를 하고 구독을 재활성화 하려면, 브라우저를 통해 MEGA에 로그인하세요.</string>
     <!-- The button of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_button">알겠습니다</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to host call or meetings without any restrictions. -->
+    <string name="account_upgrade_account_description_feature_meetings">&#8226;&#160;제한 없는 참여자 수와 시간 제한 없는 통화와 회의 주최</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to use MEGA VPN product. -->
+    <string name="account_upgrade_account_description_feature_vpn">&#8226;&#160;우리의 고속 VPN으로 온라인에서 개인 정보를 지키세요</string>
+    <!-- The body of the Dialog shown to upgrade meeting from the free version -->
+    <string name="meetings_in_call_warning_dialog_body">시간이 더 필요한가요? Pro 요금제는 무제한 통화를 할 수 있습니다.</string>
+    <!-- The action button text of the Dialog shown to upgrade meeting from the free version -->
+    <string name="meetings_in_call_warning_dialog_action_button">업그레이드</string>
+    <!-- The negative button text of the Dialog shown to upgrade meeting from the free version -->
+    <string name="meetings_in_call_warning_dialog_negative_button">나중에</string>
+    <!-- The snackbar message of the time left for the current free call -->
+    <string name="meetings_in_call_warning_timer_message">This free call will end in %s</string>
+    <!-- The title of the Dialog shown to upgrade meeting from the free version -->
+    <plurals name="meetings_in_call_warning_dialog_title">
+        <item quantity="one">Your free call will end in %d minute</item>
+        <item quantity="other">Your free call will end in %d minutes</item>
+    </plurals>
+    <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
+    <string name="notifications_screen_notification_promo_expiration_time">%1$s %2$s에 만료됨</string>
+    <!-- Warning Message and upgrade link for organiser for Free Call -->
+    <string name="meetings_free_call_organiser_number_of_participants_warning">[A]As a free user, you can only add up to 100 participants to this call. Need more?[/A]&#160;[B]Upgrade now[/B]</string>
+    <!-- Warning Message for non organiser for Free Call -->
+    <string name="meetings_free_call_non_organiser_number_of_participants_warning">100명의 참여자만 통화에 참여할 수 있습니다. 추가 참여자는 대화를 읽고 보내기만 할 수 있습니다. 주최자에게 이 제한을 없애달라고 요청하세요.</string>
 </resources>

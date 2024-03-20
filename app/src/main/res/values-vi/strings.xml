@@ -47,7 +47,7 @@
     <!-- state while importing the file -->
     <string name="general_forwarding">Đang chuyển đi</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="general_import">Lưu vào Ổ Mây</string>
+    <string name="general_import">Lưu vào Ổ&#160;Mây</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">Lỗi</string>
     <!-- when trying to download a file that is already downloaded in the device -->
@@ -193,7 +193,7 @@
         <item quantity="other">Các phiên truyền tải đã chọn sẽ bị hủy.</item>
     </plurals>
     <!-- The name of every users root drive in the cloud of MEGA. -->
-    <string name="section_cloud_drive">Ổ Mây</string>
+    <string name="section_cloud_drive">Ổ&#160;Mây</string>
     <!-- Label to reference a recents section -->
     <string name="section_recents">Sử Dụng Gần Đây</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
@@ -772,7 +772,7 @@
     <!-- Button to park an account -->
     <string name="park_account_button">Đặt thay mới</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">This is the last step to park your account, please enter your new password. Your data will be retained for at least 60&#160;days. If you recall your parked account’s password, please contact support&#64;mega.nz</string>
+    <string name="park_account_text_last_step">Đây là bước cuối&#160;cùng để đặt thay mới tài&#160;khoản của bạn, xin đặt một mật&#160;khẩu mới. Mọi dữ&#160;liệu trong tài&#160;khoản cũ sẽ được bảo&#160;lưu trong 60&#160;ngày. Trong thời&#160;gian đó nếu nhớ ra lại mật&#160;khẩu của tài&#160;khoản cũ, hãy liên&#160;hệ support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">Nhập mật khẩu mới</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
@@ -1207,9 +1207,9 @@
     <!-- Menu option -->
     <string name="general_view">Xem tệp tin</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="add_to_cloud">Lưu vào Ổ Mây</string>
+    <string name="add_to_cloud">Lưu vào Ổ&#160;Mây</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
-    <string name="add_to_cloud_node_chat">Lưu vào Ổ Mây</string>
+    <string name="add_to_cloud_node_chat">Lưu vào Ổ&#160;Mây</string>
     <!-- Menu option -->
     <string name="general_view_contacts">Xem sổ liên&#160;lạc</string>
     <!-- Menu option -->
@@ -1281,7 +1281,7 @@
     <!--  -->
     <string name="no_files_selected_warning">Chưa có tệp tin nào được chọn</string>
     <!--  -->
-    <string name="attachment_upload_panel_from_cloud">Lấy từ Ổ Mây</string>
+    <string name="attachment_upload_panel_from_cloud">Từ Ổ&#160;Mây</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Tên liên lạc</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
@@ -1455,7 +1455,7 @@
     <!-- Label to include info of the user email in the feedback form -->
     <string name="user_account_feedback">Tài khoản người dùng</string>
     <!-- Label shown in MEGA pdf-viewer when it open a PDF save in smartphone storage -->
-    <string name="save_to_mega">Lưu vào \nỔ Mây</string>
+    <string name="save_to_mega">Lưu vào \nỔ&#160;Mây của tôi</string>
     <!-- Error message when creating a chat one to one with a contact that already has a chat -->
     <string name="chat_already_exists">Cuộc chát này đã tồn&#160;tại</string>
     <!-- Info label about the connectivity state of the chat -->
@@ -1483,7 +1483,7 @@
     <!-- Option in menu of section  My QR code to delete the QR code -->
     <string name="action_delete_qr">Xoá mã QR</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive -->
-    <string name="save_cloud_drive">Vào Ổ Mây</string>
+    <string name="save_cloud_drive">Tới Ổ&#160;Mây</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
     <string name="save_file_system">Vào file system</string>
     <!-- Title of QR code section -->
@@ -1543,7 +1543,7 @@
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[A]Thùng Rác[/A] [B]trống[/B]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
-    <string name="context_empty_cloud_drive">[B]Không có tệp tin nào trong [/B][A]Ổ Mây[/A]</string>
+    <string name="context_empty_cloud_drive">[B]Không có tệp tin nào trong [/B][A]Ổ&#160;Mây[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
     <string name="context_empty_offline">[B]Không có tệp tin nào trong [/B][A]lưu về Ngoại Tuyến[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
@@ -1810,7 +1810,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Vào những lần đăng nhập tiếp theo, hệ thống sẽ yêu cầu nhập một đoạn mã dài 6 chữ số lấy từ app lập xác thực.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Please save your                                                                         <b>recovery key</b>                                                                         in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
+    <string name="recommendation_2fa_enabled">Hãy lưu <b>chìa&#160;khóa phục&#160;hồi</b> của tài&#160;khoản của bạn ở nơi an&#160;toàn, để tránh trường&#160;hợp mất khả&#160;năng truy&#160;cập vào ứng&#160;dụng, hoặc khi bạn muốn tắt đi xác&#160;thực 2&#160;yếu&#160;tố.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Mã không phù hợp</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2672,7 +2672,7 @@
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Tăng hạn mức truyền tải</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">Tệp tin không có tìm thấy trong Ổ Mây của bạn.</string>
+    <string name="warning_node_not_exists_in_cloud">Không có tìm thấy tệp tin trong Ổ&#160;Mây của bạn.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">Không&#160;gian lưu&#160;trữ đầy</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
@@ -3658,9 +3658,9 @@
     <!-- Text for the sound notifications option on calls settings -->
     <string name="settings_calls_preferences_sound_notifications_text">Nghe âm báo khi có người tham gia hoặc rời khỏi cuộc gọi.</string>
     <!-- Text indicating a text file was saved to Cloud drive -->
-    <string name="text_editor_creation_success">Tệp tin đã được lưu vào Ổ&#160;mây</string>
+    <string name="text_editor_creation_success">Tệp tin đã được lưu vào Ổ&#160;Mây</string>
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
-    <string name="text_editor_creation_error">Tệp tin chưa được lưu vào Ổ&#160;mây. Thử lại.</string>
+    <string name="text_editor_creation_error">Tệp tin chưa được lưu vào Ổ&#160;Mây. Thử lại.</string>
     <!-- Action label to start images slideshow -->
     <string name="action_slideshow">Chạy trình chiếu</string>
     <!-- Filter page: Prompt to choose media type -->
@@ -3672,7 +3672,7 @@
     <!-- Filter page: Radio button text for CD + CU source -->
     <string name="filter_button_all_source">Tất cả các vị trí</string>
     <!-- Filter page: Radio button text for CD only source -->
-    <string name="filter_button_cd_only">Ổ mây</string>
+    <string name="filter_button_cd_only">Ổ&#160;Mây</string>
     <!-- Timeline: Empty state for No Media (No Images and Videos) -->
     <string name="timeline_empty_media">Không có [B]phương tiện số[/B] nào</string>
     <!-- Timeline: Empty state for No Images -->
@@ -4540,7 +4540,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Sao&#160;lưu dự&#160;phòng tự&#160;động</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Tua lại phiên&#160;bản lên đến 90 ngày với hạng Pro&#160;Lite và đến 180 ngày với hạng Pro&#160;I, II, và III</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Tua lại dữ liệu đã xóa trong thời gian lên đến 90 ngày với hạng Pro&#160;Lite và đến 180 ngày với hạng Pro&#160;I, II, và III</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Lên lịch dọn dẹp thùng&#160;rác từ 7 ngày đến 10 năm</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5059,7 +5059,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Tải lên bị tạm dừng. Pin bên dưới %1$d%% và không được sạc.</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support.</string>
+    <string name="photos_camera_uploads_general_issue">Đăng tải camêra đã dừng hoạt&#160;động. Hãy thử bật lại đăng tải camêra để giải&#160;quyết. Nếu vấn&#160;đề tiếp diễn, vui lòng liên&#160;hệ với bộ&#160;phận hỗ&#160;trợ.</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="other">Việc đăng&#160;tải camêra đang được thực hiện, %1$d tệp đang chờ</item>
@@ -5069,7 +5069,7 @@
         <item quantity="other">Đăng tải camêra hoàn tất, %1$d tệp tin đã được tải lên</item>
     </plurals>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
-    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Your free plan has a 60&#160;minute limit on meetings. Pro users have unlimited calls and up to 1000&#160;participants.[/A] [B]Upgrade now.[/B]</string>
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Gói miễn&#160;phí của bạn có giới&#160;hạn cuộc họp là 60 phút. Người dùng Pro có thời&#160;lượng cuộc gọi không giới&#160;hạn và có tối&#160;đa 1000 người tham&#160;gia.[/A] [B]Nâng&#160;cấp ngay bây&#160;giờ.[/B]</string>
     <!-- Bottom sheet button to hide a node/file -->
     <string name="general_hide_node">Ẩn</string>
     <!-- Bottom sheet button to unhide a node/file -->
@@ -5079,7 +5079,7 @@
     <!-- Promo notification section title for promo notification section -->
     <string name="notifications_screen_notification_section_title">Ưu&#160;đãi có thời&#160;gian giới&#160;hạn</string>
     <!-- The title of the Dialog shown to Change the SFU Server Id  -->
-    <string name="meetings_change_sfu_dialog_title">Change SFU Server</string>
+    <string name="meetings_change_sfu_dialog_title">Thay đổi máy chủ SFU</string>
     <!-- The body of the Dialog shown to Change the SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_subtitle">Mặc định là -1</string>
     <!-- The placeholder text to prompt user to enter the SFU Server Id -->
@@ -5087,21 +5087,43 @@
     <!-- Button text to change SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_action_button">Thay đổi</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
-    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Free plans have a limit of 60&#160;minutes per meeting. [A]Upgrade now.[/A]</string>
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Gói miễn&#160;phí có giới&#160;hạn thời lượng cuộc họp là 60 phút mỗi cuộc. [A]Nâng&#160;cấp ngay.[/A]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">You will be charged %1$s immediately and your subscription will automatically renew after 1&#160;month for %2$s per month. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_with_price">Quý khách sẽ phải chi trả %1$s ngay lập tức và gói đăng ký của quý khách sẽ tự động gia hạn sau 1&#160;tháng với giá %2$s mỗi tháng. Tài khoản Google&#160;Play của quý khách sẽ bị tính phí gia hạn trong vòng 24&#160;giờ từ thời điểm kết thúc của mỗi kỳ thanh toán. Để hủy gói đăng ký của mình, quý khách phải tắt tự động gia hạn gói đăng ký MEGA&#160;Pro của mình ít nhất là 24&#160;giờ trước lúc kết thúc thời hạn thanh toán trong trang Gói thuê&#160;bao của [A]Google&#160;Play[/A].\nVới việc nâng cấp tài khoản của mình, quý khách đồng ý với[B]Điều&#160;Khoản Dịch&#160;Vụ[/B] và [C]Chính&#160;Sách Riêng&#160;Tư[/C] của MEGA.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">You will be charged %1$s immediately and your subscription will automatically renew after 12&#160;months for %2$s per year. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_with_price">Quý khách sẽ phải chi trả %1$s ngay lập tức và gói đăng ký của quý khách sẽ tự động gia hạn sau 12&#160;tháng với giá %2$s mỗi năm. Tài khoản Google&#160;Play của quý khách sẽ bị tính phí gia hạn trong vòng 24&#160;giờ từ thời điểm kết thúc của mỗi kỳ thanh toán. Để hủy gói đăng ký của mình, quý khách phải tắt tự động gia hạn gói đăng ký MEGA&#160;Pro của mình ít nhất là 24&#160;giờ trước lúc kết thúc thời hạn thanh toán trong trang Gói thuê&#160;bao của [A]Google&#160;Play[/A].\nVới việc nâng cấp tài khoản của mình, quý khách đồng ý với[B]Điều&#160;Khoản Dịch&#160;Vụ[/B] và [C]Chính&#160;Sách Riêng&#160;Tư[/C] của MEGA.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
-    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">You will be charged immediately and your subscription will automatically renew after 1&#160;month. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_monthly_without_price">Quý khách sẽ phải chi trả ngay lập tức và gói đăng ký của quý khách sẽ tự động gia hạn sau 1&#160;tháng. Tài khoản Google&#160;Play của quý khách sẽ bị tính phí gia hạn trong vòng 24&#160;giờ từ thời điểm kết thúc của mỗi kỳ thanh toán. Để hủy gói đăng ký của mình, quý khách phải tắt tự động gia hạn gói đăng ký MEGA&#160;Pro của mình ít nhất là 24&#160;giờ trước lúc kết thúc thời hạn thanh toán trong trang Gói thuê&#160;bao của [A]Google&#160;Play[/A].\nVới việc nâng cấp tài khoản của mình, quý khách đồng ý với[B]Điều&#160;Khoản Dịch&#160;Vụ[/B] và [C]Chính&#160;Sách Riêng&#160;Tư[/C] của MEGA.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">You will be charged immediately and your subscription will automatically renew after 12&#160;months. Your Google&#160;Play account will be charged for renewal within 24&#160;hours of the end of each billing period. To cancel your subscription, you must disable automatic renewal of your MEGA&#160;Pro subscription at least 24&#160;hours before the end of your billing period via Subscriptions in [A]Google&#160;Play[/A].\nBy upgrading your account, you agree to MEGA’s [B]Terms of Service[/B] and [C]Privacy Policy[/C].</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">Quý khách sẽ phải chi trả ngay lập tức và gói đăng ký của quý khách sẽ tự động gia hạn sau 12&#160;tháng. Tài khoản Google&#160;Play của quý khách sẽ bị tính phí gia hạn trong vòng 24&#160;giờ từ thời điểm kết thúc của mỗi kỳ thanh toán. Để hủy gói đăng ký của mình, quý khách phải tắt tự động gia hạn gói đăng ký MEGA&#160;Pro của mình ít nhất là 24&#160;giờ trước lúc kết thúc thời hạn thanh toán trong trang Gói thuê&#160;bao của [A]Google&#160;Play[/A].\nVới việc nâng cấp tài khoản của mình, quý khách đồng ý với[B]Điều&#160;Khoản Dịch&#160;Vụ[/B] và [C]Chính&#160;Sách Riêng&#160;Tư[/C] của MEGA.</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
-    <string name="account_business_account_deactivated_dialog_title">Business account deactivated</string>
+    <string name="account_business_account_deactivated_dialog_title">Tài&#160;khoản Doanh&#160;Nghiệp bị vô&#160;hiệu hóa</string>
     <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->
-    <string name="account_business_account_deactivated_dialog_sub_user_body">Your Business account has been deactivated due to payment failure. You can only browse your data.\nAsk your Business account administrator to resolve the issue.</string>
+    <string name="account_business_account_deactivated_dialog_sub_user_body">Tài&#160;khoản Doanh&#160;Nghiệp của bạn đã bị vô&#160;hiệu hóa do thanh&#160;toán không thành&#160;công. Bạn chỉ có thể duyệt xem dữ&#160;liệu của mình.\nHãy yêu&#160;cầu quản&#160;trị viên tài&#160;khoản Doanh&#160;Nghiệp của bạn giải&#160;quyết vấn&#160;đề này.</string>
     <!-- The body of the Dialog shown to a suspended Business Account Administrator -->
-    <string name="account_business_account_deactivated_dialog_admin_body">Your Business account has been deactivated due to payment failure. You can only browse your data.\nTo make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
+    <string name="account_business_account_deactivated_dialog_admin_body">Tài&#160;khoản Doanh&#160;Nghiệp của bạn đã bị vô&#160;hiệu hóa do thanh&#160;toán không thành&#160;công. Bạn chỉ có thể duyệt xem dữ liệu của mình.\nĐể thanh&#160;toán và kích&#160;hoạt lại gói đăng&#160;ký của bạn, hãy đăng&#160;nhập vào MEGA thông qua trình&#160;duyệt web.</string>
     <!-- The button of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_button">OK, hiểu rồi</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to host call or meetings without any restrictions. -->
+    <string name="account_upgrade_account_description_feature_meetings">&#8226;&#160;Tổ&#160;chức các cuộc gọi và cuộc họp với thời&#160;gian và số lượng người tham&#160;gia không giới&#160;hạn</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to use MEGA VPN product. -->
+    <string name="account_upgrade_account_description_feature_vpn">&#8226;&#160;Giữ an&#160;ninh trực&#160;tuyến với VPN tốc&#160;độ cao của chúng&#160;tôi</string>
+    <!-- The body of the Dialog shown to upgrade meeting from the free version -->
+    <string name="meetings_in_call_warning_dialog_body">Cần thêm thời gian? Các gói Pro không có giới hạn lượng cuộc gọi.</string>
+    <!-- The action button text of the Dialog shown to upgrade meeting from the free version -->
+    <string name="meetings_in_call_warning_dialog_action_button">Nâng cấp</string>
+    <!-- The negative button text of the Dialog shown to upgrade meeting from the free version -->
+    <string name="meetings_in_call_warning_dialog_negative_button">Không phải lúc này</string>
+    <!-- The snackbar message of the time left for the current free call -->
+    <string name="meetings_in_call_warning_timer_message">Cuộc gọi miễn&#160;phí này sẽ kết&#160;thúc sau %s</string>
+    <!-- The title of the Dialog shown to upgrade meeting from the free version -->
+    <plurals name="meetings_in_call_warning_dialog_title">
+        <item quantity="other">Cuộc gọi miễn&#160;phí của bạn sẽ kết&#160;thúc sau %d phút</item>
+    </plurals>
+    <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
+    <string name="notifications_screen_notification_promo_expiration_time">Hết hạn vào %1$s lúc %2$s</string>
+    <!-- Warning Message and upgrade link for organiser for Free Call -->
+    <string name="meetings_free_call_organiser_number_of_participants_warning">[A]As a free user, you can only add up to 100 participants to this call. Need more?[/A]&#160;[B]Upgrade now[/B]</string>
+    <!-- Warning Message for non organiser for Free Call -->
+    <string name="meetings_free_call_non_organiser_number_of_participants_warning">Chỉ có 100 người mới có thể tham&#160;gia cuộc gọi. Bất kỳ người tham&#160;gia nào thêm sẽ chỉ có thể gửi và đọc các cuộc chat. Yêu&#160;cầu ban tổ&#160;chức để loại bỏ hạn&#160;chế này.</string>
 </resources>

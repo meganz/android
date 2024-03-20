@@ -781,7 +781,7 @@
     <!-- Button to park an account -->
     <string name="park_account_button">Parkeren</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">Dit is de laatste stap om uw account te parkeren. Voer uw nieuwe wachtwoord in. Uw gegevens worden minstens 60 &#160; dagen bewaard. Als u zich het wachtwoord van uw geparkeerde account herinnert, neem contact op met support&#64;mega.nz</string>
+    <string name="park_account_text_last_step">Dit is de laatste stap om uw account te parkeren. Voer uw nieuwe wachtwoord in. Uw gegevens worden minstens 60 dagen bewaard. Als u zich het wachtwoord van uw geparkeerde account herinnert, neem dan contact op met support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">Voer nieuw wachtwoord in</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
@@ -1853,7 +1853,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">De volgende keer dat u inlogt in uw account wordt u gevraagd een 6-cijferige code in te voeren die gegeven is door uw authenticatie applicatie.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Bewaar alstublieft uw  <b>herstelsleutel</b> op een veilige lokatie, om problemen te vermijden als u de toegang tot uw applicatie verliest of als u twee-staps authenticatie wilt uitschakelen.</string>
+    <string name="recommendation_2fa_enabled">Bewaar uw <b>herstelsleutel</b> op een veilige lokatie, om problemen te vermijden als u de toegang tot uw applicatie verliest of als u twee-staps authenticatie wilt uitschakelen.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Ongeldige code</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -4753,7 +4753,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Automatische back-ups</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Tot 90 dagen terugspoelen op Pro&#160;Lite en tot 180 dagen op Pro&#160;I, II en III</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226; &#160; Terugspoelen tot 90 dagen aan verwijderde gegevens op Pro &#160; Lite en tot 180 dagen op Pro &#160; I, II en III</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Plan het opruimen van vuilnisbakken tussen 7 dagen en 10 jaar</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5306,7 +5306,7 @@
         <item quantity="other">Camera uploads voltooid, %1$d bestanden geüpload</item>
     </plurals>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
-    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Uw gratis abonnement heeft een limiet van 60 &#160; minuten voor vergaderingen. Pro-gebruikers kunnen onbeperkt bellen en tot 1000 &#160; deelnemers.[/A] [B]Nu upgraden.[/B]</string>
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Uw gratis abonnement heeft een limiet van 60 minuten voor vergaderingen. Pro-gebruikers kunnen onbeperkt bellen en tot 1000 deelnemers.[/A] [B]Nu upgraden.[/B]</string>
     <!-- Bottom sheet button to hide a node/file -->
     <string name="general_hide_node">Verbergen</string>
     <!-- Bottom sheet button to unhide a node/file -->
@@ -5316,7 +5316,7 @@
     <!-- Promo notification section title for promo notification section -->
     <string name="notifications_screen_notification_section_title">Tijdelijke aanbieding</string>
     <!-- The title of the Dialog shown to Change the SFU Server Id  -->
-    <string name="meetings_change_sfu_dialog_title">SFU-server wijzigen</string>
+    <string name="meetings_change_sfu_dialog_title">Wijzig de SFU-server</string>
     <!-- The body of the Dialog shown to Change the SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_subtitle">Standaard is -1</string>
     <!-- The placeholder text to prompt user to enter the SFU Server Id -->
@@ -5324,7 +5324,7 @@
     <!-- Button text to change SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_action_button">Wijzigen</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
-    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Gratis abonnementen hebben een limiet van 60 &#160; minuten per vergadering. [A]Nu upgraden.[/A]</string>
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Gratis abonnementen hebben een limiet van 60 minuten per vergadering. [A]Nu upgraden.[/A]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_monthly_with_price">Er worden onmiddelijk kosten in rekening gebracht %1$s en uw abonnement wordt na 1 &#160; maand automatisch verlengd voor %2$s per maand. Uw Google &#160; Play-account wordt binnen 24 &#160; uur na het einde van elke factureringsperiode in rekening gebracht voor verlenging. Om uw abonnement op te zeggen, moet u de automatische verlenging van uw MEGA &#160; Pro-abonnement ten minste 24 &#160; uur voor het einde van uw factureringsperiode uitschakelen via Abonnementen in [A]Google &#160; Play[/A].\nDoor uw account te upgraden, gaat u akkoord met MEGA\’s [B]Algemene Voorwaarden[/B] en [C]Privacybeleid[/C].</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
@@ -5341,4 +5341,27 @@
     <string name="account_business_account_deactivated_dialog_admin_body">Uw Zakelijke account is gedeactiveerd vanwege een mislukte betaling. U kunt alleen uw gegevens bekijken.\nOm een betaling uit te voeren en uw abonnement te her activeren, moet u via een browser bij MEGA inloggen.</string>
     <!-- The button of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_button">Ok, ik snap het</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to host call or meetings without any restrictions. -->
+    <string name="account_upgrade_account_description_feature_meetings">&#8226; &#160; Host gesprekken en vergaderingen met ongelimiteerde deelnemers en zonder tijdsbeperkingen</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to use MEGA VPN product. -->
+    <string name="account_upgrade_account_description_feature_vpn">&#8226; &#160; Blijf privé online met onze snelle VPN</string>
+    <!-- The body of the Dialog shown to upgrade meeting from the free version -->
+    <string name="meetings_in_call_warning_dialog_body">Meer tijd nodig? Pro-abonnementen bieden ongelimiteerde gesprekken.</string>
+    <!-- The action button text of the Dialog shown to upgrade meeting from the free version -->
+    <string name="meetings_in_call_warning_dialog_action_button">Upgraden</string>
+    <!-- The negative button text of the Dialog shown to upgrade meeting from the free version -->
+    <string name="meetings_in_call_warning_dialog_negative_button">Niet Nu</string>
+    <!-- The snackbar message of the time left for the current free call -->
+    <string name="meetings_in_call_warning_timer_message">Dit gratis gesprek eindigt over %s</string>
+    <!-- The title of the Dialog shown to upgrade meeting from the free version -->
+    <plurals name="meetings_in_call_warning_dialog_title">
+        <item quantity="one">Uw gratis gesprek eindigt oer%d minuut</item>
+        <item quantity="other">Uw gratis gesprek eindigt over%d minuten</item>
+    </plurals>
+    <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
+    <string name="notifications_screen_notification_promo_expiration_time">Vervalt op %1$s om %2$s</string>
+    <!-- Warning Message and upgrade link for organiser for Free Call -->
+    <string name="meetings_free_call_organiser_number_of_participants_warning">[A]As a free user, you can only add up to 100 participants to this call. Need more?[/A]&#160;[B]Upgrade now[/B]</string>
+    <!-- Warning Message for non organiser for Free Call -->
+    <string name="meetings_free_call_non_organiser_number_of_participants_warning">Slechts 100&#160;deelnemers kunnen deelnemen aan de oproep. Eventuele extra deelnemers kunnen alleen gesprekken verzenden en lezen. Vraag de organisator om deze beperking op te heffen.</string>
 </resources>

@@ -131,7 +131,7 @@
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
     <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive">Der Ordner auf Ihrem Gerät kann nicht gefunden werden</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">Problem syncing or backing up this folder because of changes to the MEGA folder. Stop the sync or backup and try setting it up again in the desktop app, or contact Support.</string>
+    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">Problem bei der Synchronisierung oder Sicherung dieses Ordners aufgrund von Änderungen am MEGA-Ordner. Beenden Sie die Synchronisierung bzw. das Backup und richten Sie sie in der Desktop-App erneut ein oder wenden Sie sich an den Support.</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
     <string name="device_center_list_view_item_sub_state_message_folder_backup_issue">Problem bei der Synchronisierung oder Sicherung dieses Ordners. Beenden Sie die Synchronisierung bzw. das Backup und richten Sie sie in der Desktop-App erneut ein oder wenden Sie sich an den Support.</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
@@ -166,4 +166,25 @@
     <string name="device_center_top_app_bar_search_syncs_hint">Synchronisierungen suchen</string>
     <!-- Text to show in the Device Center when no search results are found -->
     <string name="device_center_empty_screen_no_results">Keine Treffer</string>
+    <!-- Header of the Info view field for what is the content of a device/folder -->
+    <string name="device_center_info_content">Enthält</string>
+    <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
+    <string name="device_center_info_total_size">Gesamtgröße</string>
+    <!-- String which indicates the number of files contained into a device/folder -->
+    <plurals name="device_center_info_num_files">
+        <item quantity="one">%1$d Datei</item>
+        <item quantity="other">%1$d Dateien</item>
+    </plurals>
+    <!-- String which indicates the number of folders contained into a device/folder -->
+    <plurals name="device_center_info_num_folders">
+        <item quantity="one">%1$d folder</item>
+        <item quantity="other">%1$d folders</item>
+    </plurals>
+    <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
+    <plurals name="device_center_info_num_folders_and_files">
+        <item quantity="one">%1$d Ordner&#160;·&#160;</item>
+        <item quantity="other">%1$d Ordner&#160;·&#160;</item>
+    </plurals>
+    <!-- Header of the Info view field for the date and time a folder was added -->
+    <string name="device_center_info_added">Erstellt</string>
 </resources>

@@ -55,7 +55,7 @@
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Backups feature to display the Device or Device Folder -->
     <string name="device_center_bottom_sheet_item_show_in_backups">Hiện trong Sao&#160;lưu dự&#160;phòng</string>
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Cloud Drive feature to display the Device or Device Folder -->
-    <string name="device_center_bottom_sheet_item_show_in_cloud_drive">Hiện vị trí trong Ổ Mây</string>
+    <string name="device_center_bottom_sheet_item_show_in_cloud_drive">Hiện vị trí trong Ổ&#160;Mây</string>
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="device_center_list_view_item_sub_state_no_sync_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
@@ -101,9 +101,9 @@
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">Đổi tên không thành&#160;công.</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
-    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">Couldn’t create a .megaignore file for this sync.</string>
+    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">Không thể tạo tệp .megaignore cho việc đồng bộ này.</string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
-    <string name="device_center_list_view_item_sub_state_sync_config_read_failure">Couldn’t read sync configuration. Try again later or check folder permissions.</string>
+    <string name="device_center_list_view_item_sub_state_sync_config_read_failure">Không thể đọc cấu hình đồng bộ hóa. Thử lại sau hoặc kiểm tra quyền hạn của thư mục.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
     <string name="device_center_list_view_item_sub_state_unknown_drive_path">Không rõ đường dẫn ổ&#160;đĩa cho đồng&#160;bộ này.</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
@@ -111,7 +111,7 @@
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
     <string name="device_center_list_view_item_sub_state_notification_system_unavailable">Không thể giao&#160;tiếp với vị&#160;trí thư&#160;mục. Kiểm&#160;tra xem vị&#160;trí có thể truy&#160;cập được hay không và quyền đi tới vị&#160;trí thư&#160;mục đã được cấp phép.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
-    <string name="device_center_list_view_item_sub_state_unable_to_add_watch">Unable to add a filesystem watch. Ensure there is sufficient free space and memory, and that you have granted permissions for the folder location.</string>
+    <string name="device_center_list_view_item_sub_state_unable_to_add_watch">Không thể thêm đồng&#160;hồ hệ&#160;thống tệp. Hãy đảm&#160;bảo có đủ không&#160;gian và bộ nhớ trống, và bạn đã có cấp quyền truy&#160;cập vào vị&#160;trí thư&#160;mục.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
     <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid">Không thể đọc được vị&#160;trí thư&#160;mục. Kiểm&#160;tra xem vị&#160;trí có thể truy&#160;cập được hay không và quyền đi tới vị&#160;trí thư&#160;mục đã được cấp phép.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
@@ -129,9 +129,9 @@
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
     <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now">Hiện không thể định&#160;vị được thư&#160;mục trong thiết&#160;bị của bạn, hãy thử lại sau.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
-    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive">Folder in your device can’t be located</string>
+    <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive">Không tìm thấy vị&#160;trí của thư&#160;mục trong thiết&#160;bị của bạn</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">Problem syncing or backing up this folder because of changes to the MEGA folder. Stop the sync or backup and try setting it up again in the desktop app, or contact Support.</string>
+    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">Có sự&#160;cố đồng&#160;bộ hóa hoặc sao&#160;lưu thư&#160;mục này do các thay&#160;đổi của thư&#160;mục MEGA. Dừng đồng&#160;bộ hóa hoặc sao&#160;lưu và thử thiết&#160;lập lại trong app đành cho máy&#160;tính hoặc liên&#160;hệ với bộ&#160;phận Hỗ&#160;trợ.</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
     <string name="device_center_list_view_item_sub_state_message_folder_backup_issue">Có sự&#160;cố khi đồng&#160;bộ hóa hoặc sao&#160;lưu thư&#160;mục này. Hãy thử dừng đồng&#160;bộ hóa hoặc sao&#160;lưu và thử thiết&#160;lập lại trong Ứng&#160;dụng cho máy&#160;tính hoặc liên&#160;hệ với bộ&#160;phận Hỗ&#160;Trợ.</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
@@ -166,4 +166,22 @@
     <string name="device_center_top_app_bar_search_syncs_hint">Tìm mục đồng bộ</string>
     <!-- Text to show in the Device Center when no search results are found -->
     <string name="device_center_empty_screen_no_results">Không có Kết quả</string>
+    <!-- Header of the Info view field for what is the content of a device/folder -->
+    <string name="device_center_info_content">Chứa đựng</string>
+    <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
+    <string name="device_center_info_total_size">Tổng kích thước</string>
+    <!-- String which indicates the number of files contained into a device/folder -->
+    <plurals name="device_center_info_num_files">
+        <item quantity="other">%1$d tệp tin</item>
+    </plurals>
+    <!-- String which indicates the number of folders contained into a device/folder -->
+    <plurals name="device_center_info_num_folders">
+        <item quantity="other">%1$d thư&#160;mục</item>
+    </plurals>
+    <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
+    <plurals name="device_center_info_num_folders_and_files">
+        <item quantity="other">%1$d thư&#160;mục&#160;·&#160;</item>
+    </plurals>
+    <!-- Header of the Info view field for the date and time a folder was added -->
+    <string name="device_center_info_added">Đã thêm</string>
 </resources>
