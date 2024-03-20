@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property selectedDocumentHandles the selected document handles
  * @property actionMode if list is in action mode or not
  * @property searchQuery search query
+ * @property scrollToTop if need to scroll to top
  */
 data class DocumentSectionUiState(
     val allDocuments: List<DocumentUiEntity> = emptyList(),
@@ -24,4 +25,5 @@ data class DocumentSectionUiState(
     val selectedDocumentHandles: List<Long> = emptyList(),
     val actionMode: Boolean = false,
     val searchQuery: String? = null,
+    val scrollToTop: Boolean = false,
 )
