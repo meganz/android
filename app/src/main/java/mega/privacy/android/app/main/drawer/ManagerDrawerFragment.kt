@@ -361,7 +361,7 @@ internal class ManagerDrawerFragment : Fragment() {
             getString(R.string.section_contacts_with_notification, pendingRequestCount)
                 .spanABTextFontColour(
                     requireContext(),
-                    ColorUtils.getColorHexString(requireContext(), R.color.red_600_red_300)
+                    ColorUtils.getColorHexString(requireContext(), R.color.color_button_brand)
                 )
         }
     }
@@ -375,7 +375,7 @@ internal class ManagerDrawerFragment : Fragment() {
                 count
             ).spanABTextFontColour(
                 requireContext(),
-                ColorUtils.getColorHexString(requireContext(), R.color.red_600_red_300)
+                ColorUtils.getColorHexString(requireContext(), R.color.color_button_brand)
             )
         }
     }

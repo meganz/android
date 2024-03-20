@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.dialog.view
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -234,7 +235,7 @@ private fun BottomSheetContent(
                 if (!participant.callParticipantData.isGuest && participant.callParticipantData.isContact && !participant.isMe) {
                     BottomSheetMenuItemView(
                         modifier = Modifier,
-                        res = R.drawable.ic_chat,
+                        res = iconPackR.drawable.ic_message_chat_circle_medium_regular_outline,
                         text = R.string.context_send_message,
                         description = "Send message",
                         tintRed = false,

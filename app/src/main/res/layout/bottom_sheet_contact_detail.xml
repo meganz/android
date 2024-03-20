@@ -51,7 +51,7 @@
                 android:id="@+id/option_send_message"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_send_message"
-                app:drawableStartCompat="@drawable/ic_chat" />
+                app:drawableStartCompat="@drawable/ic_message_chat_circle_medium_regular_outline" />
 
             <TextView
                 android:id="@+id/option_send_file"

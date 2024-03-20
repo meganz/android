@@ -502,7 +502,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private val badgeDrawable: BadgeDrawerArrowDrawable by lazy {
         BadgeDrawerArrowDrawable(
-            this, R.color.red_600_red_300,
+            this, R.color.color_button_brand,
             R.color.white_dark_grey, R.color.white_dark_grey
         )
     }
@@ -1298,13 +1298,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     val tabIconColor =
-                        ContextCompat.getColor(applicationContext, R.color.red_600_red_300)
+                        ContextCompat.getColor(applicationContext, R.color.color_button_brand)
                     tab.icon?.setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN)
                 }
 
                 override fun onTabUnselected(tab: TabLayout.Tab) {
                     val tabIconColor =
-                        ContextCompat.getColor(applicationContext, R.color.grey_300_grey_600)
+                        ContextCompat.getColor(applicationContext, R.color.color_icon_secondary)
                     tab.icon?.setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN)
                 }
 
@@ -3499,17 +3499,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             when (position) {
                 SharesTab.INCOMING_TAB.position -> {
                     tab.setText(R.string.tab_incoming_shares)
-                    tab.setIcon(R.drawable.ic_incoming_shares)
+                    tab.setIcon(R.drawable.ic_folder_incoming_medium_regular_selector)
                 }
 
                 SharesTab.OUTGOING_TAB.position -> {
                     tab.setText(R.string.tab_outgoing_shares)
-                    tab.setIcon(R.drawable.ic_outgoing_shares)
+                    tab.setIcon(R.drawable.ic_folder_outgoing_medium_regular_selector)
                 }
 
                 SharesTab.LINKS_TAB.position -> {
                     tab.setText(R.string.tab_links_shares)
-                    tab.setIcon(CoreUiR.drawable.link_ic)
+                    tab.setIcon(R.drawable.ic_link01_medium_regular_selector)
                 }
             }
         }.attach()

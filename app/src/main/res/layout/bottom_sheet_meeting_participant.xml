@@ -125,7 +125,7 @@
                     style="@style/BottomSheetItem"
                     android:show="@{viewModel.showSendMessage()}"
                     android:text="@string/context_send_message"
-                    app:drawableStartCompat="@drawable/ic_chat" />
+                    app:drawableStartCompat="@drawable/ic_message_chat_circle_medium_regular_outline" />
 
                 <View
                     android:id="@+id/divider_send_message"

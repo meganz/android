@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.settings.startscreen.model
 
 import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.domain.entity.preference.StartScreen
 
 /**
@@ -18,9 +19,10 @@ internal fun mapStartScreenOption(screen: StartScreen) = when (screen) {
         StartScreenOption(
             startScreen = screen,
             title = R.string.section_cloud_drive,
-            icon = R.drawable.ic_files_home,
+            icon = iconPackR.drawable.ic_folder_medium_regular_outline,
         )
     }
+
     StartScreen.Photos -> {
         StartScreenOption(
             startScreen = screen,
@@ -28,25 +30,28 @@ internal fun mapStartScreenOption(screen: StartScreen) = when (screen) {
             icon = R.drawable.ic_camera_uploads,
         )
     }
+
     StartScreen.Home -> {
         StartScreenOption(
             startScreen = screen,
             title = R.string.home_section,
-            icon = R.drawable.ic_homepage,
+            icon = iconPackR.drawable.ic_mega_medium_regular_outline,
         )
     }
+
     StartScreen.Chat -> {
         StartScreenOption(
             startScreen = screen,
             title = R.string.section_chat,
-            icon = R.drawable.ic_chat,
+            icon = iconPackR.drawable.ic_message_chat_circle_medium_regular_outline,
         )
     }
+
     StartScreen.SharedItems -> {
         StartScreenOption(
             startScreen = screen,
             title = R.string.title_shared_items,
-            icon = R.drawable.ic_shared,
+            icon = iconPackR.drawable.ic_folder_users_medium_regular_outline,
         )
     }
 }

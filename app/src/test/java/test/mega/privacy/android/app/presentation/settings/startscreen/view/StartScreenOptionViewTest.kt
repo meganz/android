@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.presentation.settings.startscreen.view
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -26,7 +27,7 @@ class StartScreenOptionViewTest {
         val expected = "Home"
         composeRule.setContent {
             StartScreenOptionView(
-                icon = R.drawable.ic_homepage,
+                icon = iconPackR.drawable.ic_mega_medium_regular_outline,
                 text = expected,
                 isSelected = false,
                 onClick = {}
@@ -38,7 +39,7 @@ class StartScreenOptionViewTest {
 
     @Test
     fun `test that icon is displayed`() {
-        val expectedResId = R.drawable.ic_homepage
+        val expectedResId = iconPackR.drawable.ic_mega_medium_regular_outline
         composeRule.setContent {
             StartScreenOptionView(
                 icon = expectedResId,
@@ -56,7 +57,7 @@ class StartScreenOptionViewTest {
     fun `test that checkmark is displayed if selected`() {
         composeRule.setContent {
             StartScreenOptionView(
-                icon = R.drawable.ic_homepage,
+                icon = iconPackR.drawable.ic_mega_medium_regular_outline,
                 text = "expected",
                 isSelected = true,
                 onClick = {}
@@ -71,7 +72,7 @@ class StartScreenOptionViewTest {
     fun `test that checkmark is not displayed if not selected`() {
         composeRule.setContent {
             StartScreenOptionView(
-                icon = R.drawable.ic_homepage,
+                icon = iconPackR.drawable.ic_mega_medium_regular_outline,
                 text = "expected",
                 isSelected = false,
                 onClick = {}
@@ -86,7 +87,7 @@ class StartScreenOptionViewTest {
         val onClick = mock<() -> Unit>()
         composeRule.setContent {
             StartScreenOptionView(
-                icon = R.drawable.ic_homepage,
+                icon = iconPackR.drawable.ic_mega_medium_regular_outline,
                 text = "expected",
                 isSelected = false,
                 onClick = onClick

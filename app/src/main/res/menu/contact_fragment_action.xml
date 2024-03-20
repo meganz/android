@@ -14,7 +14,7 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/cab_menu_start_conversation"
-        android:icon="@drawable/ic_chat"
+        android:icon="@drawable/ic_message_chat_circle_medium_regular_outline"
         android:orderInCategory="100"
         android:title="@string/group_chat_start_conversation_label"
         app:iconTint="?attr/colorSecondary"

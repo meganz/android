@@ -3,26 +3,26 @@
 	tools:context="mega.privacy.android.app.main.ManagerActivity">
 	<item
 		android:id="@+id/bottom_navigation_item_cloud_drive"
-		android:icon="@drawable/ic_files_home"
+		android:icon="@drawable/ic_folder_medium_regular_selector"
 		android:title="@string/section_cloud_drive"/>
 
 	<item
 		android:id="@+id/bottom_navigation_item_camera_uploads"
-		android:icon="@drawable/ic_bottom_nav_photos"
+		android:icon="@drawable/ic_image03_medium_regular_selector"
 		android:title="@string/sortby_type_photo_first"/>
 
 	<item
 		android:id="@+id/bottom_navigation_item_homepage"
-		android:icon="@drawable/ic_homepage"
+		android:icon="@drawable/ic_mega_medium_regular_selector"
 		android:title="@string/home_section" />
 
 	<item
 		android:id="@+id/bottom_navigation_item_chat"
-		android:icon="@drawable/ic_chat"
+		android:icon="@drawable/ic_message_chat_circle_medium_regular_selector"
 		android:title="@string/section_chat" />
 
 	<item
 		android:id="@+id/bottom_navigation_item_shared_items"
-		android:icon="@drawable/ic_shared"
+		android:icon="@drawable/ic_folder_users_medium_regular_selector"
 		android:title="@string/title_shared_items" />
 </menu>

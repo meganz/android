@@ -174,7 +174,7 @@
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:src="@drawable/ic_chat"
+                    android:src="@drawable/ic_message_chat_circle_medium_regular_outline"
                     android:visibility="visible"
                     app:tint="?android:attr/textColorSecondary" />
 
