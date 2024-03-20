@@ -74,6 +74,7 @@ import timber.log.Timber
  */
 @Composable
 internal fun PasscodeView(
+    cryptObjectFactory: PasscodeCryptObjectFactory,
     passcodeUnlockViewModel: PasscodeUnlockViewModel = viewModel(),
     biometricAuthIsAvailable: (Context) -> Boolean = ::areBiometricsEnabled,
     showBiometricAuth: (
@@ -84,7 +85,6 @@ internal fun PasscodeView(
         promptInfo: BiometricPrompt.PromptInfo,
         cryptObject: CryptoObject,
     ) -> Unit = ::launchBiometricPrompt,
-    cryptObjectFactory: PasscodeCryptObjectFactory,
 ) {
     Timber.d("Passcode main UI composed")
     val uiState by passcodeUnlockViewModel.state.collectAsStateWithLifecycle()

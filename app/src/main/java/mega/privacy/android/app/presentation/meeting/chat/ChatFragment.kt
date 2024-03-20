@@ -17,6 +17,8 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.saver.ChatSavers
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.MessageAction
+import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.theme.MegaAppTheme
@@ -33,6 +35,9 @@ internal class ChatFragment : Fragment() {
     lateinit var messageActionFactories: Set<@JvmSuppressWildcards (ChatViewModel) -> MessageAction>
 
     @Inject
+    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
+
+    @Inject
     lateinit var savers: ChatSavers
 
     override fun onCreateView(
@@ -45,9 +50,14 @@ internal class ChatFragment : Fragment() {
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             SessionContainer(shouldCheckChatSession = true) {
                 MegaAppTheme(isDark = mode.isDarkMode()) {
-                    ChatView(
-                        actionsFactories = messageActionFactories,
-                        savers = savers,
+                    PasscodeContainer(
+                        passcodeCryptObjectFactory = passcodeCryptObjectFactory,
+                        content = {
+                            ChatView(
+                                actionsFactories = messageActionFactories,
+                                savers = savers,
+                            )
+                        }
                     )
                 }
             }
