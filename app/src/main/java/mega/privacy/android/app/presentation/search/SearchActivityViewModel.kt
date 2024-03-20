@@ -81,11 +81,6 @@ class SearchActivityViewModel @Inject constructor(
      */
     val state: StateFlow<SearchActivityState> = _state
 
-    /**
-     * Search job
-     */
-    private var searchJob: Job? = null
-
     private val isFirstLevel = stateHandle.get<Boolean>(SearchActivity.IS_FIRST_LEVEL) ?: false
     private val nodeSourceType =
         stateHandle.get<NodeSourceType>(SearchActivity.SEARCH_TYPE) ?: OTHER
@@ -142,8 +137,7 @@ class SearchActivityViewModel @Inject constructor(
      */
     private fun performSearch() {
         _state.update { it.copy(isSearching = true) }
-        searchJob?.cancel()
-        searchJob = viewModelScope.launch {
+        viewModelScope.launch {
             runCatching {
                 cancelCancelTokenUseCase()
                 if (state.value.dropdownChipsEnabled) {

@@ -3091,11 +3091,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 } else {
                     if (megaApi.rootNode != null) {
-                        fileBrowserViewModel.setFileBrowserHandle(
-                            megaApi.rootNode?.handle ?: INVALID_HANDLE
-                        )
-                        supportActionBar?.title = getString(R.string.title_mega_info_empty_screen)
-                        viewModel.setIsFirstNavigationLevel(true)
+                        if (fileBrowserViewModel.state().fileBrowserHandle == INVALID_HANDLE) {
+                            fileBrowserViewModel.setFileBrowserHandle(
+                                megaApi.rootNode?.handle ?: INVALID_HANDLE
+                            )
+                            supportActionBar?.title =
+                                getString(R.string.title_mega_info_empty_screen)
+                            viewModel.setIsFirstNavigationLevel(true)
+                        }
                     } else {
                         fileBrowserViewModel.setFileBrowserHandle(-1)
                         viewModel.setIsFirstNavigationLevel(true)
