@@ -87,6 +87,20 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/hide"
+        android:orderInCategory="121"
+        android:title="@string/general_hide_node"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/unhide"
+        android:orderInCategory="123"
+        android:title="@string/general_unhide_node"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/move"
         android:orderInCategory="125"
         android:title="@string/context_move"
