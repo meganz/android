@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
@@ -30,6 +31,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSettingUseCase
@@ -46,6 +48,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -65,6 +68,7 @@ internal class SettingsCameraUploadsViewModelTest {
 
     private lateinit var underTest: SettingsCameraUploadsViewModel
 
+    private val areUploadFileNamesKeptUseCase = mock<AreUploadFileNamesKeptUseCase>()
     private val checkEnableCameraUploadsStatusUseCase =
         mock<CheckEnableCameraUploadsStatusUseCase>()
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase =
@@ -78,6 +82,7 @@ internal class SettingsCameraUploadsViewModelTest {
     private val listenToNewMediaUseCase = mock<ListenToNewMediaUseCase>()
     private val preparePrimaryFolderPathUseCase = mock<PreparePrimaryFolderPathUseCase>()
     private val setCameraUploadsByWifiUseCase = mock<SetCameraUploadsByWifiUseCase>()
+    private val setUploadFileNamesKeptUseCase = mock<SetUploadFileNamesKeptUseCase>()
     private val setUploadOptionUseCase = mock<SetUploadOptionUseCase>()
     private val setUploadVideoQualityUseCase = mock<SetUploadVideoQualityUseCase>()
     private val setupCameraUploadsSettingUseCase = mock<SetupCameraUploadsSettingUseCase>()
@@ -90,6 +95,7 @@ internal class SettingsCameraUploadsViewModelTest {
     @BeforeEach
     fun resetMocks() {
         reset(
+            areUploadFileNamesKeptUseCase,
             checkEnableCameraUploadsStatusUseCase,
             deleteCameraUploadsTemporaryRootDirectoryUseCase,
             getUploadOptionUseCase,
@@ -101,6 +107,7 @@ internal class SettingsCameraUploadsViewModelTest {
             listenToNewMediaUseCase,
             preparePrimaryFolderPathUseCase,
             setCameraUploadsByWifiUseCase,
+            setUploadFileNamesKeptUseCase,
             setUploadOptionUseCase,
             setUploadVideoQualityUseCase,
             setupCameraUploadsSettingUseCase,
@@ -117,9 +124,11 @@ internal class SettingsCameraUploadsViewModelTest {
         isCameraUploadsByWifi: Boolean = true,
         isCameraUploadsEnabled: Boolean = true,
         isMediaUploadsEnabled: Boolean = true,
+        shouldKeepUploadFileNames: Boolean = true,
         uploadOption: UploadOption = UploadOption.PHOTOS,
         videoQuality: VideoQuality = VideoQuality.ORIGINAL,
     ) {
+        whenever(areUploadFileNamesKeptUseCase()).thenReturn(shouldKeepUploadFileNames)
         whenever(isCameraUploadsByWifiUseCase()).thenReturn(isCameraUploadsByWifi)
         whenever(isCameraUploadsEnabledUseCase()).thenReturn(isCameraUploadsEnabled)
         whenever(isSecondaryFolderEnabled()).thenReturn(isMediaUploadsEnabled)
@@ -127,6 +136,7 @@ internal class SettingsCameraUploadsViewModelTest {
         whenever(getUploadVideoQualityUseCase()).thenReturn(videoQuality)
 
         underTest = SettingsCameraUploadsViewModel(
+            areUploadFileNamesKeptUseCase = areUploadFileNamesKeptUseCase,
             checkEnableCameraUploadsStatusUseCase = checkEnableCameraUploadsStatusUseCase,
             deleteCameraUploadsTemporaryRootDirectoryUseCase = deleteCameraUploadsTemporaryRootDirectoryUseCase,
             getUploadOptionUseCase = getUploadOptionUseCase,
@@ -138,6 +148,7 @@ internal class SettingsCameraUploadsViewModelTest {
             listenToNewMediaUseCase = listenToNewMediaUseCase,
             preparePrimaryFolderPathUseCase = preparePrimaryFolderPathUseCase,
             setCameraUploadsByWifiUseCase = setCameraUploadsByWifiUseCase,
+            setUploadFileNamesKeptUseCase = setUploadFileNamesKeptUseCase,
             setUploadOptionUseCase = setUploadOptionUseCase,
             setUploadVideoQualityUseCase = setUploadVideoQualityUseCase,
             setupCameraUploadsSettingUseCase = setupCameraUploadsSettingUseCase,
@@ -545,6 +556,42 @@ internal class SettingsCameraUploadsViewModelTest {
             verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
             underTest.uiState.test {
                 assertThat(awaitItem().videoQualityUiItem).isEqualTo(videoQualityUiItem)
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("Keep File Names As In The Device")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    internal inner class KeepFileNamesTestGroup {
+        @Test
+        fun `test that an error snackbar is displayed when changing the keep file names state throws an exception`() =
+            runTest {
+                initializeUnderTest()
+                whenever(setUploadFileNamesKeptUseCase(any())).thenThrow(RuntimeException())
+
+                assertDoesNotThrow { underTest.onKeepFileNamesStateChanged(false) }
+                verify(snackBarHandler).postSnackbarMessage(
+                    resId = R.string.general_error,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
+
+        @ParameterizedTest(name = "new keep upload file names state: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that changing the keep file names state stops camera uploads`(
+            shouldKeepUploadFileNames: Boolean,
+        ) = runTest {
+            initializeUnderTest()
+
+            underTest.onKeepFileNamesStateChanged(shouldKeepUploadFileNames)
+
+            verify(setUploadFileNamesKeptUseCase).invoke(shouldKeepUploadFileNames)
+            verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
+            underTest.uiState.test {
+                assertThat(awaitItem().shouldKeepUploadFileNames).isEqualTo(
+                    shouldKeepUploadFileNames
+                )
             }
         }
     }

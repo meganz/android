@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.model.Upload
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.CAMERA_UPLOADS_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.FILE_UPLOAD_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.HOW_TO_UPLOAD_TILE
+import mega.privacy.android.app.presentation.settings.camerauploads.tiles.KEEP_FILE_NAMES_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VIDEO_QUALITY_TILE
 import org.junit.Rule
 import org.junit.Test
@@ -43,6 +44,7 @@ internal class SettingsCameraUploadsViewTest {
 
         composeTestRule.onNodeWithTag(HOW_TO_UPLOAD_TILE).assertIsDisplayed()
         composeTestRule.onNodeWithTag(FILE_UPLOAD_TILE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(KEEP_FILE_NAMES_TILE).assertIsDisplayed()
     }
 
     @Test
@@ -127,6 +129,7 @@ internal class SettingsCameraUploadsViewTest {
                 onBusinessAccountPromptDismissed = {},
                 onCameraUploadsStateChanged = {},
                 onHowToUploadPromptOptionSelected = {},
+                onKeepFileNamesStateChanged = {},
                 onMediaPermissionsGranted = {},
                 onRegularBusinessAccountSubUserPromptAcknowledged = {},
                 onRequestPermissionsStateChanged = {},

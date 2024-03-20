@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
@@ -31,6 +32,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSettingUseCase
@@ -43,6 +45,8 @@ import javax.inject.Inject
 /**
  * The [ViewModel] for Settings Camera Uploads
  *
+ * @property areUploadFileNamesKeptUseCase Checks if the existing filenames should be used when
+ * uploading content
  * @property checkEnableCameraUploadsStatusUseCase Checks the Camera Uploads status and determine if it
  * can be ran
  * @property deleteCameraUploadsTemporaryRootDirectoryUseCase Deletes the temporary Camera Uploads Cache Folder
@@ -56,6 +60,8 @@ import javax.inject.Inject
  * @property listenToNewMediaUseCase Listens to new Photos and Videos captured by the Device
  * @property preparePrimaryFolderPathUseCase Prepares the Primary Folder path
  * @property setCameraUploadsByWifiUseCase Sets whether Camera Uploads can only run through Wi-Fi / Wi-Fi or Mobile Data
+ * @property setUploadFileNamesKeptUseCase Sets whether or not existing filenames should be used
+ * when uploading content
  * @property setUploadOptionUseCase Sets the new type of content being uploaded by Camera Uploads
  * @property setUploadVideoQualityUseCase Sets the new Video Quality of Videos being uploaded by Camera Uploads
  * @property setupCameraUploadsSettingUseCase If true, this enables Camera Uploads. Otherwise, the
@@ -68,6 +74,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 internal class SettingsCameraUploadsViewModel @Inject constructor(
+    private val areUploadFileNamesKeptUseCase: AreUploadFileNamesKeptUseCase,
     private val checkEnableCameraUploadsStatusUseCase: CheckEnableCameraUploadsStatusUseCase,
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase,
     private val getUploadOptionUseCase: GetUploadOptionUseCase,
@@ -79,6 +86,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
     private val preparePrimaryFolderPathUseCase: PreparePrimaryFolderPathUseCase,
     private val setCameraUploadsByWifiUseCase: SetCameraUploadsByWifiUseCase,
+    private val setUploadFileNamesKeptUseCase: SetUploadFileNamesKeptUseCase,
     private val setUploadOptionUseCase: SetUploadOptionUseCase,
     private val setUploadVideoQualityUseCase: SetUploadVideoQualityUseCase,
     private val setupCameraUploadsSettingUseCase: SetupCameraUploadsSettingUseCase,
@@ -110,6 +118,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
 
                 val isCameraUploadsEnabled = async { isCameraUploadsEnabledUseCase() }
                 val isMediaUploadsEnabled = async { isSecondaryFolderEnabled() }
+                val shouldKeepUploadFileNames = async { areUploadFileNamesKeptUseCase() }
                 val uploadOption = async { getUploadOptionUseCase() }
                 val uploadConnectionType = async { getUploadConnectionType() }
                 val videoQuality = async { getUploadVideoQualityUseCase() }
@@ -118,6 +127,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                     it.copy(
                         isCameraUploadsEnabled = isCameraUploadsEnabled.await(),
                         isMediaUploadsEnabled = isMediaUploadsEnabled.await(),
+                        shouldKeepUploadFileNames = shouldKeepUploadFileNames.await(),
                         uploadOptionUiItem = uploadOptionUiItemMapper(uploadOption.await()),
                         uploadConnectionType = uploadConnectionType.await(),
                         videoQualityUiItem = videoQualityUiItemMapper(videoQuality.await()),
@@ -290,6 +300,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     /**
      * Configures the new type of content being uploaded by Camera Uploads. Doing this stops the
      * ongoing Camera Uploads process and clears the internal Cache
+     *
+     * @param uploadOptionUiItem The new [UploadOptionUiItem]
      */
     fun onUploadOptionUiItemSelected(uploadOptionUiItem: UploadOptionUiItem) {
         viewModelScope.launch {
@@ -308,6 +320,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     /**
      * Configures the new Video Quality for Videos being uploaded by Camera Uploads. Doing this stops
      * the ongoing Camera Uploads process
+     *
+     * @param videoQualityUiItem The new [VideoQualityUiItem]
      */
     fun onVideoQualityUiItemSelected(videoQualityUiItem: VideoQualityUiItem) {
         viewModelScope.launch {
@@ -317,6 +331,25 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 _uiState.update { it.copy(videoQualityUiItem = videoQualityUiItem) }
             }.onFailure { exception ->
                 Timber.e("An error occurred when changing the Video Quality", exception)
+                showGenericErrorSnackbar()
+            }
+        }
+    }
+
+    /**
+     * Configures whether or not the existing filenames should be used when uploading content. Doing
+     * this stops the ongoing Camera Uploads process
+     *
+     * @param newState The new Keep File Names state
+     */
+    fun onKeepFileNamesStateChanged(newState: Boolean) {
+        viewModelScope.launch {
+            runCatching {
+                setUploadFileNamesKeptUseCase(newState)
+                stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
+                _uiState.update { it.copy(shouldKeepUploadFileNames = newState) }
+            }.onFailure { exception ->
+                Timber.e("An error occurred when changing the Keep File Names state", exception)
                 showGenericErrorSnackbar()
             }
         }

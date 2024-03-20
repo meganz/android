@@ -22,6 +22,7 @@ internal fun SettingsCameraUploadsRoute(
         onBusinessAccountPromptDismissed = viewModel::onBusinessAccountPromptDismissed,
         onCameraUploadsStateChanged = viewModel::onCameraUploadsStateChanged,
         onHowToUploadPromptOptionSelected = viewModel::onHowToUploadPromptOptionSelected,
+        onKeepFileNamesStateChanged = viewModel::onKeepFileNamesStateChanged,
         onMediaPermissionsGranted = viewModel::onMediaPermissionsGranted,
         onRegularBusinessAccountSubUserPromptAcknowledged = viewModel::onRegularBusinessAccountSubUserPromptAcknowledged,
         onRequestPermissionsStateChanged = viewModel::onRequestPermissionsStateChanged,

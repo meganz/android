@@ -35,6 +35,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.permissions.
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.CameraUploadsTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.FileUploadTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.HowToUploadTile
+import mega.privacy.android.app.presentation.settings.camerauploads.tiles.KeepFileNamesTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VideoQualityTile
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
@@ -51,6 +52,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  * @param onCameraUploadsStateChanged Lambda to execute when the Camera Uploads state changes
  * @param onHowToUploadPromptOptionSelected Lambda to execute when the User selects a new
  * [UploadConnectionType] from the How to Upload prompt
+ * @param onKeepFileNamesStateChanged Lambda to execute when the Keep File Names state changes
  * @param onMediaPermissionsGranted Lambda to execute when the User has granted the Media Permissions
  * @param onRegularBusinessAccountSubUserPromptAcknowledged Lambda to execute when the Business
  * Account Sub-User acknowledges that the Business Account Administrator can access the content
@@ -70,6 +72,7 @@ internal fun SettingsCameraUploadsView(
     onBusinessAccountPromptDismissed: () -> Unit,
     onCameraUploadsStateChanged: (Boolean) -> Unit,
     onHowToUploadPromptOptionSelected: (UploadConnectionType) -> Unit,
+    onKeepFileNamesStateChanged: (Boolean) -> Unit,
     onMediaPermissionsGranted: () -> Unit,
     onRegularBusinessAccountSubUserPromptAcknowledged: () -> Unit,
     onRequestPermissionsStateChanged: (StateEvent) -> Unit,
@@ -174,6 +177,10 @@ internal fun SettingsCameraUploadsView(
                             onItemClicked = { showVideoQualityPrompt = true },
                         )
                     }
+                    KeepFileNamesTile(
+                        isChecked = uiState.shouldKeepUploadFileNames,
+                        onCheckedChange = onKeepFileNamesStateChanged,
+                    )
                 }
             }
         },
@@ -197,6 +204,7 @@ private fun SettingsCameraUploadsViewPreview(
             onBusinessAccountPromptDismissed = {},
             onCameraUploadsStateChanged = {},
             onHowToUploadPromptOptionSelected = {},
+            onKeepFileNamesStateChanged = {},
             onMediaPermissionsGranted = {},
             onRequestPermissionsStateChanged = {},
             onSettingsScreenPaused = {},
