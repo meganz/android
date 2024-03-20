@@ -603,4 +603,21 @@ interface AccountRepository {
      * Monitors update user's data broadcast.
      */
     fun monitorUpdateUserData(): Flow<Unit>
+
+    /**
+     * Get last registered email
+     * @return [Boolean]
+     */
+    suspend fun getLastRegisteredEmail(): String?
+
+    /**
+     * Save last registered email
+     * @param email [String]
+     */
+    suspend fun saveLastRegisteredEmail(email: String)
+
+    /**
+     * Clear last registered email
+     */
+    suspend fun clearLastRegisteredEmail()
 }

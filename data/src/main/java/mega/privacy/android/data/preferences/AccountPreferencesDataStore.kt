@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
@@ -14,6 +15,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.cryptography.DecryptData
+import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.extensions.monitor
 import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -23,12 +26,12 @@ import javax.inject.Inject
 
 private const val ACCOUNT_PREFERENCE = "ACCOUNT_PREFERENCE"
 private const val accountPreferenceFileName = ACCOUNT_PREFERENCE
-
 private const val SHOW_2FA_DIALOG = "SHOW_2FA_DIALOG"
 private const val LATEST_TARGET_PATH_COPY = "LATEST_TARGET_PATH_COPY"
 private const val LATEST_TARGET_PATH_MOVE = "LATEST_TARGET_PATH_MOVE"
 private const val LATEST_TARGET_PATH_TIMESTAMP_COPY = "LATEST_TARGET_PATH_TIMESTAMP_COPY"
 private const val LATEST_TARGET_PATH_TIMESTAMP_MOVE = "LATEST_TARGET_PATH_TIMESTAMP_MOVE"
+private const val LAST_REGISTERED_EMAIL = "LAST_REGISTERED_EMAIL"
 
 private val Context.accountPreferencesDataStore: DataStore<Preferences> by preferencesDataStore(
     name = accountPreferenceFileName,
@@ -43,6 +46,8 @@ private val Context.accountPreferencesDataStore: DataStore<Preferences> by prefe
 class AccountPreferencesDataStore @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val encryptData: EncryptData,
+    private val decryptData: DecryptData,
 ) : AccountPreferencesGateway {
 
     private val show2FADialog = booleanPreferencesKey(SHOW_2FA_DIALOG)
@@ -52,6 +57,8 @@ class AccountPreferencesDataStore @Inject constructor(
         longPreferencesKey(LATEST_TARGET_PATH_TIMESTAMP_COPY)
     private val latestTargetPathTimestampMovePreferenceKey =
         longPreferencesKey(LATEST_TARGET_PATH_TIMESTAMP_MOVE)
+    private val lastRegisteredEmailPreferenceKey =
+        stringPreferencesKey(LAST_REGISTERED_EMAIL)
 
     override suspend fun setDisplay2FADialog(show2FA: Boolean) {
         context.accountPreferencesDataStore.edit {
@@ -110,6 +117,23 @@ class AccountPreferencesDataStore @Inject constructor(
             context.accountPreferencesDataStore.edit {
                 it.clear()
             }
+        }
+    }
+
+    override fun monitorLastRegisteredEmail(): Flow<String?> =
+        context.accountPreferencesDataStore.monitor(lastRegisteredEmailPreferenceKey).map {
+            decryptData(it)
+        }
+
+    override suspend fun setLastRegisteredEmail(email: String) {
+        context.accountPreferencesDataStore.edit {
+            it[lastRegisteredEmailPreferenceKey] = encryptData(email).orEmpty()
+        }
+    }
+
+    override suspend fun clearLastRegisteredEmail() {
+        context.accountPreferencesDataStore.edit {
+            it.remove(lastRegisteredEmailPreferenceKey)
         }
     }
 }

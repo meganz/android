@@ -1213,6 +1213,18 @@ internal class DefaultAccountRepository @Inject constructor(
         return appEventGateway.monitorUpdateUserData()
     }
 
+    override suspend fun getLastRegisteredEmail() = withContext(ioDispatcher) {
+        accountPreferencesGateway.monitorLastRegisteredEmail().firstOrNull()
+    }
+
+    override suspend fun saveLastRegisteredEmail(email: String) = withContext(ioDispatcher) {
+        accountPreferencesGateway.setLastRegisteredEmail(email)
+    }
+
+    override suspend fun clearLastRegisteredEmail() = withContext(ioDispatcher) {
+        accountPreferencesGateway.clearLastRegisteredEmail()
+    }
+
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
         private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"

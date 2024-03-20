@@ -1656,4 +1656,28 @@ class DefaultAccountRepositoryTest {
                 assertThat(expectMostRecentItem()).isEqualTo(Unit)
             }
         }
+
+    @Test
+    fun `test that monitorLastRegisteredEmail is invoked when monitorLastRegisteredEmail called`() =
+        runTest {
+            whenever(accountPreferencesGateway.monitorLastRegisteredEmail()).thenReturn(
+                flowOf("email")
+            )
+            underTest.getLastRegisteredEmail()
+            verify(accountPreferencesGateway).monitorLastRegisteredEmail()
+        }
+
+    @Test
+    fun `test that setLastRegisteredEmail is invoked when saveLastRegisteredEmail called`() =
+        runTest {
+            underTest.saveLastRegisteredEmail("email")
+            verify(accountPreferencesGateway).setLastRegisteredEmail("email")
+        }
+
+    @Test
+    fun `test that clearLastRegisteredEmail is invoked when clearLastRegisteredEmail called`() =
+        runTest {
+            underTest.clearLastRegisteredEmail()
+            verify(accountPreferencesGateway).clearLastRegisteredEmail()
+        }
 }
