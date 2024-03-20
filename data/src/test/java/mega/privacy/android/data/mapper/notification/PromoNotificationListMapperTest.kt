@@ -23,12 +23,14 @@ class PromoNotificationListMapperTest {
 
     @Test
     fun `test that promo notification list mapper returns correctly`() {
+        val staticURL = "https://eu.static.mega.co.nz/psa/"
+        val testImageName = "vpn"
         val promoNotification = PromoNotification(
             promoID = 1L,
             title = "title",
             description = "description",
-            imageName = "imageName",
-            imageURL = "imageURL",
+            iconURL = "$staticURL$testImageName@2x.png",
+            imageURL = "$staticURL$testImageName@2x.png",
             startTimeStamp = 1L,
             endTimeStamp = 2L,
             actionName = "actionName",
@@ -46,8 +48,51 @@ class PromoNotificationListMapperTest {
             on { id } doReturn 1L
             on { title } doReturn promoNotification.title
             on { description } doReturn promoNotification.description
-            on { imageName } doReturn promoNotification.imageName
-            on { imagePath } doReturn promoNotification.imageURL
+            on { iconName } doReturn testImageName
+            on { imageName } doReturn testImageName
+            on { imagePath } doReturn staticURL
+            on { start } doReturn 1L
+            on { end } doReturn 2L
+            on { callToAction1 }.thenReturn(callToAction1Mock)
+            on { callToAction2 }.thenReturn(callToAction2Mock)
+        }
+        val megaNotificationList = mock<MegaNotificationList> {
+            on { size() } doReturn 1
+            on { get(0) }.thenReturn(megaNotification)
+        }
+        assertThat(underTest.invoke(megaNotificationList))
+            .isEqualTo(listOf(promoNotification))
+    }
+
+    @Test
+    fun `test that promo notification list mapper return iconURL and imageURL as empty ones if iconName and imageName is empty`() {
+        val staticURL = "https://eu.static.mega.co.nz/psa/"
+        val promoNotification = PromoNotification(
+            promoID = 1L,
+            title = "title",
+            description = "description",
+            iconURL = "",
+            imageURL = "",
+            startTimeStamp = 1L,
+            endTimeStamp = 2L,
+            actionName = "actionName",
+            actionURL = "actionURL"
+        )
+        val callToAction1Mock = mock<MegaStringMap> {
+            on { get("text") } doReturn promoNotification.actionName
+            on { get("link") } doReturn promoNotification.actionURL
+        }
+        val callToAction2Mock = mock<MegaStringMap> {
+            on { get("text") } doReturn "actionName1"
+            on { get("link") } doReturn "actionURL1"
+        }
+        val megaNotification = mock<MegaNotification> {
+            on { id } doReturn 1L
+            on { title } doReturn promoNotification.title
+            on { description } doReturn promoNotification.description
+            on { iconName } doReturn ""
+            on { imageName } doReturn ""
+            on { imagePath } doReturn staticURL
             on { start } doReturn 1L
             on { end } doReturn 2L
             on { callToAction1 }.thenReturn(callToAction1Mock)

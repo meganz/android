@@ -19,9 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -29,7 +27,6 @@ import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.notification.view.components.GreenIconView
 import mega.privacy.android.app.presentation.notification.view.components.NotificationDate
-import mega.privacy.android.app.presentation.twofactorauthentication.extensions.drawableId
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.core.ui.controls.dividers.DividerType
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
@@ -50,6 +47,8 @@ internal fun PromoNotificationItemView(
     onClick: () -> Unit,
 ) {
     val hasPreview = notification.imageURL.isNotBlank()
+    val hasIcon = notification.iconURL.isNotBlank()
+    val description = notification.description
     val timeText = TimeUtils.formatTime(notification.endTimeStamp)
     val dateText = TimeUtils.formatDateAndTime(
         LocalContext.current,
@@ -91,8 +90,6 @@ internal fun PromoNotificationItemView(
                     style = MaterialTheme.typography.body2medium,
                     modifier = Modifier.testTag(PROMO_NOTIFICATION_TITLE_TEST_TAG)
                 )
-
-                val description = notification.description
                 if (description.isNotBlank()) {
                     MegaText(
                         text = description,
@@ -128,13 +125,15 @@ internal fun PromoNotificationItemView(
                 )
                 if (!hasPreview) {
                     Spacer(modifier = Modifier.padding(4.dp))
-                    Image(painter = painterResource(id = R.drawable.ic_promo_notification),
-                        contentDescription = "Promo notification Icon",
-                        modifier = Modifier
-                            .size(48.dp)
-                            .semantics { drawableId = R.drawable.ic_promo_notification }
-                            .testTag(PROMO_NOTIFICATION_ICON_TEST_TAG)
-                    )
+                    if (hasIcon) {
+                        Image(
+                            painter = rememberAsyncImagePainter(model = notification.iconURL),
+                            contentDescription = "Promo notification Icon",
+                            modifier = Modifier
+                                .size(48.dp)
+                                .testTag(PROMO_NOTIFICATION_ICON_TEST_TAG)
+                        )
+                    }
                 }
             }
         }
@@ -175,7 +174,7 @@ private fun PromoNotificationItemPreview(
         promoID = 1,
         title = "Title",
         description = "Description",
-        imageName = "Image name",
+        iconURL = "https://www.pngkey.com/png/detail/137-1377870_canvas-sample-sample-image-url.png",
         imageURL = if (hasPreview) "https://www.pngkey.com/png/detail/137-1377870_canvas-sample-sample-image-url.png" else "",
         startTimeStamp = 1,
         endTimeStamp = 1665513960,

@@ -342,12 +342,14 @@ class DefaultNotificationsRepositoryTest {
 
     @Test
     fun `test that list of promo notifications is fetched`() = runTest {
+        val staticURL = "https://eu.static.mega.co.nz/psa/"
+        val testImageName = "vpn"
         val promoNotification = PromoNotification(
             promoID = 1L,
             title = "title",
             description = "description",
-            imageName = "imageName",
-            imageURL = "imageURL",
+            iconURL = "$staticURL$testImageName@2x.png",
+            imageURL = "$staticURL$testImageName@2x.png",
             startTimeStamp = 1L,
             endTimeStamp = 2L,
             actionName = "actionName",
@@ -365,8 +367,9 @@ class DefaultNotificationsRepositoryTest {
             on { id } doReturn 1L
             on { title } doReturn promoNotification.title
             on { description } doReturn promoNotification.description
-            on { imageName } doReturn promoNotification.imageName
-            on { imagePath } doReturn promoNotification.imageURL
+            on { iconName } doReturn testImageName
+            on { imageName } doReturn testImageName
+            on { imagePath } doReturn staticURL
             on { start } doReturn 1L
             on { end } doReturn 2L
             on { callToAction1 }.thenReturn(callToAction1Mock)
