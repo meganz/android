@@ -457,7 +457,9 @@ internal fun MegaAppBarTitleAndSubtitle(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            title()
+            Box(modifier = Modifier.weight(1f)) {
+                title()
+            }
             CompositionLocalProvider(
                 LocalContentColor provides MegaTheme.colors.icon.secondary,
                 LocalContentAlpha provides 1f,
