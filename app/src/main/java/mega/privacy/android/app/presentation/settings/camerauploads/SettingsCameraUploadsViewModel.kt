@@ -12,9 +12,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.mapper.UploadOptionUiItemMapper
+import mega.privacy.android.app.presentation.settings.camerauploads.mapper.VideoQualityUiItemMapper
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsUiState
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadOptionUiItem
+import mega.privacy.android.app.presentation.settings.camerauploads.model.VideoQualityUiItem
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
@@ -23,12 +25,14 @@ import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
@@ -43,6 +47,7 @@ import javax.inject.Inject
  * can be ran
  * @property deleteCameraUploadsTemporaryRootDirectoryUseCase Deletes the temporary Camera Uploads Cache Folder
  * @property getUploadOptionUseCase Gets the type of content being uploaded by Camera Uploads
+ * @property getUploadVideoQualityUseCase Gets the Video Quality of Videos being uploaded by Camera Uploads
  * @property isCameraUploadsByWifiUseCase Checks whether Camera Uploads can only be run on Wi-Fi / Wi-Fi or Mobile Data
  * @property isCameraUploadsEnabledUseCase Checks if Camera Uploads (the Primary Folder) is enabled
  * or not
@@ -52,18 +57,21 @@ import javax.inject.Inject
  * @property preparePrimaryFolderPathUseCase Prepares the Primary Folder path
  * @property setCameraUploadsByWifiUseCase Sets whether Camera Uploads can only run through Wi-Fi / Wi-Fi or Mobile Data
  * @property setUploadOptionUseCase Sets the new type of content being uploaded by Camera Uploads
+ * @property setUploadVideoQualityUseCase Sets the new Video Quality of Videos being uploaded by Camera Uploads
  * @property setupCameraUploadsSettingUseCase If true, this enables Camera Uploads. Otherwise, the
  * feature is disabled
  * @property snackBarHandler Handler to display a Snackbar
  * @property startCameraUploadUseCase Starts the Camera Uploads operation
  * @property stopCameraUploadsUseCase Stops the Camera Uploads operation
  * @property uploadOptionUiItemMapper UI Mapper that maps the Upload Option into [UploadOptionUiItem]
+ * @property videoQualityUiItemMapper UI Mapper that maps the Video Quality into [VideoQualityUiItem]
  */
 @HiltViewModel
 internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val checkEnableCameraUploadsStatusUseCase: CheckEnableCameraUploadsStatusUseCase,
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase,
     private val getUploadOptionUseCase: GetUploadOptionUseCase,
+    private val getUploadVideoQualityUseCase: GetUploadVideoQualityUseCase,
     private val isCameraUploadsByWifiUseCase: IsCameraUploadsByWifiUseCase,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
@@ -72,11 +80,13 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val preparePrimaryFolderPathUseCase: PreparePrimaryFolderPathUseCase,
     private val setCameraUploadsByWifiUseCase: SetCameraUploadsByWifiUseCase,
     private val setUploadOptionUseCase: SetUploadOptionUseCase,
+    private val setUploadVideoQualityUseCase: SetUploadVideoQualityUseCase,
     private val setupCameraUploadsSettingUseCase: SetupCameraUploadsSettingUseCase,
     private val snackBarHandler: SnackBarHandler,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
     private val uploadOptionUiItemMapper: UploadOptionUiItemMapper,
+    private val videoQualityUiItemMapper: VideoQualityUiItemMapper,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsCameraUploadsUiState())
@@ -102,6 +112,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 val isMediaUploadsEnabled = async { isSecondaryFolderEnabled() }
                 val uploadOption = async { getUploadOptionUseCase() }
                 val uploadConnectionType = async { getUploadConnectionType() }
+                val videoQuality = async { getUploadVideoQualityUseCase() }
 
                 _uiState.update {
                     it.copy(
@@ -109,6 +120,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                         isMediaUploadsEnabled = isMediaUploadsEnabled.await(),
                         uploadOptionUiItem = uploadOptionUiItemMapper(uploadOption.await()),
                         uploadConnectionType = uploadConnectionType.await(),
+                        videoQualityUiItem = videoQualityUiItemMapper(videoQuality.await()),
                     )
                 }
             }.onFailure { exception ->
@@ -288,6 +300,23 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 _uiState.update { it.copy(uploadOptionUiItem = uploadOptionUiItem) }
             }.onFailure { exception ->
                 Timber.e("An error occurred when changing the Upload Option", exception)
+                showGenericErrorSnackbar()
+            }
+        }
+    }
+
+    /**
+     * Configures the new Video Quality for Videos being uploaded by Camera Uploads. Doing this stops
+     * the ongoing Camera Uploads process
+     */
+    fun onVideoQualityUiItemSelected(videoQualityUiItem: VideoQualityUiItem) {
+        viewModelScope.launch {
+            runCatching {
+                setUploadVideoQualityUseCase(videoQualityUiItem.videoQuality)
+                stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
+                _uiState.update { it.copy(videoQualityUiItem = videoQualityUiItem) }
+            }.onFailure { exception ->
+                Timber.e("An error occurred when changing the Video Quality", exception)
                 showGenericErrorSnackbar()
             }
         }

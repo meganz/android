@@ -23,13 +23,15 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  * @param uploadConnectionType Determines the connection type for uploading content in Camera Uploads
  * Otherwise, both Wi-Fi and Mobile Data can be used
  * @param onItemClicked Lambda to execute when the Tile is clicked
+ * @param modifier The [Modifier]
  */
 @Composable
 internal fun HowToUploadTile(
     uploadConnectionType: UploadConnectionType,
     onItemClicked: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(modifier) {
         GenericTwoLineListItem(
             modifier = Modifier.testTag(HOW_TO_UPLOAD_TILE),
             title = stringResource(R.string.settings_camera_upload_how_to_upload),

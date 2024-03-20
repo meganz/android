@@ -27,5 +27,6 @@ internal fun SettingsCameraUploadsRoute(
         onRequestPermissionsStateChanged = viewModel::onRequestPermissionsStateChanged,
         onSettingsScreenPaused = viewModel::onSettingsScreenPaused,
         onUploadOptionUiItemSelected = viewModel::onUploadOptionUiItemSelected,
+        onVideoQualityUiItemSelected = viewModel::onVideoQualityUiItemSelected,
     )
 }

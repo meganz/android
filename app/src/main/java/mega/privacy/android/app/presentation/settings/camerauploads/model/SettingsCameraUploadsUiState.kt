@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
  * permissions
  * @property uploadConnectionType Determines the connection type for uploading content in Camera Uploads
  * @property uploadOptionUiItem Determines the type of content that Camera Uploads can upload
+ * @property videoQualityUiItem Determines the Video Quality of Videos being uploaded by Camera Uploads
  */
 internal data class SettingsCameraUploadsUiState(
     val businessAccountPromptType: EnableCameraUploadsStatus? = null,
@@ -23,4 +24,5 @@ internal data class SettingsCameraUploadsUiState(
     val requestPermissions: StateEvent = consumed,
     val uploadConnectionType: UploadConnectionType = UploadConnectionType.WIFI,
     val uploadOptionUiItem: UploadOptionUiItem = UploadOptionUiItem.PhotosOnly,
+    val videoQualityUiItem: VideoQualityUiItem = VideoQualityUiItem.Original,
 )

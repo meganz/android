@@ -9,10 +9,13 @@ import mega.privacy.android.app.presentation.settings.camerauploads.SETTINGS_CAM
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsView
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.FILE_UPLOAD_DIALOG
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.HOW_TO_UPLOAD_DIALOG
+import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.VIDEO_QUALITY_DIALOG
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsUiState
+import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadOptionUiItem
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.CAMERA_UPLOADS_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.FILE_UPLOAD_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.HOW_TO_UPLOAD_TILE
+import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VIDEO_QUALITY_TILE
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,24 +31,53 @@ internal class SettingsCameraUploadsViewTest {
 
     @Test
     fun `test that only the toolbar and camera uploads switch is shown when the feature is disabled`() {
-        initializeComposeContent()
+        initializeComposeContent(isCameraUploadsEnabled = false)
 
-        testInitialCameraUploadsConfiguration()
+        composeTestRule.onNodeWithTag(SETTINGS_CAMERA_UPLOADS_TOOLBAR).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(CAMERA_UPLOADS_TILE).assertIsDisplayed()
     }
 
     @Test
-    fun `test that other options are shown when camera uploads is enabled`() {
+    fun `test that the following tiles are always shown when camera uploads is enabled`() {
         initializeComposeContent(isCameraUploadsEnabled = true)
 
-        testInitialCameraUploadsConfiguration()
         composeTestRule.onNodeWithTag(HOW_TO_UPLOAD_TILE).assertIsDisplayed()
         composeTestRule.onNodeWithTag(FILE_UPLOAD_TILE).assertIsDisplayed()
     }
 
     @Test
+    fun `test that the video quality tile is hidden when the selected upload option is photos only`() {
+        initializeComposeContent(
+            isCameraUploadsEnabled = true,
+            uploadOptionUiItem = UploadOptionUiItem.PhotosOnly,
+        )
+
+        composeTestRule.onNodeWithTag(VIDEO_QUALITY_TILE).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the video quality tile is shown when the selected upload option is videos only`() {
+        initializeComposeContent(
+            isCameraUploadsEnabled = true,
+            uploadOptionUiItem = UploadOptionUiItem.VideosOnly,
+        )
+
+        composeTestRule.onNodeWithTag(VIDEO_QUALITY_TILE).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the video quality tile is shown when the selected upload option is photos and videos`() {
+        initializeComposeContent(
+            isCameraUploadsEnabled = true,
+            uploadOptionUiItem = UploadOptionUiItem.PhotosAndVideos,
+        )
+
+        composeTestRule.onNodeWithTag(VIDEO_QUALITY_TILE).assertIsDisplayed()
+    }
+
+    @Test
     fun `test that the how to upload prompt is shown when the user clicks the how to upload tile`() {
         initializeComposeContent(isCameraUploadsEnabled = true)
-        testInitialCameraUploadsConfiguration()
 
         composeTestRule.onNodeWithTag(HOW_TO_UPLOAD_TILE).apply {
             assertIsDisplayed()
@@ -58,7 +90,6 @@ internal class SettingsCameraUploadsViewTest {
     @Test
     fun `test that the file upload prompt is shown when the user clicks the file upload tile`() {
         initializeComposeContent(isCameraUploadsEnabled = true)
-        testInitialCameraUploadsConfiguration()
 
         composeTestRule.onNodeWithTag(FILE_UPLOAD_TILE).apply {
             assertIsDisplayed()
@@ -68,13 +99,30 @@ internal class SettingsCameraUploadsViewTest {
         composeTestRule.onNodeWithTag(FILE_UPLOAD_DIALOG).assertIsDisplayed()
     }
 
+    @Test
+    fun `test that the video quality prompt is shown when the user clicks the video quality tile`() {
+        initializeComposeContent(
+            isCameraUploadsEnabled = true,
+            uploadOptionUiItem = UploadOptionUiItem.VideosOnly,
+        )
+
+        composeTestRule.onNodeWithTag(VIDEO_QUALITY_TILE).apply {
+            assertIsDisplayed()
+            performClick()
+        }
+
+        composeTestRule.onNodeWithTag(VIDEO_QUALITY_DIALOG).assertIsDisplayed()
+    }
+
     private fun initializeComposeContent(
         isCameraUploadsEnabled: Boolean = false,
+        uploadOptionUiItem: UploadOptionUiItem = UploadOptionUiItem.PhotosOnly,
     ) {
         composeTestRule.setContent {
             SettingsCameraUploadsView(
                 uiState = SettingsCameraUploadsUiState(
                     isCameraUploadsEnabled = isCameraUploadsEnabled,
+                    uploadOptionUiItem = uploadOptionUiItem,
                 ),
                 onBusinessAccountPromptDismissed = {},
                 onCameraUploadsStateChanged = {},
@@ -84,12 +132,8 @@ internal class SettingsCameraUploadsViewTest {
                 onRequestPermissionsStateChanged = {},
                 onSettingsScreenPaused = {},
                 onUploadOptionUiItemSelected = {},
+                onVideoQualityUiItemSelected = {},
             )
         }
-    }
-
-    private fun testInitialCameraUploadsConfiguration() {
-        composeTestRule.onNodeWithTag(SETTINGS_CAMERA_UPLOADS_TOOLBAR).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(CAMERA_UPLOADS_TILE).assertIsDisplayed()
     }
 }
