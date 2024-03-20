@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.message.contact
 
 import mega.privacy.android.core.ui.controls.chat.messages.ContactAttachmentMessageView as CoreContactAttachmentMessageView
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,9 +14,7 @@ import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
  *
  * @param message Contact attachment message
  * @param modifier Modifier
- * @param viewModel Contact attachment message view model
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ContactAttachmentMessageView(
     message: ContactAttachmentMessage,
@@ -35,6 +32,7 @@ fun ContactAttachmentMessageView(
         avatar = {
             ChatAvatar(handle = message.contactHandle, modifier = Modifier.size(40.dp))
         },
+        isVerified = message.isVerified
     )
 }
 
