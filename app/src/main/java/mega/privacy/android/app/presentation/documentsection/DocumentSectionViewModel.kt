@@ -36,6 +36,7 @@ class DocumentSectionViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(DocumentSectionUiState())
     internal val uiState = _uiState.asStateFlow()
 
+    private var searchQuery = ""
     private val originalData = mutableListOf<DocumentUiEntity>()
 
     init {
@@ -62,7 +63,8 @@ class DocumentSectionViewModel @Inject constructor(
                 it.copy(
                     allDocuments = documentList,
                     sortOrder = sortOrder,
-                    isLoading = false
+                    isLoading = false,
+                    scrollToTop = false,
                 )
             }
         }.onFailure {
@@ -80,9 +82,7 @@ class DocumentSectionViewModel @Inject constructor(
 
     private fun List<DocumentUiEntity>.filterDocumentsBySearchQuery() =
         filter { document ->
-            _uiState.value.searchQuery?.let { query ->
-                document.name.contains(query, true)
-            } ?: true
+            document.name.contains(searchQuery, true)
         }
 
     private fun checkViewType() {
@@ -90,6 +90,40 @@ class DocumentSectionViewModel @Inject constructor(
             monitorViewType().collect { viewType ->
                 _uiState.update { it.copy(currentViewType = viewType) }
             }
+        }
+    }
+
+    internal fun shouldShowSearchMenu() = _uiState.value.allDocuments.isNotEmpty()
+
+    internal fun searchReady() {
+        if (_uiState.value.searchMode)
+            return
+
+        _uiState.update { it.copy(searchMode = true) }
+        searchQuery = ""
+    }
+
+    internal fun searchQuery(query: String) {
+        if (searchQuery == query)
+            return
+
+        searchQuery = query
+        searchNodeByQueryString()
+    }
+
+    internal fun exitSearch() {
+        _uiState.update { it.copy(searchMode = false) }
+        searchQuery = ""
+        searchNodeByQueryString()
+    }
+
+    private fun searchNodeByQueryString() {
+        val documents = originalData.filterDocumentsBySearchQuery()
+        _uiState.update {
+            it.copy(
+                allDocuments = documents,
+                scrollToTop = true
+            )
         }
     }
 }

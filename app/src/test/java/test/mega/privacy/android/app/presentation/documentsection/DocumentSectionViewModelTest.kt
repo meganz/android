@@ -12,6 +12,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.documentsection.GetAllDocumentsUseCase
@@ -28,8 +29,10 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
+import test.mega.privacy.android.app.TimberJUnit5Extension
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
+@ExtendWith(TimberJUnit5Extension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DocumentSectionViewModelTest {
     private lateinit var underTest: DocumentSectionViewModel
@@ -66,7 +69,7 @@ class DocumentSectionViewModelTest {
             getCloudSortOrder = getCloudSortOrder,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
-            monitorViewType = monitorViewType
+            monitorViewType = monitorViewType,
         )
     }
 
@@ -158,4 +161,47 @@ class DocumentSectionViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that the result returned correctly when search query is not empty`() = runTest {
+        val expectedDocumentNode = mock<TypedFileNode> { on { name }.thenReturn("document name") }
+        val documentNode = mock<TypedFileNode> { on { name }.thenReturn("name") }
+        val expectedDocument = mock<DocumentUiEntity> { on { name }.thenReturn("document name") }
+        val document = mock<DocumentUiEntity> { on { name }.thenReturn("name") }
+
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
+        whenever(getAllDocumentsUseCase()).thenReturn(listOf(expectedDocumentNode, documentNode))
+        whenever(documentUiEntityMapper(documentNode)).thenReturn(document)
+        whenever(documentUiEntityMapper(expectedDocumentNode)).thenReturn(expectedDocument)
+
+        initUnderTest()
+
+        underTest.refreshDocumentNodes()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().allDocuments.size).isEqualTo(2)
+            underTest.searchQuery("document")
+            val actual = awaitItem()
+            assertThat(actual.allDocuments.size).isEqualTo(1)
+            assertThat(actual.scrollToTop).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that the searchMode is correctly updated`() = runTest {
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
+        whenever(getAllDocumentsUseCase()).thenReturn(emptyList())
+
+        initUnderTest()
+
+        underTest.uiState.drop(1).test {
+            underTest.searchReady()
+            assertThat(awaitItem().searchMode).isTrue()
+
+            underTest.exitSearch()
+            assertThat(awaitItem().searchMode).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }
