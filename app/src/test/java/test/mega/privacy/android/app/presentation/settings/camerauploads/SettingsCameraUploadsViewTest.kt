@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.model.Upload
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.CAMERA_UPLOADS_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.FILE_UPLOAD_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.HOW_TO_UPLOAD_TILE
+import mega.privacy.android.app.presentation.settings.camerauploads.tiles.INCLUDE_LOCATION_TAGS_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.KEEP_FILE_NAMES_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VIDEO_QUALITY_TILE
 import org.junit.Rule
@@ -45,6 +46,36 @@ internal class SettingsCameraUploadsViewTest {
         composeTestRule.onNodeWithTag(HOW_TO_UPLOAD_TILE).assertIsDisplayed()
         composeTestRule.onNodeWithTag(FILE_UPLOAD_TILE).assertIsDisplayed()
         composeTestRule.onNodeWithTag(KEEP_FILE_NAMES_TILE).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the include location tags tile is hidden when the selected upload option is videos only`() {
+        initializeComposeContent(
+            isCameraUploadsEnabled = true,
+            uploadOptionUiItem = UploadOptionUiItem.VideosOnly,
+        )
+
+        composeTestRule.onNodeWithTag(INCLUDE_LOCATION_TAGS_TILE).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the include location tags tile is shown when the selected upload option is photos only`() {
+        initializeComposeContent(
+            isCameraUploadsEnabled = true,
+            uploadOptionUiItem = UploadOptionUiItem.PhotosOnly,
+        )
+
+        composeTestRule.onNodeWithTag(INCLUDE_LOCATION_TAGS_TILE).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the include location tags tile is shown when the selected upload option is photos and videos`() {
+        initializeComposeContent(
+            isCameraUploadsEnabled = true,
+            uploadOptionUiItem = UploadOptionUiItem.PhotosOnly,
+        )
+
+        composeTestRule.onNodeWithTag(INCLUDE_LOCATION_TAGS_TILE).assertIsDisplayed()
     }
 
     @Test
@@ -128,6 +159,7 @@ internal class SettingsCameraUploadsViewTest {
                 ),
                 onBusinessAccountPromptDismissed = {},
                 onCameraUploadsStateChanged = {},
+                onIncludeLocationTagsStateChanged = {},
                 onHowToUploadPromptOptionSelected = {},
                 onKeepFileNamesStateChanged = {},
                 onMediaPermissionsGranted = {},

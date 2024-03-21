@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
@@ -31,6 +32,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
@@ -68,6 +70,7 @@ internal class SettingsCameraUploadsViewModelTest {
 
     private lateinit var underTest: SettingsCameraUploadsViewModel
 
+    private val areLocationTagsEnabledUseCase = mock<AreLocationTagsEnabledUseCase>()
     private val areUploadFileNamesKeptUseCase = mock<AreUploadFileNamesKeptUseCase>()
     private val checkEnableCameraUploadsStatusUseCase =
         mock<CheckEnableCameraUploadsStatusUseCase>()
@@ -82,6 +85,7 @@ internal class SettingsCameraUploadsViewModelTest {
     private val listenToNewMediaUseCase = mock<ListenToNewMediaUseCase>()
     private val preparePrimaryFolderPathUseCase = mock<PreparePrimaryFolderPathUseCase>()
     private val setCameraUploadsByWifiUseCase = mock<SetCameraUploadsByWifiUseCase>()
+    private val setLocationTagsEnabledUseCase = mock<SetLocationTagsEnabledUseCase>()
     private val setUploadFileNamesKeptUseCase = mock<SetUploadFileNamesKeptUseCase>()
     private val setUploadOptionUseCase = mock<SetUploadOptionUseCase>()
     private val setUploadVideoQualityUseCase = mock<SetUploadVideoQualityUseCase>()
@@ -95,6 +99,7 @@ internal class SettingsCameraUploadsViewModelTest {
     @BeforeEach
     fun resetMocks() {
         reset(
+            areLocationTagsEnabledUseCase,
             areUploadFileNamesKeptUseCase,
             checkEnableCameraUploadsStatusUseCase,
             deleteCameraUploadsTemporaryRootDirectoryUseCase,
@@ -107,6 +112,7 @@ internal class SettingsCameraUploadsViewModelTest {
             listenToNewMediaUseCase,
             preparePrimaryFolderPathUseCase,
             setCameraUploadsByWifiUseCase,
+            setLocationTagsEnabledUseCase,
             setUploadFileNamesKeptUseCase,
             setUploadOptionUseCase,
             setUploadVideoQualityUseCase,
@@ -124,10 +130,12 @@ internal class SettingsCameraUploadsViewModelTest {
         isCameraUploadsByWifi: Boolean = true,
         isCameraUploadsEnabled: Boolean = true,
         isMediaUploadsEnabled: Boolean = true,
+        shouldIncludeLocationTags: Boolean = true,
         shouldKeepUploadFileNames: Boolean = true,
         uploadOption: UploadOption = UploadOption.PHOTOS,
         videoQuality: VideoQuality = VideoQuality.ORIGINAL,
     ) {
+        whenever(areLocationTagsEnabledUseCase()).thenReturn(shouldIncludeLocationTags)
         whenever(areUploadFileNamesKeptUseCase()).thenReturn(shouldKeepUploadFileNames)
         whenever(isCameraUploadsByWifiUseCase()).thenReturn(isCameraUploadsByWifi)
         whenever(isCameraUploadsEnabledUseCase()).thenReturn(isCameraUploadsEnabled)
@@ -136,6 +144,7 @@ internal class SettingsCameraUploadsViewModelTest {
         whenever(getUploadVideoQualityUseCase()).thenReturn(videoQuality)
 
         underTest = SettingsCameraUploadsViewModel(
+            areLocationTagsEnabledUseCase = areLocationTagsEnabledUseCase,
             areUploadFileNamesKeptUseCase = areUploadFileNamesKeptUseCase,
             checkEnableCameraUploadsStatusUseCase = checkEnableCameraUploadsStatusUseCase,
             deleteCameraUploadsTemporaryRootDirectoryUseCase = deleteCameraUploadsTemporaryRootDirectoryUseCase,
@@ -148,6 +157,7 @@ internal class SettingsCameraUploadsViewModelTest {
             listenToNewMediaUseCase = listenToNewMediaUseCase,
             preparePrimaryFolderPathUseCase = preparePrimaryFolderPathUseCase,
             setCameraUploadsByWifiUseCase = setCameraUploadsByWifiUseCase,
+            setLocationTagsEnabledUseCase = setLocationTagsEnabledUseCase,
             setUploadFileNamesKeptUseCase = setUploadFileNamesKeptUseCase,
             setUploadOptionUseCase = setUploadOptionUseCase,
             setUploadVideoQualityUseCase = setUploadVideoQualityUseCase,
@@ -560,6 +570,10 @@ internal class SettingsCameraUploadsViewModelTest {
         }
     }
 
+    /**
+     * The Test Group that verifies behaviors when deciding whether or not the existing filenames are
+     * used when uploading content
+     */
     @Nested
     @DisplayName("Keep File Names As In The Device")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -591,6 +605,46 @@ internal class SettingsCameraUploadsViewModelTest {
             underTest.uiState.test {
                 assertThat(awaitItem().shouldKeepUploadFileNames).isEqualTo(
                     shouldKeepUploadFileNames
+                )
+            }
+        }
+    }
+
+    /**
+     * The Test Group that verifies behaviors when Location Tags are included / excluded when
+     * uploading Photos
+     */
+    @Nested
+    @DisplayName("Include Location Tags")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    internal inner class IncludeLocationTagsTestGroup {
+        @Test
+        fun `test that an error snackbar is displayed when changing the include location tags state throws an exception`() =
+            runTest {
+                initializeUnderTest()
+                whenever(setLocationTagsEnabledUseCase(any())).thenThrow(RuntimeException())
+
+                assertDoesNotThrow { underTest.onIncludeLocationTagsStateChanged(false) }
+                verify(snackBarHandler).postSnackbarMessage(
+                    resId = R.string.general_error,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
+
+        @ParameterizedTest(name = "new include location tags state: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that changing the include location tags state stops camera uploads`(
+            shouldIncludeLocationTags: Boolean,
+        ) = runTest {
+            initializeUnderTest()
+
+            underTest.onIncludeLocationTagsStateChanged(shouldIncludeLocationTags)
+
+            verify(setLocationTagsEnabledUseCase).invoke(shouldIncludeLocationTags)
+            verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
+            underTest.uiState.test {
+                assertThat(awaitItem().shouldIncludeLocationTags).isEqualTo(
+                    shouldIncludeLocationTags
                 )
             }
         }

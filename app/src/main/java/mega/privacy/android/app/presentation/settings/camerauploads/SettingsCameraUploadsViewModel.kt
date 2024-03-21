@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
@@ -32,6 +33,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
@@ -45,6 +47,7 @@ import javax.inject.Inject
 /**
  * The [ViewModel] for Settings Camera Uploads
  *
+ * @property areLocationTagsEnabledUseCase Checks if Location Tags are included for Photo uploads
  * @property areUploadFileNamesKeptUseCase Checks if the existing filenames should be used when
  * uploading content
  * @property checkEnableCameraUploadsStatusUseCase Checks the Camera Uploads status and determine if it
@@ -60,6 +63,7 @@ import javax.inject.Inject
  * @property listenToNewMediaUseCase Listens to new Photos and Videos captured by the Device
  * @property preparePrimaryFolderPathUseCase Prepares the Primary Folder path
  * @property setCameraUploadsByWifiUseCase Sets whether Camera Uploads can only run through Wi-Fi / Wi-Fi or Mobile Data
+ * @property setLocationTagsEnabledUseCase Sets whether or not Location Tags are added in Photo uploads
  * @property setUploadFileNamesKeptUseCase Sets whether or not existing filenames should be used
  * when uploading content
  * @property setUploadOptionUseCase Sets the new type of content being uploaded by Camera Uploads
@@ -74,6 +78,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 internal class SettingsCameraUploadsViewModel @Inject constructor(
+    private val areLocationTagsEnabledUseCase: AreLocationTagsEnabledUseCase,
     private val areUploadFileNamesKeptUseCase: AreUploadFileNamesKeptUseCase,
     private val checkEnableCameraUploadsStatusUseCase: CheckEnableCameraUploadsStatusUseCase,
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase,
@@ -86,6 +91,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
     private val preparePrimaryFolderPathUseCase: PreparePrimaryFolderPathUseCase,
     private val setCameraUploadsByWifiUseCase: SetCameraUploadsByWifiUseCase,
+    private val setLocationTagsEnabledUseCase: SetLocationTagsEnabledUseCase,
     private val setUploadFileNamesKeptUseCase: SetUploadFileNamesKeptUseCase,
     private val setUploadOptionUseCase: SetUploadOptionUseCase,
     private val setUploadVideoQualityUseCase: SetUploadVideoQualityUseCase,
@@ -118,6 +124,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
 
                 val isCameraUploadsEnabled = async { isCameraUploadsEnabledUseCase() }
                 val isMediaUploadsEnabled = async { isSecondaryFolderEnabled() }
+                val shouldIncludeLocationTags = async { areLocationTagsEnabledUseCase() }
                 val shouldKeepUploadFileNames = async { areUploadFileNamesKeptUseCase() }
                 val uploadOption = async { getUploadOptionUseCase() }
                 val uploadConnectionType = async { getUploadConnectionType() }
@@ -127,6 +134,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                     it.copy(
                         isCameraUploadsEnabled = isCameraUploadsEnabled.await(),
                         isMediaUploadsEnabled = isMediaUploadsEnabled.await(),
+                        shouldIncludeLocationTags = shouldIncludeLocationTags.await(),
                         shouldKeepUploadFileNames = shouldKeepUploadFileNames.await(),
                         uploadOptionUiItem = uploadOptionUiItemMapper(uploadOption.await()),
                         uploadConnectionType = uploadConnectionType.await(),
@@ -350,6 +358,28 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 _uiState.update { it.copy(shouldKeepUploadFileNames = newState) }
             }.onFailure { exception ->
                 Timber.e("An error occurred when changing the Keep File Names state", exception)
+                showGenericErrorSnackbar()
+            }
+        }
+    }
+
+    /**
+     * Configures whether Location Tags should be added / removed when uploading Photos. Doing this
+     * stops the ongoing Camera Uploads process
+     *
+     * @param newState The new Include Location Tags state
+     */
+    fun onIncludeLocationTagsStateChanged(newState: Boolean) {
+        viewModelScope.launch {
+            runCatching {
+                setLocationTagsEnabledUseCase(newState)
+                stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
+                _uiState.update { it.copy(shouldIncludeLocationTags = newState) }
+            }.onFailure { exception ->
+                Timber.e(
+                    "An error occurred when changing the Include Location Tags state",
+                    exception
+                )
                 showGenericErrorSnackbar()
             }
         }

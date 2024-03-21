@@ -35,6 +35,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.permissions.
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.CameraUploadsTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.FileUploadTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.HowToUploadTile
+import mega.privacy.android.app.presentation.settings.camerauploads.tiles.IncludeLocationTagsTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.KeepFileNamesTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VideoQualityTile
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
@@ -50,6 +51,8 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  * @param onBusinessAccountPromptDismissed Lambda to execute when the User dismisses the Business
  * Account prompt
  * @param onCameraUploadsStateChanged Lambda to execute when the Camera Uploads state changes
+ * @param onIncludeLocationTagsStateChanged Lambda to execute when the Include Location Tags state
+ * changes
  * @param onHowToUploadPromptOptionSelected Lambda to execute when the User selects a new
  * [UploadConnectionType] from the How to Upload prompt
  * @param onKeepFileNamesStateChanged Lambda to execute when the Keep File Names state changes
@@ -71,6 +74,7 @@ internal fun SettingsCameraUploadsView(
     uiState: SettingsCameraUploadsUiState,
     onBusinessAccountPromptDismissed: () -> Unit,
     onCameraUploadsStateChanged: (Boolean) -> Unit,
+    onIncludeLocationTagsStateChanged: (Boolean) -> Unit,
     onHowToUploadPromptOptionSelected: (UploadConnectionType) -> Unit,
     onKeepFileNamesStateChanged: (Boolean) -> Unit,
     onMediaPermissionsGranted: () -> Unit,
@@ -167,11 +171,13 @@ internal fun SettingsCameraUploadsView(
                         uploadOptionUiItem = uiState.uploadOptionUiItem,
                         onItemClicked = { showFileUploadPrompt = true },
                     )
-                    if (uiState.uploadOptionUiItem in listOf(
-                            UploadOptionUiItem.VideosOnly,
-                            UploadOptionUiItem.PhotosAndVideos,
+                    if (uiState.canChangeLocationTagsState) {
+                        IncludeLocationTagsTile(
+                            isChecked = uiState.shouldIncludeLocationTags,
+                            onCheckedChange = onIncludeLocationTagsStateChanged,
                         )
-                    ) {
+                    }
+                    if (uiState.canChangeVideoQuality) {
                         VideoQualityTile(
                             videoQualityUiItem = uiState.videoQualityUiItem,
                             onItemClicked = { showVideoQualityPrompt = true },
@@ -203,6 +209,7 @@ private fun SettingsCameraUploadsViewPreview(
             onRegularBusinessAccountSubUserPromptAcknowledged = {},
             onBusinessAccountPromptDismissed = {},
             onCameraUploadsStateChanged = {},
+            onIncludeLocationTagsStateChanged = {},
             onHowToUploadPromptOptionSelected = {},
             onKeepFileNamesStateChanged = {},
             onMediaPermissionsGranted = {},
@@ -220,15 +227,12 @@ private class SettingsCameraUploadsViewParameterProvider
         get() = sequenceOf(
             // Initial Configuration - Camera Uploads Disabled
             SettingsCameraUploadsUiState(),
-            // Camera Uploads Enabled - Default Configuration
-            SettingsCameraUploadsUiState(isCameraUploadsEnabled = true),
-            // Camera Uploads Enabled - Video Quality Tile Shown
+            // Camera Uploads Enabled - All Options Shown
             SettingsCameraUploadsUiState(
                 isCameraUploadsEnabled = true,
-                uploadOptionUiItem = UploadOptionUiItem.VideosOnly,
+                uploadOptionUiItem = UploadOptionUiItem.PhotosAndVideos,
             ),
         )
-
 }
 
 /**

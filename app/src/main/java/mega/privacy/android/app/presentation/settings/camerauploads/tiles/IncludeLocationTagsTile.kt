@@ -72,6 +72,7 @@ private fun IncludeLocationTagsTilePreview(
 /**
  * Test Tags for the Include Location Tags Tile
  */
-internal const val INCLUDE_LOCATION_TAGS_TILE = "include_location_tags_tile:menu_action_list_tile"
+internal const val INCLUDE_LOCATION_TAGS_TILE =
+    "include_location_tags_tile:generic_two_line_list_item"
 internal const val INCLUDE_LOCATION_TAGS_TILE_SWITCH = "include_location_tags_tile:mega_switch"
 internal const val INCLUDE_LOCATION_TAGS_TILE_DIVIDER = "include_location_tags_tile:mega_divider"

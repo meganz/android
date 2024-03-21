@@ -21,6 +21,7 @@ internal fun SettingsCameraUploadsRoute(
         uiState = uiState,
         onBusinessAccountPromptDismissed = viewModel::onBusinessAccountPromptDismissed,
         onCameraUploadsStateChanged = viewModel::onCameraUploadsStateChanged,
+        onIncludeLocationTagsStateChanged = viewModel::onIncludeLocationTagsStateChanged,
         onHowToUploadPromptOptionSelected = viewModel::onHowToUploadPromptOptionSelected,
         onKeepFileNamesStateChanged = viewModel::onKeepFileNamesStateChanged,
         onMediaPermissionsGranted = viewModel::onMediaPermissionsGranted,
