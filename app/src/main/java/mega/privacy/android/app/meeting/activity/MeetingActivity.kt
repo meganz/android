@@ -29,7 +29,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
-import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.CallNotificationIntentService
 import mega.privacy.android.app.meeting.fragments.CreateMeetingFragment
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment
@@ -41,7 +40,6 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
@@ -52,12 +50,12 @@ import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDial
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.app.utils.ScheduledMeetingDateUtil.getAppropriateStringForScheduledMeetingDate
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ChatRoomPermission
-import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -108,6 +106,9 @@ class MeetingActivity : PasscodeActivity() {
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    @Inject
+    lateinit var navigator: MegaNavigator
 
     /**
      * Rtc audio manager gateway
@@ -414,12 +415,10 @@ class MeetingActivity : PasscodeActivity() {
             }
 
             if (state.chatIdToOpen != -1L) {
-                startActivity(
-                    Intent(
-                        this,
-                        ChatActivity::class.java
-                    ).setAction(Constants.ACTION_CHAT_SHOW_MESSAGES)
-                        .putExtra(Constants.CHAT_ID, state.chatIdToOpen)
+                navigator.openChat(
+                    context = this,
+                    chatId = state.chatIdToOpen,
+                    action = Constants.ACTION_CHAT_SHOW_MESSAGES
                 )
                 meetingViewModel.onConsumeNavigateToChatEvent()
             }
