@@ -2,7 +2,6 @@
 
 package mega.privacy.android.app.main
 
-import mega.privacy.android.core.R as CoreUiR
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -1055,11 +1054,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun checkForInAppAdvertisement() {
         lifecycleScope.launch {
             runCatching {
-                val isInAppAdvertisementEnabled =
-                    getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement)
                 val isAdsEnabled = getFeatureFlagValueUseCase(ABTestFeatures.ads)
-
-                if (isInAppAdvertisementEnabled && isAdsEnabled) {
+                if (isAdsEnabled) {
                     if (this@ManagerActivity.isPortrait()) {
                         setupAdsView()
                     } else {

@@ -198,11 +198,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     DropdownChips("Search implementation with dropdown chips and bottom sheet", false),
 
     /**
-     * In-App Ads toggle
-     */
-    InAppAdvertisement("Enable In-App Ads", true),
-
-    /**
      * To enable showing promo notifications in Notifications screen
      */
     PromoNotifications("Enable promotional notifications", false),

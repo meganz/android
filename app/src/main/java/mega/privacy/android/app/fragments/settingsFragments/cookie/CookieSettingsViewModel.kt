@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.settingsFragments.cookie.model.CookieSettingsUIState
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
@@ -124,8 +123,7 @@ class CookieSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val showAdsCookiePreference =
-                    getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement) &&
-                            getFeatureFlagValueUseCase(ABTestFeatures.ads) &&
+                    getFeatureFlagValueUseCase(ABTestFeatures.ads) &&
                             getFeatureFlagValueUseCase(ABTestFeatures.adse)
                 _uiState.update { state ->
                     state.copy(showAdsCookiePreference = showAdsCookiePreference)

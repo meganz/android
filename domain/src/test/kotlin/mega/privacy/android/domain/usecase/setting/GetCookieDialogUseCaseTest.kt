@@ -60,13 +60,11 @@ internal class GetCookieDialogUseCaseTest {
                 shouldShowCookieDialogWithAdsUseCase(
                     any(),
                     any(),
-                    any(),
                     any()
                 )
             ).thenReturn(true)
 
             val result = underTest(
-                mock(),
                 mock(),
                 mock()
             )
@@ -88,14 +86,12 @@ internal class GetCookieDialogUseCaseTest {
                 shouldShowCookieDialogWithAdsUseCase(
                     any(),
                     any(),
-                    any(),
                     any()
                 )
             ).thenReturn(false)
             whenever(shouldShowGenericCookieDialogUseCase(any())).thenReturn(true)
 
             val result = underTest(
-                mock(),
                 mock(),
                 mock()
             )
@@ -117,14 +113,12 @@ internal class GetCookieDialogUseCaseTest {
                 shouldShowCookieDialogWithAdsUseCase(
                     any(),
                     any(),
-                    any(),
                     any()
                 )
             ).thenReturn(false)
             whenever(shouldShowGenericCookieDialogUseCase(any())).thenReturn(false)
 
             val result = underTest(
-                mock(),
                 mock(),
                 mock()
             )

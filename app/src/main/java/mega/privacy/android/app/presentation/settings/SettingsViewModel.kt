@@ -198,8 +198,7 @@ class SettingsViewModel @Inject constructor(
      */
     private fun getCookiePolicyLink() = viewModelScope.launch {
         runCatching {
-            val isAdsFeatureEnabled = getFeatureFlagValueUseCase(AppFeatures.InAppAdvertisement) &&
-                    getFeatureFlagValueUseCase(ABTestFeatures.ads) &&
+            val isAdsFeatureEnabled = getFeatureFlagValueUseCase(ABTestFeatures.ads) &&
                     getFeatureFlagValueUseCase(ABTestFeatures.adse)
             val url =
                 if (isAdsFeatureEnabled) getSessionTransferURLUseCase("cookie") else COOKIES_URI

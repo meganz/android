@@ -21,13 +21,11 @@ class GetCookieDialogUseCase @Inject constructor(
     /**
      *  Get the type of cookie dialog to be shown.
      *
-     * @param inAppAdvertisementFeature Feature flag to check if in-app ads are enabled.
      * @param isAdsEnabledFeature Feature flag to check if ads are enabled.
      * @param isExternalAdsEnabledFeature Feature flag to check if external ads are enabled.
      * @return Type of cookie dialog to be shown.
      */
     suspend operator fun invoke(
-        inAppAdvertisementFeature: Feature,
         isAdsEnabledFeature: ABTestFeature,
         isExternalAdsEnabledFeature: ABTestFeature,
     ): CookieDialog {
@@ -35,7 +33,6 @@ class GetCookieDialogUseCase @Inject constructor(
 
         val shouldShowCookieDialogWithAds = shouldShowCookieDialogWithAdsUseCase(
             cookieSettings,
-            inAppAdvertisementFeature,
             isAdsEnabledFeature,
             isExternalAdsEnabledFeature
         )

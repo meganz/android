@@ -138,15 +138,12 @@ class UpgradeAccountViewModelTest {
 
     private fun provideShowNoAdsFeatureParameters() = listOf(
         Arguments.of(true, true, true),
-        Arguments.of(false, true, false),
-        Arguments.of(true, false, false),
-        Arguments.of(false, false, false),
+        Arguments.of(false, false),
     )
 
-    @ParameterizedTest(name = "The showNoAdsFeature should be: {2} when in-app ads feature is: {0}, ads are: {1}")
+    @ParameterizedTest(name = "The showNoAdsFeature should be: {1} when ads are: {0}")
     @MethodSource("provideShowNoAdsFeatureParameters")
     fun `test that showNoAdsFeature is updated correctly when all required fields are provided`(
-        inAppAdvertisementFeature: Boolean,
         isAdsEnabledFeature: Boolean,
         expected: Boolean,
     ) =
@@ -154,10 +151,7 @@ class UpgradeAccountViewModelTest {
             whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
             whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
             whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(expectedCurrentPlan)
-            whenever(getFeatureFlagValueUseCase.invoke(any())).thenReturn(
-                inAppAdvertisementFeature,
-                isAdsEnabledFeature
-            )
+            whenever(getFeatureFlagValueUseCase.invoke(any())).thenReturn(isAdsEnabledFeature)
 
             initViewModel()
             underTest.state.map { it.showNoAdsFeature }.test {

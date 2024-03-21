@@ -39,19 +39,17 @@ internal class ShouldShowCookieDialogWithAdsUseCaseTest {
     }
 
     private fun provideTestCases() = listOf(
-        Arguments.of(true, true, true, emptySet<CookieType>(), true),
-        Arguments.of(false, true, true, emptySet<CookieType>(), false),
-        Arguments.of(true, false, true, emptySet<CookieType>(), false),
-        Arguments.of(true, true, false, emptySet<CookieType>(), false),
-        Arguments.of(true, true, true, setOf(CookieType.ESSENTIAL), true),
-        Arguments.of(true, true, true, setOf(CookieType.ESSENTIAL, CookieType.ADS_CHECK), false),
-        Arguments.of(true, true, true, setOf(CookieType.ADS_CHECK), false),
+        Arguments.of(true, true, emptySet<CookieType>(), true),
+        Arguments.of(false, true, emptySet<CookieType>(), false),
+        Arguments.of(true, false, emptySet<CookieType>(), false),
+        Arguments.of(true, true, setOf(CookieType.ESSENTIAL), true),
+        Arguments.of(true, true, setOf(CookieType.ESSENTIAL, CookieType.ADS_CHECK), false),
+        Arguments.of(true, true, setOf(CookieType.ADS_CHECK), false),
     )
 
-    @ParameterizedTest(name = "The visibility of cookie dialog with ads should be: {4} when in-app ads feature is: {0}, ads are: {1}, external ads are: {2}, and cookie settings is: {3}")
+    @ParameterizedTest(name = "The visibility of cookie dialog with ads should be: {3} when ads are: {0}, external ads are: {1}, and cookie settings is: {2}")
     @MethodSource("provideTestCases")
     fun `test that show cookie dialog with ads should return expected value when all required fields are provided`(
-        inAppAdvertisementFeature: Boolean,
         isAdsEnabledFeature: Boolean,
         isExternalAdsEnabledFeature: Boolean,
         cookieSettings: Set<CookieType>,
@@ -59,14 +57,12 @@ internal class ShouldShowCookieDialogWithAdsUseCaseTest {
     ) {
         runTest {
             whenever(getFeatureFlagValueUseCase.invoke(any())).thenReturn(
-                inAppAdvertisementFeature,
                 isAdsEnabledFeature,
                 isExternalAdsEnabledFeature
             )
             whenever(updateCookieSettingsUseCase.invoke(any())).thenReturn(Unit)
             val result = underTest.invoke(
                 cookieSettings = cookieSettings,
-                inAppAdvertisementFeature = mock(),
                 isAdsEnabledFeature = mock(),
                 isExternalAdsEnabledFeature = mock(),
             )

@@ -85,7 +85,6 @@ class CookieDialogHandler @Inject constructor(
         getCookieDialogJob = applicationScope.launch(ioDispatcher) {
             runCatching {
                 val cookieDialog = getCookieDialogUseCase(
-                    AppFeatures.InAppAdvertisement,
                     ABTestFeatures.ads,
                     ABTestFeatures.adse
                 )

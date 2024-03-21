@@ -2,7 +2,6 @@ package mega.privacy.android.domain.usecase.setting
 
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.featureflag.ABTestFeature
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -26,12 +25,10 @@ class ShouldShowCookieDialogWithAdsUseCase @Inject constructor(
      */
     suspend operator fun invoke(
         cookieSettings: Set<CookieType>,
-        inAppAdvertisementFeature: Feature,
         isAdsEnabledFeature: ABTestFeature,
         isExternalAdsEnabledFeature: ABTestFeature,
     ): Boolean = coroutineScope {
         val features = listOf(
-            inAppAdvertisementFeature,
             isAdsEnabledFeature,
             isExternalAdsEnabledFeature
         )
