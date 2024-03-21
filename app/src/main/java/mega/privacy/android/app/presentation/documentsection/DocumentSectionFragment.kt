@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.getValue
@@ -36,6 +38,7 @@ import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetD
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
 import mega.privacy.android.app.presentation.documentsection.view.DocumentSectionComposeView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.textEditor.TextEditorActivity
@@ -52,6 +55,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaChatApiJava
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -68,6 +72,14 @@ class DocumentSectionFragment : Fragment(), HomepageSearchable {
      */
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    /**
+     * Mapper to get options for Action Bar
+     */
+    @Inject
+    lateinit var getOptionsForToolbarMapper: GetOptionsForToolbarMapper
+
+    private var actionMode: ActionMode? = null
 
     /**
      * onCreateView
@@ -104,15 +116,21 @@ class DocumentSectionFragment : Fragment(), HomepageSearchable {
                             .fillMaxWidth(),
                         uiState = uiState,
                         onChangeViewTypeClick = documentSectionViewModel::onChangeViewTypeClicked,
-                        onClick = { item, _ ->
-                            openDoc(
-                                activity = requireActivity(),
-                                document = item
-                            )
+                        onClick = { item, index ->
+                            if (uiState.actionMode) {
+                                documentSectionViewModel.onItemSelected(item, index)
+                            } else {
+                                openDoc(
+                                    activity = requireActivity(),
+                                    document = item
+                                )
+                            }
                         },
                         onSortOrderClick = ::showSortByPanel,
                         onMenuClick = { showOptionsMenuForItem(it.id) },
-                        onLongClick = { _, _ -> //TODO the feature regarding action mode
+                        onLongClick = { item, index ->
+                            documentSectionViewModel.onItemSelected(item, index)
+                            activateActionMode()
                         },
                         onAddDocumentClick = {
                             (requireActivity() as ManagerActivity).showUploadPanel(DOCUMENTS_UPLOAD)
@@ -120,6 +138,7 @@ class DocumentSectionFragment : Fragment(), HomepageSearchable {
                     )
                 }
             }
+            updateActionModeTitle(count = uiState.selectedDocumentHandles.size)
         }
     }
 
@@ -236,6 +255,40 @@ class DocumentSectionFragment : Fragment(), HomepageSearchable {
                     MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                 )
             }
+        }
+    }
+
+    private fun activateActionMode() {
+        if (actionMode == null) {
+            actionMode =
+                (requireActivity() as? AppCompatActivity)?.startSupportActionMode(
+                    DocumentSectionActionModeCallback(
+                        managerActivity = requireActivity() as ManagerActivity,
+                        childFragmentManager = childFragmentManager,
+                        documentSectionViewModel = documentSectionViewModel,
+                        getOptionsForToolbarMapper = getOptionsForToolbarMapper
+                    ) {
+                        disableSelectMode()
+                    }
+                )
+            documentSectionViewModel.setActionMode(true)
+        }
+    }
+
+    private fun disableSelectMode() {
+        actionMode = null
+        documentSectionViewModel.clearAllSelectedDocuments()
+        documentSectionViewModel.setActionMode(false)
+    }
+
+    private fun updateActionModeTitle(count: Int) {
+        if (count == 0) actionMode?.finish()
+        actionMode?.title = count.toString()
+
+        runCatching {
+            actionMode?.invalidate()
+        }.onFailure {
+            Timber.e(it, "Invalidate error")
         }
     }
 

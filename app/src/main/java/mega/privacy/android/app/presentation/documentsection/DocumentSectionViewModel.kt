@@ -19,9 +19,12 @@ import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEnt
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntityMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.documentsection.GetAllDocumentsUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -31,6 +34,7 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -48,6 +52,7 @@ class DocumentSectionViewModel @Inject constructor(
     private val monitorViewType: MonitorViewType,
     private val setViewType: SetViewType,
     private val getNodeByHandle: GetNodeByHandle,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getFingerprintUseCase: GetFingerprintUseCase,
     private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
     private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
@@ -222,4 +227,83 @@ class DocumentSectionViewModel @Inject constructor(
     }
 
     internal suspend fun getDocumentNodeByHandle(handle: Long) = getNodeByHandle(handle)
+
+    internal suspend fun getSelectedMegaNode(): List<MegaNode> =
+        _uiState.value.selectedDocumentHandles.mapNotNull {
+            runCatching {
+                getNodeByHandle(it)
+            }.getOrNull()
+        }
+
+    internal suspend fun getSelectedNodes(): List<TypedNode> =
+        _uiState.value.selectedDocumentHandles.mapNotNull {
+            runCatching {
+                getNodeByIdUseCase(NodeId(it))
+            }.getOrNull()
+        }
+
+    internal fun clearAllSelectedDocuments() {
+        val documents = clearDocumentsSelected()
+        _uiState.update {
+            it.copy(
+                allDocuments = documents,
+                selectedDocumentHandles = emptyList(),
+                actionMode = false
+            )
+        }
+    }
+
+    private fun clearDocumentsSelected() = _uiState.value.allDocuments.map {
+        it.copy(isSelected = false)
+    }
+
+    internal fun selectAllNodes() {
+        val documents = _uiState.value.allDocuments.map { item ->
+            item.copy(isSelected = true)
+        }
+        val selectedHandles = _uiState.value.allDocuments.map { item ->
+            item.id.longValue
+        }
+        _uiState.update {
+            it.copy(
+                allDocuments = documents,
+                selectedDocumentHandles = selectedHandles,
+                actionMode = true
+            )
+        }
+    }
+
+    internal fun setActionMode(value: Boolean) = _uiState.update { it.copy(actionMode = value) }
+
+    internal fun onItemSelected(item: DocumentUiEntity, index: Int) =
+        updateDocumentItemInSelectionState(item = item, index = index)
+
+    private fun updateDocumentItemInSelectionState(item: DocumentUiEntity, index: Int) {
+        val isSelected = !item.isSelected
+        val selectedHandles = updateSelectedDocumentHandles(item, isSelected)
+        val documents = _uiState.value.allDocuments.updateItemSelectedState(index, isSelected)
+        _uiState.update {
+            it.copy(
+                allDocuments = documents,
+                selectedDocumentHandles = selectedHandles,
+                actionMode = selectedHandles.isNotEmpty()
+            )
+        }
+    }
+
+    private fun updateSelectedDocumentHandles(item: DocumentUiEntity, isSelected: Boolean) =
+        _uiState.value.selectedDocumentHandles.toMutableList().also { selectedHandles ->
+            if (isSelected) {
+                selectedHandles.add(item.id.longValue)
+            } else {
+                selectedHandles.remove(item.id.longValue)
+            }
+        }
+
+    private fun List<DocumentUiEntity>.updateItemSelectedState(index: Int, isSelected: Boolean) =
+        if (index in indices) {
+            toMutableList().also { list ->
+                list[index] = list[index].copy(isSelected = isSelected)
+            }
+        } else this
 }

@@ -12,11 +12,13 @@ import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEnt
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.documentsection.GetAllDocumentsUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -56,6 +58,7 @@ class DocumentSectionViewModelTest {
     private val fakeMonitorViewTypeFlow = MutableSharedFlow<ViewType>()
     private val setViewType = mock<SetViewType>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getFingerprintUseCase = mock<GetFingerprintUseCase>()
     private val megaApiHttpServerIsRunningUseCase = mock<MegaApiHttpServerIsRunningUseCase>()
     private val megaApiHttpServerStartUseCase = mock<MegaApiHttpServerStartUseCase>()
@@ -87,6 +90,7 @@ class DocumentSectionViewModelTest {
             monitorViewType = monitorViewType,
             setViewType = setViewType,
             getNodeByHandle = getNodeByHandle,
+            getNodeByIdUseCase = getNodeByIdUseCase,
             getFingerprintUseCase = getFingerprintUseCase,
             megaApiHttpServerIsRunningUseCase = megaApiHttpServerIsRunningUseCase,
             megaApiHttpServerStartUseCase = megaApiHttpServerStartUseCase,
@@ -106,6 +110,7 @@ class DocumentSectionViewModelTest {
             monitorViewType,
             setViewType,
             getNodeByHandle,
+            getNodeByIdUseCase,
             getFingerprintUseCase,
             megaApiHttpServerIsRunningUseCase,
             megaApiHttpServerStartUseCase,
@@ -289,5 +294,151 @@ class DocumentSectionViewModelTest {
     fun `test that getDocumentNodeByHandle return null`() = runTest {
         whenever(getNodeByHandle(any())).thenReturn(null)
         assertThat(underTest.getDocumentNodeByHandle(1)).isNull()
+    }
+
+    private val nodeList = (0..2).map {
+        getTypedFileNode(NodeId((it).toLong()))
+    }
+    private val documentList = nodeList.map {
+        getDocumentUiEntity(it.id)
+    }
+
+    @Test
+    fun `test that the selected item is updated by 1 when long clicked`() = runTest {
+        initDocumentReturnWithSpecificDocument()
+        initUnderTest()
+
+        underTest.refreshDocumentNodes()
+        underTest.onItemSelected(documentList[0], 0)
+
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.selectedDocumentHandles.size).isEqualTo(1)
+            assertThat(actual.actionMode).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    private suspend fun initDocumentReturnWithSpecificDocument() {
+        whenever(getAllDocumentsUseCase()).thenReturn(nodeList)
+        whenever(documentUiEntityMapper(nodeList[0])).thenReturn(documentList[0])
+        whenever(documentUiEntityMapper(nodeList[1])).thenReturn(documentList[1])
+        whenever(documentUiEntityMapper(nodeList[2])).thenReturn(documentList[2])
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
+    }
+
+    private fun getDocumentUiEntity(documentId: NodeId) = mock<DocumentUiEntity> {
+        on { id }.thenReturn(documentId)
+        on { name }.thenReturn("name")
+    }
+
+    private fun getTypedFileNode(nodeId: NodeId) = mock<TypedFileNode> {
+        on { id }.thenReturn(nodeId)
+        on { name }.thenReturn("name")
+    }
+
+    @Test
+    fun `test that the checked index is incremented by 1 when the other item gets clicked`() =
+        runTest {
+            initDocumentReturnWithSpecificDocument()
+            initUnderTest()
+
+            underTest.refreshDocumentNodes()
+            underTest.onItemSelected(documentList[0], 0)
+
+            underTest.uiState.test {
+                awaitItem().let {
+                    assertThat(it.selectedDocumentHandles.size).isEqualTo(1)
+                    assertThat(it.actionMode).isTrue()
+                }
+                underTest.onItemSelected(documentList[1], 1)
+                assertThat(awaitItem().selectedDocumentHandles.size).isEqualTo(2)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that uiState is correctly updated after selectAllNodes is invoked`() = runTest {
+        initDocumentReturnWithSpecificDocument()
+        initUnderTest()
+
+        underTest.refreshDocumentNodes()
+        underTest.selectAllNodes()
+
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.allDocuments.size).isEqualTo(3)
+            assertThat(actual.selectedDocumentHandles.size).isEqualTo(3)
+            assertThat(actual.actionMode).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that uiState is correctly updated after clearAllSelectedDocuments is invoked`() =
+        runTest {
+            initDocumentReturnWithSpecificDocument()
+            initUnderTest()
+
+            underTest.refreshDocumentNodes()
+            underTest.clearAllSelectedDocuments()
+
+            underTest.uiState.test {
+                awaitItem().let {
+                    assertThat(it.allDocuments.size).isEqualTo(3)
+                    assertThat(it.selectedDocumentHandles).isEmpty()
+                    assertThat(it.actionMode).isFalse()
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that getSelectedMegaNode returns correctly by the item is clicked`() = runTest {
+        initDocumentReturnWithSpecificDocument()
+        whenever(getNodeByHandle(any())).thenReturn(mock())
+        initUnderTest()
+
+        underTest.refreshDocumentNodes()
+        underTest.onItemSelected(documentList[0], 0)
+
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.selectedDocumentHandles.size).isEqualTo(1)
+            assertThat(actual.actionMode).isTrue()
+            assertThat(underTest.getSelectedMegaNode().size).isEqualTo(1)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that getSelectedNodes returns correctly by the item is clicked`() = runTest {
+        initDocumentReturnWithSpecificDocument()
+        whenever(getNodeByIdUseCase(documentList[0].id)).thenReturn(mock())
+        initUnderTest()
+
+        underTest.refreshDocumentNodes()
+        underTest.onItemSelected(documentList[0], 0)
+
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.selectedDocumentHandles.size).isEqualTo(1)
+            assertThat(actual.actionMode).isTrue()
+            assertThat(underTest.getSelectedNodes().size).isEqualTo(1)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that actionMode is correctly updated`() = runTest {
+        initUnderTest()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().actionMode).isFalse()
+            underTest.setActionMode(true)
+            assertThat(awaitItem().actionMode).isTrue()
+            underTest.setActionMode(false)
+            assertThat(awaitItem().actionMode).isFalse()
+        }
     }
 }
