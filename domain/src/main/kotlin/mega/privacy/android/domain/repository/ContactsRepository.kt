@@ -443,4 +443,11 @@ interface ContactsRepository {
      * @return List of [LocalContact]
      */
     suspend fun getLocalContactEmailAddresses(): List<LocalContact>
+
+    /**
+     * Get list of MEGA contacts
+     *
+     * @return List of [User]
+     */
+    suspend fun getAvailableContacts(): List<User>
 }

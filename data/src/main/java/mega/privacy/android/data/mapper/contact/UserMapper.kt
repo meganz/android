@@ -19,16 +19,14 @@ class UserMapper @Inject constructor(
      * @param megaUser [MegaUser]
      * @return [User]
      */
-    operator fun invoke(megaUser: MegaUser?): User? =
-        megaUser?.let {
-            User(
-                handle = megaUser.handle,
-                email = megaUser.email,
-                visibility = userVisibility[megaUser.visibility] ?: UserVisibility.Unknown,
-                timestamp = megaUser.timestamp,
-                userChanges = userChangeMapper(megaUser.changes)
-            )
-        }
+    operator fun invoke(megaUser: MegaUser): User =
+        User(
+            handle = megaUser.handle,
+            email = megaUser.email,
+            visibility = userVisibility[megaUser.visibility] ?: UserVisibility.Unknown,
+            timestamp = megaUser.timestamp,
+            userChanges = userChangeMapper(megaUser.changes)
+        )
 
     companion object {
         internal val userVisibility = mapOf(

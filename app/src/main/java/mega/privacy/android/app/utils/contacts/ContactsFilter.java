@@ -9,6 +9,14 @@ import nz.mega.sdk.MegaUser;
 
 public class ContactsFilter {
 
+    /**
+     * This function filters out the local contacts if the emails exist in the MEGA contacts.
+     *
+     * @param api  [MegaApiJava]
+     * @param list List of local contacts' emails
+     * @deprecated <p> Use {@link mega.privacy.android.domain.usecase.contact.FilterLocalContactsByEmailUseCase} instead.
+     */
+    @Deprecated
     public static void filterOutContacts(MegaApiJava api, List<String> list) {
         for (MegaUser user : api.getContacts()) {
             list.removeIf(email -> isContact(user, email));
@@ -21,6 +29,15 @@ public class ContactsFilter {
         }
     }
 
+    /**
+     * This function determines whether the contact already exists in the MEGA contacts based on the email.
+     *
+     * @param user  [MegaUser]
+     * @param email Email
+     * @return True the email exists in the MEGA contacts, false otherwise
+     * @deprecated <p> Use {@link mega.privacy.android.domain.usecase.contact.IsAMegaContactByEmailUseCase} instead.
+     */
+    @Deprecated
     private static boolean isContact(MegaUser user, String email) {
         boolean hasSameEmail = user.getEmail().equals(email);
         boolean isContact = user.getVisibility() == MegaUser.VISIBILITY_VISIBLE;

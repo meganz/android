@@ -927,4 +927,10 @@ internal class DefaultContactsRepository @Inject constructor(
         withContext(ioDispatcher) {
             contactGateway.getLocalContactEmailAddresses()
         }
+
+    override suspend fun getAvailableContacts(): List<User> = withContext(ioDispatcher) {
+        megaApiGateway.getContacts().map {
+            userMapper(it)
+        }
+    }
 }

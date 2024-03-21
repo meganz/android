@@ -33,11 +33,6 @@ class UserMapperTest {
     }
 
     @Test
-    fun `test that invoke returns null when megaUser is null`() {
-        assertThat(underTest(null)).isNull()
-    }
-
-    @Test
     fun `test that invoke returns User`() {
         val megaUser = mock<MegaUser> {
             on { handle }.thenReturn(123L)
