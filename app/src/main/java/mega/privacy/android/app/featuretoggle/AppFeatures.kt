@@ -190,7 +190,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * Clean refactored search implementation
      */
-    SearchWithChips("Advanced search implementation in clean architecture", false),
+    SearchWithChips("Advanced search implementation in clean architecture", true),
 
     /**
      * Search implementation with dropdown chips
