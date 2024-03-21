@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property isRootNodeExist Is root node exist
  * @property isConnected Is connected
  * @property enabledFlags Enabled flags
+ * @property showPromoTag Boolean to show promo tag for promo notifications
  */
 data class ManagerDrawerUiState(
     val userChatStatus: UserChatStatus = UserChatStatus.Invalid,
@@ -22,4 +23,5 @@ data class ManagerDrawerUiState(
     val isRootNodeExist: Boolean = false,
     val isConnected: Boolean = false,
     val enabledFlags: Set<Feature> = emptySet(),
+    val showPromoTag: Boolean = false,
 )

@@ -26,6 +26,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.notifications.GetEnabledNotificationsUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import timber.log.Timber
 import javax.inject.Inject
@@ -43,6 +44,7 @@ internal class ManagerDrawerViewModel @Inject constructor(
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getEnabledNotificationsUseCase: GetEnabledNotificationsUseCase,
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ManagerDrawerUiState())
@@ -74,6 +76,7 @@ internal class ManagerDrawerViewModel @Inject constructor(
         observerVerificationStatus()
         observerConnectivityEvent()
         loadFeatureFlags()
+        shouldShowPromoTag()
     }
 
     private fun loadFeatureFlags() {
@@ -179,5 +182,18 @@ internal class ManagerDrawerViewModel @Inject constructor(
             AppFeatures.AndroidSync.takeIf { getFeatureFlagValueUseCase(it) },
             ABTestFeatures.dmca.takeIf { getFeatureFlagValueUseCase(it) },
         )
+    }
+
+    private fun shouldShowPromoTag() {
+        viewModelScope.launch {
+            runCatching {
+                val promoNotificationCount =
+                    if (getFeatureFlagValueUseCase(AppFeatures.PromoNotifications))
+                        getEnabledNotificationsUseCase().size
+                    else
+                        0
+                _state.update { it.copy(showPromoTag = promoNotificationCount > 0) }
+            }
+        }
     }
 }

@@ -1,7 +1,7 @@
 package test.mega.privacy.android.app.main.drawer
 
 import app.cash.turbine.test
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
@@ -24,6 +24,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.notifications.GetEnabledNotificationsUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeEach
@@ -31,7 +32,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -59,6 +62,7 @@ internal class ManagerDrawerViewModelTest {
     }
     private val monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase = mock()
     private val monitorVerificationStatus: MonitorVerificationStatus = mock()
+    private val getEnabledNotificationsUseCase: GetEnabledNotificationsUseCase = mock()
 
     @BeforeEach
     fun resetMocks() {
@@ -68,7 +72,8 @@ internal class ManagerDrawerViewModelTest {
             getBackupsNode,
             rootNodeExistsUseCase,
             monitorMyAccountUpdateUseCase,
-            monitorVerificationStatus
+            monitorVerificationStatus,
+            getEnabledNotificationsUseCase,
         )
         monitorMyChatOnlineStatusUseCase.stub {
             on { invoke() }.thenReturn(emptyFlow())
@@ -114,6 +119,7 @@ internal class ManagerDrawerViewModelTest {
             rootNodeExistsUseCase,
             monitorConnectivityUseCase,
             getFeatureFlagValueUseCase,
+            getEnabledNotificationsUseCase,
             monitorMyAccountUpdateUseCase,
         )
     }
@@ -127,7 +133,7 @@ internal class ManagerDrawerViewModelTest {
             initTestClass()
 
             underTest.state.test {
-                Truth.assertThat(awaitItem().isRootNodeExist).isEqualTo(exist)
+                assertThat(awaitItem().isRootNodeExist).isEqualTo(exist)
             }
         }
 
@@ -140,7 +146,7 @@ internal class ManagerDrawerViewModelTest {
             initTestClass()
 
             underTest.state.test {
-                Truth.assertThat(awaitItem().hasBackupsChildren).isEqualTo(hasChild)
+                assertThat(awaitItem().hasBackupsChildren).isEqualTo(hasChild)
             }
         }
 
@@ -153,7 +159,7 @@ internal class ManagerDrawerViewModelTest {
             initTestClass()
 
             underTest.state.test {
-                Truth.assertThat(awaitItem().userChatStatus).isEqualTo(status)
+                assertThat(awaitItem().userChatStatus).isEqualTo(status)
             }
         }
 
@@ -170,7 +176,7 @@ internal class ManagerDrawerViewModelTest {
             initTestClass()
 
             underTest.state.test {
-                Truth.assertThat(awaitItem().userChatStatus).isEqualTo(status)
+                assertThat(awaitItem().userChatStatus).isEqualTo(status)
             }
         }
 
@@ -185,7 +191,31 @@ internal class ManagerDrawerViewModelTest {
             initTestClass()
 
             underTest.state.test {
-                Truth.assertThat(awaitItem().backUpNodeHandle).isEqualTo(node.handle)
+                assertThat(awaitItem().backUpNodeHandle).isEqualTo(node.handle)
             }
         }
+
+    @ParameterizedTest(name = "test that when size of list of enabled notifications is {0} and PromoNotifications feature flag is set to {1} then showPromoTag is updated to {2}")
+    @MethodSource("provideShowPromoTagParameters")
+    fun `test that showPromoTag is updated when there is a change in the number of available promo notifications`(
+        promoNotificationsCount: List<Int>,
+        featureFlagValue: Boolean,
+        expectedShowPromoTag: Boolean,
+    ) = runTest {
+        whenever(getEnabledNotificationsUseCase()).thenReturn(promoNotificationsCount)
+        whenever(getFeatureFlagValueUseCase(any())).thenReturn(featureFlagValue)
+
+        initTestClass()
+
+        underTest.state.test {
+            assertThat(awaitItem().showPromoTag).isEqualTo(expectedShowPromoTag)
+        }
+    }
+
+    private fun provideShowPromoTagParameters() = listOf(
+        Arguments.of(emptyList<Int>(), false, false),
+        Arguments.of(emptyList<Int>(), true, false),
+        Arguments.of(listOf(1, 2), false, false),
+        Arguments.of(listOf(1, 2, 3), true, true),
+    )
 }

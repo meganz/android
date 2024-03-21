@@ -9,12 +9,22 @@ import javax.inject.Inject
  */
 class GetPromoNotificationsUseCase @Inject constructor(
     private val notificationsRepository: NotificationsRepository,
+    private val getEnabledNotificationsUseCase: GetEnabledNotificationsUseCase,
 ) {
     /**
      * Invoke
      *
      * @return [List<PromoNotification>]
      */
-    suspend operator fun invoke(): List<PromoNotification> =
-        notificationsRepository.getPromoNotifications()
+    suspend operator fun invoke(): List<PromoNotification> {
+        val promoNotificationList = mutableListOf<PromoNotification>()
+        notificationsRepository.getPromoNotifications().map { promoNotification ->
+            val enabledID = getEnabledNotificationsUseCase()
+            if (enabledID.contains(promoNotification.promoID.toInt())) {
+                promoNotificationList += promoNotification
+            }
+        }
+        promoNotificationList.sortByDescending { it.promoID }
+        return promoNotificationList
+    }
 }

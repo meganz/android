@@ -164,6 +164,7 @@ internal class ManagerDrawerFragment : Fragment() {
             binding.syncSection.isVisible = uiState.enabledFlags.contains(AppFeatures.AndroidSync)
             binding.deviceCenterSection.isVisible =
                 uiState.enabledFlags.contains(ABTestFeatures.dmca)
+            binding.notificationSectionPromoTag.isVisible = uiState.showPromoTag
         }
         viewLifecycleOwner.collectFlow(managerViewModel.numUnreadUserAlerts) { result ->
             if (result.first != UnreadUserAlertsCheckType.NAVIGATION_TOOLBAR_ICON) {
@@ -175,9 +176,6 @@ internal class ManagerDrawerFragment : Fragment() {
         }
         viewLifecycleOwner.collectFlow(managerViewModel.stalledIssuesCount) { stalledIssuesCount ->
             setSyncStatus(stalledIssuesCount)
-        }
-        viewLifecycleOwner.collectFlow(managerViewModel.showPromoTag) { showPromoTag ->
-            binding.notificationSectionPromoTag.isVisible = showPromoTag
         }
     }
 

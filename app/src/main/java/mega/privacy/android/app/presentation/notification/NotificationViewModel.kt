@@ -50,6 +50,8 @@ class NotificationViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             getPromoNotifications()
+        }
+        viewModelScope.launch {
             monitorUserAlertsUseCase().mapLatest { list ->
                 list.map { notificationMapper(it) }
             }.collect {
