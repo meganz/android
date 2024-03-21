@@ -12,6 +12,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import mega.privacy.android.core.ui.controls.dividers.DividerType
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.core.ui.controls.status.getStatusIconColor
+import mega.privacy.android.core.ui.controls.status.getStatusTextColor
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.feature.devicecenter.R
@@ -61,8 +63,8 @@ internal fun DeviceBottomSheetBody(
             body = getStatusText(device.status),
             nodeIcon = device.icon.iconRes,
             bodyIcon = device.status.icon,
-            bodyColor = getStatusColor(device.status),
-            bodyIconColor = getStatusColor(device.status),
+            bodyColor = device.status.color.getStatusTextColor(),
+            bodyIconColor = device.status.color.getStatusIconColor(),
             nodeIconColor = getNodeIconColor(device.icon),
         )
         MegaDivider(dividerType = DividerType.SmallStartPadding)
@@ -127,16 +129,6 @@ private fun getStatusText(uiNodeStatus: DeviceCenterUINodeStatus) =
     } else {
         stringResource(uiNodeStatus.name)
     }
-
-/**
- * Retrieves the Status Color to be applied in the Status Text and Icon of [DeviceBottomSheetBody]
- *
- * @param uiNodeStatus The [DeviceCenterUINodeStatus]
- * @return The corresponding Status Color
- */
-@Composable
-private fun getStatusColor(uiNodeStatus: DeviceCenterUINodeStatus) =
-    uiNodeStatus.legacyColor ?: MaterialTheme.colors.textColorSecondary
 
 /**
  * Retrieves the Color to be applied in the Node Icon of [DeviceBottomSheetBody]

@@ -10,32 +10,40 @@ sealed interface FolderIconType : DeviceCenterUINodeIcon {
     /**
      * Represents a Backup Folder Icon
      */
-    object Backup : FolderIconType {
+    data object Backup : FolderIconType {
         override val iconRes = R.drawable.ic_device_folder_backup
+
+        @Deprecated("Temporary used in order to fix icon color until we change to the new icon set. Will be removed soon.")
         override val applySecondaryColorTint = false
     }
 
     /**
      * Represents a Camera Uploads Folder Icon
      */
-    object CameraUploads : FolderIconType {
+    data object CameraUploads : FolderIconType {
         override val iconRes = R.drawable.ic_device_folder_camera_uploads
+
+        @Deprecated("Temporary used in order to fix icon color until we change to the new icon set. Will be removed soon.")
         override val applySecondaryColorTint = false
     }
 
     /**
      * Represents a plain Folder Icon
      */
-    object Folder : FolderIconType {
+    data object Folder : FolderIconType {
         override val iconRes = R.drawable.ic_device_folder
+
+        @Deprecated("Temporary used in order to fix icon color until we change to the new icon set. Will be removed soon.")
         override val applySecondaryColorTint = false
     }
 
     /**
      * Represents a Sync Folder Icon
      */
-    object Sync : FolderIconType {
+    data object Sync : FolderIconType {
         override val iconRes = R.drawable.ic_device_folder_sync
+
+        @Deprecated("Temporary used in order to fix icon color until we change to the new icon set. Will be removed soon.")
         override val applySecondaryColorTint = false
     }
 }

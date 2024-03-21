@@ -4,36 +4,22 @@ import mega.privacy.android.core.R as CoreR
 import mega.privacy.android.feature.devicecenter.R as DeviceCenterR
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.ui.graphics.Color
-import mega.privacy.android.core.ui.controls.lists.StatusColor
-import mega.privacy.android.core.ui.theme.blue_500
-import mega.privacy.android.core.ui.theme.jade_400
-import mega.privacy.android.core.ui.theme.orange_400
-import mega.privacy.android.core.ui.theme.red_500
+import mega.privacy.android.core.ui.controls.status.StatusColor
 import mega.privacy.android.feature.devicecenter.R
 
 /**
- * Sealed UI Node Status class that enumerates all possible UI Node Statuses with their respective
- * information
+ * Sealed UI Node Status class that enumerates all possible UI Node Statuses with their respective information
  *
  * @property name The generalized Status Name
- * @property localizedErrorMessage The specific Error Message for Error Statuses such as [Blocked] or
- * [Overquota]
+ * @property localizedErrorMessage The specific Error Message for Error Statuses such as [Blocked] or [Overquota]
  * @property icon The Status Icon. If no Icon should be displayed, leave it as null
- * @property color The Status Color to be applied for [name] and [icon]. If the Color should not be
- * changed, leave it as null
- * @property legacyColor The Status Color to be applied for [name] and [icon]. If the Color should not be
- * changed, leave it as null
+ * @property color The Status Color to be applied for [name] and [icon]. If the Color should not be changed, leave it as null
  */
 sealed class DeviceCenterUINodeStatus(
     @StringRes val name: Int,
     @StringRes val localizedErrorMessage: Int?,
     @DrawableRes val icon: Int?,
     val color: StatusColor?,
-    @Deprecated(
-        "Legacy color which does not follow the semantic/color tokens conventions ",
-        ReplaceWith("color")
-    ) val legacyColor: Color?,
 ) {
 
     /**
@@ -45,7 +31,6 @@ sealed class DeviceCenterUINodeStatus(
         localizedErrorMessage = null,
         icon = CoreR.drawable.ic_help_circle,
         color = null,
-        legacyColor = null,
     )
 
     /**
@@ -56,7 +41,6 @@ sealed class DeviceCenterUINodeStatus(
         localizedErrorMessage = null,
         icon = CoreR.drawable.ic_check_circle,
         color = StatusColor.Success,
-        legacyColor = jade_400,
     )
 
     /**
@@ -67,7 +51,6 @@ sealed class DeviceCenterUINodeStatus(
         localizedErrorMessage = null,
         icon = CoreR.drawable.ic_sync_02,
         color = StatusColor.Info,
-        legacyColor = blue_500,
     )
 
     /**
@@ -78,7 +61,6 @@ sealed class DeviceCenterUINodeStatus(
         localizedErrorMessage = null,
         icon = CoreR.drawable.ic_sync_02,
         color = StatusColor.Info,
-        legacyColor = blue_500,
     )
 
     /**
@@ -89,7 +71,6 @@ sealed class DeviceCenterUINodeStatus(
         localizedErrorMessage = null,
         icon = CoreR.drawable.ic_sync_02,
         color = StatusColor.Info,
-        legacyColor = blue_500,
     )
 
     /**
@@ -102,7 +83,6 @@ sealed class DeviceCenterUINodeStatus(
         localizedErrorMessage = null,
         icon = null,
         color = StatusColor.Info,
-        legacyColor = blue_500,
     )
 
     /**
@@ -113,7 +93,6 @@ sealed class DeviceCenterUINodeStatus(
         localizedErrorMessage = null,
         icon = CoreR.drawable.ic_info,
         color = StatusColor.Warning,
-        legacyColor = orange_400,
     )
 
     /**
@@ -124,7 +103,6 @@ sealed class DeviceCenterUINodeStatus(
         localizedErrorMessage = null,
         icon = CoreR.drawable.ic_alert_triangle,
         color = StatusColor.Warning,
-        legacyColor = orange_400,
     )
 
     /**
@@ -135,7 +113,6 @@ sealed class DeviceCenterUINodeStatus(
         localizedErrorMessage = null,
         icon = CoreR.drawable.ic_cloud_offline,
         color = null,
-        legacyColor = null,
     )
 
     /**
@@ -146,7 +123,6 @@ sealed class DeviceCenterUINodeStatus(
         localizedErrorMessage = null,
         icon = CoreR.drawable.ic_pause,
         color = null,
-        legacyColor = null,
     )
 
     /**
@@ -157,7 +133,6 @@ sealed class DeviceCenterUINodeStatus(
         localizedErrorMessage = null,
         icon = CoreR.drawable.ic_x_circle,
         color = null,
-        legacyColor = null,
     )
 
     /**
@@ -170,7 +145,6 @@ sealed class DeviceCenterUINodeStatus(
         localizedErrorMessage = specificErrorMessage,
         icon = CoreR.drawable.ic_alert_circle,
         color = StatusColor.Error,
-        legacyColor = red_500,
     )
 
     /**
@@ -183,7 +157,6 @@ sealed class DeviceCenterUINodeStatus(
         localizedErrorMessage = specificErrorMessage,
         icon = CoreR.drawable.ic_x_circle,
         color = StatusColor.Error,
-        legacyColor = red_500,
     )
 
     /**
@@ -196,6 +169,5 @@ sealed class DeviceCenterUINodeStatus(
         localizedErrorMessage = specificErrorMessage,
         icon = CoreR.drawable.ic_minus_circle,
         color = StatusColor.Error,
-        legacyColor = red_500,
     )
 }

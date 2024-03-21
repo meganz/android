@@ -12,6 +12,8 @@ sealed interface DeviceIconType : DeviceCenterUINodeIcon {
      */
     data object Android : DeviceIconType {
         override val iconRes = R.drawable.ic_device_android
+
+        @Deprecated("Temporary used in order to fix icon color until we change to the new icon set. Will be removed soon.")
         override val applySecondaryColorTint = true
     }
 
@@ -20,6 +22,8 @@ sealed interface DeviceIconType : DeviceCenterUINodeIcon {
      */
     data object IOS : DeviceIconType {
         override val iconRes = R.drawable.ic_device_ios
+
+        @Deprecated("Temporary used in order to fix icon color until we change to the new icon set. Will be removed soon.")
         override val applySecondaryColorTint = true
     }
 
@@ -28,6 +32,8 @@ sealed interface DeviceIconType : DeviceCenterUINodeIcon {
      */
     data object Linux : DeviceIconType {
         override val iconRes = R.drawable.ic_device_pc_linux
+
+        @Deprecated("Temporary used in order to fix icon color until we change to the new icon set. Will be removed soon.")
         override val applySecondaryColorTint = true
     }
 
@@ -36,6 +42,8 @@ sealed interface DeviceIconType : DeviceCenterUINodeIcon {
      */
     data object Mac : DeviceIconType {
         override val iconRes = R.drawable.ic_device_pc_mac
+
+        @Deprecated("Temporary used in order to fix icon color until we change to the new icon set. Will be removed soon.")
         override val applySecondaryColorTint = true
     }
 
@@ -44,6 +52,8 @@ sealed interface DeviceIconType : DeviceCenterUINodeIcon {
      */
     data object Mobile : DeviceIconType {
         override val iconRes = R.drawable.ic_device_mobile
+
+        @Deprecated("Temporary used in order to fix icon color until we change to the new icon set. Will be removed soon.")
         override val applySecondaryColorTint = true
     }
 
@@ -52,6 +62,8 @@ sealed interface DeviceIconType : DeviceCenterUINodeIcon {
      */
     data object PC : DeviceIconType {
         override val iconRes = R.drawable.ic_device_pc
+
+        @Deprecated("Temporary used in order to fix icon color until we change to the new icon set. Will be removed soon.")
         override val applySecondaryColorTint = true
     }
 
@@ -60,6 +72,8 @@ sealed interface DeviceIconType : DeviceCenterUINodeIcon {
      */
     data object Windows : DeviceIconType {
         override val iconRes = R.drawable.ic_device_pc_windows
+
+        @Deprecated("Temporary used in order to fix icon color until we change to the new icon set. Will be removed soon.")
         override val applySecondaryColorTint = true
     }
 }
