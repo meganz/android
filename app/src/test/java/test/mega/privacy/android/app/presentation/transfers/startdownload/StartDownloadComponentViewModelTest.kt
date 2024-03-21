@@ -221,7 +221,9 @@ class StartDownloadComponentViewModelTest {
             commonStub()
             stubStartDownload(flow {
                 delay(500)
-                emit(mock<MultiTransferEvent.ScanningFoldersFinished>())
+                emit(mock<MultiTransferEvent.SingleTransferEvent> {
+                    on { scanningFinished } doReturn true
+                })
             })
             underTest.startDownload(TransferTriggerEvent.StartDownloadNode(nodes))
             Truth.assertThat(underTest.uiState.value.jobInProgressState)
@@ -371,7 +373,9 @@ class StartDownloadComponentViewModelTest {
 
     private fun provideDownloadNodeParameters() = listOf(
         Arguments.of(
-            mock<MultiTransferEvent.ScanningFoldersFinished>(),
+            mock<MultiTransferEvent.SingleTransferEvent> {
+                on { scanningFinished } doReturn true
+            },
             StartDownloadTransferEvent.FinishProcessing(null, 1, 0, 0),
         ),
         Arguments.of(
@@ -404,7 +408,12 @@ class StartDownloadComponentViewModelTest {
         whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(totalFileSizeOfNodesUseCase(any())).thenReturn(1)
         whenever(shouldAskDownloadDestinationUseCase()).thenReturn(false)
-        stubStartDownload(flowOf(mock<MultiTransferEvent.ScanningFoldersFinished>()))
+        stubStartDownload(
+            flowOf(
+                mock<MultiTransferEvent.SingleTransferEvent> {
+                    on { scanningFinished } doReturn true
+                })
+        )
     }
 
     private fun stubStartDownload(flow: Flow<MultiTransferEvent>) {

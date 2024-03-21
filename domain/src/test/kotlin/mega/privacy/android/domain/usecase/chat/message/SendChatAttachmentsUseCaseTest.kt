@@ -131,8 +131,11 @@ class SendChatAttachmentsUseCaseTest {
         }
         whenever(chatMessageRepository.savePendingMessage(any()))
             .thenReturn(pendingMessage)
+        val event = mock<MultiTransferEvent.SingleTransferEvent> {
+            on { scanningFinished } doReturn true
+        }
         whenever(startChatUploadsWithWorkerUseCase(any(), any())).thenReturn(
-            flowOf(mock<MultiTransferEvent.ScanningFoldersFinished>())
+            flowOf(event)
         )
         whenever(getFileForChatUploadUseCase(any())).thenReturn(file)
     }

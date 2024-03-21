@@ -10,7 +10,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -37,7 +36,6 @@ import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCas
 import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -361,7 +359,6 @@ class DownloadNodesUseCaseTest {
                 false
             )
                 .filterIsInstance<MultiTransferEvent.SingleTransferEvent>()
-                .filter { it.isFinishScanningEvent }
                 .test {
                     nodeIds.forEach {
                         assertThat(awaitItem().transferEvent.transfer.nodeHandle).isEqualTo(it.longValue)
@@ -380,7 +377,7 @@ class DownloadNodesUseCaseTest {
 
             underTest(fileAndFolderNodes, DESTINATION_PATH_FOLDER, null, false).test {
                 assertThat(cancelAndConsumeRemainingEvents().mapNotNull { event ->
-                    (event as? Event.Item)?.value?.takeIf { it is MultiTransferEvent.ScanningFoldersFinished }
+                    (event as? Event.Item)?.value?.takeIf { (it as? MultiTransferEvent.SingleTransferEvent)?.scanningFinished == true }
                 }).hasSize(1)
             }
         }
@@ -422,7 +419,7 @@ class DownloadNodesUseCaseTest {
 
             underTest(fileAndFolderNodes, DESTINATION_PATH_FOLDER, null, false).test {
                 assertThat(cancelAndConsumeRemainingEvents().mapNotNull { event ->
-                    (event as? Event.Item)?.value?.takeIf { it is MultiTransferEvent.ScanningFoldersFinished }
+                    (event as? Event.Item)?.value?.takeIf { (it as? MultiTransferEvent.SingleTransferEvent)?.scanningFinished == true }
                 }).hasSize(1)
             }
         }
@@ -508,7 +505,7 @@ class DownloadNodesUseCaseTest {
 
             underTest(fileNodes, DESTINATION_PATH_FOLDER, null, false).test {
                 assertThat(cancelAndConsumeRemainingEvents().mapNotNull { event ->
-                    (event as? Event.Item)?.value?.takeIf { it is MultiTransferEvent.ScanningFoldersFinished }
+                    (event as? Event.Item)?.value?.takeIf { (it as? MultiTransferEvent.SingleTransferEvent)?.scanningFinished == true }
                 }).isEmpty()
             }
         }
