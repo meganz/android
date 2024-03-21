@@ -1,12 +1,12 @@
 package mega.privacy.android.feature.sync.ui
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.StateFlow
-import mega.privacy.android.core.R
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.ui.model.SolvedIssueUiItem
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SOLVED_ISSUES_MENU_ACTION_NODE_HEADER_WITH_BODY
@@ -44,7 +44,7 @@ class SyncSolvedIssueScreenTest {
                         nodeNames = listOf(),
                         localPaths = listOf(folderName),
                         resolutionExplanation = resolutionExplanation,
-                        icon = R.drawable.ic_folder_list,
+                        icon = IconPackR.drawable.ic_folder_medium_solid,
                     )
                 )
             )
@@ -72,7 +72,7 @@ class SyncSolvedIssueScreenTest {
                         nodeNames = listOf(folderName),
                         localPaths = listOf(),
                         resolutionExplanation = resolutionExplanation,
-                        icon = R.drawable.ic_folder_list,
+                        icon = IconPackR.drawable.ic_folder_medium_solid,
                     )
                 )
             )

@@ -172,7 +172,7 @@ public class MegaProviderAdapter extends RecyclerView.Adapter<MegaProviderAdapte
             int margin = dp2px(ICON_MARGIN_DP);
             params.setMargins(margin, margin, margin, margin);
 
-            holder.imageView.setImageResource(mega.privacy.android.core.R.drawable.ic_folder_list);
+            holder.imageView.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_folder_medium_solid);
             holder.textViewFileSize.setText(getMegaNodeFolderInfo(node, context));
 
             if (node.isInShare()) {
@@ -208,8 +208,8 @@ public class MegaProviderAdapter extends RecyclerView.Adapter<MegaProviderAdapte
                 holder.imageView.setImageResource(mega.privacy.android.core.R.drawable.ic_select_folder);
             } else {
                 holder.imageView.setImageResource(node.isInShare()
-                        ? R.drawable.ic_folder_incoming_list
-                        : mega.privacy.android.core.R.drawable.ic_folder_list);
+                        ? mega.privacy.android.icon.pack.R.drawable.ic_folder_incoming_medium_solid
+                        : mega.privacy.android.icon.pack.R.drawable.ic_folder_medium_solid);
             }
         } else {
             holder.permissionsIcon.setVisibility(View.GONE);

@@ -1,5 +1,6 @@
 package mega.privacy.android.core.ui.controls.lists
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -221,7 +222,7 @@ private fun PreviewGenericTwoLineListViewItemSimple() {
             subtitle = "Simple sub title",
             icon = {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_folder_sync),
+                    painter = painterResource(id = IconPackR.drawable.ic_folder_sync_medium_solid),
                     contentDescription = "Folder sync"
                 )
             }
@@ -238,7 +239,7 @@ private fun PreviewGenericTwoLineListViewItemAllEnabled() {
             subtitle = "All enabled view sub title",
             icon = {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_folder_sync),
+                    painter = painterResource(id = IconPackR.drawable.ic_folder_sync_medium_solid),
                     contentDescription = "Folder sync"
                 )
             }
@@ -255,7 +256,7 @@ private fun PreviewGenericTwoLineListItemWithLongTitle() {
             subtitle = "Subtitle very big for testing the middle ellipsis",
             icon = {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_folder_sync),
+                    painter = painterResource(id = IconPackR.drawable.ic_folder_sync_medium_solid),
                     contentDescription = "Folder sync"
                 )
             },

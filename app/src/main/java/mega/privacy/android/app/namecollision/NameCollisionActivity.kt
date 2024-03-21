@@ -19,7 +19,7 @@ import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
@@ -32,7 +32,8 @@ import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_COLLISION_RESULTS
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_SINGLE_COLLISION_RESULT
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.TextUtil
@@ -246,7 +247,7 @@ class NameCollisionActivity : PasscodeActivity() {
                 else -> {
                     thumbnailIcon.setImageResource(
                         if (isFile) MimeTypeList.typeForName(name).iconResourceId
-                        else CoreUiR.drawable.ic_folder_list
+                        else IconPackR.drawable.ic_folder_medium_solid
                     )
 
                     if (isFile && collisionResult.nameCollision is NameCollision.Upload) {
@@ -311,7 +312,7 @@ class NameCollisionActivity : PasscodeActivity() {
             } else {
                 thumbnailIcon.setImageResource(
                     if (isFile) MimeTypeList.typeForName(name).iconResourceId
-                    else CoreUiR.drawable.ic_folder_list
+                    else IconPackR.drawable.ic_folder_medium_solid
                 )
             }
             this.name.text = collisionResult.collisionName

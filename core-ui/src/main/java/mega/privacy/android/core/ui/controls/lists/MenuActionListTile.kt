@@ -1,5 +1,6 @@
 package mega.privacy.android.core.ui.controls.lists
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -149,7 +150,7 @@ private fun PreviewPreviewMegaMenuAction(
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
-            icon = painterResource(id = R.drawable.ic_folder_list),
+            icon = painterResource(id = IconPackR.drawable.ic_folder_medium_solid),
             isDestructive = isDestructive,
         )
     }
@@ -163,7 +164,7 @@ private fun PreviewMegaMenuActionWithSwitch(
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
-            icon = painterResource(id = R.drawable.ic_folder_list),
+            icon = painterResource(id = IconPackR.drawable.ic_folder_medium_solid),
         ) {
             // The MegaSwitch from :core-ui is not ready yet. Please use it instead when it is ready.
             Switch(
@@ -191,7 +192,7 @@ private fun PreviewMegaMenuActionWithTextButton() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         MenuActionListTile(
             text = "Menu Item",
-            icon = painterResource(id = R.drawable.ic_folder_list),
+            icon = painterResource(id = IconPackR.drawable.ic_folder_medium_solid),
         ) {
             Text(
                 text = "Button",

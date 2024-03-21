@@ -1,6 +1,6 @@
 package mega.privacy.android.app.getLink
 
-import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as IconPackR
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.DatePickerDialog
@@ -335,7 +335,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             binding.nodeThumbnail.setImageDrawable(
                 ResourcesCompat.getDrawable(
                     resources,
-                    CoreUiR.drawable.ic_folder_list,
+                    IconPackR.drawable.ic_folder_medium_solid,
                     null
                 )
             )

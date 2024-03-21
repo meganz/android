@@ -1,8 +1,7 @@
 package test.mega.privacy.android.app.presentation.fileinfo.model
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import com.google.common.truth.Truth
-import mega.privacy.android.core.R as CoreUiR
-import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.domain.entity.DeviceType
 import mega.privacy.android.domain.entity.FolderType
@@ -43,14 +42,10 @@ class GetFolderIconTest {
             // testing a shared node
             (folderNode.isShared || folderNode.isPendingShare)
                     // tested node would be a chat or camera upload icon in another drawer
-                    && (expectedResource == R.drawable.ic_folder_chat_list || expectedResource == R.drawable.ic_folder_camera_uploads_list)
+                    && (expectedResource == IconPackR.drawable.ic_folder_chat_medium_solid || expectedResource == IconPackR.drawable.ic_folder_camera_uploads_medium_solid)
 
-        Truth.assertThat(
-            getNodeIcon(
-                typedNode = folderNode,
-                originShares = false,
-            )
-        ).isEqualTo(if (outShareOverride) CoreUiR.drawable.ic_folder_outgoing else expectedResource)
+        Truth.assertThat(getNodeIcon(typedNode = folderNode, originShares = false))
+            .isEqualTo(if (outShareOverride) IconPackR.drawable.ic_folder_outgoing_medium_solid else expectedResource)
     }
 
     private class FolderMockNameResource(
@@ -80,43 +75,58 @@ class GetFolderIconTest {
         )
 
         private val expectedFolderNodeToResource = listOf(
-            FolderMockNameResource("InRubbishBin", CoreUiR.drawable.ic_folder_list) {
+            FolderMockNameResource("InRubbishBin", IconPackR.drawable.ic_folder_medium_solid) {
                 on { isInRubbishBin }.thenReturn(true)
             },
-            FolderMockNameResource("IncomingShare", CoreUiR.drawable.ic_folder_incoming) {
+            FolderMockNameResource(
+                "IncomingShare",
+                IconPackR.drawable.ic_folder_incoming_medium_solid
+            ) {
                 on { isIncomingShare }.thenReturn(true)
             },
-            FolderMockNameResource("MediaSync", R.drawable.ic_folder_camera_uploads_list) {
+            FolderMockNameResource(
+                "MediaSync",
+                IconPackR.drawable.ic_folder_camera_uploads_medium_solid
+            ) {
                 on { type }.thenReturn(FolderType.MediaSyncFolder)
             },
-            FolderMockNameResource("Chat", R.drawable.ic_folder_chat_list) {
+            FolderMockNameResource("Chat", IconPackR.drawable.ic_folder_chat_medium_solid) {
                 on { type }.thenReturn(FolderType.ChatFilesFolder)
             },
-            FolderMockNameResource("Shared", CoreUiR.drawable.ic_folder_outgoing) {
+            FolderMockNameResource("Shared", IconPackR.drawable.ic_folder_outgoing_medium_solid) {
                 on { isShared }.thenReturn(true)
             },
-            FolderMockNameResource("PendingShare", CoreUiR.drawable.ic_folder_outgoing) {
+            FolderMockNameResource(
+                "PendingShare",
+                IconPackR.drawable.ic_folder_outgoing_medium_solid
+            ) {
                 on { isPendingShare }.thenReturn(true)
             },
-            FolderMockNameResource("RootBackup", R.drawable.backup) {
+            FolderMockNameResource("RootBackup", IconPackR.drawable.ic_backup_medium_solid) {
                 on { type }.thenReturn(FolderType.RootBackup)
             },
-            FolderMockNameResource("BackupWin", R.drawable.pc_win) {
+            FolderMockNameResource("BackupWin", IconPackR.drawable.ic_pc_windows_medium_solid) {
                 on { type }.thenReturn(FolderType.DeviceBackup(DeviceType.Windows))
             },
-            FolderMockNameResource("BackupLinux", R.drawable.pc_linux) {
+            FolderMockNameResource("BackupLinux", IconPackR.drawable.ic_pc_linux_medium_solid) {
                 on { type }.thenReturn(FolderType.DeviceBackup(DeviceType.Linux))
             },
-            FolderMockNameResource("BackupExternal", R.drawable.ex_drive) {
+            FolderMockNameResource(
+                "BackupExternal",
+                IconPackR.drawable.ic_external_drive_medium_solid
+            ) {
                 on { type }.thenReturn(FolderType.DeviceBackup(DeviceType.ExternalDrive))
             },
-            FolderMockNameResource("BackupUnknown", R.drawable.pc) {
+            FolderMockNameResource("BackupUnknown", IconPackR.drawable.ic_pc_medium_solid) {
                 on { type }.thenReturn(FolderType.DeviceBackup(DeviceType.Unknown))
             },
-            FolderMockNameResource("BackupChild", R.drawable.ic_folder_backup) {
+            FolderMockNameResource(
+                "BackupChild",
+                IconPackR.drawable.ic_folder_backup_medium_solid
+            ) {
                 on { type }.thenReturn(FolderType.ChildBackup)
             },
-            FolderMockNameResource("Simple", CoreUiR.drawable.ic_folder_list) {},
+            FolderMockNameResource("Simple", IconPackR.drawable.ic_folder_medium_solid) {},
         )
     }
 }

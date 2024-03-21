@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.offline.offlinefileinfocompose.view
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -47,7 +48,7 @@ internal fun OfflineFileInfoScreen(
 
     val iconResource = when {
         uiState.thumbnail != null -> null
-        uiState.isFolder -> mega.privacy.android.core.R.drawable.ic_folder_list
+        uiState.isFolder -> IconPackR.drawable.ic_folder_medium_solid
         else -> MimeTypeThumbnail.typeForName(uiState.title).iconResourceId
     }
 

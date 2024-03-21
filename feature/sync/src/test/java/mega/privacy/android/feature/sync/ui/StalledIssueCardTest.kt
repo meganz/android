@@ -1,6 +1,6 @@
 package mega.privacy.android.feature.sync.ui
 
-import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -28,7 +28,7 @@ internal class StalledIssueCardTest {
             StalledIssueCard(
                 nodeName = "test folder",
                 conflictName = "Name conflict",
-                icon = CoreUiR.drawable.ic_folder_list,
+                icon = IconPackR.drawable.ic_folder_medium_solid,
                 issueDetailsClicked = {},
                 moreClicked = {},
                 shouldShowMoreIcon = true

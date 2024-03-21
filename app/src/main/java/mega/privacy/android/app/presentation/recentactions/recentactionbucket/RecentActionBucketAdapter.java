@@ -318,7 +318,7 @@ public class RecentActionBucketAdapter
                 } else {
                     int imgResource;
                     if (megaNode.isFolder()) {
-                        imgResource = mega.privacy.android.core.R.drawable.ic_folder_list;
+                        imgResource = mega.privacy.android.icon.pack.R.drawable.ic_folder_medium_solid;
                     } else {
                         imgResource = placeHolderRes;
                     }

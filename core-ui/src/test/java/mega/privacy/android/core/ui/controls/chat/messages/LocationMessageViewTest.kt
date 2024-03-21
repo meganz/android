@@ -37,7 +37,7 @@ class LocationMessageViewTest {
             LocationMessageView(
                 title = buildAnnotatedString { append(title) },
                 geolocation = geolocation,
-                map = ImageBitmap.imageResource(R.drawable.ic_folder_incoming),
+                map = ImageBitmap.imageResource(R.drawable.ic_recovery_key_circle),
                 isMe = true,
                 modifier = Modifier,
             )

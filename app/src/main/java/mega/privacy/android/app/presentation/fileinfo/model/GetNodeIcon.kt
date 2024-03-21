@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.fileinfo.model
 
-import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.annotation.DrawableRes
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.node.model.mapper.getDefaultFolderIcon
@@ -26,7 +26,7 @@ fun getNodeIcon(typedNode: TypedNode, originShares: Boolean) = when (typedNode) 
             && !typedNode.isInRubbishBin
             && !typedNode.isIncomingShare
         ) {
-            CoreUiR.drawable.ic_folder_outgoing
+            IconPackR.drawable.ic_folder_outgoing_medium_solid
         } else {
             getDefaultFolderIcon(typedNode) //in other cases, default icon
         }

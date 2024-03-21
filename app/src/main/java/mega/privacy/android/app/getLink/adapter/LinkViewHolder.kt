@@ -6,7 +6,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.zhpan.bannerview.utils.BannerUtils.dp2px
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemLinkBinding
 import mega.privacy.android.app.getLink.data.LinkItem
@@ -54,7 +54,7 @@ class LinkViewHolder(
 
         when {
             node.isFolder -> {
-                binding.thumbnailImage.setActualImageResource(CoreUiR.drawable.ic_folder_list)
+                binding.thumbnailImage.setActualImageResource(IconPackR.drawable.ic_folder_medium_solid)
             }
             item.thumbnail != null -> {
                 binding.thumbnailImage.setImageURI(Uri.fromFile(item.thumbnail))

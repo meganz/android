@@ -16,7 +16,7 @@
         android:layout_marginEnd="8dp"
         android:background="@null"
         android:scaleType="fitCenter"
-        tools:src="@drawable/ic_folder_list" />
+        tools:src="@drawable/ic_folder_medium_solid" />
 
     <TextView
         android:id="@+id/filename"

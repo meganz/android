@@ -1,5 +1,6 @@
 package mega.privacy.android.core.ui.controls.sheets
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -163,7 +164,7 @@ private fun BottomSheetPreview() {
                                 modifier = Modifier
                                     .padding(end = 32.dp)
                                     .size(size = 24.dp),
-                                painter = painterResource(id = R.drawable.ic_folder_list),
+                                painter = painterResource(id = IconPackR.drawable.ic_folder_medium_solid),
                                 contentDescription = null,
                             )
                             Text(

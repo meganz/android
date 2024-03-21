@@ -69,6 +69,7 @@ tasks.withType<Test> {
 dependencies {
     lintChecks(project(":lint"))
 
+    implementation(project(":icon-pack"))
     testImplementation(project(":core-ui-test"))
 
     implementation(platform(androidx.compose.bom))

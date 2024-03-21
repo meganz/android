@@ -1,5 +1,6 @@
 package mega.privacy.android.core.ui.controls.lists
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
@@ -199,7 +200,7 @@ private fun PreviewGenericTwoLineListViewItemSimple() {
         NodeListViewItem(
             title = "Simple title",
             subtitle = "Simple sub title",
-            icon = R.drawable.ic_folder_sync
+            icon = IconPackR.drawable.ic_folder_sync_medium_solid
         )
     }
 }
@@ -211,7 +212,7 @@ private fun PreviewGenericTwoLineListItemWithLongTitle() {
         NodeListViewItem(
             title = "Title very big for testing the middle ellipsis",
             subtitle = "Subtitle very big for testing the middle ellipsis",
-            icon = R.drawable.ic_folder_incoming,
+            icon = IconPackR.drawable.ic_folder_incoming_medium_solid,
             onMoreClicked = { },
             showOffline = true,
             showVersion = true,
@@ -230,7 +231,7 @@ private fun PreviewGenericTwoLineListItem() {
         NodeListViewItem(
             title = "Title",
             subtitle = "Subtitle",
-            icon = R.drawable.ic_folder_outgoing,
+            icon = IconPackR.drawable.ic_folder_outgoing_medium_solid,
             onMoreClicked = { },
             accessPermissionIcon = R.drawable.ic_sync,
             showOffline = true,
@@ -250,7 +251,7 @@ private fun PreviewGenericTwoLineListItemWithoutMoreOption() {
         NodeListViewItem(
             title = "Title",
             subtitle = "Subtitle",
-            icon = R.drawable.ic_folder_outgoing,
+            icon = IconPackR.drawable.ic_folder_outgoing_medium_solid,
             showFavourite = true,
             showLink = true,
             showChecked = true,

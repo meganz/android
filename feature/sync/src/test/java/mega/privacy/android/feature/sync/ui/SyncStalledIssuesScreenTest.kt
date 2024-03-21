@@ -1,12 +1,12 @@
 package mega.privacy.android.feature.sync.ui
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.StateFlow
-import mega.privacy.android.core.R
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.domain.entity.StallIssueType
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionAction
@@ -47,7 +47,7 @@ class SyncStalledIssuesScreenTest {
                         issueType = StallIssueType.LocalAndRemoteChangedSinceLastSyncedStateUserMustChoose,
                         conflictName = "Names conflict",
                         nodeNames = listOf(folderName),
-                        icon = R.drawable.ic_folder_list,
+                        icon = IconPackR.drawable.ic_folder_medium_solid,
                         detailedInfo = StalledIssueDetailedInfo("", ""),
                         actions = listOf(
                             StalledIssueResolutionAction(

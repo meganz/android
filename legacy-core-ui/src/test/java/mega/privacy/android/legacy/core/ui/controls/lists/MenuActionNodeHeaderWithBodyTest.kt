@@ -24,7 +24,7 @@ internal class MenuActionNodeHeaderWithBodyTest {
             MenuActionNodeHeaderWithBody(
                 title = "Node Title",
                 body = "Node Body",
-                nodeIcon = R.drawable.ic_folder_list,
+                nodeIcon = R.drawable.ic_folder_medium_solid,
             )
         }
         composeTestRule.onNodeWithTag(HEADER_MAIN_CONTAINER).assertIsDisplayed()
@@ -39,7 +39,7 @@ internal class MenuActionNodeHeaderWithBodyTest {
             MenuActionNodeHeaderWithBody(
                 title = "Node Title",
                 body = "Node Body",
-                nodeIcon = R.drawable.ic_folder_list,
+                nodeIcon = R.drawable.ic_folder_medium_solid,
                 bodyIcon = R.drawable.ic_favorite,
             )
         }

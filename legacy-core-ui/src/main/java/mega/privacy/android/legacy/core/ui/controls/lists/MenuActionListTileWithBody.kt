@@ -1,5 +1,6 @@
 package mega.privacy.android.legacy.core.ui.controls.lists
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -121,7 +122,7 @@ private fun PreviewTile() {
         MenuActionListTileWithBody(
             title = "Tile Title",
             body = "Tile Body",
-            icon = R.drawable.ic_folder_list,
+            icon = IconPackR.drawable.ic_folder_medium_solid,
         )
     }
 }
@@ -136,7 +137,7 @@ private fun PreviewTileWithoutDivider() {
         MenuActionListTileWithBody(
             title = "Tile Title",
             body = "Tile Body",
-            icon = R.drawable.ic_folder_list,
+            icon = IconPackR.drawable.ic_folder_medium_solid,
             addSeparator = false,
         )
     }
@@ -154,7 +155,7 @@ private fun PreviewTileWithVeryLongBody() {
         MenuActionListTileWithBody(
             title = "Tile Title",
             body = "This is a really long body text used to check if the container height dynamically expands or not",
-            icon = R.drawable.ic_folder_list,
+            icon = IconPackR.drawable.ic_folder_medium_solid,
         )
     }
 }

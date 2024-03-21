@@ -1,13 +1,13 @@
 package mega.privacy.android.app.uploadFolder.list.adapter
 
+import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as IconPackR
 import android.net.Uri
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.core.R as CoreUiR
-import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemFolderContentBinding
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 
@@ -17,7 +17,7 @@ import mega.privacy.android.app.uploadFolder.list.data.FolderContent
  * @property binding    Item's view binding
  */
 class FolderContentListHolder(
-    private val binding: ItemFolderContentBinding
+    private val binding: ItemFolderContentBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(item: FolderContent.Data) {
@@ -30,8 +30,8 @@ class FolderContentListHolder(
 
                 if (!isSelected) {
                     if (item.isFolder) {
-                        hierarchy.setPlaceholderImage(CoreUiR.drawable.ic_folder_list)
-                        setActualImageResource(CoreUiR.drawable.ic_folder_list)
+                        hierarchy.setPlaceholderImage(IconPackR.drawable.ic_folder_medium_solid)
+                        setActualImageResource(IconPackR.drawable.ic_folder_medium_solid)
                     } else {
                         hierarchy.setPlaceholderImage(MimeTypeList.typeForName(item.name).iconResourceId)
 

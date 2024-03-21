@@ -1,5 +1,6 @@
 package mega.privacy.android.core.ui.controls.chat
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -61,7 +62,6 @@ internal const val TEST_TAG_FORWARD_ICON = "chat_message_container:forward_icon"
  * @param showForwardIcon
  * @param reactions
  * @param avatarOrIcon
- * @param time
  * @param content
  */
 @Composable
@@ -308,7 +308,7 @@ private class Provider : PreviewParameterProvider<ChatMessageContainerPreviewPar
                         isMe = true,
                         title = buildAnnotatedString { append("Pinned location") },
                         geolocation = "41.1472° N, 8.6179° W",
-                        map = ImageBitmap.imageResource(R.drawable.ic_folder_incoming),
+                        map = ImageBitmap.imageResource(IconPackR.drawable.ic_folder_incoming_medium_solid),
                     )
                 }
             ),
@@ -319,7 +319,7 @@ private class Provider : PreviewParameterProvider<ChatMessageContainerPreviewPar
                         isMe = true,
                         title = buildAnnotatedString { append("Pinned location") },
                         geolocation = "41.1472° N, 8.6179° W",
-                        map = ImageBitmap.imageResource(R.drawable.ic_folder_incoming),
+                        map = ImageBitmap.imageResource(IconPackR.drawable.ic_folder_incoming_medium_solid),
                     )
                 }
             ),
@@ -330,7 +330,7 @@ private class Provider : PreviewParameterProvider<ChatMessageContainerPreviewPar
                         isMe = false,
                         title = buildAnnotatedString { append("Pinned location") },
                         geolocation = "41.1472° N, 8.6179° W",
-                        map = ImageBitmap.imageResource(R.drawable.ic_folder_incoming),
+                        map = ImageBitmap.imageResource(IconPackR.drawable.ic_folder_incoming_medium_solid),
                     )
                 }
             ),

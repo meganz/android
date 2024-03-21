@@ -1,6 +1,6 @@
 package mega.privacy.android.app.zippreview.viewmodel
 
-import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as IconPackR
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,13 +12,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.zippreview.domain.FileType
 import mega.privacy.android.app.zippreview.domain.ZipFileRepository
 import mega.privacy.android.app.zippreview.domain.ZipTreeNode
 import mega.privacy.android.app.zippreview.ui.ZipInfoUIO
+import mega.privacy.android.domain.monitoring.CrashReporter
 import timber.log.Timber
 import java.io.File
 import java.nio.charset.Charset
@@ -103,7 +103,7 @@ class ZipBrowserViewModel @Inject constructor(
      */
     private fun zipTreeNodeToZipInfoUIO(zipTreeNode: ZipTreeNode, context: Context): ZipInfoUIO {
         val imageResourceId = if (zipTreeNode.fileType == FileType.FOLDER) {
-            CoreUiR.drawable.ic_folder_list
+            IconPackR.drawable.ic_folder_medium_solid
         } else {
             MimeTypeList.typeForName(zipTreeNode.path).iconResourceId
         }

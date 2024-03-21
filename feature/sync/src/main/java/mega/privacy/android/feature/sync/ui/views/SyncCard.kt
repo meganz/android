@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R as coreR
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -114,7 +115,7 @@ private fun SyncCardHeader(
                 .padding(top = 16.dp)
         ) {
             Image(
-                painter = painterResource(coreR.drawable.ic_folder_sync),
+                painter = painterResource(IconPackR.drawable.ic_folder_sync_medium_solid),
                 contentDescription = null,
                 modifier = Modifier.padding(end = 8.dp),
             )

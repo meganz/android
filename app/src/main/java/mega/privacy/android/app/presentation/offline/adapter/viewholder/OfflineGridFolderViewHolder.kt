@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.offline.adapter.viewholder
 import android.view.View
 import androidx.core.content.ContextCompat
 import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.OfflineItemGridFolderBinding
 import mega.privacy.android.app.presentation.offline.model.OfflineNode
@@ -28,7 +29,7 @@ class OfflineGridFolderViewHolder(
         binding.root.visibility = View.VISIBLE
         binding.filename.text = node.node.name
         binding.icon.setImageResource(
-            if (node.selected) CoreUiR.drawable.ic_select_folder else CoreUiR.drawable.ic_folder_list
+            if (node.selected) CoreUiR.drawable.ic_select_folder else IconPackR.drawable.ic_folder_medium_solid
         )
 
         binding.root.background = ContextCompat.getDrawable(

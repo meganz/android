@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.folderlink.view
 
-import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
@@ -120,7 +120,7 @@ private fun BottomSheetContent(
                     modifier = Modifier
                         .padding(16.dp)
                         .clip(RoundedCornerShape(5.dp)),
-                    painter = painterResource(id = CoreUiR.drawable.ic_folder_list),
+                    painter = painterResource(id = IconPackR.drawable.ic_folder_medium_solid),
                     contentDescription = "Image"
                 )
             }

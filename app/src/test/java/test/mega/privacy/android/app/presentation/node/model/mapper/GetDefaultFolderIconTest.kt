@@ -1,7 +1,7 @@
 package test.mega.privacy.android.app.presentation.node.model.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.node.model.mapper.getDefaultFolderIcon
 import mega.privacy.android.domain.entity.DeviceType
@@ -19,7 +19,7 @@ class GetDefaultFolderIconTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(CoreUiR.drawable.ic_folder_list)
+        ).isEqualTo(IconPackR.drawable.ic_folder_medium_solid)
     }
 
 
@@ -31,7 +31,7 @@ class GetDefaultFolderIconTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(CoreUiR.drawable.ic_folder_incoming)
+        ).isEqualTo(IconPackR.drawable.ic_folder_incoming_medium_solid)
     }
 
     @Test
@@ -44,7 +44,7 @@ class GetDefaultFolderIconTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(R.drawable.ic_folder_camera_uploads_list)
+        ).isEqualTo(IconPackR.drawable.ic_folder_camera_uploads_medium_solid)
     }
 
     @Test
@@ -57,7 +57,7 @@ class GetDefaultFolderIconTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(R.drawable.ic_folder_chat_list)
+        ).isEqualTo(IconPackR.drawable.ic_folder_chat_medium_solid)
     }
 
     @Test
@@ -68,7 +68,7 @@ class GetDefaultFolderIconTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(CoreUiR.drawable.ic_folder_outgoing)
+        ).isEqualTo(IconPackR.drawable.ic_folder_outgoing_medium_solid)
     }
 
     @Test
@@ -79,7 +79,7 @@ class GetDefaultFolderIconTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(CoreUiR.drawable.ic_folder_outgoing)
+        ).isEqualTo(IconPackR.drawable.ic_folder_outgoing_medium_solid)
     }
 
     @Test
@@ -92,7 +92,7 @@ class GetDefaultFolderIconTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(R.drawable.backup)
+        ).isEqualTo(IconPackR.drawable.ic_backup_medium_solid)
     }
 
     @Test
@@ -105,7 +105,7 @@ class GetDefaultFolderIconTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(R.drawable.pc_win)
+        ).isEqualTo(IconPackR.drawable.ic_pc_windows_medium_solid)
     }
 
     @Test
@@ -118,7 +118,7 @@ class GetDefaultFolderIconTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(R.drawable.pc_linux)
+        ).isEqualTo(IconPackR.drawable.ic_pc_linux_medium_solid)
     }
 
     @Test
@@ -131,7 +131,7 @@ class GetDefaultFolderIconTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(R.drawable.pc_mac)
+        ).isEqualTo(IconPackR.drawable.ic_pc_mac_medium_solid)
     }
 
     @Test
@@ -144,7 +144,7 @@ class GetDefaultFolderIconTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(R.drawable.ex_drive)
+        ).isEqualTo(IconPackR.drawable.ic_external_drive_medium_solid)
     }
 
     @Test
@@ -157,7 +157,7 @@ class GetDefaultFolderIconTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(R.drawable.pc)
+        ).isEqualTo(IconPackR.drawable.ic_pc_medium_solid)
     }
 
     @Test
@@ -170,7 +170,7 @@ class GetDefaultFolderIconTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(R.drawable.ic_folder_backup)
+        ).isEqualTo(IconPackR.drawable.ic_folder_backup_medium_solid)
     }
 
     @Test
@@ -181,7 +181,7 @@ class GetDefaultFolderIconTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(CoreUiR.drawable.ic_folder_list)
+        ).isEqualTo(IconPackR.drawable.ic_folder_medium_solid)
     }
 
 }

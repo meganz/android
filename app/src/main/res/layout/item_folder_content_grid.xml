@@ -16,7 +16,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="16dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_folder_list"
+        android:src="@drawable/ic_folder_medium_solid"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/folder_name"
         app:layout_constraintStart_toStartOf="parent"

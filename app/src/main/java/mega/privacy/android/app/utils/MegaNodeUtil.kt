@@ -1,6 +1,6 @@
 package mega.privacy.android.app.utils
 
-import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as IconPackR
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -531,27 +531,27 @@ object MegaNodeUtil {
     @JvmStatic
     fun getFolderIcon(node: MegaNode, drawerItem: DrawerItem): Int {
         return if (node.isInShare) {
-            CoreUiR.drawable.ic_folder_incoming
+            IconPackR.drawable.ic_folder_incoming_medium_solid
         } else if (isCameraUploads(node)) {
             if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShare(node)) {
-                CoreUiR.drawable.ic_folder_outgoing
+                IconPackR.drawable.ic_folder_outgoing_medium_solid
             } else {
-                R.drawable.ic_folder_camera_uploads_list
+                IconPackR.drawable.ic_folder_camera_uploads_medium_solid
             }
         } else if (isMyChatFilesFolder(node)) {
             if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShare(node)) {
-                CoreUiR.drawable.ic_folder_outgoing
+                IconPackR.drawable.ic_folder_outgoing_medium_solid
             } else {
-                R.drawable.ic_folder_chat_list
+                IconPackR.drawable.ic_folder_chat_medium_solid
             }
         } else if (isOutShare(node)) {
-            CoreUiR.drawable.ic_folder_outgoing
+            IconPackR.drawable.ic_folder_outgoing_medium_solid
         } else if (isRootBackupFolder(node)) {
-            CoreUiR.drawable.ic_folder_list
+            IconPackR.drawable.ic_folder_medium_solid
         } else if (isDeviceBackupFolder(node)) {
             getMyBackupSubFolderIcon(node)
         } else {
-            CoreUiR.drawable.ic_folder_list
+            IconPackR.drawable.ic_folder_medium_solid
         }
     }
 
@@ -609,33 +609,27 @@ object MegaNodeUtil {
      * @return The resource ID
      */
     private fun getMyBackupSubFolderIcon(node: MegaNode?): Int {
-        if (node?.deviceId.isNullOrBlank()) return CoreUiR.drawable.ic_folder_list
+        if (node?.deviceId.isNullOrBlank()) return IconPackR.drawable.ic_folder_medium_solid
 
         val folderName = node?.name
         return when {
             folderName?.contains(
-                Regex(
-                    "win|desktop",
-                    RegexOption.IGNORE_CASE
-                )
-            ) == true -> R.drawable.pc_win
+                Regex("win|desktop", RegexOption.IGNORE_CASE)
+            ) == true -> IconPackR.drawable.ic_pc_windows_medium_solid
 
             folderName?.contains(
-                Regex(
-                    "linux|debian|ubuntu|centos",
-                    RegexOption.IGNORE_CASE
-                )
-            ) == true -> R.drawable.pc_linux
+                Regex("linux|debian|ubuntu|centos", RegexOption.IGNORE_CASE)
+            ) == true -> IconPackR.drawable.ic_pc_linux_medium_solid
 
-            folderName?.contains(Regex("mac", RegexOption.IGNORE_CASE)) == true -> R.drawable.pc_mac
             folderName?.contains(
-                Regex(
-                    "ext|drive",
-                    RegexOption.IGNORE_CASE
-                )
-            ) == true -> R.drawable.ex_drive
+                Regex("mac", RegexOption.IGNORE_CASE)
+            ) == true -> IconPackR.drawable.ic_pc_mac_medium_solid
 
-            else -> R.drawable.pc
+            folderName?.contains(
+                Regex("ext|drive", RegexOption.IGNORE_CASE)
+            ) == true -> IconPackR.drawable.ic_external_drive_medium_solid
+
+            else -> IconPackR.drawable.ic_pc_medium_solid
         }
     }
 

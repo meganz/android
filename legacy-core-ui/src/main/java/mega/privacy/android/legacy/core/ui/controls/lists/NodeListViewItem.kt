@@ -1,6 +1,6 @@
 package mega.privacy.android.legacy.core.ui.controls.lists
 
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -463,7 +463,7 @@ private fun FilePreview() {
             modifier = Modifier,
             isSelected = false,
             folderInfo = null,
-            icon = iconPackR.drawable.ic_pdf_list,
+            icon = IconPackR.drawable.ic_pdf_list,
             fileSize = "1.2 MB",
             modifiedDate = "Dec 29, 2022",
             name = "documentation.pdf",
@@ -489,7 +489,7 @@ private fun FolderPreview() {
             modifier = Modifier,
             isSelected = false,
             folderInfo = "Empty Folder",
-            icon = R.drawable.ic_folder_list,
+            icon = IconPackR.drawable.ic_folder_medium_solid,
             sharesIcon = R.drawable.ic_alert_triangle,
             fileSize = "1.2 MB",
             modifiedDate = "Dec 29, 2022",

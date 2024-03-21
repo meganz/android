@@ -11,7 +11,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
-import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.databinding.BottomSheetOfflineItemBinding
@@ -92,7 +92,7 @@ internal class OfflineOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFr
                 )
             }
         } else {
-            binding.offlineThumbnail.setImageResource(CoreUiR.drawable.ic_folder_list)
+            binding.offlineThumbnail.setImageResource(IconPackR.drawable.ic_folder_medium_solid)
         }
         if (nodeOffline.isFolder && !Util.isOnline(requireContext())) {
             binding.optionShareLayout.visibility = View.GONE

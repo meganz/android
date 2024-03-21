@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.views
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -103,7 +104,7 @@ private fun StalledIssueCardPreview() {
         StalledIssueCard(
             nodeName = "Some folder",
             conflictName = "Conflicting name",
-            icon = R.drawable.ic_folder_list,
+            icon = IconPackR.drawable.ic_folder_medium_solid,
             true,
             issueDetailsClicked = {},
             moreClicked = {},

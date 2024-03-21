@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.sync.ui.synclist.solvedissues
 
 import mega.privacy.android.core.R as CoreUiR
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -68,42 +68,42 @@ internal fun SyncSolvedIssuesScreenPreview() {
                     nodeNames = listOf("Folder name"),
                     localPaths = listOf("Folder name"),
                     resolutionExplanation = "Folders were merged",
-                    icon = CoreUiR.drawable.ic_folder_list,
+                    icon = IconPackR.drawable.ic_folder_medium_solid,
                 ),
                 SolvedIssueUiItem(
                     nodeIds = listOf(NodeId(2L)),
                     nodeNames = listOf("Folder name"),
                     localPaths = listOf("Folder name"),
                     resolutionExplanation = "Folders were merged",
-                    icon = CoreUiR.drawable.ic_folder_list,
+                    icon = IconPackR.drawable.ic_folder_medium_solid,
                 ),
                 SolvedIssueUiItem(
                     nodeIds = listOf(NodeId(3L)),
                     nodeNames = listOf("Folder name"),
                     localPaths = listOf("File name"),
                     resolutionExplanation = "All duplicates were removed",
-                    icon = iconPackR.drawable.ic_generic_list
+                    icon = IconPackR.drawable.ic_generic_list
                 ),
                 SolvedIssueUiItem(
                     nodeIds = listOf(NodeId(4L)),
                     nodeNames = listOf("Folder name"),
                     localPaths = listOf("File name"),
                     resolutionExplanation = "All items were renamed",
-                    icon = iconPackR.drawable.ic_generic_list,
+                    icon = IconPackR.drawable.ic_generic_list,
                 ),
                 SolvedIssueUiItem(
                     nodeIds = listOf(NodeId(6L)),
                     nodeNames = listOf("Folder name"),
                     localPaths = listOf("Folder name"),
                     resolutionExplanation = "All items were renamed",
-                    icon = iconPackR.drawable.ic_generic_list,
+                    icon = IconPackR.drawable.ic_generic_list,
                 ),
                 SolvedIssueUiItem(
                     nodeIds = listOf(NodeId(7L)),
                     nodeNames = listOf("Folder name"),
                     localPaths = listOf("Folder name"),
                     resolutionExplanation = "All items were renamed",
-                    icon = iconPackR.drawable.ic_generic_list,
+                    icon = IconPackR.drawable.ic_generic_list,
                 )
             )
         )

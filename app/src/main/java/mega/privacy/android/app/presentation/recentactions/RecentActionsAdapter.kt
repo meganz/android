@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.recentactions
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import android.content.Context
 import android.text.Html
 import android.text.Spanned
@@ -141,14 +142,14 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
 
                     RecentActionsSharesType.INCOMING_SHARES -> {
                         binding.sharedImage.visibility = View.VISIBLE
-                        binding.sharedImage.setImageResource(R.drawable.ic_folder_incoming_list)
+                        binding.sharedImage.setImageResource(IconPackR.drawable.ic_folder_incoming_medium_solid)
                     }
 
                     RecentActionsSharesType.OUTGOING_SHARES,
                     RecentActionsSharesType.PENDING_OUTGOING_SHARES,
                     -> {
                         binding.sharedImage.visibility = View.VISIBLE
-                        binding.sharedImage.setImageResource(R.drawable.ic_folder_outgoing_list)
+                        binding.sharedImage.setImageResource(IconPackR.drawable.ic_folder_outgoing_medium_solid)
                     }
                 }
 
@@ -338,6 +339,7 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
                     numImages
                 )
             }
+
             numImages == 0 && numVideos > 0 -> {
                 context.getQuantityStringOrDefault(
                     R.plurals.title_media_bucket_only_videos,
@@ -345,6 +347,7 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
                     numVideos
                 )
             }
+
             else -> {
                 context.getQuantityStringOrDefault(
                     R.plurals.title_media_bucket_images_and_videos,

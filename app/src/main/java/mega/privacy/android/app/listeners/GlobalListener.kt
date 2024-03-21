@@ -1,7 +1,6 @@
 package mega.privacy.android.app.listeners
 
-import mega.privacy.android.core.R as CoreUiR
-import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.icon.pack.R as IconPackR
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -396,10 +395,10 @@ class GlobalListener @Inject constructor(
             channel.setShowBadge(true)
             notificationManager.createNotificationChannel(channel)
             val d: Drawable = appContext.resources
-                .getDrawable(CoreUiR.drawable.ic_folder_incoming, appContext.theme)
+                .getDrawable(IconPackR.drawable.ic_folder_incoming_medium_solid, appContext.theme)
             val notificationBuilder: NotificationCompat.Builder =
                 NotificationCompat.Builder(appContext, notificationChannelId)
-                    .setSmallIcon(iconPackR.drawable.ic_stat_notify)
+                    .setSmallIcon(IconPackR.drawable.ic_stat_notify)
                     .setContentTitle(notificationTitle)
                     .setContentText(notificationContent)
                     .setStyle(NotificationCompat.BigTextStyle().bigText(notificationContent))

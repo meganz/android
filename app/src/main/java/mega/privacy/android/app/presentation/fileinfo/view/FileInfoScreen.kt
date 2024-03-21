@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.fileinfo.view
 
-import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as IconPackR
 import android.annotation.SuppressLint
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
@@ -27,7 +27,6 @@ import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.utils.LocationInfo
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.appbar.AppBarForCollapsibleHeader
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.SelectModeAppBar
@@ -38,6 +37,7 @@ import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
+import mega.privacy.android.shared.theme.MegaAppTheme
 import java.time.Instant
 import kotlin.time.Duration.Companion.days
 
@@ -296,7 +296,7 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             accessPermission = AccessPermission.FULL,
             contactToShowOptions = null,
             outShareContactsSelected = emptyList(),
-            iconResource = CoreUiR.drawable.ic_folder_incoming,
+            iconResource = IconPackR.drawable.ic_folder_incoming_medium_solid,
             sizeInBytes = 1024,
             isExported = true,
             isTakenDown = false,
@@ -332,7 +332,7 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             accessPermission = AccessPermission.FULL,
             contactToShowOptions = null,
             outShareContactsSelected = emptyList(),
-            iconResource = CoreUiR.drawable.ic_folder_incoming,
+            iconResource = IconPackR.drawable.ic_folder_incoming_medium_solid,
             sizeInBytes = 1024,
             isExported = true,
             isTakenDown = false,

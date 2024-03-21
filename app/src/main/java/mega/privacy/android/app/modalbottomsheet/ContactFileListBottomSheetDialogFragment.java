@@ -118,7 +118,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
 
         optionInfo.setText(R.string.general_info);
         if (node.isFolder()) {
-            nodeThumb.setImageResource(mega.privacy.android.core.R.drawable.ic_folder_incoming);
+            nodeThumb.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_folder_incoming_medium_solid);
             nodeInfo.setText(getMegaNodeFolderInfo(node, requireContext()));
 
             if (!node.isTakenDown() && (firstLevel || parentHandle == INVALID_HANDLE)) {

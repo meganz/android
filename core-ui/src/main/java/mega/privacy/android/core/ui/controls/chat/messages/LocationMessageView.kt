@@ -1,5 +1,6 @@
 package mega.privacy.android.core.ui.controls.chat.messages
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,7 +24,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -101,7 +101,7 @@ private fun LocationMessagePreview(
             isMe = isMe,
             title = buildAnnotatedString { append("Pinned location") },
             geolocation = "41.1472° N, 8.6179° W",
-            map = ImageBitmap.imageResource(R.drawable.ic_folder_incoming),
+            map = ImageBitmap.imageResource(IconPackR.drawable.ic_folder_incoming_medium_solid),
         )
     }
 }
