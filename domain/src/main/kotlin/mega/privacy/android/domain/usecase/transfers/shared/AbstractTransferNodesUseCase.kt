@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -46,8 +45,10 @@ abstract class AbstractTransferNodesUseCase<T, R>(
         beforeStartTransfer: (suspend () -> Unit)?,
         doTransfer: (T) -> Flow<TransferEvent>,
     ): Flow<MultiTransferEvent> {
-        val alreadyScanned = mutableSetOf<R>()
-        val scannedFiles = mutableSetOf<R>()
+        val alreadyScanned =
+            mutableSetOf<R>() //to check if all [items] have been scanned (childs not needed here)
+        val filesStarted =
+            mutableSetOf<R>() //to count the number of files that have been started (no folders but including children)
         val alreadyTransferredFiles = mutableSetOf<R>()
         val alreadyTransferredNodeIds = mutableSetOf<NodeId>()
         val allIds = items.map(::generateIdFromItem)
@@ -65,14 +66,55 @@ abstract class AbstractTransferNodesUseCase<T, R>(
                             }
                             alreadyScanned.add(id)
                         }
-                        .collect {
-                            totalBytesMap[it.transfer.tag] = it.transfer.totalBytes
-                            transferredBytesMap[it.transfer.tag] = it.transfer.transferredBytes
+                        .buffer(capacity = Channel.UNLIMITED)
+                        .collect { transferEvent ->
+                            totalBytesMap[transferEvent.transfer.tag] =
+                                transferEvent.transfer.totalBytes
+                            transferredBytesMap[transferEvent.transfer.tag] =
+                                transferEvent.transfer.transferredBytes
+
+                            if (transferEvent is TransferEvent.TransferStartEvent) {
+                                rootTags += transferEvent.transfer.tag
+                            }
+                            handleSDCardEventUseCase(transferEvent)
+                            //update active transfers db
+                            addOrUpdateActiveTransferUseCase(transferEvent)
+
+                            //keep track of file counters
+                            if (transferEvent.isFileTransfer) {
+                                val id = generateIdFromTransferEvent(transferEvent)
+                                filesStarted.add(id)
+                                if (transferEvent.isAlreadyTransferredEvent) {
+                                    alreadyTransferredFiles.add(id)
+                                    alreadyTransferredNodeIds.add(NodeId(transferEvent.transfer.nodeHandle))
+                                }
+                            }
+                            //check if is a single node scanning finish event
+                            if (!scanningFinishedSend && transferEvent.isFinishScanningEvent) {
+                                val id = generateIdFromTransferEvent(transferEvent)
+                                if (!alreadyScanned.contains(id)) {
+                                    //this node is already scanned: save it and emit the event
+                                    alreadyScanned.add(id)
+
+                                    //check if all nodes have been scanned
+                                    if (alreadyScanned.containsAll(allIds)) {
+                                        scanningFinishedSend = true
+                                        invalidateCancelTokenUseCase() //we need to avoid a future cancellation from now on
+                                    }
+                                }
+                            }
+
+
+
                             send(
                                 MultiTransferEvent.SingleTransferEvent(
-                                    it,
-                                    transferredBytes,
-                                    totalBytes
+                                    transferEvent = transferEvent,
+                                    totalBytesTransferred = transferredBytes,
+                                    totalBytesToTransfer = totalBytes,
+                                    startedFiles = filesStarted.size,
+                                    alreadyTransferred = alreadyTransferredFiles.size,
+                                    alreadyTransferredIds = alreadyTransferredNodeIds,
+                                    scanningFinished = scanningFinishedSend,
                                 )
                             )
                         }
@@ -83,49 +125,7 @@ abstract class AbstractTransferNodesUseCase<T, R>(
             .onStart {
                 beforeStartTransfer?.invoke()
             }
-            .buffer(capacity = Channel.UNLIMITED)
-            .transform { event ->
-                if (event is MultiTransferEvent.SingleTransferEvent) {
-                    if (event.transferEvent is TransferEvent.TransferStartEvent) {
-                        rootTags += event.transferEvent.transfer.tag
-                    }
-                    handleSDCardEventUseCase(event.transferEvent)
-                    //update active transfers db
-                    addOrUpdateActiveTransferUseCase(event.transferEvent)
-
-                    //keep track of files counters
-                    if (event.isFileTransferEvent) {
-                        val id = generateIdFromTransferEvent(event.transferEvent)
-                        scannedFiles.add(id)
-                        if (event.isAlreadyTransferredEvent) {
-                            alreadyTransferredFiles.add(id)
-                            alreadyTransferredNodeIds.add(NodeId(event.transferEvent.transfer.nodeHandle))
-                        }
-                    }
-                    //check if is a single node scanning finish event
-                    if (event.isFinishScanningEvent) {
-                        val id = generateIdFromTransferEvent(event.transferEvent)
-                        if (!alreadyScanned.contains(id)) {
-                            //this node is already scanned: save it and emit the event
-                            alreadyScanned.add(id)
-
-                            //check if all nodes have been scanned
-                            if (!scanningFinishedSend && alreadyScanned.containsAll(allIds)) {
-                                scanningFinishedSend = true
-                                invalidateCancelTokenUseCase() //we need to avoid a future cancellation from now on
-                                emit(
-                                    MultiTransferEvent.ScanningFoldersFinished(
-                                        scannedFiles.size,
-                                        alreadyTransferredFiles.size,
-                                        alreadyTransferredNodeIds,
-                                    )
-                                )
-                            }
-                        }
-                    }
-                }
-                emit(event)
-            }.onCompletion {
+            .onCompletion {
                 runCatching { cancelCancelTokenUseCase() }
             }.cancellable()
     }
@@ -163,5 +163,34 @@ abstract class AbstractTransferNodesUseCase<T, R>(
                         addOrUpdateActiveTransferUseCase(transferEvent)
                     }
                 }
+        }
+
+    /**
+     * This event indicates that the transfer was not done due to being already transferred.
+     */
+    private val TransferEvent.isAlreadyTransferredEvent: Boolean
+        get() = with(this.transfer) {
+            !isFolderTransfer && isAlreadyDownloaded
+        }
+
+    /**
+     * This event is related to a file transfer, not a folder.
+     */
+    private val TransferEvent.isFileTransfer: Boolean
+        get() = !this.transfer.isFolderTransfer
+
+    /**
+     * return true if this event represents a finish processing event (or already finished)
+     */
+    private val TransferEvent.isFinishScanningEvent: Boolean
+        get() = when {
+            this is TransferEvent.TransferUpdateEvent &&
+                    transfer.isFolderTransfer && transfer.stage == mega.privacy.android.domain.entity.transfer.TransferStage.STAGE_TRANSFERRING_FILES -> {
+                true
+            }
+
+            this is TransferEvent.TransferFinishEvent -> true
+            this is TransferEvent.TransferUpdateEvent && !transfer.isFolderTransfer -> true
+            else -> false
         }
 }

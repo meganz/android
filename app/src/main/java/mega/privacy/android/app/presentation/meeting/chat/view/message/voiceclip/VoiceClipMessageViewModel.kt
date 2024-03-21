@@ -153,9 +153,6 @@ class VoiceClipMessageViewModel @Inject constructor(
                         }
                     }
 
-                    is MultiTransferEvent.ScanningFoldersFinished -> {
-                    }
-
                     is MultiTransferEvent.InsufficientSpace -> {
                         updateDoesNotExists(msgId)
                     }

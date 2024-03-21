@@ -283,12 +283,11 @@ internal class StartDownloadComponentViewModel @Inject constructor(
             when (terminalEvent) {
                 MultiTransferEvent.InsufficientSpace -> StartDownloadTransferEvent.Message.NotSufficientSpace
                 else -> {
-                    val finishedEvent =
-                        (terminalEvent as? MultiTransferEvent.ScanningFoldersFinished)
+                    val finishedEvent = (terminalEvent as? MultiTransferEvent.SingleTransferEvent)
                     StartDownloadTransferEvent.FinishProcessing(
                         exception = lastError?.takeIf { terminalEvent == null },
                         totalNodes = nodes.size,
-                        totalFiles = finishedEvent?.scannedFiles ?: 0,
+                        totalFiles = finishedEvent?.startedFiles ?: 0,
                         totalAlreadyDownloaded = finishedEvent?.alreadyTransferred ?: 0,
                     )
                 }

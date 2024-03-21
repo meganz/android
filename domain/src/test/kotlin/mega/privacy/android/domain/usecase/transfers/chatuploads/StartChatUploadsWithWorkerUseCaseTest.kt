@@ -151,7 +151,9 @@ class StartChatUploadsWithWorkerUseCaseTest {
     fun `test that download worker is started when start download finish correctly`() = runTest {
         mockFlow(
             flowOf(
-                mock<MultiTransferEvent.ScanningFoldersFinished>(),
+                mock<MultiTransferEvent.SingleTransferEvent> {
+                    on { scanningFinished } doReturn true
+                },
             )
         )
         underTest(mockFile(), 1L).collect()
@@ -163,7 +165,9 @@ class StartChatUploadsWithWorkerUseCaseTest {
         var workerStarted = false
         mockFlow(
             flow {
-                emit(mock<MultiTransferEvent.ScanningFoldersFinished>())
+                emit(mock<MultiTransferEvent.SingleTransferEvent> {
+                    on { scanningFinished } doReturn true
+                })
                 awaitCancellation()
             }
         )
@@ -240,8 +244,10 @@ class StartChatUploadsWithWorkerUseCaseTest {
             val file = mockFile()
             val pendingMessageId = 15L
             val nodeHandle = 12L
-            val event = MultiTransferEvent.ScanningFoldersFinished(
-                1, 1, setOf(NodeId(nodeHandle))
+            val event = MultiTransferEvent.SingleTransferEvent(
+                mock<TransferEvent.TransferFinishEvent>(),
+                1L, 1L,
+                alreadyTransferredIds = setOf(NodeId(nodeHandle))
             )
             whenever(
                 uploadFilesUseCase(any(), NodeId(any()), any(), any(), any())

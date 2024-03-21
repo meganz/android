@@ -77,10 +77,10 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
                             UpdatePendingMessageTransferTagRequest(pendingMessageId, transferTag)
                         )
                     }
-                    //attach it if already uploaded
-                    (event as? MultiTransferEvent.ScanningFoldersFinished)
+                    //attach it if it's already uploaded
+                    (event as? MultiTransferEvent.SingleTransferEvent)
                         ?.alreadyTransferredIds
-                        ?.firstOrNull()
+                        ?.singleOrNull()
                         ?.takeIf { it.longValue != -1L }
                         ?.let { alreadyTransferredNodeId ->
                             attachNodeWithPendingMessageUseCase(
