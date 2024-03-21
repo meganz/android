@@ -28,6 +28,7 @@ import mega.privacy.android.app.main.megachat.MapsActivity
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
@@ -57,6 +58,7 @@ import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.chat.CreateChatException
 import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatException
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -79,9 +81,11 @@ import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsAnonymousModeUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.IsGeolocationEnabledUseCase
+import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatPendingChangesUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeavingChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallInOtherChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
@@ -231,6 +235,8 @@ class ChatViewModel @Inject constructor(
     private val getCacheFileUseCase: GetCacheFileUseCase,
     private val recordAudioUseCase: RecordAudioUseCase,
     private val deleteFileUseCase: DeleteFileUseCase,
+    private val monitorLeaveChatUseCase: MonitorLeaveChatUseCase,
+    private val leaveChatUseCase: LeaveChatUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -264,6 +270,7 @@ class ChatViewModel @Inject constructor(
         monitorNotificationMute()
         monitorJoiningChat()
         monitorLeavingChat()
+        monitorLeaveChat()
         monitorChatRoomPreference()
     }
 
@@ -1518,6 +1525,33 @@ class ChatViewModel @Inject constructor(
                 }
             } ?: run {
             Timber.e("Cache file for voice clip recording can't be created")
+        }
+    }
+
+    private fun monitorLeaveChat() {
+        viewModelScope.launch {
+            monitorLeaveChatUseCase()
+                .collect { requestChatId ->
+                    if (chatId == requestChatId) {
+                        leaveChat()
+                    }
+                }
+        }
+    }
+
+    private fun leaveChat() {
+        viewModelScope.launch {
+            runCatching {
+                leaveChatUseCase(chatId)
+            }.onFailure { exception ->
+                if (exception is MegaException) {
+                    _state.update { state ->
+                        state.copy(
+                            infoToShowEvent = triggered(InfoToShow.SimpleString(exception.getErrorStringId()))
+                        )
+                    }
+                }
+            }
         }
     }
 

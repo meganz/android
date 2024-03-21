@@ -89,9 +89,11 @@ import mega.privacy.android.domain.usecase.chat.InviteToChatUseCase
 import mega.privacy.android.domain.usecase.chat.IsAnonymousModeUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotificationMuteUseCase
 import mega.privacy.android.domain.usecase.chat.IsGeolocationEnabledUseCase
+import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatPendingChangesUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeavingChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallInOtherChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorUserChatStatusByHandleUseCase
@@ -295,6 +297,11 @@ internal class ChatViewModelTest {
     private val getCacheFileUseCase = mock<GetCacheFileUseCase>()
     private val recordAudioUseCase = mock<RecordAudioUseCase>()
     private val deleteFileUseCase = mock<DeleteFileUseCase>()
+    private val monitorLeaveChatUseCase = mock<MonitorLeaveChatUseCase> {
+        on { invoke() } doReturn emptyFlow()
+    }
+    private val leaveChatUseCase = mock<LeaveChatUseCase>()
+
 
     @BeforeEach
     fun resetMocks() {
@@ -357,6 +364,7 @@ internal class ChatViewModelTest {
             getCacheFileUseCase,
             recordAudioUseCase,
             deleteFileUseCase,
+            leaveChatUseCase
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -383,6 +391,7 @@ internal class ChatViewModelTest {
         wheneverBlocking { monitorJoiningChatUseCase(any()) } doReturn emptyFlow()
         wheneverBlocking { monitorLeavingChatUseCase(any()) } doReturn emptyFlow()
         whenever(monitorChatPendingChangesUseCase(any())) doReturn emptyFlow()
+        whenever(monitorLeaveChatUseCase()) doReturn emptyFlow()
     }
 
     private fun initTestClass() {
@@ -460,6 +469,8 @@ internal class ChatViewModelTest {
             getCacheFileUseCase = getCacheFileUseCase,
             recordAudioUseCase = recordAudioUseCase,
             deleteFileUseCase = deleteFileUseCase,
+            leaveChatUseCase = leaveChatUseCase,
+            monitorLeaveChatUseCase = monitorLeaveChatUseCase
         )
     }
 
@@ -2890,6 +2901,25 @@ internal class ChatViewModelTest {
             }
         }
     }
+
+    @Test
+    fun `test that leave chat call when monitorLeaveChatUseCase emit equals chat id`() = runTest {
+        val flow = MutableSharedFlow<Long>()
+        whenever(monitorLeaveChatUseCase()).thenReturn(flow)
+        initTestClass()
+        flow.emit(chatId)
+        verify(leaveChatUseCase).invoke(chatId)
+    }
+
+    @Test
+    fun `test that leave chat doesn't call when monitorLeaveChatUseCase emit differ chat id`() =
+        runTest {
+            val flow = MutableSharedFlow<Long>()
+            whenever(monitorLeaveChatUseCase()).thenReturn(flow)
+            initTestClass()
+            flow.emit(345L)
+            verifyNoInteractions(leaveChatUseCase)
+        }
 
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
