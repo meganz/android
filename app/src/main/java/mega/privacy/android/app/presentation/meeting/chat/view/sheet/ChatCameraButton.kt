@@ -31,9 +31,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
@@ -140,7 +140,7 @@ fun ChatCameraButton(
 
         Image(
             modifier = Modifier
-                .align(Alignment.Center)
+                .fillMaxSize()
                 .testTag(TEST_TAG_CHAT_CAMERA_BUTTON_ICON)
                 .clickable {
                     if (cameraPermissionState.status.isGranted.not()) {
@@ -151,7 +151,8 @@ fun ChatCameraButton(
                     }
                 },
             painter = painterResource(id = R.drawable.ic_take_photo),
-            contentDescription = "Take photo"
+            contentDescription = "Take photo",
+            contentScale = ContentScale.Inside
         )
     }
 }
