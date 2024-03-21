@@ -131,7 +131,6 @@ class ConfirmEmailFragment : Fragment(), MegaRequestListenerInterface {
             }
 
             binding.confirmEmailNewEmail.text.toString().lowercase().trim { it <= ' ' }.let {
-                setTemporalEmail(it)
                 megaApi.resendSignupLink(it, firstNameTemp, this@ConfirmEmailFragment)
             }
         }
@@ -197,8 +196,9 @@ class ConfirmEmailFragment : Fragment(), MegaRequestListenerInterface {
             with(requireActivity() as LoginActivity) {
                 showSnackbar(
                     if (e.errorCode == MegaError.API_OK) {
+                        setTemporalEmail(request.email)
                         loginViewModel.saveLastRegisteredEmail(request.email)
-                        requireContext().getFormattedStringOrDefault(R.string.confirm_email_misspelled_email_sent)
+                        getString(R.string.confirm_email_misspelled_email_sent)
                     } else {
                         e.errorString
                     }
