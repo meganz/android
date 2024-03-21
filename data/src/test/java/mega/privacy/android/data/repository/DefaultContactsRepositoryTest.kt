@@ -16,6 +16,7 @@ import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.gateway.contact.ContactGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ContactRequestMapper
 import mega.privacy.android.data.mapper.InviteContactRequestMapper
@@ -95,6 +96,7 @@ class DefaultContactsRepositoryTest {
     private val databaseHandler: DatabaseHandler = mock()
     private val megaLocalRoomGateway: MegaLocalRoomGateway = mock()
     private val context: Context = mock()
+    private val contactGateway: ContactGateway = mock()
 
     private val userEmail = "test@mega.nz"
     private val userHandle = -123456L
@@ -148,6 +150,7 @@ class DefaultContactsRepositoryTest {
             userChatStatusMapper = userChatStatusMapper,
             userMapper = userMapper,
             sharingScope = CoroutineScope(UnconfinedTestDispatcher()),
+            contactGateway = contactGateway
         )
     }
 

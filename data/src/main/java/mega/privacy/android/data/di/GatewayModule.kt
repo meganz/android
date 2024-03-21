@@ -65,6 +65,8 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.api.StreamingGateway
 import mega.privacy.android.data.gateway.chat.ChatStorageGateway
+import mega.privacy.android.data.gateway.contact.ContactGateway
+import mega.privacy.android.data.gateway.contact.ContactGatewayImpl
 import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
@@ -297,4 +299,6 @@ internal abstract class GatewayModule {
     @Singleton
     abstract fun bindWorkerClassGateway(implementation: WorkerClassGatewayImpl): WorkerClassGateway
 
+    @Binds
+    abstract fun bindContactGateway(implementation: ContactGatewayImpl): ContactGateway
 }

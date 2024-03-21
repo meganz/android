@@ -30,6 +30,7 @@ import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.gateway.contact.ContactGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ContactRequestMapper
 import mega.privacy.android.data.mapper.InviteContactRequestMapper
@@ -51,6 +52,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
@@ -86,6 +88,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property contactCredentialsMapper [ContactCredentialsMapper]
  * @property inviteContactRequestMapper [InviteContactRequestMapper]
  * @property localStorageGateway      [MegaLocalStorageGateway]
+ * @property contactGateway           [ContactGateway]
  */
 internal class DefaultContactsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
@@ -109,6 +112,7 @@ internal class DefaultContactsRepository @Inject constructor(
     private val userChatStatusMapper: UserChatStatusMapper,
     private val userMapper: UserMapper,
     @ApplicationScope private val sharingScope: CoroutineScope,
+    private val contactGateway: ContactGateway,
 ) : ContactsRepository {
 
     override fun monitorContactRequestUpdates(): Flow<List<ContactRequest>> =
@@ -910,4 +914,17 @@ internal class DefaultContactsRepository @Inject constructor(
             }
         }
     }
+
+    override suspend fun getLocalContacts(): List<LocalContact> = withContext(ioDispatcher) {
+        contactGateway.getLocalContacts()
+    }
+
+    override suspend fun getLocalContactNumbers(): List<LocalContact> = withContext(ioDispatcher) {
+        contactGateway.getLocalContactNumbers()
+    }
+
+    override suspend fun getLocalContactEmailAddresses(): List<LocalContact> =
+        withContext(ioDispatcher) {
+            contactGateway.getLocalContactEmailAddresses()
+        }
 }

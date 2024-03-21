@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
@@ -421,4 +422,25 @@ interface ContactsRepository {
      * @return A flow of [UserUpdate].
      */
     val monitorContactCacheUpdates: Flow<UserUpdate>
+
+    /**
+     * Get list of local contacts from the ContactGateway
+     *
+     * @return List of [LocalContact]
+     */
+    suspend fun getLocalContacts(): List<LocalContact>
+
+    /**
+     * Get list of local contact's numbers from the ContactGateway
+     *
+     * @return List of [LocalContact]
+     */
+    suspend fun getLocalContactNumbers(): List<LocalContact>
+
+    /**
+     * Get list of local contact's email addresses from the ContactGateway
+     *
+     * @return List of [LocalContact]
+     */
+    suspend fun getLocalContactEmailAddresses(): List<LocalContact>
 }
