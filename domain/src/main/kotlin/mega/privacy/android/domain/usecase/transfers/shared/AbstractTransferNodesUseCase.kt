@@ -104,8 +104,6 @@ abstract class AbstractTransferNodesUseCase<T, R>(
                                 }
                             }
 
-
-
                             send(
                                 MultiTransferEvent.SingleTransferEvent(
                                     transferEvent = transferEvent,
