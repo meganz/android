@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.documentsection.DocumentSectionViewModel
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntityMapper
@@ -15,10 +16,16 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.documentsection.GetAllDocumentsUseCase
+import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,6 +34,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import test.mega.privacy.android.app.TimberJUnit5Extension
@@ -46,6 +54,13 @@ class DocumentSectionViewModelTest {
     private val fakeMonitorNodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
     private val fakeMonitorOfflineNodeUpdatesFlow = MutableSharedFlow<List<Offline>>()
     private val fakeMonitorViewTypeFlow = MutableSharedFlow<ViewType>()
+    private val setViewType = mock<SetViewType>()
+    private val getNodeByHandle = mock<GetNodeByHandle>()
+    private val getFingerprintUseCase = mock<GetFingerprintUseCase>()
+    private val megaApiHttpServerIsRunningUseCase = mock<MegaApiHttpServerIsRunningUseCase>()
+    private val megaApiHttpServerStartUseCase = mock<MegaApiHttpServerStartUseCase>()
+    private val getFileUrlByNodeHandleUseCase = mock<GetFileUrlByNodeHandleUseCase>()
+    private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
 
 
     private val expectedDocument =
@@ -70,6 +85,13 @@ class DocumentSectionViewModelTest {
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
             monitorViewType = monitorViewType,
+            setViewType = setViewType,
+            getNodeByHandle = getNodeByHandle,
+            getFingerprintUseCase = getFingerprintUseCase,
+            megaApiHttpServerIsRunningUseCase = megaApiHttpServerIsRunningUseCase,
+            megaApiHttpServerStartUseCase = megaApiHttpServerStartUseCase,
+            getFileUrlByNodeHandleUseCase = getFileUrlByNodeHandleUseCase,
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase
         )
     }
 
@@ -81,7 +103,14 @@ class DocumentSectionViewModelTest {
             getCloudSortOrder,
             monitorNodeUpdatesUseCase,
             monitorOfflineNodeUpdatesUseCase,
-            monitorViewType
+            monitorViewType,
+            setViewType,
+            getNodeByHandle,
+            getFingerprintUseCase,
+            megaApiHttpServerIsRunningUseCase,
+            megaApiHttpServerStartUseCase,
+            getFileUrlByNodeHandleUseCase,
+            isConnectedToInternetUseCase
         )
     }
 
@@ -92,6 +121,11 @@ class DocumentSectionViewModelTest {
             assertThat(initial.allDocuments).isEmpty()
             assertThat(initial.sortOrder).isEqualTo(SortOrder.ORDER_NONE)
             assertThat(initial.isLoading).isEqualTo(true)
+            assertThat(initial.scrollToTop).isEqualTo(false)
+            assertThat(initial.currentViewType).isEqualTo(ViewType.LIST)
+            assertThat(initial.actionMode).isFalse()
+            assertThat(initial.selectedDocumentHandles).isEmpty()
+            assertThat(initial.searchMode).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -108,6 +142,7 @@ class DocumentSectionViewModelTest {
             assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
             assertThat(actual.allDocuments.size).isEqualTo(2)
             assertThat(actual.isLoading).isEqualTo(false)
+            assertThat(actual.scrollToTop).isEqualTo(false)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -203,5 +238,56 @@ class DocumentSectionViewModelTest {
             assertThat(awaitItem().searchMode).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `test that the setViewType is invoked when onChangeViewTypeClicked is triggered and currentViewType is List`() =
+        runTest {
+            underTest.onChangeViewTypeClicked()
+            verify(setViewType).invoke(ViewType.GRID)
+        }
+
+    @Test
+    fun `test that the setViewType is invoked when onChangeViewTypeClicked is triggered and currentViewType is Grid`() =
+        runTest {
+            underTest.uiState.drop(1).test {
+                fakeMonitorViewTypeFlow.emit(ViewType.GRID)
+                assertThat(awaitItem().currentViewType).isEqualTo(ViewType.GRID)
+                underTest.onChangeViewTypeClicked()
+                verify(setViewType).invoke(ViewType.LIST)
+            }
+        }
+
+    @Test
+    fun `test that the uiState is correctly updated when sort order is changed`() = runTest {
+        val order = SortOrder.ORDER_DEFAULT_DESC
+        whenever(getCloudSortOrder()).thenReturn(order)
+
+        underTest.uiState.test {
+            assertThat(awaitItem().sortOrder).isEqualTo(SortOrder.ORDER_NONE)
+            underTest.refreshWhenOrderChanged()
+            val actual = awaitItem()
+            assertThat(actual.sortOrder).isEqualTo(order)
+            assertThat(actual.isLoading).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that getLocalFilePath return null when getNodeByHandle return null`() = runTest {
+        whenever(getNodeByHandle(any())).thenReturn(null)
+        assertThat(underTest.getLocalFilePath(1)).isNull()
+    }
+
+    @Test
+    fun `test that getDocumentNodeByHandle return not null`() = runTest {
+        whenever(getNodeByHandle(any())).thenReturn(mock())
+        assertThat(underTest.getDocumentNodeByHandle(1)).isNotNull()
+    }
+
+    @Test
+    fun `test that getDocumentNodeByHandle return null`() = runTest {
+        whenever(getNodeByHandle(any())).thenReturn(null)
+        assertThat(underTest.getDocumentNodeByHandle(1)).isNull()
     }
 }
