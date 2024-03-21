@@ -22,8 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.R
+import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
@@ -33,7 +34,10 @@ import mega.privacy.android.core.ui.theme.extensions.conditional
  * Generic two line list item
  *
  * @param title Title
+ * @param modifier The [Modifier]
  * @param subtitle Subtitle
+ * @param showEntireSubtitle If true, the entire [subtitle] is displayed. Otherwise, only one line
+ * is provided for the [subtitle]
  * @param icon Icon
  * @param modifier Modifier
  * @param subTitlePrefixIcons Subtitle prefix
@@ -42,12 +46,12 @@ import mega.privacy.android.core.ui.theme.extensions.conditional
  * @param trailingIcons Body suffix
  * @param onItemClicked An optional item click listener
  */
-
 @Composable
 fun GenericTwoLineListItem(
     title: String,
     modifier: Modifier = Modifier,
     subtitle: String? = null,
+    showEntireSubtitle: Boolean = false,
     icon: @Composable (() -> Unit)? = null,
     subTitlePrefixIcons: @Composable (RowScope.() -> Unit)? = null,
     subTitleSuffixIcons: @Composable (RowScope.() -> Unit)? = null,
@@ -73,7 +77,11 @@ fun GenericTwoLineListItem(
                     text = subtitle,
                     style = MaterialTheme.typography.subtitle2,
                     color = MegaTheme.colors.text.secondary,
-                    maxLines = 1,
+                    maxLines = if (showEntireSubtitle) {
+                        Int.MAX_VALUE
+                    } else {
+                        1
+                    },
                     overflow = TextOverflow.Ellipsis,
                 )
             }
@@ -215,11 +223,11 @@ private fun SubTitleRow(
 
 @CombinedThemePreviews
 @Composable
-private fun PreviewGenericTwoLineListViewItemSimple() {
+private fun GenericTwoLineListItemPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         GenericTwoLineListItem(
-            title = "Simple title",
-            subtitle = "Simple sub title",
+            title = "Generic Two Line List Item Title",
+            subtitle = "Generic Two Line List Item Subtitle",
             icon = {
                 Icon(
                     painter = painterResource(id = IconPackR.drawable.ic_folder_sync_medium_solid),
@@ -232,28 +240,14 @@ private fun PreviewGenericTwoLineListViewItemSimple() {
 
 @CombinedThemePreviews
 @Composable
-private fun PreviewGenericTwoLineListViewItemAllEnabled() {
+private fun GenericTwoLineListItemWithLongContentPreview(
+    @PreviewParameter(BooleanProvider::class) showEntireSubtitle: Boolean,
+) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         GenericTwoLineListItem(
-            title = "All enabled view title",
-            subtitle = "All enabled view sub title",
-            icon = {
-                Icon(
-                    painter = painterResource(id = IconPackR.drawable.ic_folder_sync_medium_solid),
-                    contentDescription = "Folder sync"
-                )
-            }
-        )
-    }
-}
-
-@CombinedThemePreviews
-@Composable
-private fun PreviewGenericTwoLineListItemWithLongTitle() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
-        GenericTwoLineListItem(
-            title = "Title very big for testing the middle ellipsis",
-            subtitle = "Subtitle very big for testing the middle ellipsis",
+            title = "Very Long Generic Two Line List Item Title to Simulate Ellipsis",
+            subtitle = "Very Long Generic Two Line List Item Subtitle to Simulate Ellipsis",
+            showEntireSubtitle = showEntireSubtitle,
             icon = {
                 Icon(
                     painter = painterResource(id = IconPackR.drawable.ic_folder_sync_medium_solid),
@@ -266,8 +260,8 @@ private fun PreviewGenericTwoLineListItemWithLongTitle() {
 
 @CombinedThemePreviews
 @Composable
-private fun GenericListViewItemWithTitle() {
+private fun GenericTwoLineListItemWithOnlyTitlePreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        GenericTwoLineListItem(title = "title")
+        GenericTwoLineListItem(title = "Generic Two Line List Item Title")
     }
 }
