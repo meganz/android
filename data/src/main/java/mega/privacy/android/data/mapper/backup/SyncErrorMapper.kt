@@ -8,7 +8,7 @@ import javax.inject.Inject
  * Mapper that converts the [Int] value of [nz.mega.sdk.MegaBackupInfo.substate] into a corresponding
  * [SyncError]
  */
-internal class SyncErrorMapper @Inject constructor() {
+class SyncErrorMapper @Inject constructor() {
 
     /**
      * Invocation function

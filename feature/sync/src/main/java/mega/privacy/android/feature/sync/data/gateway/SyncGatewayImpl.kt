@@ -16,6 +16,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaSyncList
@@ -129,4 +130,7 @@ internal class SyncGatewayImpl @Inject constructor(
             return null
         }
     }
+
+    override suspend fun isNodeSyncableWithError(megaNode: MegaNode): MegaError =
+        megaApi.isNodeSyncableWithError(megaNode)
 }

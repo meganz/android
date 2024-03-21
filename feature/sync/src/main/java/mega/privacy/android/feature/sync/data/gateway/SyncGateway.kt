@@ -2,6 +2,8 @@ package mega.privacy.android.feature.sync.data.gateway
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaSyncList
 import nz.mega.sdk.MegaSyncStallList
@@ -36,6 +38,11 @@ internal interface SyncGateway {
      */
     suspend fun getFolderPairs(): MegaSyncList
 
+    /**
+     * Remove folder pair (a sync)
+     *
+     * @param folderPairId
+     */
     suspend fun removeFolderPair(folderPairId: Long)
 
     /**
@@ -63,5 +70,7 @@ internal interface SyncGateway {
     fun pauseSync(folderPairId: Long)
 
     suspend fun getSyncStalledIssues(): MegaSyncStallList?
+
+    suspend fun isNodeSyncableWithError(megaNode: MegaNode): MegaError
 }
 

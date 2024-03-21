@@ -10,6 +10,7 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaListenerInterface
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaSyncList
@@ -152,5 +153,16 @@ internal class SyncGatewayImplTest {
         whenever(megaApi.isSyncStalled).thenReturn(false)
         val result = underTest.getSyncStalledIssues()
         assertThat(result).isNull()
+    }
+
+    @Test
+    fun `test that isNodeSyncableWithError calls isNodeSyncableWithError on MegaApi`() = runTest {
+        val megaNode: MegaNode = mock()
+        val megaError: MegaError = mock()
+        whenever(megaApi.isNodeSyncableWithError(megaNode)).thenReturn(megaError)
+
+        val result = underTest.isNodeSyncableWithError(megaNode)
+
+        assertThat(result).isEqualTo(megaError)
     }
 }

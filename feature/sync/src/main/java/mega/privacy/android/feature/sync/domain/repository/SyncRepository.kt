@@ -1,6 +1,8 @@
 package mega.privacy.android.feature.sync.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.exception.MegaSyncException
 import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
@@ -72,4 +74,12 @@ interface SyncRepository {
      * Refreshes Sync list
      */
     suspend fun refreshSync()
+
+    /**
+     * Checks if a node is syncable. If it is not, returns an error.
+     *
+     * @param nodeId The id of the node to check.
+     */
+    @Throws(MegaSyncException::class)
+    suspend fun tryNodeSync(nodeId: NodeId)
 }

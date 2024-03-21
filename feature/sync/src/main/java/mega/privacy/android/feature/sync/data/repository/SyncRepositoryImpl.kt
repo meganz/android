@@ -14,7 +14,10 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.backup.SyncErrorMapper
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.exception.MegaSyncException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
@@ -25,6 +28,7 @@ import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
+import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaSyncList
 import javax.inject.Inject
 
@@ -34,6 +38,7 @@ internal class SyncRepositoryImpl @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val folderPairMapper: FolderPairMapper,
     private val stalledIssuesMapper: StalledIssuesMapper,
+    private val syncErrorMapper: SyncErrorMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val appScope: CoroutineScope,
 ) : SyncRepository {
@@ -124,5 +129,25 @@ internal class SyncRepositoryImpl @Inject constructor(
 
     override suspend fun refreshSync() {
         _refreshShow.emit(Unit)
+    }
+
+    @Throws(MegaSyncException::class)
+    override suspend fun tryNodeSync(nodeId: NodeId) {
+        val megaNode = megaApiGateway.getMegaNodeByHandle(nodeId.longValue)
+            ?: throw MegaSyncException(
+                errorCode = MegaError.API_EARGS,
+                "Node not found"
+            )
+        val error = syncGateway.isNodeSyncableWithError(megaNode)
+
+        if (error.errorCode != MegaError.API_OK) {
+            val syncError = syncErrorMapper(error.syncError)
+
+            throw MegaSyncException(
+                error.errorCode,
+                error.errorString,
+                syncError = syncError
+            )
+        }
     }
 }
