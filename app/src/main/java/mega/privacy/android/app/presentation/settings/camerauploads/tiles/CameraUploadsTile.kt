@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.settings.camerauploads.tiles
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -8,7 +9,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.controls.dividers.DividerType
-import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
+import mega.privacy.android.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.core.ui.controls.lists.GenericTwoLineListItem
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
@@ -24,18 +26,26 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 internal fun CameraUploadsTile(
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    MenuActionListTile(
-        modifier = Modifier.testTag(CAMERA_UPLOADS_TILE),
-        text = stringResource(R.string.section_photo_sync),
-        dividerType = if (isChecked) DividerType.FullSize else null,
-        addIconPadding = false,
-    ) {
-        MegaSwitch(
-            modifier = Modifier.testTag(CAMERA_UPLOADS_TILE_SWITCH),
-            checked = isChecked,
-            onCheckedChange = onCheckedChange,
+    Column(modifier) {
+        GenericTwoLineListItem(
+            modifier = Modifier.testTag(CAMERA_UPLOADS_TILE),
+            title = stringResource(R.string.section_photo_sync),
+            trailingIcons = {
+                MegaSwitch(
+                    modifier = Modifier.testTag(CAMERA_UPLOADS_TILE_SWITCH),
+                    checked = isChecked,
+                    onCheckedChange = onCheckedChange,
+                )
+            }
         )
+        if (isChecked) {
+            MegaDivider(
+                modifier = Modifier.testTag(CAMERA_UPLOADS_TILE_DIVIDER),
+                dividerType = DividerType.FullSize,
+            )
+        }
     }
 }
 
@@ -60,5 +70,6 @@ private fun CameraUploadsTilePreview(
 /**
  * Test Tags for the Camera Uploads Tile
  */
-internal const val CAMERA_UPLOADS_TILE = "camera_uploads_option:menu_action_list_tile"
-internal const val CAMERA_UPLOADS_TILE_SWITCH = "camera_uploads_option:mega_switch"
+internal const val CAMERA_UPLOADS_TILE = "camera_uploads_tile:generic_two_line_list_item"
+internal const val CAMERA_UPLOADS_TILE_SWITCH = "camera_uploads_tile:mega_switch"
+internal const val CAMERA_UPLOADS_TILE_DIVIDER = "camera_uploads_tile:mega_divider"
