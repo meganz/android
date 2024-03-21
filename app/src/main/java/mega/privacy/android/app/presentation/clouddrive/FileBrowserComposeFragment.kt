@@ -385,7 +385,7 @@ class FileBrowserComposeFragment : Fragment() {
         }
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            fileBrowserViewModel.refreshNodes()
+            fileBrowserViewModel.onCloudDriveSortOrderChanged()
         })
     }
 

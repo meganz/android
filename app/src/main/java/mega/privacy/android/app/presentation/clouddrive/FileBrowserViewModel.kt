@@ -811,6 +811,12 @@ class FileBrowserViewModel @Inject constructor(
                 }
             }
         }
+    }
 
+    /**
+     * This method will handle the sort order change event
+     */
+    fun onCloudDriveSortOrderChanged() {
+        setPendingRefreshNodes()
     }
 }
