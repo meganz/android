@@ -31,6 +31,7 @@ import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
+import mega.privacy.android.domain.usecase.transfers.active.MonitorActiveTransferFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetCurrentDownloadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorageDownloadLocationUseCase
@@ -84,6 +85,7 @@ class StartDownloadComponentViewModelTest {
     private val setStorageDownloadAskAlwaysUseCase = mock<SetStorageDownloadAskAlwaysUseCase>()
     private val setStorageDownloadLocationUseCase = mock<SetStorageDownloadLocationUseCase>()
     private val getExternalPathByContentUriUseCase = mock<GetExternalPathByContentUriUseCase>()
+    private val monitorActiveTransferFinishedUseCase = mock<MonitorActiveTransferFinishedUseCase>()
 
 
     private val node: TypedFileNode = mock()
@@ -112,8 +114,8 @@ class StartDownloadComponentViewModelTest {
             setStorageDownloadAskAlwaysUseCase,
             setStorageDownloadLocationUseCase,
             getExternalPathByContentUriUseCase,
+            monitorActiveTransferFinishedUseCase,
         )
-
     }
 
     @BeforeEach
@@ -144,6 +146,7 @@ class StartDownloadComponentViewModelTest {
 
     private fun initialStub() {
         whenever(monitorOngoingActiveTransfersUseCase(any())).thenReturn(emptyFlow())
+        whenever(monitorActiveTransferFinishedUseCase(any())).thenReturn(emptyFlow())
     }
 
     @ParameterizedTest

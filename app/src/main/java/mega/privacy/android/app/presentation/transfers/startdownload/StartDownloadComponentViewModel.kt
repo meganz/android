@@ -13,8 +13,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.last
-import kotlinx.coroutines.flow.lastOrNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
@@ -41,6 +39,7 @@ import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
+import mega.privacy.android.domain.usecase.transfers.active.MonitorActiveTransferFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetCurrentDownloadSpeedUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorageDownloadLocationUseCase
@@ -75,6 +74,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
     private val setStorageDownloadAskAlwaysUseCase: SetStorageDownloadAskAlwaysUseCase,
     private val setStorageDownloadLocationUseCase: SetStorageDownloadLocationUseCase,
     private val getExternalPathByContentUriUseCase: GetExternalPathByContentUriUseCase,
+    private val monitorActiveTransferFinishedUseCase: MonitorActiveTransferFinishedUseCase,
 ) : ViewModel() {
 
     private var currentInProgressJob: Job? = null
@@ -251,7 +251,9 @@ internal class StartDownloadComponentViewModel @Inject constructor(
         isHighPriority: Boolean,
         getPath: suspend () -> String?,
     ) {
+        monitorDownloadFinishJob?.cancel()
         clearActiveTransfersIfFinishedUseCase(TransferType.DOWNLOAD)
+        monitorDownloadFinish()
         _uiState.update {
             it.copy(jobInProgressState = StartDownloadTransferJobInProgress.ProcessingFiles)
         }
@@ -277,7 +279,6 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                     }
                 }.last()
             }
-        monitorFinish()
         checkRating()
         _uiState.updateEventAndClearProgress(
             when (terminalEvent) {
@@ -409,40 +410,30 @@ internal class StartDownloadComponentViewModel @Inject constructor(
         }
     }
 
-    private var monitorFinishJob: Job? = null
+    private var monitorDownloadFinishJob: Job? = null
 
     /**
      * Monitor finish to send the corresponding event (will display a "Download Finished" snackbar or similar)
      */
-    private fun monitorFinish() {
-        if (monitorFinishJob == null) {
-            monitorFinishJob = viewModelScope.launch {
-                val lastBeforeClear =
-                    monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD)
-                        .conflate()
-                        .map { it.activeTransferTotals }
-                        .takeWhile {
-                            it.totalTransfers > 0
-                        }.lastOrNull() ?: return@launch
-                (lastBeforeClear.totalFilesDownloaded).takeIf { it > 0 }
-                    ?.let {
-                        when (_uiState.value.transferTriggerEvent) {
-                            is TransferTriggerEvent.StartDownloadForOffline -> {
-                                StartDownloadTransferEvent.Message.FinishOffline
-                            }
-
-                            is TransferTriggerEvent.StartDownloadNode -> {
-                                StartDownloadTransferEvent.MessagePlural.FinishDownloading(
-                                    it
-                                )
-                            }
-
-                            else -> null
-                        }?.let { finishEvent ->
-                            _uiState.updateEventAndClearProgress(finishEvent)
-                        }
+    private fun monitorDownloadFinish() {
+        monitorDownloadFinishJob?.cancel()
+        monitorDownloadFinishJob = viewModelScope.launch {
+            monitorActiveTransferFinishedUseCase(TransferType.DOWNLOAD).collect { totalNodes ->
+                when (_uiState.value.transferTriggerEvent) {
+                    is TransferTriggerEvent.StartDownloadForOffline -> {
+                        StartDownloadTransferEvent.Message.FinishOffline
                     }
-                monitorFinishJob = null
+
+                    is TransferTriggerEvent.StartDownloadNode -> {
+                        StartDownloadTransferEvent.MessagePlural.FinishDownloading(
+                            totalNodes
+                        )
+                    }
+
+                    else -> null
+                }?.let { finishEvent ->
+                    _uiState.updateEventAndClearProgress(finishEvent)
+                }
             }
         }
     }
