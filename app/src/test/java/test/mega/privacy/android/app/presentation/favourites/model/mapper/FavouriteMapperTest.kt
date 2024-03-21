@@ -96,7 +96,7 @@ class FavouriteMapperTest {
         val expectedName = "TestFile.test"
         val expectedInfo = "Size · Modification"
         val expectedLabel = MegaNode.NODE_LBL_RED
-        val expectedIcon = IconPackR.drawable.ic_generic_list
+        val expectedIcon = IconPackR.drawable.ic_generic_medium_solid
         val expectedIsFavourite = false
         val expectedIsExported = false
         val expectedIsTakenDown = false

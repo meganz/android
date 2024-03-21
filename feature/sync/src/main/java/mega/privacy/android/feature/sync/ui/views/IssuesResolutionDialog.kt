@@ -124,7 +124,7 @@ private fun IssueResolutionAction(
 internal fun IssuesResolutionDialogPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         IssuesResolutionDialog(
-            icon = iconPackR.drawable.ic_generic_list,
+            icon = iconPackR.drawable.ic_generic_medium_solid,
             conflictName = "Conflict A",
             nodeName = "some file",
             actions = listOf(

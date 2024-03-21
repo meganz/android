@@ -46,7 +46,7 @@ class DocumentGridViewItemTest {
 
     private fun setComposeContent(
         isSelected: Boolean = false,
-        @DrawableRes icon: Int = R.drawable.ic_text,
+        @DrawableRes icon: Int = R.drawable.ic_text_medium_solid,
         name: String = "name",
         thumbnailData: Any? = null,
         isTakenDown: Boolean = false,

@@ -34,7 +34,7 @@ internal class StalledIssueItemMapper @Inject constructor(
                 is FileNode -> fileTypeIconMapper(firstNode.type.extension)
                 else -> stalledIssueEntity.nodeNames.firstOrNull()?.let {
                     fileTypeIconMapper(it.substringAfterLast('.'))
-                } ?: iconPackR.drawable.ic_generic_list
+                } ?: iconPackR.drawable.ic_generic_medium_solid
             },
             detailedInfo = detailedInfo,
             actions = stalledIssueResolutionActionMapper(

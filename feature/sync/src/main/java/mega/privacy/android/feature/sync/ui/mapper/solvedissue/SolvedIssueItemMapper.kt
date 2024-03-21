@@ -35,7 +35,7 @@ internal class SolvedIssueItemMapper @Inject constructor(
                 is FileNode -> fileTypeIconMapper(node.type.extension)
                 else -> solvedIssue.localPaths.firstOrNull()?.let {
                     fileTypeIconMapper(it.substringAfterLast('.'))
-                } ?: iconPackR.drawable.ic_generic_list
+                } ?: iconPackR.drawable.ic_generic_medium_solid
             },
         )
     }

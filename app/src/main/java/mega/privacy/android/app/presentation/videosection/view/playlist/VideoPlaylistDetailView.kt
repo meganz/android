@@ -279,7 +279,7 @@ fun VideoPlaylistDetailView(
                             else -> {
                                 val videoItem = items[it]
                                 VideoItemView(
-                                    icon = iconPackR.drawable.ic_video_list,
+                                    icon = iconPackR.drawable.ic_video_medium_solid,
                                     name = videoItem.name,
                                     fileSize = formatFileSize(videoItem.size, LocalContext.current),
                                     duration = videoItem.durationString,

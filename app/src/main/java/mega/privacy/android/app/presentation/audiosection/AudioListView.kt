@@ -58,7 +58,7 @@ internal fun AudioListView(
             NodeListViewItem(
                 isSelected = audioItem.isSelected,
                 folderInfo = null,
-                icon = R.drawable.ic_audio_list,
+                icon = R.drawable.ic_audio_medium_solid,
                 infoIcon = if (audioItem.hasVersions) coreR.drawable.ic_version_small else null,
                 fileSize = formatFileSize(audioItem.size, LocalContext.current),
                 modifiedDate = formatModifiedDate(

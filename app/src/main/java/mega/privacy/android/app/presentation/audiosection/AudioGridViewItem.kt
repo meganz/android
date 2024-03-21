@@ -84,7 +84,7 @@ internal fun AudioGridViewItem(
                     .padding(1.dp),
                 contentDescription = "File",
                 data = thumbnailData,
-                defaultImage = iconPackR.drawable.ic_audio_list,
+                defaultImage = iconPackR.drawable.ic_audio_medium_solid,
                 contentScale = ContentScale.Crop,
             )
             duration?.let {

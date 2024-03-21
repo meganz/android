@@ -291,7 +291,7 @@ internal fun VideoSizeAndIconsView(
 private fun VideoItemViewWithFavouritePreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         VideoItemView(
-            icon = iconPackR.drawable.ic_video_list,
+            icon = iconPackR.drawable.ic_video_medium_solid,
             name = "testing_video_file_name_long_name_testing.mp4",
             fileSize = "1.3MB",
             duration = "04:00",
@@ -311,7 +311,7 @@ private fun VideoItemViewWithFavouritePreview() {
 private fun VideoItemViewWithoutFavouritePreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         VideoItemView(
-            icon = iconPackR.drawable.ic_video_list,
+            icon = iconPackR.drawable.ic_video_medium_solid,
             name = "name.mp4",
             fileSize = "1.3MB",
             duration = "04:00",

@@ -262,7 +262,7 @@ internal class ManagerDrawerFragment : Fragment() {
                     ColorUtils.getColorHexString(requireContext(), R.color.amber_600_amber_300)
 
                 StorageState.Red, StorageState.PayWall -> colorString =
-                    ColorUtils.getColorHexString(requireContext(), R.color.red_600_red_300)
+                    ColorUtils.getColorHexString(requireContext(), R.color.color_button_brand)
 
                 else -> {}
             }
@@ -304,7 +304,7 @@ internal class ManagerDrawerFragment : Fragment() {
             getString(R.string.section_notification_with_unread, unread)
                 .spanABTextFontColour(
                     requireContext(),
-                    ColorUtils.getColorHexString(requireContext(), R.color.red_600_red_300)
+                    ColorUtils.getColorHexString(requireContext(), R.color.color_button_brand)
                 )
         }
     }

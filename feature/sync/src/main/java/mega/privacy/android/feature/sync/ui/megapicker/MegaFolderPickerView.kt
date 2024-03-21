@@ -63,17 +63,9 @@ internal fun MegaFolderPickerView(
             val nodeEntity = nodesList[it]
 
             val icon = when (nodeEntity) {
-                is FolderNode -> {
-                    nodeEntity.getIcon()
-                }
-
-                is FileNode -> {
-                    fileTypeIconMapper(nodeEntity.type.extension)
-                }
-
-                else -> {
-                    iconPackR.drawable.ic_generic_list
-                }
+                is FolderNode -> nodeEntity.getIcon()
+                is FileNode -> fileTypeIconMapper(nodeEntity.type.extension)
+                else -> iconPackR.drawable.ic_generic_medium_solid
             }
             NodeListViewItem(
                 isSelected = false,

@@ -463,7 +463,7 @@ private fun FilePreview() {
             modifier = Modifier,
             isSelected = false,
             folderInfo = null,
-            icon = IconPackR.drawable.ic_pdf_list,
+            icon = IconPackR.drawable.ic_pdf_medium_solid,
             fileSize = "1.2 MB",
             modifiedDate = "Dec 29, 2022",
             name = "documentation.pdf",

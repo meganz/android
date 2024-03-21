@@ -82,28 +82,28 @@ internal fun SyncSolvedIssuesScreenPreview() {
                     nodeNames = listOf("Folder name"),
                     localPaths = listOf("File name"),
                     resolutionExplanation = "All duplicates were removed",
-                    icon = IconPackR.drawable.ic_generic_list
+                    icon = IconPackR.drawable.ic_generic_medium_solid
                 ),
                 SolvedIssueUiItem(
                     nodeIds = listOf(NodeId(4L)),
                     nodeNames = listOf("Folder name"),
                     localPaths = listOf("File name"),
                     resolutionExplanation = "All items were renamed",
-                    icon = IconPackR.drawable.ic_generic_list,
+                    icon = IconPackR.drawable.ic_generic_medium_solid,
                 ),
                 SolvedIssueUiItem(
                     nodeIds = listOf(NodeId(6L)),
                     nodeNames = listOf("Folder name"),
                     localPaths = listOf("Folder name"),
                     resolutionExplanation = "All items were renamed",
-                    icon = IconPackR.drawable.ic_generic_list,
+                    icon = IconPackR.drawable.ic_generic_medium_solid,
                 ),
                 SolvedIssueUiItem(
                     nodeIds = listOf(NodeId(7L)),
                     nodeNames = listOf("Folder name"),
                     localPaths = listOf("Folder name"),
                     resolutionExplanation = "All items were renamed",
-                    icon = IconPackR.drawable.ic_generic_list,
+                    icon = IconPackR.drawable.ic_generic_medium_solid,
                 )
             )
         )
