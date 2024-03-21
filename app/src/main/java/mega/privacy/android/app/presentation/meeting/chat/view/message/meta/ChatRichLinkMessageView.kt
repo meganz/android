@@ -46,7 +46,7 @@ fun ChatRichLinkMessageView(
             modifier = modifier,
             isMe = isMe,
             title = preview.title,
-            contentTitle = preview.description,
+            contentTitle = preview.title,
             contentDescription = preview.description,
             content = content,
             host = preview.domainName,
