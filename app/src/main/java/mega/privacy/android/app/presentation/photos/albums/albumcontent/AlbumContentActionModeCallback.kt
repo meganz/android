@@ -7,6 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.mobile.analytics.event.AlbumContentRemoveItemsEvent
@@ -54,6 +55,16 @@ class AlbumContentActionModeCallback(
                 clearSelection()
             }
 
+            R.id.cab_menu_hide -> {
+                fragment.albumContentViewModel.hideOrUnhideNodes(true)
+                clearSelection()
+            }
+
+            R.id.cab_menu_unhide -> {
+                fragment.albumContentViewModel.hideOrUnhideNodes(false)
+                clearSelection()
+            }
+
             R.id.cab_menu_remove_favourites -> {
                 removeFavourite()
             }
@@ -76,6 +87,19 @@ class AlbumContentActionModeCallback(
                 menu.findItem(R.id.cab_menu_remove_photos)?.isVisible = false
             }
             menu.findItem(R.id.cab_menu_select_all)?.isVisible = !isSelectAll()
+
+            fragment.lifecycleScope.launch {
+                val isHiddenNodesEnabled =
+                    fragment.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+                val hasNonSensitiveNode =
+                    fragment.albumContentViewModel.getSelectedNodes().any { !it.isMarkedSensitive }
+
+                menu.findItem(R.id.cab_menu_hide)?.isVisible =
+                    isHiddenNodesEnabled && hasNonSensitiveNode
+
+                menu.findItem(R.id.cab_menu_unhide)?.isVisible =
+                    isHiddenNodesEnabled && !hasNonSensitiveNode
+            }
         }
     }
 

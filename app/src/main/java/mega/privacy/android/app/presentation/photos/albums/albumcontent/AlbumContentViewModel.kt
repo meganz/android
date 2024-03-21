@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -36,6 +37,7 @@ import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
@@ -66,6 +68,7 @@ internal class AlbumContentViewModel @Inject constructor(
     private val getNodeListByIds: GetNodeListByIds,
     private val getProscribedAlbumNamesUseCase: GetProscribedAlbumNamesUseCase,
     private val updateAlbumNameUseCase: UpdateAlbumNameUseCase,
+    private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumContentState())
     val state = _state.asStateFlow()
@@ -441,5 +444,15 @@ internal class AlbumContentViewModel @Inject constructor(
 
     fun setNewAlbumNameValidity(valid: Boolean) = _state.update {
         it.copy(isInputNameValid = valid)
+    }
+
+    fun hideOrUnhideNodes(hide: Boolean) = viewModelScope.launch {
+        for (node in getSelectedNodes()) {
+            async {
+                runCatching {
+                    updateNodeSensitiveUseCase(nodeId = NodeId(node.handle), isSensitive = hide)
+                }.onFailure { Timber.e("Update sensitivity failed: $it") }
+            }
+        }
     }
 }

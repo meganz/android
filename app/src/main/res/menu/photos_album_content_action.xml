@@ -13,6 +13,18 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/cab_menu_hide"
+        android:orderInCategory="111"
+        android:title="@string/general_hide_node"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_unhide"
+        android:orderInCategory="112"
+        android:title="@string/general_unhide_node"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/cab_menu_remove_photos"
         android:orderInCategory="120"
         android:title="@string/general_remove"
