@@ -18,10 +18,12 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.logging.LegacyLoggingSettings
+import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
 import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.messageId
@@ -58,10 +60,12 @@ import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.ClearLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
 import mega.privacy.android.domain.usecase.login.FetchNodesUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutUseCase
 import mega.privacy.android.domain.usecase.login.LoginUseCase
@@ -71,6 +75,7 @@ import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
@@ -79,6 +84,7 @@ import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCas
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadWorkerUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import mega.privacy.mobile.analytics.event.AccountRegistrationEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -118,7 +124,11 @@ class LoginViewModel @Inject constructor(
     private val getTimelinePhotosUseCase: GetTimelinePhotosUseCase,
     private val startDownloadWorkerUseCase: StartDownloadWorkerUseCase,
     private val startChatUploadsWorkerUseCase: StartChatUploadsWorkerUseCase,
-    @LoginMutex private val loginMutex: Mutex
+    private val saveLastRegisteredEmailUseCase: SaveLastRegisteredEmailUseCase,
+    private val getLastRegisteredEmailUseCase: GetLastRegisteredEmailUseCase,
+    private val clearLastRegisteredEmailUseCase: ClearLastRegisteredEmailUseCase,
+    private val installReferrerHandler: InstallReferrerHandler,
+    @LoginMutex private val loginMutex: Mutex,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -534,7 +544,7 @@ class LoginViewModel @Inject constructor(
                         email,
                         password,
                         DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
-                    ).collectLatest { status -> status.checkStatus() }
+                    ).collectLatest { status -> status.checkStatus(email = email) }
                 }.onFailure { exception ->
                     if (exception !is LoginException) return@onFailure
 
@@ -569,13 +579,14 @@ class LoginViewModel @Inject constructor(
 
             with(state.value) {
                 runCatching {
+                    val email = accountSession?.email ?: return@launch
                     loginWith2FAUseCase(
-                        accountSession?.email ?: return@launch,
+                        email,
                         password ?: return@launch,
                         pin2FA,
                         DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
                     ).collectLatest { status ->
-                        status.checkStatus()
+                        status.checkStatus(email = email)
                     }
                 }.onFailure { exception ->
                     if (exception !is LoginException) return@onFailure
@@ -652,7 +663,10 @@ class LoginViewModel @Inject constructor(
             )
         }
 
-    private fun LoginStatus.checkStatus(isFastLogin: Boolean = false) = when (this) {
+    private fun LoginStatus.checkStatus(
+        isFastLogin: Boolean = false,
+        email: String? = null,
+    ) = when (this) {
         LoginStatus.LoginStarted -> {
             Timber.d("Login started")
         }
@@ -673,6 +687,7 @@ class LoginViewModel @Inject constructor(
                 }
             }
             fetchNodes()
+            sendAnalyticsEventIfFirstTimeLogin(email)
         }
 
         LoginStatus.LoginCannotStart -> {
@@ -850,6 +865,17 @@ class LoginViewModel @Inject constructor(
     }
 
     /**
+     * Save last registered email address to local storage
+     */
+    fun saveLastRegisteredEmail(email: String) {
+        viewModelScope.launch {
+            runCatching {
+                saveLastRegisteredEmailUseCase(email)
+            }.onFailure { Timber.e(it) }
+        }
+    }
+
+    /**
      * Save ephemeral
      *
      * @param ephemeral
@@ -867,6 +893,38 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching { clearEphemeralCredentialsUseCase() }
                 .onFailure { Timber.e(it) }
+        }
+    }
+
+    /**
+     * Send analytics event if the current logged email matches
+     * with the last registration attempted email
+     */
+    fun sendAnalyticsEventIfFirstTimeLogin(loggedEmail: String?) {
+        if (loggedEmail.isNullOrEmpty()) return
+        viewModelScope.launch {
+            val lastRegisteredEmail =
+                runCatching { getLastRegisteredEmailUseCase() }.getOrNull()
+            if (loggedEmail == lastRegisteredEmail) {
+                runCatching {
+                    installReferrerHandler.getDetails()
+                }.onSuccess { details ->
+                    Analytics.tracker.trackEvent(
+                        AccountRegistrationEvent(
+                            referrerUrl = details.referrerUrl,
+                            referrerClickTime = details.referrerClickTime,
+                            appInstallTime = details.appInstallTime
+                        )
+                    )
+                }.onFailure {
+                    Timber.e(it)
+                }
+                runCatching {
+                    clearLastRegisteredEmailUseCase()
+                }.onFailure {
+                    Timber.e(it)
+                }
+            }
         }
     }
 

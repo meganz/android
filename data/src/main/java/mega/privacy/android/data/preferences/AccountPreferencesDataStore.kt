@@ -114,8 +114,15 @@ class AccountPreferencesDataStore @Inject constructor(
 
     override suspend fun clearPreferences() {
         withContext(ioDispatcher) {
+            // After clearing all preferences, restore the last registered email if it exists.
+            // This is because the last registered email should only be cleared
+            // after the user's first login following account registration with that email.
             context.accountPreferencesDataStore.edit {
+                val lastRegisteredEmail = it[lastRegisteredEmailPreferenceKey]
                 it.clear()
+                lastRegisteredEmail?.let { email ->
+                    it[lastRegisteredEmailPreferenceKey] = email
+                }
             }
         }
     }

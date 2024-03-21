@@ -10,6 +10,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -17,6 +18,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentConfirmEmailBinding
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
@@ -43,6 +45,7 @@ class ConfirmEmailFragment : Fragment(), MegaRequestListenerInterface {
     lateinit var megaApi: MegaApiAndroid
 
     private val viewModel: ConfirmEmailViewModel by viewModels()
+    private val loginViewModel: LoginViewModel by activityViewModels()
 
     private var _binding: FragmentConfirmEmailBinding? = null
 
@@ -162,6 +165,7 @@ class ConfirmEmailFragment : Fragment(), MegaRequestListenerInterface {
                     it.isEmpty() -> requireContext().getFormattedStringOrDefault(R.string.error_enter_email)
                     !EMAIL_ADDRESS.matcher(it).matches() ->
                         requireContext().getFormattedStringOrDefault(R.string.error_invalid_email)
+
                     else -> null
                 }
             }
@@ -193,6 +197,7 @@ class ConfirmEmailFragment : Fragment(), MegaRequestListenerInterface {
             with(requireActivity() as LoginActivity) {
                 showSnackbar(
                     if (e.errorCode == MegaError.API_OK) {
+                        loginViewModel.saveLastRegisteredEmail(request.email)
                         requireContext().getFormattedStringOrDefault(R.string.confirm_email_misspelled_email_sent)
                     } else {
                         e.errorString

@@ -60,7 +60,7 @@ interface AccountPreferencesGateway {
     fun getLatestTargetTimestampMovePreference(): Flow<Long?>
 
     /**
-     * Clears account preferences.
+     * Clears account preferences except last registered email
      */
     suspend fun clearPreferences()
 

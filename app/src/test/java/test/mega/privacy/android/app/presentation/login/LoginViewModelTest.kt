@@ -2,7 +2,6 @@ package test.mega.privacy.android.app.presentation.login
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,6 +14,8 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.logging.LegacyLoggingSettings
+import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerDetails
+import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -28,9 +29,11 @@ import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.ClearLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
 import mega.privacy.android.domain.usecase.login.FetchNodesUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutUseCase
 import mega.privacy.android.domain.usecase.login.LoginUseCase
@@ -40,6 +43,7 @@ import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
@@ -55,7 +59,9 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.AnalyticsTestExtension
 import test.mega.privacy.android.app.InstantExecutorExtension
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -96,6 +102,10 @@ internal class LoginViewModelTest {
     private val getTimelinePhotosUseCase = mock<GetTimelinePhotosUseCase>()
     private val startDownloadWorkerUseCase = mock<StartDownloadWorkerUseCase>()
     private val startChatUploadsWorkerUseCase = mock<StartChatUploadsWorkerUseCase>()
+    private val getLastRegisteredEmailUseCase = mock<GetLastRegisteredEmailUseCase>()
+    private val saveLastRegisteredEmailUseCase = mock<SaveLastRegisteredEmailUseCase>()
+    private val clearLastRegisteredEmailUseCase = mock<ClearLastRegisteredEmailUseCase>()
+    private val installReferrerHandler = mock<InstallReferrerHandler>()
 
     @BeforeEach
     fun setUp() {
@@ -129,7 +139,11 @@ internal class LoginViewModelTest {
             getTimelinePhotosUseCase = getTimelinePhotosUseCase,
             startDownloadWorkerUseCase = startDownloadWorkerUseCase,
             startChatUploadsWorkerUseCase = startChatUploadsWorkerUseCase,
-            loginMutex = mock()
+            loginMutex = mock(),
+            getLastRegisteredEmailUseCase = getLastRegisteredEmailUseCase,
+            saveLastRegisteredEmailUseCase = saveLastRegisteredEmailUseCase,
+            clearLastRegisteredEmailUseCase = clearLastRegisteredEmailUseCase,
+            installReferrerHandler = installReferrerHandler
         )
     }
 
@@ -307,11 +321,50 @@ internal class LoginViewModelTest {
             verify(clearEphemeralCredentialsUseCase).invoke()
         }
 
+    @Test
+    fun `test that sendAnalyticsEventIfFirstTimeLogin sends event when logged email matched with last registered email`() =
+        runTest {
+            val email = "test@example.com"
+            val details = InstallReferrerDetails(
+                referrerUrl = "referrerUrl",
+                referrerClickTime = 123L,
+                appInstallTime = 456L
+            )
+            whenever(getLastRegisteredEmailUseCase()).thenReturn(email)
+            whenever(installReferrerHandler.getDetails()).thenReturn(details)
+
+            underTest.sendAnalyticsEventIfFirstTimeLogin(email)
+            advanceUntilIdle()
+
+            assertThat(analyticsExtension.events).hasSize(1)
+            verify(installReferrerHandler).getDetails()
+            verify(clearLastRegisteredEmailUseCase).invoke()
+        }
+
+    @Test
+    fun `test that sendAnalyticsEventIfFirstTimeLogin does not send event when emails do not match`() =
+        runTest {
+            val email = "test@example.com"
+            val lastRegisteredEmail = "lastRegistered@example.com"
+
+            whenever(getLastRegisteredEmailUseCase()).thenReturn(lastRegisteredEmail)
+
+            underTest.sendAnalyticsEventIfFirstTimeLogin(email)
+            advanceUntilIdle()
+
+            assertThat(analyticsExtension.events).isEmpty()
+            verifyNoInteractions(installReferrerHandler, clearLastRegisteredEmailUseCase)
+        }
+
     companion object {
         private val scheduler = TestCoroutineScheduler()
 
         @JvmField
         @RegisterExtension
         val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher(scheduler))
+
+        @JvmField
+        @RegisterExtension
+        val analyticsExtension = AnalyticsTestExtension()
     }
 }

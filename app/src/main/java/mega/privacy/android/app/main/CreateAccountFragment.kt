@@ -548,6 +548,7 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
                     request.text
                 )
                 viewModel.saveEphemeral(ephemeral)
+                viewModel.saveLastRegisteredEmail(request.email)
 
                 if (createAccountEmailText.text != null && createAccountNameText.text != null
                     && createAccountLastNameText.text != null && createAccountPasswordText.text != null

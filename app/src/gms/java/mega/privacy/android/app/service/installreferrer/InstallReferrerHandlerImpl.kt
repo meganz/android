@@ -50,6 +50,12 @@ class InstallReferrerHandlerImpl @Inject constructor(
                                 IOException("Install Referrer API connection to service unavailable")
                             )
                         }
+
+                        else -> {
+                            continuation.resumeWithException(
+                                IOException("Install Referrer API response code: $responseCode")
+                            )
+                        }
                     }
                     referrerClient.endConnection() // Disconnect after receiving response
                 }
