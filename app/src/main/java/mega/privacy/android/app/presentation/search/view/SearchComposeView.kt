@@ -26,6 +26,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -91,6 +92,7 @@ fun SearchComposeView(
     val scaffoldState = rememberScaffoldState()
     val snackBarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+    val keyboardController = LocalSoftwareKeyboardController.current
     val typeBottomSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = false
@@ -156,12 +158,9 @@ fun SearchComposeView(
                         typeFilterTitle = "Type",
                         selectedTypeFilterTitle = state.typeSelectedFilterOption?.title ?: "Type",
                         onTypeFilterClicked = {
-                            if (state.typeSelectedFilterOption == null) {
-                                coroutineScope.launch {
-                                    typeBottomSheetState.show()
-                                }
-                            } else {
-                                onTypeFilterItemClicked(null)
+                            coroutineScope.launch {
+                                keyboardController?.hide()
+                                typeBottomSheetState.show()
                             }
                         }
                     )
@@ -225,12 +224,9 @@ fun SearchComposeView(
                 coroutineScope.launch {
                     typeBottomSheetState.hide()
                 }
-                val typeOption =
-                    if (item.id in TypeFilterOption.entries.indices) {
-                        TypeFilterOption.entries.firstOrNull { it.ordinal == item.id }
-                    } else {
-                        null
-                    }
+                val typeOption = TypeFilterOption.entries.getOrNull(item.id)
+                    ?.takeIf { it.ordinal != state.typeSelectedFilterOption?.ordinal }
+
                 onTypeFilterItemClicked(typeOption)
             }
         )
