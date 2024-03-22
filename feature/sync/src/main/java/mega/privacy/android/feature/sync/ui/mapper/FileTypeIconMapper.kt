@@ -56,7 +56,10 @@ private val audioMap =
         "mp3",
         "3ga",
         "opus",
-        "weba"
+        "weba",
+        "ra",
+        "ram",
+        "rm"
     ).associateWith { iconPackR.drawable.ic_audio_medium_solid }
 
 private val cadMap = arrayOf("dwg", "dxf").associateWith { iconPackR.drawable.ic_cad_medium_solid }
@@ -86,19 +89,8 @@ private val compressedMap = arrayOf(
     "pkg"
 ).associateWith { iconPackR.drawable.ic_compressed_medium_solid }
 
-private val databaseMap = arrayOf(
-    "accdb",
-    "db",
-    "dbf",
-    "mdb",
-    "pdb",
-    "sql"
-).associateWith { iconPackR.drawable.ic_database_list }
 
 private val dmgMap = mutableMapOf(Pair("dmg", iconPackR.drawable.ic_dmg_medium_solid))
-
-private val dreamViewerMap =
-    mutableMapOf(Pair("dwt", iconPackR.drawable.ic_dreamweaver_list))
 
 
 private val excelMap = arrayOf(
@@ -132,21 +124,9 @@ private val executableMap = arrayOf(
 private val webLandMap =
     arrayOf("as", "asc", "ascs").associateWith { iconPackR.drawable.ic_web_lang_medium_solid }
 
-private val flashMap = mutableMapOf(Pair("flg", iconPackR.drawable.ic_flash_list))
-
 private val fontMap =
     arrayOf("fnt", "fon", "otf", "ttf").associateWith { iconPackR.drawable.ic_font_medium_solid }
 
-private val gisMap =
-    arrayOf("gpx", "kml", "kmz").associateWith { iconPackR.drawable.ic_gis_list }
-
-private val htmlMap = arrayOf(
-    "dhtml",
-    "htm",
-    "html",
-    "shtml",
-    "xhtml"
-).associateWith { iconPackR.drawable.ic_html_list }
 
 private val illustratorMap = arrayOf(
     "ai",
@@ -170,11 +150,6 @@ private val imageMap = arrayOf(
 
 private val indesignMap = mutableMapOf(Pair("indd", iconPackR.drawable.ic_indesign_medium_solid))
 
-private val javaMap = arrayOf("class", "jar", "java").associateWith {
-    iconPackR.drawable.ic_java_list
-}
-
-private val midiMap = arrayOf("mid", "midi").associateWith { iconPackR.drawable.ic_midi_list }
 
 private val pfgMap = mutableMapOf(Pair("pdf", iconPackR.drawable.ic_pdf_medium_solid))
 
@@ -184,12 +159,6 @@ private val photoShopMap = arrayOf(
     "psb",
     "psd"
 ).associateWith { iconPackR.drawable.ic_photoshop_medium_solid }
-
-private val playListMap =
-    arrayOf("asx", "m3u", "pls").associateWith { iconPackR.drawable.ic_playlist_list }
-
-private val podCastMap =
-    mutableMapOf(Pair("pcast", iconPackR.drawable.ic_podcast_list))
 
 private val powerPointMap = arrayOf(
     "pot",
@@ -240,25 +209,6 @@ private val rawMap = arrayOf(
     "ciff",
 ).associateWith { iconPackR.drawable.ic_raw_medium_solid }
 
-private val realAudioMap =
-    arrayOf("ra", "ram", "rm").associateWith { iconPackR.drawable.ic_real_audio_list }
-
-private val sourceListMap = arrayOf(
-    "c",
-    "cc",
-    "cgi",
-    "cpp",
-    "cxx",
-    "dll",
-    "h",
-    "hpp",
-    "pl",
-    "py",
-    "sh",
-    "cs",
-    "swift"
-).associateWith { iconPackR.drawable.ic_source_list }
-
 private val spreadShitMap = arrayOf(
     "123",
     "gsheet",
@@ -269,15 +219,9 @@ private val spreadShitMap = arrayOf(
     "xlr"
 ).associateWith { iconPackR.drawable.ic_spreadsheet_medium_solid }
 
-private val subTitleMap = mutableMapOf(Pair("srt", iconPackR.drawable.ic_subtitles_list))
-
-private val swfMap = arrayOf("swf", "flv").associateWith { iconPackR.drawable.ic_swf_list }
 
 private val torrentMap =
     mutableMapOf(Pair("torrent", iconPackR.drawable.ic_torrent_medium_solid))
-
-private val vCardMap =
-    arrayOf("vcard", "vcf").associateWith { iconPackR.drawable.ic_vcard_list }
 
 private val vectorMap = arrayOf(
     "cdr",
@@ -320,10 +264,9 @@ private val videoMap = arrayOf(
     "mkv",
     "mk3d",
     "movie",
+    "vob"
 ).associateWith { iconPackR.drawable.ic_video_medium_solid }
 
-private val vobVideoMap =
-    mutableMapOf(Pair("vob", iconPackR.drawable.ic_video_vob_list))
 
 private val webDataMap = arrayOf(
     "asp",
@@ -359,9 +302,6 @@ private val keyNodeMap =
 private val numbersMap =
     mutableMapOf(Pair("numbers", iconPackR.drawable.ic_numbers_medium_solid))
 
-private val sketchMap =
-    mutableMapOf(Pair("sketch", iconPackR.drawable.ic_sketch_list))
-
 private val urlMap = mutableMapOf(Pair("url", iconPackR.drawable.ic_url_medium_solid))
 
 private val openFileMap =
@@ -369,13 +309,12 @@ private val openFileMap =
 
 private val mergedMap =
     textExtensionMap + webDataMap + threeDMap + audioMap + cadMap + compressedMap +
-            databaseMap + executableMap + excelMap + dmgMap + dreamViewerMap + webLandMap +
-            flashMap + fontMap + gisMap + htmlMap + illustratorMap + imageMap +
-            indesignMap + javaMap + midiMap + pfgMap + photoShopMap + playListMap +
-            podCastMap + powerPointMap + premiereMap + rawMap + realAudioMap +
-            sourceListMap + spreadShitMap + subTitleMap + swfMap + torrentMap + vCardMap +
-            vectorMap + vobVideoMap + worldMap + pagesMap + xdMap + keyNodeMap +
-            numbersMap + sketchMap + urlMap + openFileMap + afterEffectsMap + videoMap
+            executableMap + excelMap + dmgMap + webLandMap +
+            fontMap + illustratorMap + imageMap +
+            indesignMap + pfgMap + photoShopMap +
+            powerPointMap + premiereMap + rawMap + spreadShitMap + torrentMap +
+            vectorMap + worldMap + pagesMap + xdMap + keyNodeMap +
+            numbersMap + urlMap + openFileMap + afterEffectsMap + videoMap
 
 private val treeMap = TreeMap<String, Int>(String.CASE_INSENSITIVE_ORDER).apply {
     putAll(mergedMap)

@@ -82,7 +82,10 @@ class FileTypeIconMapperTest {
                 "mp3",
                 "3ga",
                 "opus",
-                "weba"
+                "weba",
+                "ra",
+                "ram",
+                "rm"
             ).associateWith {
                 R.drawable.ic_audio_medium_solid
             } + arrayOf("dwg", "dxf").associateWith {
@@ -112,21 +115,7 @@ class FileTypeIconMapperTest {
                 "pkg"
             ).associateWith {
                 R.drawable.ic_compressed_medium_solid
-            } + arrayOf(
-                "accdb",
-                "db",
-                "dbf",
-                "mdb",
-                "pdb",
-                "sql"
-            ).associateWith {
-                R.drawable.ic_database_list
-            } + mutableMapOf(Pair("dmg", R.drawable.ic_dmg_medium_solid)) + mutableMapOf(
-                Pair(
-                    "dwt",
-                    R.drawable.ic_dreamweaver_list
-                )
-            ) + arrayOf(
+            } + mutableMapOf(Pair("dmg", R.drawable.ic_dmg_medium_solid)) + arrayOf(
                 "xla",
                 "xlam",
                 "xll",
@@ -154,22 +143,12 @@ class FileTypeIconMapperTest {
                 R.drawable.ic_executable_medium_solid
             } + arrayOf("as", "asc", "ascs").associateWith {
                 R.drawable.ic_web_lang_medium_solid
-            } + mutableMapOf(Pair("flg", R.drawable.ic_flash_list)) + arrayOf(
+            } + arrayOf(
                 "fnt",
                 "fon",
                 "otf",
                 "ttf"
             ).associateWith { R.drawable.ic_font_medium_solid } + arrayOf(
-                "gpx",
-                "kml",
-                "kmz"
-            ).associateWith { R.drawable.ic_gis_list } + arrayOf(
-                "dhtml",
-                "htm",
-                "html",
-                "shtml",
-                "xhtml"
-            ).associateWith { R.drawable.ic_html_list } + arrayOf(
                 "ai",
                 "aia",
                 "aip",
@@ -190,12 +169,7 @@ class FileTypeIconMapperTest {
                     "indd",
                     R.drawable.ic_indesign_medium_solid
                 )
-            ) + arrayOf("class", "jar", "java").associateWith {
-                R.drawable.ic_java_list
-            } + arrayOf(
-                "mid",
-                "midi"
-            ).associateWith { R.drawable.ic_midi_list } + mutableMapOf(
+            ) + mutableMapOf(
                 Pair(
                     "pdf",
                     R.drawable.ic_pdf_medium_solid
@@ -205,24 +179,20 @@ class FileTypeIconMapperTest {
                 "csh",
                 "psb",
                 "psd"
-            ).associateWith { R.drawable.ic_photoshop_medium_solid } + arrayOf(
-                "asx",
-                "m3u",
-                "pls"
-            ).associateWith { R.drawable.ic_playlist_list } +
-                    mutableMapOf(Pair("pcast", R.drawable.ic_podcast_list)) + arrayOf(
-                "pot",
-                "potm",
-                "potx",
-                "ppam",
-                "ppc",
-                "pps",
-                "ppsm",
-                "ppsx",
-                "ppt",
-                "pptm",
-                "pptx",
-            ).associateWith { R.drawable.ic_powerpoint_medium_solid } + arrayOf(
+            ).associateWith { R.drawable.ic_photoshop_medium_solid } +
+                    arrayOf(
+                        "pot",
+                        "potm",
+                        "potx",
+                        "ppam",
+                        "ppc",
+                        "pps",
+                        "ppsm",
+                        "ppsx",
+                        "ppt",
+                        "pptm",
+                        "pptx",
+                    ).associateWith { R.drawable.ic_powerpoint_medium_solid } + arrayOf(
                 "plb",
                 "ppj",
                 "prproj",
@@ -254,24 +224,6 @@ class FileTypeIconMapperTest {
                 "cr3",
                 "ciff",
             ).associateWith { R.drawable.ic_raw_medium_solid } + arrayOf(
-                "ra",
-                "ram",
-                "rm"
-            ).associateWith { R.drawable.ic_real_audio_list } + arrayOf(
-                "c",
-                "cc",
-                "cgi",
-                "cpp",
-                "cxx",
-                "dll",
-                "h",
-                "hpp",
-                "pl",
-                "py",
-                "sh",
-                "cs",
-                "swift"
-            ).associateWith { R.drawable.ic_source_list } + arrayOf(
                 "123",
                 "gsheet",
                 "nb",
@@ -281,18 +233,10 @@ class FileTypeIconMapperTest {
                 "xlr"
             ).associateWith { R.drawable.ic_spreadsheet_medium_solid } + mutableMapOf(
                 Pair(
-                    "srt",
-                    R.drawable.ic_subtitles_list
-                )
-            ) + arrayOf(
-                "swf",
-                "flv"
-            ).associateWith { R.drawable.ic_swf_list } + mutableMapOf(
-                Pair(
                     "torrent",
                     R.drawable.ic_torrent_medium_solid
                 )
-            ) + arrayOf("vcard", "vcf").associateWith { R.drawable.ic_vcard_list } + arrayOf(
+            ) + arrayOf(
                 "cdr",
                 "eps",
                 "ps",
@@ -331,12 +275,8 @@ class FileTypeIconMapperTest {
                 "mkv",
                 "mk3d",
                 "movie",
-            ).associateWith { R.drawable.ic_video_medium_solid } + mutableMapOf(
-                Pair(
-                    "vob",
-                    R.drawable.ic_video_vob_list
-                )
-            ) + arrayOf(
+                "vob"
+            ).associateWith { R.drawable.ic_video_medium_solid } + arrayOf(
                 "asp",
                 "aspx",
                 "php",
@@ -370,7 +310,7 @@ class FileTypeIconMapperTest {
                     "numbers",
                     R.drawable.ic_numbers_medium_solid
                 )
-            ) + mutableMapOf(Pair("sketch", R.drawable.ic_sketch_list)) + mutableMapOf(
+            ) + mutableMapOf(
                 Pair(
                     "url",
                     R.drawable.ic_url_medium_solid

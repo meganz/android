@@ -18,7 +18,7 @@ private fun getFileIconOutline(extension: String) =
     when (extension) {
         "3ds", "3dm", "max", "obj" -> IconPackR.drawable.ic_3d_thumbnail_outline
         "aec", "aep", "aepx", "aes", "aet", "aetx" -> IconPackR.drawable.ic_aftereffects_thumbnail_outline
-        "aif", "aiff", "wav", "flac", "iff", "m4a", "wma", "oga", "ogg", "mp3", "3ga", "opus", "weba" -> IconPackR.drawable.ic_audio_thumbnail_outline
+        "aif", "aiff", "wav", "flac", "iff", "m4a", "wma", "oga", "ogg", "mp3", "3ga", "opus", "weba", "ra", "ram", "rm" -> IconPackR.drawable.ic_audio_thumbnail_outline
         "dwg", "dxf" -> IconPackR.drawable.ic_cad_thumbnail_outline
         "bz2", "gz", "rar", "tar", "tbz", "tgz", "zip", "deb", "udeb", "rpm", "air", "7z", "bz", "bzip2", "cab", "lha", "gzip", "ace", "arc", "pkg" -> IconPackR.drawable.ic_compressed_thumbnail_outline
         "dmg" -> IconPackR.drawable.ic_dmg_thumbnail_outline
@@ -38,7 +38,7 @@ private fun getFileIconOutline(extension: String) =
         "ans", "ascii", "log", "rtf", "txt", "wpd" -> IconPackR.drawable.ic_text_thumbnail_outline
         "torrent" -> IconPackR.drawable.ic_torrent_thumbnail_outline
         "cdr", "eps", "ps", "svg", "svgz" -> IconPackR.drawable.ic_vector_thumbnail_outline
-        "3g2", "3gp", "asf", "avi", "mkv", "mov", "mpeg", "mpg", "wmv", "3gpp", "h261", "h263", "h264", "jpgv", "jpm", "jpgm", "mp4", "mp4v", "mpg4", "mpe", "m1v", "m2v", "ogv", "qt", "m4u", "webm", "f4v", "fli", "m4v", "mk3d", "movie" -> IconPackR.drawable.ic_video_thumbnail_outline
+        "3g2", "3gp", "asf", "avi", "mkv", "mov", "mpeg", "mpg", "wmv", "3gpp", "h261", "h263", "h264", "jpgv", "jpm", "jpgm", "mp4", "mp4v", "mpg4", "mpe", "m1v", "m2v", "ogv", "qt", "m4u", "webm", "f4v", "fli", "m4v", "mk3d", "movie", "vob" -> IconPackR.drawable.ic_video_thumbnail_outline
         "asp", "aspx", "php", "php3", "php4", "php5", "phtml", "css", "inc", "js", "xml" -> IconPackR.drawable.ic_web_data_thumbnail_outline
         "doc", "docm", "docx", "dot", "dotx", "wps" -> IconPackR.drawable.ic_word_thumbnail_outline
         "pages" -> IconPackR.drawable.ic_pages_thumbnail_outline

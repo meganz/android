@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            app:placeholderImage="@drawable/ic_image_thumbnail"
+            app:placeholderImage="@drawable/ic_image_medium_solid"
             tools:ignore="ImageContrastCheck" />
 
         <com.facebook.drawee.view.SimpleDraweeView

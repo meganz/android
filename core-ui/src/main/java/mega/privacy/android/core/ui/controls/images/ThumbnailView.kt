@@ -5,15 +5,23 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import mega.privacy.android.core.R
+import mega.privacy.android.icon.pack.R
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import java.io.File
 
@@ -59,6 +67,8 @@ fun ThumbnailView(
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Fit,
 ) {
+    var padding by remember { mutableStateOf(0.dp) }
+    var cornerRadius by remember { mutableStateOf(0.dp) }
     data?.let {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
@@ -71,6 +81,16 @@ fun ThumbnailView(
             contentScale = contentScale,
             modifier = modifier
                 .aspectRatio(1f)
+                .padding(padding)
+                .clip(RoundedCornerShape(cornerRadius)),
+            onError = {
+                padding = 0.dp
+                cornerRadius = 0.dp
+            },
+            onSuccess = {
+                padding = 4.dp
+                cornerRadius = 4.dp
+            }
         )
     } ?: run {
         Image(
@@ -90,7 +110,7 @@ private fun ThumbnailViewPreview() {
         ThumbnailView(
             contentDescription = "image",
             imageFile = null as File?,
-            defaultImage = R.drawable.ic_image_thumbnail,
+            defaultImage = R.drawable.ic_image_medium_solid,
         )
     }
 }

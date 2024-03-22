@@ -1,16 +1,11 @@
 package mega.privacy.android.app.utils
 
-import android.graphics.Bitmap
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.View
-import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
-import com.facebook.common.executors.UiThreadImmediateExecutorService
-import com.facebook.common.references.CloseableReference
-import com.facebook.datasource.DataSource
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.drawee.drawable.ScalingUtils
@@ -18,16 +13,13 @@ import com.facebook.drawee.interfaces.DraweeController
 import com.facebook.drawee.view.SimpleDraweeView
 import com.facebook.imagepipeline.common.ResizeOptions
 import com.facebook.imagepipeline.common.RotationOptions
-import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber
-import com.facebook.imagepipeline.image.CloseableImage
 import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter
+import mega.privacy.android.icon.pack.R
 import timber.log.Timber
-import java.io.File
 
 object FrescoUtils {
 
@@ -52,7 +44,7 @@ object FrescoUtils {
         if (shouldDisplayPlaceHolder) {
             if (placeholder == null) {
                 gifImgDisplay.hierarchy.setPlaceholderImage(
-                    CoreUiR.drawable.ic_image_thumbnail,
+                    R.drawable.ic_image_medium_solid,
                     ScalingUtils.ScaleType.CENTER_INSIDE
                 )
             } else {
@@ -89,55 +81,10 @@ object FrescoUtils {
      * SimpleDraweeView handles with cache and resource release.
      *
      * @param gifImgDisplay The SimpleDraweeView to display the GIF/WEBP.
-     * @param pb            Progress bar showing when loading.
-     * @param placeholder      Used as placeholder, before the GIF/WEBP is fully loaded.
-     * @param uri           The uri of GIF/WEBP. May be from url or local path.
-     */
-    fun loadGif(
-        gifImgDisplay: SimpleDraweeView,
-        pb: ProgressBar?,
-        placeholder: Drawable?,
-        uri: Uri?,
-    ) {
-        loadGif(gifImgDisplay, pb, true, placeholder, uri)
-    }
-
-    /**
-     * Load GIF/WEBP to display the animation.
-     * SimpleDraweeView handles with cache and resource release.
-     *
-     * @param gifImgDisplay The SimpleDraweeView to display the GIF/WEBP.
      * @param uri           The uri of GIF/WEBP. May be from url or local path.
      */
     fun loadGif(gifImgDisplay: SimpleDraweeView, uri: Uri?) {
         loadGif(gifImgDisplay, null, false, null, uri)
-    }
-
-    /**
-     * Load a local file into a ordinary ImageView.
-     *
-     * @param imageView An ordinary ImageView used to display the image.
-     * @param pb Progress bar, should be dismissed after the image is displayed.
-     * @param uri Uri of the local image file.
-     */
-    fun loadImage(imageView: ImageView, pb: ProgressBar?, uri: Uri?) {
-        val imagePipeline = Fresco.getImagePipeline()
-        val imageRequest = ImageRequest.fromUri(uri)
-        imagePipeline.fetchDecodedImage(imageRequest, null)
-            .subscribe(object : BaseBitmapDataSubscriber() {
-                public override fun onNewResultImpl(bitmap: Bitmap?) {
-                    if (bitmap != null && !bitmap.isRecycled) {
-                        // Work around: bitmap will be recylced by Fresco soon, create a copy then use the copy.
-                        val copy = bitmap.copy(Bitmap.Config.ARGB_8888, false)
-                        hideProgressBar(pb)
-                        imageView.setImageBitmap(copy)
-                    }
-                }
-
-                override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
-                    // No cleanup required here.
-                }
-            }, UiThreadImmediateExecutorService.getInstance())
     }
 
     /**
@@ -204,18 +151,6 @@ object FrescoUtils {
             pb.visibility = View.GONE
         }
     }
-}
-
-/**
- * Helper method to load file path into a SimpleDraweeView while resizing it to the View size
- *
- * @param filePath  File Path
- */
-fun SimpleDraweeView.setImageRequestFromFilePath(filePath: String?) {
-    if (filePath.isNullOrBlank()) return
-
-    val fileUri = Uri.fromFile(File(filePath))
-    setImageRequestFromUri(fileUri)
 }
 
 /**

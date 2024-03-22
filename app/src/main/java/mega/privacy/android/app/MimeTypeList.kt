@@ -165,12 +165,7 @@ class MimeTypeList private constructor(val type: String, val extension: String) 
                     "pkg",
                 )
             )
-            put(
-                iconPackR.drawable.ic_database_list,
-                arrayOf("accdb", "db", "dbf", "mdb", "pdb", "sql")
-            )
             put(iconPackR.drawable.ic_dmg_medium_solid, arrayOf("dmg"))
-            put(iconPackR.drawable.ic_dreamweaver_list, arrayOf("dwt"))
             put(
                 iconPackR.drawable.ic_excel_medium_solid,
                 arrayOf("xla", "xlam", "xll", "xlm", "xls", "xlsm", "xlsx", "xlt", "xltm", "xltx")
@@ -180,10 +175,7 @@ class MimeTypeList private constructor(val type: String, val extension: String) 
                 arrayOf("apk", "app", "bat", "com", "exe", "gadget", "msi", "pif", "vb", "wsf")
             )
             put(iconPackR.drawable.ic_web_lang_medium_solid, arrayOf("as", "asc", "ascs"))
-            put(iconPackR.drawable.ic_flash_list, arrayOf("fla"))
             put(iconPackR.drawable.ic_font_medium_solid, arrayOf("fnt", "fon", "otf", "ttf"))
-            put(iconPackR.drawable.ic_gis_list, arrayOf("gpx", "kml", "kmz"))
-            put(iconPackR.drawable.ic_html_list, arrayOf("dhtml", "htm", "html", "shtml", "xhtml"))
             put(
                 iconPackR.drawable.ic_illustrator_medium_solid,
                 arrayOf("ai", "aia", "aip", "ait", "art", "irs")
@@ -193,12 +185,8 @@ class MimeTypeList private constructor(val type: String, val extension: String) 
                 arrayOf("jpg", "jpeg", "tga", "tif", "tiff", "bmp", "gif", "png")
             )
             put(iconPackR.drawable.ic_indesign_medium_solid, arrayOf("indd"))
-            put(iconPackR.drawable.ic_java_list, arrayOf("class", "jar", "java"))
-            put(iconPackR.drawable.ic_midi_list, arrayOf("mid", "midi"))
             put(iconPackR.drawable.ic_pdf_medium_solid, arrayOf("pdf"))
             put(iconPackR.drawable.ic_photoshop_medium_solid, arrayOf("abr", "csh", "psb", "psd"))
-            put(iconPackR.drawable.ic_playlist_list, arrayOf("asx", "m3u", "pls"))
-            put(iconPackR.drawable.ic_podcast_list, arrayOf("pcast"))
             put(
                 iconPackR.drawable.ic_powerpoint_medium_solid,
                 arrayOf(
@@ -249,23 +237,15 @@ class MimeTypeList private constructor(val type: String, val extension: String) 
                     "ciff",
                 )
             )
-            put(iconPackR.drawable.ic_real_audio_list, arrayOf("ra", "ram", "rm"))
-            put(
-                iconPackR.drawable.ic_source_list,
-                arrayOf("c", "cc", "cgi", "cpp", "cxx", "dll", "h", "hpp", "pl", "py", "sh")
-            )
             put(
                 iconPackR.drawable.ic_spreadsheet_medium_solid,
                 arrayOf("123", "gsheet", "nb", "ods", "ots", "sxc", "xlr")
             )
-            put(iconPackR.drawable.ic_subtitles_list, arrayOf("srt"))
-            put(iconPackR.drawable.ic_swf_list, arrayOf("swf", "flv"))
             put(
                 iconPackR.drawable.ic_text_medium_solid,
                 arrayOf("ans", "ascii", "log", "rtf", "txt", "wpd", "org")
             )
             put(iconPackR.drawable.ic_torrent_medium_solid, arrayOf("torrent"))
-            put(iconPackR.drawable.ic_vcard_list, arrayOf("vcard", "vcf"))
             put(
                 iconPackR.drawable.ic_vector_medium_solid,
                 arrayOf("cdr", "eps", "ps", "svg", "svgz")
@@ -308,7 +288,6 @@ class MimeTypeList private constructor(val type: String, val extension: String) 
                     "movie",
                 )
             )
-            put(iconPackR.drawable.ic_video_vob_list, arrayOf("vob"))
             put(
                 iconPackR.drawable.ic_web_data_medium_solid,
                 arrayOf(
@@ -334,7 +313,6 @@ class MimeTypeList private constructor(val type: String, val extension: String) 
             put(iconPackR.drawable.ic_keynote_medium_solid, arrayOf("key"))
             put(iconPackR.drawable.ic_numbers_medium_solid, arrayOf("numbers"))
             put(iconPackR.drawable.ic_openoffice_medium_solid, arrayOf("odp", "odt", "ods"))
-            put(iconPackR.drawable.ic_sketch_list, arrayOf("sketch"))
             put(iconPackR.drawable.ic_url_medium_solid, arrayOf("url"))
         }
     }

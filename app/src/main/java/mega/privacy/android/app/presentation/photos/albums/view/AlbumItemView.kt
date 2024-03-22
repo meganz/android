@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.photos.albums.view
 
 import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -348,8 +349,8 @@ private fun AlbumPhotoView(
             .crossfade(true)
             .build(),
         contentDescription = null,
-        placeholder = painterResource(id = CoreUiR.drawable.ic_image_thumbnail),
-        error = painterResource(id = CoreUiR.drawable.ic_image_thumbnail),
+        placeholder = painterResource(id = IconPackR.drawable.ic_image_medium_solid),
+        error = painterResource(id = IconPackR.drawable.ic_image_medium_solid),
         contentScale = ContentScale.Crop,
         modifier = Modifier
             .width(width)

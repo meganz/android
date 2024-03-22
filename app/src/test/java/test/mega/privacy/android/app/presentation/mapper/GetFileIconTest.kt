@@ -2,7 +2,6 @@ package test.mega.privacy.android.app.presentation.mapper
 
 import mega.privacy.android.icon.pack.R as IconPackR
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.node.model.mapper.getFileIcon
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import org.junit.jupiter.params.ParameterizedTest
@@ -54,7 +53,10 @@ class GetFileIconTest {
                 "mp3",
                 "3ga",
                 "opus",
-                "weba"
+                "weba",
+                "ra",
+                "ram",
+                "rm"
             )
             it[IconPackR.drawable.ic_cad_medium_solid] = arrayOf("dwg", "dxf")
             it[IconPackR.drawable.ic_compressed_medium_solid] = arrayOf(
@@ -79,30 +81,20 @@ class GetFileIconTest {
                 "arc",
                 "pkg"
             )
-            it[R.drawable.database_thumbnail] =
-                arrayOf("accdb", "db", "dbf", "mdb", "pdb", "sql")
             it[IconPackR.drawable.ic_dmg_medium_solid] = arrayOf("dmg")
-            it[R.drawable.dreamweaver_thumbnail] = arrayOf("dwt")
             it[IconPackR.drawable.ic_excel_medium_solid] =
                 arrayOf("xla", "xlam", "xll", "xlm", "xls", "xlsm", "xlsx", "xlt", "xltm", "xltx")
             it[IconPackR.drawable.ic_executable_medium_solid] =
                 arrayOf("apk", "app", "bat", "com", "exe", "gadget", "msi", "pif", "vb", "wsf")
             it[IconPackR.drawable.ic_web_lang_medium_solid] = arrayOf("as", "asc", "ascs")
-            it[R.drawable.flash_thumbnail] = arrayOf("fla")
             it[IconPackR.drawable.ic_font_medium_solid] = arrayOf("fnt", "fon", "otf", "ttf")
-            it[R.drawable.gis_thumbnail] = arrayOf("gpx", "kml", "kmz")
-            it[R.drawable.html_thumbnail] = arrayOf("dhtml", "htm", "html", "shtml", "xhtml")
             it[IconPackR.drawable.ic_illustrator_medium_solid] =
                 arrayOf("ai", "aia", "aip", "ait", "art", "irs")
             it[IconPackR.drawable.ic_image_medium_solid] =
                 arrayOf("jpg", "jpeg", "tga", "tif", "tiff", "bmp", "gif", "png")
             it[IconPackR.drawable.ic_indesign_medium_solid] = arrayOf("indd")
-            it[R.drawable.java_thumbnail] = arrayOf("class", "jar", "java")
-            it[R.drawable.midi_thumbnail] = arrayOf("mid", "midi")
             it[IconPackR.drawable.ic_pdf_medium_solid] = arrayOf("pdf")
             it[IconPackR.drawable.ic_photoshop_medium_solid] = arrayOf("abr", "csh", "psb", "psd")
-            it[R.drawable.playlist_thumbnail] = arrayOf("asx", "m3u", "pls")
-            it[R.drawable.podcast_thumbnail] = arrayOf("pcast")
             it[IconPackR.drawable.ic_powerpoint_medium_solid] = arrayOf(
                 "pot",
                 "potm",
@@ -136,17 +128,11 @@ class GetFileIconTest {
                 "rwl",
                 "srf"
             )
-            it[R.drawable.real_audio_thumbnail] = arrayOf("ra", "ram", "rm")
-            it[R.drawable.source_thumbnail] =
-                arrayOf("c", "cc", "cgi", "cpp", "cxx", "dll", "h", "hpp", "pl", "py", "sh")
             it[IconPackR.drawable.ic_spreadsheet_medium_solid] =
                 arrayOf("123", "gsheet", "nb", "ots", "sxc", "xlr")
-            it[R.drawable.subtitles_thumbnail] = arrayOf("srt")
-            it[R.drawable.swf_thumbnail] = arrayOf("swf", "flv")
             it[IconPackR.drawable.ic_text_medium_solid] =
                 arrayOf("ans", "ascii", "log", "rtf", "txt", "wpd")
             it[IconPackR.drawable.ic_torrent_medium_solid] = arrayOf("torrent")
-            it[R.drawable.vcard_thumbnail] = arrayOf("vcard", "vcf")
             it[IconPackR.drawable.ic_vector_medium_solid] =
                 arrayOf("cdr", "eps", "ps", "svg", "svgz")
             it[IconPackR.drawable.ic_video_medium_solid] = arrayOf(
@@ -181,9 +167,9 @@ class GetFileIconTest {
                 "m4v",
                 "mkv",
                 "mk3d",
-                "movie"
+                "movie",
+                "vob"
             )
-            it[R.drawable.video_vob_thumbnail] = arrayOf("vob")
             it[IconPackR.drawable.ic_web_data_medium_solid] = arrayOf(
                 "asp",
                 "aspx",
@@ -204,7 +190,6 @@ class GetFileIconTest {
             it[IconPackR.drawable.ic_keynote_medium_solid] = arrayOf("key")
             it[IconPackR.drawable.ic_numbers_medium_solid] = arrayOf("numbers")
             it[IconPackR.drawable.ic_openoffice_medium_solid] = arrayOf("odp", "odt", "ods")
-            it[R.drawable.ic_sketch_thumbnail] = arrayOf("sketch")
             it[IconPackR.drawable.ic_url_medium_solid] = arrayOf("url")
         }
     }

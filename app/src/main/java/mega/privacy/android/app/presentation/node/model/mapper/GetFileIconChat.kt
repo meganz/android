@@ -17,7 +17,7 @@ internal fun getFileIconChat(fileTypeInfo: FileTypeInfo): Int {
 private fun getFileIconChat(extension: String) = when (extension) {
     "3ds", "3dm", "max", "obj" -> R.drawable.ic_3d_medium_solid
     "aec", "aep", "aepx", "aes", "aet", "aetx" -> R.drawable.ic_aftereffects_medium_solid
-    "aif", "aiff", "wav", "flac", "iff", "m4a", "wma", "oga", "ogg", "mp3", "3ga", "opus", "weba" -> R.drawable.ic_audio_medium_solid
+    "aif", "aiff", "wav", "flac", "iff", "m4a", "wma", "oga", "ogg", "mp3", "3ga", "opus", "weba", "ra", "ram", "rm" -> R.drawable.ic_audio_medium_solid
     "dwg", "dxf" -> R.drawable.ic_cad_medium_solid
     "bz2", "gz", "rar", "tar", "tbz", "tgz", "zip", "deb", "udeb", "rpm", "air", "7z", "bz", "bzip2", "cab", "lha", "gzip", "ace", "arc", "pkg" -> R.drawable.ic_compressed_medium_solid
     "dmg" -> R.drawable.ic_dmg_medium_solid
@@ -37,7 +37,7 @@ private fun getFileIconChat(extension: String) = when (extension) {
     "ans", "ascii", "log", "rtf", "txt", "wpd" -> R.drawable.ic_text_medium_solid
     "torrent" -> R.drawable.ic_torrent_medium_solid
     "cdr", "eps", "ps", "svg", "svgz" -> R.drawable.ic_vector_medium_solid
-    "3g2", "3gp", "asf", "avi", "mkv", "mov", "mpeg", "mpg", "wmv", "3gpp", "h261", "h263", "h264", "jpgv", "jpm", "jpgm", "mp4", "mp4v", "mpg4", "mpe", "m1v", "m2v", "ogv", "qt", "m4u", "webm", "f4v", "fli", "m4v", "mk3d", "movie" -> R.drawable.ic_video_medium_solid
+    "3g2", "3gp", "asf", "avi", "mkv", "mov", "mpeg", "mpg", "wmv", "3gpp", "h261", "h263", "h264", "jpgv", "jpm", "jpgm", "mp4", "mp4v", "mpg4", "mpe", "m1v", "m2v", "ogv", "qt", "m4u", "webm", "f4v", "fli", "m4v", "mk3d", "movie", "vob" -> R.drawable.ic_video_medium_solid
     "asp", "aspx", "php", "php3", "php4", "php5", "phtml", "css", "inc", "js", "xml" -> R.drawable.ic_web_data_medium_solid
     "doc", "docm", "docx", "dot", "dotx", "wps" -> R.drawable.ic_word_medium_solid
     "pages" -> R.drawable.ic_pages_medium_solid
