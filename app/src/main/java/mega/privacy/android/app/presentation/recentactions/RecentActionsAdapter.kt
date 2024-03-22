@@ -205,7 +205,7 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
 
                     if (bucket.isMedia) {
                         binding.firstLineText.text = getMediaTitle(context, nodeList)
-                        binding.thumbnailView.setImageResource(R.drawable.media)
+                        binding.thumbnailView.setImageResource(IconPackR.drawable.ic_image_stack_medium_solid)
                     } else {
                         if (!item.isKeyVerified) {
                             binding.firstLineText.text =
