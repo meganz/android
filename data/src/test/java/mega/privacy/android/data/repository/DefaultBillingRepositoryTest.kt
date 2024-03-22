@@ -139,7 +139,8 @@ class DefaultBillingRepositoryTest {
             }
 
             whenever(pricingMapper(expectedMegaPricing, expectedMegaCurrency)).thenReturn(
-                expectedPricing)
+                expectedPricing
+            )
 
             underTest.getPricing(true)
             verify(pricingCache, times(1)).set(expectedPricing)
@@ -171,7 +172,8 @@ class DefaultBillingRepositoryTest {
             }
             whenever(pricingCache.get()).thenReturn(null)
             whenever(pricingMapper(expectedMegaPricing, expectedMegaCurrency)).thenReturn(
-                expectedPricing)
+                expectedPricing
+            )
 
             underTest.getPricing(false)
             verify(pricingCache, times(1)).set(expectedPricing)
@@ -342,5 +344,30 @@ class DefaultBillingRepositoryTest {
         verify(numberOfSubscriptionCache, times(1)).clear()
         assertNull(activeSubscriptionCache.get())
         assertNull(numberOfSubscriptionCache.get())
+    }
+
+    @Test
+    fun `test that cancelSubscriptions returns true when creditCardQuerySubscriptions is successful`() {
+        runTest {
+            val feedback = "feedback"
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
+            }
+
+            val megaRequest = mock<MegaRequest> {
+                on { type }.thenReturn(MegaRequest.TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS)
+            }
+
+            whenever(megaApiGateway.creditCardQuerySubscriptions(listener = any())).thenAnswer {
+                ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            val actual = underTest.cancelSubscriptions(feedback)
+            Truth.assertThat(actual).isTrue()
+        }
     }
 }

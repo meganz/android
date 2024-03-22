@@ -104,7 +104,7 @@ internal class DefaultBillingRepository @Inject constructor(
 
     private suspend fun fetchNumberOfSubscription(): Long = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener("fetchNumberOfSubscription"){
+            val listener = continuation.getRequestListener("fetchNumberOfSubscription") {
                 it.number
             }
             megaApiGateway.creditCardQuerySubscriptions(listener)
@@ -124,9 +124,20 @@ internal class DefaultBillingRepository @Inject constructor(
         billingGateway.launchPurchaseFlow(activity, productId)
 
     override suspend fun getCurrentPaymentMethod(): PaymentMethod? =
-        PaymentMethod.values().firstOrNull {
+        PaymentMethod.entries.firstOrNull {
             it.methodId == paymentMethodTypeMapper(accountInfoWrapper.subscriptionMethodId)
         }
+
+    override suspend fun cancelSubscriptions(feedback: String?) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener =
+                continuation.getRequestListener(methodName = "cancelSubscriptions") { true }
+            megaApiGateway.creditCardQuerySubscriptions(listener = listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener = listener)
+            }
+        }
+    }
 
     override fun isBillingAvailable(): Boolean = skusCache.get().isNullOrEmpty().not()
 

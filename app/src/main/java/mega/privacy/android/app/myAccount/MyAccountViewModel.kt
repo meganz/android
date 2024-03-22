@@ -44,7 +44,6 @@ import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM_NO_NAVIGATION
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ITUNES
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
-import mega.privacy.android.app.myAccount.usecase.CancelSubscriptionsUseCase
 import mega.privacy.android.app.myAccount.usecase.QueryRecoveryLinkUseCase
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
@@ -88,6 +87,7 @@ import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.BroadcastRefreshSessionUseCase
+import mega.privacy.android.domain.usecase.account.CancelSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.CheckVersionsUseCase
 import mega.privacy.android.domain.usecase.account.ConfirmCancelAccountUseCase
@@ -320,7 +320,7 @@ class MyAccountViewModel @Inject constructor(
      *
      * @param clearCache
      */
-    fun refreshNumberOfSubscription(clearCache: Boolean) {
+    private fun refreshNumberOfSubscription(clearCache: Boolean) {
         viewModelScope.launch {
             _numberOfSubscription.value =
                 runCatching { getNumberOfSubscription(clearCache) }
@@ -333,7 +333,7 @@ class MyAccountViewModel @Inject constructor(
      *
      */
     fun checkSubscription() {
-        PlatformInfo.values().firstOrNull {
+        PlatformInfo.entries.firstOrNull {
             it.subscriptionMethodId == myAccountInfo.subscriptionMethodId
         }?.run {
             when {
@@ -734,22 +734,27 @@ class MyAccountViewModel @Inject constructor(
     /**
      * Cancel subscriptions
      *
-     * @param feedback
-     * @param action
-     * @receiver
+     * @param feedback Feedback message to cancel subscriptions.
      */
-    fun cancelSubscriptions(feedback: String?, action: (Boolean) -> Unit) {
-        cancelSubscriptionsUseCase.cancel(feedback)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { action.invoke(true) },
-                onError = { error ->
-                    Timber.w("Error when killing sessions: ${error.message}")
-                    action.invoke(false)
+    fun cancelSubscriptions(feedback: String?) {
+        viewModelScope.launch {
+            runCatching {
+                cancelSubscriptionsUseCase(feedback).let { isSuccessful ->
+                    snackBarHandler.postSnackbarMessage(
+                        if (isSuccessful) R.string.cancel_subscription_ok
+                        else R.string.cancel_subscription_error,
+                        snackbarDuration = MegaSnackbarDuration.Long,
+                    )
                 }
-            )
-            .addTo(composite)
+            }.onFailure {
+                Timber.e(it, "Error cancelling subscriptions")
+                snackBarHandler.postSnackbarMessage(
+                    R.string.cancel_subscription_error,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
+            refreshNumberOfSubscription(true)
+        }
     }
 
     /**

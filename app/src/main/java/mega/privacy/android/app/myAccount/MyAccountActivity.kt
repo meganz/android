@@ -464,22 +464,6 @@ class MyAccountActivity : PasscodeActivity(),
     }
 
     /**
-     * Shows the result of the cancel subscriptions action.
-     *
-     * @param success True if the request finishes with success, false otherwise.
-     */
-    private fun showCancelSubscriptionsResult(success: Boolean) {
-        showSnackbar(
-            getString(
-                if (success) R.string.cancel_subscription_ok
-                else R.string.cancel_subscription_error
-            )
-        )
-
-        viewModel.refreshNumberOfSubscription(true)
-    }
-
-    /**
      * Shows a confirmation dialog before kill sessions.
      */
     private fun showConfirmationKillSessions() {
@@ -550,9 +534,7 @@ class MyAccountActivity : PasscodeActivity(),
         cancelSubscriptionsConfirmationDialog = MaterialAlertDialogBuilder(this)
             .setMessage(getString(R.string.confirmation_cancel_subscriptions))
             .setPositiveButton(getString(R.string.general_yes)) { _, _ ->
-                viewModel.cancelSubscriptions(cancelSubscriptionsFeedback) { success ->
-                    showCancelSubscriptionsResult(success)
-                }
+                viewModel.cancelSubscriptions(cancelSubscriptionsFeedback)
             }.setNegativeButton(getString(R.string.general_no), null)
             .show()
     }

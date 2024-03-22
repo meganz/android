@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -15,8 +16,8 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.myAccount.usecase.CancelSubscriptionsUseCase
 import mega.privacy.android.app.myAccount.usecase.QueryRecoveryLinkUseCase
+import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.domain.entity.node.NodeId
@@ -32,6 +33,7 @@ import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.BroadcastRefreshSessionUseCase
+import mega.privacy.android.domain.usecase.account.CancelSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.CheckVersionsUseCase
 import mega.privacy.android.domain.usecase.account.ConfirmCancelAccountUseCase
@@ -59,6 +61,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -237,6 +240,49 @@ class MyAccountViewModelTest {
                 type = SNACKBAR_TYPE,
                 content = context.getString(R.string.remove_phone_number_success),
                 chatId = MEGACHAT_INVALID_HANDLE
+            )
+        }
+
+    @Test
+    fun `test that getNumberOfSubscription is called when cancelSubscriptionsUseCase is invoked`() =
+        runTest {
+            val feedback = "feedback"
+            val shouldClearCache = true
+            whenever(cancelSubscriptionsUseCase(feedback)).thenReturn(true)
+            underTest.cancelSubscriptions(feedback)
+            verify(getNumberOfSubscription, times(1)).invoke(shouldClearCache)
+        }
+
+
+    @Test
+    fun `test that a failed snackBar message is shown when cancelSubscriptionsUseCase return false`() =
+        runTest {
+            val feedback = "feedback"
+            whenever(cancelSubscriptionsUseCase(feedback)).thenReturn(false)
+
+            underTest.cancelSubscriptions(feedback)
+
+            verify(
+                snackBarHandler
+            ).postSnackbarMessage(
+                resId = R.string.cancel_subscription_error,
+                snackbarDuration = MegaSnackbarDuration.Long
+            )
+        }
+
+    @Test
+    fun `test that a success snackBar message is shown when cancelSubscriptionsUseCase return true`() =
+        runTest {
+            val feedback = "feedback"
+            whenever(cancelSubscriptionsUseCase(feedback)).thenReturn(true)
+
+            underTest.cancelSubscriptions(feedback)
+
+            verify(
+                snackBarHandler
+            ).postSnackbarMessage(
+                resId = R.string.cancel_subscription_ok,
+                snackbarDuration = MegaSnackbarDuration.Long
             )
         }
 

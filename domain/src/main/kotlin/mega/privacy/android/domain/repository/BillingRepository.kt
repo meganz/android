@@ -79,4 +79,9 @@ interface BillingRepository {
      *
      */
     fun clearCache()
+
+    /**
+     * Get the credit card subscriptions of the account
+     */
+    suspend fun cancelSubscriptions(feedback: String?): Boolean
 }
