@@ -84,14 +84,13 @@ import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
-import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
+import mega.privacy.android.domain.usecase.camerauploads.CheckOrCreateCameraUploadsNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableMediaUploadsSettingsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DoesCameraUploadsRecordExistsInTargetNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ExtractGpsCoordinatesUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetDefaultNodeHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPendingCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
@@ -106,11 +105,7 @@ import mega.privacy.android.domain.usecase.camerauploads.ProcessCameraUploadsMed
 import mega.privacy.android.domain.usecase.camerauploads.RenameCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SendBackupHeartBeatSyncUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderLocalPathUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryNodeIdUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryNodeIdUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupHeartbeatStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UploadCameraUploadsRecordsUseCase
@@ -119,14 +114,12 @@ import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
-import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.time.Instant
 import java.util.Hashtable
@@ -149,21 +142,15 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase,
     private val isChargingRequiredUseCase: IsChargingRequiredUseCase,
     private val getUploadFolderHandleUseCase: GetUploadFolderHandleUseCase,
-    private val setPrimaryNodeIdUseCase: SetPrimaryNodeIdUseCase,
-    private val setSecondaryNodeIdUseCase: SetSecondaryNodeIdUseCase,
-    private val getDefaultNodeHandleUseCase: GetDefaultNodeHandleUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase,
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
-    private val isNodeInRubbishOrDeletedUseCase: IsNodeInRubbishOrDeletedUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val handleLocalIpChangeUseCase: HandleLocalIpChangeUseCase,
     private val cancelAllUploadTransfersUseCase: CancelAllUploadTransfersUseCase,
-    private val createFolderNodeUseCase: CreateFolderNodeUseCase,
-    private val setupPrimaryFolderUseCase: SetupPrimaryFolderUseCase,
-    private val setupSecondaryFolderUseCase: SetupSecondaryFolderUseCase,
+    private val checkOrCreateCameraUploadsNodeUseCase: CheckOrCreateCameraUploadsNodeUseCase,
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
     private val resetTotalUploadsUseCase: ResetTotalUploadsUseCase,
     private val disableMediaUploadSettingsUseCase: DisableMediaUploadsSettingsUseCase,
@@ -651,17 +638,6 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
 
     /**
-     * Checks whether the Upload Node is valid
-     *
-     * @param cameraUploadFolderType
-     * @return true if the Upload Node handle is a valid handle, and false if otherwise
-     */
-    private suspend fun isUploadNodeHandleValid(cameraUploadFolderType: CameraUploadFolderType): Boolean =
-        getUploadFolderHandleUseCase(cameraUploadFolderType).let {
-            !(it == MegaApiJava.INVALID_HANDLE || isNodeInRubbishOrDeletedUseCase(it))
-        }
-
-    /**
      * Check if the Primary Upload Node is valid.
      * When the Primary Upload Node does not exist, this function will create the corresponding node
      *
@@ -669,23 +645,10 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun checkOrCreatePrimaryUploadNodes(): Boolean {
         return runCatching {
-            // Setup the Primary Folder if it is missing
-            if (!isUploadNodeHandleValid(CameraUploadFolderType.Primary)) {
-                Timber.d("The Primary Folder is missing")
-
-                val primaryHandle =
-                    getDefaultNodeHandleUseCase(context.getString(R.string.section_photo_sync))
-
-                if (primaryHandle == MegaApiJava.INVALID_HANDLE
-                    || isNodeInRubbishOrDeletedUseCase(primaryHandle)
-                ) {
-                    Timber.d("Proceed to create the Primary Folder")
-                    createAndSetupPrimaryUploadFolder()
-                } else {
-                    Timber.d("Primary Handle retrieved from getPrimaryFolderHandle(): $primaryHandle")
-                    setPrimaryNodeIdUseCase(NodeId(primaryHandle))
-                }
-            }
+            checkOrCreateCameraUploadsNodeUseCase(
+                folderName = context.getString(R.string.section_photo_sync),
+                folderType = CameraUploadFolderType.Primary,
+            )
         }.onFailure {
             Timber.e(it)
         }.isSuccess
@@ -699,23 +662,10 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun checkOrCreateSecondaryUploadNodes(): Boolean {
         return runCatching {
-            // If Secondary Media Uploads is enabled, setup the Secondary Folder if it is missing
-            if (!isUploadNodeHandleValid(CameraUploadFolderType.Secondary)) {
-                Timber.d("The local secondary folder is missing")
-
-                val secondaryHandle =
-                    getDefaultNodeHandleUseCase(context.getString(R.string.section_secondary_media_uploads))
-
-                if (secondaryHandle == MegaApiJava.INVALID_HANDLE
-                    || isNodeInRubbishOrDeletedUseCase(secondaryHandle)
-                ) {
-                    Timber.d("Proceed to create the Secondary Folder")
-                    createAndSetupSecondaryUploadFolder()
-                } else {
-                    Timber.d("Secondary Handle retrieved from getSecondaryFolderHandle(): $secondaryHandle")
-                    setSecondaryNodeIdUseCase(NodeId(secondaryHandle))
-                }
-            }
+            checkOrCreateCameraUploadsNodeUseCase(
+                folderName = context.getString(R.string.section_secondary_media_uploads),
+                folderType = CameraUploadFolderType.Secondary,
+            )
         }.onFailure {
             Timber.e(it)
         }.isSuccess
@@ -1162,41 +1112,6 @@ class CameraUploadsWorker @AssistedInject constructor(
         } else {
             Timber.e("isLoggingIn lock not available, cannot perform backgroundFastLogin. Stop process")
             false
-        }
-    }
-
-    /**
-     * Create the primary upload folder on the cloud drive
-     * If the creation succeed, set up the primary folder
-     *
-     * @throws Exception if the creation of the primary upload folder failed
-     */
-    private suspend fun createAndSetupPrimaryUploadFolder() {
-        runCatching {
-            createFolderNodeUseCase(context.getString(R.string.section_photo_sync)).let {
-                Timber.d("Primary Folder successfully created with NodeId $it. Setting up Primary Folder")
-                setupPrimaryFolderUseCase(it.longValue)
-            }
-        }.onFailure {
-            throw Exception("Failed to create primary upload folder", it)
-        }
-
-    }
-
-    /**
-     * Create the secondary upload folder on the cloud drive
-     * If the creation succeed, set up the secondary folder in local
-     *
-     * @throws Exception if the creation of the secondary upload folder failed
-     */
-    private suspend fun createAndSetupSecondaryUploadFolder() {
-        runCatching {
-            createFolderNodeUseCase(context.getString(R.string.section_secondary_media_uploads)).let {
-                Timber.d("Secondary Folder successfully created with handle $it. Setting up Secondary Folder")
-                setupSecondaryFolderUseCase(it.longValue)
-            }
-        }.onFailure {
-            throw Exception("Failed to create secondary upload folder", it)
         }
     }
 
