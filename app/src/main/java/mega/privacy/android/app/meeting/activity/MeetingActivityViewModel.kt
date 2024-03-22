@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -144,7 +145,6 @@ import javax.inject.Inject
  * @property monitorChatCallUpdatesUseCase                  [MonitorChatCallUpdatesUseCase]
  * @property getChatRoomUseCase                             [GetChatRoomUseCase]
  * @property getChatCallUseCase                             [GetChatCallUseCase]
- * @property getFeatureFlagValue                            [GetFeatureFlagValueUseCase]
  * @property setOpenInvite                                  [SetOpenInvite]
  * @property chatParticipantMapper                          [ChatParticipantMapper]
  * @property monitorChatRoomUpdates                         [MonitorChatRoomUpdates]
@@ -192,7 +192,6 @@ class MeetingActivityViewModel @Inject constructor(
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val queryChatLink: QueryChatLink,
-    private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
     private val setOpenInvite: SetOpenInvite,
     private val chatParticipantMapper: ChatParticipantMapper,
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase,
@@ -218,11 +217,19 @@ class MeetingActivityViewModel @Inject constructor(
     private val muteAllPeersUseCase: MuteAllPeersUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val getCurrentSubscriptionPlanUseCase: GetCurrentSubscriptionPlanUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    savedStateHandle: SavedStateHandle,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
 
-    private val _state = MutableStateFlow(MeetingState())
+    private val _state = MutableStateFlow(
+        MeetingState(
+            chatId = savedStateHandle[MeetingActivity.MEETING_CHAT_ID]
+                ?: -1L
+        )
+    )
+
     val state: StateFlow<MeetingState> = _state
 
     /**
@@ -332,13 +339,21 @@ class MeetingActivityViewModel @Inject constructor(
     ).post(isVisible)
 
     init {
+        startMonitoringChatCallUpdates()
+        startMonitorChatSessionUpdates()
+        getMyFullName()
+
+        if (_state.value.chatId != -1L) {
+            getChatAndCall()
+        }
+
         viewModelScope.launch {
             getCurrentSubscriptionPlanUseCase()?.let { currentSubscriptionPlan ->
                 _state.update { it.copy(subscriptionPlan = currentSubscriptionPlan) }
             }
         }
         viewModelScope.launch {
-            getFeatureFlagValue(AppFeatures.CallUnlimitedProPlan).let { flag ->
+            getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan).let { flag ->
                 _state.update { state ->
                     state.copy(
                         isCallUnlimitedProPlanFeatureFlagEnabled = flag,
@@ -356,9 +371,7 @@ class MeetingActivityViewModel @Inject constructor(
         LiveEventBus.get(EVENT_MEETING_CREATED, Long::class.java)
             .observeForever(meetingCreatedObserver)
 
-        startMonitoringChatCallUpdates()
-        startMonitorChatSessionUpdates()
-        getMyFullName()
+
 
         getCallUseCase.getCallEnded()
             .subscribeOn(Schedulers.io())
@@ -368,7 +381,7 @@ class MeetingActivityViewModel @Inject constructor(
                     if (chatIdOfCallEnded == _state.value.chatId) {
                         resetCallRecordingState()
                         viewModelScope.launch { broadcastCallEndedUseCase(chatIdOfCallEnded) }
-                        _finishMeetingActivity.value = true
+                        finishMeetingActivity()
                     }
                 },
                 onError = Timber::e
@@ -509,9 +522,18 @@ class MeetingActivityViewModel @Inject constructor(
                 getChatCallUseCase(_state.value.chatId)
             }.onSuccess { call ->
                 call?.let {
-                    checkIfPresenting(it)
-                    if (checkEphemeralAccount) {
-                        checkEphemeralAccountAndWaitingRoom(it)
+                    when (call.status) {
+                        ChatCallStatus.UserNoPresent,
+                        ChatCallStatus.TerminatingUserParticipation,
+                        ChatCallStatus.Destroyed,
+                        -> finishMeetingActivity()
+
+                        else -> {
+                            checkIfPresenting(it)
+                            if (checkEphemeralAccount) {
+                                checkEphemeralAccountAndWaitingRoom(it)
+                            }
+                        }
                     }
                 }
             }.onFailure { exception ->
@@ -749,13 +771,13 @@ class MeetingActivityViewModel @Inject constructor(
                 .filter { it.chatId == _state.value.chatId }
                 .collectLatest { call ->
                     checkIfPresenting(call)
-
                     call.changes?.apply {
                         if (contains(ChatCallChanges.Status)) {
                             if (call.status == ChatCallStatus.InProgress) {
-                                checkEphemeralAccountAndWaitingRoom(call)
+                                checkEphemeralAccountAndWaitingRoom(
+                                    call
+                                )
                             }
-
                         }
                         if (contains(ChatCallChanges.LocalAVFlags)) {
                             val isEnable = call.hasLocalAudio
@@ -873,7 +895,7 @@ class MeetingActivityViewModel @Inject constructor(
         if (chatId != MEGACHAT_INVALID_HANDLE && chatId != _state.value.chatId && _switchCall.value != chatId) {
             _switchCall.value = chatId
         } else if (shouldEndCurrentCall) {
-            _finishMeetingActivity.value = true
+            finishMeetingActivity()
         }
     }
 
@@ -935,13 +957,20 @@ class MeetingActivityViewModel @Inject constructor(
                     chatId = chatId
                 )
             }
-            getChatRoom()
-            getChatCall()
-            getScheduledMeeting()
-            startMonitoringChatParticipantsUpdated(chatId = chatId)
-            startMonitorChatRoomUpdates(chatId = chatId)
-            startMonitorScheduledMeetingUpdates()
+            getChatAndCall()
         }
+    }
+
+    /**
+     * Get chat and call
+     */
+    private fun getChatAndCall() {
+        getChatRoom()
+        getChatCall()
+        getScheduledMeeting()
+        startMonitoringChatParticipantsUpdated(chatId = _state.value.chatId)
+        startMonitorChatRoomUpdates(chatId = _state.value.chatId)
+        startMonitorScheduledMeetingUpdates()
     }
 
     /**
@@ -1272,6 +1301,7 @@ class MeetingActivityViewModel @Inject constructor(
         enableAudio: Boolean,
         speakerAudio: Boolean,
     ): LiveData<AnswerCallResult> {
+
         val result = MutableLiveData<AnswerCallResult>()
         _state.value.chatId.let { chatId ->
             if (CallUtil.amIParticipatingInThisMeeting(chatId)) {
@@ -1294,7 +1324,7 @@ class MeetingActivityViewModel @Inject constructor(
                     chatManagement.removeJoiningCallChatId(chatId)
                     rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
                     if (call == null) {
-                        _finishMeetingActivity.value = true
+                        finishMeetingActivity()
                     } else {
                         chatManagement.setSpeakerStatus(call.chatId, call.hasLocalVideo)
                         chatManagement.setRequestSentCall(call.callId, false)
@@ -1303,7 +1333,9 @@ class MeetingActivityViewModel @Inject constructor(
                         result.value =
                             AnswerCallResult(chatId, call.hasLocalVideo, call.hasLocalAudio)
                     }
-                }.onFailure { Timber.w("Exception answering call: $it") }
+                }.onFailure {
+                    Timber.w("Exception answering call: $it")
+                }
             }
         }
 

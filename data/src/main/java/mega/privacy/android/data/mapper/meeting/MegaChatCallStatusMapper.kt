@@ -25,6 +25,7 @@ internal class MegaChatCallStatusMapper @Inject constructor() {
         ChatCallStatus.Joining -> MegaChatCall.CALL_STATUS_JOINING
         ChatCallStatus.InProgress -> MegaChatCall.CALL_STATUS_IN_PROGRESS
         ChatCallStatus.TerminatingUserParticipation -> MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION
+        ChatCallStatus.GenericNotification -> MegaChatCall.CHANGE_TYPE_GENERIC_NOTIFICATION
         ChatCallStatus.Destroyed -> MegaChatCall.CALL_STATUS_DESTROYED
         else -> -1
     }

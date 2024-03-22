@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.meeting.chat.model
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatMessage
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.StorageState
@@ -11,9 +10,7 @@ import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
-import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
-import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion.NUMBER_MESSAGES_TO_LOAD
 
 /**
  * Chat ui state
@@ -49,6 +46,8 @@ import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion
  * @property myUserHandle User handle of current logged in user.
  * @property downloadEvent Event to start a download.
  * @property actionToManageEvent [ActionToManage].
+ * @property callEndedDueToFreePlanLimits  State event to show the force free plan limit participants dialog.
+ * @property isCallUnlimitedProPlanFeatureFlagEnabled   True, if Call Unlimited Pro Plan feature flag enabled. False, otherwise.
  */
 data class ChatUiState(
     val chat: ChatRoom? = null,
@@ -82,6 +81,8 @@ data class ChatUiState(
     val myUserHandle: Long? = null,
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val actionToManageEvent: StateEventWithContent<ActionToManage> = consumed(),
+    val callEndedDueToFreePlanLimits: Boolean = false,
+    val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
 ) {
 
     /**

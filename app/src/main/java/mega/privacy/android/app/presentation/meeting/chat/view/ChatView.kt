@@ -102,6 +102,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatToolbar
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.MessageNotSentBottomSheet
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.MessageOptionsBottomSheet
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ReactionsInfoBottomSheet
+import mega.privacy.android.app.presentation.meeting.view.FreePlanLimitParticipantsDialog
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
 import mega.privacy.android.app.utils.CallUtil
@@ -179,6 +180,7 @@ internal fun ChatView(
         consumeDownloadEvent = viewModel::consumeDownloadEvent,
         onActionToManageEventConsumed = viewModel::onActionToManageEventConsumed,
         onVoiceClipRecordEvent = viewModel::onVoiceClipRecordEvent,
+        onConfirmFreePlanParticipantsLimitDialogEvent = viewModel::consumeShowFreePlanParticipantsLimitDialogEvent
     )
 }
 
@@ -272,6 +274,7 @@ internal fun ChatView(
     consumeDownloadEvent: () -> Unit = {},
     onActionToManageEventConsumed: () -> Unit = {},
     onVoiceClipRecordEvent: (VoiceClipRecordEvent) -> Unit = {},
+    onConfirmFreePlanParticipantsLimitDialogEvent: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -295,6 +298,8 @@ internal fun ChatView(
     }
 
     var showJoinAnswerCallDialog by rememberSaveable { mutableStateOf(false) }
+    var showFreePlanLimitParticipantsDialog by rememberSaveable { mutableStateOf(false) }
+
     var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
     var showReactionPicker by rememberSaveable { mutableStateOf(false) }
     var addingReactionTo by rememberSaveable { mutableStateOf<Long?>(null) }
@@ -461,6 +466,7 @@ internal fun ChatView(
                     }
             }
         var takePictureUri by remember { mutableStateOf(Uri.EMPTY) }
+
         val takePictureLauncher =
             rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.TakePicture()
@@ -490,6 +496,10 @@ internal fun ChatView(
 
         if (!isMessageOptionsModalShown && addingReactionTo == null) {
             showReactionPicker = false
+        }
+
+        if (callEndedDueToFreePlanLimits && isCallUnlimitedProPlanFeatureFlagEnabled) {
+            showFreePlanLimitParticipantsDialog = true
         }
 
         BottomSheet(
@@ -966,6 +976,13 @@ internal fun ChatView(
                         },
                         onDismiss = { showJoinAnswerCallDialog = false },
                     )
+                }
+
+                if (showFreePlanLimitParticipantsDialog) {
+                    FreePlanLimitParticipantsDialog(onConfirm = {
+                        onConfirmFreePlanParticipantsLimitDialogEvent()
+                        showFreePlanLimitParticipantsDialog = false
+                    })
                 }
 
                 pendingAction?.let { it() }

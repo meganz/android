@@ -5329,6 +5329,12 @@
     <string name="account_business_account_deactivated_dialog_admin_body">Your Business account has been deactivated due to payment failure. You can only browse your data.\nTo make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
     <!-- The button of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_button">OK, got it</string>
+    <!-- Free plan limitation dialog title for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Cannot join</string>
+    <!-- Free plan limitation dialogue description for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">This call can only support 100 participants. Ask the organiser to upgrade to Pro to remove these restrictions.</string>
+    <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">OK, got it</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to host call or meetings without any restrictions. -->
     <string name="account_upgrade_account_description_feature_meetings">&#8226;&#160;Host calls and meetings with unlimited participants and no time restrictions</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to use MEGA VPN product. -->

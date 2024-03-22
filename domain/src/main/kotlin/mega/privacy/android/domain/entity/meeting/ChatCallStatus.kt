@@ -40,6 +40,11 @@ enum class ChatCallStatus {
     TerminatingUserParticipation,
 
     /**
+     * Call status Generic Notification
+     */
+    GenericNotification,
+
+    /**
      * Call status Destroyed
      */
     Destroyed,
@@ -56,6 +61,4 @@ enum class ChatCallStatus {
  * @return true if the call is finished, false otherwise
  */
 fun ChatCallStatus.isCallFinished() =
-    this == ChatCallStatus.Destroyed
-            || this == ChatCallStatus.TerminatingUserParticipation
-            || this == ChatCallStatus.Unknown
+    this == ChatCallStatus.Destroyed || this == ChatCallStatus.Unknown

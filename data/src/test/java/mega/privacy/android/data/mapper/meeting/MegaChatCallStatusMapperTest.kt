@@ -38,6 +38,10 @@ class MegaChatCallStatusMapperTest {
             ChatCallStatus.TerminatingUserParticipation,
             MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION
         ),
+        Arguments.of(
+            ChatCallStatus.GenericNotification,
+            MegaChatCall.CHANGE_TYPE_GENERIC_NOTIFICATION
+        ),
         Arguments.of(ChatCallStatus.Destroyed, MegaChatCall.CALL_STATUS_DESTROYED),
         Arguments.of(ChatCallStatus.Unknown, -1)
     )

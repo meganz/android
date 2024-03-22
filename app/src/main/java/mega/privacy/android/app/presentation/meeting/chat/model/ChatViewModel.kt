@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.megachat.MapsActivity
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.GifData
@@ -51,6 +52,8 @@ import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -117,6 +120,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorAllContactParticipants
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.CreateNewImageUriUseCase
 import mega.privacy.android.domain.usecase.file.DeleteFileUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
@@ -156,6 +160,7 @@ const val EXTRA_LINK = "LINK"
  * @property monitorChatRoomUpdates
  * @property monitorUpdatePushNotificationSettingsUseCase
  * @property monitorUserChatStatusByHandleUseCase
+ * @property getFeatureFlagValueUseCase
  * @property state UI state.
  *
  * @param savedStateHandle
@@ -235,6 +240,7 @@ class ChatViewModel @Inject constructor(
     private val getCacheFileUseCase: GetCacheFileUseCase,
     private val recordAudioUseCase: RecordAudioUseCase,
     private val deleteFileUseCase: DeleteFileUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorLeaveChatUseCase: MonitorLeaveChatUseCase,
     private val leaveChatUseCase: LeaveChatUseCase,
 ) : ViewModel() {
@@ -243,6 +249,7 @@ class ChatViewModel @Inject constructor(
 
     private val chatId: Long = savedStateHandle[Constants.CHAT_ID]
         ?: throw IllegalStateException("Chat screen must have a chat room id")
+
     private val chatLink: String
         get() = savedStateHandle.get<String>(EXTRA_LINK).orEmpty()
 
@@ -261,6 +268,7 @@ class ChatViewModel @Inject constructor(
     private var monitorConnectivityJob: Job? = null
 
     init {
+        checkFeatureFlag()
         getMyUserHandle()
         checkGeolocation()
         monitorStorageStateEvent()
@@ -272,6 +280,18 @@ class ChatViewModel @Inject constructor(
         monitorLeavingChat()
         monitorLeaveChat()
         monitorChatRoomPreference()
+    }
+
+    private fun checkFeatureFlag() {
+        viewModelScope.launch {
+            getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan).let { flag ->
+                _state.update { state ->
+                    state.copy(
+                        isCallUnlimitedProPlanFeatureFlagEnabled = flag,
+                    )
+                }
+            }
+        }
     }
 
     private fun monitorChatRoomPreference() {
@@ -667,6 +687,17 @@ class ChatViewModel @Inject constructor(
             monitorCallInChatUseCase(chatId)
                 .catch { Timber.e(it) }
                 .collect {
+                    it?.apply {
+                        when (status) {
+                            ChatCallStatus.TerminatingUserParticipation, ChatCallStatus.GenericNotification ->
+                                if (termCode == ChatCallTermCodeType.CallUsersLimit
+                                ) {
+                                    _state.update { state -> state.copy(callEndedDueToFreePlanLimits = true) }
+                                }
+
+                            else -> {}
+                        }
+                    }
                     _state.update { state -> state.copy(callInThisChat = it) }
                 }
         }
@@ -1376,6 +1407,14 @@ class ChatViewModel @Inject constructor(
             }
         }
         super.onCleared()
+    }
+
+    /**
+     * Consume show free plan participants limit dialog event
+     *
+     */
+    fun consumeShowFreePlanParticipantsLimitDialogEvent() {
+        _state.update { state -> state.copy(callEndedDueToFreePlanLimits = false) }
     }
 
     /**

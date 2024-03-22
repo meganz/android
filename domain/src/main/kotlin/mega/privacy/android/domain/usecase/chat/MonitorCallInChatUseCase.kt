@@ -26,7 +26,7 @@ class MonitorCallInChatUseCase @Inject constructor(
             if (call.status?.isCallFinished() == true) {
                 null
             } else {
-                callRepository.getChatCall(chatId)
+                call
             }
         }
         .onStart { emit(callRepository.getChatCall(chatId)) }

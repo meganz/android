@@ -20,6 +20,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.PasscodeManagement
@@ -125,6 +126,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorAllContactParticipants
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorUserLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.CreateNewImageUriUseCase
 import mega.privacy.android.domain.usecase.file.DeleteFileUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
@@ -297,6 +299,7 @@ internal class ChatViewModelTest {
     private val getCacheFileUseCase = mock<GetCacheFileUseCase>()
     private val recordAudioUseCase = mock<RecordAudioUseCase>()
     private val deleteFileUseCase = mock<DeleteFileUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val monitorLeaveChatUseCase = mock<MonitorLeaveChatUseCase> {
         on { invoke() } doReturn emptyFlow()
     }
@@ -364,7 +367,8 @@ internal class ChatViewModelTest {
             getCacheFileUseCase,
             recordAudioUseCase,
             deleteFileUseCase,
-            leaveChatUseCase
+            getFeatureFlagValueUseCase,
+            leaveChatUseCase,
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -392,6 +396,7 @@ internal class ChatViewModelTest {
         wheneverBlocking { monitorLeavingChatUseCase(any()) } doReturn emptyFlow()
         whenever(monitorChatPendingChangesUseCase(any())) doReturn emptyFlow()
         whenever(monitorLeaveChatUseCase()) doReturn emptyFlow()
+        wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan) } doReturn false
     }
 
     private fun initTestClass() {
@@ -469,8 +474,9 @@ internal class ChatViewModelTest {
             getCacheFileUseCase = getCacheFileUseCase,
             recordAudioUseCase = recordAudioUseCase,
             deleteFileUseCase = deleteFileUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             leaveChatUseCase = leaveChatUseCase,
-            monitorLeaveChatUseCase = monitorLeaveChatUseCase
+            monitorLeaveChatUseCase = monitorLeaveChatUseCase,
         )
     }
 
