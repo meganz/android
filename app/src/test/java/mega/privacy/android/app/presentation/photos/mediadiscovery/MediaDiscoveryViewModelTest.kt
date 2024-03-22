@@ -24,7 +24,6 @@ import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
@@ -35,6 +34,7 @@ import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUs
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdInFolderLinkUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
@@ -83,7 +83,7 @@ class MediaDiscoveryViewModelTest {
     private val monitorSubFolderMediaDiscoverySettingsUseCase =
         mock<MonitorSubFolderMediaDiscoverySettingsUseCase>()
     private val getFeatureFlagUseCase = mock<GetFeatureFlagValueUseCase>()
-    private val isNodeInRubbish = mock<IsNodeInRubbish>()
+    private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getPublicChildNodeFromIdUseCase = mock<GetPublicChildNodeFromIdUseCase>()
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
@@ -116,7 +116,7 @@ class MediaDiscoveryViewModelTest {
             setViewType,
             monitorSubFolderMediaDiscoverySettingsUseCase,
             getFeatureFlagUseCase,
-            isNodeInRubbish,
+            isNodeInRubbishBinUseCase,
             getNodeByIdUseCase,
             getPublicChildNodeFromIdUseCase,
             updateNodeSensitiveUseCase,
@@ -157,7 +157,7 @@ class MediaDiscoveryViewModelTest {
         setViewType,
         monitorSubFolderMediaDiscoverySettingsUseCase,
         getFeatureFlagUseCase,
-        isNodeInRubbish,
+        isNodeInRubbishBinUseCase,
         getNodeByIdUseCase,
         getPublicChildNodeFromIdUseCase,
     )

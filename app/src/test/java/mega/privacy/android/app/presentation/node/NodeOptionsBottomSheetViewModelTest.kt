@@ -8,10 +8,10 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.shares.DefaultGetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.GetOutShareByNodeIdUseCase
@@ -30,7 +30,7 @@ class NodeOptionsBottomSheetViewModelTest {
 
     private lateinit var viewModel: NodeOptionsBottomSheetViewModel
     private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
-    private val isNodeInRubbish = mock<IsNodeInRubbish>()
+    private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
     private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
@@ -49,7 +49,7 @@ class NodeOptionsBottomSheetViewModelTest {
             nodeBottomSheetActionMapper = NodeBottomSheetActionMapper(),
             bottomSheetOptions = setOf(),
             getNodeAccessPermission = getNodeAccessPermission,
-            isNodeInRubbish = isNodeInRubbish,
+            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
@@ -65,7 +65,7 @@ class NodeOptionsBottomSheetViewModelTest {
         initViewModel()
         viewModel.getBottomSheetOptions(sampleNode.id.longValue)
         verify(getNodeByIdUseCase).invoke(sampleNode.id)
-        verify(isNodeInRubbish).invoke(sampleNode.id.longValue)
+        verify(isNodeInRubbishBinUseCase).invoke(sampleNode.id)
         verify(isNodeInBackupsUseCase).invoke(sampleNode.id.longValue)
         verify(getNodeAccessPermission).invoke(sampleNode.id)
     }

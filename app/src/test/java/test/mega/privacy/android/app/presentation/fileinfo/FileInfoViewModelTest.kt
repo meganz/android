@@ -51,7 +51,6 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
@@ -73,6 +72,7 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -108,7 +108,7 @@ internal class FileInfoViewModelTest {
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase = mock()
-    private val isNodeInRubbish: IsNodeInRubbish = mock()
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase = mock()
     private val checkNameCollision: CheckNameCollision = mock()
     private val moveNodeUseCase: MoveNodeUseCase = mock()
     private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase = mock()
@@ -164,7 +164,7 @@ internal class FileInfoViewModelTest {
             monitorStorageStateEventUseCase,
             isConnectedToInternetUseCase,
             isNodeInBackupsUseCase,
-            isNodeInRubbish,
+            isNodeInRubbishBinUseCase,
             checkNameCollision,
             moveNodeUseCase,
             moveNodeToRubbishBinUseCase,
@@ -212,7 +212,7 @@ internal class FileInfoViewModelTest {
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
-            isNodeInRubbish = isNodeInRubbish,
+            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
             checkNameCollision = checkNameCollision,
             moveNodeUseCase = moveNodeUseCase,
             copyNodeUseCase = copyNodeUseCase,
@@ -255,7 +255,7 @@ internal class FileInfoViewModelTest {
         whenever(isConnectedToInternetUseCase.invoke()).thenReturn(true)
         whenever(typedFileNode.versionCount).thenReturn(0)
         whenever(isNodeInBackupsUseCase(NODE_HANDLE)).thenReturn(false)
-        whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(false)
+        whenever(isNodeInRubbishBinUseCase(NodeId(NODE_HANDLE))).thenReturn(false)
         whenever(previewFile.exists()).thenReturn(true)
         whenever(previewFile.toURI()).thenReturn(URI.create(previewUri))
         whenever(getNodeByIdUseCase.invoke(nodeId)).thenReturn(typedFileNode)
@@ -307,7 +307,7 @@ internal class FileInfoViewModelTest {
     fun `test that viewModel state's isNodeInRubbish property reflects the value of the isNodeInRubbish use case after updating the node`() =
         runTest {
             suspend fun verify(isNodeInRubbish: Boolean) {
-                whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(isNodeInRubbish)
+                whenever(isNodeInRubbishBinUseCase(NodeId(NODE_HANDLE))).thenReturn(isNodeInRubbish)
                 underTest.setNode(node.handle, true)
                 underTest.uiState.test {
                     val state = awaitItem()
@@ -1104,7 +1104,7 @@ internal class FileInfoViewModelTest {
     }
 
     private suspend fun mockDeleteSuccess() {
-        whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(true)
+        whenever(isNodeInRubbishBinUseCase(NodeId(NODE_HANDLE))).thenReturn(true)
         underTest.setNode(node.handle, true)
         whenever(deleteNodeByHandleUseCase.invoke(nodeId)).thenReturn(Unit)
     }
@@ -1127,7 +1127,7 @@ internal class FileInfoViewModelTest {
     }
 
     private suspend fun mockDeleteFailure() {
-        whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(true)
+        whenever(isNodeInRubbishBinUseCase(NodeId(NODE_HANDLE))).thenReturn(true)
         underTest.setNode(node.handle, true)
         whenever(deleteNodeByHandleUseCase.invoke(nodeId)).thenThrow(RuntimeException("fake exception"))
     }

@@ -53,7 +53,6 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
@@ -75,6 +74,7 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -98,7 +98,7 @@ class FileInfoViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
-    private val isNodeInRubbish: IsNodeInRubbish,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val checkNameCollision: CheckNameCollision,
     private val moveNodeUseCase: MoveNodeUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
@@ -624,7 +624,9 @@ class FileInfoViewModel @Inject constructor(
                         Owner -> updateOwner()
                         Inshare -> updateAccessPermission()
                         Parent ->
-                            if (!_uiState.value.isNodeInRubbish && isNodeInRubbish(typedNode.id.longValue)) {
+                            if (!_uiState.value.isNodeInRubbish
+                                && isNodeInRubbishBinUseCase(typedNode.id)
+                            ) {
                                 //if the node is moved to rubbish bin, let's close the screen like when it's deleted
                                 _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.NodeDeleted)
                             } else {
@@ -721,7 +723,7 @@ class FileInfoViewModel @Inject constructor(
                 //a first cached fast version, later we'll ask for a fresh ContactItem
                 getContactItemFromInShareFolder(folderNode = it, skipCache = false)
             }
-            val isNodeInRubbish = isNodeInRubbish(typedNode.id.longValue)
+            val isNodeInRubbish = isNodeInRubbishBinUseCase(typedNode.id)
             uiState.copyWithTypedNode(
                 typedNode = typedNode,
             ).copy(

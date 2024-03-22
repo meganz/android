@@ -54,7 +54,6 @@ import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
@@ -65,6 +64,7 @@ import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUs
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdInFolderLinkUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
@@ -101,7 +101,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val setViewType: SetViewType,
     private val monitorSubFolderMediaDiscoverySettingsUseCase: MonitorSubFolderMediaDiscoverySettingsUseCase,
     private var getFeatureFlagUseCase: GetFeatureFlagValueUseCase,
-    private val isNodeInRubbish: IsNodeInRubbish,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
@@ -244,7 +244,7 @@ class MediaDiscoveryViewModel @Inject constructor(
 
     private suspend fun isMDFolderInRubbish(sourcePhotos: List<Photo>) =
         _state.value.currentFolderId?.let { currentFolderId ->
-            sourcePhotos.isEmpty() && isNodeInRubbish(currentFolderId)
+            sourcePhotos.isEmpty() && isNodeInRubbishBinUseCase(NodeId(currentFolderId))
         } ?: false
 
     internal fun sortAndFilterPhotos(sourcePhotos: List<Photo>): List<Photo> {

@@ -12,17 +12,18 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 internal class ConfirmMoveToRubbishBinViewModel @Inject constructor(
-    private val isNodeInRubbish: IsNodeInRubbish,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
@@ -80,7 +81,7 @@ internal class ConfirmMoveToRubbishBinViewModel @Inject constructor(
             .getOrDefault(false)
 
     private suspend fun isNodeInRubbishBin(handle: Long): Boolean =
-        runCatching { isNodeInRubbish(handle) }
+        runCatching { isNodeInRubbishBinUseCase(NodeId(handle)) }
             .getOrDefault(false)
 }
 

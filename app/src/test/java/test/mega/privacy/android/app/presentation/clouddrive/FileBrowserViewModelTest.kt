@@ -36,7 +36,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
@@ -44,6 +43,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.quota.GetBandwidthOverQuotaDelayUseCase
@@ -71,7 +71,7 @@ class FileBrowserViewModelTest {
     private lateinit var underTest: FileBrowserViewModel
 
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
-    private val isNodeInRubbish = mock<IsNodeInRubbish>()
+    private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
     private val monitorMediaDiscoveryView = mock<MonitorMediaDiscoveryView> {
         on { invoke() }.thenReturn(emptyFlow())
     }
@@ -108,7 +108,7 @@ class FileBrowserViewModelTest {
             monitorMediaDiscoveryView = monitorMediaDiscoveryView,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             getParentNodeUseCase = getParentNodeUseCase,
-            getIsNodeInRubbish = isNodeInRubbish,
+            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
             getFileBrowserNodeChildrenUseCase = getFileBrowserNodeChildrenUseCase,
             getCloudSortOrder = getCloudSortOrder,
             setViewType = setViewType,

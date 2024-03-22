@@ -7,11 +7,12 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -28,7 +29,7 @@ import java.util.stream.Stream
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class ConfirmMoveToRubbishBinViewModelTest {
     private lateinit var underTest: ConfirmMoveToRubbishBinViewModel
-    private val isNodeInRubbish: IsNodeInRubbish = mock()
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase = mock()
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase = mock()
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled = mock()
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase = mock()
@@ -38,7 +39,7 @@ internal class ConfirmMoveToRubbishBinViewModelTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            isNodeInRubbish,
+            isNodeInRubbishBinUseCase,
             isCameraUploadsEnabledUseCase,
             isSecondaryFolderEnabled,
             getPrimarySyncHandleUseCase,
@@ -49,7 +50,7 @@ internal class ConfirmMoveToRubbishBinViewModelTest {
 
     private fun initTestClass() {
         underTest = ConfirmMoveToRubbishBinViewModel(
-            isNodeInRubbish = isNodeInRubbish,
+            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             isSecondaryFolderEnabled = isSecondaryFolderEnabled,
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
@@ -65,7 +66,7 @@ internal class ConfirmMoveToRubbishBinViewModelTest {
             whenever(savedStateHandle.get<LongArray>(ConfirmMoveToRubbishBinDialogFragment.EXTRA_HANDLES)).thenReturn(
                 longArrayOf(1L)
             )
-            whenever(isNodeInRubbish(1L)).thenReturn(boolean)
+            whenever(isNodeInRubbishBinUseCase(NodeId(1L))).thenReturn(boolean)
             initTestClass()
             underTest.state.test {
                 val state = awaitItem()

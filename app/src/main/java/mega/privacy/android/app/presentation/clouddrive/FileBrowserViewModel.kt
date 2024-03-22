@@ -36,7 +36,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
@@ -44,6 +43,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.quota.GetBandwidthOverQuotaDelayUseCase
@@ -61,7 +61,7 @@ import javax.inject.Inject
  * @param monitorMediaDiscoveryView Monitor media discovery view settings
  * @param monitorNodeUpdatesUseCase Monitor node updates
  * @param getParentNodeUseCase To get parent node of current node
- * @param getIsNodeInRubbish To get current node is in rubbish
+ * @param isNodeInRubbishBinUseCase To get current node is in rubbish
  * @param getFileBrowserNodeChildrenUseCase [GetFileBrowserNodeChildrenUseCase]
  * @param getCloudSortOrder [GetCloudSortOrder]
  * @param monitorViewType [MonitorViewType] check view type
@@ -79,7 +79,7 @@ class FileBrowserViewModel @Inject constructor(
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val getParentNodeUseCase: GetParentNodeUseCase,
-    private val getIsNodeInRubbish: IsNodeInRubbish,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val monitorViewType: MonitorViewType,
@@ -203,7 +203,7 @@ class FileBrowserViewModel @Inject constructor(
         changes.forEach { (node, _) ->
             if (node is FolderNode) {
                 if (node.isInRubbishBin && _state.value.fileBrowserHandle == node.id.longValue) {
-                    while (handleStack.isNotEmpty() && getIsNodeInRubbish(handleStack.peek())) {
+                    while (handleStack.isNotEmpty() && isNodeInRubbishBinUseCase(NodeId(handleStack.peek()))) {
                         handleStack.pop()
                     }
                     handleStack.takeIf { stack -> stack.isNotEmpty() }?.peek()?.let { parent ->
