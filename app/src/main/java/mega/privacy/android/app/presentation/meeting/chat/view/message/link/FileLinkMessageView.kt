@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.message.link
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import android.net.Uri
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
@@ -77,7 +78,7 @@ private fun FolderLinkMessageViewPreview(
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ChatBubble(isMe = isMe, subContent = {
             FileLinkMessageView(
-                fileIcon = painterResource(R.drawable.ic_3d_thumbnail_outline),
+                fileIcon = painterResource(IconPackR.drawable.ic_3d_thumbnail_outline),
                 fileName = "File name",
                 fileSize = 1234567890L,
                 link = "https://mega.nz/file/1234567890"

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -301,7 +302,7 @@ internal fun SubtitleFileInfoListItem(
                     if (subtitleFileInfoItem.selected) {
                         R.drawable.ic_select_thumbnail
                     } else {
-                        R.drawable.ic_text_thumbnail
+                        IconPackR.drawable.ic_text_medium_solid
                     }
                 ),
                 contentDescription = null,

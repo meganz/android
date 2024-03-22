@@ -1,7 +1,7 @@
 package test.mega.privacy.android.app.presentation.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.R
 import mega.privacy.android.app.presentation.node.model.mapper.getFileIconOutline
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode

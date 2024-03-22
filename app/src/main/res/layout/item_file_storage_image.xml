@@ -26,7 +26,7 @@
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
             android:visibility="gone"
-            app:placeholderImage="@drawable/ic_video_thumbnail" />
+            app:placeholderImage="@drawable/ic_video_medium_solid" />
 
         <ImageView
             android:id="@+id/ic_selected"

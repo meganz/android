@@ -3,9 +3,10 @@ package mega.privacy.android.app;
 import android.annotation.SuppressLint;
 import android.util.SparseArray;
 import android.webkit.MimeTypeMap;
-import mega.privacy.android.app.R;
 
 import java.util.HashMap;
+
+import mega.privacy.android.icon.pack.R;
 
 /*
  * Mime type for files
@@ -18,53 +19,53 @@ public class MimeTypeThumbnail {
 	static {
 		resourcesCache = new HashMap<String, Integer>();
 		resources = new SparseArray<String[]>();
-		resources.put(R.drawable.ic_3d_thumbnail, new String[] {"3ds", "3dm", "max", "obj", });
-		resources.put(R.drawable.ic_aftereffects_thumbnail, new String[] {"aec", "aep", "aepx", "aes", "aet", "aetx", });
-		resources.put(R.drawable.ic_audio_thumbnail, new String[] {"aif", "aiff", "wav", "flac", "iff", "m4a", "wma", "oga", "ogg", "mp3", "3ga", "opus", "weba"});
-		resources.put(R.drawable.ic_cad_thumbnail, new String[] {"dwg", "dxf", });
-		resources.put(R.drawable.ic_compressed_thumbnail, new String[] {"bz2", "gz", "rar", "tar", "tbz", "tgz", "zip", "deb", "udeb", "rpm", "air", "apk", "dmg", "7z", "bz", "bzip2", "cab", "lha", "gzip", "ace", "arc", "pkg", });
-		resources.put(R.drawable.database_thumbnail, new String[] {"accdb", "db", "dbf", "mdb", "pdb", "sql", });
-		resources.put(R.drawable.ic_dmg_thumbnail, new String[]{"dmg", });
-		resources.put(R.drawable.dreamweaver_thumbnail, new String[] {"dwt", });
-		resources.put(R.drawable.ic_excel_thumbnail, new String[] {"xla", "xlam", "xll", "xlm", "xls", "xlsm", "xlsx", "xlt", "xltm", "xltx",});
-		resources.put(R.drawable.ic_executabe_thumbnail, new String[] {"apk", "app", "bat", "com", "exe", "gadget", "msi", "pif", "vb", "wsf", });
-		resources.put(R.drawable.ic_web_lang_thumbnail, new String[] {"as", "asc", "ascs", });
-		resources.put(R.drawable.flash_thumbnail, new String[] {"fla", });
-		resources.put(R.drawable.ic_font_thumbnail, new String[] {"fnt", "fon", "otf", "ttf", });
-		resources.put(R.drawable.gis_thumbnail, new String[] {"gpx", "kml", "kmz", });
-		resources.put(R.drawable.html_thumbnail, new String[] {"dhtml", "htm", "html", "shtml", "xhtml", });
-		resources.put(R.drawable.ic_illustrator_thumbnail, new String[] {"ai", "aia", "aip", "ait", "art", "irs", });
-		resources.put(mega.privacy.android.core.R.drawable.ic_image_thumbnail, new String[] {"jpg", "jpeg", "tga", "tif", "tiff", "bmp", "gif", "png",});
-		resources.put(R.drawable.ic_indesign_thumbnail, new String[] {"indd", });
-		resources.put(R.drawable.java_thumbnail, new String[] {"class", "jar", "java", });
-		resources.put(R.drawable.midi_thumbnail, new String[] {"mid", "midi", });
-		resources.put(R.drawable.ic_pdf_thumbnail, new String[] {"pdf", });
-		resources.put(R.drawable.ic_photoshop_thumbnail, new String[] {"abr", "csh", "psb", "psd", });
-		resources.put(R.drawable.playlist_thumbnail, new String[] {"asx", "m3u", "pls", });
-		resources.put(R.drawable.podcast_thumbnail, new String[] {"pcast", });
-		resources.put(R.drawable.ic_powerpoint_thumbnail, new String[] {"pot", "potm", "potx", "ppam", "ppc", "pps", "ppsm", "ppsx", "ppt", "pptm", "pptx", });
-		resources.put(R.drawable.ic_premiere_thumbnail, new String[] {"plb", "ppj", "prproj", "prtpset", });
-		resources.put(R.drawable.ic_raw_thumbnail, new String[] {"3fr", "mef", "arw", "bay", "cr2", "dcr", "dng", "erf", "fff", "mrw", "nef", "orf", "pef", "rw2", "rwl", "srf", });
-		resources.put(R.drawable.real_audio_thumbnail, new String[] {"ra", "ram", "rm", });
-		resources.put(R.drawable.source_thumbnail, new String[] {"c", "cc", "cgi", "cpp", "cxx", "dll", "h", "hpp", "pl", "py", "sh", });
-		resources.put(R.drawable.ic_spreadsheet_thumbnail, new String[] {"123", "gsheet", "nb", "ots", "sxc", "xlr", });
-		resources.put(R.drawable.subtitles_thumbnail, new String[] {"srt", });
-		resources.put(R.drawable.swf_thumbnail, new String[] {"swf", "flv", });
-		resources.put(R.drawable.ic_text_thumbnail, new String[] {"ans", "ascii", "log",  "rtf", "txt", "wpd", });
-		resources.put(R.drawable.ic_torrent_thumbnail, new String[] {"torrent", });
-		resources.put(R.drawable.vcard_thumbnail, new String[] {"vcard", "vcf", });
-		resources.put(R.drawable.ic_vector_thumbnail, new String[] {"cdr", "eps", "ps", "svg", "svgz", });
-		resources.put(R.drawable.ic_video_thumbnail, new String[] {"3g2", "3gp", "asf", "avi", "mkv", "mov", "mpeg", "mpg", "wmv", "3gpp", "h261", "h263", "h264", "jpgv", "jpm", "jpgm", "mp4", "mp4v", "mpg4", "mpe", "m1v", "m2v", "ogv", "qt", "m4u", "webm", "f4v", "fli", "m4v", "mkv", "mk3d", "vob", "movie", });
-		resources.put(R.drawable.video_vob_thumbnail, new String[]{"vob", });
-		resources.put(R.drawable.ic_web_data_thumbnail, new String[] {"asp", "aspx", "php", "php3", "php4", "php5", "phtml", "css", "inc", "js", "xml", });
-		resources.put(R.drawable.ic_word_thumbnail, new String[] {"doc", "docm", "docx", "dot", "dotx", "wps",});
-		resources.put(R.drawable.ic_pages_thumbnail, new String[] {"pages", });
-		resources.put(R.drawable.ic_experiencedesign_thumbnail, new String[] {"Xd", });
-		resources.put(R.drawable.ic_keynote_thumbnail, new String[] {"key", });
-		resources.put(R.drawable.ic_numbers_thumbnail, new String[] {"numbers", });
-		resources.put(R.drawable.ic_openoffice_thumbnail, new String[] {"odp", "odt", "ods"});
-		resources.put(R.drawable.ic_sketch_thumbnail, new String[] {"sketch", });
-		resources.put(R.drawable.ic_url_thumbnail, new String[]{"url"});
+		resources.put(R.drawable.ic_3d_medium_solid, new String[] {"3ds", "3dm", "max", "obj", });
+		resources.put(R.drawable.ic_aftereffects_medium_solid, new String[] {"aec", "aep", "aepx", "aes", "aet", "aetx", });
+		resources.put(R.drawable.ic_audio_medium_solid, new String[] {"aif", "aiff", "wav", "flac", "iff", "m4a", "wma", "oga", "ogg", "mp3", "3ga", "opus", "weba"});
+		resources.put(R.drawable.ic_cad_medium_solid, new String[] {"dwg", "dxf", });
+		resources.put(R.drawable.ic_compressed_medium_solid, new String[] {"bz2", "gz", "rar", "tar", "tbz", "tgz", "zip", "deb", "udeb", "rpm", "air", "apk", "dmg", "7z", "bz", "bzip2", "cab", "lha", "gzip", "ace", "arc", "pkg", });
+		resources.put(mega.privacy.android.app.R.drawable.database_thumbnail, new String[] {"accdb", "db", "dbf", "mdb", "pdb", "sql", });
+		resources.put(R.drawable.ic_dmg_medium_solid, new String[]{"dmg", });
+		resources.put(mega.privacy.android.app.R.drawable.dreamweaver_thumbnail, new String[] {"dwt", });
+		resources.put(R.drawable.ic_excel_medium_solid, new String[] {"xla", "xlam", "xll", "xlm", "xls", "xlsm", "xlsx", "xlt", "xltm", "xltx",});
+		resources.put(R.drawable.ic_executable_medium_solid, new String[] {"apk", "app", "bat", "com", "exe", "gadget", "msi", "pif", "vb", "wsf", });
+		resources.put(R.drawable.ic_web_lang_medium_solid, new String[] {"as", "asc", "ascs", });
+		resources.put(mega.privacy.android.app.R.drawable.flash_thumbnail, new String[] {"fla", });
+		resources.put(R.drawable.ic_font_medium_solid, new String[] {"fnt", "fon", "otf", "ttf", });
+		resources.put(mega.privacy.android.app.R.drawable.gis_thumbnail, new String[] {"gpx", "kml", "kmz", });
+		resources.put(mega.privacy.android.app.R.drawable.html_thumbnail, new String[] {"dhtml", "htm", "html", "shtml", "xhtml", });
+		resources.put(R.drawable.ic_illustrator_medium_solid, new String[] {"ai", "aia", "aip", "ait", "art", "irs", });
+		resources.put(R.drawable.ic_image_medium_solid, new String[] {"jpg", "jpeg", "tga", "tif", "tiff", "bmp", "gif", "png",});
+		resources.put(R.drawable.ic_indesign_medium_solid, new String[] {"indd", });
+		resources.put(mega.privacy.android.app.R.drawable.java_thumbnail, new String[] {"class", "jar", "java", });
+		resources.put(mega.privacy.android.app.R.drawable.midi_thumbnail, new String[] {"mid", "midi", });
+		resources.put(R.drawable.ic_pdf_medium_solid, new String[] {"pdf", });
+		resources.put(R.drawable.ic_photoshop_medium_solid, new String[] {"abr", "csh", "psb", "psd", });
+		resources.put(mega.privacy.android.app.R.drawable.playlist_thumbnail, new String[] {"asx", "m3u", "pls", });
+		resources.put(mega.privacy.android.app.R.drawable.podcast_thumbnail, new String[] {"pcast", });
+		resources.put(R.drawable.ic_powerpoint_medium_solid, new String[] {"pot", "potm", "potx", "ppam", "ppc", "pps", "ppsm", "ppsx", "ppt", "pptm", "pptx", });
+		resources.put(R.drawable.ic_premiere_medium_solid, new String[] {"plb", "ppj", "prproj", "prtpset", });
+		resources.put(R.drawable.ic_raw_medium_solid, new String[] {"3fr", "mef", "arw", "bay", "cr2", "dcr", "dng", "erf", "fff", "mrw", "nef", "orf", "pef", "rw2", "rwl", "srf", });
+		resources.put(mega.privacy.android.app.R.drawable.real_audio_thumbnail, new String[] {"ra", "ram", "rm", });
+		resources.put(mega.privacy.android.app.R.drawable.source_thumbnail, new String[] {"c", "cc", "cgi", "cpp", "cxx", "dll", "h", "hpp", "pl", "py", "sh", });
+		resources.put(R.drawable.ic_spreadsheet_medium_solid, new String[] {"123", "gsheet", "nb", "ots", "sxc", "xlr", });
+		resources.put(mega.privacy.android.app.R.drawable.subtitles_thumbnail, new String[] {"srt", });
+		resources.put(mega.privacy.android.app.R.drawable.swf_thumbnail, new String[] {"swf", "flv", });
+		resources.put(R.drawable.ic_text_medium_solid, new String[] {"ans", "ascii", "log",  "rtf", "txt", "wpd", });
+		resources.put(R.drawable.ic_torrent_medium_solid, new String[] {"torrent", });
+		resources.put(mega.privacy.android.app.R.drawable.vcard_thumbnail, new String[] {"vcard", "vcf", });
+		resources.put(R.drawable.ic_vector_medium_solid, new String[] {"cdr", "eps", "ps", "svg", "svgz", });
+		resources.put(R.drawable.ic_video_medium_solid, new String[] {"3g2", "3gp", "asf", "avi", "mkv", "mov", "mpeg", "mpg", "wmv", "3gpp", "h261", "h263", "h264", "jpgv", "jpm", "jpgm", "mp4", "mp4v", "mpg4", "mpe", "m1v", "m2v", "ogv", "qt", "m4u", "webm", "f4v", "fli", "m4v", "mkv", "mk3d", "vob", "movie", });
+		resources.put(mega.privacy.android.app.R.drawable.video_vob_thumbnail, new String[]{"vob", });
+		resources.put(R.drawable.ic_web_data_medium_solid, new String[] {"asp", "aspx", "php", "php3", "php4", "php5", "phtml", "css", "inc", "js", "xml", });
+		resources.put(R.drawable.ic_word_medium_solid, new String[] {"doc", "docm", "docx", "dot", "dotx", "wps",});
+		resources.put(R.drawable.ic_pages_medium_solid, new String[] {"pages", });
+		resources.put(R.drawable.ic_experiencedesign_medium_solid, new String[] {"Xd", });
+		resources.put(R.drawable.ic_keynote_medium_solid, new String[] {"key", });
+		resources.put(R.drawable.ic_numbers_medium_solid, new String[] {"numbers", });
+		resources.put(R.drawable.ic_openoffice_medium_solid, new String[] {"odp", "odt", "ods"});
+		resources.put(mega.privacy.android.app.R.drawable.ic_sketch_thumbnail, new String[] {"sketch", });
+		resources.put(R.drawable.ic_url_medium_solid, new String[]{"url"});
 	}
 
 	private String type;
@@ -132,7 +133,7 @@ public class MimeTypeThumbnail {
 				}
 			}
 			if (resId == -1) {
-				resId = R.drawable.ic_generic_thumbnail;
+				resId = R.drawable.ic_generic_medium_solid;
 			}
 		}
 		return resId;

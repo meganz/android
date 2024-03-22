@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.twofactorauthentication.view.screens
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -173,7 +174,7 @@ fun RecoveryKeyBox(
             modifier = Modifier.padding(horizontal = 40.dp, vertical = 20.dp)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_text_thumbnail),
+                painter = painterResource(id = IconPackR.drawable.ic_text_medium_solid),
                 contentDescription = "",
                 modifier = Modifier.size(size = 24.dp)
             )
