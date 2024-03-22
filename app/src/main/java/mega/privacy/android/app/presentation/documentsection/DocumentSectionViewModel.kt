@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.documentsection.model.DocumentSectionUiState
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
@@ -203,13 +202,13 @@ class DocumentSectionViewModel @Inject constructor(
      * Update intent
      *
      * @param handle node handle
-     * @param name node name
+     * @param fileType node file type
      * @param intent Intent
      * @return updated intent
      */
     internal suspend fun updateIntent(
         handle: Long,
-        name: String,
+        fileType: String,
         intent: Intent,
     ): Intent {
         if (megaApiHttpServerIsRunningUseCase() == 0) {
@@ -219,7 +218,7 @@ class DocumentSectionViewModel @Inject constructor(
 
         getFileUrlByNodeHandleUseCase(handle)?.let { url ->
             Uri.parse(url)?.let { uri ->
-                intent.setDataAndType(uri, MimeTypeList.typeForName(name).type)
+                intent.setDataAndType(uri, fileType)
             }
         }
 

@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.documentsection.model
 
+import androidx.annotation.DrawableRes
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import java.io.File
 
@@ -10,6 +12,8 @@ import java.io.File
  * @property name the document's name
  * @property size the document's size
  * @property thumbnail the document's thumbnail
+ * @property icon the document's icon
+ * @property fileTypeInfo the document's file type info
  * @property isFavourite the document if is Favourite
  * @property isExported the document if is Exported
  * @property isTakenDown the document if is TakenDown
@@ -24,6 +28,8 @@ data class DocumentUiEntity(
     val name: String,
     val size: Long,
     val thumbnail: File? = null,
+    @DrawableRes val icon: Int,
+    val fileTypeInfo: FileTypeInfo,
     val isFavourite: Boolean = false,
     val isExported: Boolean = false,
     val isTakenDown: Boolean = false,

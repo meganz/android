@@ -4,14 +4,20 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntityMapper
+import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.icon.pack.R
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DocumentUiEntityMapperTest {
@@ -28,14 +34,26 @@ class DocumentUiEntityMapperTest {
     private val expectedModificationTime: Long = 999
     private val expectedLabel = 1
     private val expectedAvailableOffline = true
+    private val expectedType = mock<PdfFileTypeInfo> {
+        on { extension }.thenReturn("pdf")
+    }
+    private val expectedIcon = R.drawable.ic_pdf_medium_solid
+
+    private val fileTypeIconMapper = mock<FileTypeIconMapper>()
 
     @BeforeAll
     fun setUp() {
-        underTest = DocumentUiEntityMapper()
+        underTest = DocumentUiEntityMapper(fileTypeIconMapper)
+    }
+
+    @AfterEach
+    fun resetMocks() {
+        reset(fileTypeIconMapper)
     }
 
     @Test
     fun `test that DocumentUIEntity can be mapped correctly`() = runTest {
+        whenever(fileTypeIconMapper(expectedType.extension)).thenReturn(expectedIcon)
         val documentUIEntity = underTest(initTypedFileNode())
         assertMappedDocumentUIEntity(documentUIEntity)
     }
@@ -53,6 +71,7 @@ class DocumentUiEntityMapperTest {
         on { versionCount }.thenReturn(expectedNumVersions)
         on { modificationTime }.thenReturn(expectedModificationTime)
         on { hasVersion }.thenReturn(true)
+        on { type }.thenReturn(expectedType)
     }
 
     private fun assertMappedDocumentUIEntity(documentUIEntity: DocumentUiEntity) {
@@ -69,7 +88,9 @@ class DocumentUiEntityMapperTest {
                 { assertThat(it.isTakenDown).isEqualTo(expectedIsTakeDown) },
                 { assertThat(it.hasVersions).isTrue() },
                 { assertThat(it.modificationTime).isEqualTo(expectedModificationTime) },
-                { assertThat(it.label).isEqualTo(expectedLabel) }
+                { assertThat(it.label).isEqualTo(expectedLabel) },
+                { assertThat(it.fileTypeInfo).isEqualTo(expectedType) },
+                { assertThat(it.icon).isEqualTo(expectedIcon) },
             )
         }
     }

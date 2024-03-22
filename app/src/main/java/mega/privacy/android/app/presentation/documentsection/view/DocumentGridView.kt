@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
@@ -60,7 +59,7 @@ internal fun DocumentGridView(
                 modifier = Modifier.testTag("$DOCUMENT_SECTION_GRID_ITEM_VIEW_TEST_TAG$it"),
                 isSelected = documentItem.isSelected,
                 name = documentItem.name,
-                icon = MimeTypeList.typeForName(documentItem.name).iconResourceId,
+                icon = documentItem.icon,
                 thumbnailData = if (documentItem.thumbnail?.exists() == true) {
                     documentItem.thumbnail
                 } else {

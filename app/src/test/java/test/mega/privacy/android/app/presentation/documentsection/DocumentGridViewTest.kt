@@ -15,7 +15,9 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
 import mega.privacy.android.app.presentation.documentsection.view.DOCUMENT_SECTION_GRID_ITEM_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.documentsection.view.DocumentGridView
+import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.icon.pack.R
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -91,5 +93,12 @@ class DocumentGridViewTest {
         on { size }.thenReturn(1000)
         on { modificationTime }.thenReturn(100000)
         on { label }.thenReturn(0)
+        on { icon }.thenReturn(R.drawable.ic_text_medium_solid)
+        on { fileTypeInfo }.thenReturn(
+            TextFileTypeInfo(
+                mimeType = "text/plain",
+                extension = "txt"
+            )
+        )
     }
 }

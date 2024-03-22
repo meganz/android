@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.documentsection.view
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -38,6 +39,8 @@ import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEnt
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.white_black
+import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
@@ -201,7 +204,7 @@ private fun DocumentSectionComposeViewPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DocumentSectionComposeView(
             uiState = DocumentSectionUiState(
-                allDocuments = getItems(),
+                allDocuments = getPreviewItems(),
                 isLoading = false
             ),
             modifier = Modifier,
@@ -225,13 +228,15 @@ private fun AddDocumentFabButtonPreview() {
     }
 }
 
-private fun getItems() = listOf(
+private fun getPreviewItems() = listOf(
     DocumentUiEntity(
         id = NodeId(1),
         name = "Document 1.txt",
         size = 1000,
         modificationTime = 100000,
         label = MegaNode.NODE_LBL_UNKNOWN,
+        icon = iconPackR.drawable.ic_pdf_medium_solid,
+        fileTypeInfo = PdfFileTypeInfo
     ),
     DocumentUiEntity(
         id = NodeId(2),
@@ -242,7 +247,12 @@ private fun getItems() = listOf(
         isFavourite = true,
         isExported = true,
         hasVersions = true,
-        nodeAvailableOffline = true
+        nodeAvailableOffline = true,
+        icon = iconPackR.drawable.ic_text_medium_solid,
+        fileTypeInfo = TextFileTypeInfo(
+            mimeType = "text/plain",
+            extension = "txt"
+        )
     ),
     DocumentUiEntity(
         id = NodeId(3),
@@ -250,6 +260,11 @@ private fun getItems() = listOf(
         size = 3000,
         modificationTime = 300000,
         label = MegaNode.NODE_LBL_RED,
+        icon = iconPackR.drawable.ic_word_medium_solid,
+        fileTypeInfo = TextFileTypeInfo(
+            mimeType = "text/plain",
+            extension = "docx"
+        )
     ),
 )
 

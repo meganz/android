@@ -16,15 +16,17 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.icon.pack.R
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.shared.theme.MegaAppTheme
@@ -65,7 +67,7 @@ internal fun DocumentListView(
                 modifier = Modifier.testTag("$DOCUMENT_SECTION_ITEM_VIEW_TEST_TAG$it"),
                 isSelected = documentItem.isSelected,
                 folderInfo = null,
-                icon = MimeTypeList.typeForName(documentItem.name).iconResourceId,
+                icon = documentItem.icon,
                 infoIcon = if (documentItem.hasVersions) coreR.drawable.ic_version_small else null,
                 fileSize = formatFileSize(documentItem.size, LocalContext.current),
                 modifiedDate = formatModifiedDate(
@@ -111,33 +113,7 @@ internal fun DocumentListView(
 private fun DocumentListViewPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DocumentListView(
-            items = listOf(
-                DocumentUiEntity(
-                    id = NodeId(1),
-                    name = "Document 1.txt",
-                    size = 1000,
-                    modificationTime = 100000,
-                    label = MegaNode.NODE_LBL_UNKNOWN,
-                ),
-                DocumentUiEntity(
-                    id = NodeId(2),
-                    name = "Document 2.pdf",
-                    size = 2000,
-                    modificationTime = 200000,
-                    label = MegaNode.NODE_LBL_GREEN,
-                    isFavourite = true,
-                    isExported = true,
-                    hasVersions = true,
-                    nodeAvailableOffline = true
-                ),
-                DocumentUiEntity(
-                    id = NodeId(3),
-                    name = "Document 3.docx",
-                    size = 3000,
-                    modificationTime = 300000,
-                    label = MegaNode.NODE_LBL_RED,
-                ),
-            ),
+            items = getPreviewItems(),
             lazyListState = rememberLazyListState(),
             sortOrder = "Size",
             modifier = Modifier,
@@ -149,6 +125,46 @@ private fun DocumentListViewPreview() {
         )
     }
 }
+
+private fun getPreviewItems() = listOf(
+    DocumentUiEntity(
+        id = NodeId(1),
+        name = "Document 1.txt",
+        size = 1000,
+        modificationTime = 100000,
+        label = MegaNode.NODE_LBL_UNKNOWN,
+        icon = R.drawable.ic_pdf_medium_solid,
+        fileTypeInfo = PdfFileTypeInfo
+    ),
+    DocumentUiEntity(
+        id = NodeId(2),
+        name = "Document 2.pdf",
+        size = 2000,
+        modificationTime = 200000,
+        label = MegaNode.NODE_LBL_GREEN,
+        isFavourite = true,
+        isExported = true,
+        hasVersions = true,
+        nodeAvailableOffline = true,
+        icon = R.drawable.ic_text_medium_solid,
+        fileTypeInfo = TextFileTypeInfo(
+            mimeType = "text/plain",
+            extension = "txt"
+        )
+    ),
+    DocumentUiEntity(
+        id = NodeId(3),
+        name = "Document 3.docx",
+        size = 3000,
+        modificationTime = 300000,
+        label = MegaNode.NODE_LBL_RED,
+        icon = R.drawable.ic_word_medium_solid,
+        fileTypeInfo = TextFileTypeInfo(
+            mimeType = "text/plain",
+            extension = "docx"
+        )
+    ),
+)
 
 /**
  * Test tag for the item view.

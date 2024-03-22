@@ -14,8 +14,10 @@ import mega.privacy.android.app.presentation.documentsection.view.DOCUMENT_SECTI
 import mega.privacy.android.app.presentation.documentsection.view.DOCUMENT_SECTION_LIST_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.documentsection.view.DOCUMENT_SECTION_PROGRESS_BAR_TEST_TAG
 import mega.privacy.android.app.presentation.documentsection.view.DocumentSectionComposeView
+import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.icon.pack.R
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -104,6 +106,13 @@ class DocumentSectionComposeViewTest {
         on { size }.thenReturn(1000)
         on { modificationTime }.thenReturn(100000)
         on { label }.thenReturn(0)
+        on { icon }.thenReturn(R.drawable.ic_text_medium_solid)
+        on { fileTypeInfo }.thenReturn(
+            TextFileTypeInfo(
+                mimeType = "text/plain",
+                extension = "txt"
+            )
+        )
     }
 
     @Test

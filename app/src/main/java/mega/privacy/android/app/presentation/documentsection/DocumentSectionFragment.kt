@@ -26,7 +26,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.homepage.EventObserver
@@ -50,6 +49,8 @@ import mega.privacy.android.app.utils.Constants.DOCUMENTS_SEARCH_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.callManager
+import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -145,10 +146,10 @@ class DocumentSectionFragment : Fragment(), HomepageSearchable {
     private fun openDoc(activity: Activity, document: DocumentUiEntity) {
         viewLifecycleOwner.lifecycleScope.launch {
             val nodeHandle = document.id.longValue
-            val nodeName = document.name
+            val nodeFileType = document.fileTypeInfo.mimeType
             val searchMode = documentSectionViewModel.uiState.value.searchMode
             when {
-                MimeTypeList.typeForName(document.name).isPdf -> {
+                document.fileTypeInfo is PdfFileTypeInfo -> {
                     val intent = Intent(context, PdfViewerActivity::class.java).apply {
                         putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
                         putExtra(
@@ -172,24 +173,22 @@ class DocumentSectionFragment : Fragment(), HomepageSearchable {
                             }.onFailure {
                                 Uri.fromFile(file)
                             }.map { mediaFileUri ->
-                                intent.setDataAndType(
-                                    mediaFileUri,
-                                    MimeTypeList.typeForName(nodeName).type
-                                )
+                                intent.setDataAndType(mediaFileUri, nodeFileType)
                                 intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                             }
                         }
                         intent
                     } ?: documentSectionViewModel.updateIntent(
                         handle = nodeHandle,
-                        name = nodeName,
+                        fileType = nodeFileType,
                         intent = intent
                     ).let {
                         activity.startActivity(it)
                     }
                 }
 
-                MimeTypeList.typeForName(nodeName).isOpenableTextFile(document.size) -> {
+                document.fileTypeInfo is TextFileTypeInfo
+                        && document.size <= TextFileTypeInfo.MAX_SIZE_OPENABLE_TEXT_FILE -> {
                     Intent(context, TextEditorActivity::class.java).apply {
                         putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, nodeHandle)
                         putExtra(
