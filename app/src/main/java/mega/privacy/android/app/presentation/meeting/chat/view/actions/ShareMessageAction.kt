@@ -18,7 +18,7 @@ import timber.log.Timber
 
 internal class ShareMessageAction : MessageAction(
     text = R.string.general_share,
-    icon = iconPackR.drawable.ic_menu_share,
+    icon = iconPackR.drawable.ic_share_network_medium_regular_outline,
     testTag = "action_share",
     group = MessageActionGroup.Share,
 ) {

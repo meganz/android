@@ -1,5 +1,6 @@
 package mega.privacy.android.core.ui.controls.appbar
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -94,7 +95,7 @@ private fun getSampleToolbarActions(): List<MenuAction> {
     val item3 =
         object : MenuActionString(R.drawable.ic_chevron_up, R.string.password_text, "chevron up") {}
     val item4 =
-        object : MenuActionString(R.drawable.ic_alert_circle, R.string.password_text, "circle") {}
+        object : MenuActionString(iconPackR.drawable.ic_alert_circle_regular_medium_outline, R.string.password_text, "circle") {}
     val item5 = object : MenuActionWithoutIcon(R.string.password_text, "password") {}
     return listOf(item1, item2, item3, item4, item5)
 }

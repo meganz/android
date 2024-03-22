@@ -122,7 +122,8 @@
                 android:layout_height="16dp"
                 android:layout_gravity="end|center_vertical"
                 android:background="@null"
-                android:src="@drawable/ic_taken_down"
+                android:src="@drawable/ic_alert_triangle_medium_regular_outline"
+                app:tint="@color/color_button_brand"
                 android:visibility="@{item.node.isTakenDown() ? View.VISIBLE : View.GONE}" />
 
             <ImageView

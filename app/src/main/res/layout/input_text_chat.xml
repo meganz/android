@@ -219,7 +219,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@null"
-                            android:src="@drawable/ic_send_white"
+                            android:src="@drawable/ic_send_horizontal_medium_regular_outline"
                             android:visibility="visible"
                             tools:ignore="ContentDescription,TouchTargetSizeCheck,SpeakableTextPresentCheck" />
                     </RelativeLayout>

@@ -21,7 +21,7 @@ class RemoveLinkMenuAction @Inject constructor(
     override fun getDescription() = stringResource(id = R.string.context_remove_link_menu)
 
     @Composable
-    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_menu_remove_link)
+    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_link_off_01_medium_regular_outline)
 
 
     override val testTag: String = "menu_action:remove_link"

@@ -5,6 +5,7 @@
 
 package mega.privacy.android.app.presentation.imagepreview.view
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -683,7 +684,7 @@ private fun ImagePreviewTopBar(
             if (isSaveToDeviceMenuVisible) {
                 IconButton(onClick = onClickSaveToDevice) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_download_white),
+                        painter = painterResource(id = iconPackR.drawable.ic_download_medium_regular_outline),
                         contentDescription = null,
                         tint = MaterialTheme.colors.black_white,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SAVE_TO_DEVICE),
@@ -705,7 +706,7 @@ private fun ImagePreviewTopBar(
             if (isSendToMenuVisible) {
                 IconButton(onClick = onClickSendTo) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_send_to_contact),
+                        painter = painterResource(id = iconPackR.drawable.ic_message_arrow_up_medium_regular_outline),
                         contentDescription = null,
                         tint = MaterialTheme.colors.black_white,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SEND_TO),

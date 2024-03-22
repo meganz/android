@@ -13,7 +13,7 @@ import javax.inject.Inject
  */
 class InfoMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
-    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_menu_info)
+    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_info_medium_regular_outline)
 
     @Composable
     override fun getDescription() = stringResource(id = R.string.general_info)

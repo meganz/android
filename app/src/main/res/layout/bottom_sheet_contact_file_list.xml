@@ -141,7 +141,7 @@
                 android:id="@+id/rename_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_rename"
-                app:drawableStartCompat="@drawable/ic_rename"/>
+                app:drawableStartCompat="@drawable/ic_pen_2_medium_regular_outline"/>
 
             <TextView
                 android:id="@+id/move_option"

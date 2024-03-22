@@ -181,7 +181,7 @@
                     style="@style/BottomSheetOption"
                     android:layout_width="wrap_content"
                     android:text="@string/file_properties_available_offline"
-                    app:drawableStartCompat="@drawable/ic_save_offline" />
+                    app:drawableStartCompat="@drawable/ic_arrow_down_circle_medium_regular_outline" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/switch_offline"
@@ -203,27 +203,27 @@
                 android:id="@+id/option_manage_link"
                 style="@style/BottomSheetOption"
                 android:text="@string/edit_link_option"
-                app:drawableStartCompat="@drawable/link_ic" />
+                app:drawableStartCompat="@drawable/ic_link01_medium_regular_outline" />
 
             <TextView
                 android:id="@+id/option_remove_link"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_remove_link_menu"
                 android:visibility="gone"
-                app:drawableStartCompat="@drawable/ic_remove_link"
+                app:drawableStartCompat="@drawable/ic_link_off_01_medium_regular_outline"
                 tools:visibility="visible" />
 
             <TextView
                 android:id="@+id/option_send_to_chat"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_send_file_to_chat"
-                app:drawableStartCompat="@drawable/ic_send_to_contact" />
+                app:drawableStartCompat="@drawable/ic_message_arrow_up_medium_regular_outline" />
 
             <TextView
                 android:id="@+id/option_share"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_share"
-                app:drawableStartCompat="@drawable/ic_social_share_white" />
+                app:drawableStartCompat="@drawable/ic_share_network_medium_regular_outline" />
 
             <View
                 android:id="@+id/separator_share"
@@ -236,7 +236,7 @@
                 android:id="@+id/option_rename"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_rename"
-                app:drawableStartCompat="@drawable/ic_rename" />
+                app:drawableStartCompat="@drawable/ic_pen_2_medium_regular_outline" />
 
             <TextView
                 android:id="@+id/option_move"

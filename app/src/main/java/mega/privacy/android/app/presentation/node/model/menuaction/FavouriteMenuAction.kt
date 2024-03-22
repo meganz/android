@@ -13,7 +13,7 @@ import javax.inject.Inject
  */
 class FavouriteMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
-    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_menu_favourite)
+    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_heart_medium_regular_outline)
 
     @Composable
     override fun getDescription() = stringResource(id = R.string.file_properties_favourite)

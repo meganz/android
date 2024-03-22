@@ -29,7 +29,7 @@
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="5dp"
             android:backgroundTint="@color/white_teal_100"
-            android:src="@drawable/ic_send_white"
+            android:src="@drawable/ic_send_horizontal_medium_regular_outline"
             app:borderWidth="0dp"
             app:tint="@color/teal_300_grey_087"
             tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
@@ -156,7 +156,7 @@
                             android:layout_centerInParent="true"
                             android:adjustViewBounds="true"
                             android:background="@null"
-                            android:src="@drawable/ic_phone_white"
+                            android:src="@drawable/ic_phone_01_medium_regular_outline"
                             app:tint="@color/grey_054_white_087"
                             tools:ignore="ContentDescription" />
                     </RelativeLayout>
@@ -192,7 +192,7 @@
                             android:layout_centerInParent="true"
                             android:adjustViewBounds="true"
                             android:background="@null"
-                            android:src="@drawable/ic_videocam_white"
+                            android:src="@drawable/ic_video_medium_regular_outline"
                             app:tint="@color/grey_054_white_087"
                             tools:ignore="ContentDescription" />
                     </RelativeLayout>

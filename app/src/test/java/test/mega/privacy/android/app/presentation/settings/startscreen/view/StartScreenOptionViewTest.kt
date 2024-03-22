@@ -64,7 +64,7 @@ class StartScreenOptionViewTest {
             )
         }
 
-        composeRule.onNodeWithTag(R.drawable.ic_check.toString(), useUnmergedTree = true)
+        composeRule.onNodeWithTag(iconPackR.drawable.ic_check_medium_regular_outline.toString(), useUnmergedTree = true)
             .assertIsDisplayed()
     }
 
@@ -79,7 +79,7 @@ class StartScreenOptionViewTest {
             )
         }
 
-        composeRule.onNodeWithTag(R.drawable.ic_check.toString()).assertDoesNotExist()
+        composeRule.onNodeWithTag(iconPackR.drawable.ic_check_medium_regular_outline.toString()).assertDoesNotExist()
     }
 
     @Test

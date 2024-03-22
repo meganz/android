@@ -31,7 +31,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.R
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.theme.grey_alpha_012
@@ -98,12 +97,12 @@ fun StartScreenOptionView(
             )
             if (isSelected) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_check),
+                    painter = painterResource(id = iconPackR.drawable.ic_check_medium_regular_outline),
                     contentDescription = null,
                     modifier = Modifier
                         .padding(end = 20.dp)
                         .size(24.dp)
-                        .testTag(R.drawable.ic_check.toString())
+                        .testTag(iconPackR.drawable.ic_check_medium_regular_outline.toString())
                 )
             }
         }

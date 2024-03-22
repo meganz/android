@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.folderlink.view
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.Configuration
@@ -343,7 +344,7 @@ internal fun FolderLinkTopAppBar(
         actions = {
             IconButton(onClick = onShareClicked) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_social_share_white),
+                    painter = painterResource(id = iconPackR.drawable.ic_share_network_medium_regular_outline),
                     contentDescription = stringResource(id = R.string.general_share),
                     colorFilter = ColorFilter.tint(if (MaterialTheme.colors.isLight) Color.Black else Color.White)
                 )

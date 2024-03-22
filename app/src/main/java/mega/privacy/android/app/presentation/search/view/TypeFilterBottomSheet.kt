@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.search.view
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -67,7 +68,7 @@ internal fun TypeFilterBottomSheet(
 
                         if (option.isSelected) {
                             Image(
-                                painter = painterResource(id = R.drawable.ic_check),
+                                painter = painterResource(id = iconPackR.drawable.ic_check_medium_regular_outline),
                                 contentDescription = null,
                                 modifier = Modifier
                                     .size(24.dp)

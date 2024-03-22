@@ -108,7 +108,7 @@
             android:layout_marginStart="3dp"
             android:layout_marginEnd="4dp"
             android:background="@null"
-            android:src="@drawable/link_ic"
+            android:src="@drawable/ic_link01_medium_regular_outline"
             android:visibility="@{item.node.exported ? View.VISIBLE : View.INVISIBLE}"
             app:layout_constraintBottom_toBottomOf="@id/name"
             app:layout_constraintStart_toEndOf="@id/img_favourite"
@@ -120,11 +120,12 @@
             style="@style/taken_down_icon"
             android:layout_marginStart="3dp"
             android:layout_marginEnd="6dp"
-            android:src="@drawable/ic_taken_down"
+            android:src="@drawable/ic_alert_triangle_medium_regular_outline"
             app:layout_constraintBottom_toBottomOf="@id/public_link"
             app:layout_constraintStart_toEndOf="@id/public_link"
             app:layout_constraintTop_toTopOf="@id/public_link"
             app:visibleGone="@{item.node.takenDown}"
+            app:tint="@color/color_button_brand"
             tools:visibility="visible" />
 
         <ImageView

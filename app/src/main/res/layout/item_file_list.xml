@@ -123,7 +123,7 @@
             app:layout_constraintStart_toEndOf="@id/img_favourite"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:src="@drawable/link_ic"
+            android:src="@drawable/ic_link01_medium_regular_outline"
             app:tint="?android:attr/textColorSecondary"
             tools:ignore="ContentDescription" />
 
@@ -135,9 +135,9 @@
             app:layout_constraintStart_toEndOf="@id/file_list_public_link"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:src="@drawable/ic_taken_down"
+            android:src="@drawable/ic_alert_triangle_medium_regular_outline"
             tools:ignore="ContentDescription"
-            app:tint="@color/red_800_red_400"
+            app:tint="@color/color_button_brand"
             android:visibility="gone"
             tools:visibility="visible"/>
     </androidx.constraintlayout.widget.ConstraintLayout>

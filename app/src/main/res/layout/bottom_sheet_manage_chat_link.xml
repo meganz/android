@@ -48,7 +48,7 @@
                 android:gravity="center_vertical"
                 android:text="@string/button_copy_link"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
-                app:drawableStartCompat="@drawable/ic_copy_white"
+                app:drawableStartCompat="@drawable/ic_copy_01_medium_regular_outline"
                 app:drawableTint="?android:attr/textColorSecondary" />
 
             <TextView
@@ -59,7 +59,7 @@
                 android:gravity="center_vertical"
                 android:text="@string/context_get_link"
                 android:textAppearance="?attr/textAppearanceSubtitle1"
-                app:drawableStartCompat="@drawable/ic_social_share_white"
+                app:drawableStartCompat="@drawable/ic_share_network_medium_regular_outline"
                 app:drawableTint="?android:attr/textColorSecondary" />
 
             <TextView

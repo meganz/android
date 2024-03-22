@@ -15,7 +15,7 @@
 
     <item
         android:id="@+id/action_download_versions"
-        android:icon="@drawable/ic_download_white"
+        android:icon="@drawable/ic_download_medium_regular_outline"
         android:orderInCategory="115"
         android:title="@string/general_save_to_device"
         app:iconTint="?attr/colorSecondary"

@@ -25,7 +25,7 @@ internal class OpenWithMessageAction(
     private val chatViewModel: ChatViewModel,
 ) : MessageAction(
     text = R.string.external_play,
-    icon = mega.privacy.android.icon.pack.R.drawable.ic_menu_open_with,
+    icon = mega.privacy.android.icon.pack.R.drawable.ic_external_link_medium_regular_outline,
     testTag = "open_with",
     group = MessageActionGroup.Open,
 ) {

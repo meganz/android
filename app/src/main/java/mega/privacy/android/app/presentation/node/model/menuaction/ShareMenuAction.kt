@@ -17,7 +17,7 @@ class ShareMenuAction @Inject constructor() : MenuActionWithIcon {
     override fun getDescription() = stringResource(id = R.string.general_share)
 
     @Composable
-    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_menu_share)
+    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_share_network_medium_regular_outline)
 
     override val orderInCategory = 200
 

@@ -16,7 +16,7 @@ class RemoveShareMenuAction @Inject constructor(
 ) : MenuActionWithIcon {
 
     @Composable
-    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_menu_remove_share)
+    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_folder_gear_01_medium_regular_outline)
 
     @Composable
     override fun getDescription() = stringResource(id = R.string.context_clean_shares_menu)

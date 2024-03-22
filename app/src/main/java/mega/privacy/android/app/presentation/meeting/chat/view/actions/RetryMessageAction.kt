@@ -6,13 +6,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageActionGroup
 import mega.privacy.android.app.presentation.meeting.chat.view.message.error.SendErrorViewModel
-import mega.privacy.android.core.ui.model.MenuActionWithClick
 import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 
 internal class RetryMessageAction : MessageAction(
     text = R.string.message_option_retry,
-    icon = IconPack.ic_menu_retry,
+    icon = IconPack.ic_rotate_ccw_medium_regular_outline,
     testTag = "action_retry",
     group = MessageActionGroup.Retry,
 ) {

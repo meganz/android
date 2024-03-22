@@ -40,7 +40,7 @@
                 android:layout_width="0dp"
                 android:layout_height="56dp"
                 android:text="@string/context_send_file_to_chat"
-                app:drawableStartCompat="@drawable/ic_send_to_contact"
+                app:drawableStartCompat="@drawable/ic_message_arrow_up_medium_regular_outline"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -51,7 +51,7 @@
                 android:layout_width="0dp"
                 android:layout_height="56dp"
                 android:text="@string/context_copy"
-                app:drawableStartCompat="@drawable/ic_copy_white"
+                app:drawableStartCompat="@drawable/ic_copy_01_medium_regular_outline"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/send_manage_meeting_link_option" />
@@ -62,7 +62,7 @@
                 android:layout_width="0dp"
                 android:layout_height="56dp"
                 android:text="@string/general_share"
-                app:drawableStartCompat="@drawable/ic_social_share_white"
+                app:drawableStartCompat="@drawable/ic_share_network_medium_regular_outline"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/copy_manage_meeting_link_option" />

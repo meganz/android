@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.contactinfo.view
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -143,14 +144,14 @@ fun ContactInfoTopAppBar(
 private fun ActionItems(iconColor: Color) {
     IconButton(onClick = { /*TODO*/ }) {
         Icon(
-            painter = painterResource(id = R.drawable.ic_send_to_contact),
+            painter = painterResource(id = iconPackR.drawable.ic_message_arrow_up_medium_regular_outline),
             contentDescription = "",
             tint = iconColor
         )
     }
     IconButton(onClick = { /*TODO*/ }) {
         Icon(
-            painter = painterResource(id = R.drawable.ic_share),
+            painter = painterResource(id = iconPackR.drawable.ic_folder_users_medium_regular_outline),
             contentDescription = "",
             tint = iconColor
         )

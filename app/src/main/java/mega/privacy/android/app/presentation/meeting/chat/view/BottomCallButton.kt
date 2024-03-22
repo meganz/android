@@ -46,7 +46,7 @@ internal fun BottomCallButton(
         callInThisChat?.status == ChatCallStatus.UserNoPresent && !schedIsPending -> {
             BottomCallButton(
                 textId = if (isGroup) R.string.title_join_call else R.string.title_join_one_to_one_call,
-                iconId = R.drawable.ic_phone_01_medium_regular,
+                iconId = R.drawable.ic_phone_01_medium_regular_outline,
                 modifier = modifier.testTag(
                     if (isGroup) TEST_TAG_BOTTOM_JOIN_CALL_BUTTON
                     else TEST_TAG_BOTTOM_ANSWER_CALL_BUTTON
@@ -101,7 +101,7 @@ private fun JoinAnswerCallButtonPreview(
         Box {
             BottomCallButton(
                 textId = if (isGroup) R.string.title_join_call else R.string.title_join_one_to_one_call,
-                iconId = R.drawable.ic_phone_01_medium_regular,
+                iconId = R.drawable.ic_phone_01_medium_regular_outline,
                 onClick = {},
             )
         }

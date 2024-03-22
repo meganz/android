@@ -691,7 +691,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 )
                 optionHide.setText(if (node.isMarkedSensitive) R.string.general_unhide_node else R.string.general_hide_node)
                 optionHide.setCompoundDrawablesWithIntrinsicBounds(
-                    if (node.isMarkedSensitive) RPack.drawable.ic_menu_unhide else RPack.drawable.ic_menu_hide,
+                    if (node.isMarkedSensitive) RPack.drawable.ic_eye_medium_regular_outline else RPack.drawable.ic_eye_off_medium_regular_outline,
                     0,
                     0,
                     0

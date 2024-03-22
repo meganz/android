@@ -104,7 +104,7 @@
 			android:layout_gravity="bottom|right|end"
 			android:layout_margin="16dp"
 			android:elevation="@dimen/elevation_low"
-			android:src="@drawable/ic_send_white"
+			android:src="@drawable/ic_send_horizontal_medium_regular_outline"
 			android:stateListAnimator="@anim/button_elevation"
 			android:tint="@android:color/white"
 			android:visibility="gone"

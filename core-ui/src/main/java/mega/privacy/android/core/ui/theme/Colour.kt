@@ -314,3 +314,7 @@ val transparent = Color(0x00000000)
 val lightBlack = Color(0xFF252626)
 
 val lightGrey = Color(0xFFEAEFEF)
+
+val colorButtonBrandhLight = Color(0xFFDD1405)
+
+val colorButtonBrandhDark = Color(0xFFF23433)

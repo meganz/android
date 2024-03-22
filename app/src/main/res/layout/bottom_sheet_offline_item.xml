@@ -160,7 +160,7 @@
                     android:layout_marginStart="5dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:src="@drawable/ic_social_share_white"
+                    android:src="@drawable/ic_share_network_medium_regular_outline"
                     android:visibility="visible"
                     app:tint="?android:attr/textColorSecondary" />
 

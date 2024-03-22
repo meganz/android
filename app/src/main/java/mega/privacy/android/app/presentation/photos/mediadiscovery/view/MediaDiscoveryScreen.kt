@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.mediadiscovery.view
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -288,7 +289,7 @@ private fun MDHeader(
                 } else {
                     IconButton(onClick = onSaveToDeviceClicked) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_download_white),
+                            painter = painterResource(id = iconPackR.drawable.ic_download_medium_regular_outline),
                             contentDescription = null,
                             tint = tealIconTint(),
                         )
@@ -297,7 +298,7 @@ private fun MDHeader(
                     if (showImportMenu) {
                         IconButton(onClick = onImportClicked) {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_import_to_cloud_white),
+                                painter = painterResource(id = R.drawable.ic_cloud_upload_medium_regular_outline),
                                 contentDescription = null,
                                 tint = tealIconTint(),
                             )

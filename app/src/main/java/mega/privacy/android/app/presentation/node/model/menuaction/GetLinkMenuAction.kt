@@ -17,7 +17,7 @@ class GetLinkMenuAction @Inject constructor() : MenuActionWithIcon {
 
     @Composable
     override fun getIconPainter() =
-        painterResource(id = iconPackR.drawable.ic_menu_link)
+        painterResource(id = iconPackR.drawable.ic_link_01_medium_regular_outline)
 
     override val orderInCategory = 160
 

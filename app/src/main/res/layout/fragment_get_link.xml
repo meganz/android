@@ -286,7 +286,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@id/key_title_text"
                 android:layout_marginTop="4dp"
-                android:src="@drawable/ic_copy"
+                android:src="@drawable/ic_copy_01_medium_regular_outline"
                 android:layout_alignParentEnd="true"
                 app:tint="?colorOnPrimary"/>
 
@@ -326,7 +326,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@id/link_title_text"
                 android:layout_marginTop="4dp"
-                android:src="@drawable/ic_copy"
+                android:src="@drawable/ic_copy_01_medium_regular_outline"
                 android:layout_alignParentEnd="true"
                 app:tint="?colorOnPrimary"/>
 

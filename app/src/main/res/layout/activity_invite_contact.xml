@@ -196,6 +196,6 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_send_white" />
+        android:src="@drawable/ic_send_horizontal_medium_regular_outline" />
 
 </RelativeLayout>

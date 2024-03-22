@@ -1,5 +1,6 @@
 package mega.privacy.android.core.ui.controls.appbar
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -141,7 +142,7 @@ class MegaAppBarTest {
             ) {}
         val item4 =
             object : MenuActionString(
-                iconRes = R.drawable.ic_alert_circle,
+                iconRes = iconPackR.drawable.ic_alert_circle_regular_medium_outline,
                 descriptionRes = R.string.action_long,
                 testTag = menuButtonAlert
             ) {}

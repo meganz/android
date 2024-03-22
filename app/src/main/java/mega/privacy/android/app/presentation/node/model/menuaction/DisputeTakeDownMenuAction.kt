@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.model.menuaction
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -15,7 +16,7 @@ class DisputeTakeDownMenuAction @Inject constructor() : MenuActionWithIcon {
     override fun getDescription() = stringResource(id = R.string.dispute_takendown_file)
 
     @Composable
-    override fun getIconPainter() = painterResource(id = R.drawable.ic_taken_down_menu_option)
+    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_alert_triangle_medium_regular_outline)
 
     override val orderInCategory = 100
 

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.documentsection.view
 
+import mega.privacy.android.icon.pack .R as iconPackR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -36,6 +37,7 @@ import mega.privacy.android.core.ui.controls.images.ThumbnailView
 import mega.privacy.android.core.ui.controls.text.MiddleEllipsisText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.background_white_alpha_005
+import mega.privacy.android.core.ui.theme.extensions.color_button_brand
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.core.ui.theme.tokens.TextColor
@@ -126,8 +128,8 @@ internal fun DocumentGridViewItem(
                     .height(16.dp)
                     .width(16.dp)
                     .testTag(DOCUMENT_SECTION_GRID_ITEM_TAKEN_DOWN_TEST_TAG),
-                painter = painterResource(id = mega.privacy.android.app.R.drawable.ic_taken_down),
-                colorFilter = ColorFilter.tint(MaterialTheme.colors.red_800_red_400),
+                painter = painterResource(id = iconPackR.drawable.ic_alert_triangle_medium_regular_outline),
+                colorFilter = ColorFilter.tint(MaterialTheme.colors.color_button_brand),
                 contentDescription = DOCUMENT_SECTION_GRID_ITEM_TAKEN_DOWN_ICON_DESCRIPTION
             )
             MiddleEllipsisText(

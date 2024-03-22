@@ -3,7 +3,7 @@
 
   <item
       android:id="@+id/cab_menu_download"
-      android:icon="@drawable/ic_download_white"
+      android:icon="@drawable/ic_download_medium_regular_outline"
       android:orderInCategory="70"
       android:title="@string/general_save_to_device"
       app:iconTint="?attr/colorSecondary"
@@ -11,7 +11,7 @@
 
   <item
       android:id="@+id/cab_menu_share_out"
-      android:icon="@drawable/ic_social_share_white"
+      android:icon="@drawable/ic_share_network_medium_regular_outline"
       android:orderInCategory="80"
       app:iconTint="?attr/colorSecondary"
       android:title="@string/general_share"

@@ -13,7 +13,7 @@ import javax.inject.Inject
  */
 class LabelMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
-    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_menu_label)
+    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_tag_simple_medium_regular_outline)
 
     @Composable
     override fun getDescription() = stringResource(id = R.string.file_properties_label)

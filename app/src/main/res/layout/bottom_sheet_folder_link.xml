@@ -116,7 +116,7 @@
                     android:layout_marginStart="5dp"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_import_to_cloud_white"
+                    android:src="@drawable/ic_cloud_upload_medium_regular_outline"
                     android:visibility="visible"
                     app:tint="?android:attr/textColorSecondary" />
 

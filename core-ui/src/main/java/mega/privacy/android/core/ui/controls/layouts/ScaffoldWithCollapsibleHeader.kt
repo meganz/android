@@ -1,5 +1,6 @@
 package mega.privacy.android.core.ui.controls.layouts
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -470,6 +471,6 @@ private fun Header() = Box(
 )
 
 private fun getSampleToolbarActions(): List<MenuAction> = listOf(
-    object : MenuActionString(R.drawable.ic_alert_circle, R.string.password_text, "circle") {},
+    object : MenuActionString(iconPackR.drawable.ic_alert_circle_regular_medium_outline, R.string.password_text, "circle") {},
     object : MenuActionWithoutIcon(R.string.password_text, "password") {},
 )

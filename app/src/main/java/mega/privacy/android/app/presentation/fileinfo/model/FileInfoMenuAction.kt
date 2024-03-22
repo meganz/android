@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.fileinfo.model
 
-import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionPlural
@@ -10,7 +10,7 @@ import mega.privacy.android.core.ui.model.MenuActionWithoutIcon
 internal sealed interface FileInfoMenuAction : MenuAction {
 
     object Download : MenuActionString(
-        R.drawable.ic_download_white,
+        IconPackR.drawable.ic_download_medium_regular_outline,
         R.string.general_save_to_device,
         TEST_TAG_DOWNLOAD_ACTION
     ), FileInfoMenuAction {
@@ -18,19 +18,19 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object ShareFolder : MenuActionString(
-        R.drawable.ic_share,
+        IconPackR.drawable.ic_folder_users_medium_regular_outline,
         R.string.context_share_folder,
         TEST_TAG_SHARE_FOLDER_ACTION,
     ), FileInfoMenuAction
 
     object GetLink : MenuActionPlural(
-        CoreUiR.drawable.link_ic_white,
+        IconPackR.drawable.ic_link01_medium_regular_outline,
         R.plurals.get_links, 1,
         TEST_TAG_GET_LINK_ACTION,
     ), FileInfoMenuAction
 
     object SendToChat : MenuActionString(
-        R.drawable.ic_send_to_contact,
+        IconPackR.drawable.ic_message_arrow_up_medium_regular_outline,
         R.string.context_send_file_to_chat,
         TEST_TAG_SEND_CHAT_ACTION,
     ), FileInfoMenuAction {
@@ -45,7 +45,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object RemoveLink : MenuActionString(
-        R.drawable.ic_remove_link,
+        IconPackR.drawable.ic_link_off_01_medium_regular_outline,
         R.string.context_remove_link_menu,
         TEST_TAG_REMOVE_LINK_ACTION
     ), FileInfoMenuAction
@@ -59,7 +59,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object Rename : MenuActionString(
-        R.drawable.ic_rename,
+        R.drawable.ic_pen_2_medium_regular_outline,
         R.string.context_rename,
         TEST_TAG_RENAME_ACTION
     ), FileInfoMenuAction {
@@ -67,7 +67,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object Move : MenuActionString(
-        R.drawable.ic_move_white,
+        IconPackR.drawable.ic_move_medium_regular_outline,
         R.string.general_move,
         TEST_TAG_MOVE_ACTION
     ), FileInfoMenuAction {
@@ -75,7 +75,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object Copy : MenuActionString(
-        R.drawable.ic_copy_white,
+        IconPackR.drawable.ic_copy_01_medium_regular_outline,
         R.string.context_copy,
         TEST_TAG_COPY_ACTION
     ), FileInfoMenuAction {
@@ -83,7 +83,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object MoveToRubbishBin : MenuActionString(
-        R.drawable.ic_move_to_rubbish_bin,
+        IconPackR.drawable.ic_trash_medium_regular_outline,
         R.string.context_move_to_trash,
         TEST_TAG_RUBBISH_ACTION
     ), FileInfoMenuAction {
@@ -91,7 +91,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     }
 
     object Leave : MenuActionString(
-        R.drawable.ic_leave_share_w,
+        IconPackR.drawable.ic_log_out_02_medium_regular_outline,
         R.string.general_leave,
         TEST_TAG_LEAVE_ACTION
     ), FileInfoMenuAction {

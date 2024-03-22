@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.getlink
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.text.TextUtils.TruncateAt.MIDDLE
 import android.view.View
 import android.widget.TextView
@@ -276,7 +277,7 @@ private fun AlbumGetLinkTopBar(
                 enabled = link.isNotBlank(),
                 content = {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_social_share_white),
+                        painter = painterResource(id = iconPackR.drawable.ic_share_network_medium_regular_outline),
                         contentDescription = null,
                         tint = grey_alpha_087.takeIf { isLight } ?: white_alpha_087,
                     )

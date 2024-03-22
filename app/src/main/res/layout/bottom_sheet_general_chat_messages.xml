@@ -122,7 +122,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="10dp"
-                    android:src="@drawable/ic_rename"
+                    android:src="@drawable/ic_pen_2_medium_regular_outline"
                     android:visibility="visible"
                     app:tint="?android:attr/textColorSecondary" />
 
@@ -158,7 +158,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="10dp"
-                    android:src="@drawable/ic_copy_white"
+                    android:src="@drawable/ic_copy_01_medium_regular_outline"
                     android:visibility="visible"
                     app:tint="?android:attr/textColorSecondary" />
 
@@ -194,7 +194,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="10dp"
-                    android:src="@drawable/ic_social_share_white"
+                    android:src="@drawable/ic_share_network_medium_regular_outline"
                     android:visibility="visible"
                     app:tint="?android:attr/textColorSecondary" />
 
@@ -394,7 +394,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="10dp"
-                    android:src="@drawable/ic_import_to_cloud_white"
+                    android:src="@drawable/ic_cloud_upload_medium_regular_outline"
                     android:visibility="visible"
                     app:tint="?android:attr/textColorSecondary" />
 
@@ -450,7 +450,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:src="@drawable/ic_save_offline"
+                    android:src="@drawable/ic_arrow_down_circle_medium_regular_outline"
                     android:visibility="visible"
                     app:tint="?android:attr/textColorSecondary" />
 

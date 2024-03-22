@@ -117,7 +117,7 @@
                         android:layout_marginStart="5dp"
                         android:paddingTop="2dp"
                         android:paddingBottom="2dp"
-                        android:src="@drawable/ic_menu_search"
+                        android:src="@drawable/ic_search_large_medium_regular_outline"
                         android:visibility="visible"
                         app:tint="?android:attr/textColorSecondary" />
 
@@ -154,7 +154,7 @@
                         android:layout_marginStart="5dp"
                         android:paddingTop="2dp"
                         android:paddingBottom="2dp"
-                        android:src="@drawable/link_ic"
+                        android:src="@drawable/ic_link01_medium_regular_outline"
                         android:visibility="visible"
                         app:tint="?android:attr/textColorSecondary" />
 

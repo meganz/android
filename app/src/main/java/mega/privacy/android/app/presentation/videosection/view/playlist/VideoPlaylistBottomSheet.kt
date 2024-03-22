@@ -56,7 +56,7 @@ internal fun RenameVideoPlaylistBottomSheetTile(
     MenuActionListTile(
         dividerType = null,
         text = "Rename",
-        icon = painterResource(id = iconPackR.drawable.ic_menu_rename),
+        icon = painterResource(id = iconPackR.drawable.ic_pen_02_medium_regular_outline),
         onActionClicked = onActionClicked,
     )
 }
@@ -68,7 +68,7 @@ internal fun DeleteVideoPlaylistBottomSheetTile(
     MenuActionListTile(
         dividerType = null,
         text = "Delete playlist",
-        icon = painterResource(id = iconPackR.drawable.ic_menu_move_to_rubbish),
+        icon = painterResource(id = iconPackR.drawable.ic_trash_medium_regular_outline),
         onActionClicked = onActionClicked,
     )
 }

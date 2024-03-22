@@ -157,7 +157,7 @@ private fun BottomSheetContent(
         if (showImport) {
             MenuItem(
                 modifier = Modifier.testTag(Constants.BOTTOM_SHEET_IMPORT),
-                res = R.drawable.ic_import_to_cloud_white,
+                res = R.drawable.ic_cloud_upload_medium_regular_outline,
                 text = R.string.add_to_cloud,
                 description = "Import",
                 onClick = {

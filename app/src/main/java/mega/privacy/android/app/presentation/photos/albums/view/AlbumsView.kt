@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.view
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.core.R as CoreUiR
 import android.annotation.SuppressLint
 import android.content.res.Configuration
@@ -355,7 +356,7 @@ fun AlbumsView(
                                     .matchParentSize()
                             )
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_link_white),
+                                painter = painterResource(id = iconPackR.drawable.ic_link01_medium_regular_outline),
                                 contentDescription = "${(album.title as AlbumTitle.StringTitle).title} Exported",
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)

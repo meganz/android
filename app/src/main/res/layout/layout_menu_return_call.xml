@@ -18,7 +18,7 @@
             android:layout_gravity="center_vertical|center_horizontal"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
-            android:src="@drawable/ic_call_menu"
+            android:src="@drawable/ic_phone_01_medium_regular_solid"
             android:contentDescription="@string/call_in_progress_layout"/>
         <Chronometer
             android:id="@+id/chrono_menu"

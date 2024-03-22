@@ -57,7 +57,7 @@
                 android:id="@+id/option_send_file"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_send_file"
-                app:drawableStartCompat="@drawable/ic_send_to_contact" />
+                app:drawableStartCompat="@drawable/ic_message_arrow_up_medium_regular_outline" />
 
             <View
                 android:id="@+id/divider_send"
@@ -76,7 +76,7 @@
                 android:id="@+id/option_share_folder"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_share_folder"
-                app:drawableStartCompat="@drawable/ic_share" />
+                app:drawableStartCompat="@drawable/ic_folder_users_medium_regular_outline" />
 
             <View
                 android:id="@+id/divider_share"

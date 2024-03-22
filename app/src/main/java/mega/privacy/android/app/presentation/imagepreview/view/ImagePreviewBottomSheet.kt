@@ -36,7 +36,6 @@ import kotlinx.coroutines.flow.collectLatest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
-import mega.privacy.android.core.R.drawable.link_ic
 import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.controls.text.MiddleEllipsisText
@@ -309,7 +308,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isImportMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = R.drawable.ic_import_to_cloud_white),
+                        icon = painterResource(id = R.drawable.ic_cloud_upload_medium_regular_outline),
                         text = stringResource(id = R.string.general_import),
                         onActionClicked = onClickImport,
                         dividerType = null,
@@ -320,7 +319,7 @@ internal fun ImagePreviewBottomSheet(
                 if (isAvailableOfflineMenuVisible) {
                     MenuActionListTile(
                         text = stringResource(id = R.string.file_properties_available_offline),
-                        icon = painterResource(id = R.drawable.ic_save_offline),
+                        icon = painterResource(id = Rpack.drawable.ic_arrow_down_circle_medium_regular_outline),
                         dividerType = null,
                         modifier = Modifier.testTag(
                             IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_AVAILABLE_OFFLINE
@@ -337,7 +336,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isGetLinkMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = link_ic),
+                        icon = painterResource(id = Rpack.drawable.ic_link_01_medium_regular_outline),
                         text = if (imageNode.exportedData != null) {
                             stringResource(id = R.string.edit_link_option)
                         } else {
@@ -354,7 +353,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isGetLinkMenuVisible && imageNode.exportedData != null) {
                     MenuActionListTile(
-                        icon = painterResource(id = R.drawable.ic_remove_link),
+                        icon = painterResource(id = Rpack.drawable.ic_link_off_01_medium_regular_outline),
                         text = stringResource(id = R.string.context_remove_link_menu),
                         onActionClicked = onClickRemoveLink,
                         dividerType = null,
@@ -364,7 +363,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isSendToChatMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = R.drawable.ic_send_to_contact),
+                        icon = painterResource(id = Rpack.drawable.ic_message_arrow_up_medium_regular_outline),
                         text = stringResource(id = R.string.context_send_file_to_chat),
                         onActionClicked = onClickSendToChat,
                         dividerType = null,
@@ -374,7 +373,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isShareMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = R.drawable.ic_social_share_white),
+                        icon = painterResource(id = Rpack.drawable.ic_share_network_medium_regular_outline),
                         text = stringResource(id = R.string.general_share),
                         onActionClicked = onClickShare,
                         dividerType = null,
@@ -386,7 +385,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isRenameMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = R.drawable.ic_rename),
+                        icon = painterResource(id = R.drawable.ic_pen_2_medium_regular_outline),
                         text = stringResource(id = R.string.context_rename),
                         onActionClicked = onClickRename,
                         dividerType = null,
@@ -396,7 +395,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isHideMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = Rpack.drawable.ic_menu_hide),
+                        icon = painterResource(id = Rpack.drawable.ic_eye_off_medium_regular_outline),
                         text = stringResource(id = R.string.general_hide_node),
                         onActionClicked = onClickHide,
                         dividerType = null,
@@ -406,7 +405,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isUnhideMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = Rpack.drawable.ic_menu_unhide),
+                        icon = painterResource(id = Rpack.drawable.ic_eye_medium_regular_outline),
                         text = stringResource(id = R.string.general_unhide_node),
                         onActionClicked = onClickUnhide,
                         dividerType = null,

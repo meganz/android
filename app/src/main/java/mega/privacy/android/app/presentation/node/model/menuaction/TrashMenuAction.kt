@@ -14,7 +14,7 @@ import javax.inject.Inject
 class TrashMenuAction @Inject constructor() : MenuActionWithIcon {
 
     @Composable
-    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_menu_move_to_rubbish)
+    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_trash_medium_regular_outline)
 
     @Composable
     override fun getDescription() = stringResource(id = R.string.context_move_to_trash)

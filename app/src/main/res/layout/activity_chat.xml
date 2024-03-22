@@ -136,7 +136,7 @@
                             <ImageView
                                 android:layout_width="18dp"
                                 android:layout_height="18dp"
-                                android:src="@drawable/ic_videocam_white"
+                                android:src="@drawable/ic_video_medium_regular_outline"
                                 app:tint="?android:attr/textColorPrimary"/>
                         </LinearLayout>
                     </LinearLayout>

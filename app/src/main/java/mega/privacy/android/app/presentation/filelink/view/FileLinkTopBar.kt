@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.filelink.view
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
@@ -36,7 +37,7 @@ internal fun FileLinkTopBar(
 
 private class ShareMenuAction : MenuActionWithIcon {
     @Composable
-    override fun getIconPainter() = painterResource(id = R.drawable.ic_social_share_white)
+    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_share_network_medium_regular_outline)
 
     @Composable
     override fun getDescription() = stringResource(id = R.string.general_share)

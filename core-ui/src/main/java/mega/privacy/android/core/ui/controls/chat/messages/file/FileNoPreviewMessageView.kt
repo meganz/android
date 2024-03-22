@@ -1,5 +1,6 @@
 package mega.privacy.android.core.ui.controls.chat.messages.file
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -152,7 +153,7 @@ private class NoPreviewPreviewProvider : PreviewParameterProvider<NoPreviewPrevi
             ),
             NoPreviewPreviewParams(
                 isMe = isMe,
-                fileTypeResId = R.drawable.ic_alert_circle,
+                fileTypeResId = iconPackR.drawable.ic_alert_circle_regular_medium_outline,
                 loadProgress = 0.6f,
                 fileName = "long long long file name.pdf",
                 fileSize = "30 MB",

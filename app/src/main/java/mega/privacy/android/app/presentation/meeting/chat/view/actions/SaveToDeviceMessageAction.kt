@@ -13,7 +13,7 @@ internal class SaveToDeviceMessageAction(
     private val chatViewModel: ChatViewModel,
 ) : MessageAction(
     text = R.string.general_save_to_device,
-    icon = mega.privacy.android.icon.pack.R.drawable.ic_menu_download,
+    icon = mega.privacy.android.icon.pack.R.drawable.ic_download_medium_regular_outline,
     testTag = "save_to_device",
     group = MessageActionGroup.Transfer,
 ) {

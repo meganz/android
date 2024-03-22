@@ -17,7 +17,7 @@ class MoveMenuAction @Inject constructor() : MenuActionWithIcon {
     override fun getDescription() = stringResource(id = R.string.general_move)
 
     @Composable
-    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_menu_move)
+    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_move_medium_regular_outline)
 
     override val orderInCategory = 230
 

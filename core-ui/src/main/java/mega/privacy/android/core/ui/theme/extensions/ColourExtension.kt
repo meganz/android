@@ -9,6 +9,8 @@ import mega.privacy.android.core.ui.theme.blue_200
 import mega.privacy.android.core.ui.theme.blue_300
 import mega.privacy.android.core.ui.theme.blue_400
 import mega.privacy.android.core.ui.theme.blue_700
+import mega.privacy.android.core.ui.theme.colorButtonBrandhDark
+import mega.privacy.android.core.ui.theme.colorButtonBrandhLight
 import mega.privacy.android.core.ui.theme.dark_blue_200
 import mega.privacy.android.core.ui.theme.dark_blue_500
 import mega.privacy.android.core.ui.theme.dark_blue_tooltip
@@ -439,3 +441,9 @@ val Colors.blue_700_blue_200: Color
  */
 val Colors.teal_600_teal_200: Color
     get() = if (isLight) teal_600 else teal_200
+
+/**
+ * Color when light [colorButtonBrandhLight] and when dark [colorButtonBrandhDark]
+ */
+val Colors.color_button_brand: Color
+    get() = if (isLight) colorButtonBrandhLight else colorButtonBrandhDark

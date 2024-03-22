@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.views
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
@@ -132,7 +133,7 @@ private fun SyncCardHeader(
                 ) {
                     Image(
                         painter = when {
-                            hasStalledIssues -> painterResource(coreR.drawable.ic_alert_circle)
+                            hasStalledIssues -> painterResource(iconPackR.drawable.ic_alert_circle_regular_medium_outline)
                             status == SyncStatus.SYNCING -> painterResource(coreR.drawable.ic_sync_02)
                             status == SyncStatus.PAUSED -> painterResource(coreR.drawable.ic_pause)
                             else -> painterResource(coreR.drawable.ic_check_circle)

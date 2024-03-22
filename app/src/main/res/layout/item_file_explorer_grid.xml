@@ -49,7 +49,8 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="6dp"
-                android:src="@drawable/ic_taken_down"
+                android:src="@drawable/ic_alert_triangle_medium_regular_outline"
+                app:tint="@color/color_button_brand"
                 tools:ignore="ContentDescription" />
 
         </RelativeLayout>
@@ -158,7 +159,8 @@
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="6dp"
                 android:layout_alignParentEnd="true"
-                android:src="@drawable/ic_taken_down"
+                android:src="@drawable/ic_alert_triangle_medium_regular_outline"
+                app:tint="@color/color_button_brand"
                 tools:ignore="ContentDescription" />
 
         </RelativeLayout>

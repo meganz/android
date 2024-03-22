@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/action_save"
-        android:icon="@drawable/ic_check"
+        android:icon="@drawable/ic_check_medium_regular_outline"
         android:orderInCategory="100"
         android:title="@string/save_action"
         android:visible="false"
@@ -12,7 +12,7 @@
 
     <item
         android:id="@+id/action_download"
-        android:icon="@drawable/ic_download_white"
+        android:icon="@drawable/ic_download_medium_regular_outline"
         android:orderInCategory="100"
         android:title="@string/general_save_to_device"
         android:visible="false"
@@ -21,7 +21,7 @@
 
     <item
         android:id="@+id/action_get_link"
-        android:icon="@drawable/link_ic_white"
+        android:icon="@drawable/ic_link01_medium_regular_outline"
         android:orderInCategory="100"
         android:title="@{@plurals/get_links(one)}"
         android:visible="false"
@@ -30,7 +30,7 @@
 
     <item
         android:id="@+id/action_remove_link"
-        android:icon="@drawable/ic_remove_link"
+        android:icon="@drawable/ic_link_off_01_medium_regular_outline"
         android:orderInCategory="100"
         android:title="@string/context_remove_link_menu"
         android:visible="false"
@@ -39,7 +39,7 @@
 
     <item
         android:id="@+id/action_send_to_chat"
-        android:icon="@drawable/ic_send_to_contact"
+        android:icon="@drawable/ic_message_arrow_up_medium_regular_outline"
         android:orderInCategory="100"
         android:title="@string/general_share"
         android:visible="false"
@@ -48,7 +48,7 @@
 
     <item
         android:id="@+id/action_share"
-        android:icon="@drawable/ic_social_share_white"
+        android:icon="@drawable/ic_share_network_medium_regular_outline"
         android:orderInCategory="100"
         android:title="@string/general_share"
         android:visible="false"
@@ -115,7 +115,7 @@
 
     <item
         android:id="@+id/chat_action_import"
-        android:icon="@drawable/ic_import_to_cloud_white"
+        android:icon="@drawable/ic_cloud_upload_medium_regular_outline"
         android:orderInCategory="100"
         android:title="@string/add_to_cloud"
         android:visible="false"
@@ -124,7 +124,7 @@
 
     <item
         android:id="@+id/chat_action_save_for_offline"
-        android:icon="@drawable/ic_save_offline"
+        android:icon="@drawable/ic_arrow_down_circle_medium_regular_outline"
         android:orderInCategory="100"
         android:title="@string/file_properties_available_offline"
         android:visible="false"

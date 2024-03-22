@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.devicecenter.ui.model.status
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.core.R as CoreR
 import mega.privacy.android.feature.devicecenter.R as DeviceCenterR
 import androidx.annotation.DrawableRes
@@ -143,7 +144,7 @@ sealed class DeviceCenterUINodeStatus(
     data class Overquota(val specificErrorMessage: Int?) : DeviceCenterUINodeStatus(
         name = DeviceCenterR.string.device_center_list_view_item_status_out_of_quota,
         localizedErrorMessage = specificErrorMessage,
-        icon = CoreR.drawable.ic_alert_circle,
+        icon = iconPackR.drawable.ic_alert_circle_regular_medium_outline,
         color = StatusColor.Error,
     )
 

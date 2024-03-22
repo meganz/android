@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.contactinfo
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -780,7 +781,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         )
         sendFileMenuItem?.icon = Util.mutateIconSecondary(
             this,
-            R.drawable.ic_send_to_contact,
+            iconPackR.drawable.ic_message_arrow_up_medium_regular_outline,
             R.color.white
         )
         if (viewModel.isOnline()) {
@@ -843,8 +844,8 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         drawableDots = ContextCompat.getDrawable(this, R.drawable.ic_dots_vertical_white)
             ?.mutate()
         drawableArrow = ContextCompat.getDrawable(this, R.drawable.ic_arrow_back_white)?.mutate()
-        drawableShare = ContextCompat.getDrawable(this, R.drawable.ic_share)?.mutate()
-        drawableSend = ContextCompat.getDrawable(this, R.drawable.ic_send_to_contact)?.mutate()
+        drawableShare = ContextCompat.getDrawable(this, iconPackR.drawable.ic_folder_users_medium_regular_outline)?.mutate()
+        drawableSend = ContextCompat.getDrawable(this, iconPackR.drawable.ic_message_arrow_up_medium_regular_outline)?.mutate()
     }
 
     private fun setColorFilter(isDark: Boolean) {

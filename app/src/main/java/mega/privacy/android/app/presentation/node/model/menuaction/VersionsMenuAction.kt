@@ -13,7 +13,7 @@ import javax.inject.Inject
  */
 class VersionsMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
-    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_menu_versions)
+    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_clock_rotate_medium_regular_outline)
 
     @Composable
     override fun getDescription() = stringResource(id = R.string.title_section_versions)

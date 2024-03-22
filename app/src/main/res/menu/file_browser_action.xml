@@ -22,7 +22,7 @@
 
     <item
         android:id="@+id/cab_menu_download"
-        android:icon="@drawable/ic_download_white"
+        android:icon="@drawable/ic_download_medium_regular_outline"
         android:orderInCategory="100"
         android:title="@string/general_save_to_device"
         app:iconTint="?attr/colorSecondary"
@@ -30,7 +30,7 @@
 
     <item
         android:id="@+id/cab_menu_share_link"
-        android:icon="@drawable/ic_link_white"
+        android:icon="@drawable/ic_link01_medium_regular_outline"
         android:orderInCategory="105"
         android:title="@{@plurals/get_links(one)}"
         android:visible="false"
@@ -39,7 +39,7 @@
 
     <item
         android:id="@+id/cab_menu_share_link_remove"
-        android:icon="@drawable/ic_remove_link"
+        android:icon="@drawable/ic_link_off_01_medium_regular_outline"
         android:orderInCategory="105"
         android:title="@string/context_remove_link_menu"
         android:visible="false"
@@ -48,7 +48,7 @@
 
     <item
         android:id="@+id/cab_menu_edit_link"
-        android:icon="@drawable/ic_link_white"
+        android:icon="@drawable/ic_link01_medium_regular_outline"
         android:orderInCategory="105"
         android:title="@string/edit_link_option"
         android:visible="false"
@@ -57,7 +57,7 @@
 
     <item
         android:id="@+id/cab_menu_remove_share"
-        android:icon="@drawable/ic_remove_share"
+        android:icon="@drawable/ic_folder_gear_01_medium_regular_outline"
         android:orderInCategory="105"
         android:title="@string/context_share_folder"
         android:visible="false"
@@ -66,7 +66,7 @@
 
     <item
         android:id="@+id/cab_menu_send_to_chat"
-        android:icon="@drawable/ic_send_to_contact"
+        android:icon="@drawable/ic_message_arrow_up_medium_regular_outline"
         android:orderInCategory="110"
         android:title="@string/context_send_file_to_chat"
         android:visible="false"
@@ -75,7 +75,7 @@
 
     <item
         android:id="@+id/cab_menu_share"
-        android:icon="@drawable/ic_share"
+        android:icon="@drawable/ic_folder_users_medium_regular_outline"
         android:orderInCategory="115"
         android:title="@string/context_share_folder"
         android:visible="false"
@@ -84,7 +84,7 @@
 
     <item
         android:id="@+id/cab_menu_leave_multiple_share"
-        android:icon="@drawable/ic_leave_share_w"
+        android:icon="@drawable/ic_log_out_02_medium_regular_outline"
         android:orderInCategory="115"
         android:title="@string/alert_leave_share"
         app:iconTint="?attr/colorSecondary"
@@ -92,14 +92,14 @@
 
     <item
         android:id="@+id/cab_menu_rename"
-        android:icon="@drawable/ic_menu_rename_dark"
+        android:icon="@drawable/ic_pen_2_medium_regular_outline"
         android:orderInCategory="120"
         android:title="@string/context_rename"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/cab_menu_move"
-        android:icon="@drawable/ic_move_white"
+        android:icon="@drawable/ic_move_medium_regular_outline"
         android:orderInCategory="120"
         android:title="@string/context_move"
         app:iconTint="?attr/colorSecondary"
@@ -107,7 +107,7 @@
 
     <item
         android:id="@+id/cab_menu_copy"
-        android:icon="@drawable/ic_copy_white"
+        android:icon="@drawable/ic_copy_01_medium_regular_outline"
         android:orderInCategory="125"
         android:title="@string/context_copy"
         app:iconTint="?attr/colorSecondary"
@@ -115,7 +115,7 @@
 
     <item
         android:id="@+id/cab_menu_trash"
-        android:icon="@drawable/ic_close_white"
+        android:icon="@drawable/ic_x_medium_regular_outline"
         android:orderInCategory="130"
         android:title="@string/context_move_to_trash"
         app:iconTint="?attr/colorSecondary"

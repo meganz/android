@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="46dp"
-            android:src="@drawable/ic_copyright"
+            android:src="@drawable/ic_copy_01_medium_regular_outline"
             app:tint="@color/red_600_red_300"
             tools:ignore="ContentDescription" />
 

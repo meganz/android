@@ -19,7 +19,7 @@
             android:layout_width="108dp"
             android:layout_height="108dp"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/ic_save_offline_new" />
+            android:src="@drawable/ic_arrow_down_circle_medium_regular_outline" />
 
         <TextView
             android:id="@+id/empty_hint_text"

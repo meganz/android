@@ -36,7 +36,7 @@ internal fun ContactInfoBottomSheet(
             Column {
                 MenuActionListTile(
                     text = stringResource(id = R.string.title_edit_profile_info),
-                    icon = painterResource(id = R.drawable.ic_rename),
+                    icon = painterResource(id = R.drawable.ic_pen_2_medium_regular_outline),
                     onActionClicked = {
                         coroutineScope.launch { modalSheetState.hide() }
                         updateNickNameDialogVisibility(true)

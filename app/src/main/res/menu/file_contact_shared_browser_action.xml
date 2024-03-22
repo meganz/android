@@ -23,7 +23,7 @@
 
     <item
         android:id="@+id/action_file_contact_list_delete"
-        android:icon="@drawable/ic_close_white"
+        android:icon="@drawable/ic_x_medium_regular_outline"
         android:orderInCategory="120"
         android:title="@string/context_remove"
         app:iconTint="?attr/colorSecondary"

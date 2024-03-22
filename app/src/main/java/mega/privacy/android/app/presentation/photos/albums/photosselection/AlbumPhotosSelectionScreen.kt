@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.photosselection
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -188,7 +189,7 @@ fun AlbumPhotosSelectionScreen(
                     backgroundColor = teal_300,
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_check),
+                        painter = painterResource(id = iconPackR.drawable.ic_check_medium_regular_outline),
                         contentDescription = null,
                         tint = white.takeIf { isLight } ?: black,
                     )

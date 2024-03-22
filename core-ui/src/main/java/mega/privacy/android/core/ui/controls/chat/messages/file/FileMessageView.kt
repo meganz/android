@@ -1,5 +1,6 @@
 package mega.privacy.android.core.ui.controls.chat.messages.file
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.content.ContentResolver
 import android.net.Uri
 import androidx.compose.foundation.Image
@@ -123,7 +124,7 @@ private fun FileNoPreviewMessageViewPreview(
         }
         FileMessageView(
             isMe = isMe,
-            fileTypeResId = R.drawable.ic_alert_circle,
+            fileTypeResId = iconPackR.drawable.ic_alert_circle_regular_medium_outline,
             previewUri = resourceUri,
             duration = null,
             loadProgress = 0.6f.takeIf { isMe },

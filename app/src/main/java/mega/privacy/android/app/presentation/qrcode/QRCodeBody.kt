@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.qrcode
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -266,7 +267,7 @@ fun MyQRCodeHeader(
                     onClick = onShare
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_social_share_white),
+                        painter = painterResource(id = iconPackR.drawable.ic_share_network_medium_regular_outline),
                         contentDescription = null,
                         tint = black.takeIf { isLight } ?: white,
                     )

@@ -1,9 +1,9 @@
 package mega.privacy.android.app.presentation.node.model.menuaction
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import javax.inject.Inject
 
@@ -16,7 +16,7 @@ class ManageLinkMenuAction @Inject constructor() : MenuActionWithIcon {
 
     @Composable
     override fun getIconPainter() =
-        painterResource(id = R.drawable.link_ic_white)
+        painterResource(id = iconPackR.drawable.ic_link01_medium_regular_outline)
 
     @Composable
     override fun getDescription() =

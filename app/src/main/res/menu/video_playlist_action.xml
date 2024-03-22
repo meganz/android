@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_delete"
-        android:icon="@drawable/ic_trash_bin"
+        android:icon="@drawable/ic_trash_medium_regular_outline"
         android:orderInCategory="1"
         android:title="@string/general_remove"
         app:iconTint="?attr/colorSecondary"

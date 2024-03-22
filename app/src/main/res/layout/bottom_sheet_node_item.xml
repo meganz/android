@@ -22,7 +22,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription"
-            tools:src="@drawable/ic_folder_incoming" />
+            tools:src="@drawable/ic_folder_incoming_medium_regular_outline" />
 
         <TextView
             android:id="@+id/node_name_text"
@@ -305,7 +305,7 @@
                     style="@style/BottomSheetOption"
                     android:layout_width="wrap_content"
                     android:text="@string/file_properties_available_offline"
-                    app:drawableStartCompat="@drawable/ic_save_offline"/>
+                    app:drawableStartCompat="@drawable/ic_arrow_down_circle_medium_regular_outline"/>
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/file_properties_switch"
@@ -327,37 +327,37 @@
             <TextView
                 android:id="@+id/link_option"
                 style="@style/BottomSheetOption"
-                app:drawableStartCompat="@drawable/link_ic"/>
+                app:drawableStartCompat="@drawable/ic_link01_medium_regular_outline"/>
 
             <TextView
                 android:id="@+id/remove_link_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_remove_link_menu"
-                app:drawableStartCompat="@drawable/ic_remove_link"/>
+                app:drawableStartCompat="@drawable/ic_link_off_01_medium_regular_outline"/>
 
             <TextView
                 android:id="@+id/share_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_share"
-                app:drawableStartCompat="@drawable/ic_social_share_white"/>
+                app:drawableStartCompat="@drawable/ic_share_network_medium_regular_outline"/>
 
             <TextView
                 android:id="@+id/share_folder_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_share_folder"
-                app:drawableStartCompat="@drawable/ic_share"/>
+                app:drawableStartCompat="@drawable/ic_folder_users_medium_regular_outline"/>
 
             <TextView
                 android:id="@+id/send_chat_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_send_file_to_chat"
-                app:drawableStartCompat="@drawable/ic_send_to_contact"/>
+                app:drawableStartCompat="@drawable/ic_message_arrow_up_medium_regular_outline"/>
 
             <TextView
                 android:id="@+id/clear_share_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_clean_shares_menu"
-                app:drawableStartCompat="@drawable/ic_remove_share"/>
+                app:drawableStartCompat="@drawable/ic_folder_gear_01_medium_regular_outline"/>
 
             <LinearLayout
                 android:id="@+id/separator_share_options"
@@ -371,14 +371,14 @@
                 android:id="@+id/rename_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_rename"
-                app:drawableStartCompat="@drawable/ic_rename"/>
+                app:drawableStartCompat="@drawable/ic_pen_2_medium_regular_outline"/>
 
             <TextView
                 android:id="@+id/hide_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_hide_node"
                 android:visibility="gone"
-                app:drawableStartCompat="@drawable/ic_menu_hide"/>
+                app:drawableStartCompat="@drawable/ic_eye_off_medium_regular_outline"/>
 
             <TextView
                 android:id="@+id/move_option"

@@ -34,7 +34,7 @@ internal class AvailableOfflineMessageAction(
     private val chatViewModel: ChatViewModel,
 ) : MessageAction(
     text = R.string.file_properties_available_offline,
-    icon = mega.privacy.android.icon.pack.R.drawable.ic_menu_available_offline,
+    icon = mega.privacy.android.icon.pack.R.drawable.ic_arrow_down_circle_medium_regular_outline,
     testTag = "available_offline",
     group = MessageActionGroup.Transfer,
 ) {

@@ -22,7 +22,7 @@
 
     <item
         android:id="@+id/cab_menu_share_folder"
-        android:icon="@drawable/ic_share"
+        android:icon="@drawable/ic_folder_users_medium_regular_outline"
         android:orderInCategory="116"
         android:title="@string/context_share_folder"
         app:iconTint="?attr/colorSecondary"
@@ -30,7 +30,7 @@
 
     <item
         android:id="@+id/cab_menu_send_file"
-        android:icon="@drawable/ic_send_to_contact"
+        android:icon="@drawable/ic_message_arrow_up_medium_regular_outline"
         android:orderInCategory="115"
         android:title="@string/context_send_file"
         app:iconTint="?attr/colorSecondary"
@@ -58,7 +58,7 @@
 
     <item
         android:id="@+id/cab_menu_delete"
-        android:icon="@drawable/ic_delete"
+        android:icon="@drawable/ic_x_medium_regular_outline"
         android:orderInCategory="135"
         android:title="@string/context_remove"
         app:iconTint="?attr/colorSecondary"

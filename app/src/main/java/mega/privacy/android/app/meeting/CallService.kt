@@ -282,7 +282,7 @@ class CallService : LifecycleService() {
                             )
                         )
 
-                val actionIcon = R.drawable.ic_phone_white
+                val actionIcon = iconPackR.drawable.ic_phone_01_medium_regular_outline
                 val actionPendingIntent = getPendingIntent(call, notificationId + 1)
                 val actionTitle =
                     getString(R.string.button_notification_call_in_progress)
@@ -338,7 +338,7 @@ class CallService : LifecycleService() {
                                 )
                             )
                         )
-                val actionIcon = R.drawable.ic_phone_white
+                val actionIcon = iconPackR.drawable.ic_phone_01_medium_regular_outline
                 val actionPendingIntent = getPendingIntent(call, notificationId + 1)
                 val actionTitle =
                     getString(R.string.button_notification_call_in_progress)

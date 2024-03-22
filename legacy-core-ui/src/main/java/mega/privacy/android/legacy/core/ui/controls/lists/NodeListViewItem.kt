@@ -44,6 +44,8 @@ import androidx.constraintlayout.compose.Visibility
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.images.ThumbnailView
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.core.ui.theme.extensions.color_button_brand
+import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
@@ -309,7 +311,7 @@ fun NodeListViewItem(
                             modifier = iconModifier
                                 .size(16.dp)
                                 .testTag(EXPORTED_TEST_TAG),
-                            painter = painterResource(id = R.drawable.link_ic),
+                            painter = painterResource(id = IconPackR.drawable.ic_link01_medium_regular_outline),
                             contentDescription = "Link",
                             colorFilter = ColorFilter.tint(
                                 MaterialTheme.colors.textColorSecondary
@@ -321,8 +323,9 @@ fun NodeListViewItem(
                             alignment = Alignment.Center,
                             modifier = iconModifier
                                 .testTag(TAKEN_TEST_TAG),
-                            painter = painterResource(id = R.drawable.ic_taken_down),
+                            painter = painterResource(id = IconPackR.drawable.ic_alert_triangle_medium_regular_outline),
                             contentDescription = "Taken Down",
+                            colorFilter = ColorFilter.tint(color = MaterialTheme.colors.color_button_brand)
                         )
                     }
                 }

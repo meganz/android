@@ -14,7 +14,7 @@ import javax.inject.Inject
 class AvailableOfflineMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
     override fun getIconPainter() =
-        painterResource(id = iconPackR.drawable.ic_menu_available_offline)
+        painterResource(id = iconPackR.drawable.ic_arrow_down_circle_medium_regular_outline)
 
     @Composable
     override fun getDescription() = stringResource(id = R.string.file_properties_available_offline)
