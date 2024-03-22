@@ -77,7 +77,8 @@ internal fun DocumentGridViewItem(
                     .height(172.dp)
                     .fillMaxSize()
                     .clip(RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp))
-                    .padding(1.dp),
+                    .padding(1.dp)
+                    .testTag(DOCUMENT_SECTION_GRID_ITEM_THUMBNAIL_TEST_TAG),
                 contentDescription = DOCUMENT_SECTION_GRID_ITEM_THUMBNAIL_DESCRIPTION,
                 data = thumbnailData,
                 defaultImage = icon,
@@ -87,7 +88,9 @@ internal fun DocumentGridViewItem(
                 Image(
                     painter = painterResource(id = R.drawable.ic_select_folder),
                     contentDescription = DOCUMENT_SECTION_GRID_ITEM_SELECTED_ICON_DESCRIPTION,
-                    modifier = Modifier.padding(12.dp)
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .testTag(DOCUMENT_SECTION_GRID_ITEM_SELECTED_TEST_TAG)
                 )
             }
         }
@@ -109,6 +112,7 @@ internal fun DocumentGridViewItem(
                     .constrainAs(menuImage) {
                         end.linkTo(parent.end)
                     }
+                    .testTag(DOCUMENT_SECTION_GRID_ITEM_MENU_TEST_TAG)
             )
             Image(
                 modifier = Modifier
@@ -120,7 +124,8 @@ internal fun DocumentGridViewItem(
                             if (isTakenDown) Visibility.Visible else Visibility.Gone
                     }
                     .height(16.dp)
-                    .width(16.dp),
+                    .width(16.dp)
+                    .testTag(DOCUMENT_SECTION_GRID_ITEM_TAKEN_DOWN_TEST_TAG),
                 painter = painterResource(id = mega.privacy.android.app.R.drawable.ic_taken_down),
                 colorFilter = ColorFilter.tint(MaterialTheme.colors.red_800_red_400),
                 contentDescription = DOCUMENT_SECTION_GRID_ITEM_TAKEN_DOWN_ICON_DESCRIPTION
@@ -161,6 +166,28 @@ private fun DocumentGridItemViewPreview() {
  */
 const val DOCUMENT_SECTION_GRID_ITEM_NAME_VIEW_TEST_TAG =
     "document_section_grid_item_name_view_test_tag"
+
+/**
+ * Test tag for the thumbnail of the grid item.
+ */
+const val DOCUMENT_SECTION_GRID_ITEM_THUMBNAIL_TEST_TAG =
+    "document_section_grid_item:thumbnail_view"
+
+/**
+ * Test tag for the selected icon of the grid item.
+ */
+const val DOCUMENT_SECTION_GRID_ITEM_SELECTED_TEST_TAG = "document_section_grid_item:image_selected"
+
+/**
+ * Test tag for the menu icon of the grid item.
+ */
+const val DOCUMENT_SECTION_GRID_ITEM_MENU_TEST_TAG = "document_section_grid_item:image_menu"
+
+/**
+ * Test tag for the taken down icon of the grid item.
+ */
+const val DOCUMENT_SECTION_GRID_ITEM_TAKEN_DOWN_TEST_TAG =
+    "document_section_grid_item:image_taken_down"
 
 /**
  * Description for the thumbnail of the grid item.

@@ -23,10 +23,13 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
@@ -41,6 +44,7 @@ import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaNode
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun DocumentSectionComposeView(
     modifier: Modifier,
@@ -68,7 +72,7 @@ internal fun DocumentSectionComposeView(
     }
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.semantics { testTagsAsResourceId = true },
         scaffoldState = rememberScaffoldState(),
         floatingActionButton = {
             val scrollNotInProgress by remember {
@@ -252,24 +256,24 @@ private fun getItems() = listOf(
 /**
  * Test tag for adding document fab button
  */
-const val DOCUMENT_SECTION_FAB_BUTTON_TEST_TAG = "document_section_fab_button_test_tag"
+const val DOCUMENT_SECTION_FAB_BUTTON_TEST_TAG = "document_section:button_add_document"
 
 /**
  * Test tag for the progress bar view.
  */
-const val DOCUMENT_SECTION_PROGRESS_BAR_TEST_TAG = "document_section_progress_bar_test_tag"
+const val DOCUMENT_SECTION_PROGRESS_BAR_TEST_TAG = "document_section:progress_bar_loading"
 
 /**
  * Test tag for the empty view.
  */
-const val DOCUMENT_SECTION_EMPTY_VIEW_TEST_TAG = "document_section_empty_view_test_tag"
+const val DOCUMENT_SECTION_EMPTY_VIEW_TEST_TAG = "document_section:empty_view"
 
 /**
  * Test tag for the list view.
  */
-const val DOCUMENT_SECTION_LIST_VIEW_TEST_TAG = "document_section_list_view_test_tag"
+const val DOCUMENT_SECTION_LIST_VIEW_TEST_TAG = "document_section:list_view"
 
 /**
  * Test tag for the grid view.
  */
-const val DOCUMENT_SECTION_GRID_VIEW_TEST_TAG = "document_section_grid_view_test_tag"
+const val DOCUMENT_SECTION_GRID_VIEW_TEST_TAG = "document_section:grid_view"

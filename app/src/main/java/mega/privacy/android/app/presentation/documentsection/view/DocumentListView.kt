@@ -153,4 +153,4 @@ private fun DocumentListViewPreview() {
 /**
  * Test tag for the item view.
  */
-const val DOCUMENT_SECTION_ITEM_VIEW_TEST_TAG = "document_section_item_view_test_tag"
+const val DOCUMENT_SECTION_ITEM_VIEW_TEST_TAG = "document_section_list:item_view"

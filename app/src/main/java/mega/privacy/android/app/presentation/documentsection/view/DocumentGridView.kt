@@ -78,4 +78,4 @@ internal fun DocumentGridView(
 /**
  * Test tag for the gird item view.
  */
-const val DOCUMENT_SECTION_GRID_ITEM_VIEW_TEST_TAG = "document_section_grid_item_view_test_tag"
+const val DOCUMENT_SECTION_GRID_ITEM_VIEW_TEST_TAG = "document_section_grid:item_view"
