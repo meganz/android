@@ -11,20 +11,13 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import javax.inject.Inject
 
 /**
  * Check general nodes name collision use case (Cloud driver node)
- *
- * @property isNodeInRubbish
- * @property getChildNodeUseCase
- * @property getNodeByHandleUseCase
- * @property getRootNodeUseCase
- * @property nodeRepository
  */
 class CheckNodesNameCollisionUseCase @Inject constructor(
-    private val isNodeInRubbish: IsNodeInRubbish,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val getChildNodeUseCase: GetChildNodeUseCase,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
@@ -86,5 +79,5 @@ class CheckNodesNameCollisionUseCase @Inject constructor(
             getRootNodeUseCase()
         } else {
             getNodeByHandleUseCase(parentHandle)
-        }?.takeUnless { isNodeInRubbish(parentHandle) }
+        }?.takeUnless { isNodeInRubbishBinUseCase(NodeId(parentHandle)) }
 }

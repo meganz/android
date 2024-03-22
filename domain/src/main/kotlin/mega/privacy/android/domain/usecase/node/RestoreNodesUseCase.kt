@@ -10,7 +10,6 @@ import mega.privacy.android.domain.entity.node.SingleNodeRestoreResult
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.exception.node.NodeInRubbishException
 import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import javax.inject.Inject
 
 /**
@@ -19,7 +18,7 @@ import javax.inject.Inject
  */
 class RestoreNodesUseCase @Inject constructor(
     private val moveNodeUseCase: MoveNodeUseCase,
-    private val isNodeInRubbish: IsNodeInRubbish,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val accountRepository: AccountRepository,
 ) {
@@ -35,7 +34,7 @@ class RestoreNodesUseCase @Inject constructor(
                 async {
                     val (nodeHandle, destinationHandle) = entry
                     runCatching {
-                        if (isNodeInRubbish(destinationHandle)) throw NodeInRubbishException()
+                        if (isNodeInRubbishBinUseCase(NodeId(destinationHandle))) throw NodeInRubbishException()
                         moveNodeUseCase(NodeId(nodeHandle), NodeId(destinationHandle))
                     }
                 }

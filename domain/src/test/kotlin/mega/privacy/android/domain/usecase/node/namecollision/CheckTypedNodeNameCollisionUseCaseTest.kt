@@ -10,9 +10,9 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.namecollision.TypedNodeNameCollisionResult
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.node.GetChildNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,11 +27,9 @@ class CheckTypedNodeNameCollisionUseCaseTest {
 
     private lateinit var underTest: CheckTypedNodeNameCollisionUseCase
 
-    private val isNodeInRubbishBin = mock<IsNodeInRubbish>()
+    private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
     private val getChildNodeUseCase = mock<GetChildNodeUseCase>()
     private val getNodeByHandleUseCase = mock<GetNodeByHandleUseCase>()
-    private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
-    private val nodeRepository = mock<NodeRepository>()
 
     private val handleWhereToImport = 123L
     private val node1 = mock<TypedNode> {
@@ -83,22 +81,18 @@ class CheckTypedNodeNameCollisionUseCaseTest {
     @BeforeAll
     fun setUp() {
         underTest = CheckTypedNodeNameCollisionUseCase(
-            isNodeInRubbishBin,
+            isNodeInRubbishBinUseCase,
             getChildNodeUseCase,
             getNodeByHandleUseCase,
-            getRootNodeUseCase,
-            nodeRepository
         )
     }
 
     @BeforeEach
     fun resetMocks() {
         reset(
-            isNodeInRubbishBin,
+            isNodeInRubbishBinUseCase,
             getChildNodeUseCase,
             getNodeByHandleUseCase,
-            getRootNodeUseCase,
-            nodeRepository
         )
     }
 
@@ -113,7 +107,7 @@ class CheckTypedNodeNameCollisionUseCaseTest {
     @Test
     fun `test that all nodes do not have conflict when parent node is in Rubbish Bin`() = runTest {
         whenever(getNodeByHandleUseCase(handleWhereToImport)).thenReturn(folderNode)
-        whenever(isNodeInRubbishBin(handleWhereToImport)).thenReturn(true)
+        whenever(isNodeInRubbishBinUseCase(NodeId(handleWhereToImport))).thenReturn(true)
 
         Truth.assertThat(underTest.invoke(nodes, handleWhereToImport))
             .isEqualTo(TypedNodeNameCollisionResult(nodes, emptyList()))
@@ -122,7 +116,7 @@ class CheckTypedNodeNameCollisionUseCaseTest {
     @Test
     fun `test that returns correctly when all the nodes have conflicts`() = runTest {
         whenever(getNodeByHandleUseCase(handleWhereToImport)).thenReturn(folderNode)
-        whenever(isNodeInRubbishBin(handleWhereToImport)).thenReturn(false)
+        whenever(isNodeInRubbishBinUseCase(NodeId(handleWhereToImport))).thenReturn(false)
         nodes.forEach { node ->
             whenever(getChildNodeUseCase(NodeId(handleWhereToImport), node.name))
                 .thenReturn(fileNode)
@@ -140,7 +134,7 @@ class CheckTypedNodeNameCollisionUseCaseTest {
     @Test
     fun `test that returns correctly when one of the nodes has conflict`() = runTest {
         whenever(getNodeByHandleUseCase(handleWhereToImport)).thenReturn(folderNode)
-        whenever(isNodeInRubbishBin(handleWhereToImport)).thenReturn(false)
+        whenever(isNodeInRubbishBinUseCase(NodeId(handleWhereToImport))).thenReturn(false)
         whenever(getChildNodeUseCase(NodeId(handleWhereToImport), node1.name))
             .thenReturn(null)
         whenever(getChildNodeUseCase(NodeId(handleWhereToImport), node2.name))

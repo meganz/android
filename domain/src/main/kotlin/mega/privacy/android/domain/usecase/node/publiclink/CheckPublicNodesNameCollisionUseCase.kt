@@ -10,22 +10,17 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisionResult
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.node.GetChildNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import javax.inject.Inject
 
 /**
  * Check public link nodes name collision use case
  *
- * @property isNodeInRubbish
- * @property getChildNodeUseCase
- * @property getNodeByHandleUseCase
- * @property getRootNodeUseCase
- * @property nodeRepository
  */
 class CheckPublicNodesNameCollisionUseCase @Inject constructor(
-    private val isNodeInRubbish: IsNodeInRubbish,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val getChildNodeUseCase: GetChildNodeUseCase,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
@@ -83,5 +78,5 @@ class CheckPublicNodesNameCollisionUseCase @Inject constructor(
             getRootNodeUseCase()
         } else {
             getNodeByHandleUseCase(parentHandle)
-        }?.takeUnless { isNodeInRubbish(parentHandle) }
+        }?.takeUnless { isNodeInRubbishBinUseCase(NodeId(parentHandle)) }
 }

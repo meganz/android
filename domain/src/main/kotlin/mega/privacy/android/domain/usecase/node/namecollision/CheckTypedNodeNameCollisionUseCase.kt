@@ -7,28 +7,18 @@ import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.node.namecollision.TypedNodeNameCollisionResult
-import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.node.GetChildNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import javax.inject.Inject
 
 /**
  * Check general nodes name collision use case (Cloud driver node)
- *
- * @property isNodeInRubbish
- * @property getChildNodeUseCase
- * @property getNodeByHandleUseCase
- * @property getRootNodeUseCase
- * @property nodeRepository
  */
 class CheckTypedNodeNameCollisionUseCase @Inject constructor(
-    private val isNodeInRubbish: IsNodeInRubbish,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val getChildNodeUseCase: GetChildNodeUseCase,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
-    private val getRootNodeUseCase: GetRootNodeUseCase,
-    private val nodeRepository: NodeRepository,
 ) {
     /**
      * Invoke
@@ -43,7 +33,8 @@ class CheckTypedNodeNameCollisionUseCase @Inject constructor(
         val noConflictNodes = mutableListOf<TypedNode>()
         val conflictNodes = mutableListOf<NodeNameCollision>()
         getNodeByHandleUseCase(handleWhereToImport)
-            ?.takeUnless { isNodeInRubbish(handleWhereToImport) }?.let { parentNode ->
+            ?.takeUnless { isNodeInRubbishBinUseCase(NodeId(handleWhereToImport)) }
+            ?.let { parentNode ->
                 nodes.forEach { node ->
                     getChildNodeUseCase(
                         NodeId(handleWhereToImport),

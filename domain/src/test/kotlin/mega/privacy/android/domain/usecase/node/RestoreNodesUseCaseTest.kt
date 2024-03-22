@@ -9,7 +9,6 @@ import mega.privacy.android.domain.entity.node.SingleNodeRestoreResult
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.exception.node.NodeInRubbishException
 import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -23,7 +22,7 @@ internal class RestoreNodesUseCaseTest {
     private lateinit var underTest: RestoreNodesUseCase
 
     private val moveNodeUseCase: MoveNodeUseCase = mock()
-    private val isNodeInRubbish: IsNodeInRubbish = mock()
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase = mock()
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase = mock()
     private val accountRepository: AccountRepository = mock()
 
@@ -31,17 +30,18 @@ internal class RestoreNodesUseCaseTest {
     fun setUp() {
         underTest = RestoreNodesUseCase(
             moveNodeUseCase = moveNodeUseCase,
-            isNodeInRubbish = isNodeInRubbish,
+            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
             getNodeByHandleUseCase = getNodeByHandleUseCase,
             accountRepository = accountRepository
         )
     }
 
     @Test
-    fun `test that throw NodeInRubbishException when parent is in rubbish bin`() = runTest {
-        whenever(isNodeInRubbish(any())).thenReturn(true)
+    fun `test that throw NodeInRubbishException when destination is in rubbish bin`() = runTest {
+        val moveFirstNode = (1L to 2L)
+        whenever(isNodeInRubbishBinUseCase(NodeId(moveFirstNode.second))).thenReturn(true)
         try {
-            underTest(mapOf(1L to 2L))
+            underTest(mapOf(moveFirstNode))
         } catch (e: Exception) {
             Truth.assertThat(e).isInstanceOf(NodeInRubbishException::class.java)
         }
@@ -50,7 +50,7 @@ internal class RestoreNodesUseCaseTest {
     @Test
     fun `test that throw ForeignNodeException when move node throw ForeignNodeException`() =
         runTest {
-            whenever(isNodeInRubbish(any())).thenReturn(false)
+            whenever(isNodeInRubbishBinUseCase(NodeId(any()))).thenReturn(false)
             whenever(moveNodeUseCase(NodeId(any()), NodeId(any()), eq(null)))
                 .thenThrow(ForeignNodeException::class.java)
             try {
@@ -65,7 +65,7 @@ internal class RestoreNodesUseCaseTest {
         runTest {
             val moveFirstNode = 1L to 100L
             val moveSecondNode = 2L to 101L
-            whenever(isNodeInRubbish(any())).thenReturn(false)
+            whenever(isNodeInRubbishBinUseCase(NodeId(any()))).thenReturn(false)
             whenever(moveNodeUseCase(NodeId(moveFirstNode.first), NodeId(moveFirstNode.second)))
                 .thenReturn(NodeId(moveFirstNode.first))
             whenever(moveNodeUseCase(NodeId(moveSecondNode.first), NodeId(moveSecondNode.second)))
@@ -83,7 +83,7 @@ internal class RestoreNodesUseCaseTest {
                 on { name }.thenReturn("name")
             }
             whenever(getNodeByHandleUseCase(moveFirstNode.second, true)).thenReturn(fileNode)
-            whenever(isNodeInRubbish(any())).thenReturn(false)
+            whenever(isNodeInRubbishBinUseCase(NodeId(moveFirstNode.second))).thenReturn(false)
             whenever(moveNodeUseCase(NodeId(moveFirstNode.first), NodeId(moveFirstNode.second)))
                 .thenReturn(NodeId(moveFirstNode.first))
             val result = underTest(mapOf(moveFirstNode))
@@ -94,8 +94,8 @@ internal class RestoreNodesUseCaseTest {
     @Test
     fun `test that return SingleNodeRestoreResult correctly when move failed`() =
         runTest {
-            val moveFirstNode = 1L to 100L
-            whenever(isNodeInRubbish(any())).thenReturn(false)
+            val moveFirstNode = (1L to 100L)
+            whenever(isNodeInRubbishBinUseCase(NodeId(moveFirstNode.second))).thenReturn(false)
             whenever(moveNodeUseCase(NodeId(moveFirstNode.first), NodeId(moveFirstNode.second)))
                 .thenThrow(RuntimeException::class.java)
             val result = underTest(mapOf(moveFirstNode))
