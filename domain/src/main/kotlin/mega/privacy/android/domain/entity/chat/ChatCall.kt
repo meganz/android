@@ -54,11 +54,14 @@ import kotlin.time.Duration
  * @property speakersList                   List that contains the user handles of all non-moderator users that have been given speak permission
  * @property speakRequestsList              List that contains the user handles of all non-moderator users that have a pending speak request in flight
  * @property auxHandle                      Generic handle value that can be used for multiple purposes. For example with CHANGE_TYPE_LOCAL_AVFLAGS, represents the clientId of the user that MUTED our own client
- * @property num                            Generic numeric value that can be used for multiple purposes. if a method is called more than once for the same MegaChatCallPrivate instance, the value stored at mNum will be overwritten
  * @property callDurationLimit              The call duration limit, specified in seconds
+ * @property callUsersLimit                 The call users limit
+ * @property callClientsLimit               The call clients limit
+ * @property callClientsPerUserLimit        The call clients limit per user
  * @property notificationType               [CallNotificationType] When a call notification is forwarded to the apps
  * @property handle                         Handle used to notify multiple events. For example in onChatCallUpdate to indicate that speak permission for a call participant has changed
  * @property flag                           A boolean used to notify multiple events. For example in onChatCallUpdate, true to indicate that speak permission for a call participant has been granted, false otherwise
+ * @property callWillEndTs                  Time stamp at which the call will be ended due to restrictions
  */
 data class ChatCall(
     val chatId: Long,
@@ -73,8 +76,10 @@ data class ChatCall(
     val initialTimestamp: Long? = null,
     val finalTimestamp: Long? = null,
     val termCode: ChatCallTermCodeType? = null,
-    val num: Int? = null,
     val callDurationLimit: Int? = null,
+    val callUsersLimit: Int? = null,
+    val callClientsLimit: Int? = null,
+    val callClientsPerUserLimit: Int? = null,
     val endCallReason: EndCallReason? = null,
     val isSpeakRequestEnabled: Boolean = false,
     val notificationType: CallNotificationType? = null,
@@ -104,6 +109,7 @@ data class ChatCall(
     val handleList: List<Long>? = emptyList(),
     val speakersList: List<Long>? = emptyList(),
     val speakRequestsList: List<Long>? = emptyList(),
+    val callWillEndTs: Long? = null,
 ) {
 
     /**

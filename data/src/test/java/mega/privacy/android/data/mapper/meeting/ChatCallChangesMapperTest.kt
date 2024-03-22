@@ -70,5 +70,7 @@ class ChatCallChangesMapperTest {
             .contains(ChatCallChanges.SpeakRequested)
         Truth.assertThat(underTest(MegaChatCall.CHANGE_TYPE_CALL_WILL_END))
             .contains(ChatCallChanges.CallWillEnd)
+        Truth.assertThat(underTest(MegaChatCall.CHANGE_TYPE_CALL_LIMITS_UPDATED))
+            .contains(ChatCallChanges.CallLimitsUpdated)
     }
 }

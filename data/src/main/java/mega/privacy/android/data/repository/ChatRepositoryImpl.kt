@@ -1363,6 +1363,7 @@ internal class ChatRepositoryImpl @Inject constructor(
         numUsers: Long?,
         numClients: Long?,
         numClientsPerUser: Long?,
+        divider: Long?,
     ) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getChatRequestListener("setLimitsInCall") {
@@ -1374,6 +1375,7 @@ internal class ChatRepositoryImpl @Inject constructor(
                 numUsers,
                 numClients,
                 numClientsPerUser,
+                divider,
                 listener
             )
             continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }

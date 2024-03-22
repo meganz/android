@@ -472,10 +472,10 @@ class InMeetingViewModel @Inject constructor(
      * Cancel the timer when call is upgraded or start the end timer if the call is free
      */
     private fun handleFreeCallEndWarning(call: ChatCall) {
-        if (call.num == -1) {
+        if (call.callWillEndTs == null || call.callWillEndTs == 0L) return
+        if (call.callWillEndTs == -1L) {
             Timber.d("Cancelling Meeting Timer Job")
-            // CALL_LIMIT_DURATION_DISABLED
-            // to do stop the call duration warning
+            // CALL_LIMIT_DISABLED
             meetingLeftTimerJob?.cancel()
             _state.update {
                 it.copy(
@@ -485,10 +485,14 @@ class InMeetingViewModel @Inject constructor(
             }
 
         } else {
-            // to do show the call duration warning
-            Timber.d("Call will end in ${call.num} seconds")
-            call.num?.let {
-                startMeetingEndWarningTimer(it / 60)
+            Timber.d("Call will end in ${call.callWillEndTs} seconds")
+            call.callWillEndTs?.let { timeStampInSecond ->
+                val currentTimeStampInSecond =
+                    TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
+                val seconds = timeStampInSecond - currentTimeStampInSecond
+                val minutes = TimeUnit.SECONDS.toMinutes(seconds)
+                Timber.d("Call will end in $minutes minutes")
+                startMeetingEndWarningTimer(minutes.toInt())
             }
             if (call.isOwnModerator) {
                 _state.update {

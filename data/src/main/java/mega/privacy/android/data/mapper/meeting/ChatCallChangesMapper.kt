@@ -34,7 +34,8 @@ internal class ChatCallChangesMapper @Inject constructor() {
             MegaChatCall.CHANGE_TYPE_WR_USERS_DENY to ChatCallChanges.WaitingRoomUsersDeny,
             MegaChatCall.CHANGE_TYPE_WR_PUSHED_FROM_CALL to ChatCallChanges.WaitingRoomPushedFromCall,
             MegaChatCall.CHANGE_TYPE_SPEAK_REQUESTED to ChatCallChanges.SpeakRequested,
-            MegaChatCall.CHANGE_TYPE_CALL_WILL_END to ChatCallChanges.CallWillEnd
+            MegaChatCall.CHANGE_TYPE_CALL_WILL_END to ChatCallChanges.CallWillEnd,
+            MegaChatCall.CHANGE_TYPE_CALL_LIMITS_UPDATED to ChatCallChanges.CallLimitsUpdated
         )
     }
 }

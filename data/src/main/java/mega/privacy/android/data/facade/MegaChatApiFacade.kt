@@ -841,9 +841,18 @@ internal class MegaChatApiFacade @Inject constructor(
         numUsers: Long?,
         numClients: Long?,
         numClientsPerUser: Long?,
+        divider: Long?,
         listener: MegaChatRequestListenerInterface?,
     ) {
-        chatApi.setLimitsInCall(chatId, callDur, numUsers, numClients, numClientsPerUser, listener)
+        chatApi.setLimitsInCall(
+            chatId,
+            callDur,
+            numUsers,
+            numClients,
+            numClientsPerUser,
+            divider,
+            listener
+        )
     }
 
     override suspend fun removeFailedMessage(chatId: Long, rowId: Long) {

@@ -991,6 +991,7 @@ interface ChatRepository {
      * @param callDur      Call duration in seconds
      * @param numUsers     Number of users
      * @param numClients   Number of clients
+     * @param divider      A divider that divides all existing limits by the specified number, rounding the result (except for callDur).
      * @param numClientsPerUser Number of clients per user
      */
     suspend fun setLimitsInCall(
@@ -998,6 +999,7 @@ interface ChatRepository {
         callDur: Long?,
         numUsers: Long?,
         numClients: Long?,
+        divider: Long?,
         numClientsPerUser: Long?,
     )
 }

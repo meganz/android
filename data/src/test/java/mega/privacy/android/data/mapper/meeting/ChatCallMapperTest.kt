@@ -27,7 +27,7 @@ class ChatRequestMapperTest {
     private val expectedPeerId2 = 789L
     private val expectedMsg = "message to test"
     private val expectedCallLimit = 3
-    private val expectedNum = 3
+    private val expectedCallWillEndTs = 789L
     private val expectedFlag = true
 
     @Before
@@ -76,10 +76,10 @@ class ChatRequestMapperTest {
     }
 
     @Test
-    fun `test mapping chat call generic num`() {
-        val chatCall = getMockChatCall(num = expectedNum)
+    fun `test mapping chat call will end Ts`() {
+        val chatCall = getMockChatCall(callWillEndTs = expectedCallWillEndTs)
         val actual = underTest(chatCall)
-        Truth.assertThat(actual.num).isEqualTo(expectedNum)
+        Truth.assertThat(actual.callWillEndTs).isEqualTo(expectedCallWillEndTs)
     }
 
     @Test
@@ -90,10 +90,31 @@ class ChatRequestMapperTest {
     }
 
     @Test
-    fun `test mapping chat call duration limit`() {
+    fun `test mapping call duration limit`() {
         val chatCall = getMockChatCall()
         val actual = underTest(chatCall)
         Truth.assertThat(actual.callDurationLimit).isEqualTo(expectedCallLimit)
+    }
+
+    @Test
+    fun `test mapping call clients limit`() {
+        val chatCall = getMockChatCall()
+        val actual = underTest(chatCall)
+        Truth.assertThat(actual.callClientsLimit).isEqualTo(expectedCallLimit)
+    }
+
+    @Test
+    fun `test mapping call users limit`() {
+        val chatCall = getMockChatCall()
+        val actual = underTest(chatCall)
+        Truth.assertThat(actual.callUsersLimit).isEqualTo(expectedCallLimit)
+    }
+
+    @Test
+    fun `test mapping call clients per user limit`() {
+        val chatCall = getMockChatCall()
+        val actual = underTest(chatCall)
+        Truth.assertThat(actual.callClientsPerUserLimit).isEqualTo(expectedCallLimit)
     }
 
     @Test
@@ -291,7 +312,10 @@ class ChatRequestMapperTest {
         isOnHold: Boolean = false,
         genericMessage: String = "",
         callDurationLimit: Int = expectedCallLimit,
-        num: Int = 4,
+        callUsersLimit: Int = expectedCallLimit,
+        callClientsLimit: Int = expectedCallLimit,
+        callClientsPerUserLimit: Int = expectedCallLimit,
+        callWillEndTs: Long = expectedCallWillEndTs,
         networkQuality: Int = -1,
         waitingRoomStatus: Int? = 0,
         waitingRoom: MegaChatWaitingRoom? = null,
@@ -311,8 +335,11 @@ class ChatRequestMapperTest {
             on { this.initialTimeStamp }.thenReturn(initialTimeStamp)
             on { this.finalTimeStamp }.thenReturn(finalTimeStamp)
             on { this.termCode }.thenReturn(termCode)
-            on { this.num }.thenReturn(num)
+            on { this.callWillEndTs }.thenReturn(callWillEndTs)
             on { this.callDurationLimit }.thenReturn(callDurationLimit)
+            on { this.callUsersLimit }.thenReturn(callUsersLimit)
+            on { this.callClientsLimit }.thenReturn(callClientsLimit)
+            on { this.callClientsPerUserLimit }.thenReturn(callClientsPerUserLimit)
             on { this.endCallReason }.thenReturn(endCallReason)
             on { this.isSpeakRequestEnabled }.thenReturn(isSpeakRequestEnabled)
             on { this.notificationType }.thenReturn(notificationType)

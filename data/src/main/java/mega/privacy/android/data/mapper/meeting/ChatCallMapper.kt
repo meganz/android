@@ -36,8 +36,10 @@ internal class ChatCallMapper @Inject constructor(
         initialTimestamp = megaChatCall.initialTimeStamp,
         finalTimestamp = megaChatCall.finalTimeStamp,
         termCode = chatCallTermCodeMapper(megaChatCall.termCode),
-        num = megaChatCall.num,
         callDurationLimit = megaChatCall.callDurationLimit,
+        callUsersLimit = megaChatCall.callUsersLimit,
+        callClientsLimit = megaChatCall.callClientsLimit,
+        callClientsPerUserLimit = megaChatCall.callClientsPerUserLimit,
         endCallReason = endCallReasonMapper(megaChatCall.endCallReason),
         isSpeakRequestEnabled = megaChatCall.isSpeakRequestEnabled,
         notificationType = callNotificationMapper(megaChatCall.notificationType),
@@ -67,6 +69,7 @@ internal class ChatCallMapper @Inject constructor(
         handleList = if (megaChatCall.handleList == null) null else handleListMapper(megaChatCall.handleList),
         speakersList = handleListMapper(megaChatCall.speakersList),
         speakRequestsList = handleListMapper(megaChatCall.speakRequestsList),
+        callWillEndTs = megaChatCall.callWillEndTs
     )
 
     private fun MegaChatCall.toChatSessionByClientId(): Map<Long, ChatSession> {

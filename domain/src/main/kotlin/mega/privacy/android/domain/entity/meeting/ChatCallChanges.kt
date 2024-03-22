@@ -111,9 +111,14 @@ enum class ChatCallChanges {
     SpeakRequested,
 
     /**
-     *  * Notify that call will end due to duration restrictions associated to MEGA account plan
+     * Notify that call will end due to duration restrictions associated to MEGA account plan
      */
     CallWillEnd,
+
+    /**
+     *  Notify that call limits have been updated
+     */
+    CallLimitsUpdated,
 
     /**
      * Unknown
