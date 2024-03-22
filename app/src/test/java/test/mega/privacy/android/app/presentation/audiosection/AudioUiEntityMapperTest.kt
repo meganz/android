@@ -2,12 +2,12 @@ package test.mega.privacy.android.app.presentation.audiosection
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.audiosection.mapper.AudioUIEntityMapper
+import mega.privacy.android.app.presentation.audiosection.mapper.AudioUiEntityMapper
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedAudioNode
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -15,18 +15,18 @@ import org.mockito.kotlin.mock
 import kotlin.time.Duration.Companion.seconds
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class AudioUIEntityMapperTest {
-    private lateinit var underTest: AudioUIEntityMapper
+class AudioUiEntityMapperTest {
+    private lateinit var underTest: AudioUiEntityMapper
 
     private val durationInSecondsTextMapper = DurationInSecondsTextMapper()
 
     @BeforeAll
     fun setUp() {
-        underTest = AudioUIEntityMapper(durationInSecondsTextMapper)
+        underTest = AudioUiEntityMapper(durationInSecondsTextMapper)
     }
 
     @Test
-    fun `test that AudioUIEntity can be mapped correctly`() = runTest {
+    fun `test that AudioUiEntity can be mapped correctly`() = runTest {
         val expectedId = NodeId(123456L)
         val expectedName = "Audio file name"
         val expectedSize: Long = 100
@@ -39,6 +39,7 @@ class AudioUIEntityMapperTest {
         val expectedModificationTime: Long = 999
         val expectedLabel = 1
         val expectedAvailableOffline = true
+        val expectedType = mock<AudioFileTypeInfo>()
 
         val expectedTypedAudioNode = mock<TypedAudioNode> {
             on { id }.thenReturn(expectedId)
@@ -55,6 +56,7 @@ class AudioUIEntityMapperTest {
             on { label }.thenReturn(expectedLabel)
             on { isAvailableOffline }.thenReturn(expectedAvailableOffline)
             on { hasVersion }.thenReturn(true)
+            on { type }.thenReturn(expectedType)
         }
 
         underTest(typedAudioNode = expectedTypedAudioNode).let {
@@ -70,6 +72,7 @@ class AudioUIEntityMapperTest {
             Truth.assertThat(it.modificationTime).isEqualTo(expectedModificationTime)
             Truth.assertThat(it.label).isEqualTo(expectedLabel)
             Truth.assertThat(it.nodeAvailableOffline).isEqualTo(expectedAvailableOffline)
+            Truth.assertThat(it.fileTypeInfo).isEqualTo(expectedType)
         }
     }
 }

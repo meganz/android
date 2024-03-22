@@ -17,7 +17,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property isInSelection if list is in selection mode or not
  */
 data class AudioSectionState(
-    val allAudios: List<AudioUIEntity> = emptyList(),
+    val allAudios: List<AudioUiEntity> = emptyList(),
     val currentViewType: ViewType = ViewType.LIST,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
     val isPendingRefresh: Boolean = false,

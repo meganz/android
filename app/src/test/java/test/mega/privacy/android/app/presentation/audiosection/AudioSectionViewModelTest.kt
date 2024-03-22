@@ -11,8 +11,8 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.audiosection.AudioSectionViewModel
-import mega.privacy.android.app.presentation.audiosection.mapper.AudioUIEntityMapper
-import mega.privacy.android.app.presentation.audiosection.model.AudioUIEntity
+import mega.privacy.android.app.presentation.audiosection.mapper.AudioUiEntityMapper
+import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeUpdate
@@ -30,7 +30,6 @@ import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseC
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -50,7 +49,7 @@ class AudioSectionViewModelTest {
     private lateinit var underTest: AudioSectionViewModel
 
     private val getAllAudioUseCase = mock<GetAllAudioUseCase>()
-    private val audioUIEntityMapper = mock<AudioUIEntityMapper>()
+    private val audioUIEntityMapper = mock<AudioUiEntityMapper>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
@@ -64,7 +63,7 @@ class AudioSectionViewModelTest {
     private val fakeMonitorViewTypeFlow = MutableSharedFlow<ViewType>()
     private val monitorViewType = mock<MonitorViewType>()
 
-    private val expectedAudio: AudioUIEntity = mock { on { name }.thenReturn("audio name") }
+    private val expectedAudio: AudioUiEntity = mock { on { name }.thenReturn("audio name") }
 
     @BeforeEach
     fun setUp() {
@@ -181,8 +180,8 @@ class AudioSectionViewModelTest {
     fun `test that the result returned correctly when search query is not empty`() = runTest {
         val expectedTypedAudioNode = mock<TypedAudioNode> { on { name }.thenReturn("audio name") }
         val audioNode = mock<TypedAudioNode> { on { name }.thenReturn("name") }
-        val expectedAudio = mock<AudioUIEntity> { on { name }.thenReturn("audio name") }
-        val audio = mock<AudioUIEntity> { on { name }.thenReturn("name") }
+        val expectedAudio = mock<AudioUiEntity> { on { name }.thenReturn("audio name") }
+        val audio = mock<AudioUiEntity> { on { name }.thenReturn("name") }
 
         whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
         whenever(getAllAudioUseCase()).thenReturn(listOf(expectedTypedAudioNode, audioNode))

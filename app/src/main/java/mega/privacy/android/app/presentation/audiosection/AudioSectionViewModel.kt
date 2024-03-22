@@ -13,12 +13,10 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
-import mega.privacy.android.app.presentation.audiosection.mapper.AudioUIEntityMapper
+import mega.privacy.android.app.presentation.audiosection.mapper.AudioUiEntityMapper
 import mega.privacy.android.app.presentation.audiosection.model.AudioSectionState
-import mega.privacy.android.app.presentation.audiosection.model.AudioUIEntity
+import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import mega.privacy.android.app.utils.FileUtil.getDownloadLocation
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
@@ -34,6 +32,7 @@ import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
@@ -47,7 +46,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AudioSectionViewModel @Inject constructor(
     private val getAllAudioUseCase: GetAllAudioUseCase,
-    private val audioUIEntityMapper: AudioUIEntityMapper,
+    private val audioUIEntityMapper: AudioUiEntityMapper,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
@@ -68,7 +67,7 @@ class AudioSectionViewModel @Inject constructor(
     val state: StateFlow<AudioSectionState> = _state.asStateFlow()
 
     private var searchQuery = ""
-    private val originalData = mutableListOf<AudioUIEntity>()
+    private val originalData = mutableListOf<AudioUiEntity>()
 
     init {
         checkViewType()
@@ -96,7 +95,7 @@ class AudioSectionViewModel @Inject constructor(
     private fun setPendingRefreshNodes() = _state.update { it.copy(isPendingRefresh = true) }
 
     internal fun refreshNodes() = viewModelScope.launch {
-        val audioList = getAudioUIEntityList().updateOriginalData().filterAudiosBySearchQuery()
+        val audioList = getAudioUiEntityList().updateOriginalData().filterAudiosBySearchQuery()
         val sortOrder = getCloudSortOrder()
         _state.update {
             it.copy(
@@ -109,19 +108,19 @@ class AudioSectionViewModel @Inject constructor(
         }
     }
 
-    private fun List<AudioUIEntity>.filterAudiosBySearchQuery() =
+    private fun List<AudioUiEntity>.filterAudiosBySearchQuery() =
         filter { audio ->
             audio.name.contains(searchQuery, true)
         }
 
-    private fun List<AudioUIEntity>.updateOriginalData() = also { data ->
+    private fun List<AudioUiEntity>.updateOriginalData() = also { data ->
         if (originalData.isNotEmpty()) {
             originalData.clear()
         }
         originalData.addAll(data)
     }
 
-    private suspend fun getAudioUIEntityList() =
+    private suspend fun getAudioUiEntityList() =
         getAllAudioUseCase().map { audioUIEntityMapper(it) }
 
     internal fun markHandledPendingRefresh() = _state.update { it.copy(isPendingRefresh = false) }
@@ -173,13 +172,13 @@ class AudioSectionViewModel @Inject constructor(
      * Update intent
      *
      * @param handle node handle
-     * @param name node name
+     * @param fileType node file type
      * @param intent Intent
      * @return updated intent
      */
     internal suspend fun updateIntent(
         handle: Long,
-        name: String,
+        fileType: String,
         intent: Intent,
     ): Intent {
         if (megaApiHttpServerIsRunningUseCase() == 0) {
@@ -189,7 +188,7 @@ class AudioSectionViewModel @Inject constructor(
 
         getFileUrlByNodeHandleUseCase(handle)?.let { url ->
             Uri.parse(url)?.let { uri ->
-                intent.setDataAndType(uri, MimeTypeList.typeForName(name).type)
+                intent.setDataAndType(uri, fileType)
             }
         }
 
@@ -227,14 +226,14 @@ class AudioSectionViewModel @Inject constructor(
         }
     }
 
-    internal fun onItemClicked(item: AudioUIEntity, index: Int) {
+    internal fun onItemClicked(item: AudioUiEntity, index: Int) {
         updateAudioItemInSelectionState(item = item, index = index)
     }
 
-    internal fun onItemLongClicked(item: AudioUIEntity, index: Int) =
+    internal fun onItemLongClicked(item: AudioUiEntity, index: Int) =
         updateAudioItemInSelectionState(item = item, index = index)
 
-    private fun updateAudioItemInSelectionState(item: AudioUIEntity, index: Int) {
+    private fun updateAudioItemInSelectionState(item: AudioUiEntity, index: Int) {
         val isSelected = !item.isSelected
         val selectedHandles = updateSelectedAudioHandles(item, isSelected)
         val audios = _state.value.allAudios.updateItemSelectedState(index, isSelected)
@@ -247,7 +246,7 @@ class AudioSectionViewModel @Inject constructor(
         }
     }
 
-    private fun List<AudioUIEntity>.updateItemSelectedState(index: Int, isSelected: Boolean) =
+    private fun List<AudioUiEntity>.updateItemSelectedState(index: Int, isSelected: Boolean) =
         if (index in indices) {
             toMutableList().also { list ->
                 list[index] = list[index].copy(isSelected = isSelected)
@@ -255,7 +254,7 @@ class AudioSectionViewModel @Inject constructor(
         } else this
 
 
-    private fun updateSelectedAudioHandles(item: AudioUIEntity, isSelected: Boolean) =
+    private fun updateSelectedAudioHandles(item: AudioUiEntity, isSelected: Boolean) =
         _state.value.selectedAudioHandles.toMutableList().also { selectedHandles ->
             if (isSelected) {
                 selectedHandles.add(item.id.longValue)

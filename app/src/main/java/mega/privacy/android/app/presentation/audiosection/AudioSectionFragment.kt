@@ -22,7 +22,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentAudioSectionBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
@@ -30,7 +29,7 @@ import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
-import mega.privacy.android.app.presentation.audiosection.model.AudioUIEntity
+import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
@@ -164,12 +163,12 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
 
     private fun openAudioFile(
         activity: Activity,
-        item: AudioUIEntity,
+        item: AudioUiEntity,
         index: Int,
     ) {
         viewLifecycleOwner.lifecycleScope.launch {
             val nodeHandle = item.id.longValue
-            val nodeName = item.name
+            val fileType = item.fileTypeInfo.mimeType
             val intent = getIntent(item = item, index = index)
 
             activity.startActivity(
@@ -184,17 +183,14 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
                         }.onFailure {
                             Uri.fromFile(mediaFile)
                         }.map { mediaFileUri ->
-                            intent.setDataAndType(
-                                mediaFileUri,
-                                MimeTypeList.typeForName(nodeName).type
-                            )
+                            intent.setDataAndType(mediaFileUri, fileType)
                             intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                         }
                     }
                     intent
                 } ?: audioSectionViewModel.updateIntent(
                     handle = nodeHandle,
-                    name = nodeName,
+                    fileType = fileType,
                     intent = intent
                 )
             )
@@ -202,7 +198,7 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
     }
 
     private fun getIntent(
-        item: AudioUIEntity,
+        item: AudioUiEntity,
         index: Int,
     ) = getMediaIntent(activity, item.name).apply {
         putExtra(INTENT_EXTRA_KEY_POSITION, index)
@@ -257,7 +253,7 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
         }
     }
 
-    private fun showOptionsMenuForItem(item: AudioUIEntity) {
+    private fun showOptionsMenuForItem(item: AudioUiEntity) {
         (requireActivity() as? ManagerActivity)?.showNodeOptionsPanel(
             nodeId = item.id,
             mode = NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE
