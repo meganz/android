@@ -27,6 +27,7 @@ import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 @Composable
 fun AudioSectionComposeView(
     uiState: AudioSectionState,
+    modifier: Modifier = Modifier,
     onChangeViewTypeClick: () -> Unit = {},
     onClick: (item: AudioUiEntity, index: Int) -> Unit = { _, _ -> },
     onSortOrderClick: () -> Unit = {},
@@ -47,47 +48,48 @@ fun AudioSectionComposeView(
                 gridState.scrollToItem(0)
         }
     }
+    Box(modifier = modifier) {
+        when {
+            progressBarShowing -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 20.dp),
+                    contentAlignment = Alignment.TopCenter,
+                    content = {
+                        MegaCircularProgressIndicator(
+                            modifier = Modifier
+                                .size(50.dp),
+                            strokeWidth = 4.dp,
+                        )
+                    },
+                )
+            }
 
-    when {
-        progressBarShowing -> {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 20.dp),
-                contentAlignment = Alignment.TopCenter,
-                content = {
-                    MegaCircularProgressIndicator(
-                        modifier = Modifier
-                            .size(50.dp),
-                        strokeWidth = 4.dp,
-                    )
-                },
-            )
-        }
-
-        items.isEmpty() -> LegacyMegaEmptyView(
-            modifier = Modifier,
-            text = stringResource(id = R.string.homepage_empty_hint_audio),
-            imagePainter = painterResource(id = R.drawable.ic_homepage_empty_audio)
-        )
-
-        else -> {
-            AudiosView(
-                items = items,
-                isListView = uiState.currentViewType == ViewType.LIST,
-                listState = listState,
-                gridState = gridState,
-                sortOrder = stringResource(
-                    id = SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
-                        ?: R.string.sortby_name
-                ),
+            items.isEmpty() -> LegacyMegaEmptyView(
                 modifier = Modifier,
-                onChangeViewTypeClick = onChangeViewTypeClick,
-                onSortOrderClick = onSortOrderClick,
-                onClick = onClick,
-                onLongClick = onLongClick,
-                onMenuClick = onMenuClick
+                text = stringResource(id = R.string.homepage_empty_hint_audio),
+                imagePainter = painterResource(id = R.drawable.ic_homepage_empty_audio)
             )
+
+            else -> {
+                AudiosView(
+                    items = items,
+                    isListView = uiState.currentViewType == ViewType.LIST,
+                    listState = listState,
+                    gridState = gridState,
+                    sortOrder = stringResource(
+                        id = SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
+                            ?: R.string.sortby_name
+                    ),
+                    modifier = Modifier,
+                    onChangeViewTypeClick = onChangeViewTypeClick,
+                    onSortOrderClick = onSortOrderClick,
+                    onClick = onClick,
+                    onLongClick = onLongClick,
+                    onMenuClick = onMenuClick
+                )
+            }
         }
     }
 }

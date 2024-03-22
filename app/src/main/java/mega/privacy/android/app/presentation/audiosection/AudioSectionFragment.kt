@@ -10,8 +10,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -23,16 +29,15 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.databinding.FragmentAudioSectionBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
+import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AUDIO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
@@ -71,9 +76,6 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
     @Inject
     lateinit var getOptionsForToolbarMapper: GetOptionsForToolbarMapper
 
-    private var _binding: FragmentAudioSectionBinding? = null
-    private val binding get() = _binding!!
-
     private var actionMode: ActionMode? = null
 
     /**
@@ -83,53 +85,33 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View {
-        _binding = FragmentAudioSectionBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    /**
-     * onViewCreated
-     */
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        initAudioSectionComposeView()
-        setupMiniAudioPlayer()
-
-        sortByHeaderViewModel.orderChangeEvent.observe(
-            viewLifecycleOwner, EventObserver { audioSectionViewModel.refreshWhenOrderChanged() }
-        )
-
-        viewLifecycleOwner.collectFlow(
-            audioSectionViewModel.state.map { it.isPendingRefresh }.distinctUntilChanged()
-        ) { isPendingRefresh ->
-            if (isPendingRefresh) {
-                with(audioSectionViewModel) {
-                    refreshNodes()
-                    markHandledPendingRefresh()
-                }
-            }
-        }
-
-        viewLifecycleOwner.collectFlow(
-            audioSectionViewModel.state.map { it.allAudios }.distinctUntilChanged()
-        ) { list ->
-            if (!audioSectionViewModel.state.value.searchMode && list.isNotEmpty()) {
-                callManager {
-                    it.invalidateOptionsMenu()
-                }
-            }
-        }
-    }
-
-    private fun initAudioSectionComposeView() {
-        binding.audioSectionComposeView.apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-                val uiState by audioSectionViewModel.state.collectAsStateWithLifecycle()
-                MegaAppTheme(isDark = themeMode.isDarkMode()) {
+    ): View = ComposeView(requireContext()).apply {
+        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        setContent {
+            val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val uiState by audioSectionViewModel.state.collectAsStateWithLifecycle()
+            MegaAppTheme(isDark = themeMode.isDarkMode()) {
+                ConstraintLayout(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    val (audioPlayer, audioSectionComposeView) = createRefs()
+                    MiniAudioPlayerView(
+                        modifier = Modifier
+                            .constrainAs(audioPlayer) {
+                                bottom.linkTo(parent.bottom)
+                            }
+                            .fillMaxWidth(),
+                        lifecycle = lifecycle,
+                    )
                     AudioSectionComposeView(
                         uiState = uiState,
+                        modifier = Modifier
+                            .constrainAs(audioSectionComposeView) {
+                                top.linkTo(parent.top)
+                                bottom.linkTo(audioPlayer.top)
+                                height = Dimension.fillToConstraints
+                            }
+                            .fillMaxWidth(),
                         onChangeViewTypeClick = audioSectionViewModel::onChangeViewTypeClicked,
                         onSortOrderClick = { showSortByPanel() },
                         onClick = { item, index ->
@@ -152,7 +134,37 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
                         }
                     )
                 }
-                updateActionModeTitle(count = uiState.selectedAudioHandles.size)
+            }
+            updateActionModeTitle(count = uiState.selectedAudioHandles.size)
+        }
+    }
+
+    /**
+     * onViewCreated
+     */
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        sortByHeaderViewModel.orderChangeEvent.observe(
+            viewLifecycleOwner, EventObserver { audioSectionViewModel.refreshWhenOrderChanged() }
+        )
+
+        viewLifecycleOwner.collectFlow(
+            audioSectionViewModel.state.map { it.isPendingRefresh }.distinctUntilChanged()
+        ) { isPendingRefresh ->
+            if (isPendingRefresh) {
+                with(audioSectionViewModel) {
+                    refreshNodes()
+                    markHandledPendingRefresh()
+                }
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(
+            audioSectionViewModel.state.map { it.allAudios }.distinctUntilChanged()
+        ) { list ->
+            if (!audioSectionViewModel.state.value.searchMode && list.isNotEmpty()) {
+                callManager {
+                    it.invalidateOptionsMenu()
+                }
             }
         }
     }
@@ -258,21 +270,6 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
             nodeId = item.id,
             mode = NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE
         )
-    }
-
-    private fun setupMiniAudioPlayer() {
-        val audioPlayerController = MiniAudioPlayerController(binding.miniAudioPlayer).apply {
-            shouldVisible = true
-        }
-        lifecycle.addObserver(audioPlayerController)
-    }
-
-    /**
-     * onDestroyView
-     */
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     /**
