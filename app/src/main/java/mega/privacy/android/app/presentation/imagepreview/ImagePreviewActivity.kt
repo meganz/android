@@ -38,6 +38,8 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewState
 import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowActivity
 import mega.privacy.android.app.presentation.imagepreview.view.ImagePreviewScreen
+import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
@@ -62,6 +64,9 @@ class ImagePreviewActivity : BaseActivity() {
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    @Inject
+    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
     private val selectMoveFolderLauncher: ActivityResultLauncher<LongArray> =
         registerForActivityResult(
@@ -110,28 +115,33 @@ class ImagePreviewActivity : BaseActivity() {
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             MegaAppTheme(isDark = themeMode.isDarkMode()) {
-                ImagePreviewScreen(
-                    onClickBack = ::finish,
-                    onClickVideoPlay = ::playVideo,
-                    onClickSlideshow = ::playSlideshow,
-                    onClickInfo = ::checkInfo,
-                    onClickFavourite = ::favouriteNode,
-                    onClickLabel = ::handleLabel,
-                    onClickOpenWith = ::handleOpenWith,
-                    onClickSaveToDevice = ::saveNodeToDevice,
-                    onClickImport = ::importNode,
-                    onSwitchAvailableOffline = ::setAvailableOffline,
-                    onClickGetLink = ::getNodeLink,
-                    onClickSendTo = ::sendNodeToChat,
-                    onClickShare = ::shareNode,
-                    onClickRename = ::renameNode,
-                    onClickHide = ::hideNode,
-                    onClickUnhide = ::unhideNode,
-                    onClickMove = ::moveNode,
-                    onClickCopy = ::copyNode,
-                    onClickRestore = ::restoreNode,
-                    onClickRemove = ::removeNode,
-                    onClickMoveToRubbishBin = ::moveNodeToRubbishBin,
+                PasscodeContainer(
+                    passcodeCryptObjectFactory = passcodeCryptObjectFactory,
+                    content = {
+                        ImagePreviewScreen(
+                            onClickBack = ::finish,
+                            onClickVideoPlay = ::playVideo,
+                            onClickSlideshow = ::playSlideshow,
+                            onClickInfo = ::checkInfo,
+                            onClickFavourite = ::favouriteNode,
+                            onClickLabel = ::handleLabel,
+                            onClickOpenWith = ::handleOpenWith,
+                            onClickSaveToDevice = ::saveNodeToDevice,
+                            onClickImport = ::importNode,
+                            onSwitchAvailableOffline = ::setAvailableOffline,
+                            onClickGetLink = ::getNodeLink,
+                            onClickSendTo = ::sendNodeToChat,
+                            onClickShare = ::shareNode,
+                            onClickRename = ::renameNode,
+                            onClickHide = ::hideNode,
+                            onClickUnhide = ::unhideNode,
+                            onClickMove = ::moveNode,
+                            onClickCopy = ::copyNode,
+                            onClickRestore = ::restoreNode,
+                            onClickRemove = ::removeNode,
+                            onClickMoveToRubbishBin = ::moveNodeToRubbishBin,
+                        )
+                    }
                 )
             }
         }

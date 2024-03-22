@@ -352,7 +352,7 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                if (imageNode.exportedData != null) {
+                if (isGetLinkMenuVisible && imageNode.exportedData != null) {
                     MenuActionListTile(
                         icon = painterResource(id = R.drawable.ic_remove_link),
                         text = stringResource(id = R.string.context_remove_link_menu),
