@@ -10,12 +10,16 @@ import android.view.View
 import android.widget.NumberPicker.OnScrollListener
 import android.widget.NumberPicker.OnValueChangeListener
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
+import androidx.lifecycle.Lifecycle
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME
 import mega.privacy.android.app.databinding.ActivityManageChatHistoryBinding
 import mega.privacy.android.app.listeners.SetRetentionTimeListener
+import mega.privacy.android.app.presentation.meeting.managechathistory.ManageChatHistoryViewModel
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.createHistoryRetentionAlertDialog
 import mega.privacy.android.app.utils.Constants.CHAT_ID
@@ -51,6 +55,8 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
         private const val MINIMUM_VALUE_TEXT_PICKER = 0
         private const val MAXIMUM_VALUE_TEXT_PICKER = 4
     }
+
+    internal val viewModel: ManageChatHistoryViewModel by viewModels()
 
     private var chat: MegaChatRoom? = null
     private var chatId = MEGACHAT_INVALID_HANDLE
@@ -111,6 +117,9 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
                 chatId = chat?.chatId!!
         }
 
+        monitorUpdates(chatId)
+        collectFlows()
+
         registerReceiver(
             retentionTimeReceiver,
             IntentFilter(ACTION_UPDATE_RETENTION_TIME)
@@ -162,6 +171,19 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
             binding.textPicker.setOnScrollListener(onScrollListenerPickerText)
             binding.textPicker.setOnValueChangedListener(onValueChangeListenerPickerText)
             binding.pickerButton.setOnClickListener(this)
+        }
+    }
+
+    private fun monitorUpdates(chatId: Long) {
+        viewModel.monitorChatRetentionTimeUpdate(chatId)
+    }
+
+    private fun collectFlows() {
+        collectFlow(viewModel.state, Lifecycle.State.STARTED) { state ->
+            state.retentionTimeUpdate?.let {
+                updateRetentionTimeUI(it)
+                viewModel.onRetentionTimeUpdateConsumed()
+            }
         }
     }
 
