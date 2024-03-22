@@ -14,15 +14,15 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class IsCameraUploadNodeValidUseCaseTest {
-    private lateinit var underTest: IsCameraUploadNodeValidUseCase
+class IsCameraUploadsNodeValidUseCaseTest {
+    private lateinit var underTest: IsCameraUploadsNodeValidUseCase
 
     private val cameraUploadRepository = mock<CameraUploadRepository>()
     private val isNodeInRubbishOrDeletedUseCase = mock<IsNodeInRubbishOrDeletedUseCase>()
 
     @BeforeAll
     fun setUp() {
-        underTest = IsCameraUploadNodeValidUseCase(
+        underTest = IsCameraUploadsNodeValidUseCase(
             cameraUploadRepository = cameraUploadRepository,
             isNodeInRubbishOrDeletedUseCase = isNodeInRubbishOrDeletedUseCase,
         )

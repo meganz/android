@@ -20,7 +20,7 @@ class CheckOrCreateCameraUploadsNodeUseCaseTest {
 
     private lateinit var underTest: CheckOrCreateCameraUploadsNodeUseCase
 
-    private val isCameraUploadNodeValidUseCase: IsCameraUploadNodeValidUseCase = mock()
+    private val isCameraUploadsNodeValidUseCase: IsCameraUploadsNodeValidUseCase = mock()
     private val getUploadFolderHandleUseCase: GetUploadFolderHandleUseCase = mock()
     private val getDefaultNodeHandleUseCase: GetDefaultNodeHandleUseCase = mock()
     private val createFolderNodeUseCase: CreateFolderNodeUseCase = mock()
@@ -32,7 +32,7 @@ class CheckOrCreateCameraUploadsNodeUseCaseTest {
     @BeforeAll
     fun setUp() {
         underTest = CheckOrCreateCameraUploadsNodeUseCase(
-            isCameraUploadNodeValidUseCase = isCameraUploadNodeValidUseCase,
+            isCameraUploadsNodeValidUseCase = isCameraUploadsNodeValidUseCase,
             getUploadFolderHandleUseCase = getUploadFolderHandleUseCase,
             getDefaultNodeHandleUseCase = getDefaultNodeHandleUseCase,
             createFolderNodeUseCase = createFolderNodeUseCase,
@@ -65,7 +65,7 @@ class CheckOrCreateCameraUploadsNodeUseCaseTest {
         val nodeId = NodeId(1234L)
         whenever(getUploadFolderHandleUseCase(folderType))
             .thenReturn(nodeId.longValue)
-        whenever(isCameraUploadNodeValidUseCase(nodeId)).thenReturn(true)
+        whenever(isCameraUploadsNodeValidUseCase(nodeId)).thenReturn(true)
 
         underTest.invoke(defaultFolderName, folderType)
 
@@ -95,9 +95,9 @@ class CheckOrCreateCameraUploadsNodeUseCaseTest {
             val defaultFolderNodeId = NodeId(1111L)
             whenever(getUploadFolderHandleUseCase(folderType))
                 .thenReturn(nodeId.longValue)
-            whenever(isCameraUploadNodeValidUseCase(nodeId)).thenReturn(false)
+            whenever(isCameraUploadsNodeValidUseCase(nodeId)).thenReturn(false)
             whenever(getDefaultNodeHandleUseCase(defaultFolderName)).thenReturn(defaultFolderNodeId.longValue)
-            whenever(isCameraUploadNodeValidUseCase(defaultFolderNodeId)).thenReturn(true)
+            whenever(isCameraUploadsNodeValidUseCase(defaultFolderNodeId)).thenReturn(true)
 
             underTest.invoke(defaultFolderName, folderType)
 
@@ -126,9 +126,9 @@ class CheckOrCreateCameraUploadsNodeUseCaseTest {
             val defaultFolderNodeId = NodeId(1234L)
             whenever(getUploadFolderHandleUseCase(folderType))
                 .thenReturn(folderNodeId.longValue)
-            whenever(isCameraUploadNodeValidUseCase(folderNodeId)).thenReturn(false)
+            whenever(isCameraUploadsNodeValidUseCase(folderNodeId)).thenReturn(false)
             whenever(getDefaultNodeHandleUseCase(defaultFolderName)).thenReturn(defaultFolderNodeId.longValue)
-            whenever(isCameraUploadNodeValidUseCase(defaultFolderNodeId)).thenReturn(true)
+            whenever(isCameraUploadsNodeValidUseCase(defaultFolderNodeId)).thenReturn(true)
 
             underTest.invoke(defaultFolderName, folderType)
 
@@ -158,9 +158,9 @@ class CheckOrCreateCameraUploadsNodeUseCaseTest {
             val createdDefaultFolderNodeId = NodeId(5678L)
             whenever(getUploadFolderHandleUseCase(folderType))
                 .thenReturn(folderNodeId.longValue)
-            whenever(isCameraUploadNodeValidUseCase(folderNodeId)).thenReturn(false)
+            whenever(isCameraUploadsNodeValidUseCase(folderNodeId)).thenReturn(false)
             whenever(getDefaultNodeHandleUseCase(defaultFolderName)).thenReturn(defaultFolderNodeId.longValue)
-            whenever(isCameraUploadNodeValidUseCase(defaultFolderNodeId)).thenReturn(false)
+            whenever(isCameraUploadsNodeValidUseCase(defaultFolderNodeId)).thenReturn(false)
             whenever(createFolderNodeUseCase(defaultFolderName))
                 .thenReturn(createdDefaultFolderNodeId)
 

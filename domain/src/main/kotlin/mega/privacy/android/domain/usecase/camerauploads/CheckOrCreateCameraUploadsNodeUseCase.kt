@@ -12,7 +12,7 @@ import javax.inject.Inject
  * - If Default Node not valid, create a new Default Upload Node and set the new Upload node in user attributes and local preferences
  */
 class CheckOrCreateCameraUploadsNodeUseCase @Inject constructor(
-    private val isCameraUploadNodeValidUseCase: IsCameraUploadNodeValidUseCase,
+    private val isCameraUploadsNodeValidUseCase: IsCameraUploadsNodeValidUseCase,
     private val getUploadFolderHandleUseCase: GetUploadFolderHandleUseCase,
     private val getDefaultNodeHandleUseCase: GetDefaultNodeHandleUseCase,
     private val createFolderNodeUseCase: CreateFolderNodeUseCase,
@@ -27,9 +27,9 @@ class CheckOrCreateCameraUploadsNodeUseCase @Inject constructor(
      */
     suspend operator fun invoke(folderName: String, folderType: CameraUploadFolderType) {
         val nodeId = NodeId(getUploadFolderHandleUseCase(folderType))
-        if (!isCameraUploadNodeValidUseCase(nodeId)) {
+        if (!isCameraUploadsNodeValidUseCase(nodeId)) {
             val defaultNodeId = NodeId(getDefaultNodeHandleUseCase(folderName))
-            when (isCameraUploadNodeValidUseCase(defaultNodeId)) {
+            when (isCameraUploadsNodeValidUseCase(defaultNodeId)) {
                 true -> setNodeId(defaultNodeId, folderType)
                 false -> createNode(folderName, folderType)
             }

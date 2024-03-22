@@ -8,7 +8,7 @@ import javax.inject.Inject
 /**
  * Check if the Camera Uploads Node (Primary or secondary) is valid or node
  */
-class IsCameraUploadNodeValidUseCase @Inject constructor(
+class IsCameraUploadsNodeValidUseCase @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
     private val isNodeInRubbishOrDeletedUseCase: IsNodeInRubbishOrDeletedUseCase,
 ) {
