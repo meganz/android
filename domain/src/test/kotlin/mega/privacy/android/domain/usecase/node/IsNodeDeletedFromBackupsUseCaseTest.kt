@@ -5,7 +5,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -29,25 +28,28 @@ class IsNodeDeletedFromBackupsUseCaseTest {
 
     private lateinit var underTest: IsNodeDeletedFromBackupsUseCase
 
-    private val isNodeInRubbish = mock<IsNodeInRubbish>()
+    private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
     private val nodeRepository = mock<NodeRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest = IsNodeDeletedFromBackupsUseCase(
-            isNodeInRubbish = isNodeInRubbish,
+            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
             nodeRepository = nodeRepository,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(isNodeInRubbish, nodeRepository)
+        reset(
+            isNodeInRubbishBinUseCase,
+            nodeRepository,
+        )
     }
 
     @Test
     fun `test that false is returned when the node does not exist in the rubbish bin`() = runTest {
-        whenever(isNodeInRubbish(any())).thenReturn(false)
+        whenever(isNodeInRubbishBinUseCase(NodeId(any()))).thenReturn(false)
         val deletedFromBackups = underTest(NodeId(123456))
         assertThat(deletedFromBackups).isFalse()
         verifyNoInteractions(nodeRepository)
@@ -60,7 +62,7 @@ class IsNodeDeletedFromBackupsUseCaseTest {
         expected: Boolean,
     ) = runTest {
         val testNodeId = NodeId(123456)
-        whenever(isNodeInRubbish(any())).thenReturn(true)
+        whenever(isNodeInRubbishBinUseCase(NodeId(any()))).thenReturn(true)
         whenever(nodeRepository.getNodePathById(testNodeId)).thenReturn(nodePath)
 
         val actual = underTest(testNodeId)

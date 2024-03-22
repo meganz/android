@@ -1,12 +1,10 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
-import org.junit.jupiter.api.Assertions.*
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -18,20 +16,19 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
-@ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FindNodeWithFingerprintInParentNodeUseCaseTest {
 
     private lateinit var underTest: FindNodeWithFingerprintInParentNodeUseCase
 
     private val getNodeFromCloudUseCase = mock<GetNodeFromCloudUseCase>()
-    private val isNodeInRubbishBin = mock<IsNodeInRubbish>()
+    private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
 
     @BeforeAll
     fun setUp() {
         underTest = FindNodeWithFingerprintInParentNodeUseCase(
             getNodeFromCloudUseCase = getNodeFromCloudUseCase,
-            isNodeInRubbish = isNodeInRubbishBin,
+            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
         )
     }
 
@@ -39,7 +36,7 @@ class FindNodeWithFingerprintInParentNodeUseCaseTest {
     fun resetMocks() {
         reset(
             getNodeFromCloudUseCase,
-            isNodeInRubbishBin,
+            isNodeInRubbishBinUseCase,
         )
     }
 
@@ -80,7 +77,7 @@ class FindNodeWithFingerprintInParentNodeUseCaseTest {
         whenever(getNodeFromCloudUseCase(fingerprint, generatedFingerprint, parentNodeId))
             .thenReturn(expectedNode)
         expectedNode?.let {
-            whenever(isNodeInRubbishBin(it.id.longValue)).thenReturn(isNodeInRubbishBin)
+            whenever(isNodeInRubbishBinUseCase(it.id)).thenReturn(isNodeInRubbishBin)
         }
 
         assertThat(underTest(fingerprint, generatedFingerprint, parentNodeId))

@@ -2,17 +2,13 @@ package mega.privacy.android.domain.usecase.node
 
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import javax.inject.Inject
 
 /**
  * Use Case that checks if the deleted Node is from Backups or not
- *
- * @property isNodeInRubbish [IsNodeInRubbish]
- * @property nodeRepository [NodeRepository]
  */
 class IsNodeDeletedFromBackupsUseCase @Inject constructor(
-    private val isNodeInRubbish: IsNodeInRubbish,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val nodeRepository: NodeRepository,
 ) {
 
@@ -24,7 +20,7 @@ class IsNodeDeletedFromBackupsUseCase @Inject constructor(
      * substring of the SyncDebris, and false if otherwise
      */
     suspend operator fun invoke(nodeId: NodeId): Boolean {
-        if (isNodeInRubbish(nodeId.longValue)) {
+        if (isNodeInRubbishBinUseCase(nodeId)) {
             val nodePath = nodeRepository.getNodePathById(nodeId)
             val nodePathLength = nodePath.length
 
@@ -33,6 +29,7 @@ class IsNodeDeletedFromBackupsUseCase @Inject constructor(
                 nodePathLength == SYNC_DEBRIS_PATH_LENGTH -> {
                     nodePath == SYNC_DEBRIS_PATH
                 }
+
                 else -> {
                     nodePath.subSequence(0, SYNC_DEBRIS_PATH_LENGTH + 1) == "$SYNC_DEBRIS_PATH/"
                 }

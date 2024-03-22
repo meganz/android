@@ -5,7 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -13,7 +13,6 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -30,19 +29,19 @@ class GetDefaultNodeHandleUseCaseTest {
     private lateinit var underTest: GetDefaultNodeHandleUseCase
 
     private val nodeRepository = mock<NodeRepository>()
-    private val isNodeInRubbish: IsNodeInRubbish = mock()
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase = mock()
 
     @BeforeAll
     fun setUp() {
         underTest = GetDefaultNodeHandleUseCase(
             nodeRepository = nodeRepository,
-            isNodeInRubbish = isNodeInRubbish
+            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(nodeRepository, isNodeInRubbish)
+        reset(nodeRepository, isNodeInRubbishBinUseCase)
     }
 
     @Test
@@ -50,7 +49,7 @@ class GetDefaultNodeHandleUseCaseTest {
         runTest {
             val defaultFolderName = "Camera Upload"
             val nodeId = NodeId(123456789L)
-            whenever(isNodeInRubbish.invoke(nodeId.longValue)).thenReturn(false)
+            whenever(isNodeInRubbishBinUseCase(nodeId)).thenReturn(false)
             whenever(nodeRepository.getDefaultNodeHandle(defaultFolderName)).thenReturn(nodeId)
             val actual = underTest(defaultFolderName)
             verify(nodeRepository).getDefaultNodeHandle(defaultFolderName)
@@ -60,16 +59,16 @@ class GetDefaultNodeHandleUseCaseTest {
     @ParameterizedTest(name = "when nodeId is {0} and is node in rubbish is {1}")
     @MethodSource("provideParams")
     fun `test that get default node handle returns invalid node value when there is no default node handle`(
-        nodeId: Long?,
+        nodeId: NodeId?,
         isInRubbishBin: Boolean,
     ) =
         runTest {
             val defaultFolderName = "Camera Upload"
             val invalidHandle = -1L
-            whenever(isNodeInRubbish.invoke(any())).thenReturn(isInRubbishBin)
-            whenever(nodeRepository.getDefaultNodeHandle(defaultFolderName)).thenReturn(
-                nodeId?.let { NodeId(it) }
-            )
+            nodeId?.let {
+                whenever(isNodeInRubbishBinUseCase(it)).thenReturn(isInRubbishBin)
+            }
+            whenever(nodeRepository.getDefaultNodeHandle(defaultFolderName)).thenReturn(nodeId)
             whenever(nodeRepository.getInvalidHandle()).thenReturn(invalidHandle)
             val actual = underTest(defaultFolderName)
             Truth.assertThat(actual).isEqualTo(invalidHandle)
@@ -78,6 +77,6 @@ class GetDefaultNodeHandleUseCaseTest {
     private fun provideParams() = Stream.of(
         Arguments.of(null, true),
         Arguments.of(null, false),
-        Arguments.of(1234L, true)
+        Arguments.of(NodeId(1234L), true)
     )
 }

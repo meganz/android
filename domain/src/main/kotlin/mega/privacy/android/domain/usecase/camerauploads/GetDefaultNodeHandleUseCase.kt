@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import javax.inject.Inject
 
 /**
@@ -10,7 +10,7 @@ import javax.inject.Inject
  */
 class GetDefaultNodeHandleUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
-    private val isNodeInRubbish: IsNodeInRubbish,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
 ) {
 
     /**
@@ -21,7 +21,7 @@ class GetDefaultNodeHandleUseCase @Inject constructor(
      */
     suspend operator fun invoke(defaultFolderName: String): Long {
         return nodeRepository.getDefaultNodeHandle(defaultFolderName)
-            ?.takeIf { isNodeInRubbish(it.longValue).not() }?.longValue
+            ?.takeIf { isNodeInRubbishBinUseCase(it).not() }?.longValue
             ?: nodeRepository.getInvalidHandle()
     }
 }

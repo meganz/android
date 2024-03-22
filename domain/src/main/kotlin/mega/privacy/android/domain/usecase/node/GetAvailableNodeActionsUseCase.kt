@@ -5,7 +5,6 @@ import mega.privacy.android.domain.entity.node.NodeAction
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import javax.inject.Inject
 
@@ -14,7 +13,7 @@ import javax.inject.Inject
  */
 class GetAvailableNodeActionsUseCase @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
-    private val isNodeInRubbish: IsNodeInRubbish,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
 ) {
@@ -26,7 +25,7 @@ class GetAvailableNodeActionsUseCase @Inject constructor(
      */
     suspend operator fun invoke(
         typedNode: TypedNode,
-    ) = if (isNodeInRubbish(typedNode.id.longValue)) {
+    ) = if (isNodeInRubbishBinUseCase(typedNode.id)) {
         listOf(NodeAction.Delete)
     } else mutableListOf<NodeAction>().apply {
         if (!typedNode.isTakenDown && typedNode is FileNode) {

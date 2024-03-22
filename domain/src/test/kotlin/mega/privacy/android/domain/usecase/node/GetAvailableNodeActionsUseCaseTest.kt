@@ -10,7 +10,6 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DynamicTest.dynamicTest
@@ -23,7 +22,6 @@ import org.mockito.kotlin.whenever
 /**
  * Test class for [GetAvailableNodeActionsUseCase]
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class GetAvailableNodeActionsUseCaseTest {
 
@@ -35,11 +33,11 @@ internal class GetAvailableNodeActionsUseCaseTest {
     }
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
-    private val isNodeInRubbish = mock<IsNodeInRubbish>()
+    private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
     private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>()
     private val underTest = GetAvailableNodeActionsUseCase(
         getNodeByIdUseCase = getNodeByIdUseCase,
-        isNodeInRubbish = isNodeInRubbish,
+        isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
         getNodeAccessPermission = getNodeAccessPermission,
         isNodeInBackupsUseCase = isNodeInBackupsUseCase,
     )
@@ -55,7 +53,7 @@ internal class GetAvailableNodeActionsUseCaseTest {
             folderNode,
             getNodeByIdUseCase,
             getNodeAccessPermission,
-            isNodeInRubbish,
+            isNodeInRubbishBinUseCase,
             isNodeInBackupsUseCase,
         )
     }
@@ -68,7 +66,7 @@ internal class GetAvailableNodeActionsUseCaseTest {
                 dynamicTest("node: $name, in rubbish bin: $inRubbish") {
                     runTest {
                         val node = mockNode()
-                        whenever(isNodeInRubbish(node.id.longValue)).thenReturn(inRubbish)
+                        whenever(isNodeInRubbishBinUseCase(node.id)).thenReturn(inRubbish)
                         val result = underTest(node)
                         if (inRubbish) {
                             Truth.assertThat(result).containsExactly(NodeAction.Delete)
@@ -360,7 +358,7 @@ internal class GetAvailableNodeActionsUseCaseTest {
         resetMocks()
         whenever(getNodeByIdUseCase.invoke(nodeId)).thenReturn(folderNode)
         whenever(folderNode.id).thenReturn(nodeId)
-        whenever(isNodeInRubbish(nodeId.longValue)).thenReturn(false)
+        whenever(isNodeInRubbishBinUseCase(nodeId)).thenReturn(false)
         whenever(folderNode.isIncomingShare).thenReturn(false)
         whenever(folderNode.parentId).thenReturn(invalidNode)
         whenever(isNodeInBackupsUseCase(nodeId.longValue)).thenReturn(false)
@@ -371,7 +369,7 @@ internal class GetAvailableNodeActionsUseCaseTest {
         resetMocks()
         whenever(getNodeByIdUseCase.invoke(nodeId)).thenReturn(fileNode)
         whenever(fileNode.id).thenReturn(nodeId)
-        whenever(isNodeInRubbish(nodeId.longValue)).thenReturn(false)
+        whenever(isNodeInRubbishBinUseCase(nodeId)).thenReturn(false)
         whenever(fileNode.isIncomingShare).thenReturn(false)
         whenever(fileNode.parentId).thenReturn(invalidNode)
         whenever(isNodeInBackupsUseCase(nodeId.longValue)).thenReturn(false)

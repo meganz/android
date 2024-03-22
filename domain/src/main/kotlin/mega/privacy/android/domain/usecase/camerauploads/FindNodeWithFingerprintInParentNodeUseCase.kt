@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import javax.inject.Inject
 
 /**
@@ -10,7 +10,7 @@ import javax.inject.Inject
  */
 class FindNodeWithFingerprintInParentNodeUseCase @Inject constructor(
     private val getNodeFromCloudUseCase: GetNodeFromCloudUseCase,
-    private val isNodeInRubbish: IsNodeInRubbish,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
 ) {
 
     /**
@@ -36,14 +36,14 @@ class FindNodeWithFingerprintInParentNodeUseCase @Inject constructor(
         )
 
         return nodeExists?.let { node ->
-            val isNodeInRubbish = isNodeInRubbish(node.id.longValue)
+            val isNodeInRubbishBin = isNodeInRubbishBinUseCase(node.id)
             val isNodeInParentFolder =
                 node.parentId.longValue == parentNodeId.longValue
 
             when {
                 isNodeInParentFolder -> Pair(true, node.id)
 
-                !isNodeInRubbish && !isNodeInParentFolder -> Pair(false, node.id)
+                !isNodeInRubbishBin && !isNodeInParentFolder -> Pair(false, node.id)
 
                 else -> Pair(null, node.id)
             }
