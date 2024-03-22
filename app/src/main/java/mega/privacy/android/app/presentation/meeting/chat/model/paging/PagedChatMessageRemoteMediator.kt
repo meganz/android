@@ -7,6 +7,7 @@ import androidx.paging.RemoteMediator
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.isActive
 import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatMessage
@@ -70,7 +71,11 @@ class PagedChatMessageRemoteMediator @AssistedInject constructor(
 
             MediatorResult.Success(endOfPaginationReached = response.loadResponse == ChatHistoryLoadStatus.NONE)
         } catch (e: Exception) {
-            Timber.e(e, "Paging mediator load: error")
+            if (e is TimeoutCancellationException) {
+                Timber.d("Paging mediator load: timeout")
+            } else {
+                Timber.e(e, "Paging mediator load: error")
+            }
             MediatorResult.Error(e)
         }
     }
