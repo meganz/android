@@ -219,6 +219,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun setMyChatFilesFolder(nodeHandle: Long) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("setMyChatFilesFolder") {
+                myChatsFilesFolderIdFlow.value = NodeId(nodeHandle)
                 chatFilesFolderUserAttributeMapper(it.megaStringMap)?.let { value ->
                     megaApiGateway.base64ToHandle(value)
                         .takeIf { handle -> handle != megaApiGateway.getInvalidHandle() }

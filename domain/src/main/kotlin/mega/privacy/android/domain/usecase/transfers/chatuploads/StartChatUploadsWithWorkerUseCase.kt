@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageTransferTagRequest
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -29,7 +30,6 @@ import kotlin.coroutines.coroutineContext
  */
 class StartChatUploadsWithWorkerUseCase @Inject constructor(
     private val uploadFilesUseCase: UploadFilesUseCase,
-    private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
     private val startChatUploadsWorkerUseCase: StartChatUploadsWorkerUseCase,
     private val isChatUploadsWorkerStartedUseCase: IsChatUploadsWorkerStartedUseCase,
     private val compressFileForChatUseCase: CompressFileForChatUseCase,
@@ -45,10 +45,12 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
      *
      * @param file the file that will be uploaded to chats folder in the cloud drive. If it's a folder will be filtered out because folders are not allowed as chat uploads
      * @param pendingMessageId the message id to be included in the app data, so the ChatUploadsWorker can associate the files to the corresponding message
+     * @param chatFilesFolderId the id of the folder where the files will be uploaded
      */
     operator fun invoke(
         file: File,
         pendingMessageId: Long,
+        chatFilesFolderId: NodeId,
     ): Flow<MultiTransferEvent> = flow {
         if (!fileSystemRepository.isFilePath(file.path)) {
             emit(
@@ -64,7 +66,6 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
                     to chatMessageRepository.getPendingMessage(pendingMessageId)?.name
         )
         coroutineContext.ensureActive()
-        val chatFilesFolderId = getMyChatsFilesFolderIdUseCase()
         val appData = TransferAppData.ChatUpload(pendingMessageId)
         startTransfersAndWorker(
             doTransfers = {

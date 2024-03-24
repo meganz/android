@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessa
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.GetFileForChatUploadUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWithWorkerUseCase
 import javax.inject.Inject
 
@@ -20,6 +21,7 @@ class SendChatAttachmentsUseCase @Inject constructor(
     private val getFileForChatUploadUseCase: GetFileForChatUploadUseCase,
     private val chatMessageRepository: ChatMessageRepository,
     private val deviceCurrentTimeUseCase: GetDeviceCurrentTimeUseCase,
+    private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
 ) {
     /**
      * Invoke
@@ -34,6 +36,7 @@ class SendChatAttachmentsUseCase @Inject constructor(
         isVoiceClip: Boolean = false,
     ) =
         flow {
+            val chatFolderId = getMyChatsFilesFolderIdUseCase()
             emitAll(
                 //each file is sent as a single message in parallel
                 urisWithNames.mapKeys {
@@ -55,7 +58,7 @@ class SendChatAttachmentsUseCase @Inject constructor(
                                 transferTag = -1,
                             )
                         ).id
-                        startChatUploadsWithWorkerUseCase(file, pendingMessageId)
+                        startChatUploadsWithWorkerUseCase(file, pendingMessageId, chatFolderId)
                     }
                 }.merge()
             )

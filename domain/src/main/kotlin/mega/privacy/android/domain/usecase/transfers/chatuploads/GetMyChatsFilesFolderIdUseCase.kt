@@ -3,8 +3,8 @@ package mega.privacy.android.domain.usecase.transfers.chatuploads
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
-import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import javax.inject.Inject
 
 /**
@@ -13,8 +13,8 @@ import javax.inject.Inject
 class GetMyChatsFilesFolderIdUseCase @Inject constructor(
     private val createFolderNodeUseCase: CreateFolderNodeUseCase,
     private val fileSystemRepository: FileSystemRepository,
-    private val nodeRepository: NodeRepository,
     private val chatRepository: ChatRepository,
+    private val isNodeInRubbishOrDeletedUseCase: IsNodeInRubbishOrDeletedUseCase,
 ) {
 
     /**
@@ -22,7 +22,7 @@ class GetMyChatsFilesFolderIdUseCase @Inject constructor(
      */
     suspend operator fun invoke(): NodeId {
         val nodeId = fileSystemRepository.getMyChatsFilesFolderId()
-        return if (nodeId == null || nodeRepository.getNodeById(nodeId) == null) {
+        return if (nodeId == null || isNodeInRubbishOrDeletedUseCase(nodeId.longValue)) {
             val handle =
                 fileSystemRepository.setMyChatFilesFolder(
                     createFolderNodeUseCase(chatRepository.getDefaultChatFolderName()).longValue

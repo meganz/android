@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMes
 import mega.privacy.android.domain.entity.chat.messages.PendingVoiceClipMessage
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWithWorkerUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -31,6 +32,7 @@ class RetryPendingMessageUseCaseTest {
 
     private val startChatUploadsWithWorkerUseCase = mock<StartChatUploadsWithWorkerUseCase>()
     private val attachNodeWithPendingMessageUseCase = mock<AttachNodeWithPendingMessageUseCase>()
+    private val getMyChatsFilesFolderIdUseCase = mock<GetMyChatsFilesFolderIdUseCase>()
 
 
     @BeforeAll
@@ -38,6 +40,7 @@ class RetryPendingMessageUseCaseTest {
         underTest = RetryPendingMessageUseCase(
             startChatUploadsWithWorkerUseCase,
             attachNodeWithPendingMessageUseCase,
+            getMyChatsFilesFolderIdUseCase,
         )
     }
 
@@ -89,16 +92,24 @@ class RetryPendingMessageUseCaseTest {
         runTest {
             val file = mock<File>()
             val msgId = 15L
+            val myChatFilesFolderId = NodeId(11L)
             val message = mock<PendingFileAttachmentMessage> {
                 on { it.state } doReturn PendingMessageState.ERROR_UPLOADING
                 on { it.file } doReturn file
                 on { it.msgId } doReturn msgId
             }
-            whenever(startChatUploadsWithWorkerUseCase(any(), any())) doReturn emptyFlow()
+            whenever(
+                startChatUploadsWithWorkerUseCase(
+                    any(),
+                    any(),
+                    NodeId(any())
+                )
+            ) doReturn emptyFlow()
+            whenever(getMyChatsFilesFolderIdUseCase()) doReturn myChatFilesFolderId
 
             underTest(message)
 
-            verify(startChatUploadsWithWorkerUseCase).invoke(file, msgId)
+            verify(startChatUploadsWithWorkerUseCase).invoke(file, msgId, myChatFilesFolderId)
         }
 
     @Test

@@ -4,10 +4,12 @@ import app.cash.turbine.test
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.PendingMessage
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.GetFileForChatUploadUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWithWorkerUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -32,6 +34,7 @@ class SendChatAttachmentsUseCaseTest {
     private val getFileForChatUploadUseCase = mock<GetFileForChatUploadUseCase>()
     private val chatMessageRepository = mock<ChatMessageRepository>()
     private val deviceCurrentTimeUseCase = mock<GetDeviceCurrentTimeUseCase>()
+    private val getMyChatsFilesFolderIdUseCase = mock<GetMyChatsFilesFolderIdUseCase>()
 
     private val file = mockFile()
 
@@ -43,6 +46,7 @@ class SendChatAttachmentsUseCaseTest {
             getFileForChatUploadUseCase,
             chatMessageRepository,
             deviceCurrentTimeUseCase,
+            getMyChatsFilesFolderIdUseCase,
         )
     }
 
@@ -53,6 +57,7 @@ class SendChatAttachmentsUseCaseTest {
             getFileForChatUploadUseCase,
             chatMessageRepository,
             deviceCurrentTimeUseCase,
+            getMyChatsFilesFolderIdUseCase,
         )
     }
 
@@ -64,7 +69,7 @@ class SendChatAttachmentsUseCaseTest {
         underTest(chatId, uris).test {
             cancelAndIgnoreRemainingEvents()
         }
-        verify(startChatUploadsWithWorkerUseCase)(eq(file), any())
+        verify(startChatUploadsWithWorkerUseCase)(eq(file), any(), NodeId(any()))
     }
 
     @Test
@@ -79,7 +84,7 @@ class SendChatAttachmentsUseCaseTest {
         underTest(chatId, uris).test {
             cancelAndIgnoreRemainingEvents()
         }
-        verify(startChatUploadsWithWorkerUseCase, times(uris.size))(any(), any())
+        verify(startChatUploadsWithWorkerUseCase, times(uris.size))(any(), any(), NodeId(any()))
     }
 
     @Test
@@ -91,7 +96,7 @@ class SendChatAttachmentsUseCaseTest {
         underTest(chatId, uris).test {
             cancelAndIgnoreRemainingEvents()
         }
-        verify(startChatUploadsWithWorkerUseCase)(eq(file), eq(pendingMsgId))
+        verify(startChatUploadsWithWorkerUseCase)(eq(file), eq(pendingMsgId), NodeId(any()))
     }
 
     @Test
@@ -125,7 +130,27 @@ class SendChatAttachmentsUseCaseTest {
             })
         }
 
-    private suspend fun commonStub(pendingMsgId: Long = 1L) {
+    @Test
+    fun `test that getMyChatsFilesFolderIdUseCase is called only once for multiple files`() =
+        runTest {
+            val chatId = 123L
+            val myChatFolderId = NodeId(154L)
+            val uris = List(3) { "file$it" }.associateWith { null }
+            commonStub(myChatFolderId = myChatFolderId)
+            uris.keys.forEach {
+                val file = mockFile()
+                whenever(getFileForChatUploadUseCase(it)).thenReturn(file)
+            }
+            underTest(chatId, uris).test {
+                cancelAndConsumeRemainingEvents()
+
+                verify(startChatUploadsWithWorkerUseCase, times(uris.size))
+                    .invoke(any(), any(), NodeId(eq(myChatFolderId.longValue)))
+                verify(getMyChatsFilesFolderIdUseCase).invoke()
+            }
+        }
+
+    private suspend fun commonStub(pendingMsgId: Long = 1L, myChatFolderId: NodeId = NodeId(-1)) {
         val pendingMessage = mock<PendingMessage> {
             on { id } doReturn pendingMsgId
         }
@@ -134,10 +159,11 @@ class SendChatAttachmentsUseCaseTest {
         val event = mock<MultiTransferEvent.SingleTransferEvent> {
             on { scanningFinished } doReturn true
         }
-        whenever(startChatUploadsWithWorkerUseCase(any(), any())).thenReturn(
+        whenever(startChatUploadsWithWorkerUseCase(any(), any(), NodeId(any()))).thenReturn(
             flowOf(event)
         )
         whenever(getFileForChatUploadUseCase(any())).thenReturn(file)
+        whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(myChatFolderId)
     }
 
     private fun mockFile() = mock<File> {
