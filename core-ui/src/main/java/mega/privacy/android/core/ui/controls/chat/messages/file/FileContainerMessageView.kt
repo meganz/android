@@ -47,26 +47,27 @@ internal fun FileContainerMessageView(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-
     // the size of loading overlay is calculated later
     var width by remember { mutableStateOf(0.dp) }
     var height by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(MegaTheme.colors.background.surface2)
-            .testTag(FILE_MESSAGE_VIEW_ROOT_TEST_TAG)
-            .onGloballyPositioned {
-                width = with(density) { it.size.width.toDp() }
-                height = with(density) { it.size.height.toDp() }
-            }
-    ) {
-        content()
+
+    Box(modifier = modifier.clip(RoundedCornerShape(12.dp))) {
+        Box(
+            modifier = Modifier
+                .background(MegaTheme.colors.background.surface2)
+                .testTag(FILE_MESSAGE_VIEW_ROOT_TEST_TAG)
+                .onGloballyPositioned {
+                    width = with(density) { it.size.width.toDp() }
+                    height = with(density) { it.size.height.toDp() }
+                }
+        ) {
+            content()
+        }
+
         if ((loadProgress ?: 1f) < 1f) {
             Box(
-                modifier = Modifier
-                    .size(width, height)
+                modifier = Modifier.size(width, height)
             ) {
                 LoadOverlay(modifier = Modifier.testTag(FILE_MESSAGE_VIEW_OVERLAY_TEST_TAG))
                 MegaLinearProgressIndicator(
