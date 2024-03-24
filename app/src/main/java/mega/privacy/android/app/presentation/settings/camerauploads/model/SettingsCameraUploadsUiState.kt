@@ -11,8 +11,12 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
  * attempts to enable Camera Uploads
  * @property isCameraUploadsEnabled true if Camera Uploads is enabled
  * @property isMediaUploadsEnabled true if Media Uploads is enabled
+ * @property maximumNonChargingVideoCompressionSize The maximum aggregated Video Size that can be
+ * compressed without having to charge the Device
  * @property requestPermissions State Event that triggers a request to grant Camera Uploads
  * permissions
+ * @property requireChargingDuringVideoCompression, If true, the Device needs to be charged when
+ * compressing Videos
  * @property shouldIncludeLocationTags If true, Location Tags are added when uploading Photos through
  * Camera Uploads
  * @property shouldKeepUploadFileNames true if the content being uploaded should retain their filenames
@@ -24,7 +28,9 @@ internal data class SettingsCameraUploadsUiState(
     val businessAccountPromptType: EnableCameraUploadsStatus? = null,
     val isCameraUploadsEnabled: Boolean = false,
     val isMediaUploadsEnabled: Boolean = false,
+    val maximumNonChargingVideoCompressionSize: Int = 200,
     val requestPermissions: StateEvent = consumed,
+    val requireChargingDuringVideoCompression: Boolean = true,
     val shouldIncludeLocationTags: Boolean = false,
     val shouldKeepUploadFileNames: Boolean = false,
     val uploadConnectionType: UploadConnectionType = UploadConnectionType.WIFI,
@@ -36,15 +42,17 @@ internal data class SettingsCameraUploadsUiState(
      * uploading Photos
      */
     val canChangeLocationTagsState
-        get() = uploadOptionUiItem in listOf(
-            UploadOptionUiItem.PhotosOnly, UploadOptionUiItem.PhotosAndVideos
-        )
+        get() = uploadOptionUiItem != UploadOptionUiItem.VideosOnly
+
+    /**
+     * Checks if the User can change whether or not charging is required during Video Compression
+     */
+    val canChangeChargingDuringVideoCompressionState
+        get() = uploadOptionUiItem != UploadOptionUiItem.PhotosOnly && videoQualityUiItem != VideoQualityUiItem.Original
 
     /**
      * Checks if the User can select what Video Quality to use when uploading Videos
      */
     val canChangeVideoQuality
-        get() = uploadOptionUiItem in listOf(
-            UploadOptionUiItem.VideosOnly, UploadOptionUiItem.PhotosAndVideos
-        )
+        get() = uploadOptionUiItem != UploadOptionUiItem.PhotosOnly
 }

@@ -37,6 +37,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.tiles.FileUp
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.HowToUploadTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.IncludeLocationTagsTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.KeepFileNamesTile
+import mega.privacy.android.app.presentation.settings.camerauploads.tiles.RequireChargingDuringVideoCompressionTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VideoQualityTile
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
@@ -51,6 +52,8 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  * @param onBusinessAccountPromptDismissed Lambda to execute when the User dismisses the Business
  * Account prompt
  * @param onCameraUploadsStateChanged Lambda to execute when the Camera Uploads state changes
+ * @param onChargingDuringVideoCompressionStateChanged Lambda to execute when the Device charging
+ * state has changed when compressing Videos
  * @param onIncludeLocationTagsStateChanged Lambda to execute when the Include Location Tags state
  * changes
  * @param onHowToUploadPromptOptionSelected Lambda to execute when the User selects a new
@@ -74,6 +77,7 @@ internal fun SettingsCameraUploadsView(
     uiState: SettingsCameraUploadsUiState,
     onBusinessAccountPromptDismissed: () -> Unit,
     onCameraUploadsStateChanged: (Boolean) -> Unit,
+    onChargingDuringVideoCompressionStateChanged: (Boolean) -> Unit,
     onIncludeLocationTagsStateChanged: (Boolean) -> Unit,
     onHowToUploadPromptOptionSelected: (UploadConnectionType) -> Unit,
     onKeepFileNamesStateChanged: (Boolean) -> Unit,
@@ -183,6 +187,13 @@ internal fun SettingsCameraUploadsView(
                             onItemClicked = { showVideoQualityPrompt = true },
                         )
                     }
+                    if (uiState.canChangeChargingDuringVideoCompressionState) {
+                        RequireChargingDuringVideoCompressionTile(
+                            maximumNonChargingVideoCompressionSize = uiState.maximumNonChargingVideoCompressionSize,
+                            isChecked = uiState.requireChargingDuringVideoCompression,
+                            onCheckedChange = onChargingDuringVideoCompressionStateChanged,
+                        )
+                    }
                     KeepFileNamesTile(
                         isChecked = uiState.shouldKeepUploadFileNames,
                         onCheckedChange = onKeepFileNamesStateChanged,
@@ -209,6 +220,7 @@ private fun SettingsCameraUploadsViewPreview(
             onRegularBusinessAccountSubUserPromptAcknowledged = {},
             onBusinessAccountPromptDismissed = {},
             onCameraUploadsStateChanged = {},
+            onChargingDuringVideoCompressionStateChanged = {},
             onIncludeLocationTagsStateChanged = {},
             onHowToUploadPromptOptionSelected = {},
             onKeepFileNamesStateChanged = {},

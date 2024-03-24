@@ -28,11 +28,14 @@ import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptU
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
@@ -55,14 +58,20 @@ import javax.inject.Inject
  * @property deleteCameraUploadsTemporaryRootDirectoryUseCase Deletes the temporary Camera Uploads Cache Folder
  * @property getUploadOptionUseCase Gets the type of content being uploaded by Camera Uploads
  * @property getUploadVideoQualityUseCase Gets the Video Quality of Videos being uploaded by Camera Uploads
+ * @property getVideoCompressionSizeLimitUseCase Gets the maximum aggregated Video Size that can be
+ * compressed without having to charge the Device
  * @property isCameraUploadsByWifiUseCase Checks whether Camera Uploads can only be run on Wi-Fi / Wi-Fi or Mobile Data
  * @property isCameraUploadsEnabledUseCase Checks if Camera Uploads (the Primary Folder) is enabled
  * or not
+ * @property isChargingRequiredForVideoCompressionUseCase Checks whether or not the Device should be
+ * charged when compressing Videos
  * @property isConnectedToInternetUseCase Checks if the User is connected to the Internet or not
  * @property isSecondaryFolderEnabled Checks if Media Uploads (the Secondary Folder) is enabled or not
  * @property listenToNewMediaUseCase Listens to new Photos and Videos captured by the Device
  * @property preparePrimaryFolderPathUseCase Prepares the Primary Folder path
  * @property setCameraUploadsByWifiUseCase Sets whether Camera Uploads can only run through Wi-Fi / Wi-Fi or Mobile Data
+ * @property setChargingRequiredForVideoCompressionUseCase Sets whether or not the Device should be
+ * charged when compressing Videos
  * @property setLocationTagsEnabledUseCase Sets whether or not Location Tags are added in Photo uploads
  * @property setUploadFileNamesKeptUseCase Sets whether or not existing filenames should be used
  * when uploading content
@@ -84,13 +93,16 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase,
     private val getUploadOptionUseCase: GetUploadOptionUseCase,
     private val getUploadVideoQualityUseCase: GetUploadVideoQualityUseCase,
+    private val getVideoCompressionSizeLimitUseCase: GetVideoCompressionSizeLimitUseCase,
     private val isCameraUploadsByWifiUseCase: IsCameraUploadsByWifiUseCase,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
+    private val isChargingRequiredForVideoCompressionUseCase: IsChargingRequiredForVideoCompressionUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
     private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
     private val preparePrimaryFolderPathUseCase: PreparePrimaryFolderPathUseCase,
     private val setCameraUploadsByWifiUseCase: SetCameraUploadsByWifiUseCase,
+    private val setChargingRequiredForVideoCompressionUseCase: SetChargingRequiredForVideoCompressionUseCase,
     private val setLocationTagsEnabledUseCase: SetLocationTagsEnabledUseCase,
     private val setUploadFileNamesKeptUseCase: SetUploadFileNamesKeptUseCase,
     private val setUploadOptionUseCase: SetUploadOptionUseCase,
@@ -124,6 +136,10 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
 
                 val isCameraUploadsEnabled = async { isCameraUploadsEnabledUseCase() }
                 val isMediaUploadsEnabled = async { isSecondaryFolderEnabled() }
+                val maximumNonChargingVideoCompressionSize =
+                    async { getVideoCompressionSizeLimitUseCase() }
+                val requireChargingDuringVideoCompression =
+                    async { isChargingRequiredForVideoCompressionUseCase() }
                 val shouldIncludeLocationTags = async { areLocationTagsEnabledUseCase() }
                 val shouldKeepUploadFileNames = async { areUploadFileNamesKeptUseCase() }
                 val uploadOption = async { getUploadOptionUseCase() }
@@ -134,6 +150,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                     it.copy(
                         isCameraUploadsEnabled = isCameraUploadsEnabled.await(),
                         isMediaUploadsEnabled = isMediaUploadsEnabled.await(),
+                        maximumNonChargingVideoCompressionSize = maximumNonChargingVideoCompressionSize.await(),
+                        requireChargingDuringVideoCompression = requireChargingDuringVideoCompression.await(),
                         shouldIncludeLocationTags = shouldIncludeLocationTags.await(),
                         shouldKeepUploadFileNames = shouldKeepUploadFileNames.await(),
                         uploadOptionUiItem = uploadOptionUiItemMapper(uploadOption.await()),
@@ -379,6 +397,28 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 Timber.e(
                     "An error occurred when changing the Include Location Tags state",
                     exception
+                )
+                showGenericErrorSnackbar()
+            }
+        }
+    }
+
+    /**
+     * Configures whether or not the Device should be charged when compressing Videos. Doing this
+     * stops the ongoing Camera Uploads process
+     *
+     * @param newState The new Device charging state when compressing Videos
+     */
+    fun onChargingDuringVideoCompressionStateChanged(newState: Boolean) {
+        viewModelScope.launch {
+            runCatching {
+                setChargingRequiredForVideoCompressionUseCase(newState)
+                stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
+                _uiState.update { it.copy(requireChargingDuringVideoCompression = newState) }
+            }.onFailure { exception ->
+                Timber.e(
+                    "An error occurred when changing the Video Compression Charging State",
+                    exception,
                 )
                 showGenericErrorSnackbar()
             }

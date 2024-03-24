@@ -27,11 +27,14 @@ import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptU
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
@@ -78,13 +81,18 @@ internal class SettingsCameraUploadsViewModelTest {
         mock<DeleteCameraUploadsTemporaryRootDirectoryUseCase>()
     private val getUploadOptionUseCase = mock<GetUploadOptionUseCase>()
     private val getUploadVideoQualityUseCase = mock<GetUploadVideoQualityUseCase>()
+    private val getVideoCompressionSizeLimitUseCase = mock<GetVideoCompressionSizeLimitUseCase>()
     private val isCameraUploadsByWifiUseCase = mock<IsCameraUploadsByWifiUseCase>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
+    private val isChargingRequiredForVideoCompressionUseCase =
+        mock<IsChargingRequiredForVideoCompressionUseCase>()
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
     private val listenToNewMediaUseCase = mock<ListenToNewMediaUseCase>()
     private val preparePrimaryFolderPathUseCase = mock<PreparePrimaryFolderPathUseCase>()
     private val setCameraUploadsByWifiUseCase = mock<SetCameraUploadsByWifiUseCase>()
+    private val setChargingRequiredForVideoCompressionUseCase =
+        mock<SetChargingRequiredForVideoCompressionUseCase>()
     private val setLocationTagsEnabledUseCase = mock<SetLocationTagsEnabledUseCase>()
     private val setUploadFileNamesKeptUseCase = mock<SetUploadFileNamesKeptUseCase>()
     private val setUploadOptionUseCase = mock<SetUploadOptionUseCase>()
@@ -105,13 +113,16 @@ internal class SettingsCameraUploadsViewModelTest {
             deleteCameraUploadsTemporaryRootDirectoryUseCase,
             getUploadOptionUseCase,
             getUploadVideoQualityUseCase,
+            getVideoCompressionSizeLimitUseCase,
             isCameraUploadsByWifiUseCase,
             isCameraUploadsEnabledUseCase,
+            isChargingRequiredForVideoCompressionUseCase,
             isConnectedToInternetUseCase,
             isSecondaryFolderEnabled,
             listenToNewMediaUseCase,
             preparePrimaryFolderPathUseCase,
             setCameraUploadsByWifiUseCase,
+            setChargingRequiredForVideoCompressionUseCase,
             setLocationTagsEnabledUseCase,
             setUploadFileNamesKeptUseCase,
             setUploadOptionUseCase,
@@ -130,6 +141,8 @@ internal class SettingsCameraUploadsViewModelTest {
         isCameraUploadsByWifi: Boolean = true,
         isCameraUploadsEnabled: Boolean = true,
         isMediaUploadsEnabled: Boolean = true,
+        maximumNonChargingVideoCompressionSize: Int = 500,
+        requireChargingDuringVideoCompression: Boolean = true,
         shouldIncludeLocationTags: Boolean = true,
         shouldKeepUploadFileNames: Boolean = true,
         uploadOption: UploadOption = UploadOption.PHOTOS,
@@ -137,11 +150,17 @@ internal class SettingsCameraUploadsViewModelTest {
     ) {
         whenever(areLocationTagsEnabledUseCase()).thenReturn(shouldIncludeLocationTags)
         whenever(areUploadFileNamesKeptUseCase()).thenReturn(shouldKeepUploadFileNames)
-        whenever(isCameraUploadsByWifiUseCase()).thenReturn(isCameraUploadsByWifi)
-        whenever(isCameraUploadsEnabledUseCase()).thenReturn(isCameraUploadsEnabled)
-        whenever(isSecondaryFolderEnabled()).thenReturn(isMediaUploadsEnabled)
         whenever(getUploadOptionUseCase()).thenReturn(uploadOption)
         whenever(getUploadVideoQualityUseCase()).thenReturn(videoQuality)
+        whenever(getVideoCompressionSizeLimitUseCase()).thenReturn(
+            maximumNonChargingVideoCompressionSize
+        )
+        whenever(isCameraUploadsByWifiUseCase()).thenReturn(isCameraUploadsByWifi)
+        whenever(isCameraUploadsEnabledUseCase()).thenReturn(isCameraUploadsEnabled)
+        whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(
+            requireChargingDuringVideoCompression
+        )
+        whenever(isSecondaryFolderEnabled()).thenReturn(isMediaUploadsEnabled)
 
         underTest = SettingsCameraUploadsViewModel(
             areLocationTagsEnabledUseCase = areLocationTagsEnabledUseCase,
@@ -150,13 +169,16 @@ internal class SettingsCameraUploadsViewModelTest {
             deleteCameraUploadsTemporaryRootDirectoryUseCase = deleteCameraUploadsTemporaryRootDirectoryUseCase,
             getUploadOptionUseCase = getUploadOptionUseCase,
             getUploadVideoQualityUseCase = getUploadVideoQualityUseCase,
+            getVideoCompressionSizeLimitUseCase = getVideoCompressionSizeLimitUseCase,
             isCameraUploadsByWifiUseCase = isCameraUploadsByWifiUseCase,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
+            isChargingRequiredForVideoCompressionUseCase = isChargingRequiredForVideoCompressionUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             isSecondaryFolderEnabled = isSecondaryFolderEnabled,
             listenToNewMediaUseCase = listenToNewMediaUseCase,
             preparePrimaryFolderPathUseCase = preparePrimaryFolderPathUseCase,
             setCameraUploadsByWifiUseCase = setCameraUploadsByWifiUseCase,
+            setChargingRequiredForVideoCompressionUseCase = setChargingRequiredForVideoCompressionUseCase,
             setLocationTagsEnabledUseCase = setLocationTagsEnabledUseCase,
             setUploadFileNamesKeptUseCase = setUploadFileNamesKeptUseCase,
             setUploadOptionUseCase = setUploadOptionUseCase,
@@ -645,6 +667,52 @@ internal class SettingsCameraUploadsViewModelTest {
             underTest.uiState.test {
                 assertThat(awaitItem().shouldIncludeLocationTags).isEqualTo(
                     shouldIncludeLocationTags
+                )
+            }
+        }
+    }
+
+    /**
+     * The Test Group that verifies behaviors when Device Charging is enabled / disabled when
+     * compressing Videos
+     */
+    @Nested
+    @DisplayName("Require Charging During Video Compression")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    internal inner class RequireChargingDuringVideoCompressionTestGroup {
+        @Test
+        fun `test that an error snackbar is displayed when changing the device charging state throws an exception`() =
+            runTest {
+                initializeUnderTest()
+                whenever(setChargingRequiredForVideoCompressionUseCase(any())).thenThrow(
+                    RuntimeException()
+                )
+
+                assertDoesNotThrow { underTest.onChargingDuringVideoCompressionStateChanged(false) }
+                verify(snackBarHandler).postSnackbarMessage(
+                    resId = R.string.general_error,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
+
+        @ParameterizedTest(name = "new device charging state during video compression: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that changing the device charging state during video compression stops camera uploads`(
+            requireChargingDuringVideoCompression: Boolean,
+        ) = runTest {
+            initializeUnderTest()
+
+            underTest.onChargingDuringVideoCompressionStateChanged(
+                requireChargingDuringVideoCompression
+            )
+
+            verify(setChargingRequiredForVideoCompressionUseCase).invoke(
+                requireChargingDuringVideoCompression
+            )
+            verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
+            underTest.uiState.test {
+                assertThat(awaitItem().requireChargingDuringVideoCompression).isEqualTo(
+                    requireChargingDuringVideoCompression
                 )
             }
         }
