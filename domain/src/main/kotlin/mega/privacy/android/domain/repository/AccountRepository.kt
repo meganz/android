@@ -620,4 +620,12 @@ interface AccountRepository {
      * Clear last registered email
      */
     suspend fun clearLastRegisteredEmail()
+
+    /**
+     * Retrieves information on the Account Cancellation Link
+     *
+     * @param accountCancellationLink The Account Cancellation Link to be queried
+     * @return the Account Cancellation Link if there are no issues found during the querying process
+     */
+    suspend fun queryCancelLink(accountCancellationLink: String): String
 }

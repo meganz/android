@@ -519,7 +519,8 @@ internal class MegaApiFacade @Inject constructor(
     override fun getUserEmail(userHandle: Long, callback: MegaRequestListenerInterface) =
         megaApi.getUserEmail(userHandle, callback)
 
-    override suspend fun getContact(emailOrBase64Handle: String): MegaUser? = megaApi.getContact(emailOrBase64Handle)
+    override suspend fun getContact(emailOrBase64Handle: String): MegaUser? =
+        megaApi.getContact(emailOrBase64Handle)
 
     override suspend fun getUserAlerts(): List<MegaUserAlert> = megaApi.userAlerts
 
@@ -1545,4 +1546,7 @@ internal class MegaApiFacade @Inject constructor(
         pwd: String,
         listener: MegaRequestListenerInterface,
     ) = megaApi.confirmChangeEmail(link, pwd, listener)
+
+    override fun queryCancelLink(link: String, listener: MegaRequestListenerInterface) =
+        megaApi.queryCancelLink(link, listener)
 }
