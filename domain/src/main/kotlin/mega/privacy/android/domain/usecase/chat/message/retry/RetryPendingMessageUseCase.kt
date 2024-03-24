@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWithWorkerUseCase
 import javax.inject.Inject
 
@@ -14,6 +15,7 @@ import javax.inject.Inject
 class RetryPendingMessageUseCase @Inject constructor(
     private val startChatUploadsWithWorkerUseCase: StartChatUploadsWithWorkerUseCase,
     private val attachNodeWithPendingMessageUseCase: AttachNodeWithPendingMessageUseCase,
+    private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
 ) : RetryMessageUseCase() {
     override fun canRetryMessage(message: TypedMessage): Boolean =
         message is PendingAttachmentMessage
@@ -23,7 +25,11 @@ class RetryPendingMessageUseCase @Inject constructor(
         when (message.state) {
             PendingMessageState.ERROR_UPLOADING -> {
                 message.file?.let {
-                    startChatUploadsWithWorkerUseCase(it, message.msgId).collect()
+                    startChatUploadsWithWorkerUseCase(
+                        file = it,
+                        pendingMessageId = message.msgId,
+                        chatFilesFolderId = getMyChatsFilesFolderIdUseCase()
+                    ).collect()
                 }
                     ?: throw IllegalArgumentException("Only messages with file can be retried when the state is ERROR_UPLOADING")
             }

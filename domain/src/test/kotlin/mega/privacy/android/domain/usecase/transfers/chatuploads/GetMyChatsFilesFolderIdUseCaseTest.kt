@@ -5,8 +5,8 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
-import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -18,24 +18,23 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.lang.IllegalArgumentException
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetMyChatsFilesFolderIdUseCaseTest {
     private lateinit var underTest: GetMyChatsFilesFolderIdUseCase
 
     private val fileSystemRepository = mock<FileSystemRepository>()
-    private val nodeRepository = mock<NodeRepository>()
     private val chatRepository = mock<ChatRepository>()
     private val createFolderNodeUseCase = mock<CreateFolderNodeUseCase>()
+    private val isNodeInRubbishOrDeletedUseCase = mock<IsNodeInRubbishOrDeletedUseCase>()
 
     @BeforeAll
     fun setup() {
         underTest = GetMyChatsFilesFolderIdUseCase(
             createFolderNodeUseCase,
             fileSystemRepository,
-            nodeRepository,
             chatRepository,
+            isNodeInRubbishOrDeletedUseCase,
         )
     }
 
@@ -43,19 +42,20 @@ class GetMyChatsFilesFolderIdUseCaseTest {
     fun resetMocks() =
         reset(
             fileSystemRepository,
-            nodeRepository,
             chatRepository,
             createFolderNodeUseCase,
+            isNodeInRubbishOrDeletedUseCase,
         )
 
     @Test
-    fun `test that repository folder id is returned when the folder exists`() = runTest {
-        val folderId = NodeId(11L)
-        whenever(fileSystemRepository.getMyChatsFilesFolderId()).thenReturn(folderId)
-        whenever(nodeRepository.getNodeById(folderId)).thenReturn(mock())
-        val actual = underTest()
-        assertThat(actual).isEqualTo(folderId)
-    }
+    fun `test that repository folder id is returned when the folder exists and is not in the rubbish bin`() =
+        runTest {
+            val folderId = NodeId(11L)
+            whenever(fileSystemRepository.getMyChatsFilesFolderId()).thenReturn(folderId)
+            whenever(isNodeInRubbishOrDeletedUseCase(folderId.longValue)).thenReturn(false)
+            val actual = underTest()
+            assertThat(actual).isEqualTo(folderId)
+        }
 
     @Test
     fun `test that created folder is returned when existing folder id is null`() = runTest {
@@ -65,6 +65,18 @@ class GetMyChatsFilesFolderIdUseCaseTest {
         val actual = underTest()
         assertThat(actual).isEqualTo(folderId)
     }
+
+    @Test
+    fun `test that created folder is returned when existing folder id is in rubbish bin`() =
+        runTest {
+            val handle = 11L
+            val folderId = NodeId(handle)
+            whenever(fileSystemRepository.getMyChatsFilesFolderId()).thenReturn(folderId)
+            whenever(isNodeInRubbishOrDeletedUseCase(folderId.longValue)).thenReturn(true)
+            stubFolderCreation()
+            val actual = underTest()
+            assertThat(actual).isEqualTo(folderId)
+        }
 
     @Test
     fun `test that folder is created with the proper name`() = runTest {
