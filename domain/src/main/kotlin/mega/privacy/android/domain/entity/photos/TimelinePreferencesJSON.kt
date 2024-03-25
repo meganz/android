@@ -30,4 +30,8 @@ enum class TimelinePreferencesJSON(val value: String) {
     JSON_VAL_LOCATION_CLOUD_DRIVE("cloudDrive"),
 
     JSON_VAL_LOCATION_CAMERA_UPLOAD("cameraUploads"),
+
+    JSON_SENSITIVES("sensitives"),
+
+    JSON_SENSITIVES_ONBOARDED("onboarded"),
 }

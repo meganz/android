@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.bottomsheet.model
 
+import mega.privacy.android.domain.entity.account.AccountDetail
 import nz.mega.sdk.MegaNode
 
 /**
@@ -11,6 +12,8 @@ import nz.mega.sdk.MegaNode
  * @property shareData
  * @property nodeDeviceCenterInformation
  * @property shareKeyCreated
+ * @property accountDetail
+ * @property isHiddenNodesOnboarded
  */
 data class NodeBottomSheetUIState(
     val canMoveNode: Boolean = false,
@@ -20,4 +23,6 @@ data class NodeBottomSheetUIState(
     val shareData: NodeShareInformation? = null,
     val nodeDeviceCenterInformation: NodeDeviceCenterInformation? = null,
     val shareKeyCreated: Boolean? = null,
+    val accountDetail: AccountDetail? = null,
+    val isHiddenNodesOnboarded: Boolean? = null,
 )

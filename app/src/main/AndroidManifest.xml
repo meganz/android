@@ -716,6 +716,10 @@
         <activity
             android:name=".presentation.imagepreview.slideshow.SlideshowActivity"
             android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name=".presentation.hidenode.HiddenNodesOnboardingActivity"
+            android:label=""
+            android:launchMode="singleTop" />
     </application>
 
 </manifest>

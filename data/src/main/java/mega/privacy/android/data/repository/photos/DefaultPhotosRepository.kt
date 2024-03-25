@@ -40,6 +40,8 @@ import mega.privacy.android.data.mapper.node.ImageNodeFileMapper
 import mega.privacy.android.data.mapper.node.ImageNodeMapper
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.photos.ContentConsumptionMegaStringMapMapper
+import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesMapper
+import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesRetriever
 import mega.privacy.android.data.mapper.photos.TimelineFilterPreferencesJSONMapper
 import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -68,6 +70,7 @@ import nz.mega.sdk.MegaNode
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 @Singleton
@@ -88,6 +91,8 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val imageNodeFileMapper: ImageNodeFileMapper,
     private val timelineFilterPreferencesJSONMapper: TimelineFilterPreferencesJSONMapper,
     private val contentConsumptionMegaStringMapMapper: ContentConsumptionMegaStringMapMapper,
+    private val sensitivesMapper: MegaStringMapSensitivesMapper,
+    private val sensitivesRetriever: MegaStringMapSensitivesRetriever,
     private val imageNodeMapper: ImageNodeMapper,
     private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway,
     private val sortOrderIntMapper: SortOrderIntMapper,
@@ -928,6 +933,33 @@ internal class DefaultPhotosRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaNodeMapper(typedFileNode)?.let { megaApiFacade.httpServerGetLocalLink(it) }
         }
+
+    override suspend fun isHiddenNodesOnboarded(): Boolean = withContext(ioDispatcher) {
+        sensitivesRetriever(prefs = getContentConsumptionPreferences())
+    }
+
+    override suspend fun setHiddenNodesOnboarded() = withContext(ioDispatcher) {
+        val newPrefs = sensitivesMapper(
+            prefs = getContentConsumptionPreferences(),
+            data = mapOf(TimelinePreferencesJSON.JSON_SENSITIVES_ONBOARDED.value to true),
+        )
+
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, _ -> continuation.resume(Unit) },
+            )
+
+            megaApiFacade.setUserAttribute(
+                type = MegaApiJava.USER_ATTR_CC_PREFS,
+                value = newPrefs,
+                listener = listener,
+            )
+
+            continuation.invokeOnCancellation {
+                megaApiFacade.removeRequestListener(listener)
+            }
+        }
+    }
 
     override fun clearCache() {
         isInitialized = false

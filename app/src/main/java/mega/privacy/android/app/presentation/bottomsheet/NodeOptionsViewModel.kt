@@ -18,7 +18,9 @@ import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformat
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactUserNameFromDatabaseUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
@@ -48,6 +50,8 @@ class NodeOptionsViewModel @Inject constructor(
     private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
     private val getContactUserNameFromDatabaseUseCase: GetContactUserNameFromDatabaseUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -87,6 +91,31 @@ class NodeOptionsViewModel @Inject constructor(
             }.collect {
                 _state.update(it)
             }
+        }
+
+        viewModelScope.launch {
+            monitorAccountDetailUseCase()
+                .collect { accountDetail ->
+                    _state.update {
+                        it.copy(accountDetail = accountDetail)
+                    }
+                }
+        }
+
+        viewModelScope.launch {
+            val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
+            _state.update {
+                it.copy(isHiddenNodesOnboarded = isHiddenNodesOnboarded)
+            }
+        }
+    }
+
+    /**
+     * Mark hidden nodes onboarding has shown
+     */
+    fun setHiddenNodesOnboarded() {
+        _state.update {
+            it.copy(isHiddenNodesOnboarded = true)
         }
     }
 

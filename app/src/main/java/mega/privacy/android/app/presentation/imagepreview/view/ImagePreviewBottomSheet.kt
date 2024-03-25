@@ -2,8 +2,10 @@
 
 package mega.privacy.android.app.presentation.imagepreview.view
 
+import mega.privacy.android.core.R as RCore
 import mega.privacy.android.icon.pack.R as Rpack
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +16,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +32,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.flow.Flow
@@ -39,7 +45,13 @@ import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
 import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.controls.text.MiddleEllipsisText
+import mega.privacy.android.core.ui.theme.grey_alpha_070
+import mega.privacy.android.core.ui.theme.teal_200
+import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.tokens.TextColor
+import mega.privacy.android.core.ui.theme.white_alpha_070
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
@@ -74,6 +86,8 @@ internal fun ImagePreviewBottomSheet(
     downloadImage: suspend (ImageNode) -> Flow<ImageResult>,
     getImageThumbnailPath: suspend (ImageResult?) -> String?,
     isAvailableOffline: Boolean = false,
+    accountDetail: AccountDetail? = null,
+    isHiddenNodesOnboarded: Boolean? = null,
     onClickInfo: () -> Unit = {},
     onClickFavourite: () -> Unit = {},
     onClickLabel: () -> Unit = {},
@@ -89,6 +103,7 @@ internal fun ImagePreviewBottomSheet(
     onClickShare: () -> Unit = {},
     onClickRename: () -> Unit = {},
     onClickHide: () -> Unit = {},
+    onClickHideHelp: () -> Unit = {},
     onClickUnhide: () -> Unit = {},
     onClickMove: () -> Unit = {},
     onClickCopy: () -> Unit = {},
@@ -97,6 +112,7 @@ internal fun ImagePreviewBottomSheet(
     onClickMoveToRubbishBin: () -> Unit = {},
 ) {
     val context = LocalContext.current
+    val isLight = MaterialTheme.colors.isLight
 
     BottomSheet(
         modalSheetState = modalSheetState,
@@ -115,6 +131,8 @@ internal fun ImagePreviewBottomSheet(
             val labelColorText = remember(imageNode) {
                 MegaNodeUtil.getNodeLabelText(imageNode.label, context)
             }
+
+            val accountType = accountDetail?.levelDetail?.accountType
 
             val isInfoMenuVisible by produceState(false, imageNode) {
                 value = showInfoMenu(imageNode)
@@ -393,13 +411,33 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                if (isHideMenuVisible) {
+                if (isHideMenuVisible && accountType != null && isHiddenNodesOnboarded != null) {
                     MenuActionListTile(
                         icon = painterResource(id = Rpack.drawable.ic_eye_off_medium_regular_outline),
                         text = stringResource(id = R.string.general_hide_node),
                         onActionClicked = onClickHide,
                         dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_HIDE),
+                        trailingItem = {
+                            if (accountType == AccountType.FREE) {
+                                Text(
+                                    text = stringResource(id = R.string.general_pro_only),
+                                    color = teal_300.takeIf { isLight } ?: teal_200,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.W400,
+                                    style = MaterialTheme.typography.subtitle1,
+                                )
+                            } else {
+                                Icon(
+                                    painter = painterResource(id = RCore.drawable.ic_help_circle),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .clickable { onClickHideHelp() },
+                                    tint = grey_alpha_070.takeIf { isLight } ?: white_alpha_070,
+                                )
+                            }
+                        },
                     )
                 }
 

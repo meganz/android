@@ -19,6 +19,8 @@ import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.node.ImageNodeFileMapper
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.photos.ContentConsumptionMegaStringMapMapper
+import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesMapper
+import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesRetriever
 import mega.privacy.android.data.mapper.photos.TimelineFilterPreferencesJSONMapper
 import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -68,6 +70,8 @@ class DefaultPhotosRepositoryTest {
     private val timelineFilterPreferencesJSONMapper: TimelineFilterPreferencesJSONMapper = mock()
     private val contentConsumptionMegaStringMapMapper: ContentConsumptionMegaStringMapMapper =
         mock()
+    private val megaStringMapSensitivesMapper: MegaStringMapSensitivesMapper = mock()
+    private val megaStringMapSensitivesRetriever: MegaStringMapSensitivesRetriever = mock()
 
     private val cameraUploadsSettingsPreferenceGateway =
         mock<CameraUploadsSettingsPreferenceGateway>()
@@ -282,7 +286,9 @@ class DefaultPhotosRepositoryTest {
         imageNodeMapper = mock(),
         cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway,
         sortOrderIntMapper = mock(),
-        megaNodeMapper = megaNodeMapper
+        megaNodeMapper = megaNodeMapper,
+        sensitivesMapper = megaStringMapSensitivesMapper,
+        sensitivesRetriever = megaStringMapSensitivesRetriever,
     )
 
     private fun createMegaNode(

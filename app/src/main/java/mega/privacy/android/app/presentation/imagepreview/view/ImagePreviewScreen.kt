@@ -87,6 +87,7 @@ import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 
@@ -107,7 +108,8 @@ internal fun ImagePreviewScreen(
     onClickSendTo: (ImageNode) -> Unit = {},
     onClickShare: (ImageNode) -> Unit = {},
     onClickRename: (ImageNode) -> Unit = {},
-    onClickHide: (ImageNode) -> Unit = {},
+    onClickHide: (ImageNode, AccountDetail?, Boolean?) -> Unit = { _, _, _ -> },
+    onClickHideHelp: () -> Unit = {},
     onClickUnhide: (ImageNode) -> Unit = {},
     onClickMove: (ImageNode) -> Unit = {},
     onClickCopy: (ImageNode) -> Unit = {},
@@ -125,6 +127,8 @@ internal fun ImagePreviewScreen(
     }
 
     val currentImageNodeIndex = viewState.currentImageNodeIndex
+    val accountDetail = viewState.accountDetail
+    val isHiddenNodesOnboarded = viewState.isHiddenNodesOnboarded
     viewState.currentImageNode?.let { currentImageNode ->
         val isCurrentImageNodeAvailableOffline = viewState.isCurrentImageNodeAvailableOffline
         var showRemoveLinkDialog by rememberSaveable { mutableStateOf(false) }
@@ -331,6 +335,8 @@ internal fun ImagePreviewScreen(
                     modalSheetState = modalSheetState,
                     imageNode = currentImageNode,
                     isAvailableOffline = isCurrentImageNodeAvailableOffline,
+                    accountDetail = accountDetail,
+                    isHiddenNodesOnboarded = isHiddenNodesOnboarded,
                     showInfoMenu = viewModel::isInfoMenuVisible,
                     showFavouriteMenu = viewModel::isFavouriteMenuVisible,
                     showLabelMenu = viewModel::isLabelMenuVisible,
@@ -410,7 +416,11 @@ internal fun ImagePreviewScreen(
                         hideBottomSheet(coroutineScope, modalSheetState)
                     },
                     onClickHide = {
-                        onClickHide(currentImageNode)
+                        onClickHide(currentImageNode, accountDetail, isHiddenNodesOnboarded)
+                        hideBottomSheet(coroutineScope, modalSheetState)
+                    },
+                    onClickHideHelp = {
+                        onClickHideHelp()
                         hideBottomSheet(coroutineScope, modalSheetState)
                     },
                     onClickUnhide = {

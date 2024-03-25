@@ -373,12 +373,44 @@
                 android:text="@string/context_rename"
                 app:drawableStartCompat="@drawable/ic_pen_2_medium_regular_outline"/>
 
-            <TextView
-                android:id="@+id/hide_option"
-                style="@style/BottomSheetOption"
-                android:text="@string/general_hide_node"
-                android:visibility="gone"
-                app:drawableStartCompat="@drawable/ic_eye_off_medium_regular_outline"/>
+            <LinearLayout
+                android:id="@+id/option_hide_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/hide_option"
+                    style="@style/BottomSheetOption"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="@string/general_hide_node"
+                    app:drawableStartCompat="@drawable/ic_eye_off_medium_regular_outline"/>
+
+                <TextView
+                    android:id="@+id/hide_option_pro_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:drawablePadding="8dp"
+                    android:gravity="end"
+                    android:text="@string/general_pro_only"
+                    android:textColor="@color/teal_300"
+                    android:textSize="16sp"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/hide_option_help"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="16dp"
+                    android:src="@drawable/ic_help_circle"
+                    android:visibility="gone"
+                    app:tint="?android:attr/textColorSecondary" />
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/move_option"

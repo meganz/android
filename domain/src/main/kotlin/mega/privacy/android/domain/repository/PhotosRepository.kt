@@ -183,4 +183,14 @@ interface PhotosRepository {
      * @param typedFileNode
      */
     suspend fun getHttpServerLocalLink(typedFileNode: TypedFileNode): String?
+
+    /**
+     * Check is hidden nodes onboarded
+     */
+    suspend fun isHiddenNodesOnboarded(): Boolean
+
+    /**
+     * Set hidden nodes onboarded
+     */
+    suspend fun setHiddenNodesOnboarded()
 }
