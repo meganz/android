@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
@@ -50,7 +51,7 @@ internal class MoveNodesUseCaseTest {
     @Test
     fun `test that throw ForeignNodeException when move node throw ForeignNodeException`() =
         runTest {
-            whenever(moveNodeUseCase(NodeId(any()), NodeId(any())))
+            whenever(moveNodeUseCase(NodeId(any()), NodeId(any()), eq(null)))
                 .thenThrow(ForeignNodeException::class.java)
             assertThrows<ForeignNodeException> {
                 underTest(mapOf(1L to 2L))
@@ -60,7 +61,7 @@ internal class MoveNodesUseCaseTest {
     @Test
     fun `test that throw NotEnoughQuotaMegaException when move node throw NotEnoughQuotaMegaException`() =
         runTest {
-            whenever(moveNodeUseCase(NodeId(any()), NodeId(any())))
+            whenever(moveNodeUseCase(NodeId(any()), NodeId(any()), eq(null)))
                 .thenAnswer {
                     throw NotEnoughQuotaMegaException(1, "")
                 }
@@ -72,7 +73,7 @@ internal class MoveNodesUseCaseTest {
     @Test
     fun `test that throw QuotaExceededMegaException when move node throw QuotaExceededMegaException`() =
         runTest {
-            whenever(moveNodeUseCase(NodeId(any()), NodeId(any())))
+            whenever(moveNodeUseCase(NodeId(any()), NodeId(any()), eq(null)))
                 .thenAnswer {
                     throw QuotaExceededMegaException(1, "")
                 }

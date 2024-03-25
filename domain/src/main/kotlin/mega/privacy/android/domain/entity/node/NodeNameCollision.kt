@@ -13,6 +13,7 @@ package mega.privacy.android.domain.entity.node
  * @property parentHandle
  * @property isFile
  * @property serializedData
+ * @property renameName
  */
 data class NodeNameCollision(
     val collisionHandle: Long,
@@ -24,5 +25,6 @@ data class NodeNameCollision(
     val lastModified: Long,
     val parentHandle: Long,
     val isFile: Boolean,
-    val serializedData: String? = null
+    val serializedData: String? = null,
+    val renameName: String? = null
 )

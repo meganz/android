@@ -5,9 +5,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
-import mega.privacy.android.domain.exception.QuotaExceededMegaException
-import mega.privacy.android.domain.exception.node.ForeignNodeException
+import mega.privacy.android.domain.exception.extension.shouldEmitErrorForNodeMovement
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import javax.inject.Inject
@@ -35,7 +33,7 @@ class MoveNodesUseCase @Inject constructor(
                     runCatching {
                         moveNodeUseCase(NodeId(nodeHandle), NodeId(destinationHandle))
                     }.recover {
-                        if (it.shouldEmitError()) throw it
+                        if (it.shouldEmitErrorForNodeMovement()) throw it
                         return@async Result.failure(it)
                     }
                 }
@@ -59,7 +57,4 @@ class MoveNodesUseCase @Inject constructor(
     } else {
         nodeRepository.getInvalidHandle()
     }
-
-    private fun Throwable.shouldEmitError(): Boolean =
-        this is QuotaExceededMegaException || this is NotEnoughQuotaMegaException || this is ForeignNodeException
 }

@@ -14,10 +14,12 @@ class MoveNodeUseCase @Inject constructor(
      * Move a MegaNode to a new MegaNode, both referenced by their [NodeId]
      * @param nodeToMove the node's [NodeId] that we want to move
      * @param newNodeParent the folder node's [NodeId] where we want to move the node
+     * @param newNodeName the renamed name of the node
      * @return the [NodeId] of the moved node
      */
     suspend operator fun invoke(
         nodeToMove: NodeId,
         newNodeParent: NodeId,
-    ): NodeId = nodeRepository.moveNode(nodeToMove, newNodeParent, null)
+        newNodeName: String? = null,
+    ): NodeId = nodeRepository.moveNode(nodeToMove, newNodeParent, newNodeName)
 }

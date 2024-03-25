@@ -13,6 +13,7 @@ import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -50,7 +51,7 @@ internal class RestoreNodesUseCaseTest {
     fun `test that throw ForeignNodeException when move node throw ForeignNodeException`() =
         runTest {
             whenever(isNodeInRubbish(any())).thenReturn(false)
-            whenever(moveNodeUseCase(NodeId(any()), NodeId(any())))
+            whenever(moveNodeUseCase(NodeId(any()), NodeId(any()), eq(null)))
                 .thenThrow(ForeignNodeException::class.java)
             try {
                 underTest(mapOf(1L to 2L))
