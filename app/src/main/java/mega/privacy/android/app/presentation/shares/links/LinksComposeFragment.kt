@@ -347,7 +347,7 @@ class LinksComposeFragment : Fragment() {
                 val intent = getIntentToOpenFileMapper(
                     activity = requireActivity(),
                     fileNode = fileNode,
-                    viewType = Constants.FILE_BROWSER_ADAPTER
+                    viewType = Constants.LINKS_ADAPTER
                 )
                 intent?.let {
                     if (MegaApiUtils.isIntentAvailable(context, it)) {

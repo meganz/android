@@ -636,7 +636,7 @@ class IncomingSharesComposeFragment : Fragment() {
                 val intent = getIntentToOpenFileMapper(
                     activity = requireActivity(),
                     fileNode = fileNode,
-                    viewType = Constants.FILE_BROWSER_ADAPTER
+                    viewType = Constants.INCOMING_SHARES_ADAPTER
                 )
                 intent?.let {
                     if (MegaApiUtils.isIntentAvailable(context, it)) {
