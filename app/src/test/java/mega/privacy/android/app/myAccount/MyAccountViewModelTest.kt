@@ -1,13 +1,13 @@
 package mega.privacy.android.app.myAccount
 
 import android.content.Context
+import androidx.annotation.StringRes
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -23,6 +23,7 @@ import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.VerificationStatus
+import mega.privacy.android.domain.exception.account.QueryCancelLinkException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
@@ -30,6 +31,7 @@ import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
+import mega.privacy.android.domain.usecase.IsUrlMatchesRegexUseCase
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.BroadcastRefreshSessionUseCase
@@ -41,6 +43,7 @@ import mega.privacy.android.domain.usecase.account.ConfirmChangeEmailUseCase
 import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.account.KillOtherSessionsUseCase
+import mega.privacy.android.domain.usecase.account.QueryCancelLinkUseCase
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
@@ -67,9 +70,12 @@ import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import kotlin.random.Random
 
+/**
+ * Test class for [MyAccountViewModel]
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
-class MyAccountViewModelTest {
+internal class MyAccountViewModelTest {
 
     private lateinit var underTest: MyAccountViewModel
 
@@ -87,6 +93,8 @@ class MyAccountViewModelTest {
     private val getUserDataUseCase: GetUserDataUseCase = mock()
     private val getFileVersionsOption: GetFileVersionsOption = mock()
     private val queryRecoveryLinkUseCase: QueryRecoveryLinkUseCase = mock()
+    private val queryCancelLinkUseCase: QueryCancelLinkUseCase = mock()
+    private val isUrlMatchesRegexUseCase: IsUrlMatchesRegexUseCase = mock()
     private val confirmCancelAccountUseCase: ConfirmCancelAccountUseCase = mock()
     private val confirmChangeEmailUseCase: ConfirmChangeEmailUseCase = mock()
     private val filePrepareUseCase: FilePrepareUseCase = mock()
@@ -154,6 +162,8 @@ class MyAccountViewModelTest {
             getUserDataUseCase = getUserDataUseCase,
             getFileVersionsOption = getFileVersionsOption,
             queryRecoveryLinkUseCase = queryRecoveryLinkUseCase,
+            queryCancelLinkUseCase = queryCancelLinkUseCase,
+            isUrlMatchesRegexUseCase = isUrlMatchesRegexUseCase,
             confirmCancelAccountUseCase = confirmCancelAccountUseCase,
             confirmChangeEmailUseCase = confirmChangeEmailUseCase,
             filePrepareUseCase = filePrepareUseCase,
@@ -311,6 +321,90 @@ class MyAccountViewModelTest {
             )
         }
 
+    @Test
+    fun `test that an error alert is shown when querying the account cancellation link throws an unrelated account cancellation link exception`() =
+        runTest {
+            testAccountCancellationError(
+                queryCancelLinkException = QueryCancelLinkException.UnrelatedAccountCancellationLink(
+                    errorCode = 20,
+                    errorString = "The link is unrelated to this account",
+                ),
+                errorMessageRes = R.string.error_not_logged_with_correct_account,
+            )
+        }
+
+    @Test
+    fun `test that an error alert is shown when querying the account cancellation link throws an expired account cancellation link exception`() =
+        runTest {
+            testAccountCancellationError(
+                queryCancelLinkException = QueryCancelLinkException.ExpiredAccountCancellationLink(
+                    errorCode = 25,
+                    errorString = "The link has expired",
+                ),
+                errorMessageRes = R.string.cancel_link_expired,
+            )
+        }
+
+    @Test
+    fun `test that an error alert is shown when querying the account cancellation link throws an unknown exception`() =
+        runTest {
+            testAccountCancellationError(
+                queryCancelLinkException = QueryCancelLinkException.Unknown(
+                    errorCode = 30,
+                    errorString = "An unexpected issue occurred",
+                ),
+                errorMessageRes = R.string.invalid_link,
+            )
+        }
+
+    private suspend fun testAccountCancellationError(
+        queryCancelLinkException: QueryCancelLinkException,
+        @StringRes errorMessageRes: Int,
+    ) {
+        whenever(queryCancelLinkUseCase(any())).thenAnswer {
+            throw queryCancelLinkException
+        }
+
+        underTest.cancelAccount(accountCancellationLink = "link/to/cancel")
+        underTest.state.test {
+            assertThat(awaitItem().errorMessageRes).isEqualTo(errorMessageRes)
+        }
+    }
+
+    @Test
+    fun `test that an error alert is shown when checking the account cancellation link validity throws an exception`() =
+        runTest {
+            whenever(queryCancelLinkUseCase(any())).thenReturn("link/to/cancel")
+            whenever(
+                isUrlMatchesRegexUseCase(
+                    url = any(),
+                    patterns = any(),
+                )
+            ).thenThrow(RuntimeException())
+
+            underTest.cancelAccount(accountCancellationLink = "link/to/cancel")
+            underTest.state.test {
+                assertThat(awaitItem().errorMessageRes).isEqualTo(R.string.general_error_word)
+            }
+        }
+
+    @Test
+    fun `test that an error alert is shown when checking the account cancellation link returns an invalid link`() =
+        runTest {
+            whenever(queryCancelLinkUseCase(any())).thenReturn("link/to/cancel")
+            whenever(
+                isUrlMatchesRegexUseCase(
+                    url = any(),
+                    patterns = any(),
+                )
+            ).thenReturn(false)
+
+            underTest.cancelAccount(accountCancellationLink = "link/to/cancel")
+            underTest.state.test {
+                assertThat(awaitItem().errorMessageRes).isEqualTo(R.string.general_error_word)
+            }
+        }
+
     @After
     fun tearDown() {
         Dispatchers.resetMain()
@@ -329,6 +423,8 @@ class MyAccountViewModelTest {
             getUserDataUseCase,
             getFileVersionsOption,
             queryRecoveryLinkUseCase,
+            queryCancelLinkUseCase,
+            isUrlMatchesRegexUseCase,
             confirmCancelAccountUseCase,
             confirmChangeEmailUseCase,
             filePrepareUseCase,

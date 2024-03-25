@@ -184,9 +184,7 @@ class MyAccountActivity : PasscodeActivity(),
 
             ACTION_CANCEL_ACCOUNT -> {
                 intent.dataString?.let { link ->
-                    viewModel.confirmCancelAccount(link) { result ->
-                        showConfirmCancelAccountQueryResult(result)
-                    }
+                    viewModel.cancelAccount(accountCancellationLink = link)
                 }
 
                 intent.action = null
@@ -537,14 +535,6 @@ class MyAccountActivity : PasscodeActivity(),
                 viewModel.cancelSubscriptions(cancelSubscriptionsFeedback)
             }.setNegativeButton(getString(R.string.general_no), null)
             .show()
-    }
-
-    private fun showConfirmCancelAccountQueryResult(result: String) {
-        if (matchRegexs(result, CANCEL_ACCOUNT_LINK_REGEXS)) {
-            viewModel.checkSubscription()
-        } else {
-            showErrorAlert(getString(R.string.general_error_word))
-        }
     }
 
     /**

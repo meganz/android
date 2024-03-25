@@ -52,6 +52,7 @@ import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants.ACTION_REFRESH
+import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.CHANGE_MAIL_2FA
 import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
 import mega.privacy.android.app.utils.Constants.FREE
@@ -76,6 +77,7 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.exception.account.ConfirmCancelAccountException
 import mega.privacy.android.domain.exception.account.ConfirmChangeEmailException
+import mega.privacy.android.domain.exception.account.QueryCancelLinkException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
@@ -84,6 +86,7 @@ import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
+import mega.privacy.android.domain.usecase.IsUrlMatchesRegexUseCase
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.BroadcastRefreshSessionUseCase
@@ -95,6 +98,7 @@ import mega.privacy.android.domain.usecase.account.ConfirmChangeEmailUseCase
 import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.account.KillOtherSessionsUseCase
+import mega.privacy.android.domain.usecase.account.QueryCancelLinkUseCase
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
@@ -133,6 +137,8 @@ import javax.inject.Inject
  * @property getUserDataUseCase
  * @property getFileVersionsOption
  * @property queryRecoveryLinkUseCase
+ * @property queryCancelLinkUseCase Queries information on an Account Cancellation Link
+ * @property isUrlMatchesRegexUseCase Checks if the URL Matches any of the Regex Patterns provided
  * @property [confirmCancelAccountUseCase] [ConfirmCancelAccountUseCase]
  * @property confirmChangeEmailUseCase
  * @property filePrepareUseCase
@@ -166,6 +172,8 @@ class MyAccountViewModel @Inject constructor(
     private val getUserDataUseCase: GetUserDataUseCase,
     private val getFileVersionsOption: GetFileVersionsOption,
     private val queryRecoveryLinkUseCase: QueryRecoveryLinkUseCase,
+    private val queryCancelLinkUseCase: QueryCancelLinkUseCase,
+    private val isUrlMatchesRegexUseCase: IsUrlMatchesRegexUseCase,
     private val confirmCancelAccountUseCase: ConfirmCancelAccountUseCase,
     private val confirmChangeEmailUseCase: ConfirmChangeEmailUseCase,
     private val filePrepareUseCase: FilePrepareUseCase,
@@ -329,10 +337,9 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Check subscription
-     *
+     * Checks the User's Subscription type
      */
-    fun checkSubscription() {
+    private fun checkSubscription() {
         PlatformInfo.entries.firstOrNull {
             it.subscriptionMethodId == myAccountInfo.subscriptionMethodId
         }?.run {
@@ -1027,21 +1034,62 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Confirm cancel account
+     * Begins the process of cancelling the User's Account
      *
-     * @param link
-     * @param action
-     * @receiver
+     * @param accountCancellationLink the Account Cancellation Link
      */
-    fun confirmCancelAccount(link: String, action: (String) -> Unit) {
-        queryRecoveryLinkUseCase.queryCancelAccount(link)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy { result ->
-                confirmationLink = result
-                action.invoke(result)
+    fun cancelAccount(accountCancellationLink: String) {
+        viewModelScope.launch {
+            runCatching {
+                queryCancelLinkUseCase(accountCancellationLink)
+            }.onSuccess { newAccountCancellationLink ->
+                Timber.d("Successfully queried the Account Cancellation Link")
+                confirmationLink = newAccountCancellationLink
+                checkAccountCancellationLinkValidity()
+            }.onFailure { exception ->
+                Timber.e("An issue occurred when querying the Account Cancellation Link", exception)
+                _state.update {
+                    it.copy(
+                        errorMessageRes = when (exception) {
+                            is QueryCancelLinkException.UnrelatedAccountCancellationLink -> R.string.error_not_logged_with_correct_account
+                            is QueryCancelLinkException.ExpiredAccountCancellationLink -> R.string.cancel_link_expired
+                            else -> R.string.invalid_link
+                        }
+                    )
+                }
             }
-            .addTo(composite)
+        }
+    }
+
+    /**
+     * Once the Account Cancellation Link has been successfully queried and no issues were found,
+     * check if the Account Cancellation Link matches the specified Regex
+     */
+    private fun checkAccountCancellationLinkValidity() {
+        viewModelScope.launch {
+            runCatching {
+                isUrlMatchesRegexUseCase(
+                    url = confirmationLink,
+                    patterns = CANCEL_ACCOUNT_LINK_REGEXS,
+                )
+            }.onSuccess { isMatching ->
+                Timber.d(
+                    "Successfully checked if the URL matches the Cancel Account Link Regex\n" +
+                            "Is Account Cancellation Link Valid: $isMatching"
+                )
+                if (isMatching) {
+                    checkSubscription()
+                } else {
+                    _state.update { it.copy(errorMessageRes = R.string.general_error_word) }
+                }
+            }.onFailure { exception ->
+                Timber.e(
+                    "An issue occurred when checking if the URL matches the Cancel Account Link Regex",
+                    exception
+                )
+                _state.update { it.copy(errorMessageRes = R.string.general_error_word) }
+            }
+        }
     }
 
     /**
