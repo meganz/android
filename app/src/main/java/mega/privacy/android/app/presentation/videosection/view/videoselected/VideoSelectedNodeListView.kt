@@ -14,7 +14,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.folderInfo
 import mega.privacy.android.app.presentation.view.extension.getIcon
@@ -28,6 +27,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.icon.pack.R
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.shared.theme.MegaAppTheme
@@ -74,7 +74,7 @@ internal fun <T : TypedNode> VideoSelectedNodeListView(
                 icon = nodeEntity
                     .let { node -> node as? TypedFolderNode }
                     ?.getIcon()
-                    ?: MimeTypeList.typeForName(nodeUIItemList[it].node.name).iconResourceId,
+                    ?: R.drawable.ic_video_medium_solid,
                 fileSize = nodeEntity
                     .let { node -> node as? FileNode }
                     ?.let { file -> formatFileSize(file.size, LocalContext.current) },

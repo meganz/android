@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
@@ -351,13 +350,13 @@ class VideoSectionViewModel @Inject constructor(
      * Update intent
      *
      * @param handle node handle
-     * @param name node name
+     * @param type node type
      * @param intent Intent
      * @return updated intent
      */
     internal suspend fun updateIntent(
         handle: Long,
-        name: String,
+        type: String,
         intent: Intent,
     ): Intent {
         if (megaApiHttpServerIsRunningUseCase() == 0) {
@@ -367,7 +366,7 @@ class VideoSectionViewModel @Inject constructor(
 
         getFileUrlByNodeHandleUseCase(handle)?.let { url ->
             Uri.parse(url)?.let { uri ->
-                intent.setDataAndType(uri, MimeTypeList.typeForName(name).type)
+                intent.setDataAndType(uri, type)
             }
         }
 

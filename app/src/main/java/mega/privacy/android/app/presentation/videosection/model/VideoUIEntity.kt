@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.videosection.model
 
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import java.io.File
 import kotlin.time.Duration
@@ -11,6 +12,7 @@ import kotlin.time.Duration
  * @property parentId the video's parent id
  * @property name the video's name
  * @property size the video's size
+ * @property fileTypeInfo the video's file type info
  * @property durationString the video's duration String
  * @property duration the video's duration
  * @property thumbnail the video's thumbnail
@@ -26,6 +28,7 @@ data class VideoUIEntity(
     val parentId: NodeId,
     val name: String,
     val size: Long,
+    val fileTypeInfo: FileTypeInfo,
     val durationString: String?,
     val duration: Duration,
     val thumbnail: File? = null,

@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.videosection.mapper.VideoUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
@@ -33,6 +34,7 @@ class VideoUIEntityMapperTest {
     private val expectedElementID = 2L
     private val expectedLabel = 1
     private val expectedExportedData = mock<ExportedData>()
+    private val expectedType = mock<VideoFileTypeInfo>()
 
     @BeforeAll
     fun setUp() {
@@ -73,6 +75,7 @@ class VideoUIEntityMapperTest {
         on { exportedData }.thenReturn(exportData)
         on { elementID }.thenReturn(expectedElementID)
         on { label }.thenReturn(expectedLabel)
+        on { type }.thenReturn(expectedType)
     }
 
     private fun assertMappedVideoUIEntity(
@@ -93,7 +96,8 @@ class VideoUIEntityMapperTest {
                 { assertThat(it.isFavourite).isEqualTo(expectedIsFavourite) },
                 { assertThat(it.isSharedItems).isEqualTo(expectedIsShared) },
                 { assertThat(it.elementID).isEqualTo(expectedElementID) },
-                { assertThat(it.label).isEqualTo(expectedLabel) }
+                { assertThat(it.label).isEqualTo(expectedLabel) },
+                { assertThat(it.fileTypeInfo).isEqualTo(expectedType) }
             )
         }
     }

@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentVideoSectionBinding
@@ -304,7 +303,7 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
     ) {
         viewLifecycleOwner.lifecycleScope.launch {
             val nodeHandle = item.id.longValue
-            val nodeName = item.name
+            val nodeType = item.fileTypeInfo.mimeType
             val intent = getIntent(item = item, index = index)
 
             activity.startActivity(
@@ -319,17 +318,14 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                         }.onFailure {
                             Uri.fromFile(mediaFile)
                         }.map { mediaFileUri ->
-                            intent.setDataAndType(
-                                mediaFileUri,
-                                MimeTypeList.typeForName(nodeName).type
-                            )
+                            intent.setDataAndType(mediaFileUri, nodeType)
                             intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                         }
                     }
                     intent
                 } ?: videoSectionViewModel.updateIntent(
                     handle = nodeHandle,
-                    name = nodeName,
+                    type = nodeType,
                     intent = intent
                 )
             )
