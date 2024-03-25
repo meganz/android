@@ -357,6 +357,11 @@ class FileFacade @Inject constructor(
 
     override suspend fun isContentUri(uriString: String) = uriString.toUri().scheme == "content"
 
+    override suspend fun isExternalStorageContentUri(uriString: String) =
+        with(Uri.parse(uriString)) {
+            scheme == "content" && path?.startsWith("com.android.externalstorage") == true
+        }
+
     override suspend fun getFileNameFromUri(uriString: String): String? {
         val cursor = context.contentResolver.query(uriString.toUri(), null, null, null, null)
         return cursor?.use {

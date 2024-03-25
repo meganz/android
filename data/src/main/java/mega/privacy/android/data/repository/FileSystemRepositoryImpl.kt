@@ -547,6 +547,11 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         fileGateway.isContentUri(uriString)
     }
 
+    override suspend fun isExternalStorageContentUri(uriString: String): Boolean =
+        withContext(ioDispatcher) {
+            fileGateway.isExternalStorageContentUri(uriString)
+        }
+
     override suspend fun getFileNameFromUri(uriString: String): String? =
         withContext(ioDispatcher) {
             fileGateway.getFileNameFromUri(uriString)

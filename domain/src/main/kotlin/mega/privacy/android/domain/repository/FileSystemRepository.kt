@@ -343,6 +343,11 @@ interface FileSystemRepository {
     suspend fun isContentUri(uriString: String): Boolean
 
     /**
+     * @return true if the [uriString] represents an external storage content Uri
+     */
+    suspend fun isExternalStorageContentUri(uriString: String): Boolean
+
+    /**
      * @return the file name of the file represented by [uriString]
      */
     suspend fun getFileNameFromUri(uriString: String): String?

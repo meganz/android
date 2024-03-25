@@ -556,4 +556,15 @@ internal class FileSystemRepositoryImplTest {
         ).thenReturn(file)
         assertThat(underTest.getLocalFile(fileNode)).isEqualTo(file)
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that isExternalStorageContentUri returns gateway result`(expected: Boolean) =
+        runTest {
+            whenever(fileGateway.isExternalStorageContentUri(any())).thenReturn(expected)
+
+            val actual = underTest.isExternalStorageContentUri("someUri")
+
+            assertThat(actual).isEqualTo(expected)
+        }
 }
