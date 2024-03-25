@@ -19,7 +19,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     NewDocumentSection(
         "Enable new document section flag",
-        false
+        true
     ),
 
     /**
