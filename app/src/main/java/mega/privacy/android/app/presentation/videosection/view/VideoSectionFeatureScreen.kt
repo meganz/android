@@ -16,6 +16,7 @@ import mega.privacy.android.app.presentation.videosection.view.playlist.videoPla
 
 @Composable
 internal fun VideoSectionFeatureScreen(
+    modifier: Modifier,
     videoSectionViewModel: VideoSectionViewModel,
     onClick: (item: VideoUIEntity, index: Int) -> Unit,
     onAddElementsClicked: () -> Unit,
@@ -32,7 +33,7 @@ internal fun VideoSectionFeatureScreen(
     val navHostController = rememberNavController()
 
     VideoSectionNavHost(
-        modifier = Modifier,
+        modifier = modifier,
         navHostController = navHostController,
         viewModel = videoSectionViewModel,
         onClick = onClick,
