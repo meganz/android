@@ -158,6 +158,7 @@ fun createStartDownloadView(
                 snackbarHostState.currentSnackbarData?.message?.let {
                     Util.showSnackbar(activity, it)
                 }
+                snackbarHostState.currentSnackbarData?.dismiss()
             }
             StartDownloadComponent(
                 downloadEvent,

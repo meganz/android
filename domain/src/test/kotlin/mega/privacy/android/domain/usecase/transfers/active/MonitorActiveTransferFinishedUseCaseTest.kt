@@ -67,7 +67,7 @@ class MonitorActiveTransferFinishedUseCaseTest {
 
     @ParameterizedTest
     @EnumSource(TransferType::class)
-    fun `test that no value is emmited when active transfers totals with 0 totalFileTransfers is not received`(
+    fun `test that no value is emitted when active transfers totals with 0 totalFileTransfers is not received`(
         type: TransferType,
     ) = runTest {
         val flow = createTotals(5, 6, 7)
@@ -80,7 +80,7 @@ class MonitorActiveTransferFinishedUseCaseTest {
 
     @ParameterizedTest
     @EnumSource(TransferType::class)
-    fun `test that no value is emmited when first active transfers totals has 0 totalFileTransfers`(
+    fun `test that no value is emitted when first active transfers totals has 0 totalFileTransfers`(
         type: TransferType,
     ) = runTest {
         val flow = createTotals(0, 5, 6, 7)
@@ -91,10 +91,32 @@ class MonitorActiveTransferFinishedUseCaseTest {
         }
     }
 
+    @ParameterizedTest
+    @EnumSource(TransferType::class)
+    fun `test that no value is emitted when all transfers were already downloaded`(
+        type: TransferType,
+    ) = runTest {
+        val flow = listOf(
+            mockTotal(5, 5, 5),
+            mockTotal(0)
+        )
+        whenever(transferRepository.getActiveTransferTotalsByType(any())) doReturn flow.asFlow()
+
+        underTest(type).test {
+            awaitComplete()
+        }
+    }
+
     private fun createTotals(vararg totals: Int) = totals.map { mockTotal(it) }
 
-    private fun mockTotal(total: Int) = mock<ActiveTransferTotals> {
-        on { totalFileTransfers } doReturn total
+    private fun mockTotal(
+        totalFileTransfers: Int,
+        totalFinishedTransfers: Int = totalFileTransfers,
+        totalAlreadyDownloadedFiles: Int = 0,
+    ) = mock<ActiveTransferTotals> {
+        on { this.totalFileTransfers } doReturn totalFileTransfers
+        on { this.totalFinishedTransfers } doReturn totalFinishedTransfers
+        on { this.totalAlreadyDownloadedFiles } doReturn totalAlreadyDownloadedFiles
     }
 
 }
