@@ -450,4 +450,11 @@ interface ContactsRepository {
      * @return List of [User]
      */
     suspend fun getAvailableContacts(): List<User>
+
+    /**
+     * Get list of outgoing contact requests
+     *
+     * @return List of [ContactRequest]
+     */
+    suspend fun getOutgoingContactRequests(): List<ContactRequest>
 }

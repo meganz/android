@@ -23,6 +23,14 @@ public class ContactsFilter {
         }
     }
 
+    /**
+     * This function filters out the local contacts if the email is in a pending state.
+     *
+     * @param api  [MegaApiJava]
+     * @param list List of local contacts' emails
+     * @deprecated <p> Use {@link mega.privacy.android.domain.usecase.contact.FilterPendingOrAcceptedLocalContactsByEmailUseCase} instead.
+     */
+    @Deprecated
     public static void filterOutPendingContacts(MegaApiJava api, List<String> list) {
         for (MegaContactRequest request : api.getOutgoingContactRequests()) {
             list.removeIf(email -> isPending(request, email));
@@ -44,6 +52,15 @@ public class ContactsFilter {
         return hasSameEmail && isContact;
     }
 
+    /**
+     * This function validates if the requested contact by email is in a pending state.
+     *
+     * @param request [MegaContactRequest]
+     * @param email   Email
+     * @return True if the contact's request is in a pending state, false otherwise
+     * @deprecated <p> Use {@link mega.privacy.android.domain.usecase.contact.IsContactRequestByEmailInPendingOrAcceptedStateUseCase} instead.
+     */
+    @Deprecated
     private static boolean isPending(MegaContactRequest request, String email) {
         boolean hasSameEmail = request.getTargetEmail().equals(email);
         boolean isAccepted = request.getStatus() == MegaContactRequest.STATUS_ACCEPTED;

@@ -933,4 +933,9 @@ internal class DefaultContactsRepository @Inject constructor(
             userMapper(it)
         }
     }
+
+    override suspend fun getOutgoingContactRequests(): List<ContactRequest> =
+        withContext(ioDispatcher) {
+            megaApiGateway.outgoingContactRequests().map(contactRequestMapper)
+        }
 }
