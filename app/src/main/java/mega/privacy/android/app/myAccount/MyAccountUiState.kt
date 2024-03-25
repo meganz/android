@@ -21,6 +21,10 @@ import mega.privacy.android.domain.entity.Feature
  * @property errorMessage The Error Message to be displayed
  * @property errorMessageRes A [StringRes] version of the Error Message to be displayed
  * @property shouldNavigateToSmsVerification
+ * @property showInvalidChangeEmailLinkPrompt true if a prompt should be shown explaining that the
+ * link to change the User's email is invalid
+ * @property showChangeEmailConfirmation true if a confirmation should be shown explaining that the
+ * User's Email Address will be changed
  */
 data class MyAccountUiState(
     val isFileVersioningEnabled: Boolean = true,
@@ -38,4 +42,6 @@ data class MyAccountUiState(
     val errorMessage: String = "",
     @StringRes val errorMessageRes: Int? = null,
     val shouldNavigateToSmsVerification: Boolean = false,
+    val showInvalidChangeEmailLinkPrompt: Boolean = false,
+    val showChangeEmailConfirmation: Boolean = false,
 )

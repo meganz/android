@@ -41,7 +41,6 @@ import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM_
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ITUNES
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
-import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
@@ -53,16 +52,13 @@ import mega.privacy.android.app.utils.Constants.ACTION_PASS_CHANGED
 import mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS
 import mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_LINK
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS
-import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_STORAGE_OVERQUOTA
 import mega.privacy.android.app.utils.Constants.RESULT
 import mega.privacy.android.app.utils.Constants.UPDATE_ACCOUNT_DETAILS
-import mega.privacy.android.app.utils.Constants.VERIFY_CHANGE_MAIL_LINK_REGEXS
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.Util.isDarkMode
 import mega.privacy.android.app.utils.Util.isOnline
-import mega.privacy.android.app.utils.Util.matchRegexs
 import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
@@ -192,9 +188,7 @@ class MyAccountActivity : PasscodeActivity(),
 
             ACTION_CHANGE_MAIL -> {
                 intent.dataString?.let { link ->
-                    viewModel.confirmChangeEmail(link) { result ->
-                        showConfirmChangeEmailQueryResult(result)
-                    }
+                    viewModel.beginChangeEmailProcess(changeEmailLink = link)
                 }
 
                 intent.action = null
@@ -458,6 +452,18 @@ class MyAccountActivity : PasscodeActivity(),
             if (state.isBusinessAccount || viewModel.isProFlexiAccount()) {
                 refreshMenuOptionsVisibility()
             }
+            if (state.showInvalidChangeEmailLinkPrompt) {
+                showAlert(
+                    this,
+                    getString(R.string.account_change_email_error_not_logged_with_correct_account_message),
+                    getString(R.string.account_change_email_error_not_logged_with_correct_account_title),
+                )
+                viewModel.resetInvalidChangeEmailLinkPrompt()
+            }
+            if (state.showChangeEmailConfirmation) {
+                showConfirmChangeEmailDialog()
+                viewModel.resetChangeEmailConfirmation()
+            }
         }
     }
 
@@ -627,26 +633,6 @@ class MyAccountActivity : PasscodeActivity(),
             errorInputBinding.textField,
             errorInputBinding.errorIcon
         )
-    }
-
-    private fun showConfirmChangeEmailQueryResult(result: String) {
-        when {
-            matchRegexs(result, VERIFY_CHANGE_MAIL_LINK_REGEXS) -> {
-                showConfirmChangeEmailDialog()
-            }
-
-            result == getFormattedStringOrDefault(R.string.account_change_email_error_not_logged_with_correct_account_message) -> {
-                showAlert(
-                    this,
-                    result,
-                    getFormattedStringOrDefault(R.string.account_change_email_error_not_logged_with_correct_account_title)
-                )
-            }
-
-            else -> {
-                showErrorAlert(getString(R.string.general_error_word))
-            }
-        }
     }
 
     private fun showConfirmChangeEmailDialog() {

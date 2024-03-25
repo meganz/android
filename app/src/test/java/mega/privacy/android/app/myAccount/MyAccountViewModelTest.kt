@@ -16,7 +16,6 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.myAccount.usecase.QueryRecoveryLinkUseCase
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
@@ -24,6 +23,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.VerificationStatus
 import mega.privacy.android.domain.exception.account.QueryCancelLinkException
+import mega.privacy.android.domain.exception.account.QueryChangeEmailLinkException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
@@ -44,6 +44,7 @@ import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.account.KillOtherSessionsUseCase
 import mega.privacy.android.domain.usecase.account.QueryCancelLinkUseCase
+import mega.privacy.android.domain.usecase.account.QueryChangeEmailLinkUseCase
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
@@ -92,8 +93,8 @@ internal class MyAccountViewModelTest {
     private val resetSMSVerifiedPhoneNumber: ResetSMSVerifiedPhoneNumber = mock()
     private val getUserDataUseCase: GetUserDataUseCase = mock()
     private val getFileVersionsOption: GetFileVersionsOption = mock()
-    private val queryRecoveryLinkUseCase: QueryRecoveryLinkUseCase = mock()
     private val queryCancelLinkUseCase: QueryCancelLinkUseCase = mock()
+    private val queryChangeEmailLinkUseCase: QueryChangeEmailLinkUseCase = mock()
     private val isUrlMatchesRegexUseCase: IsUrlMatchesRegexUseCase = mock()
     private val confirmCancelAccountUseCase: ConfirmCancelAccountUseCase = mock()
     private val confirmChangeEmailUseCase: ConfirmChangeEmailUseCase = mock()
@@ -161,8 +162,8 @@ internal class MyAccountViewModelTest {
             resetSMSVerifiedPhoneNumber = resetSMSVerifiedPhoneNumber,
             getUserDataUseCase = getUserDataUseCase,
             getFileVersionsOption = getFileVersionsOption,
-            queryRecoveryLinkUseCase = queryRecoveryLinkUseCase,
             queryCancelLinkUseCase = queryCancelLinkUseCase,
+            queryChangeEmailLinkUseCase = queryChangeEmailLinkUseCase,
             isUrlMatchesRegexUseCase = isUrlMatchesRegexUseCase,
             confirmCancelAccountUseCase = confirmCancelAccountUseCase,
             confirmChangeEmailUseCase = confirmChangeEmailUseCase,
@@ -405,6 +406,106 @@ internal class MyAccountViewModelTest {
             }
         }
 
+    @Test
+    fun `test that the invalid change email link prompt is shown when querying the change email link throws a link not generated exception`() =
+        runTest {
+            whenever(queryChangeEmailLinkUseCase(any())).thenAnswer {
+                throw QueryChangeEmailLinkException.LinkNotGenerated(
+                    errorCode = 20,
+                    errorString = "The link was not generated",
+                )
+            }
+
+            underTest.beginChangeEmailProcess("link/to/change/email")
+            underTest.state.test {
+                assertThat(awaitItem().showInvalidChangeEmailLinkPrompt).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that an error alert is shown when querying the change email link throws an unknown exception`() =
+        runTest {
+            whenever(queryChangeEmailLinkUseCase(any())).thenAnswer {
+                throw QueryChangeEmailLinkException.Unknown(
+                    errorCode = 30,
+                    errorString = "An unexpected issue occurred",
+                )
+            }
+
+            underTest.beginChangeEmailProcess("link/to/change/email")
+            underTest.state.test {
+                assertThat(awaitItem().errorMessageRes).isEqualTo(R.string.general_error_word)
+            }
+        }
+
+    @Test
+    fun `test that an error alert is shown when checking the change email link validity throws an exception`() =
+        runTest {
+            whenever(queryChangeEmailLinkUseCase(any())).thenReturn("link/to/change/email")
+            whenever(
+                isUrlMatchesRegexUseCase(
+                    url = any(),
+                    patterns = any(),
+                )
+            ).thenThrow(RuntimeException())
+
+            underTest.beginChangeEmailProcess("change/email/link")
+            underTest.state.test {
+                assertThat(awaitItem().errorMessageRes).isEqualTo(R.string.general_error_word)
+            }
+        }
+
+    @Test
+    fun `test that an error alert is shown when checking the change email link validity returns an invalid link`() =
+        runTest {
+            whenever(queryChangeEmailLinkUseCase(any())).thenReturn("link/to/change/email")
+            whenever(
+                isUrlMatchesRegexUseCase(
+                    url = any(),
+                    patterns = any(),
+                )
+            ).thenReturn(false)
+
+            underTest.beginChangeEmailProcess("change/email/link")
+            underTest.state.test {
+                assertThat(awaitItem().errorMessageRes).isEqualTo(R.string.general_error_word)
+            }
+        }
+
+    @Test
+    fun `test that the change email confirmation is shown`() = runTest {
+        whenever(queryChangeEmailLinkUseCase(any())).thenReturn("link/to/change/email")
+        whenever(
+            isUrlMatchesRegexUseCase(
+                url = any(),
+                patterns = any(),
+            )
+        ).thenReturn(true)
+
+        underTest.beginChangeEmailProcess("change/email/link")
+        underTest.state.test {
+            assertThat(awaitItem().showChangeEmailConfirmation).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that the invalid change email link prompt is hidden`() = runTest {
+        underTest.resetInvalidChangeEmailLinkPrompt()
+
+        underTest.state.test {
+            assertThat(awaitItem().showInvalidChangeEmailLinkPrompt).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that the change email confirmation is hidden`() = runTest {
+        underTest.resetChangeEmailConfirmation()
+
+        underTest.state.test {
+            assertThat(awaitItem().showChangeEmailConfirmation).isFalse()
+        }
+    }
+
     @After
     fun tearDown() {
         Dispatchers.resetMain()
@@ -422,8 +523,8 @@ internal class MyAccountViewModelTest {
             resetSMSVerifiedPhoneNumber,
             getUserDataUseCase,
             getFileVersionsOption,
-            queryRecoveryLinkUseCase,
             queryCancelLinkUseCase,
+            queryChangeEmailLinkUseCase,
             isUrlMatchesRegexUseCase,
             confirmCancelAccountUseCase,
             confirmChangeEmailUseCase,

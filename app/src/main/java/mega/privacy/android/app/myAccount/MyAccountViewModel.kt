@@ -10,13 +10,10 @@ import android.net.Uri
 import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +29,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
@@ -44,13 +40,13 @@ import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM_NO_NAVIGATION
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ITUNES
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
-import mega.privacy.android.app.myAccount.usecase.QueryRecoveryLinkUseCase
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.utils.CacheFolderManager
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ACTION_REFRESH
 import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.CHANGE_MAIL_2FA
@@ -78,6 +74,7 @@ import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.exception.account.ConfirmCancelAccountException
 import mega.privacy.android.domain.exception.account.ConfirmChangeEmailException
 import mega.privacy.android.domain.exception.account.QueryCancelLinkException
+import mega.privacy.android.domain.exception.account.QueryChangeEmailLinkException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
@@ -99,6 +96,7 @@ import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.account.KillOtherSessionsUseCase
 import mega.privacy.android.domain.usecase.account.QueryCancelLinkUseCase
+import mega.privacy.android.domain.usecase.account.QueryChangeEmailLinkUseCase
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
@@ -136,8 +134,8 @@ import javax.inject.Inject
  * @property resetSMSVerifiedPhoneNumber
  * @property getUserDataUseCase
  * @property getFileVersionsOption
- * @property queryRecoveryLinkUseCase
  * @property queryCancelLinkUseCase Queries information on an Account Cancellation Link
+ * @property queryChangeEmailLinkUseCase Queries information on a Change Email Link
  * @property isUrlMatchesRegexUseCase Checks if the URL Matches any of the Regex Patterns provided
  * @property [confirmCancelAccountUseCase] [ConfirmCancelAccountUseCase]
  * @property confirmChangeEmailUseCase
@@ -171,8 +169,8 @@ class MyAccountViewModel @Inject constructor(
     private val resetSMSVerifiedPhoneNumber: ResetSMSVerifiedPhoneNumber,
     private val getUserDataUseCase: GetUserDataUseCase,
     private val getFileVersionsOption: GetFileVersionsOption,
-    private val queryRecoveryLinkUseCase: QueryRecoveryLinkUseCase,
     private val queryCancelLinkUseCase: QueryCancelLinkUseCase,
+    private val queryChangeEmailLinkUseCase: QueryChangeEmailLinkUseCase,
     private val isUrlMatchesRegexUseCase: IsUrlMatchesRegexUseCase,
     private val confirmCancelAccountUseCase: ConfirmCancelAccountUseCase,
     private val confirmChangeEmailUseCase: ConfirmChangeEmailUseCase,
@@ -196,7 +194,7 @@ class MyAccountViewModel @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val snackBarHandler: SnackBarHandler,
-) : BaseRxViewModel() {
+) : ViewModel() {
 
     companion object {
         const val CHECKING_2FA = "CHECKING_2FA"
@@ -1138,21 +1136,70 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Confirm change email
+     * Begins the process of changing the User's Email Address
      *
-     * @param link
-     * @param action
-     * @receiver
+     * @param changeEmailLink the Change Email Link
      */
-    fun confirmChangeEmail(link: String, action: (String) -> Unit) {
-        queryRecoveryLinkUseCase.queryChangeEmail(link)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy { result ->
-                confirmationLink = link
-                action.invoke(result)
+    fun beginChangeEmailProcess(changeEmailLink: String) {
+        viewModelScope.launch {
+            runCatching {
+                queryChangeEmailLinkUseCase(changeEmailLink)
+            }.onSuccess { newChangeEmailLink ->
+                Timber.d("Successfully queried the Change Email Link")
+                confirmationLink = newChangeEmailLink
+                checkChangeEmailLinkValidity()
+            }.onFailure { exception ->
+                Timber.e("An issue occurred when querying the Change Email Link", exception)
+                if (exception is QueryChangeEmailLinkException.LinkNotGenerated) {
+                    _state.update { it.copy(showInvalidChangeEmailLinkPrompt = true) }
+                } else {
+                    _state.update { it.copy(errorMessageRes = R.string.general_error_word) }
+                }
             }
-            .addTo(composite)
+        }
+    }
+
+    /**
+     * Once the Change Email Link has been successfully queried and no issues were found,
+     * check if the Change Email Link matches the specified Regex
+     */
+    private fun checkChangeEmailLinkValidity() {
+        runCatching {
+            isUrlMatchesRegexUseCase(
+                url = confirmationLink,
+                patterns = Constants.VERIFY_CHANGE_MAIL_LINK_REGEXS,
+            )
+        }.onSuccess { isMatching ->
+            Timber.d(
+                "Successfully checked if the URL matches the Change Email Link Regex\n" +
+                        "Is Change Email Link Valid: $isMatching"
+            )
+            if (isMatching) {
+                _state.update { it.copy(showChangeEmailConfirmation = true) }
+            } else {
+                _state.update { it.copy(errorMessageRes = R.string.general_error_word) }
+            }
+        }.onFailure { exception ->
+            Timber.e(
+                "An issue occurred when checking if the URL matches the Change Email Link Regex",
+                exception
+            )
+            _state.update { it.copy(errorMessageRes = R.string.general_error_word) }
+        }
+    }
+
+    /**
+     * Change the specific State Parameter to hide the Change Email Confirmation
+     */
+    fun resetChangeEmailConfirmation() {
+        _state.update { it.copy(showChangeEmailConfirmation = false) }
+    }
+
+    /**
+     * Change the specific State Parameter to hide the Invalid Change Email Link Prompt
+     */
+    fun resetInvalidChangeEmailLinkPrompt() {
+        _state.update { it.copy(showInvalidChangeEmailLinkPrompt = false) }
     }
 
     /**
