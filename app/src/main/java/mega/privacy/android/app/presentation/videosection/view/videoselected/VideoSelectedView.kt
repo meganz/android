@@ -139,8 +139,8 @@ internal fun VideoSelectedView(
 
             uiState.nodesList.isEmpty() -> LegacyMegaEmptyView(
                 modifier = Modifier.testTag(VIDEO_SELECTED_EMPTY_VIEW_TEST_TAG),
-                text = "[B]No[/B] [A]playlists[/A] [B]found[/B]",
-                imagePainter = painterResource(id = R.drawable.ic_homepage_empty_playlists)
+                text = stringResource(id = R.string.homepage_empty_hint_video),
+                imagePainter = painterResource(id = R.drawable.ic_homepage_empty_video)
             )
 
             else -> {
