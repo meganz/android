@@ -77,6 +77,7 @@ import mega.privacy.android.domain.exception.ResetPasswordLinkException
 import mega.privacy.android.domain.exception.account.ConfirmCancelAccountException
 import mega.privacy.android.domain.exception.account.ConfirmChangeEmailException
 import mega.privacy.android.domain.exception.account.QueryCancelLinkException
+import mega.privacy.android.domain.exception.account.QueryChangeEmailLinkException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
 import nz.mega.sdk.MegaApiJava
@@ -1274,6 +1275,47 @@ internal class DefaultAccountRepository @Inject constructor(
                     }
                 )
                 megaApiGateway.queryCancelLink(accountCancellationLink, listener)
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
+
+    override suspend fun queryChangeEmailLink(changeEmailLink: String): String =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request, error ->
+                        when (error.errorCode) {
+                            MegaError.API_OK -> {
+                                continuation.resumeWith(Result.success(request.link))
+                            }
+
+                            MegaError.API_EACCESS -> {
+                                continuation.resumeWith(
+                                    Result.failure(
+                                        QueryChangeEmailLinkException.LinkNotGenerated(
+                                            error.errorCode,
+                                            error.errorString,
+                                        )
+                                    )
+                                )
+                            }
+
+                            else -> {
+                                continuation.resumeWith(
+                                    Result.failure(
+                                        QueryChangeEmailLinkException.Unknown(
+                                            error.errorCode,
+                                            error.errorString,
+                                        )
+                                    )
+                                )
+                            }
+                        }
+                    }
+                )
+                megaApiGateway.queryChangeEmailLink(changeEmailLink, listener)
                 continuation.invokeOnCancellation {
                     megaApiGateway.removeRequestListener(listener)
                 }

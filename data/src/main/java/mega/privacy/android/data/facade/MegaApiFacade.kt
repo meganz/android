@@ -1549,4 +1549,7 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun queryCancelLink(link: String, listener: MegaRequestListenerInterface) =
         megaApi.queryCancelLink(link, listener)
+
+    override fun queryChangeEmailLink(link: String, listener: MegaRequestListenerInterface) =
+        megaApi.queryChangeEmailLink(link, listener)
 }

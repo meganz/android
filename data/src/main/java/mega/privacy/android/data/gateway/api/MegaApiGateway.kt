@@ -3442,4 +3442,23 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun queryCancelLink(link: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Get information about a change-email link created by MegaApi::changeEmail.
+     *
+     * The associated request type with this request is MegaRequest::TYPE_QUERY_RECOVERY_LINK
+     * Valid data in the MegaRequest object received on all callbacks:
+     * - MegaRequest::getLink - Returns the change-email link
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getEmail - Return the email associated with the link
+     *
+     * If the account is logged-in into a different account than the account for which the link
+     * was generated, onRequestFinish will be called with the error code MegaError::API_EACCESS.
+     *
+     * @param link Change-email link (verify)
+     * @param listener MegaRequestListener to track this request
+     */
+    fun queryChangeEmailLink(link: String, listener: MegaRequestListenerInterface)
 }

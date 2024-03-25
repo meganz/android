@@ -628,4 +628,12 @@ interface AccountRepository {
      * @return the Account Cancellation Link if there are no issues found during the querying process
      */
     suspend fun queryCancelLink(accountCancellationLink: String): String
+
+    /**
+     * Retrieves information on the Change Email Link
+     *
+     * @param changeEmailLink The Change Email Link to be queried
+     * @return The Change Email Link if there are no issues found during the querying process
+     */
+    suspend fun queryChangeEmailLink(changeEmailLink: String): String
 }
