@@ -682,6 +682,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         binding.hostLeaveCallDialogComposeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
+                val sharedState by sharedModel.state.collectAsStateWithLifecycle()
                 val state by inMeetingViewModel.state.collectAsStateWithLifecycle()
 
                 MegaAppTheme(isDark = true) {
@@ -694,7 +695,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         onEndForAllClick = inMeetingViewModel::endCallForAll,
                         onDismiss = inMeetingViewModel::hideBottomPanels
                     )
-                    if (state.showMeetingEndWarningDialog) {
+                    if (sharedState.isCallUnlimitedProPlanFeatureFlagEnabled && state.showMeetingEndWarningDialog) {
                         MegaAlertDialog(
                             title = pluralStringResource(
                                 R.plurals.meetings_in_call_warning_dialog_title,
@@ -1138,7 +1139,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 endMeetingAsModeratorDialog?.dismissAllowingStateLoss()
                 endMeetingAsModeratorDialog = null
             }
-            if (state.minutesToEndMeeting != null) {
+            if (sharedModel.state.value.isCallUnlimitedProPlanFeatureFlagEnabled && state.minutesToEndMeeting != null) {
                 callBanner?.apply {
                     isVisible = true
                     text = getString(
@@ -1150,8 +1151,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         )
                     )
                 }
-            } else {
-                callBanner?.isVisible = false
             }
         }
 
