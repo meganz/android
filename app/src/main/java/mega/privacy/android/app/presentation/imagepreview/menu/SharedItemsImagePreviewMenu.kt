@@ -2,9 +2,13 @@ package mega.privacy.android.app.presentation.imagepreview.menu
 
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import javax.inject.Inject
 
-internal class SharedItemsImagePreviewMenu @Inject constructor() : ImagePreviewMenu {
+internal class SharedItemsImagePreviewMenu @Inject constructor(
+    private val getNodeAccessPermission: GetNodeAccessPermission,
+) : ImagePreviewMenu {
     override suspend fun isInfoMenuVisible(imageNode: ImageNode): Boolean {
         return true
     }
@@ -14,11 +18,11 @@ internal class SharedItemsImagePreviewMenu @Inject constructor() : ImagePreviewM
     }
 
     override suspend fun isFavouriteMenuVisible(imageNode: ImageNode): Boolean {
-        return true
+        return haveOwnerAccessPermission(imageNode)
     }
 
     override suspend fun isLabelMenuVisible(imageNode: ImageNode): Boolean {
-        return true
+        return haveOwnerAccessPermission(imageNode)
     }
 
     override suspend fun isDisputeMenuVisible(imageNode: ImageNode): Boolean {
@@ -42,19 +46,19 @@ internal class SharedItemsImagePreviewMenu @Inject constructor() : ImagePreviewM
     }
 
     override suspend fun isGetLinkMenuVisible(imageNode: ImageNode): Boolean {
-        return true
+        return haveOwnerAccessPermission(imageNode)
     }
 
     override suspend fun isSendToChatMenuVisible(imageNode: ImageNode): Boolean {
-        return true
+        return haveOwnerAccessPermission(imageNode)
     }
 
     override suspend fun isShareMenuVisible(imageNode: ImageNode): Boolean {
-        return true
+        return haveOwnerAccessPermission(imageNode)
     }
 
     override suspend fun isRenameMenuVisible(imageNode: ImageNode): Boolean {
-        return true
+        return haveOwnerAccessPermission(imageNode)
     }
 
     override suspend fun isHideMenuVisible(imageNode: ImageNode): Boolean {
@@ -66,7 +70,7 @@ internal class SharedItemsImagePreviewMenu @Inject constructor() : ImagePreviewM
     }
 
     override suspend fun isMoveMenuVisible(imageNode: ImageNode): Boolean {
-        return true
+        return haveOwnerAccessPermission(imageNode)
     }
 
     override suspend fun isCopyMenuVisible(imageNode: ImageNode): Boolean {
@@ -94,6 +98,12 @@ internal class SharedItemsImagePreviewMenu @Inject constructor() : ImagePreviewM
     }
 
     override suspend fun isMoveToRubbishBinMenuVisible(imageNode: ImageNode): Boolean {
-        return true
+        return haveOwnerAccessPermission(imageNode)
     }
+
+    private suspend fun haveOwnerAccessPermission(
+        imageNode: ImageNode,
+    ) = getNodeAccessPermission(imageNode.id)?.let { accessPermission ->
+        accessPermission == AccessPermission.OWNER
+    } ?: false
 }

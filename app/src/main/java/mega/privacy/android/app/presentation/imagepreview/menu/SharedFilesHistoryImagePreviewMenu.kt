@@ -10,7 +10,7 @@ internal class SharedFilesHistoryImagePreviewMenu @Inject constructor(
     private val getNodeAccessPermission: GetNodeAccessPermission,
 ) : ImagePreviewMenu {
     override suspend fun isInfoMenuVisible(imageNode: ImageNode): Boolean {
-        return checkFullAccessPermission(imageNode)
+        return haveOwnerAccessPermission(imageNode)
     }
 
     override suspend fun isSlideshowMenuVisible(imageNode: ImageNode): Boolean {
@@ -101,9 +101,9 @@ internal class SharedFilesHistoryImagePreviewMenu @Inject constructor(
         return false
     }
 
-    private suspend fun checkFullAccessPermission(
+    private suspend fun haveOwnerAccessPermission(
         imageNode: ImageNode,
     ) = getNodeAccessPermission(imageNode.id)?.let { accessPermission ->
-        accessPermission != AccessPermission.FULL
+        accessPermission == AccessPermission.OWNER
     } ?: false
 }
