@@ -24,11 +24,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
@@ -48,6 +51,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.shared.theme.MegaAppTheme
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun VideoSelectedView(
     uiState: VideoSelectedState,
@@ -79,7 +83,7 @@ internal fun VideoSelectedView(
     }
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.semantics { testTagsAsResourceId = true },
         scaffoldState = rememberScaffoldState(),
         topBar = {
             VideoSelectedTopBar(
@@ -274,26 +278,26 @@ private fun VideoSelectedViewWithEmptyViewPreview() {
 /**
  * Test tag for progressBar
  */
-const val VIDEO_SELECTED_PROGRESS_BAR_TEST_TAG = "video_selected_progress_bar_test_tag"
+const val VIDEO_SELECTED_PROGRESS_BAR_TEST_TAG = "video_selected:progress_bar"
 
 /**
  * Test tag for empty view
  */
-const val VIDEO_SELECTED_EMPTY_VIEW_TEST_TAG = "video_selected_empty_view_test_tag"
+const val VIDEO_SELECTED_EMPTY_VIEW_TEST_TAG = "video_selected:empty_view"
 
 /**
  * Test tag for list view
  */
-const val VIDEO_SELECTED_LIST_VIEW_TEST_TAG = "video_selected_list_view_test_tag"
+const val VIDEO_SELECTED_LIST_VIEW_TEST_TAG = "video_selected:list_view"
 
 /**
  * Test tag for list view
  */
-const val VIDEO_SELECTED_GRID_VIEW_TEST_TAG = "video_selected_grid_view_test_tag"
+const val VIDEO_SELECTED_GRID_VIEW_TEST_TAG = "video_selected:grid_view"
 
 /**
  * Test tag for fab button
  */
-const val VIDEO_SELECTED_FAB_BUTTON_TEST_TAG = "video_selected_fab_button_test_tag"
+const val VIDEO_SELECTED_FAB_BUTTON_TEST_TAG = "video_selected:fab_button_videos_selected"
 
 internal const val videoSelectedRoute = "videoSelectedFeature/videSelected"

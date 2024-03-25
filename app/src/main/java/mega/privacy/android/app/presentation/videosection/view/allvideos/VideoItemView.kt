@@ -109,7 +109,7 @@ internal fun VideoItemView(
                         if (!isSelected) {
                             onMenuClick()
                         }
-                    },
+                    }.testTag(VIDEO_ITEM_MENU_ICON_TEST_TAG),
                 alignment = Alignment.CenterEnd,
             )
         }
@@ -140,7 +140,7 @@ internal fun VideoThumbnailView(
             placeholder = painterResource(id = icon),
             error = painterResource(id = icon),
             contentScale = ContentScale.FillBounds,
-            modifier = thumbnailModifier
+            modifier = thumbnailModifier.testTag(VIDEO_ITEM_THUMBNAIL_TEST_TAG)
         )
 
         duration?.let {
@@ -161,6 +161,7 @@ internal fun VideoThumbnailView(
             modifier = Modifier
                 .size(16.dp)
                 .align(Alignment.Center)
+                .testTag(VIDEO_ITEM_PLAY_ICON_TEST_TAG)
         )
         if (isFavourite) {
             Image(
@@ -170,6 +171,7 @@ internal fun VideoThumbnailView(
                     .padding(top = 5.dp, end = 5.dp)
                     .size(12.dp)
                     .align(Alignment.TopEnd)
+                    .testTag(VIDEO_ITEM_FAVOURITE_ICON_TEST_TAG)
             )
         }
     }
@@ -261,7 +263,8 @@ internal fun VideoSizeAndIconsView(
             Image(
                 modifier = Modifier
                     .padding(start = 10.dp)
-                    .size(16.dp),
+                    .size(16.dp)
+                    .testTag(VIDEO_ITEM_OFFLINE_ICON_TEST_TAG),
                 colorFilter = ColorFilter.tint(
                     MaterialTheme.colors.textColorSecondary
                 ),
@@ -274,7 +277,8 @@ internal fun VideoSizeAndIconsView(
             Image(
                 modifier = Modifier
                     .padding(start = 10.dp)
-                    .size(16.dp),
+                    .size(16.dp)
+                    .testTag(VIDEO_ITEM_LINK_ICON_TEST_TAG),
                 painter = painterResource(id = iconPackR.drawable.ic_link),
                 contentDescription = VIDEO_ITEM_LINK_ICON_CONTENT_DESCRIPTION,
                 colorFilter = ColorFilter.tint(
@@ -346,27 +350,27 @@ private fun VideoInfoViewPreview() {
 /**
  * Test tag for the video item view
  */
-const val VIDEO_ITEM_VIEW_TEST_TAG = "video_item_view_test_tag"
+const val VIDEO_ITEM_VIEW_TEST_TAG = "video_item:row_item"
 
 /**
  * Test tag for the video item label view
  */
-const val VIDEO_ITEM_LABEL_VIEW_TEST_TAG = "video_item_label_view_test_tag"
+const val VIDEO_ITEM_LABEL_VIEW_TEST_TAG = "video_item:box_label"
 
 /**
  * Test tag for the video item duration view
  */
-const val VIDEO_ITEM_DURATION_VIEW_TEST_TAG = "video_item_duration_view_test_tag"
+const val VIDEO_ITEM_DURATION_VIEW_TEST_TAG = "video_item:text_duration"
 
 /**
  * Test tag for the video item name view
  */
-const val VIDEO_ITEM_NAME_VIEW_TEST_TAG = "video_item_name_view_test_tag"
+const val VIDEO_ITEM_NAME_VIEW_TEST_TAG = "video_item:text_name"
 
 /**
  * Test tag for the video item size view
  */
-const val VIDEO_ITEM_SIZE_VIEW_TEST_TAG = "video_item_size_view_test_tag"
+const val VIDEO_ITEM_SIZE_VIEW_TEST_TAG = "video_item:text_size"
 
 /**
  * Content description for the video item thumbnail
@@ -374,9 +378,19 @@ const val VIDEO_ITEM_SIZE_VIEW_TEST_TAG = "video_item_size_view_test_tag"
 const val VIDEO_ITEM_THUMBNAIL_CONTENT_DESCRIPTION = "Video thumbnail"
 
 /**
+ * Test tag for the video item thumbnail view
+ */
+const val VIDEO_ITEM_THUMBNAIL_TEST_TAG = "video_item:image_thumbnail"
+
+/**
  * Content description for the video item menu icon
  */
 const val VIDEO_ITEM_MENU_ICON_CONTENT_DESCRIPTION = "menu icon"
+
+/**
+ * Test tag for the video item menu icon view
+ */
+const val VIDEO_ITEM_MENU_ICON_TEST_TAG = "video_item:image_menu"
 
 /**
  * Content description for the video item play icon
@@ -384,9 +398,19 @@ const val VIDEO_ITEM_MENU_ICON_CONTENT_DESCRIPTION = "menu icon"
 const val VIDEO_ITEM_PLAY_ICON_CONTENT_DESCRIPTION = "play icon"
 
 /**
+ * Test tag for the video item play icon view
+ */
+const val VIDEO_ITEM_PLAY_ICON_TEST_TAG = "video_item:image_play"
+
+/**
  * Content description for the video item favourite icon
  */
 const val VIDEO_ITEM_FAVOURITE_ICON_CONTENT_DESCRIPTION = "favourite icon"
+
+/**
+ * Test tag for the video item favourite icon view
+ */
+const val VIDEO_ITEM_FAVOURITE_ICON_TEST_TAG = "video_item:image_favourite"
 
 /**
  * Content description for the video item offline icon
@@ -394,6 +418,16 @@ const val VIDEO_ITEM_FAVOURITE_ICON_CONTENT_DESCRIPTION = "favourite icon"
 const val VIDEO_ITEM_OFFLINE_ICON_CONTENT_DESCRIPTION = "Available Offline"
 
 /**
+ * Test tag for the video item offline icon view
+ */
+const val VIDEO_ITEM_OFFLINE_ICON_TEST_TAG = "video_item:image_offline"
+
+/**
  * Content description for the video item link icon
  */
 const val VIDEO_ITEM_LINK_ICON_CONTENT_DESCRIPTION = "Link icon"
+
+/**
+ * Test tag for the video item link icon view
+ */
+const val VIDEO_ITEM_LINK_ICON_TEST_TAG = "video_item:image_link"

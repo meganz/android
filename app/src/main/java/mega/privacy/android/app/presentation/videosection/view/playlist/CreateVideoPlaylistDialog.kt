@@ -52,17 +52,6 @@ import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.shared.theme.MegaAppTheme
 
-/**
- * Test tag for error message
- */
-const val ERROR_MESSAGE_TEST_TAG = "error_message_test_tag"
-
-/**
- * Test tag for error message
- */
-const val POSITIVE_BUTTON_TEST_TAG = "positive_button_test_tag"
-
-
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun CreateVideoPlaylistDialog(
@@ -306,3 +295,14 @@ private fun CreateVideoPlaylistDialogWithSameNamePreview() {
         }
     }
 }
+
+/**
+ * Test tag for error message
+ */
+const val ERROR_MESSAGE_TEST_TAG = "video_playlist_create_dialog:text_error_message"
+
+/**
+ * Test tag for error message
+ */
+const val POSITIVE_BUTTON_TEST_TAG = "video_playlist_create_dialog:button_positive"
+

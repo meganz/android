@@ -42,26 +42,6 @@ import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaNode
 
-/**
- * Test tag for the videos progress bar.
- */
-const val VIDEOS_PROGRESS_BAR_TEST_TAG = "videos_progress_bar_test_tag"
-
-/**
- * Test tag for the videos empty view.
- */
-const val VIDEOS_EMPTY_VIEW_TEST_TAG = "videos_empty_view_test_tag"
-
-/**
- * Test tag for the videos filter button view.
- */
-const val VIDEOS_FILTER_BUTTON_VIEW_TEST_TAG = "videos_filter_button_view_test_tag"
-
-/**
- * Test tag for the videos list.
- */
-const val VIDEOS_LIST_TEST_TAG = "videos_list_test_tag"
-
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun AllVideosView(
@@ -311,3 +291,23 @@ private fun AllVideosViewPreview() {
         )
     }
 }
+
+/**
+ * Test tag for the videos progress bar.
+ */
+const val VIDEOS_PROGRESS_BAR_TEST_TAG = "all_videos:progress_bar"
+
+/**
+ * Test tag for the videos empty view.
+ */
+const val VIDEOS_EMPTY_VIEW_TEST_TAG = "all_videos:empty_view"
+
+/**
+ * Test tag for the videos filter button view.
+ */
+const val VIDEOS_FILTER_BUTTON_VIEW_TEST_TAG = "all_videos:button_filter"
+
+/**
+ * Test tag for the videos list.
+ */
+const val VIDEOS_LIST_TEST_TAG = "all_videos:videos_list"

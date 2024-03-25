@@ -450,29 +450,29 @@ private fun FabButtonPreview() {
 /**
  * Test tag for creating video playlist fab button
  */
-const val FAB_BUTTON_TEST_TAG = "fab_button_test_tag"
+const val FAB_BUTTON_TEST_TAG = "video_playlists:fab_button_create_video_playlist"
 
 /**
  * Test tag for CreateVideoPlaylistDialog
  */
-const val CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG = "create_video_playlist_dialog_test_tag"
+const val CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG = "video_playlists:dialog_create_video_playlist"
 
 /**
  * Test tag for RenameVideoPlaylistDialog
  */
-const val RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG = "rename_video_playlist_dialog_test_tag"
+const val RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG = "video_playlists:dialog_rename_video_playlist"
 
 /**
  * Test tag for DeleteVideoPlaylistDialog
  */
-const val DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG = "delete_video_playlist_dialog_test_tag"
+const val DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG = "video_playlists:dialog_delete_video_playlist"
 
 /**
  * Test tag for progressBar
  */
-const val PROGRESS_BAR_TEST_TAG = "progress_bar_test_tag"
+const val PROGRESS_BAR_TEST_TAG = "video_playlists:progress_bar"
 
 /**
  * Test tag for empty view
  */
-const val VIDEO_PLAYLISTS_EMPTY_VIEW_TEST_TAG = "video_playlists_empty_view_test_tag"
+const val VIDEO_PLAYLISTS_EMPTY_VIEW_TEST_TAG = "video_playlists:empty_view"

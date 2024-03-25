@@ -138,14 +138,14 @@ private fun VideoSelectedTopBarWithQueryPreview(
 /**
  * Test tag for empty top bar
  */
-const val EMPTY_TOP_BAR_TEST_TAG = "empty_top_bar_test_tag"
+const val EMPTY_TOP_BAR_TEST_TAG = "video_selected_top_bar:top_bar_empty"
 
 /**
  * Test tag for selected mode top bar
  */
-const val SELECTED_MODE_TOP_BAR_TEST_TAG = "selected_mode_top_bar_test_tag"
+const val SELECTED_MODE_TOP_BAR_TEST_TAG = "video_selected_top_bar:top_bar_selected_mode"
 
 /**
  * Test tag for search top bar of video selected
  */
-const val SEARCH_TOP_BAR_TEST_TAG = "search_top_bar_test_tag"
+const val SEARCH_TOP_BAR_TEST_TAG = "video_selected_top_bar:top_bar_search"

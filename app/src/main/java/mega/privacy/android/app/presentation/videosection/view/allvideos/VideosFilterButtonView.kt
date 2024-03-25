@@ -132,9 +132,9 @@ private fun VideosFilterButtonViewSelectedPreview() {
 /**
  * Test tag for location filter button text.
  */
-const val LOCATION_FILTER_BUTTON_TEXT_TEST_TAG = "location_filter_button_text_test_tag"
+const val LOCATION_FILTER_BUTTON_TEXT_TEST_TAG = "filter_button:text_location"
 
 /**
  * Test tag for duration filter button text.
  */
-const val DURATION_FILTER_BUTTON_TEXT_TEST_TAG = "duration_filter_button_text_test_tag"
+const val DURATION_FILTER_BUTTON_TEXT_TEST_TAG = "filter_button:text_duration"
