@@ -38,10 +38,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.search.SearchActivity
+import mega.privacy.android.app.presentation.search.model.DateFilterOption
+import mega.privacy.android.app.presentation.search.model.FilterOptionEntity
 import mega.privacy.android.app.presentation.search.model.SearchActivityState
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.model.TypeFilterOption
-import mega.privacy.android.app.presentation.search.model.TypeFilterOptionEntity
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -63,6 +64,8 @@ import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewForSearch
  * @param onLinkClicked link click listener for item
  * @param onDisputeTakeDownClicked dispute take-down click listener
  * @param onTypeFilterItemClicked a type filter has been clicked
+ * @param onDateModifiedFilterItemClicked a date modified filter has been clicked
+ * @param onDateAddedFilterItemClicked a date added filter has been clicked
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -81,6 +84,8 @@ fun SearchComposeView(
     trackAnalytics: (SearchFilter) -> Unit,
     updateSearchQuery: (String) -> Unit,
     onTypeFilterItemClicked: (TypeFilterOption?) -> Unit,
+    onDateModifiedFilterItemClicked: (DateFilterOption?) -> Unit,
+    onDateAddedFilterItemClicked: (DateFilterOption?) -> Unit,
     onBackPressed: () -> Unit,
     navHostController: NavHostController,
     nodeActionHandler: NodeActionHandler,
@@ -95,13 +100,28 @@ fun SearchComposeView(
     val keyboardController = LocalSoftwareKeyboardController.current
     val typeBottomSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
-        skipHalfExpanded = false
+    )
+    val dateModifiedBottomSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+    )
+    val dateAddedBottomSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
     )
 
-    BackHandler(enabled = typeBottomSheetState.isVisible) {
+    BackHandler(
+        enabled = typeBottomSheetState.isVisible
+                || dateModifiedBottomSheetState.isVisible
+                || dateAddedBottomSheetState.isVisible
+    ) {
         coroutineScope.launch {
             if (typeBottomSheetState.isVisible) {
                 typeBottomSheetState.hide()
+            }
+            if (dateModifiedBottomSheetState.isVisible) {
+                dateModifiedBottomSheetState.hide()
+            }
+            if (dateAddedBottomSheetState.isVisible) {
+                dateAddedBottomSheetState.hide()
             }
         }
     }
@@ -154,15 +174,47 @@ fun SearchComposeView(
             if (state.nodeSourceType == NodeSourceType.CLOUD_DRIVE || state.nodeSourceType == NodeSourceType.HOME) {
                 if (state.dropdownChipsEnabled) {
                     DropdownChipToolbar(
-                        isTypeFilterSelected = state.typeSelectedFilterOption != null,
-                        typeFilterTitle = "Type",
-                        selectedTypeFilterTitle = state.typeSelectedFilterOption?.title ?: "Type",
-                        onTypeFilterClicked = {
-                            coroutineScope.launch {
-                                keyboardController?.hide()
-                                typeBottomSheetState.show()
-                            }
-                        }
+                        listOf(
+                            ChipItem(
+                                isSelected = state.typeSelectedFilterOption != null,
+                                notSelectedTitle = "Type",
+                                selectedFilterTitle = state.typeSelectedFilterOption?.title
+                                    ?: "Type",
+                                onFilterClicked = {
+                                    coroutineScope.launch {
+                                        keyboardController?.hide()
+                                        typeBottomSheetState.show()
+                                    }
+                                },
+                                testTag = TYPE_DROPDOWN_CHIP_TEST_TAG,
+                            ),
+                            ChipItem(
+                                isSelected = state.dateModifiedSelectedFilterOption != null,
+                                notSelectedTitle = "Last modified",
+                                selectedFilterTitle = state.dateModifiedSelectedFilterOption?.title
+                                    ?: "Last modified",
+                                onFilterClicked = {
+                                    coroutineScope.launch {
+                                        keyboardController?.hide()
+                                        dateModifiedBottomSheetState.show()
+                                    }
+                                },
+                                testTag = DATE_MODIFIED_DROPDOWN_CHIP_TEST_TAG,
+                            ),
+                            ChipItem(
+                                isSelected = state.dateAddedSelectedFilterOption != null,
+                                notSelectedTitle = "Date added",
+                                selectedFilterTitle = state.dateAddedSelectedFilterOption?.title
+                                    ?: "Date added",
+                                onFilterClicked = {
+                                    coroutineScope.launch {
+                                        keyboardController?.hide()
+                                        dateAddedBottomSheetState.show()
+                                    }
+                                },
+                                testTag = DATE_ADDED_DROPDOWN_CHIP_TEST_TAG,
+                            ),
+                        )
                     )
                 } else {
                     SearchFilterChipsView(
@@ -209,14 +261,13 @@ fun SearchComposeView(
             }
         }
 
-        TypeFilterBottomSheet(
-            modifier = Modifier,
+        SearchFilterBottomSheet(
             modalSheetState = typeBottomSheetState,
             title = "Type",
             options = TypeFilterOption.entries.map { option ->
-                TypeFilterOptionEntity(
+                FilterOptionEntity(
                     option.ordinal,
-                    option.name,
+                    option.title,
                     option == state.typeSelectedFilterOption
                 )
             },
@@ -228,6 +279,48 @@ fun SearchComposeView(
                     ?.takeIf { it.ordinal != state.typeSelectedFilterOption?.ordinal }
 
                 onTypeFilterItemClicked(typeOption)
+            }
+        )
+
+        SearchFilterBottomSheet(
+            modalSheetState = dateModifiedBottomSheetState,
+            title = "Last modified",
+            options = DateFilterOption.entries.map { option ->
+                FilterOptionEntity(
+                    option.ordinal,
+                    option.title,
+                    option == state.dateModifiedSelectedFilterOption
+                )
+            },
+            onItemSelected = { item ->
+                coroutineScope.launch {
+                    dateModifiedBottomSheetState.hide()
+                }
+                val dateModifiedOption = DateFilterOption.entries.getOrNull(item.id)
+                    ?.takeIf { it.ordinal != state.dateModifiedSelectedFilterOption?.ordinal }
+
+                onDateModifiedFilterItemClicked(dateModifiedOption)
+            }
+        )
+
+        SearchFilterBottomSheet(
+            modalSheetState = dateAddedBottomSheetState,
+            title = "Date added",
+            options = DateFilterOption.entries.map { option ->
+                FilterOptionEntity(
+                    option.ordinal,
+                    option.title,
+                    option == state.dateAddedSelectedFilterOption
+                )
+            },
+            onItemSelected = { item ->
+                coroutineScope.launch {
+                    dateAddedBottomSheetState.hide()
+                }
+                val dateAddedOption = DateFilterOption.entries.getOrNull(item.id)
+                    ?.takeIf { it.ordinal != state.dateAddedSelectedFilterOption?.ordinal }
+
+                onDateAddedFilterItemClicked(dateAddedOption)
             }
         )
     }
@@ -271,6 +364,8 @@ private fun PreviewSearchComposeView() {
         trackAnalytics = {},
         updateSearchQuery = {},
         onTypeFilterItemClicked = {},
+        onDateModifiedFilterItemClicked = {},
+        onDateAddedFilterItemClicked = {},
         onBackPressed = {},
         navHostController = NavHostController(LocalContext.current),
         modifier = Modifier,
@@ -281,3 +376,20 @@ private fun PreviewSearchComposeView() {
         clearSelection = {}
     )
 }
+
+/**
+ * Test tag for type
+ */
+internal const val TYPE_DROPDOWN_CHIP_TEST_TAG = "search_compose_view:dropdown_chip_type"
+
+/**
+ * Test tag for date modified
+ */
+internal const val DATE_MODIFIED_DROPDOWN_CHIP_TEST_TAG =
+    "search_compose_view:dropdown_chip_date_modified"
+
+/**
+ * Test tag for date added
+ */
+internal const val DATE_ADDED_DROPDOWN_CHIP_TEST_TAG =
+    "search_compose_view:dropdown_chip_date_added"

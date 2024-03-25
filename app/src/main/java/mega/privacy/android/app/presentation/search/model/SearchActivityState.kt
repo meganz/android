@@ -24,6 +24,8 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property filters search filter categories
  * @property selectedFilter selected filter which is enabled on chips
  * @property typeSelectedFilterOption the type selected filter option
+ * @property dateModifiedSelectedFilterOption the date modified selected filter option
+ * @property dateAddedSelectedFilterOption the date added selected filter option
  * @property nodeSourceType type of Node Source
  * @property emptyState empty state to be shown on UI
  * @property toolbarMenuItems list of [ToolbarMenuItem] to be shown on toolbar
@@ -44,6 +46,8 @@ data class SearchActivityState(
     val filters: List<SearchFilter> = emptyList(),
     val selectedFilter: SearchFilter? = null,
     val typeSelectedFilterOption: TypeFilterOption? = null,
+    val dateModifiedSelectedFilterOption: DateFilterOption? = null,
+    val dateAddedSelectedFilterOption: DateFilterOption? = null,
     val emptyState: Pair<Int, String>? = null,
     val toolbarMenuItems: List<ToolbarMenuItem> = emptyList(),
     val nodeSourceType: NodeSourceType = NodeSourceType.OTHER,

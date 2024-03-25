@@ -7,6 +7,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.app.presentation.search.view.ChipItem
 import mega.privacy.android.app.presentation.search.view.DropdownChipToolbar
 import mega.privacy.android.app.presentation.search.view.TYPE_DROPDOWN_CHIP_TEST_TAG
 import org.junit.Rule
@@ -28,10 +29,15 @@ class DropdownChipToolbarTest {
     ) {
         composeTestRule.setContent {
             DropdownChipToolbar(
-                isTypeFilterSelected = isTypeFilterSelected,
-                typeFilterTitle = typeFilterTitle,
-                selectedTypeFilterTitle = selectedTypeFilterTitle,
-                onTypeFilterClicked = onTypeFilterClicked,
+                listOf(
+                    ChipItem(
+                        isSelected = isTypeFilterSelected,
+                        notSelectedTitle = typeFilterTitle,
+                        selectedFilterTitle = selectedTypeFilterTitle,
+                        onFilterClicked = onTypeFilterClicked,
+                        testTag = TYPE_DROPDOWN_CHIP_TEST_TAG
+                    )
+                )
             )
         }
     }

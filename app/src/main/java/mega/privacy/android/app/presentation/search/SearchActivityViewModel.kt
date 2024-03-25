@@ -19,6 +19,7 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
 import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
 import mega.privacy.android.app.presentation.search.mapper.TypeFilterToSearchMapper
+import mega.privacy.android.app.presentation.search.model.DateFilterOption
 import mega.privacy.android.app.presentation.search.model.SearchActivityState
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.model.TypeFilterOption
@@ -109,7 +110,14 @@ class SearchActivityViewModel @Inject constructor(
     }
 
     private fun initializeSearch() {
-        _state.update { it.copy(nodeSourceType = nodeSourceType, typeSelectedFilterOption = null) }
+        _state.update {
+            it.copy(
+                nodeSourceType = nodeSourceType,
+                typeSelectedFilterOption = null,
+                dateModifiedSelectedFilterOption = null,
+                dateAddedSelectedFilterOption = null
+            )
+        }
         runCatching {
             getSearchCategoriesUseCase().map { searchFilterMapper(it) }
                 .filterNot { it.filter == SearchCategory.ALL }
@@ -328,6 +336,30 @@ class SearchActivityViewModel @Inject constructor(
         _state.update {
             it.copy(
                 typeSelectedFilterOption = typeFilterOption,
+            )
+        }
+        viewModelScope.launch { performSearch() }
+    }
+
+    /**
+     * Updates the date modified filter with the selected option
+     */
+    fun setDateModifiedSelectedFilterOption(dateFilterOption: DateFilterOption?) {
+        _state.update {
+            it.copy(
+                dateModifiedSelectedFilterOption = dateFilterOption,
+            )
+        }
+        viewModelScope.launch { performSearch() }
+    }
+
+    /**
+     * Updates the date added filter with the selected option
+     */
+    fun setDateAddedSelectedFilterOption(dateFilterOption: DateFilterOption?) {
+        _state.update {
+            it.copy(
+                dateAddedSelectedFilterOption = dateFilterOption,
             )
         }
         viewModelScope.launch { performSearch() }

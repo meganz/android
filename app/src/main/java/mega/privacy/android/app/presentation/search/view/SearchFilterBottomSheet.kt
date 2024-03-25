@@ -21,9 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.search.model.FilterOptionEntity
 import mega.privacy.android.app.presentation.search.model.TypeFilterOption
-import mega.privacy.android.app.presentation.search.model.TypeFilterOptionEntity
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -32,12 +31,12 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-internal fun TypeFilterBottomSheet(
-    modifier: Modifier,
+internal fun SearchFilterBottomSheet(
+    modifier: Modifier = Modifier,
     modalSheetState: ModalBottomSheetState,
     title: String,
-    options: List<TypeFilterOptionEntity>,
-    onItemSelected: (TypeFilterOptionEntity) -> Unit,
+    options: List<FilterOptionEntity>,
+    onItemSelected: (FilterOptionEntity) -> Unit,
 ) {
     BottomSheet(modalSheetState = modalSheetState,
         sheetBody = {
@@ -84,17 +83,16 @@ internal fun TypeFilterBottomSheet(
 @OptIn(ExperimentalMaterialApi::class)
 @CombinedThemePreviews
 @Composable
-private fun TypeFilterBottomSheetPreview() {
+private fun SearchFilterBottomSheetPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
-        TypeFilterBottomSheet(
-            modifier = Modifier,
+        SearchFilterBottomSheet(
             modalSheetState = rememberModalBottomSheetState(
                 initialValue = ModalBottomSheetValue.Expanded,
                 skipHalfExpanded = false,
             ),
             title = "Type",
             options = TypeFilterOption.entries.map { option ->
-                TypeFilterOptionEntity(
+                FilterOptionEntity(
                     id = option.ordinal,
                     title = option.title,
                     isSelected = true
