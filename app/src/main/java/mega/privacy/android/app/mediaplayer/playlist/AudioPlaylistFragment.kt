@@ -318,7 +318,7 @@ class AudioPlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListen
             }
         }
         playlistActionModeCallback?.run {
-            actionMode = (context as AppCompatActivity).startSupportActionMode(this)
+            actionMode = (activity as? AppCompatActivity)?.startSupportActionMode(this)
             actionMode?.title = resources.getString(R.string.title_select_tracks)
         }
     }

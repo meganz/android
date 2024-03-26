@@ -1,5 +1,7 @@
 package mega.privacy.android.app.mediaplayer.gateway
 
+import androidx.annotation.OptIn
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.source.ShuffleOrder
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 
@@ -35,6 +37,7 @@ interface AudioPlayerServiceViewModelGateway : PlayerServiceViewModelGateway {
      *
      * @return ShuffleOrder
      */
+    @OptIn(UnstableApi::class)
     fun getShuffleOrder(): ShuffleOrder
 
     /**
@@ -64,5 +67,6 @@ interface AudioPlayerServiceViewModelGateway : PlayerServiceViewModelGateway {
      *
      * @return new shuffle order
      */
+    @OptIn(UnstableApi::class)
     fun newShuffleOrder(): ShuffleOrder
 }

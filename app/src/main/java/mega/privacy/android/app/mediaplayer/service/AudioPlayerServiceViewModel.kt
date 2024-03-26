@@ -138,6 +138,7 @@ import kotlin.time.Duration.Companion.seconds
  * A class containing audio player service logic, because using ViewModel in Service
  * is not the standard scenario, so this class is actually not a subclass of ViewModel.
  */
+@OptIn(UnstableApi::class)
 class AudioPlayerServiceViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper,

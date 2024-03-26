@@ -5,6 +5,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter.Companion.TYPE_PREVIOUS
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -49,7 +50,9 @@ fun PlaylistItem.updateNodeName(newName: String) = copy(nodeName = newName)
 fun PlaylistItem.formatCurrentPositionAndDuration(
     currentPosition: Long,
     durationInSecondsTextMapper: DurationInSecondsTextMapper,
-) = "${durationInSecondsTextMapper(currentPosition.seconds)} / ${durationInSecondsTextMapper(duration)}"
+) = "${durationInSecondsTextMapper(currentPosition.milliseconds)} / ${
+    durationInSecondsTextMapper(duration)
+}"
 
 /**
  * Get name of item header

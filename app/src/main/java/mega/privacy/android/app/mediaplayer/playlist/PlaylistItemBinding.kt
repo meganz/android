@@ -15,7 +15,7 @@ import java.io.File
 fun setPlaylistItemThumbnail(
     imageView: SimpleDraweeView,
     file: File?,
-    defaultThumbnail: Int
+    defaultThumbnail: Int,
 ) {
     with(imageView) {
         when {
@@ -30,8 +30,9 @@ fun setPlaylistItemThumbnail(
                     resources.getDimensionPixelSize(R.dimen.non_default_thumbnail_margin_start)
                 layoutParams = param
             }
+
             else -> {
-                setActualImageResource(defaultThumbnail)
+                hierarchy.setPlaceholderImage(defaultThumbnail)
 
                 val param = layoutParams as FrameLayout.LayoutParams
                 param.width =
