@@ -449,7 +449,7 @@ class ImagePreviewViewModel @Inject constructor(
                 imagePreviewMenuSource in listOf(
                     ImagePreviewMenuSource.ALBUM_SHARING,
                     ImagePreviewMenuSource.PUBLIC_FILE,
-                    ImagePreviewMenuSource.SHARED_FILES_HISTORY
+                    ImagePreviewMenuSource.CHAT
                 ) -> node.serializedData?.let { getPublicNodeFromSerializedDataUseCase(it) }
 
                 else -> addImageTypeUseCase(node)
@@ -539,7 +539,7 @@ class ImagePreviewViewModel @Inject constructor(
     fun importNode(context: Context, importHandle: Long, toHandle: Long) {
         viewModelScope.launch {
             when (imagePreviewFetcherSource) {
-                ImagePreviewFetcherSource.SHARED_FILES_HISTORY -> {
+                ImagePreviewFetcherSource.CHAT -> {
                     importChatNode(
                         context = context,
                         newParentHandle = toHandle,

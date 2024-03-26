@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import javax.inject.Inject
 
-internal class SharedFilesHistoryImagePreviewMenu @Inject constructor(
+internal class ChatImagePreviewMenu @Inject constructor(
     private val getNodeAccessPermission: GetNodeAccessPermission,
 ) : ImagePreviewMenu {
     override suspend fun isInfoMenuVisible(imageNode: ImageNode): Boolean {

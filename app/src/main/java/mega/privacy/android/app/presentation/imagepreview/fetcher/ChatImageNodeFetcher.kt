@@ -8,16 +8,16 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
-import mega.privacy.android.domain.usecase.MonitorSharedFilesHistoryImageNodesUseCase
+import mega.privacy.android.domain.usecase.MonitorChatImageNodesUseCase
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class SharedFilesHistoryImageNodeFetcher @Inject constructor(
-    private val monitorSharedFilesHistoryImageNodesUseCase: MonitorSharedFilesHistoryImageNodesUseCase,
+internal class ChatImageNodeFetcher @Inject constructor(
+    private val monitorChatImageNodesUseCase: MonitorChatImageNodesUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ImageNodeFetcher {
     override fun monitorImageNodes(bundle: Bundle): Flow<List<ImageNode>> {
-        return monitorSharedFilesHistoryImageNodesUseCase(
+        return monitorChatImageNodesUseCase(
             chatRoomId = bundle.getLong(CHAT_ROOM_ID),
             messageIds = bundle.getLongArray(MESSAGE_IDS)?.map { it }.orEmpty(),
         ).mapLatest { imageNodes ->

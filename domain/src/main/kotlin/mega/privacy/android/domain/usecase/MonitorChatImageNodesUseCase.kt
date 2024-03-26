@@ -10,9 +10,9 @@ import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import javax.inject.Inject
 
 /**
- * Get shared files history images nodes use case
+ * Get chat images nodes use case
  */
-class MonitorSharedFilesHistoryImageNodesUseCase @Inject constructor(
+class MonitorChatImageNodesUseCase @Inject constructor(
     private val photosRepository: PhotosRepository,
     private val addImageTypeUseCase: AddImageTypeUseCase,
 ) {

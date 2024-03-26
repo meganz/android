@@ -151,7 +151,7 @@ class UiChatMessageMapper @Inject constructor(
 
             is NodeAttachmentMessage -> NodeAttachmentUiMessage(
                 message = message,
-                reactions = uiReactionListMapper(message.reactions)
+                reactions = uiReactionListMapper(message.reactions),
             )
 
             is PendingAttachmentMessage -> PendingAttachmentUiMessage(

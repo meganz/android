@@ -84,7 +84,7 @@ internal class MessageListViewModelTest {
             monitorReactionUpdatesUseCase = mock(),
             monitorContactCacheUpdates = monitorContactCacheUpdates,
             monitorPendingMessagesUseCase = mock(),
-            chatMessageTimeSeparatorMapper = chatMessageTimeSeparatorMapper
+            chatMessageTimeSeparatorMapper = chatMessageTimeSeparatorMapper,
         )
     }
 

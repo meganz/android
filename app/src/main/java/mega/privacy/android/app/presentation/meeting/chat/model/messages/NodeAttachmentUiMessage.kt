@@ -15,6 +15,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.ChatImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
+import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageView
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
@@ -67,12 +71,23 @@ data class NodeAttachmentUiMessage(
                     viewModel.handleFileNode(message)
                 }.onSuccess { content ->
                     when (content) {
-                        is FileNodeContent.ImageForChat -> openImageViewer(
-                            context,
-                            message.chatId,
-                            content.allAttachmentMessageIds.toLongArray(),
-                            message.fileNode.id.longValue
-                        )
+                        is FileNodeContent.ImageForChat -> {
+                            if (viewModel.useImagePreview()) {
+                                openImagePreview(
+                                    context,
+                                    message.chatId,
+                                    content.allAttachmentMessageIds.toLongArray(),
+                                    message.fileNode.id.longValue
+                                )
+                            } else {
+                                openImageViewer(
+                                    context,
+                                    message.chatId,
+                                    content.allAttachmentMessageIds.toLongArray(),
+                                    message.fileNode.id.longValue
+                                )
+                            }
+                        }
 
                         is FileNodeContent.AudioOrVideo -> openVideoOrAudioFile(
                             context,
@@ -201,6 +216,25 @@ data class NodeAttachmentUiMessage(
             chatRoomId = chatId,
             messageIds = messageIds,
             currentNodeHandle = nodeId
+        )
+        context.startActivity(intent)
+    }
+
+    private fun openImagePreview(
+        context: Context,
+        chatId: Long,
+        messageIds: LongArray,
+        nodeId: Long,
+    ) {
+        val intent = ImagePreviewActivity.createSecondaryIntent(
+            context = context,
+            imageSource = ImagePreviewFetcherSource.CHAT,
+            menuOptionsSource = ImagePreviewMenuSource.CHAT,
+            anchorImageNodeId = nodeId,
+            params = mapOf(
+                ChatImageNodeFetcher.CHAT_ROOM_ID to chatId,
+                ChatImageNodeFetcher.MESSAGE_IDS to messageIds
+            ),
         )
         context.startActivity(intent)
     }

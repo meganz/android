@@ -20,14 +20,14 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MonitorSharedFilesHistoryImageNodesUseCaseTest {
-    private lateinit var underTest: MonitorSharedFilesHistoryImageNodesUseCase
+class MonitorChatImageNodesUseCaseTest {
+    private lateinit var underTest: MonitorChatImageNodesUseCase
     private val photosRepository = mock<PhotosRepository>()
     private val addImageTypeUseCase = mock<AddImageTypeUseCase>()
 
     @BeforeAll
     fun setUp() {
-        underTest = MonitorSharedFilesHistoryImageNodesUseCase(
+        underTest = MonitorChatImageNodesUseCase(
             photosRepository = photosRepository,
             addImageTypeUseCase = addImageTypeUseCase,
         )

@@ -8,7 +8,7 @@ import dagger.multibindings.IntoMap
 import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumSharingImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.BackupsImageNodeFetcher
-import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedFilesHistoryImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.ChatImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ContactFileListImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNodeFetcher
@@ -110,6 +110,6 @@ internal interface ImagePreviewModule {
 
     @Binds
     @IntoMap
-    @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.SHARED_FILES_HISTORY)
-    fun bindSharedFilesHistoryFetcher(fetcher: SharedFilesHistoryImageNodeFetcher): ImageNodeFetcher
+    @ImageNodeFetcherSourceKey(ImagePreviewFetcherSource.CHAT)
+    fun bindChatFetcher(fetcher: ChatImageNodeFetcher): ImageNodeFetcher
 }

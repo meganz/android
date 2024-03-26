@@ -104,7 +104,7 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.presentation.chat.NodeAttachmentHistoryViewModel;
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper;
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity;
-import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedFilesHistoryImageNodeFetcher;
+import mega.privacy.android.app.presentation.imagepreview.fetcher.ChatImageNodeFetcher;
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource;
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
@@ -724,13 +724,13 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
             }
             if (isEnabled != null && isEnabled) {
                 Map<String, Object> previewParams = new HashMap<>();
-                previewParams.put(SharedFilesHistoryImageNodeFetcher.CHAT_ROOM_ID, chatId);
-                previewParams.put(SharedFilesHistoryImageNodeFetcher.MESSAGE_IDS, Longs.toArray(messageIds));
+                previewParams.put(ChatImageNodeFetcher.CHAT_ROOM_ID, chatId);
+                previewParams.put(ChatImageNodeFetcher.MESSAGE_IDS, Longs.toArray(messageIds));
 
                 Intent intent = ImagePreviewActivity.Companion.createSecondaryIntent(
                         this,
-                        ImagePreviewFetcherSource.SHARED_FILES_HISTORY,
-                        ImagePreviewMenuSource.SHARED_FILES_HISTORY,
+                        ImagePreviewFetcherSource.CHAT,
+                        ImagePreviewMenuSource.CHAT,
                         currentNodeHandle,
                         previewParams,
                         false,

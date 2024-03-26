@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
@@ -27,6 +28,7 @@ import mega.privacy.android.domain.usecase.chat.GetShareChatNodesUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetCachedOriginalPathUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetMessageIdsByTypeUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.ImportTypedNodesUseCase
@@ -55,6 +57,7 @@ class NodeAttachmentMessageViewModel @Inject constructor(
     private val getShareChatNodesUseCase: GetShareChatNodesUseCase,
     private val importTypedNodesUseCase: ImportTypedNodesUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     fileSizeStringMapper: FileSizeStringMapper,
     durationInSecondsTextMapper: DurationInSecondsTextMapper,
 ) : AbstractAttachmentMessageViewModel<NodeAttachmentMessage>(
@@ -103,6 +106,8 @@ class NodeAttachmentMessageViewModel @Inject constructor(
                 }
             }
         }
+
+    suspend fun useImagePreview() = getFeatureFlagValueUseCase(AppFeatures.ImagePreview)
 
     /**
      * Handle file node

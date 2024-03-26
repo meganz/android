@@ -85,7 +85,7 @@ class ImagePreviewVideoLauncher @Inject constructor(
     ): String? {
         return if (source == ImagePreviewFetcherSource.ZIP) {//handle zip file
             imageNode.fullSizePath
-        } else if (source == ImagePreviewFetcherSource.SHARED_FILES_HISTORY) {
+        } else if (source == ImagePreviewFetcherSource.CHAT) {
             MegaNode.unserialize(imageNode.serializedData)?.let { node ->
                 checkNodePath(node)
             }
@@ -123,7 +123,7 @@ class ImagePreviewVideoLauncher @Inject constructor(
         }
 
         when (source) {
-            ImagePreviewFetcherSource.SHARED_FILES_HISTORY -> {
+            ImagePreviewFetcherSource.CHAT -> {
                 getFileUrlByImageNodeUseCase(imageNode as ChatImageFile).let { url ->
                     Uri.parse(url)?.let { uri ->
                         intent.setDataAndType(uri, MimeTypeList.typeForName(imageNode.name).type)
