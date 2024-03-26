@@ -33,11 +33,11 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetOutgoingSharesChildrenNodeUseCase
@@ -54,7 +54,7 @@ import javax.inject.Inject
  * @param monitorNodeUpdatesUseCase Monitor node updates
  * @param monitorContactUpdatesUseCase Monitor contact updates
  * @param getParentNodeUseCase [GetParentNodeUseCase] To get parent node of current node
- * @param getIsNodeInRubbish [IsNodeInRubbish] To get current node is in rubbish
+ * @param isNodeInRubbishBinUseCase [IsNodeInRubbishBinUseCase] To get current node is in rubbish
  * @param getOutgoingSharesChildrenNodeUseCase [GetOutgoingSharesChildrenNodeUseCase] To get children of current node
  * @param getCloudSortOrder [GetCloudSortOrder] To get cloud sort order
  * @param getOthersSortOrder [GetOthersSortOrder] To get others sort order
@@ -74,7 +74,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorContactUpdatesUseCase: MonitorContactUpdates,
     private val getParentNodeUseCase: GetParentNodeUseCase,
-    private val getIsNodeInRubbish: IsNodeInRubbish,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val getOutgoingSharesChildrenNodeUseCase: GetOutgoingSharesChildrenNodeUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
@@ -191,7 +191,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
         changes.forEach { (node, _) ->
             if (node is FolderNode) {
                 if (node.isInRubbishBin && _state.value.currentHandle == node.id.longValue) {
-                    while (handleStack.isNotEmpty() && getIsNodeInRubbish(handleStack.peek())) {
+                    while (handleStack.isNotEmpty() && isNodeInRubbishBinUseCase(NodeId(handleStack.peek()))) {
                         handleStack.pop()
                     }
                     handleStack.takeIf { stack -> stack.isNotEmpty() }?.peek()?.let { parent ->

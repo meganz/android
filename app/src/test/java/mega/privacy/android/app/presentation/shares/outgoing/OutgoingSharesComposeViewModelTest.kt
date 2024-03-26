@@ -38,11 +38,11 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetOutgoingSharesChildrenNodeUseCase
@@ -70,7 +70,7 @@ class OutgoingSharesComposeViewModelTest {
     private lateinit var underTest: OutgoingSharesComposeViewModel
 
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
-    private val isNodeInRubbish = mock<IsNodeInRubbish>()
+    private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val getParentNodeUseCase = mock<GetParentNodeUseCase>()
@@ -101,7 +101,7 @@ class OutgoingSharesComposeViewModelTest {
             getRootNodeUseCase = getRootNodeUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             getParentNodeUseCase = getParentNodeUseCase,
-            getIsNodeInRubbish = isNodeInRubbish,
+            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
             getOutgoingSharesChildrenNodeUseCase = getOutgoingSharesChildrenNodeUseCase,
             getCloudSortOrder = getCloudSortOrder,
             setViewType = setViewType,

@@ -32,9 +32,9 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorFolderNodeDeleteUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MonitorPublicLinksUseCase
 import timber.log.Timber
@@ -53,7 +53,7 @@ class LinksViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val handleOptionClickMapper: HandleOptionClickMapper,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val getIsNodeInRubbish: IsNodeInRubbish,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
 ) : ViewModel() {
 
     private val currentFlow = Channel<Flow<LinksUiState>>()
@@ -130,7 +130,7 @@ class LinksViewModel @Inject constructor(
                             }
                     )
                 }
-                val isNodeInRubbish = getIsNodeInRubbish(parent.node.id.longValue)
+                val isNodeInRubbish = isNodeInRubbishBinUseCase(parent.node.id)
                 if (isNodeInRubbish) {
                     _state.update {
                         it.copy(

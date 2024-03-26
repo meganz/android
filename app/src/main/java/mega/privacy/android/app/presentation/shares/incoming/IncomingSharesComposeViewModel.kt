@@ -37,13 +37,13 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingShareParentUserEmailUseCase
@@ -60,7 +60,7 @@ import javax.inject.Inject
  * @param monitorNodeUpdatesUseCase Monitor node updates
  * @param monitorContactUpdatesUseCase Monitor contact updates
  * @param getParentNodeUseCase [GetParentNodeUseCase] To get parent node of current node
- * @param getIsNodeInRubbish [IsNodeInRubbish] To get current node is in rubbish
+ * @param isNodeInRubbishBinUseCase [IsNodeInRubbishBinUseCase] To get current node is in rubbish
  * @param getIncomingSharesChildrenNodeUseCase [GetIncomingSharesChildrenNodeUseCase] To get children of current node
  * @param getCloudSortOrder [GetCloudSortOrder] To get cloud sort order
  * @param getOthersSortOrder [GetOthersSortOrder] To get others sort order
@@ -84,7 +84,7 @@ class IncomingSharesComposeViewModel @Inject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorContactUpdatesUseCase: MonitorContactUpdates,
     private val getParentNodeUseCase: GetParentNodeUseCase,
-    private val getIsNodeInRubbish: IsNodeInRubbish,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val getIncomingSharesChildrenNodeUseCase: GetIncomingSharesChildrenNodeUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
@@ -235,11 +235,11 @@ class IncomingSharesComposeViewModel @Inject constructor(
 
     /**
      * This will check if node is deleted from incoming share by the owner
-     * @param handle [Long] of node
+     * @param nodeId [NodeId] of node
      * @return [Boolean] true if node is deleted
      */
-    private suspend fun isNodeDeleted(handle: Long) =
-        getIsNodeInRubbish(handle) || getNodeByIdUseCase(NodeId(handle)) == null
+    private suspend fun isNodeDeleted(nodeId: NodeId) =
+        isNodeInRubbishBinUseCase(nodeId) || getNodeByIdUseCase(nodeId) == null
 
     /**
      * This will update current handle if any node is deleted from incoming share and
@@ -254,7 +254,7 @@ class IncomingSharesComposeViewModel @Inject constructor(
                 && state.value.currentHandle == node.id.longValue
             ) {
                 val handleStack = state.value.openedFolderNodeHandles.toMutableArrayDeque()
-                while (handleStack.isNotEmpty() && isNodeDeleted(handleStack.last())) {
+                while (handleStack.isNotEmpty() && isNodeDeleted(NodeId(handleStack.last()))) {
                     handleStack.pop()
                 }
                 _state.update {

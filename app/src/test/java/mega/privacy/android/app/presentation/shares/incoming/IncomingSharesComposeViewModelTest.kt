@@ -39,13 +39,13 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingShareParentUserEmailUseCase
@@ -73,7 +73,7 @@ class IncomingSharesComposeViewModelTest {
     private lateinit var underTest: IncomingSharesComposeViewModel
 
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
-    private val isNodeInRubbish = mock<IsNodeInRubbish>()
+    private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val getParentNodeUseCase = mock<GetParentNodeUseCase>()
@@ -109,7 +109,7 @@ class IncomingSharesComposeViewModelTest {
             getRootNodeUseCase = getRootNodeUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             getParentNodeUseCase = getParentNodeUseCase,
-            getIsNodeInRubbish = isNodeInRubbish,
+            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
             getIncomingSharesChildrenNodeUseCase = getIncomingSharesChildrenNodeUseCase,
             getCloudSortOrder = getCloudSortOrder,
             setViewType = setViewType,

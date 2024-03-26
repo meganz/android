@@ -3,13 +3,13 @@ package mega.privacy.android.app.presentation.imagepreview.menu
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.shares.AccessPermission.OWNER
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import javax.inject.Inject
 
 internal class AlbumSharingImagePreviewMenu @Inject constructor(
     private val getNodeAccessPermission: GetNodeAccessPermission,
-    private val isNodeInRubbish: IsNodeInRubbish,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
 ) : ImagePreviewMenu {
     override suspend fun isInfoMenuVisible(imageNode: ImageNode): Boolean {
         return true
@@ -49,14 +49,14 @@ internal class AlbumSharingImagePreviewMenu @Inject constructor(
 
     override suspend fun isGetLinkMenuVisible(imageNode: ImageNode): Boolean {
         return !imageNode.isTakenDown
-                && !isNodeInRubbish(handle = imageNode.id.longValue)
+                && !isNodeInRubbishBinUseCase(imageNode.id)
                 && getNodeAccessPermission(nodeId = imageNode.id) == OWNER
     }
 
     override suspend fun isSendToChatMenuVisible(imageNode: ImageNode): Boolean {
         return !imageNode.isTakenDown
                 && imageNode.exportedData == null
-                && !isNodeInRubbish(handle = imageNode.id.longValue)
+                && !isNodeInRubbishBinUseCase(imageNode.id)
                 && getNodeAccessPermission(nodeId = imageNode.id) == OWNER
     }
 

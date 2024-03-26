@@ -27,9 +27,9 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorFolderNodeDeleteUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MonitorPublicLinksUseCase
 import org.junit.jupiter.api.AfterAll
@@ -64,7 +64,7 @@ internal class LinksViewModelTest {
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val monitorFolderNodeDeleteUpdatesUseCase: MonitorFolderNodeDeleteUpdatesUseCase =
         mock()
-    private val getIsNodeInRubbish: IsNodeInRubbish = mock()
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase = mock()
 
     @BeforeAll
     internal fun initialise() {
@@ -83,7 +83,7 @@ internal class LinksViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             handleOptionClickMapper = handleOptionClickMapper,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            getIsNodeInRubbish = getIsNodeInRubbish,
+            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
         )
     }
 
@@ -93,7 +93,7 @@ internal class LinksViewModelTest {
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
         whenever(monitorFolderNodeDeleteUpdatesUseCase()).thenReturn(emptyFlow())
         whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
-        whenever(getIsNodeInRubbish(any())).thenReturn(false)
+        whenever(isNodeInRubbishBinUseCase(NodeId(any()))).thenReturn(false)
     }
 
     @AfterAll
@@ -106,7 +106,7 @@ internal class LinksViewModelTest {
             monitorConnectivityUseCase,
             handleOptionClickMapper,
             getFeatureFlagValueUseCase,
-            getIsNodeInRubbish,
+            isNodeInRubbishBinUseCase,
         )
     }
 
