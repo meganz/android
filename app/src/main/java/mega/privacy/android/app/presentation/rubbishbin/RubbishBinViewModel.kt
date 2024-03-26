@@ -147,6 +147,12 @@ class RubbishBinViewModel @Inject constructor(
     }
 
     /**
+     * This method will handle the sort order change event
+     */
+    fun onSortOrderChanged() {
+        setPendingRefreshNodes()
+    }
+    /**
      * This will map list of [Node] to [NodeUIItem]
      */
     private fun getNodeUiItems(nodeList: List<TypedNode>): List<NodeUIItem<TypedNode>> {

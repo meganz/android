@@ -369,7 +369,7 @@ class RubbishBinComposeFragment : Fragment() {
             requireActivity().invalidateOptionsMenu()
         }
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            viewModel.refreshNodes()
+            viewModel.onSortOrderChanged()
         })
     }
 

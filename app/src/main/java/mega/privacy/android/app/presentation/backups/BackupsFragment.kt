@@ -442,7 +442,7 @@ class BackupsFragment : RotatableFragment() {
             EventObserver { showSortByPanel() }
         )
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            refreshBackupsNodes()
+            viewModel.onSortOrderChanged()
         })
     }
 

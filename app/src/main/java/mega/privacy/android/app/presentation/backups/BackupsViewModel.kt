@@ -208,6 +208,13 @@ class BackupsViewModel @Inject constructor(
     }
 
     /**
+     * This method will handle the sort order change event
+     */
+    fun onSortOrderChanged() {
+        markHandledPendingRefresh()
+    }
+
+    /**
      * Retrieves the list of Nodes
      *
      * @param nodeHandle The Node Handle used to retrieve the current list of Nodes. Defaults to [BackupsState.currentBackupsFolderNodeId]

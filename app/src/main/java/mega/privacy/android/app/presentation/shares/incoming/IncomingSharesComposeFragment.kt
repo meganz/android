@@ -375,7 +375,7 @@ class IncomingSharesComposeFragment : Fragment() {
         }
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            viewModel.refreshNodes()
+            viewModel.onSortOrderChanged()
         })
     }
 

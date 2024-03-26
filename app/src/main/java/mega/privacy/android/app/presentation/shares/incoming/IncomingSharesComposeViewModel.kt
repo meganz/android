@@ -327,6 +327,13 @@ class IncomingSharesComposeViewModel @Inject constructor(
         }
     }
 
+    /**
+     * This method will handle the sort order change event
+     */
+    fun onSortOrderChanged() {
+        setPendingRefreshNodes()
+    }
+
     private suspend fun refreshNodesState() {
         val currentHandle = _state.value.currentHandle
         val isRootNode = _state.value.isInRootLevel
