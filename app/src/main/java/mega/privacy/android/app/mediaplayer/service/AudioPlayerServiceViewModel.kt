@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
@@ -79,6 +78,7 @@ import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFolderName
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
+import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.TypedAudioNode
@@ -569,6 +569,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                 TYPE_PLAYING,
                 node?.size ?: INVALID_SIZE,
                 duration,
+                node?.type?.extension
             ).let { playlistItem ->
                 playlistItems.add(playlistItem)
             }
@@ -641,7 +642,8 @@ class AudioPlayerServiceViewModel @Inject constructor(
                         currentIndex,
                         TYPE_NEXT,
                         megaOffline.getSize(context),
-                        0.seconds
+                        0.seconds,
+                        MimeTypeList.typeForName(megaOffline.name).extension
                     )
                         .let { playlistItem ->
                             playlistItems.add(playlistItem)
@@ -716,6 +718,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                 TYPE_NEXT,
                 typedAudioNode.size,
                 duration,
+                typedAudioNode.type.extension
             ).let { playlistItem ->
                 playlistItems.add(playlistItem)
             }
@@ -807,7 +810,8 @@ class AudioPlayerServiceViewModel @Inject constructor(
                 currentIndex,
                 TYPE_NEXT,
                 file.length(),
-                0.seconds
+                0.seconds,
+                MimeTypeList.typeForName(file.name).extension
             )
                 .let { playlistItem ->
                     playlistItems.add(playlistItem)

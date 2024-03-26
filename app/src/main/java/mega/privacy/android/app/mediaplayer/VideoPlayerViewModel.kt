@@ -40,7 +40,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
@@ -103,6 +102,7 @@ import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
+import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
@@ -968,6 +968,7 @@ class VideoPlayerViewModel @Inject constructor(
                 TYPE_PLAYING,
                 node?.size ?: INVALID_SIZE,
                 duration,
+                node?.type?.extension
             ).let { playlistItem ->
                 playlistItems.add(playlistItem)
             }
@@ -1017,7 +1018,8 @@ class VideoPlayerViewModel @Inject constructor(
                         currentIndex,
                         TYPE_NEXT,
                         megaOffline.getSize(context),
-                        0.seconds
+                        0.seconds,
+                        MimeTypeList.typeForName(megaOffline.name).extension
                     )
                         .let { playlistItem ->
                             playlistItems.add(playlistItem)
@@ -1090,6 +1092,7 @@ class VideoPlayerViewModel @Inject constructor(
                 TYPE_NEXT,
                 typedNode.size,
                 duration,
+                typedNode.type.extension
             ).let { playlistItem ->
                 playlistItems.add(playlistItem)
             }
@@ -1147,7 +1150,8 @@ class VideoPlayerViewModel @Inject constructor(
                 currentIndex,
                 TYPE_NEXT,
                 file.length(),
-                0.seconds
+                0.seconds,
+                MimeTypeList.typeForName(file.name).extension
             )
                 .let { playlistItem ->
                     playlistItems.add(playlistItem)

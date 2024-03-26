@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer.playlist
 
+import androidx.annotation.DrawableRes
 import java.io.File
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -15,7 +16,8 @@ import kotlin.time.Duration.Companion.seconds
  * @property size size of the node
  * @property isSelected Whether the item is selected
  * @property headerIsVisible the header of item if is visible
- * @property duration the duration of audio
+ * @property duration the duration of media item
+ * @property icon the icon of play list item
  */
 data class PlaylistItem(
     val nodeHandle: Long,
@@ -27,4 +29,5 @@ data class PlaylistItem(
     val isSelected: Boolean = false,
     val headerIsVisible: Boolean = false,
     val duration: Duration = 0.seconds,
+    @DrawableRes val icon: Int,
 )

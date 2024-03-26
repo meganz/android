@@ -5,8 +5,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
-import mega.privacy.android.app.mediaplayer.mapper.toPlaylistItemMapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.HeaderMapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.toFavourite
@@ -26,12 +24,6 @@ class MapperModule {
      */
     @Provides
     fun provideFavouriteMapper(): FavouriteMapper = ::toFavourite
-
-    /**
-     * Provide PlaylistItem mapper
-     */
-    @Provides
-    fun providePlaylistItemMapper(): PlaylistItemMapper = ::toPlaylistItemMapper
 
     /**
      * Provide header mapper

@@ -7,8 +7,6 @@
 
         <import type="android.view.View" />
 
-        <import type="mega.privacy.android.app.MimeTypeList" />
-
         <import type="mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter" />
 
         <variable
@@ -80,7 +78,7 @@
                 android:layout_marginStart="12dp"
                 android:scaleType="fitCenter"
                 android:visibility="@{item.isSelected ? View.INVISIBLE : View.VISIBLE}"
-                app:apDefaultThumbnail="@{MimeTypeList.typeForName(item.nodeName).iconResourceId}"
+                app:apDefaultThumbnail="@{item.icon}"
                 app:apThumbnail="@{item.thumbnail}"
                 app:roundedCornerRadius="4dp" />
 
