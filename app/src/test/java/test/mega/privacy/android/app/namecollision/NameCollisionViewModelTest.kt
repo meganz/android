@@ -32,7 +32,6 @@ internal class NameCollisionViewModelTest {
             getFileVersionsOption = getFileVersionsOption,
             getNameCollisionResultUseCase = mock(),
             uploadUseCase = mock(),
-            legacyMoveNodeUseCase = mock(),
             legacyCopyNodeUseCase = mock(),
             monitorUserUpdates = monitorUserUpdates,
             getNodeUseCase = mock(),
@@ -40,7 +39,9 @@ internal class NameCollisionViewModelTest {
             setMoveLatestTargetPathUseCase = mock(),
             copyRequestMessageMapper = mock(),
             moveRequestMessageMapper = mock(),
-            getNodeByFingerprintAndParentNodeUseCase = mock()
+            getNodeByFingerprintAndParentNodeUseCase = mock(),
+            moveCollidedNodeUseCase = mock(),
+            moveCollidedNodesUseCase = mock(),
         )
     }
 

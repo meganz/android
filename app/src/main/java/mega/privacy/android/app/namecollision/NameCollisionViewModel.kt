@@ -27,18 +27,20 @@ import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageM
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
-import mega.privacy.android.app.usecase.LegacyMoveNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetNodeByFingerprintAndParentNodeUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
+import mega.privacy.android.domain.usecase.node.MoveCollidedNodeUseCase
+import mega.privacy.android.domain.usecase.node.MoveCollidedNodesUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
@@ -48,7 +50,6 @@ import javax.inject.Inject
  *
  * @property getNameCollisionResultUseCase  Required for getting all the needed info for present a collision.
  * @property uploadUseCase                  Required for uploading files.
- * @property legacyMoveNodeUseCase          Required for moving nodes.
  * @property legacyCopyNodeUseCase          Required for copying nodes.
  * @property getNodeUseCase                 Required for getting node from handle
  */
@@ -57,7 +58,6 @@ class NameCollisionViewModel @Inject constructor(
     private val getFileVersionsOption: GetFileVersionsOption,
     private val getNameCollisionResultUseCase: GetNameCollisionResultUseCase,
     private val uploadUseCase: UploadUseCase,
-    private val legacyMoveNodeUseCase: LegacyMoveNodeUseCase,
     private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val getNodeUseCase: GetNodeUseCase,
@@ -66,6 +66,8 @@ class NameCollisionViewModel @Inject constructor(
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
     private val moveRequestMessageMapper: MoveRequestMessageMapper,
     private val getNodeByFingerprintAndParentNodeUseCase: GetNodeByFingerprintAndParentNodeUseCase,
+    private val moveCollidedNodeUseCase: MoveCollidedNodeUseCase,
+    private val moveCollidedNodesUseCase: MoveCollidedNodesUseCase,
 ) : BaseRxViewModel() {
 
     private val currentCollision: MutableLiveData<NameCollisionResult?> = MutableLiveData()
@@ -562,6 +564,37 @@ class NameCollisionViewModel @Inject constructor(
     }
 
     /**
+     * A temporary mapper to map app module's NameCollisionResult to domain module's NodeNameCollision.
+     * It should be removed when this ViewModel is refactored to use domain module's usecases and NodeNameCollisionResult
+     *
+     * @param result    The NameCollisionResult to map.
+     * @return The mapped NodeNameCollision.
+     */
+    private fun mapToNodeNameCollision(result: NameCollisionResult): NodeNameCollision {
+        return NodeNameCollision(
+            collisionHandle = result.nameCollision.collisionHandle,
+            nodeHandle = when (result.nameCollision) {
+                is NameCollision.Copy -> result.nameCollision.nodeHandle
+                is NameCollision.Movement -> result.nameCollision.nodeHandle
+                is NameCollision.Import -> result.nameCollision.nodeHandle
+                else -> -1L
+            },
+            name = result.collisionName ?: "",
+            size = result.collisionSize ?: 0L,
+            childFolderCount = result.nameCollision.childFileCount,
+            childFileCount = result.nameCollision.childFileCount,
+            lastModified = result.collisionLastModified ?: 0L,
+            parentHandle = result.nameCollision.parentHandle ?: -1L,
+            isFile = result.nameCollision.isFile,
+            serializedData = when (result.nameCollision) {
+                is NameCollision.Copy -> result.nameCollision.serializedNode
+                else -> null
+            },
+            renameName = result.renameName
+        )
+    }
+
+    /**
      * Proceeds with the movement of the current collision.
      *
      * @param rename    True if should rename the node, false otherwise.
@@ -571,22 +604,21 @@ class NameCollisionViewModel @Inject constructor(
             if (rename) NameCollisionChoice.RENAME
             else NameCollisionChoice.REPLACE_UPDATE_MERGE
 
-        legacyMoveNodeUseCase.move(currentCollision.value ?: return, rename)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { result ->
-                    setMovementResult(
-                        result,
-                        currentCollision.value?.nameCollision?.parentHandle ?: -1
-                    )
-                    continueWithNext(choice)
-                },
-                onError = { error ->
-                    throwable.value = error
-                    Timber.w(error)
-                })
-            .addTo(composite)
+        viewModelScope.launch {
+            runCatching {
+                moveCollidedNodeUseCase(
+                    mapToNodeNameCollision(
+                        currentCollision.value ?: return@launch
+                    ), rename
+                )
+            }.onSuccess {
+                setMovementResult(it, currentCollision.value?.nameCollision?.parentHandle ?: -1)
+                continueWithNext(choice)
+            }.onFailure {
+                throwable.value = it
+                Timber.w(it)
+            }
+        }
     }
 
     /**
@@ -595,22 +627,21 @@ class NameCollisionViewModel @Inject constructor(
      * @param list      List of collisions to move.
      * @param rename    True if should rename the nodes, false otherwise.
      */
-    private fun move(list: MutableList<NameCollisionResult>, rename: Boolean) {
-        legacyMoveNodeUseCase.move(list, rename)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { result ->
-                    setMovementResult(
-                        result,
-                        list[0].nameCollision.parentHandle ?: -1
-                    )
-                },
-                onError = { error ->
-                    throwable.value = error
-                    Timber.w(error)
-                })
-            .addTo(composite)
+    private fun move(list: List<NameCollisionResult>, rename: Boolean) {
+        if (list.isEmpty()) return
+        viewModelScope.launch {
+            runCatching {
+                moveCollidedNodesUseCase(
+                    list.map { mapToNodeNameCollision(it) },
+                    rename
+                )
+            }.onSuccess {
+                setMovementResult(it, list.firstOrNull()?.nameCollision?.parentHandle ?: -1)
+            }.onFailure {
+                throwable.value = it
+                Timber.w(it)
+            }
+        }
     }
 
     /**

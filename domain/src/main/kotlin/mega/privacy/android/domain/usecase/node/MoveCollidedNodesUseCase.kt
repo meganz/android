@@ -25,7 +25,7 @@ class MoveCollidedNodesUseCase @Inject constructor(
     suspend operator fun invoke(
         nodeNameCollisions: List<NodeNameCollision>,
         rename: Boolean,
-    ): MoveRequestResult {
+    ): MoveRequestResult.GeneralMovement {
         val results = coroutineScope {
             nodeNameCollisions.map { nodeNameCollision ->
                 async {
