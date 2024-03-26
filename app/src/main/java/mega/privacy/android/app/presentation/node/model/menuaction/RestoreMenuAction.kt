@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.model.menuaction
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -16,7 +17,8 @@ class RestoreMenuAction @Inject constructor() : MenuActionWithIcon {
     override fun getDescription() = stringResource(id = R.string.context_restore)
 
     @Composable
-    override fun getIconPainter() = painterResource(id = R.drawable.ic_restore)
+    override fun getIconPainter() =
+        painterResource(id = IconPackR.drawable.ic_rotate_ccw_medium_regular_outline)
 
     override val orderInCategory = 250
 

@@ -428,7 +428,7 @@
                 android:id="@+id/restore_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_restore"
-                app:drawableStartCompat="@drawable/ic_restore"/>
+                app:drawableStartCompat="@drawable/ic_rotate_ccw_medium_regular_outline"/>
 
             <LinearLayout
                 android:id="@+id/separator_modify_options"

@@ -475,7 +475,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isRestoreMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = R.drawable.ic_restore),
+                        icon = painterResource(id = Rpack.drawable.ic_rotate_ccw_medium_regular_outline),
                         text = stringResource(id = R.string.context_restore),
                         onActionClicked = onClickRestore,
                         dividerType = null,
