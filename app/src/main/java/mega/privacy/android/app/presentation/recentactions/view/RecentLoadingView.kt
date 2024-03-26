@@ -14,10 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.core.ui.controls.skeleton.ListItemLoadingSkeleton
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.legacy.core.ui.controls.lists.NodeLoadingListViewItem
-import mega.privacy.android.legacy.core.ui.controls.modifier.skeletonEffect
+import mega.privacy.android.core.ui.utils.shimmerEffect
 
 /**
  * Loading state view for Recent Actions
@@ -34,7 +34,7 @@ fun RecentLoadingView(
             Row(
                 modifier = modifier
                     .height(40.dp)
-                    .padding(top = 8.dp, start = 8.dp, end = 8.dp),
+                    .padding(top = 8.dp, start = 12.dp, end = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Spacer(
@@ -42,12 +42,12 @@ fun RecentLoadingView(
                         .height(20.dp)
                         .width(100.dp)
                         .clip(RoundedCornerShape(100.dp))
-                        .skeletonEffect()
+                        .shimmerEffect()
                 )
             }
         }
         items(count = 10) {
-            NodeLoadingListViewItem()
+            ListItemLoadingSkeleton()
         }
     }
 }
