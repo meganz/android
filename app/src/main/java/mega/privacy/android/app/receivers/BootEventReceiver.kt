@@ -30,12 +30,15 @@ class BootEventReceiver : BroadcastReceiver() {
     @Inject
     lateinit var startCameraUploadUseCase: StartCameraUploadUseCase
 
+    /**
+     * Receive an Intent broadcast
+     */
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action.equals(Intent.ACTION_BOOT_COMPLETED)) {
             Timber.d("BootEventReceiver")
             applicationScope.launch {
                 runCatching {
-                    startCameraUploadUseCase
+                    startCameraUploadUseCase()
                 }.onFailure { Timber.e(it) }
             }
         }
