@@ -231,6 +231,7 @@ class DefaultAlbumRepositoryTest {
             on { get(any()) }.thenReturn(megaSetElement)
         }
         whenever(megaApiGateway.getSetElements(any())).thenReturn(megaSetElementList)
+        whenever(nodeRepository.isNodeInRubbishBin(NodeId(any()))).thenReturn(false)
 
         underTest = createUnderTest(this)
         val actualElementIds = underTest.getAlbumElementIDs(albumId)
@@ -552,7 +553,6 @@ class DefaultAlbumRepositoryTest {
         nodeRepository = nodeRepository,
         megaApiGateway = megaApiGateway,
         userSetMapper = userSetMapper,
-        isNodeInRubbish = { false },
         albumStringResourceGateway = albumStringResourceGateway,
         photoMapper = photoMapper,
         imageNodeMapper = imageNodeMapper,

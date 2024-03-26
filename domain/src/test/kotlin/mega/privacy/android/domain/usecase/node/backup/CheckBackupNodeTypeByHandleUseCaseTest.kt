@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.usecase.node.backup
 
 import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
@@ -9,6 +8,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
 import mega.privacy.android.domain.repository.BackupRepository
 import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -20,13 +20,17 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CheckBackupNodeTypeByHandleUseCaseTest {
 
     private val nodeRepository: NodeRepository = mock()
     private val backupRepository: BackupRepository = mock()
-    private val underTest = CheckBackupNodeTypeByHandleUseCase(nodeRepository, backupRepository)
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase = mock()
+    private val underTest = CheckBackupNodeTypeByHandleUseCase(
+        nodeRepository,
+        backupRepository,
+        isNodeInRubbishBinUseCase
+    )
 
     @ParameterizedTest(name = "isNodeInBackups : {0}, isNodeInRubbishBin: {1}")
     @MethodSource("provideNotInBackupsParameters")
@@ -36,7 +40,7 @@ class CheckBackupNodeTypeByHandleUseCaseTest {
         node: Node,
     ) = runTest {
         whenever(nodeRepository.isNodeInBackups(node.id.longValue)).thenReturn(isNodeInBackups)
-        whenever(nodeRepository.isNodeInRubbish(node.id.longValue)).thenReturn(isNodeInRubbishBin)
+        whenever(isNodeInRubbishBinUseCase(node.id)).thenReturn(isNodeInRubbishBin)
 
         val value = underTest(node)
         Truth.assertThat(value).isEqualTo(BackupNodeType.NonBackupNode)
@@ -53,7 +57,7 @@ class CheckBackupNodeTypeByHandleUseCaseTest {
             whenever(it.id).thenReturn(NodeId(1234L))
         }
         whenever(nodeRepository.isNodeInBackups(node.id.longValue)).thenReturn(true)
-        whenever(nodeRepository.isNodeInRubbish(node.id.longValue)).thenReturn(false)
+        whenever(isNodeInRubbishBinUseCase(node.id)).thenReturn(false)
 
         whenever(nodeRepository.getBackupsNode()).thenReturn(node)
         val value = underTest(node)
@@ -69,7 +73,7 @@ class CheckBackupNodeTypeByHandleUseCaseTest {
             whenever(it.id).thenReturn(NodeId(1234L))
         }
         whenever(nodeRepository.isNodeInBackups(node.id.longValue)).thenReturn(true)
-        whenever(nodeRepository.isNodeInRubbish(node.id.longValue)).thenReturn(false)
+        whenever(isNodeInRubbishBinUseCase(node.id)).thenReturn(false)
 
         whenever(nodeRepository.getBackupsNode()).thenReturn(passedNode)
         whenever(backupRepository.getDeviceId()).thenReturn("1234")
@@ -89,7 +93,7 @@ class CheckBackupNodeTypeByHandleUseCaseTest {
             whenever(it.id).thenReturn(NodeId(5678L))
         }
         whenever(nodeRepository.isNodeInBackups(node.id.longValue)).thenReturn(true)
-        whenever(nodeRepository.isNodeInRubbish(node.id.longValue)).thenReturn(false)
+        whenever(isNodeInRubbishBinUseCase(node.id)).thenReturn(false)
 
         whenever(nodeRepository.getNodeById(node.parentId)).thenReturn(parentNode)
         whenever(backupRepository.getDeviceId()).thenReturn("1234")
@@ -103,7 +107,7 @@ class CheckBackupNodeTypeByHandleUseCaseTest {
         val node = mock<FolderNode>()
 
         whenever(nodeRepository.isNodeInBackups(node.id.longValue)).thenReturn(true)
-        whenever(nodeRepository.isNodeInRubbish(node.id.longValue)).thenReturn(false)
+        whenever(isNodeInRubbishBinUseCase(node.id)).thenReturn(false)
 
         val value = underTest(node)
         Truth.assertThat(value).isEqualTo(BackupNodeType.ChildFolderNode)

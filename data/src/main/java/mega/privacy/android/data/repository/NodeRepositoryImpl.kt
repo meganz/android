@@ -185,10 +185,10 @@ internal class NodeRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun isNodeInRubbish(handle: Long) = withContext(ioDispatcher) {
-        megaApiGateway.getMegaNodeByHandle(handle)?.let { megaApiGateway.isInRubbish(it) }
+    override suspend fun isNodeInRubbishBin(nodeId: NodeId) = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let { megaApiGateway.isInRubbish(it) }
             ?: run {
-                Timber.w("isNodeInRubbish returns false because the node with handle $handle was not found")
+                Timber.w("isNodeInRubbishBin returns false because the node with handle $nodeId was not found")
                 false
             }
     }

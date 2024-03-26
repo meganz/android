@@ -193,7 +193,7 @@ internal class DefaultPhotosRepository @Inject constructor(
         return node.isFile
                 && fileType is ImageFileTypeInfo
                 && (fileType !is SvgFileTypeInfo || !filterSvg)
-                && (!nodeRepository.isNodeInRubbish(node.handle) || includeRubbishBin)
+                && (!nodeRepository.isNodeInRubbishBin(NodeId(node.handle)) || includeRubbishBin)
                 && node.hasThumbnail()
     }
 
@@ -204,7 +204,7 @@ internal class DefaultPhotosRepository @Inject constructor(
         val fileType = fileTypeInfoMapper(node)
         return node.isFile
                 && fileType is VideoFileTypeInfo
-                && (!nodeRepository.isNodeInRubbish(node.handle) || includeRubbishBin)
+                && (!nodeRepository.isNodeInRubbishBin(NodeId(node.handle)) || includeRubbishBin)
                 && node.hasThumbnail()
     }
 
@@ -564,7 +564,7 @@ internal class DefaultPhotosRepository @Inject constructor(
      * Check valid Photo Node, not include Photo nodes that are in rubbish bin or without thumbnail
      */
     private suspend fun MegaNode.isValidPhotoNode() =
-        !nodeRepository.isNodeInRubbish(handle) && this.hasThumbnail()
+        !nodeRepository.isNodeInRubbishBin(NodeId(handle)) && this.hasThumbnail()
 
     /**
      * Convert the MegaNode to Image

@@ -81,7 +81,7 @@ interface NodeRepository {
      *
      * @return Boolean
      */
-    suspend fun isNodeInRubbish(handle: Long): Boolean
+    suspend fun isNodeInRubbishBin(nodeId: NodeId): Boolean
 
     /**
      * check whether the node is in Backups or not

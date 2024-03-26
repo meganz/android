@@ -98,7 +98,7 @@ class DefaultPhotosRepositoryTest {
         whenever(megaApiGateway.isInRubbish(any()))
             .thenReturn(false)
 
-        whenever(nodeRepository.isNodeInRubbish(any()))
+        whenever(nodeRepository.isNodeInRubbishBin(NodeId(any())))
             .thenReturn(false)
 
         underTest = createUnderTest(this)
@@ -118,7 +118,7 @@ class DefaultPhotosRepositoryTest {
         whenever(megaApiGateway.isInRubbish(any()))
             .thenReturn(false)
 
-        whenever(nodeRepository.isNodeInRubbish(any()))
+        whenever(nodeRepository.isNodeInRubbishBin(NodeId(any())))
             .thenReturn(false)
 
         underTest = createUnderTest(this)
@@ -134,7 +134,7 @@ class DefaultPhotosRepositoryTest {
         whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.longValue))
             .thenReturn(megaNode)
 
-        whenever(nodeRepository.isNodeInRubbish(any()))
+        whenever(nodeRepository.isNodeInRubbishBin(NodeId(any())))
             .thenReturn(false)
 
         underTest = createUnderTest(this)
@@ -153,7 +153,7 @@ class DefaultPhotosRepositoryTest {
         whenever(megaApiGateway.isInRubbish(any()))
             .thenReturn(false)
 
-        whenever(nodeRepository.isNodeInRubbish(any()))
+        whenever(nodeRepository.isNodeInRubbishBin(NodeId(any())))
             .thenReturn(false)
 
         underTest = createUnderTest(this)

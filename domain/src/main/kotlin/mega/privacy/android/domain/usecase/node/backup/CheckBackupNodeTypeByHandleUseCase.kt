@@ -4,6 +4,7 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
 import mega.privacy.android.domain.repository.BackupRepository
 import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import javax.inject.Inject
 
 /**
@@ -11,7 +12,8 @@ import javax.inject.Inject
  */
 class CheckBackupNodeTypeByHandleUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
-    private val backupRepository: BackupRepository
+    private val backupRepository: BackupRepository,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
 ) {
 
     /**
@@ -23,7 +25,7 @@ class CheckBackupNodeTypeByHandleUseCase @Inject constructor(
         val deviceId = backupRepository.getDeviceId()
 
         return if (nodeRepository.isNodeInBackups(node.id.longValue).not() ||
-            nodeRepository.isNodeInRubbish(node.id.longValue)
+            isNodeInRubbishBinUseCase(node.id)
         ) {
             BackupNodeType.NonBackupNode
         } else if (nodeRepository.getBackupsNode()?.id?.longValue == node.id.longValue) {

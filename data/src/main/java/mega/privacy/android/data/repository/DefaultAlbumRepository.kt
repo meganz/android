@@ -49,7 +49,6 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaHandleList
 import nz.mega.sdk.MegaNode
@@ -73,7 +72,6 @@ internal class DefaultAlbumRepository @Inject constructor(
     private val nodeRepository: NodeRepository,
     private val megaApiGateway: MegaApiGateway,
     private val userSetMapper: UserSetMapper,
-    private val isNodeInRubbish: IsNodeInRubbish,
     private val albumStringResourceGateway: AlbumStringResourceGateway,
     private val photoMapper: PhotoMapper,
     private val imageNodeMapper: ImageNodeMapper,
@@ -212,7 +210,7 @@ internal class DefaultAlbumRepository @Inject constructor(
                 val sets = nodeSetsMap.getOrPut(NodeId(element.node())) { mutableSetOf() }
                 sets.add(element.setId())
 
-                if (isNodeInRubbish(element.node())) null
+                if (nodeRepository.isNodeInRubbishBin(NodeId(element.node()))) null
                 else element.toAlbumPhotoId()
             }.also { albumElements[albumId] = it }
         }
