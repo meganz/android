@@ -28,6 +28,7 @@ internal fun SettingsCameraUploadsRoute(
         onMediaPermissionsGranted = viewModel::onMediaPermissionsGranted,
         onRegularBusinessAccountSubUserPromptAcknowledged = viewModel::onRegularBusinessAccountSubUserPromptAcknowledged,
         onRequestPermissionsStateChanged = viewModel::onRequestPermissionsStateChanged,
+        onMediaUploadsStateChanged = viewModel::onMediaUploadsStateChanged,
         onSettingsScreenPaused = viewModel::onSettingsScreenPaused,
         onUploadOptionUiItemSelected = viewModel::onUploadOptionUiItemSelected,
         onVideoQualityUiItemSelected = viewModel::onVideoQualityUiItemSelected,

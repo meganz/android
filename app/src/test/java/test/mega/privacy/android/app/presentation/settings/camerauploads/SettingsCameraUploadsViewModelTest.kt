@@ -25,21 +25,27 @@ import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
+import mega.privacy.android.domain.usecase.camerauploads.DisableMediaUploadsSettingsUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSettingUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetupDefaultSecondaryFolderUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetupMediaUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
@@ -79,6 +85,8 @@ internal class SettingsCameraUploadsViewModelTest {
         mock<CheckEnableCameraUploadsStatusUseCase>()
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase =
         mock<DeleteCameraUploadsTemporaryRootDirectoryUseCase>()
+    private val disableMediaUploadsSettingsUseCase = mock<DisableMediaUploadsSettingsUseCase>()
+    private val getSecondaryFolderPathUseCase = mock<GetSecondaryFolderPathUseCase>()
     private val getUploadOptionUseCase = mock<GetUploadOptionUseCase>()
     private val getUploadVideoQualityUseCase = mock<GetUploadVideoQualityUseCase>()
     private val getVideoCompressionSizeLimitUseCase = mock<GetVideoCompressionSizeLimitUseCase>()
@@ -88,16 +96,20 @@ internal class SettingsCameraUploadsViewModelTest {
         mock<IsChargingRequiredForVideoCompressionUseCase>()
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
+    private val isSecondaryFolderPathValidUseCase = mock<IsSecondaryFolderPathValidUseCase>()
     private val listenToNewMediaUseCase = mock<ListenToNewMediaUseCase>()
     private val preparePrimaryFolderPathUseCase = mock<PreparePrimaryFolderPathUseCase>()
     private val setCameraUploadsByWifiUseCase = mock<SetCameraUploadsByWifiUseCase>()
     private val setChargingRequiredForVideoCompressionUseCase =
         mock<SetChargingRequiredForVideoCompressionUseCase>()
     private val setLocationTagsEnabledUseCase = mock<SetLocationTagsEnabledUseCase>()
+    private val setSecondaryFolderLocalPathUseCase = mock<SetSecondaryFolderLocalPathUseCase>()
     private val setUploadFileNamesKeptUseCase = mock<SetUploadFileNamesKeptUseCase>()
     private val setUploadOptionUseCase = mock<SetUploadOptionUseCase>()
     private val setUploadVideoQualityUseCase = mock<SetUploadVideoQualityUseCase>()
     private val setupCameraUploadsSettingUseCase = mock<SetupCameraUploadsSettingUseCase>()
+    private val setupDefaultSecondaryFolderUseCase = mock<SetupDefaultSecondaryFolderUseCase>()
+    private val setupMediaUploadsSettingUseCase = mock<SetupMediaUploadsSettingUseCase>()
     private val snackBarHandler = mock<SnackBarHandler>()
     private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
     private val stopCameraUploadsUseCase = mock<StopCameraUploadsUseCase>()
@@ -111,6 +123,8 @@ internal class SettingsCameraUploadsViewModelTest {
             areUploadFileNamesKeptUseCase,
             checkEnableCameraUploadsStatusUseCase,
             deleteCameraUploadsTemporaryRootDirectoryUseCase,
+            disableMediaUploadsSettingsUseCase,
+            getSecondaryFolderPathUseCase,
             getUploadOptionUseCase,
             getUploadVideoQualityUseCase,
             getVideoCompressionSizeLimitUseCase,
@@ -119,15 +133,19 @@ internal class SettingsCameraUploadsViewModelTest {
             isChargingRequiredForVideoCompressionUseCase,
             isConnectedToInternetUseCase,
             isSecondaryFolderEnabled,
+            isSecondaryFolderPathValidUseCase,
             listenToNewMediaUseCase,
             preparePrimaryFolderPathUseCase,
             setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompressionUseCase,
             setLocationTagsEnabledUseCase,
+            setSecondaryFolderLocalPathUseCase,
             setUploadFileNamesKeptUseCase,
             setUploadOptionUseCase,
             setUploadVideoQualityUseCase,
             setupCameraUploadsSettingUseCase,
+            setupDefaultSecondaryFolderUseCase,
+            setupMediaUploadsSettingUseCase,
             snackBarHandler,
             startCameraUploadUseCase,
             stopCameraUploadsUseCase,
@@ -143,12 +161,14 @@ internal class SettingsCameraUploadsViewModelTest {
         isMediaUploadsEnabled: Boolean = true,
         maximumNonChargingVideoCompressionSize: Int = 500,
         requireChargingDuringVideoCompression: Boolean = true,
+        secondaryFolderPath: String = "secondary/folder/path",
         shouldIncludeLocationTags: Boolean = true,
         shouldKeepUploadFileNames: Boolean = true,
         uploadOption: UploadOption = UploadOption.PHOTOS,
         videoQuality: VideoQuality = VideoQuality.ORIGINAL,
     ) {
         whenever(areLocationTagsEnabledUseCase()).thenReturn(shouldIncludeLocationTags)
+        whenever(getSecondaryFolderPathUseCase()).thenReturn(secondaryFolderPath)
         whenever(areUploadFileNamesKeptUseCase()).thenReturn(shouldKeepUploadFileNames)
         whenever(getUploadOptionUseCase()).thenReturn(uploadOption)
         whenever(getUploadVideoQualityUseCase()).thenReturn(videoQuality)
@@ -167,6 +187,8 @@ internal class SettingsCameraUploadsViewModelTest {
             areUploadFileNamesKeptUseCase = areUploadFileNamesKeptUseCase,
             checkEnableCameraUploadsStatusUseCase = checkEnableCameraUploadsStatusUseCase,
             deleteCameraUploadsTemporaryRootDirectoryUseCase = deleteCameraUploadsTemporaryRootDirectoryUseCase,
+            disableMediaUploadsSettingsUseCase = disableMediaUploadsSettingsUseCase,
+            getSecondaryFolderPathUseCase = getSecondaryFolderPathUseCase,
             getUploadOptionUseCase = getUploadOptionUseCase,
             getUploadVideoQualityUseCase = getUploadVideoQualityUseCase,
             getVideoCompressionSizeLimitUseCase = getVideoCompressionSizeLimitUseCase,
@@ -175,15 +197,19 @@ internal class SettingsCameraUploadsViewModelTest {
             isChargingRequiredForVideoCompressionUseCase = isChargingRequiredForVideoCompressionUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             isSecondaryFolderEnabled = isSecondaryFolderEnabled,
+            isSecondaryFolderPathValidUseCase = isSecondaryFolderPathValidUseCase,
             listenToNewMediaUseCase = listenToNewMediaUseCase,
             preparePrimaryFolderPathUseCase = preparePrimaryFolderPathUseCase,
             setCameraUploadsByWifiUseCase = setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompressionUseCase = setChargingRequiredForVideoCompressionUseCase,
             setLocationTagsEnabledUseCase = setLocationTagsEnabledUseCase,
+            setSecondaryFolderLocalPathUseCase = setSecondaryFolderLocalPathUseCase,
             setUploadFileNamesKeptUseCase = setUploadFileNamesKeptUseCase,
             setUploadOptionUseCase = setUploadOptionUseCase,
             setUploadVideoQualityUseCase = setUploadVideoQualityUseCase,
             setupCameraUploadsSettingUseCase = setupCameraUploadsSettingUseCase,
+            setupDefaultSecondaryFolderUseCase = setupDefaultSecondaryFolderUseCase,
+            setupMediaUploadsSettingUseCase = setupMediaUploadsSettingUseCase,
             snackBarHandler = snackBarHandler,
             startCameraUploadUseCase = startCameraUploadUseCase,
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,
@@ -715,6 +741,135 @@ internal class SettingsCameraUploadsViewModelTest {
                     requireChargingDuringVideoCompression
                 )
             }
+        }
+    }
+
+    /**
+     * The Test Group that verifies behaviors when changing the Media Uploads State
+     */
+    @Nested
+    @DisplayName("Media Uploads")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    internal inner class MediaUploadsTestGroup {
+        @Test
+        fun `test that an error snackbar is shown when the user disables media uploads and is not connected to the internet`() =
+            runTest {
+                initializeUnderTest()
+                whenever(isConnectedToInternetUseCase()).thenReturn(false)
+
+                underTest.onMediaUploadsStateChanged(enabled = false)
+
+                verify(snackBarHandler).postSnackbarMessage(
+                    resId = R.string.general_error,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
+
+        @Test
+        fun `test that an error snackbar is shown when disabling media uploads throws an exception`() =
+            runTest {
+                initializeUnderTest()
+                whenever(isConnectedToInternetUseCase()).thenThrow(RuntimeException())
+
+                assertDoesNotThrow { underTest.onMediaUploadsStateChanged(enabled = false) }
+                verify(snackBarHandler).postSnackbarMessage(
+                    resId = R.string.general_error,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
+
+        @Test
+        fun `test that media uploads is now disabled`() = runTest {
+            initializeUnderTest()
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
+
+            underTest.onMediaUploadsStateChanged(enabled = false)
+
+            verify(disableMediaUploadsSettingsUseCase).invoke()
+            underTest.uiState.test {
+                assertThat(awaitItem().isMediaUploadsEnabled).isFalse()
+            }
+        }
+
+        @Test
+        fun `test that an error snackbar is shown when the user enables media uploads and is not connected to the internet`() =
+            runTest {
+                initializeUnderTest(isMediaUploadsEnabled = false)
+                whenever(isConnectedToInternetUseCase()).thenReturn(false)
+
+                underTest.onMediaUploadsStateChanged(enabled = true)
+
+                verify(snackBarHandler).postSnackbarMessage(
+                    resId = R.string.general_error,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
+
+        @Test
+        fun `test that an error snackbar is shown when enabling media uploads throws an exception`() =
+            runTest {
+                initializeUnderTest(isMediaUploadsEnabled = false)
+                whenever(isConnectedToInternetUseCase()).thenThrow(RuntimeException())
+
+                assertDoesNotThrow { underTest.onMediaUploadsStateChanged(enabled = true) }
+                verify(snackBarHandler).postSnackbarMessage(
+                    resId = R.string.general_error,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
+
+        @Test
+        fun `test that media uploads is now enabled with an empty secondary folder path if the existing path is invalid`() =
+            runTest {
+                initializeUnderTest(isMediaUploadsEnabled = false)
+                whenever(isConnectedToInternetUseCase()).thenReturn(true)
+                whenever(isSecondaryFolderPathValidUseCase(any())).thenReturn(false)
+
+                underTest.onMediaUploadsStateChanged(enabled = true)
+
+                verify(setupDefaultSecondaryFolderUseCase).invoke()
+                verify(setupMediaUploadsSettingUseCase).invoke(isEnabled = true)
+                underTest.uiState.test {
+                    val state = awaitItem()
+                    assertThat(state.isMediaUploadsEnabled).isTrue()
+                    assertThat(state.secondaryFolderPath).isEmpty()
+                }
+            }
+
+        @Test
+        fun `test that media uploads is now enabled using the existing secondary folder path if the existing path is valid`() =
+            runTest {
+                val expectedSecondaryFolderPath = "secondary/folder/path"
+                initializeUnderTest(
+                    isMediaUploadsEnabled = false,
+                    secondaryFolderPath = expectedSecondaryFolderPath,
+                )
+                whenever(isConnectedToInternetUseCase()).thenReturn(true)
+                whenever(isSecondaryFolderPathValidUseCase(any())).thenReturn(true)
+
+                underTest.onMediaUploadsStateChanged(enabled = true)
+
+                verify(setupDefaultSecondaryFolderUseCase).invoke()
+                verify(setupMediaUploadsSettingUseCase).invoke(isEnabled = true)
+                underTest.uiState.test {
+                    val state = awaitItem()
+                    assertThat(state.isMediaUploadsEnabled).isTrue()
+                    assertThat(state.secondaryFolderPath).isEqualTo(expectedSecondaryFolderPath)
+                }
+            }
+
+        @ParameterizedTest(name = "is media uploads enabled: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that enabling or disabling media uploads stops the ongoing camera uploads process`(
+            isMediaUploadsEnabled: Boolean,
+        ) = runTest {
+            initializeUnderTest()
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
+            whenever(isSecondaryFolderPathValidUseCase(any())).thenReturn(true)
+
+            underTest.onMediaUploadsStateChanged(enabled = isMediaUploadsEnabled)
+
+            verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
         }
     }
 }

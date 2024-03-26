@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.settings.camerauploads.SETTINGS_CAMERA_UPLOADS_TOOLBAR
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsView
@@ -18,6 +19,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.tiles.FILE_U
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.HOW_TO_UPLOAD_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.INCLUDE_LOCATION_TAGS_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.KEEP_FILE_NAMES_TILE
+import mega.privacy.android.app.presentation.settings.camerauploads.tiles.MEDIA_UPLOADS_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.REQUIRE_CHARGING_DURING_VIDEO_COMPRESSION_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VIDEO_QUALITY_TILE
 import org.junit.Rule
@@ -45,9 +47,12 @@ internal class SettingsCameraUploadsViewTest {
     fun `test that the following tiles are always shown when camera uploads is enabled`() {
         initializeComposeContent(isCameraUploadsEnabled = true)
 
-        composeTestRule.onNodeWithTag(HOW_TO_UPLOAD_TILE).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(FILE_UPLOAD_TILE).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(KEEP_FILE_NAMES_TILE).assertIsDisplayed()
+        listOf(
+            HOW_TO_UPLOAD_TILE, FILE_UPLOAD_TILE, KEEP_FILE_NAMES_TILE, MEDIA_UPLOADS_TILE
+        ).forEach { tag ->
+            // performScrollTo() is used to make all of the Composable items viewable in the viewport
+            composeTestRule.onNodeWithTag(tag).performScrollTo().assertIsDisplayed()
+        }
     }
 
     @Test
@@ -182,6 +187,7 @@ internal class SettingsCameraUploadsViewTest {
                 onMediaPermissionsGranted = {},
                 onRegularBusinessAccountSubUserPromptAcknowledged = {},
                 onRequestPermissionsStateChanged = {},
+                onMediaUploadsStateChanged = {},
                 onSettingsScreenPaused = {},
                 onUploadOptionUiItemSelected = {},
                 onVideoQualityUiItemSelected = {},

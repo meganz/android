@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.settings.camerauploads
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -38,6 +39,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.tiles.HowToU
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.IncludeLocationTagsTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.KeepFileNamesTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.RequireChargingDuringVideoCompressionTile
+import mega.privacy.android.app.presentation.settings.camerauploads.tiles.MediaUploadsTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VideoQualityTile
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
@@ -65,6 +67,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  * in Camera Uploads
  * @param onRequestPermissionsStateChanged Lambda to execute whether a Camera Uploads permissions
  * request should be done (triggered) or not (consumed)
+ * @param onMediaUploadsStateChanged Lambda to execute when the Media Uploads state changes
  * @param onSettingsScreenPaused Lambda to execute when the User triggers onPause() in the Settings
  * screen
  * @param onUploadOptionUiItemSelected Lambda to execute when the User selects a new
@@ -84,6 +87,7 @@ internal fun SettingsCameraUploadsView(
     onMediaPermissionsGranted: () -> Unit,
     onRegularBusinessAccountSubUserPromptAcknowledged: () -> Unit,
     onRequestPermissionsStateChanged: (StateEvent) -> Unit,
+    onMediaUploadsStateChanged: (Boolean) -> Unit,
     onSettingsScreenPaused: () -> Unit,
     onUploadOptionUiItemSelected: (UploadOptionUiItem) -> Unit,
     onVideoQualityUiItemSelected: (VideoQualityUiItem) -> Unit,
@@ -159,8 +163,9 @@ internal fun SettingsCameraUploadsView(
             }
             Column(
                 modifier = Modifier
-                    .padding(padding)
-                    .verticalScroll(rememberScrollState()),
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState())
+                    .padding(padding),
             ) {
                 CameraUploadsTile(
                     isChecked = uiState.isCameraUploadsEnabled,
@@ -198,6 +203,10 @@ internal fun SettingsCameraUploadsView(
                         isChecked = uiState.shouldKeepUploadFileNames,
                         onCheckedChange = onKeepFileNamesStateChanged,
                     )
+                    MediaUploadsTile(
+                        isMediaUploadsEnabled = uiState.isMediaUploadsEnabled,
+                        onItemClicked = onMediaUploadsStateChanged,
+                    )
                 }
             }
         },
@@ -226,6 +235,7 @@ private fun SettingsCameraUploadsViewPreview(
             onKeepFileNamesStateChanged = {},
             onMediaPermissionsGranted = {},
             onRequestPermissionsStateChanged = {},
+            onMediaUploadsStateChanged = {},
             onSettingsScreenPaused = {},
             onUploadOptionUiItemSelected = {},
             onVideoQualityUiItemSelected = {},
@@ -243,6 +253,7 @@ private class SettingsCameraUploadsViewParameterProvider
             SettingsCameraUploadsUiState(
                 isCameraUploadsEnabled = true,
                 uploadOptionUiItem = UploadOptionUiItem.PhotosAndVideos,
+                videoQualityUiItem = VideoQualityUiItem.High,
             ),
         )
 }
