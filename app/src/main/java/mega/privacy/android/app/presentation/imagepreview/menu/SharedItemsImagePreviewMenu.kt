@@ -50,7 +50,7 @@ internal class SharedItemsImagePreviewMenu @Inject constructor(
     }
 
     override suspend fun isSendToChatMenuVisible(imageNode: ImageNode): Boolean {
-        return haveOwnerAccessPermission(imageNode)
+        return haveOwnerOrFullAccessPermission(imageNode)
     }
 
     override suspend fun isShareMenuVisible(imageNode: ImageNode): Boolean {
@@ -58,7 +58,7 @@ internal class SharedItemsImagePreviewMenu @Inject constructor(
     }
 
     override suspend fun isRenameMenuVisible(imageNode: ImageNode): Boolean {
-        return haveOwnerAccessPermission(imageNode)
+        return haveOwnerOrFullAccessPermission(imageNode)
     }
 
     override suspend fun isHideMenuVisible(imageNode: ImageNode): Boolean {
@@ -70,7 +70,7 @@ internal class SharedItemsImagePreviewMenu @Inject constructor(
     }
 
     override suspend fun isMoveMenuVisible(imageNode: ImageNode): Boolean {
-        return haveOwnerAccessPermission(imageNode)
+        return haveOwnerOrFullAccessPermission(imageNode)
     }
 
     override suspend fun isCopyMenuVisible(imageNode: ImageNode): Boolean {
@@ -98,12 +98,18 @@ internal class SharedItemsImagePreviewMenu @Inject constructor(
     }
 
     override suspend fun isMoveToRubbishBinMenuVisible(imageNode: ImageNode): Boolean {
-        return haveOwnerAccessPermission(imageNode)
+        return haveOwnerOrFullAccessPermission(imageNode)
     }
 
     private suspend fun haveOwnerAccessPermission(
         imageNode: ImageNode,
     ) = getNodeAccessPermission(imageNode.id)?.let { accessPermission ->
         accessPermission == AccessPermission.OWNER
+    } ?: false
+
+    private suspend fun haveOwnerOrFullAccessPermission(
+        imageNode: ImageNode,
+    ) = getNodeAccessPermission(imageNode.id)?.let { accessPermission ->
+        accessPermission == AccessPermission.OWNER || accessPermission == AccessPermission.FULL
     } ?: false
 }

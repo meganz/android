@@ -16,6 +16,7 @@ import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivit
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
@@ -24,6 +25,7 @@ import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
 import mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER
+import mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_APP
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
@@ -33,6 +35,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PLACEHOLDER
+import mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
@@ -65,7 +68,7 @@ import javax.inject.Inject
  */
 @Deprecated(
     message = "This class is deprecated",
-    replaceWith = ReplaceWith(expression = "NodeActionsViewModel -> handleFileNodeClicked()",)
+    replaceWith = ReplaceWith(expression = "NodeActionsViewModel -> handleFileNodeClicked()")
 )
 class GetIntentToOpenFileMapper @Inject constructor(
     private val getLocalFileForNodeUseCase: GetLocalFileForNodeUseCase,
@@ -245,19 +248,21 @@ class GetIntentToOpenFileMapper @Inject constructor(
         } else if (MimeTypeList.typeForName(fileNode.name).isImage) {
             if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview) && viewType == FILE_BROWSER_ADAPTER) {
                 val parentNodeHandle = fileNode.parentId.longValue
-                val menuOptionsSource = getNodeByHandle(parentNodeHandle)?.let { node ->
-                    if (node.isShared) {
-                        ImagePreviewMenuSource.SHARED_ITEMS
-                    } else {
-                        ImagePreviewMenuSource.CLOUD_DRIVE
-                    }
-                } ?: ImagePreviewMenuSource.CLOUD_DRIVE
                 ImagePreviewActivity.createIntent(
                     context = activity,
                     imageSource = ImagePreviewFetcherSource.CLOUD_DRIVE,
-                    menuOptionsSource = menuOptionsSource,
+                    menuOptionsSource = ImagePreviewMenuSource.CLOUD_DRIVE,
                     anchorImageNodeId = fileNode.id,
                     params = mapOf(CloudDriveImageNodeFetcher.PARENT_ID to parentNodeHandle),
+                )
+            } else if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview) && (viewType == INCOMING_SHARES_ADAPTER || viewType == OUTGOING_SHARES_ADAPTER)) {
+                val parentNodeHandle = fileNode.parentId.longValue
+                ImagePreviewActivity.createIntent(
+                    context = activity,
+                    imageSource = ImagePreviewFetcherSource.SHARED_ITEMS,
+                    menuOptionsSource = ImagePreviewMenuSource.SHARED_ITEMS,
+                    anchorImageNodeId = fileNode.id,
+                    params = mapOf(SharedItemsImageNodeFetcher.PARENT_ID to parentNodeHandle),
                 )
             } else if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview) && viewType == RUBBISH_BIN_ADAPTER) {
                 ImagePreviewActivity.createIntent(
