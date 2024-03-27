@@ -69,6 +69,7 @@ fun ParticipantsBottomPanelView(
     onInviteParticipantsClick: () -> Unit,
     onShareMeetingLinkClick: () -> Unit,
     onAllowAddParticipantsClick: () -> Unit,
+    shouldShowParticipantsLimitWarning: Boolean = false,
     onAdmitParticipantClicked: (ChatParticipant) -> Unit = {},
     onDenyParticipantClicked: (ChatParticipant) -> Unit = {},
     onParticipantMoreOptionsClicked: (ChatParticipant) -> Unit = {},
@@ -290,7 +291,7 @@ fun ParticipantsBottomPanelView(
                     }
                 }
 
-                if (state.isCallUnlimitedProPlanFeatureFlagEnabled && state.shouldShowParticipantsLimitWarning()) {
+                if (shouldShowParticipantsLimitWarning) {
                     item(key = "Warning") {
                         ParticipantsLimitWarningComposeView(state.isModerator)
                     }

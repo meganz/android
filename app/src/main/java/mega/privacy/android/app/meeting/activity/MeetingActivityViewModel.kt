@@ -774,9 +774,7 @@ class MeetingActivityViewModel @Inject constructor(
                     call.changes?.apply {
                         if (contains(ChatCallChanges.Status)) {
                             if (call.status == ChatCallStatus.InProgress) {
-                                checkEphemeralAccountAndWaitingRoom(
-                                    call
-                                )
+                                checkEphemeralAccountAndWaitingRoom(call)
                             }
                         }
                         if (contains(ChatCallChanges.LocalAVFlags)) {

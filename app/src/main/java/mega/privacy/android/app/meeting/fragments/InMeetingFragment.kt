@@ -41,6 +41,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -96,6 +98,7 @@ import mega.privacy.android.app.presentation.meeting.dialog.view.LeaveMeetingBot
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants.AVATAR_CHANGE
@@ -104,6 +107,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_IS_FROM_MEETING
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MAX_USER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
 import mega.privacy.android.app.utils.Constants.INVALID_CALL_STATUS
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
@@ -707,6 +711,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             cancelButtonText = stringResource(id = R.string.meetings_in_call_warning_dialog_negative_button),
                             onConfirm = {
                                 inMeetingViewModel.onMeetingEndWarningDialogDismissed()
+                                context.startActivity(
+                                    Intent(
+                                        context,
+                                        UpgradeAccountActivity::class.java
+                                    )
+                                )
                             },
                             onDismiss = {
                                 inMeetingViewModel.onMeetingEndWarningDialogDismissed()
@@ -1139,18 +1149,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 endMeetingAsModeratorDialog?.dismissAllowingStateLoss()
                 endMeetingAsModeratorDialog = null
             }
-            if (sharedModel.state.value.isCallUnlimitedProPlanFeatureFlagEnabled && state.minutesToEndMeeting != null) {
-                callBanner?.apply {
-                    isVisible = true
-                    text = getString(
-                        R.string.meetings_in_call_warning_timer_message,
-                        TimeUtils.getMinutesAndSecondsFromMilliseconds(
-                            TimeUnit.MINUTES.toMillis(
-                                state.minutesToEndMeeting.toLong()
-                            )
-                        )
-                    )
-                }
+            showWarningTimer()
+            if (state.showMeetingEndWarningDialog) {
+                collapsePanel()
             }
         }
 
@@ -1218,6 +1219,31 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 sharedModel.updateParticipantsSection(ParticipantsSection.WaitingRoomSection)
                 if (bottomFloatingPanelViewHolder?.getState() != BottomSheetBehavior.STATE_EXPANDED) {
                     bottomFloatingPanelViewHolder?.expand()
+                }
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.showMeetingEndWarningDialog }
+            .distinctUntilChanged()) { showMeetingEndWarningDialog ->
+            if (showMeetingEndWarningDialog) {
+                callBanner?.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun showWarningTimer() {
+        inMeetingViewModel.state.value.let { state ->
+            if (state.minutesToEndMeeting != null && !state.showMeetingEndWarningDialog) {
+                callBanner?.apply {
+                    isVisible = true
+                    text = getString(
+                        R.string.meetings_in_call_warning_timer_message,
+                        TimeUtils.getMinutesAndSecondsFromMilliseconds(
+                            TimeUnit.MINUTES.toMillis(
+                                state.minutesToEndMeeting.toLong()
+                            )
+                        )
+                    )
                 }
             }
         }
@@ -1385,6 +1411,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             if (type == TYPE_LEFT) {
                                 inMeetingViewModel.checkShowOnlyMeBanner()
                             }
+                            showWarningTimer()
                         }
                 }
             } else {
@@ -1401,6 +1428,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 showCallWillEndBannerAndOnlyMeDialog()
             } else {
                 hideCallBannerAndOnlyMeDialog()
+            }
+            if (shouldBeShown.not()) {
+                showWarningTimer()
             }
         }
 
@@ -2728,6 +2758,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     putExtra(INTENT_EXTRA_IS_FROM_MEETING, true)
                     putExtra(INTENT_EXTRA_KEY_CHAT_ID, inMeetingViewModel.getChatId())
                     putExtra(
+                        INTENT_EXTRA_KEY_MAX_USER,
+                        inMeetingViewModel.state.value.call?.callUsersLimit
+                    )
+                    putExtra(
                         INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
                         getString(R.string.invite_participants)
                     )
@@ -2806,6 +2840,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         MegaApplication.getInstance().startProximitySensor()
         checkChildFragments()
         inMeetingViewModel.checkParticipantsList()
+        showWarningTimer()
     }
 
     override fun onPause() {

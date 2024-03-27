@@ -178,13 +178,7 @@ data class MeetingState(
      *
      * @return True, if has free plan. False, if has pro plan.
      */
-    private fun hasFreePlan() = subscriptionPlan == AccountType.FREE
-
-    /**
-     * Should show free plan limit warning
-     */
-    fun shouldShowParticipantsLimitWarning() = isCallUnlimitedProPlanFeatureFlagEnabled &&
-            hasFreePlan() && chatParticipantsInCall.size >= FREE_PLAN_PARTICIPANTS_LIMIT
+    fun hasFreePlan() = subscriptionPlan == AccountType.FREE
 
     /**
      * Check if user is moderator

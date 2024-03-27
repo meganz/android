@@ -16,7 +16,10 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -32,6 +35,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
+import mega.privacy.android.app.presentation.meeting.model.MeetingState.Companion.FREE_PLAN_PARTICIPANTS_LIMIT
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsBottomPanelView
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
@@ -444,9 +448,18 @@ class BottomFloatingPanelViewHolder(
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 val meetingState by meetingViewModel.state.collectAsStateWithLifecycle()
-                MegaAppTheme(isDark = Util.isDarkMode(context)) {
+                val inMeetingState by inMeetingViewModel.state.collectAsStateWithLifecycle()
+                val shouldShowParticipantsLimitWarning by remember {
+                    derivedStateOf {
+                        meetingState.isCallUnlimitedProPlanFeatureFlagEnabled &&
+                                meetingState.hasFreePlan() && meetingState.chatParticipantsInCall.size >= (inMeetingState.call?.callUsersLimit
+                            ?: FREE_PLAN_PARTICIPANTS_LIMIT)
+                    }
+                }
+                MegaAppTheme(isDark = isSystemInDarkTheme()) {
                     ParticipantsBottomPanelView(
                         state = meetingState,
+                        shouldShowParticipantsLimitWarning = shouldShowParticipantsLimitWarning,
                         onWaitingRoomClick = {
                             meetingViewModel.updateParticipantsSection(
                                 ParticipantsSection.WaitingRoomSection

@@ -60,7 +60,6 @@ import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NAME_CHANGE
 import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.meeting.AnotherCallType
@@ -396,20 +395,17 @@ class InMeetingViewModel @Inject constructor(
                 getChatCallUseCase(_state.value.currentChatId)
             }.onSuccess { chatCall ->
                 chatCall?.let { call ->
-                    Timber.d("Call id ${call.callId} and chat id ${call.chatId}")
+                    Timber.d("Call id ${call.callId} and chat id ${call.chatId} and call users limit ${call.callUsersLimit}")
                     Timber.d("Call limit ${call.callDurationLimit} Call Duration ${call.duration} and initial timestamp ${call.initialTimestamp}")
                     _state.update { it.copy(call = call) }
                     call.status?.let { status ->
                         checkSubtitleToolbar()
                         setCall(_state.value.currentChatId)
                         if (status != ChatCallStatus.Initial && _state.value.previousState == ChatCallStatus.Initial) {
-                            _state.update {
-                                it.copy(
-                                    previousState = status,
-                                )
-                            }
+                            _state.update { it.copy(previousState = status) }
                         }
                     }
+                    handleFreeCallEndWarning()
                 }
             }.onFailure { exception ->
                 Timber.e(exception)
@@ -432,9 +428,7 @@ class InMeetingViewModel @Inject constructor(
                     }
                 }
                 if (chat.hasChanged(ChatRoomChange.OpenInvite)) {
-                    _state.update {
-                        it.copy(isOpenInvite = chat.isOpenInvite)
-                    }
+                    _state.update { it.copy(isOpenInvite = chat.isOpenInvite) }
                 }
             }
         }
@@ -462,7 +456,7 @@ class InMeetingViewModel @Inject constructor(
                                 }
                             }
                         } else if (contains(ChatCallChanges.CallWillEnd)) {
-                            handleFreeCallEndWarning(call)
+                            handleFreeCallEndWarning()
                         }
                     }
                 }
@@ -471,7 +465,8 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Cancel the timer when call is upgraded or start the end timer if the call is free
      */
-    private fun handleFreeCallEndWarning(call: ChatCall) {
+    private fun handleFreeCallEndWarning() {
+        val call = _state.value.call ?: return
         if (call.callWillEndTs == null || call.callWillEndTs == 0L) return
         if (call.callWillEndTs == -1L) {
             Timber.d("Cancelling Meeting Timer Job")
@@ -492,7 +487,7 @@ class InMeetingViewModel @Inject constructor(
                 val seconds = timeStampInSecond - currentTimeStampInSecond
                 val minutes = TimeUnit.SECONDS.toMinutes(seconds)
                 Timber.d("Call will end in $minutes minutes")
-                startMeetingEndWarningTimer(minutes.toInt())
+                startMeetingEndWarningTimer(if (minutes == 0L) 1 else minutes.toInt())
             }
             if (call.isOwnModerator) {
                 _state.update {
