@@ -708,7 +708,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 }
                 optionFavourite.setText(if (node.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite)
                 optionFavourite.setCompoundDrawablesWithIntrinsicBounds(
-                    if (node.isFavourite) R.drawable.ic_remove_favourite else R.drawable.ic_add_favourite,
+                    if (node.isFavourite) RPack.drawable.ic_heart_broken_medium_regular_outline else RPack.drawable.ic_heart_medium_regular_outline,
                     0, 0, 0
                 )
                 optionHide.setText(if (node.isMarkedSensitive) R.string.general_unhide_node else R.string.general_hide_node)

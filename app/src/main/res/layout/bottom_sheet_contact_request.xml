@@ -36,7 +36,7 @@
                 android:layout_width="0dp"
                 android:layout_height="56dp"
                 android:text="@string/contact_accept"
-                app:drawableStartCompat="@drawable/ic_accept"
+                app:drawableStartCompat="@drawable/ic_check_circle_medium_regular_outline"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -57,7 +57,7 @@
                 android:layout_width="0dp"
                 android:layout_height="56dp"
                 android:text="@string/contact_ignore"
-                app:drawableStartCompat="@drawable/ic_ignore"
+                app:drawableStartCompat="@drawable/ic_slash_circle_medium_regular_outline"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/divider_accept" />
@@ -78,7 +78,7 @@
                 android:layout_width="0dp"
                 android:layout_height="56dp"
                 android:text="@string/contact_decline"
-                app:drawableStartCompat="@drawable/ic_decline"
+                app:drawableStartCompat="@drawable/ic_x_circle_medium_regular_outline"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/divider_ignore" />
@@ -116,7 +116,7 @@
                 android:layout_width="0dp"
                 android:layout_height="56dp"
                 android:text="@string/general_remove"
-                app:drawableStartCompat="@drawable/ic_remove"
+                app:drawableStartCompat="@drawable/ic_x_medium_regular_outline"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/divider_reinvite" />

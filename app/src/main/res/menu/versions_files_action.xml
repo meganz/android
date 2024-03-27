@@ -23,7 +23,7 @@
 
     <item
         android:id="@+id/action_revert_version"
-        android:icon="@drawable/ic_restore_black_24dp"
+        android:icon="@drawable/ic_clock_rotate_medium_regular_outline"
         android:orderInCategory="120"
         android:title="@string/general_revert"
         app:iconTint="?attr/colorSecondary"

@@ -103,66 +103,18 @@
             android:orientation="vertical">
 
             <!--Contact info-->
-            <LinearLayout
+            <TextView
                 android:id="@+id/contact_info_group_participants_chat_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/contact_info_group_participants_chat_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:layout_marginStart="5dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/info_ic"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:id="@+id/contact_info_group_participants_chat_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/general_info"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
+                style="@style/BottomSheetOption"
+                android:text="@string/general_info"
+                app:drawableStartCompat="@drawable/ic_info_medium_regular_outline"/>
 
             <!--Edit profile-->
-            <LinearLayout
+            <TextView
                 android:id="@+id/edit_profile_group_participants_chat_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/edit_profile_group_participants_chat_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/info_ic"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:id="@+id/edit_profile_group_participants_chat_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/group_chat_edit_profile_label"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
+                style="@style/BottomSheetOption"
+                android:text="@string/group_chat_edit_profile_label"
+                app:drawableStartCompat="@drawable/ic_pen_2_medium_regular_outline"/>
 
             <View
                 android:id="@+id/separator_info"
@@ -173,66 +125,18 @@
                 android:background="@color/grey_012_white_012" />
 
             <!--Call-->
-            <LinearLayout
+            <TextView
                 android:id="@+id/contact_list_option_call_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/contact_list_option_call"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_call_fille"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:id="@+id/contact_list_option_call_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/call_button"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
+                style="@style/BottomSheetOption"
+                android:text="@string/call_button"
+                app:drawableStartCompat="@drawable/ic_phone_01_medium_regular_solid"/>
 
             <!--Send msg-->
-            <LinearLayout
+            <TextView
                 android:id="@+id/start_chat_group_participants_chat_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/start_chat_group_participants_chat_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:layout_marginStart="5dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_message_chat_circle_medium_regular_outline"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:id="@+id/start_chat_group_participants_chat_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/context_send_message"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
+                style="@style/BottomSheetOption"
+                android:text="@string/context_send_message"
+                app:drawableStartCompat="@drawable/ic_message_chat_circle_medium_regular_outline"/>
 
             <View
                 android:id="@+id/separator_chat"
@@ -243,66 +147,18 @@
                 android:background="@color/grey_012_white_012" />
 
             <!--Change Permissions-->
-            <LinearLayout
+            <TextView
                 android:id="@+id/change_permissions_group_participants_chat_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/change_permissions_group_participants_chat_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:layout_marginStart="5dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_change_permissions"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:id="@+id/change_permissions_group_participants_chat_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/file_properties_shared_folder_change_permissions"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
+                style="@style/BottomSheetOption"
+                android:text="@string/file_properties_shared_folder_change_permissions"
+                app:drawableStartCompat="@drawable/ic_change_permissions"/>
 
             <!--Invite a non-contact-->
-            <LinearLayout
+            <TextView
                 android:id="@+id/invite_group_participants_chat_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/invite_group_participants_chat_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_g_add_contact"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:id="@+id/invite_group_participants_chat_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/menu_add_contact"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
+                style="@style/BottomSheetOption"
+                android:text="@string/menu_add_contact"
+                app:drawableStartCompat="@drawable/ic_plus_circle_medium_regular_outline"/>
 
             <View
                 android:id="@+id/separator_options"
@@ -313,35 +169,11 @@
                 android:background="@color/grey_012_white_012" />
 
             <!--Leave chat-->
-            <LinearLayout
+            <TextView
                 android:id="@+id/leave_group_participants_chat_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/leave_group_participants_chat_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_leave_chat"
-                    android:visibility="visible"
-                    app:tint="@color/red_600_red_300" />
-
-                <TextView
-                    android:id="@+id/leave_group_participants_chat_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/title_properties_chat_leave_chat"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
-            </LinearLayout>
+                style="@style/BottomSheetOption.Red"
+                android:text="@string/title_properties_chat_leave_chat"
+                app:drawableStartCompat="@drawable/ic_log_out_02_medium_regular_outline"/>
 
             <View
                 android:id="@+id/separator_leave"
@@ -352,36 +184,11 @@
                 android:background="@color/grey_012_white_012" />
 
             <!--Remove contact-->
-            <LinearLayout
+            <TextView
                 android:id="@+id/remove_group_participants_chat_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/remove_group_participants_chat_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_remove"
-                    android:visibility="visible"
-                    app:tint="@color/red_600_red_300" />
-
-                <TextView
-                    android:id="@+id/remove_group_participants_chat_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/remove_participant_menu_item"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
-            </LinearLayout>
-
+                style="@style/BottomSheetOption.Red"
+                android:text="@string/remove_participant_menu_item"
+                app:drawableStartCompat="@drawable/ic_x_medium_regular_outline"/>
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

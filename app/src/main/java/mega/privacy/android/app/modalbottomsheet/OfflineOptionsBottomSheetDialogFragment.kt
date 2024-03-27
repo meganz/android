@@ -53,7 +53,7 @@ internal class OfflineOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFr
         binding.optionOpenWithLayout.setOnClickListener(this)
         binding.offlineNameText.maxWidth = Util.scaleWidthPx(200, resources.displayMetrics)
         binding.offlineInfoText.maxWidth = Util.scaleWidthPx(200, resources.displayMetrics)
-        binding.optionPropertiesText.setText(R.string.general_info)
+        binding.optionPropertiesLayout.setText(R.string.general_info)
         binding.optionOpenWithLayout.isGone = nodeOffline.isFolder
         binding.separatorOpen.isGone = nodeOffline.isFolder
         binding.offlineNameText.text = nodeOffline.name

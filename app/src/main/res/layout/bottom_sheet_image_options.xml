@@ -78,13 +78,13 @@
                 android:id="@+id/option_info"
                 style="@style/BottomSheetOption"
                 android:text="@string/file_properties_info_info_file"
-                app:drawableStartCompat="@drawable/info_ic" />
+                app:drawableStartCompat="@drawable/ic_info_medium_regular_outline" />
 
             <TextView
                 android:id="@+id/option_favorite"
                 style="@style/BottomSheetOption"
                 android:text="@string/file_properties_favourite"
-                app:drawableStartCompat="@drawable/ic_add_favourite" />
+                app:drawableStartCompat="@drawable/ic_heart_medium_regular_outline" />
 
             <LinearLayout
                 android:id="@+id/option_label_layout"
@@ -100,7 +100,7 @@
                     android:layout_width="wrap_content"
                     android:background="@null"
                     android:text="@string/file_properties_label"
-                    app:drawableStartCompat="@drawable/ic_label" />
+                    app:drawableStartCompat="@drawable/ic_tag_simple_medium_regular_outline" />
 
                 <TextView
                     android:id="@+id/option_label_current"
@@ -154,7 +154,7 @@
                 android:id="@+id/option_forward"
                 style="@style/BottomSheetOption"
                 android:text="@string/forward_menu_item"
-                app:drawableStartCompat="@drawable/ic_forward" />
+                app:drawableStartCompat="@drawable/ic_corner_up_right_medium_regular_outline" />
 
             <View
                 android:id="@+id/separator_open"
@@ -167,7 +167,7 @@
                 android:id="@+id/option_download"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_save_to_device"
-                app:drawableStartCompat="@drawable/ic_save_to_device" />
+                app:drawableStartCompat="@drawable/ic_download_medium_regular_outline" />
 
             <LinearLayout
                 android:id="@+id/option_offline_layout"
@@ -277,7 +277,7 @@
                 style="@style/BottomSheetOption.Red"
                 android:text="@string/context_delete_offline"
                 android:visibility="gone"
-                app:drawableStartCompat="@drawable/ic_remove"
+                app:drawableStartCompat="@drawable/ic_x_medium_regular_outline"
                 tools:visibility="visible" />
 
             <TextView
@@ -285,14 +285,14 @@
                 style="@style/BottomSheetOption.Red"
                 android:text="@string/context_remove"
                 android:visibility="gone"
-                app:drawableStartCompat="@drawable/ic_remove"
+                app:drawableStartCompat="@drawable/ic_x_medium_regular_outline"
                 tools:visibility="visible" />
 
             <TextView
                 android:id="@+id/option_rubbish_bin"
                 style="@style/BottomSheetOption.Red"
                 android:text="@string/context_move_to_trash"
-                app:drawableStartCompat="@drawable/ic_rubbish_bin" />
+                app:drawableStartCompat="@drawable/ic_trash_medium_regular_outline" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

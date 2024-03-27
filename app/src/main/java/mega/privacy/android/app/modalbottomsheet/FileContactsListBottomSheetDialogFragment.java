@@ -101,9 +101,9 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
         TextView titleMailContactPanel = contentView.findViewById(R.id.file_contact_list_contact_mail_text);
         RoundedImageView contactImageView = contentView.findViewById(R.id.sliding_file_contact_list_thumbnail);
 
-        LinearLayout optionChangePermissions = contentView.findViewById(R.id.file_contact_list_option_permissions_layout);
-        LinearLayout optionDelete = contentView.findViewById(R.id.file_contact_list_option_delete_layout);
-        LinearLayout optionInfo = contentView.findViewById(R.id.file_contact_list_option_info_layout);
+        TextView optionChangePermissions = contentView.findViewById(R.id.file_contact_list_option_permissions_layout);
+        TextView optionDelete = contentView.findViewById(R.id.file_contact_list_option_delete_layout);
+        TextView optionInfo = contentView.findViewById(R.id.file_contact_list_option_info_layout);
 
         optionChangePermissions.setOnClickListener(this);
         optionDelete.setOnClickListener(this);

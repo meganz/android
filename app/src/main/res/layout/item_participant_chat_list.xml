@@ -67,7 +67,7 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:background="@null"
-                android:src="@drawable/ic_moderator"
+                android:src="@drawable/ic_user_king_medium_regular_outline"
                 android:visibility="gone" />
         </LinearLayout>
 

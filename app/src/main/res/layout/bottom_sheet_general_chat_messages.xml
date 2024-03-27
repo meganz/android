@@ -36,33 +36,11 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <RelativeLayout
+            <TextView
                 android:id="@+id/open_with_layout"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_gravity="start"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <ImageView
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
-                    android:src="@drawable/ic_open_with"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="72dp"
-                    android:layout_marginEnd="15dp"
-                    android:text="@string/external_play"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </RelativeLayout>
+                style="@style/BottomSheetOption"
+                android:text="@string/external_play"
+                app:drawableStartCompat="@drawable/ic_open_with" />
 
             <LinearLayout
                 android:id="@+id/forward_separator"
@@ -72,33 +50,13 @@
                 android:background="@color/grey_012_white_012"
                 android:orientation="vertical" />
 
-            <RelativeLayout
+            <TextView
                 android:id="@+id/forward_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_gravity="start"
+                style="@style/BottomSheetOption"
                 android:visibility="gone"
-                tools:visibility="visible">
-
-                <ImageView
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
-                    android:src="@drawable/ic_forward"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="72dp"
-                    android:layout_marginEnd="15dp"
-                    android:text="@string/forward_menu_item"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </RelativeLayout>
+                tools:visibility="visible"
+                android:text="@string/forward_menu_item"
+                app:drawableStartCompat="@drawable/ic_corner_up_right_medium_regular_outline" />
 
             <LinearLayout
                 android:id="@+id/edit_separator"
@@ -108,33 +66,13 @@
                 android:background="@color/grey_012_white_012"
                 android:orientation="vertical" />
 
-            <RelativeLayout
+            <TextView
                 android:id="@+id/edit_layout"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_gravity="start"
+                style="@style/BottomSheetOption"
                 android:visibility="gone"
-                tools:visibility="visible">
-
-                <ImageView
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
-                    android:src="@drawable/ic_pen_2_medium_regular_outline"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="72dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="15dp"
-                    android:text="@string/title_edit_profile_info"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </RelativeLayout>
+                tools:visibility="visible"
+                android:text="@string/title_edit_profile_info"
+                app:drawableStartCompat="@drawable/ic_pen_2_medium_regular_outline" />
 
             <LinearLayout
                 android:id="@+id/copy_separator"
@@ -144,33 +82,13 @@
                 android:background="@color/grey_012_white_012"
                 android:orientation="vertical" />
 
-            <RelativeLayout
+            <TextView
                 android:id="@+id/copy_layout"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_gravity="start"
+                style="@style/BottomSheetOption"
                 android:visibility="gone"
-                tools:visibility="visible">
-
-                <ImageView
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
-                    android:src="@drawable/ic_copy_01_medium_regular_outline"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="72dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="15dp"
-                    android:text="@string/context_copy"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </RelativeLayout>
+                tools:visibility="visible"
+                android:text="@string/context_copy"
+                app:drawableStartCompat="@drawable/ic_copy_01_medium_regular_outline" />
 
             <LinearLayout
                 android:id="@+id/share_separator"
@@ -180,33 +98,13 @@
                 android:background="@color/grey_012_white_012"
                 android:orientation="vertical" />
 
-            <RelativeLayout
+            <TextView
                 android:id="@+id/share_layout"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_gravity="start"
+                style="@style/BottomSheetOption"
                 android:visibility="gone"
-                tools:visibility="visible">
-
-                <ImageView
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
-                    android:src="@drawable/ic_share_network_medium_regular_outline"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="72dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="15dp"
-                    android:text="@string/general_share"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </RelativeLayout>
+                tools:visibility="visible"
+                android:text="@string/general_share"
+                app:drawableStartCompat="@drawable/ic_share_network_medium_regular_outline" />
 
             <LinearLayout
                 android:id="@+id/select_separator"
@@ -216,33 +114,13 @@
                 android:background="@color/grey_012_white_012"
                 android:orientation="vertical" />
 
-            <RelativeLayout
+            <TextView
                 android:id="@+id/select_layout"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_gravity="start"
+                style="@style/BottomSheetOption"
                 android:visibility="gone"
-                tools:visibility="visible">
-
-                <ImageView
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
-                    android:src="@drawable/ic_select_modal"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="72dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="15dp"
-                    android:text="@string/general_select"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </RelativeLayout>
+                tools:visibility="visible"
+                android:text="@string/general_select"
+                app:drawableStartCompat="@drawable/ic_select_modal" />
 
             <LinearLayout
                 android:id="@+id/info_separator"
@@ -252,61 +130,13 @@
                 android:background="@color/grey_012_white_012"
                 android:orientation="vertical" />
 
-            <RelativeLayout
+            <TextView
                 android:id="@+id/option_view_layout"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_gravity="start"
+                style="@style/BottomSheetOption"
                 android:visibility="gone"
-                tools:visibility="visible">
-
-                <ImageView
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
-                    android:src="@drawable/info_ic"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="72dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="15dp"
-                    android:text="@string/general_view_contacts"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/option_info_layout"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_gravity="start"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <ImageView
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
-                    android:src="@drawable/info_ic"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="72dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="15dp"
-                    android:text="@string/file_properties_info_info_file"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </RelativeLayout>
+                tools:visibility="visible"
+                android:text="@string/general_view_contacts"
+                app:drawableStartCompat="@drawable/ic_info_medium_regular_outline" />
 
             <LinearLayout
                 android:id="@+id/invite_separator"
@@ -316,61 +146,21 @@
                 android:background="@color/grey_012_white_012"
                 android:orientation="vertical" />
 
-            <RelativeLayout
+            <TextView
                 android:id="@+id/option_start_conversation_layout"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_gravity="start"
+                style="@style/BottomSheetOption"
                 android:visibility="gone"
-                tools:visibility="visible">
+                tools:visibility="visible"
+                android:text="@string/context_send_message"
+                app:drawableStartCompat="@drawable/ic_send_message_modal" />
 
-                <ImageView
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
-                    android:src="@drawable/ic_send_message_modal"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="72dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="15dp"
-                    android:text="@string/context_send_message"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </RelativeLayout>
-
-            <RelativeLayout
+            <TextView
                 android:id="@+id/option_invite_layout"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_gravity="start"
+                style="@style/BottomSheetOption"
                 android:visibility="gone"
-                tools:visibility="visible">
-
-                <ImageView
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
-                    android:src="@drawable/ic_g_add_contact"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="72dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="15dp"
-                    android:text="@string/contact_invite"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </RelativeLayout>
+                tools:visibility="visible"
+                android:text="@string/contact_invite"
+                app:drawableStartCompat="@drawable/ic_plus_circle_medium_regular_outline" />
 
             <LinearLayout
                 android:id="@+id/info_file_separator"
@@ -380,90 +170,35 @@
                 android:background="@color/grey_012_white_012"
                 android:orientation="vertical" />
 
-            <RelativeLayout
+            <TextView
                 android:id="@+id/option_import_layout"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_gravity="start"
+                style="@style/BottomSheetOption"
                 android:visibility="gone"
-                tools:visibility="visible">
+                tools:visibility="visible"
+                android:text="@string/add_to_cloud_node_chat"
+                app:drawableStartCompat="@drawable/ic_cloud_upload_medium_regular_outline" />
 
-                <ImageView
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
-                    android:src="@drawable/ic_cloud_upload_medium_regular_outline"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="72dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="15dp"
-                    android:text="@string/add_to_cloud_node_chat"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </RelativeLayout>
-
-            <RelativeLayout
+            <TextView
                 android:id="@+id/option_download_layout"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_gravity="start"
+                style="@style/BottomSheetOption"
                 android:visibility="gone"
-                tools:visibility="visible">
-
-                <ImageView
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
-                    android:src="@drawable/ic_save_to_device"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="72dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="15dp"
-                    android:text="@string/general_save_to_device"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </RelativeLayout>
+                tools:visibility="visible"
+                android:text="@string/general_save_to_device"
+                app:drawableStartCompat="@drawable/ic_download_medium_regular_outline" />
 
             <LinearLayout
                 android:id="@+id/option_save_offline_layout"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_gravity="start"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:visibility="visible">
-
-                <ImageView
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:src="@drawable/ic_arrow_down_circle_medium_regular_outline"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+                android:orientation="horizontal" >
 
                 <TextView
-                    android:id="@+id/option_offline_text"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:layout_weight="5"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
+                    android:id="@+id/offline_option"
+                    style="@style/BottomSheetOption"
+                    android:layout_width="wrap_content"
                     android:text="@string/file_properties_available_offline"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+                    app:drawableStartCompat="@drawable/ic_arrow_down_circle_medium_regular_outline"/>
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/file_properties_switch"
@@ -481,38 +216,14 @@
                 android:background="@color/grey_012_white_012"
                 android:orientation="vertical" />
 
-            <RelativeLayout
+            <TextView
                 android:id="@+id/delete_layout"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_gravity="start"
+                style="@style/BottomSheetOption.Red"
                 android:visibility="gone"
-                tools:visibility="visible">
-
-                <ImageView
-                    android:id="@+id/delete_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
-                    android:src="@drawable/ic_clear_white"
-                    android:visibility="visible"
-                    app:tint="@color/red_600_red_300" />
-
-                <TextView
-                    android:id="@+id/delete_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="72dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="15dp"
-                    android:text="@string/context_remove"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
-            </RelativeLayout>
+                tools:visibility="visible"
+                android:text="@string/context_remove"
+                app:drawableStartCompat="@drawable/ic_x_medium_regular_outline" />
 
         </LinearLayout>
-
     </androidx.core.widget.NestedScrollView>
-
 </RelativeLayout>

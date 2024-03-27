@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.adapter
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -21,7 +22,7 @@ object MeetingBindingAdapterMethods {
     @BindingAdapter("android:showModeratorIcon")
     fun showModeratorIcon(view: TextView, moderator: Boolean) {
         if (moderator) {
-            val drawable = ContextCompat.getDrawable(view.context, R.drawable.ic_moderator)
+            val drawable = ContextCompat.getDrawable(view.context, iconPackR.drawable.ic_user_king_medium_regular_outline)
             drawable?.setTint(ContextCompat.getColor(view.context, R.color.teal_300_teal_200))
             view.setCompoundDrawablesWithIntrinsicBounds(
                 null,

@@ -23,7 +23,7 @@
         <TextView
             android:id="@+id/sort_by_name_asc"
             style="@style/BottomSheetItem"
-            app:drawableStartCompat="@drawable/ic_sort_name_ascending"
+            app:drawableStartCompat="@drawable/ic_arrow_ascending_medium_regular_outline"
             app:drawableTint="?android:attr/textColorSecondary"
             tools:drawableTint="?attr/colorSecondary"
             tools:text="Name (ascending)"
@@ -32,7 +32,7 @@
         <TextView
             android:id="@+id/sort_by_name_desc"
             style="@style/BottomSheetItem"
-            app:drawableStartCompat="@drawable/ic_sort_name_descending"
+            app:drawableStartCompat="@drawable/ic_arrow_descending_medium_regular_outline"
             tools:text="Name (descending)" />
 
         <View
@@ -46,13 +46,13 @@
             android:id="@+id/sort_by_largest_size"
             style="@style/BottomSheetItem"
             android:text="@string/sortby_size_largest_first"
-            app:drawableStartCompat="@drawable/ic_sort_largest" />
+            app:drawableStartCompat="@drawable/ic_xl_medium_regular_outline" />
 
         <TextView
             android:id="@+id/sort_by_smallest_size"
             style="@style/BottomSheetItem"
             android:text="@string/sortby_size_smallest_first"
-            app:drawableStartCompat="@drawable/ic_sort_smallest" />
+            app:drawableStartCompat="@drawable/ic_xs_medium_regular_outline" />
 
         <View
             android:id="@+id/sort_by_size_separator"
@@ -65,13 +65,13 @@
             android:id="@+id/sort_by_newest_date"
             style="@style/BottomSheetItem"
             android:text="@string/sortby_date_newest"
-            app:drawableStartCompat="@drawable/ic_sort_newest" />
+            app:drawableStartCompat="@drawable/ic_hourglass_newest_medium_regular_outline" />
 
         <TextView
             android:id="@+id/sort_by_oldest_date"
             style="@style/BottomSheetItem"
             android:text="@string/sortby_date_oldest"
-            app:drawableStartCompat="@drawable/ic_sort_oldest" />
+            app:drawableStartCompat="@drawable/ic_hourglass_oldest_medium_regular_outline" />
 
         <View
             android:id="@+id/sort_by_date_separator"
@@ -84,13 +84,13 @@
             android:id="@+id/sort_by_favorites_type"
             style="@style/BottomSheetItem"
             android:text="@string/file_properties_favourite"
-            app:drawableStartCompat="@drawable/ic_add_favourite"/>
+            app:drawableStartCompat="@drawable/ic_heart_medium_regular_outline"/>
 
         <TextView
             android:id="@+id/sort_by_label_type"
             style="@style/BottomSheetItem"
             android:text="@string/file_properties_label"
-            app:drawableStartCompat="@drawable/ic_label" />
+            app:drawableStartCompat="@drawable/ic_tag_simple_medium_regular_outline" />
 
     </LinearLayout>
 

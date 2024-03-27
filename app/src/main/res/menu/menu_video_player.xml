@@ -74,7 +74,7 @@
     <item
         android:id="@+id/remove"
         android:orderInCategory="145"
-        android:icon="@drawable/ic_remove"
+        android:icon="@drawable/ic_x_medium_regular_outline"
         android:title="@string/general_remove"
         android:visible="true"
         app:iconTint="@color/white"

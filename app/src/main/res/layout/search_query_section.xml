@@ -68,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:elevation="0dp"
                 android:scaleType="center"
-                android:src="@drawable/ic_call_fille"
+                android:src="@drawable/ic_phone_01_medium_regular_solid"
                 app:border_width="0dp"
                 app:elevation="0dp"
                 app:fabCustomSize="24dp"

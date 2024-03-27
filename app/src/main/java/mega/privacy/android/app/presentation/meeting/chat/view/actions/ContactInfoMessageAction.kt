@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.actions
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.runtime.Composable
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -14,7 +15,7 @@ internal class ContactInfoMessageAction(
     private val chatViewModel: ChatViewModel,
 ) : MessageAction(
     text = R.string.general_info,
-    icon = R.drawable.ic_info_medium_regular_outline,
+    icon = iconPackR.drawable.ic_info_medium_regular_outline,
     testTag = "action_contact_info",
     group = MessageActionGroup.Contact,
 ) {

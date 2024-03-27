@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.filelink.view
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
@@ -40,7 +41,7 @@ internal fun FileLinkContent(
                 .padding(start = 16.dp, top = 24.dp, end = 16.dp, bottom = 12.dp)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.info_ic),
+                painter = painterResource(id = iconPackR.drawable.ic_info_medium_regular_outline),
                 contentDescription = "info icon",
                 colorFilter = ColorFilter.tint(MaterialTheme.colors.textColorSecondary)
             )

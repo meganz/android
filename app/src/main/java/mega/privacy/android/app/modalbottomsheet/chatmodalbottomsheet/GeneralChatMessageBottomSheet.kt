@@ -78,21 +78,21 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
     private var chatRoom: MegaChatRoom? = null
     private lateinit var reactionsLayout: LinearLayout
     private lateinit var reactionsFragment: ChatReactionsView
-    private lateinit var optionOpenWith: RelativeLayout
+    private lateinit var optionOpenWith: TextView
     private lateinit var reactionSeparator: View
-    private lateinit var optionForward: RelativeLayout
-    private lateinit var optionEdit: RelativeLayout
-    private lateinit var optionCopy: RelativeLayout
-    private lateinit var optionShare: RelativeLayout
-    private lateinit var optionSelect: RelativeLayout
-    private lateinit var optionViewContacts: RelativeLayout
-    private lateinit var optionInfoContacts: RelativeLayout
-    private lateinit var optionStartConversation: RelativeLayout
-    private lateinit var optionInviteContact: RelativeLayout
-    private lateinit var optionImport: RelativeLayout
-    private lateinit var optionDownload: RelativeLayout
+    private lateinit var optionForward: TextView
+    private lateinit var optionEdit: TextView
+    private lateinit var optionCopy: TextView
+    private lateinit var optionShare: TextView
+    private lateinit var optionSelect: TextView
+    private lateinit var optionViewContacts: TextView
+    private lateinit var optionInfoContacts: TextView
+    private lateinit var optionStartConversation: TextView
+    private lateinit var optionInviteContact: TextView
+    private lateinit var optionImport: TextView
+    private lateinit var optionDownload: TextView
     private lateinit var offlineSwitch: SwitchMaterial
-    private lateinit var optionDelete: RelativeLayout
+    private lateinit var optionDelete: TextView
     private lateinit var forwardSeparator: LinearLayout
     private lateinit var editSeparator: LinearLayout
     private lateinit var copySeparator: LinearLayout
@@ -176,7 +176,6 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
         offlineSwitch = contentView.findViewById(R.id.file_properties_switch)
         deleteSeparator = contentView.findViewById(R.id.delete_separator)
         optionDelete = contentView.findViewById(R.id.delete_layout)
-        val textDelete = contentView.findViewById<TextView>(R.id.delete_text)
         optionOpenWith.setOnClickListener(this)
         optionForward.setOnClickListener(this)
         optionEdit.setOnClickListener(this)
@@ -238,9 +237,9 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
                 optionDelete.visibility = View.GONE
             } else {
                 if (megaChatMessage.type == MegaChatMessage.TYPE_NORMAL || megaChatMessage.type == MegaChatMessage.TYPE_CONTAINS_META && megaChatMessage.containsMeta != null && megaChatMessage.containsMeta.type == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION) {
-                    textDelete.text = getString(R.string.delete_button)
+                    optionDelete.text = getString(R.string.delete_button)
                 } else {
-                    textDelete.text = getString(R.string.context_remove)
+                    optionDelete.text = getString(R.string.context_remove)
                 }
                 optionDelete.visibility = View.VISIBLE
             }

@@ -81,7 +81,7 @@
                     android:paddingBottom="2dp"
                     android:layout_marginStart="16dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/ic_upload_file"
+                    android:src="@drawable/ic_file_upload_medium_regular_outline"
                     android:visibility="visible"
                     app:tint="?android:attr/textColorSecondary" />
 

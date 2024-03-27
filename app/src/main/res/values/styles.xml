@@ -580,6 +580,8 @@
 
     <style name="BottomSheetOption" parent="BottomSheetOptionWithoutBackground">
         <item name="android:background">?selectableItemBackground</item>
+        <item name="android:textColor">@color/color_icon_secondary</item>
+        <item name="drawableTint">@color/color_icon_secondary</item>
     </style>
 
     <style name="BottomSheetItem">
@@ -590,7 +592,8 @@
         <item name="android:paddingStart">@dimen/bottom_sheet_item_padding_horizontal</item>
         <item name="android:paddingEnd">@dimen/bottom_sheet_item_padding_horizontal</item>
         <item name="android:textAppearance">?attr/textAppearanceSubtitle1</item>
-        <item name="drawableTint">?android:attr/textColorSecondary</item>
+        <item name="android:textColor">@color/color_icon_secondary</item>
+        <item name="drawableTint">@color/color_icon_secondary</item>
     </style>
 
     <style name="BottomSheetCallPositiveItem">
@@ -652,7 +655,7 @@
 
     <style name="BottomSheetOption.Red">
         <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle1.Red</item>
-        <item name="drawableTint">@color/red_600_red_300</item>
+        <item name="drawableTint">@color/color_button_brand</item>
     </style>
 
     <style name="CallBanner">

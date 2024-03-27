@@ -13,29 +13,15 @@
 
         <TextView
             android:id="@+id/capture_photo_action"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:drawablePadding="@dimen/bottom_sheet_drawable_padding"
-            android:gravity="center_vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+            style="@style/BottomSheetOption"
             android:text="@string/take_photo_avatar_panel"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
-            app:drawableStartCompat="@drawable/ic_capture"
-            app:drawableTint="?android:attr/textColorSecondary" />
+            app:drawableStartCompat="@drawable/ic_camera_medium_regular_outline" />
 
         <TextView
             android:id="@+id/choose_photo_action"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:drawablePadding="@dimen/bottom_sheet_drawable_padding"
-            android:gravity="center_vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+            style="@style/BottomSheetOption"
             android:text="@string/choose_photo_avatar_panel"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
-            app:drawableStartCompat="@drawable/ic_choose_photo"
-            app:drawableTint="?android:attr/textColorSecondary" />
+            app:drawableStartCompat="@drawable/ic_ic_choose_photo_medium_regular_solid" />
 
         <include
             android:id="@+id/delete_separator"
@@ -43,17 +29,9 @@
 
         <TextView
             android:id="@+id/delete_picture_action"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:drawablePadding="@dimen/bottom_sheet_drawable_padding"
-            android:gravity="center_vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+            style="@style/BottomSheetOption.Red"
             android:text="@string/delete_avatar_panel"
-            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red"
-            app:drawableStartCompat="@drawable/ic_remove"
-            app:drawableTint="@color/red_600_red_300" />
-
+            app:drawableStartCompat="@drawable/ic_x_medium_regular_outline" />
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

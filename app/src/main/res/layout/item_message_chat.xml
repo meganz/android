@@ -424,7 +424,7 @@
                                 android:layout_height="24dp"
                                 android:layout_gravity="center_vertical"
                                 android:layout_marginStart="16dp"
-                                android:src="@drawable/ic_clear_white"
+                                android:src="@drawable/ic_x_medium_regular_outline"
                                 android:background="@null"
                                 android:visibility="gone"
                                 app:tint="@color/white" />
@@ -1428,7 +1428,7 @@
                             android:layout_height="24dp"
                             android:layout_gravity="center_vertical"
                             android:layout_marginStart="16dp"
-                            android:src="@drawable/ic_clear_white"
+                            android:src="@drawable/ic_x_medium_regular_outline"
                             android:background="@null"
                             android:visibility="gone"
                             app:tint="@color/grey_087_white" />

@@ -61,7 +61,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_decline"
+            android:src="@drawable/ic_x_circle_medium_regular_outline"
             android:layout_marginRight="16dp"
             android:layout_marginLeft="16dp"
             android:layout_centerVertical="true"

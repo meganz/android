@@ -146,7 +146,7 @@ private fun BottomSheetContent(
         )
         MenuItem(
             modifier = Modifier.testTag(Constants.BOTTOM_SHEET_SAVE),
-            res = R.drawable.ic_save_to_device,
+            res = IconPackR.drawable.ic_download_medium_regular_outline,
             text = R.string.general_save_to_device,
             description = "Save",
             onClick = {

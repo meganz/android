@@ -17,13 +17,13 @@
             android:id="@+id/upload_files"
             style="@style/BottomSheetOption"
             android:text="@string/upload_files"
-            app:drawableStartCompat="@drawable/ic_upload_file" />
+            app:drawableStartCompat="@drawable/ic_file_upload_medium_regular_outline" />
 
         <TextView
             android:id="@+id/upload_folder"
             style="@style/BottomSheetOption"
             android:text="@string/upload_folder"
-            app:drawableStartCompat="@drawable/ic_upload_folder" />
+            app:drawableStartCompat="@drawable/ic_folder_arrow_medium_regular_outline" />
 
         <include layout="@layout/view_linear_layout_72_margin_start_separator" />
 
@@ -31,14 +31,14 @@
             android:id="@+id/scan_document_option"
             style="@style/BottomSheetOption"
             android:text="@string/menu_scan_document"
-            app:drawableStartCompat="@drawable/ic_scan_document" />
+            app:drawableStartCompat="@drawable/ic_file_scan_medium_regular_outline" />
 
         <TextView
             android:id="@+id/take_picture_option"
             style="@style/BottomSheetOption"
             android:layout_width="match_parent"
             android:text="@string/menu_take_picture"
-            app:drawableStartCompat="@drawable/ic_capture" />
+            app:drawableStartCompat="@drawable/ic_camera_medium_regular_outline" />
 
         <include layout="@layout/view_linear_layout_72_margin_start_separator" />
 
@@ -46,14 +46,14 @@
             android:id="@+id/new_folder_option"
             style="@style/BottomSheetOption"
             android:text="@string/action_create_folder"
-            app:drawableStartCompat="@drawable/ic_new_folder" />
+            app:drawableStartCompat="@drawable/ic_folder_plus_01_medium_regular_outline" />
 
         <TextView
             android:id="@+id/new_txt_option"
             style="@style/BottomSheetOption"
             android:layout_width="match_parent"
             android:text="@string/action_create_txt"
-            app:drawableStartCompat="@drawable/ic_new_text_file" />
+            app:drawableStartCompat="@drawable/ic_file_plus_02_medium_regular_outline" />
 
     </LinearLayout>
 

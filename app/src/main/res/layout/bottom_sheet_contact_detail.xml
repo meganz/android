@@ -32,7 +32,7 @@
                 android:id="@+id/option_info"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_info"
-                app:drawableStartCompat="@drawable/info_ic" />
+                app:drawableStartCompat="@drawable/ic_info_medium_regular_outline" />
 
             <View
                 android:id="@+id/divider_info"
@@ -45,7 +45,7 @@
                 android:id="@+id/option_call"
                 style="@style/BottomSheetOption"
                 android:text="@string/call_button"
-                app:drawableStartCompat="@drawable/ic_call_fille" />
+                app:drawableStartCompat="@drawable/ic_phone_01_medium_regular_solid" />
 
             <TextView
                 android:id="@+id/option_send_message"
@@ -89,7 +89,7 @@
                 android:id="@+id/option_remove"
                 style="@style/BottomSheetOption.Red"
                 android:text="@string/context_remove"
-                app:drawableStartCompat="@drawable/ic_remove" />
+                app:drawableStartCompat="@drawable/ic_x_medium_regular_outline" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

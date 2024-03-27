@@ -112,7 +112,7 @@
             <TextView
                 android:id="@+id/properties_option"
                 style="@style/BottomSheetOption"
-                app:drawableStartCompat="@drawable/info_ic"
+                app:drawableStartCompat="@drawable/ic_info_medium_regular_outline"
                 tools:text="Info"/>
 
             <LinearLayout
@@ -127,7 +127,7 @@
                 android:id="@+id/download_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_save_to_device"
-                app:drawableStartCompat="@drawable/ic_save_to_device"/>
+                app:drawableStartCompat="@drawable/ic_download_medium_regular_outline"/>
 
             <LinearLayout
                 android:id="@+id/separator_download"
@@ -173,7 +173,7 @@
                 android:id="@+id/rubbish_bin_option"
                 style="@style/BottomSheetOption.Red"
                 android:text="@string/context_move_to_trash"
-                app:drawableStartCompat="@drawable/ic_rubbish_bin"/>
+                app:drawableStartCompat="@drawable/ic_trash_medium_regular_outline"/>
 
         </LinearLayout>
 

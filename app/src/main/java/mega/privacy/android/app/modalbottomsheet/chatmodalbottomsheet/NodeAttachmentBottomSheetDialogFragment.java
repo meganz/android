@@ -65,7 +65,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
     private TextView nodeInfo;
     private RelativeLayout titleLayout;
     private LinearLayout titleSeparator;
-    private LinearLayout optionView;
+    private TextView optionView;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -116,7 +116,6 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         }
 
 
-        TextView optionViewText = contentView.findViewById(R.id.option_view_text);
         LinearLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
         LinearLayout optionImport = contentView.findViewById(R.id.option_import_layout);
         LinearLayout optionSaveOffline = contentView.findViewById(R.id.option_save_offline_layout);
@@ -177,9 +176,9 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
                 }
 
                 if (nodeList.size() == count) {
-                    optionViewText.setText(getString(R.string.general_view));
+                    optionView.setText(getString(R.string.general_view));
                 } else {
-                    optionViewText.setText(getString(R.string.general_view_with_revoke, nodeList.size() - count));
+                    optionView.setText(getString(R.string.general_view_with_revoke, nodeList.size() - count));
                 }
             }
         } else {

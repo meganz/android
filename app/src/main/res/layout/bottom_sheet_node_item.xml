@@ -157,13 +157,13 @@
                 android:id="@+id/properties_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_info"
-                app:drawableStartCompat="@drawable/info_ic"/>
+                app:drawableStartCompat="@drawable/ic_info_medium_regular_outline"/>
 
             <TextView
                 android:id="@+id/view_in_folder_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/view_in_folder_label"
-                app:drawableStartCompat="@drawable/ic_upload_pick_file"/>
+                app:drawableStartCompat="@drawable/ic_folder_open_medium_regular_outline"/>
 
             <LinearLayout
                 android:id="@+id/option_versions_layout"
@@ -195,7 +195,7 @@
                 android:id="@+id/favorite_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/file_properties_favourite"
-                app:drawableStartCompat="@drawable/ic_add_favourite"/>
+                app:drawableStartCompat="@drawable/ic_heart_medium_regular_outline"/>
 
             <LinearLayout
                 android:id="@+id/option_label_layout"
@@ -213,7 +213,7 @@
                     android:layout_width="wrap_content"
                     android:background="@null"
                     android:text="@string/file_properties_label"
-                    app:drawableStartCompat="@drawable/ic_label" />
+                    app:drawableStartCompat="@drawable/ic_tag_simple_medium_regular_outline" />
 
                 <TextView
                     android:id="@+id/option_label_current"
@@ -277,7 +277,7 @@
                 android:id="@+id/open_folder_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/search_open_location"
-                app:drawableStartCompat="@drawable/ic_upload_pick_file"/>
+                app:drawableStartCompat="@drawable/ic_folder_open_medium_regular_outline"/>
 
             <LinearLayout
                 android:id="@+id/separator_open_options"
@@ -291,7 +291,7 @@
                 android:id="@+id/download_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_save_to_device"
-                app:drawableStartCompat="@drawable/ic_save_to_device"/>
+                app:drawableStartCompat="@drawable/ic_download_medium_regular_outline"/>
 
             <LinearLayout
                 android:id="@+id/option_offline_layout"
@@ -448,13 +448,13 @@
                 android:id="@+id/rubbish_bin_option"
                 style="@style/BottomSheetOption.Red"
                 android:text="@string/context_move_to_trash"
-                app:drawableStartCompat="@drawable/ic_rubbish_bin"/>
+                app:drawableStartCompat="@drawable/ic_trash_medium_regular_outline"/>
 
             <TextView
                 android:id="@+id/remove_option"
                 style="@style/BottomSheetOption.Red"
                 android:text="@string/rubbish_bin_bottom_menu_option_delete"
-                app:drawableStartCompat="@drawable/ic_remove"/>
+                app:drawableStartCompat="@drawable/ic_x_medium_regular_outline"/>
 
         </LinearLayout>
 

@@ -683,7 +683,7 @@ private fun ImagePreviewTopBar(
             if (isForwardMenuVisible) {
                 IconButton(onClick = onClickForward) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_forward),
+                        painter = painterResource(id = iconPackR.drawable.ic_corner_up_right_medium_regular_outline),
                         contentDescription = null,
                         tint = MaterialTheme.colors.black_white,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_FORWARD),

@@ -89,7 +89,7 @@
                     android:layout_marginStart="16dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:src="@drawable/ic_remove"
+                    android:src="@drawable/ic_x_medium_regular_outline"
                     android:visibility="visible"
                     app:tint="@color/red_600_red_300" />
 

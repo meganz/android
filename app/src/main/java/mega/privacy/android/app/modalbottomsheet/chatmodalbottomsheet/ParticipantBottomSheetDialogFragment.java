@@ -22,7 +22,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -122,21 +121,20 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         TextView titleMailContactChatPanel = contentView.findViewById(R.id.group_participants_chat_mail_text);
         contactImageView = contentView.findViewById(R.id.sliding_group_participants_chat_list_thumbnail);
 
-        LinearLayout optionContactInfoChat = contentView.findViewById(R.id.contact_info_group_participants_chat_layout);
-        LinearLayout optionEditProfileChat = contentView.findViewById(R.id.edit_profile_group_participants_chat_layout);
+        TextView optionContactInfoChat = contentView.findViewById(R.id.contact_info_group_participants_chat_layout);
+        TextView optionEditProfileChat = contentView.findViewById(R.id.edit_profile_group_participants_chat_layout);
 
-        LinearLayout optionStartConversationChat = contentView.findViewById(R.id.start_chat_group_participants_chat_layout);
-        LinearLayout optionStartCall = contentView.findViewById(R.id.contact_list_option_call_layout);
-        LinearLayout optionLeaveChat = contentView.findViewById(R.id.leave_group_participants_chat_layout);
-        TextView optionLeaveChatText = contentView.findViewById(R.id.leave_group_participants_chat_text);
+        TextView optionStartConversationChat = contentView.findViewById(R.id.start_chat_group_participants_chat_layout);
+        TextView optionStartCall = contentView.findViewById(R.id.contact_list_option_call_layout);
+        TextView optionLeaveChat = contentView.findViewById(R.id.leave_group_participants_chat_layout);
         if (megaChatApi.getChatRoom(chatId) != null && megaChatApi.getChatRoom(chatId).isMeeting()) {
-            optionLeaveChatText.setText(R.string.meetings_info_leave_option);
+            optionLeaveChat.setText(R.string.meetings_info_leave_option);
         } else {
-            optionLeaveChatText.setText(R.string.title_properties_chat_leave_chat);
+            optionLeaveChat.setText(R.string.title_properties_chat_leave_chat);
         }
-        LinearLayout optionChangePermissionsChat = contentView.findViewById(R.id.change_permissions_group_participants_chat_layout);
-        LinearLayout optionRemoveParticipantChat = contentView.findViewById(R.id.remove_group_participants_chat_layout);
-        LinearLayout optionInvite = contentView.findViewById(R.id.invite_group_participants_chat_layout);
+        TextView optionChangePermissionsChat = contentView.findViewById(R.id.change_permissions_group_participants_chat_layout);
+        TextView optionRemoveParticipantChat = contentView.findViewById(R.id.remove_group_participants_chat_layout);
+        TextView optionInvite = contentView.findViewById(R.id.invite_group_participants_chat_layout);
 
         optionChangePermissionsChat.setOnClickListener(this);
         optionRemoveParticipantChat.setOnClickListener(this);

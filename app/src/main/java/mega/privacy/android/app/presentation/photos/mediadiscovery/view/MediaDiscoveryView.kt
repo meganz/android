@@ -2,6 +2,7 @@
 
 package mega.privacy.android.app.presentation.photos.mediadiscovery.view
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.annotation.DrawableRes
@@ -264,7 +265,7 @@ fun MDBottomSheet(
             ) {
                 MenuItem(
                     modifier = Modifier,
-                    res = R.drawable.ic_upload_file,
+                    res = iconPackR.drawable.ic_file_upload_medium_regular_outline,
                     text = R.string.upload_files,
                     description = "UploadFiles",
                     onClick = onUploadFiles

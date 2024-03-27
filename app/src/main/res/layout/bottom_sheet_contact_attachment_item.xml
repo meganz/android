@@ -91,65 +91,17 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
+            <TextView
                 android:id="@+id/option_view_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                style="@style/BottomSheetOption"
+                android:text="@string/general_view_contacts"
+                app:drawableStartCompat="@drawable/ic_info_medium_regular_outline" />
 
-                <ImageView
-                    android:id="@+id/option_view_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:src="@drawable/info_ic"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:id="@+id/option_view_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:text="@string/general_view_contacts"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
-
-            <LinearLayout
+            <TextView
                 android:id="@+id/option_info_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/option_info_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:src="@drawable/info_ic"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:id="@+id/option_info_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:text="@string/file_properties_info_info_file"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
+                style="@style/BottomSheetOption"
+                android:text="@string/file_properties_info_info_file"
+                app:drawableStartCompat="@drawable/ic_info_medium_regular_outline" />
 
             <View
                 android:id="@+id/separator_info"
@@ -159,66 +111,17 @@
                 android:background="@color/grey_012_white_012"
                 android:orientation="vertical" />
 
-            <LinearLayout
+            <TextView
                 android:id="@+id/option_start_conversation_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                style="@style/BottomSheetOption"
+                android:text="@string/context_send_message"
+                app:drawableStartCompat="@drawable/ic_message_chat_circle_medium_regular_outline" />
 
-                <ImageView
-                    android:id="@+id/option_start_conversation_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:src="@drawable/ic_message_chat_circle_medium_regular_outline"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:id="@+id/option_start_conversation_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:text="@string/context_send_message"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
-
-            <LinearLayout
+            <TextView
                 android:id="@+id/option_invite_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/option_invite"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:src="@drawable/ic_g_add_contact"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:id="@+id/option_invite_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:text="@string/contact_invite"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
-
+                style="@style/BottomSheetOption"
+                android:text="@string/contact_invite"
+                app:drawableStartCompat="@drawable/ic_plus_circle_medium_regular_outline" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

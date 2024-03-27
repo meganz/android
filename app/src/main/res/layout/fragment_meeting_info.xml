@@ -28,7 +28,7 @@
         android:id="@+id/moderator_name"
         style="@style/BottomSheetInfoItem"
         android:text="meeting"
-        app:drawableStartCompat="@drawable/ic_moderator"
+        app:drawableStartCompat="@drawable/ic_user_king_medium_regular_outline"
         app:drawableTint="?attr/colorSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

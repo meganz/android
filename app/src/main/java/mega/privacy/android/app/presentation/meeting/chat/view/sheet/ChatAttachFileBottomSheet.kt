@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.sheet
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -95,7 +96,7 @@ fun ChatAttachFileBottomSheet(
         )
         MenuActionListTile(
             text = stringResource(id = R.string.upload_files),
-            icon = painterResource(id = R.drawable.ic_upload_file),
+            icon = painterResource(id = iconPackR.drawable.ic_file_upload_medium_regular_outline),
             dividerType = null,
             onActionClicked = { openFilePicker(localLauncher) },
             modifier = Modifier.testTag(TEST_TAG_SEND_FROM_LOCAL)

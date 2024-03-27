@@ -103,7 +103,7 @@
                     android:paddingBottom="2dp"
                     android:layout_marginLeft="5dp"
                     android:paddingTop="2dp"
-                    android:src="@drawable/info_ic"
+                    android:src="@drawable/ic_info_medium_regular_outline"
                     android:visibility="visible"
                     app:tint="?android:attr/textColorSecondary" />
 

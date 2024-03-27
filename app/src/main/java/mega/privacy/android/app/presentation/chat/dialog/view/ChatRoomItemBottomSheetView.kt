@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.chat.dialog.view
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -222,7 +223,7 @@ internal fun ChatRoomItemBottomSheetView(
 
                 MenuItem(
                     modifier = Modifier.testTag("info"),
-                    res = R.drawable.info_ic,
+                    res = iconPackR.drawable.ic_info_medium_regular_outline,
                     text = R.string.general_info,
                     description = "Info",
                     onClick = onInfoClick
