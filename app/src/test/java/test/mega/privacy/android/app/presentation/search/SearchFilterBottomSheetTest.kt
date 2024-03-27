@@ -1,17 +1,14 @@
 package test.mega.privacy.android.app.presentation.search
 
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.search.model.FilterOptionEntity
-import mega.privacy.android.app.presentation.search.view.SearchFilterBottomSheet
+import mega.privacy.android.app.presentation.search.view.BottomSheetContentLayout
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,14 +28,8 @@ class SearchFilterBottomSheetTest {
         onItemSelected: (FilterOptionEntity) -> Unit = {},
     ) {
         composeTestRule.setContent {
-            val sheetState = ModalBottomSheetState(
-                initialValue = ModalBottomSheetValue.Expanded,
-                isSkipHalfExpanded = false,
-                density = LocalDensity.current,
-            )
-            SearchFilterBottomSheet(
+            BottomSheetContentLayout(
                 modifier = modifier,
-                modalSheetState = sheetState,
                 title = title,
                 options = options,
                 onItemSelected = onItemSelected

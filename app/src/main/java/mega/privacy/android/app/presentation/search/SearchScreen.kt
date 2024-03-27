@@ -25,6 +25,7 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetRoute
+import mega.privacy.android.app.presentation.search.navigation.searchFilterBottomSheetRoute
 import mega.privacy.android.app.presentation.search.view.SearchComposeView
 import mega.privacy.android.domain.entity.node.TypedNode
 
@@ -90,9 +91,12 @@ fun SearchScreen(
         updateFilter = searchActivityViewModel::updateFilter,
         trackAnalytics = trackAnalytics,
         updateSearchQuery = searchActivityViewModel::updateSearchQuery,
-        onTypeFilterItemClicked = searchActivityViewModel::setTypeSelectedFilterOption,
-        onDateModifiedFilterItemClicked = searchActivityViewModel::setDateModifiedSelectedFilterOption,
-        onDateAddedFilterItemClicked = searchActivityViewModel::setDateAddedSelectedFilterOption,
+        onFilterClicked = {
+            keyboardController?.hide()
+            navHostController.navigate(
+                route = searchFilterBottomSheetRoute.plus("/${it}")
+            )
+        },
         clearSelection = searchActivityViewModel::clearSelection,
         onBackPressed = onBackPressed,
         navHostController = navHostController,

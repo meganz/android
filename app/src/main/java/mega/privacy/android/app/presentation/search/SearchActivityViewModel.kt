@@ -5,7 +5,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -110,23 +109,25 @@ class SearchActivityViewModel @Inject constructor(
     }
 
     private fun initializeSearch() {
-        _state.update {
-            it.copy(
-                nodeSourceType = nodeSourceType,
-                typeSelectedFilterOption = null,
-                dateModifiedSelectedFilterOption = null,
-                dateAddedSelectedFilterOption = null
-            )
-        }
-        runCatching {
-            getSearchCategoriesUseCase().map { searchFilterMapper(it) }
-                .filterNot { it.filter == SearchCategory.ALL }
-        }.onSuccess { filters ->
+        viewModelScope.launch {
             _state.update {
-                it.copy(filters = filters, selectedFilter = null)
+                it.copy(
+                    nodeSourceType = nodeSourceType,
+                    typeSelectedFilterOption = null,
+                    dateModifiedSelectedFilterOption = null,
+                    dateAddedSelectedFilterOption = null,
+                )
             }
-        }.onFailure {
-            Timber.e("Get search categories failed $it")
+            runCatching {
+                getSearchCategoriesUseCase().map { searchFilterMapper(it) }
+                    .filterNot { it.filter == SearchCategory.ALL }
+            }.onSuccess { filters ->
+                _state.update {
+                    it.copy(filters = filters, selectedFilter = null)
+                }
+            }.onFailure {
+                Timber.e("Get search categories failed $it")
+            }
         }
     }
 

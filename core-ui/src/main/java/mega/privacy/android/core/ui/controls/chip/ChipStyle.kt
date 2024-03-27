@@ -152,13 +152,13 @@ object DefaultChipStyle : ChipStyle {
     override fun colors(): ChipColors = DefaultChipColors(
         selectedBackgroundColor = MegaTheme.colors.components.selectionControl,
         unselectedBackgroundColor = MegaTheme.colors.button.secondary,
-        disabledBackgroundColor = MegaTheme.colors.button.disabled,
+        disabledBackgroundColor = MegaTheme.colors.button.secondary,
         selectedContentColor = MegaTheme.colors.text.inverse,
         unselectedContentColor = MegaTheme.colors.text.secondary,
-        disabledContentColor = MegaTheme.colors.text.disabled,
+        disabledContentColor = MegaTheme.colors.text.secondary,
         selectedBorderColor = Color.Transparent,
         unselectedBorderColor = Color.Transparent,
-        disabledBorderColor = MegaTheme.colors.border.disabled,
+        disabledBorderColor = Color.Transparent,
     )
 
     /**

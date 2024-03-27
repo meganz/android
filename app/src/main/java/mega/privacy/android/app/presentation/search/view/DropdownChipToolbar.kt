@@ -18,11 +18,13 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 internal fun DropdownChipToolbar(
     chipItems: List<ChipItem>,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     ChipBar(modifier = modifier) {
         chipItems.forEach {
             DropdownChip(
                 isSelected = it.isSelected,
+                isEnabled = enabled,
                 notSelectedTitle = it.notSelectedTitle,
                 selectedFilterTitle = it.selectedFilterTitle,
                 onFilterClicked = it.onFilterClicked,
@@ -35,6 +37,7 @@ internal fun DropdownChipToolbar(
 @Composable
 private fun DropdownChip(
     isSelected: Boolean,
+    isEnabled: Boolean,
     notSelectedTitle: String,
     selectedFilterTitle: String,
     onFilterClicked: () -> Unit,
@@ -43,6 +46,7 @@ private fun DropdownChip(
 ) {
     Chip(
         selected = isSelected,
+        enabled = isEnabled,
         contentDescription = "Dropdown Chip",
         modifier = modifier,
         onClick = onFilterClicked,

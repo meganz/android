@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.search.model
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -60,7 +60,7 @@ class SearchActivityViewModelTest {
     private val searchNodesUseCase: SearchNodesUseCase = mock()
     private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase = mock()
     private val searchFilterMapper: SearchFilterMapper = mock()
-    private val typeFilterToSearchMapper: TypeFilterToSearchMapper= mock()
+    private val typeFilterToSearchMapper: TypeFilterToSearchMapper = mock()
     private val emptySearchViewMapper: EmptySearchViewMapper = mock()
     private val stateHandle: SavedStateHandle = mock()
     private val setViewType: SetViewType = mock()
@@ -124,8 +124,8 @@ class SearchActivityViewModelTest {
             )
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.selectedNodes.size).isEqualTo(1)
-                Truth.assertThat(state.selectedNodes.filter { it is FileNode }.size).isEqualTo(0)
+                assertThat(state.selectedNodes.size).isEqualTo(1)
+                assertThat(state.selectedNodes.filter { it is FileNode }.size).isEqualTo(0)
             }
         }
 
@@ -148,7 +148,7 @@ class SearchActivityViewModelTest {
             )
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.selectedNodes.size).isEqualTo(0)
+                assertThat(state.selectedNodes.size).isEqualTo(0)
             }
             underTest.onItemClicked(
                 NodeUIItem(
@@ -159,7 +159,7 @@ class SearchActivityViewModelTest {
             )
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.selectedNodes.size).isEqualTo(0)
+                assertThat(state.selectedNodes.size).isEqualTo(0)
             }
         }
 
@@ -190,8 +190,8 @@ class SearchActivityViewModelTest {
             )
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.selectedNodes.size).isEqualTo(2)
-                Truth.assertThat(state.selectedNodes.filter { it is FileNode }.size).isEqualTo(1)
+                assertThat(state.selectedNodes.size).isEqualTo(2)
+                assertThat(state.selectedNodes.filter { it is FileNode }.size).isEqualTo(1)
             }
             underTest.onItemClicked(
                 NodeUIItem(
@@ -202,8 +202,47 @@ class SearchActivityViewModelTest {
             )
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.selectedNodes.size).isEqualTo(1)
-                Truth.assertThat(state.selectedNodes.any { it is FileNode }).isFalse()
+                assertThat(state.selectedNodes.size).isEqualTo(1)
+                assertThat(state.selectedNodes.any { it is FileNode }).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that setting a type filter will change the filter state`() =
+        runTest {
+            val type = TypeFilterOption.Images
+            underTest.setTypeSelectedFilterOption(type)
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.typeSelectedFilterOption).isEqualTo(type)
+                assertThat(state.dateModifiedSelectedFilterOption).isEqualTo(null)
+                assertThat(state.dateAddedSelectedFilterOption).isEqualTo(null)
+            }
+        }
+
+    @Test
+    fun `test that setting a date modified filter will change the filter state`() =
+        runTest {
+            val date = DateFilterOption.Today
+            underTest.setDateModifiedSelectedFilterOption(date)
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.typeSelectedFilterOption).isEqualTo(null)
+                assertThat(state.dateModifiedSelectedFilterOption).isEqualTo(date)
+                assertThat(state.dateAddedSelectedFilterOption).isEqualTo(null)
+            }
+        }
+
+    @Test
+    fun `test that setting a date added filter will change the filter state`() =
+        runTest {
+            val date = DateFilterOption.Older
+            underTest.setDateAddedSelectedFilterOption(date)
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.typeSelectedFilterOption).isEqualTo(null)
+                assertThat(state.dateModifiedSelectedFilterOption).isEqualTo(null)
+                assertThat(state.dateAddedSelectedFilterOption).isEqualTo(date)
             }
         }
 
@@ -240,8 +279,8 @@ class SearchActivityViewModelTest {
             underTest.updateFilter(filter)
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.selectedFilter).isEqualTo(filter)
-                Truth.assertThat(state.searchItemList.size).isEqualTo(2)
+                assertThat(state.selectedFilter).isEqualTo(filter)
+                assertThat(state.searchItemList.size).isEqualTo(2)
             }
         }
 
@@ -280,8 +319,8 @@ class SearchActivityViewModelTest {
             underTest.updateSearchQuery(query)
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.searchQuery).isEqualTo(query)
-                Truth.assertThat(state.searchItemList.size).isEqualTo(nodeList.size)
+                assertThat(state.searchQuery).isEqualTo(query)
+                assertThat(state.searchItemList.size).isEqualTo(nodeList.size)
             }
         }
 
@@ -307,8 +346,8 @@ class SearchActivityViewModelTest {
             underTest.updateFilter(filter)
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.selectedFilter).isEqualTo(filter)
-                Truth.assertThat(state.searchItemList).isEmpty()
+                assertThat(state.selectedFilter).isEqualTo(filter)
+                assertThat(state.searchItemList).isEmpty()
             }
         }
 
@@ -319,12 +358,12 @@ class SearchActivityViewModelTest {
             underTest.showShowErrorMessage(errorMessageId)
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.errorMessageId).isEqualTo(errorMessageId)
+                assertThat(state.errorMessageId).isEqualTo(errorMessageId)
             }
             underTest.errorMessageShown()
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.errorMessageId).isNull()
+                assertThat(state.errorMessageId).isNull()
             }
         }
 
@@ -354,17 +393,17 @@ class SearchActivityViewModelTest {
             underTest.updateSearchQuery(query)
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.searchQuery).isEqualTo(query)
-                Truth.assertThat(state.searchItemList.size).isEqualTo(2)
-                Truth.assertThat(state.selectedNodes).isEmpty()
+                assertThat(state.searchQuery).isEqualTo(query)
+                assertThat(state.searchItemList.size).isEqualTo(2)
+                assertThat(state.selectedNodes).isEmpty()
                 underTest.selectAll()
                 val selectAllState = awaitItem()
-                Truth.assertThat(selectAllState.selectedNodes).contains(typedFileNode)
-                Truth.assertThat(selectAllState.selectedNodes).contains(typedFolderNode)
-                Truth.assertThat(selectAllState.selectedNodes.size).isEqualTo(2)
+                assertThat(selectAllState.selectedNodes).contains(typedFileNode)
+                assertThat(selectAllState.selectedNodes).contains(typedFolderNode)
+                assertThat(selectAllState.selectedNodes.size).isEqualTo(2)
                 underTest.clearSelection()
                 val clearedState = awaitItem()
-                Truth.assertThat(clearedState.selectedNodes.size).isEqualTo(0)
+                assertThat(clearedState.selectedNodes.size).isEqualTo(0)
             }
         }
 

@@ -80,6 +80,7 @@ dependencies {
     implementation(google.material)
     implementation(google.accompanist.systemui)
     implementation(google.accompanist.permissions)
+    implementation(google.accompanist.navigationmaterial)
     implementation(androidx.compose.activity)
     implementation(androidx.lifecycle.runtime)
     implementation(androidx.lifecycle.runtime.compose)
