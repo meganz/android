@@ -52,6 +52,7 @@ fun Chip(
     onClick: () -> Unit = {},
     enabled: Boolean = true,
     onClickLabel: String? = null,
+    shape: RoundedCornerShape = RoundedCornerShape(8.dp),
     content: @Composable RowScope.() -> Unit,
 ) {
     val backgroundColor = style.colors().backgroundColor(
@@ -72,7 +73,7 @@ fun Chip(
     Surface(
         modifier = modifier
             .height(40.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .clip(shape)
             .selectable(
                 selected = selected,
                 enabled = enabled,
@@ -82,7 +83,7 @@ fun Chip(
                 this.contentDescription = contentDescription
                 this.onClick(label = onClickLabel) { onClick(); true }
             },
-        shape = RoundedCornerShape(8.dp),
+        shape = shape,
         color = backgroundColor,
         border = borderStroke,
     ) {

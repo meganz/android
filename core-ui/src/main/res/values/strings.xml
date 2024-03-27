@@ -18,4 +18,5 @@
     <string name="error_message_voice_clip"/>
     <string name="general_allow"/>
     <string name="chat_microphone_permissions_denied_for_voice_clip"/>
+    <string name="context_send"/>
 </resources>
