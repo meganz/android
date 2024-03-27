@@ -313,6 +313,14 @@ interface FileSystemRepository {
     suspend fun createNewImageUri(fileName: String): String?
 
     /**
+     * Create new video uri
+     *
+     * @param fileName file name
+     * @return uri string
+     */
+    suspend fun createNewVideoUri(fileName: String): String?
+
+    /**
      * @return true if the [uriString] represents a file Uri
      */
     suspend fun isFileUri(uriString: String): Boolean

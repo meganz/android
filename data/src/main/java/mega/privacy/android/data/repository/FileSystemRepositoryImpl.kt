@@ -527,6 +527,10 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         fileGateway.createNewImageUri(fileName)?.toString()
     }
 
+    override suspend fun createNewVideoUri(fileName: String): String? = withContext(ioDispatcher) {
+        fileGateway.createNewVideoUri(fileName)?.toString()
+    }
+
     override suspend fun isFileUri(uriString: String) = withContext(ioDispatcher) {
         fileGateway.isFileUri(uriString)
     }

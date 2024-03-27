@@ -248,6 +248,13 @@ interface FileGateway {
     suspend fun createNewImageUri(fileName: String): Uri?
 
     /**
+     * Create new video uri
+     *
+     * @param fileName
+     */
+    suspend fun createNewVideoUri(fileName: String): Uri?
+
+    /**
      * @return true if the [uriString] represents a file Uri
      */
     suspend fun isFileUri(uriString: String): Boolean

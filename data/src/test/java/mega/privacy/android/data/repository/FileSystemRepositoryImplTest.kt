@@ -385,6 +385,16 @@ internal class FileSystemRepositoryImplTest {
             assertThat(underTest.createNewImageUri("name")).isEqualTo("uri")
         }
 
+    @Test
+    fun `test that create new video uri returns correct value`() =
+        runTest {
+            val uri = mock<Uri> {
+                on { toString() } doReturn "uri"
+            }
+            whenever(fileGateway.createNewVideoUri(any())).thenReturn(uri)
+            assertThat(underTest.createNewVideoUri("name")).isEqualTo("uri")
+        }
+
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
     fun `test that isContentUri returns correct value`(
