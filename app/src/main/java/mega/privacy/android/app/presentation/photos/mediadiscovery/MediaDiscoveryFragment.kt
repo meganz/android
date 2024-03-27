@@ -126,6 +126,11 @@ class MediaDiscoveryFragment : Fragment() {
 
     private fun onModalSheetVisibilityChange(isVisible: Boolean) {
         managerActivity?.showHideBottomNavigationView(hide = isVisible)
+        if (isVisible) {
+            managerActivity?.hideAdsView()
+        } else {
+            managerActivity?.showAdsView()
+        }
     }
 
     private fun onUploadFiles() {

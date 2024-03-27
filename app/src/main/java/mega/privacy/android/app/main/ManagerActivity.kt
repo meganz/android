@@ -8957,7 +8957,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         adsViewModel.onAdConsumed()
     }
 
-    private fun showAdsView() {
+    fun showAdsView() {
         adsComposeView.isVisible = true
     }
 
