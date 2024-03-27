@@ -1,9 +1,5 @@
 package mega.privacy.android.app.activities
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -15,8 +11,6 @@ import androidx.lifecycle.Lifecycle
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.constants.BroadcastConstants
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME
 import mega.privacy.android.app.databinding.ActivityManageChatHistoryBinding
 import mega.privacy.android.app.listeners.SetRetentionTimeListener
 import mega.privacy.android.app.presentation.meeting.managechathistory.ManageChatHistoryViewModel
@@ -71,18 +65,6 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
         }
     }
 
-    private val retentionTimeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == null || intent.action != ACTION_UPDATE_RETENTION_TIME) {
-                return
-            }
-
-            val seconds =
-                intent.getLongExtra(BroadcastConstants.RETENTION_TIME, DISABLED_RETENTION_TIME)
-            updateRetentionTimeUI(seconds)
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -119,11 +101,6 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
 
         monitorUpdates(chatId)
         collectFlows()
-
-        registerReceiver(
-            retentionTimeReceiver,
-            IntentFilter(ACTION_UPDATE_RETENTION_TIME)
-        )
 
         binding = ActivityManageChatHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -548,10 +525,5 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
             onBackPressedDispatcher.onBackPressed()
 
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onDestroy() {
-        unregisterReceiver(retentionTimeReceiver)
-        super.onDestroy()
     }
 }
