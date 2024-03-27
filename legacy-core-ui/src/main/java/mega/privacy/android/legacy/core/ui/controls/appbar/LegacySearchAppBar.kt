@@ -20,9 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -31,7 +30,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -234,13 +232,8 @@ fun ExpandedSearchAppBar(
             )
         )
 
-        val windowInfo = LocalWindowInfo.current
-        LaunchedEffect(windowInfo) {
-            snapshotFlow { windowInfo.isWindowFocused }.collect { isWindowFocused ->
-                if (isWindowFocused) {
-                    focusRequester.requestFocus()
-                }
-            }
+        SideEffect {
+            focusRequester.requestFocus()
         }
     }
 }
