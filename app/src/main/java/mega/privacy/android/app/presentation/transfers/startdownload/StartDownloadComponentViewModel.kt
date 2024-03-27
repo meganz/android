@@ -31,7 +31,6 @@ import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
-import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
@@ -73,7 +72,6 @@ internal class StartDownloadComponentViewModel @Inject constructor(
     private val saveDoNotPromptToSaveDestinationUseCase: SaveDoNotPromptToSaveDestinationUseCase,
     private val setStorageDownloadAskAlwaysUseCase: SetStorageDownloadAskAlwaysUseCase,
     private val setStorageDownloadLocationUseCase: SetStorageDownloadLocationUseCase,
-    private val getExternalPathByContentUriUseCase: GetExternalPathByContentUriUseCase,
     private val monitorActiveTransferFinishedUseCase: MonitorActiveTransferFinishedUseCase,
 ) : ViewModel() {
 
@@ -171,12 +169,10 @@ internal class StartDownloadComponentViewModel @Inject constructor(
         destinationUri: Uri,
     ) {
         viewModelScope.launch {
-            getExternalPathByContentUriUseCase(destinationUri.toString())?.let { destination ->
-                startDownloadNodes(startDownloadNode, destination)
-                if (shouldPromptToSaveDestinationUseCase()) {
-                    _uiState.update {
-                        it.copy(promptSaveDestination = triggered(destination))
-                    }
+            startDownloadNodes(startDownloadNode, destinationUri.toString())
+            if (shouldPromptToSaveDestinationUseCase()) {
+                _uiState.update {
+                    it.copy(promptSaveDestination = triggered(destinationUri.toString()))
                 }
             }
         }

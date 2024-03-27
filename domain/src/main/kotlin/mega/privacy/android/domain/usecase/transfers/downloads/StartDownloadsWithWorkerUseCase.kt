@@ -12,6 +12,8 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceForNodesUseCase
+import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
+import mega.privacy.android.domain.usecase.file.IsExternalStorageContentUriUseCase
 import mega.privacy.android.domain.usecase.transfers.shared.AbstractStartTransfersWithWorkerUseCase
 import java.io.File
 import javax.inject.Inject
@@ -30,6 +32,8 @@ class StartDownloadsWithWorkerUseCase @Inject constructor(
     private val transferRepository: TransferRepository,
     private val startDownloadWorkerUseCase: StartDownloadWorkerUseCase,
     private val isDownloadsWorkerStartedUseCase: IsDownloadsWorkerStartedUseCase,
+    private val getExternalPathByContentUriUseCase: GetExternalPathByContentUriUseCase,
+    private val isExternalStorageContentUriUseCase: IsExternalStorageContentUriUseCase,
     cancelCancelTokenUseCase: CancelCancelTokenUseCase,
 ) : AbstractStartTransfersWithWorkerUseCase(
     cancelCancelTokenUseCase,
@@ -50,26 +54,40 @@ class StartDownloadsWithWorkerUseCase @Inject constructor(
         if (destinationPath.isEmpty()) {
             return nodes.asFlow().map { MultiTransferEvent.TransferNotStarted(it.id, null) }
         }
-        //wrap the startDownloadFlow to be able to execute suspended functions
+        //wrap the downloadNodesUseCase flow to be able to execute suspended functions
         return flow {
             val appData: TransferAppData?
-            val finalDestinationPath = if (fileSystemRepository.isSDCardPath(destinationPath)) {
-                appData = TransferAppData.SdCardDownload(destinationPath, null)
-                transferRepository.getOrCreateSDCardTransfersCacheFolder()?.path?.plus(File.separator)
-                    ?: run {
-                        nodes.forEach {
-                            emit(
-                                MultiTransferEvent.TransferNotStarted(
-                                    it.id,
-                                    LocalStorageException(null, null)
-                                )
-                            )
-                        }
-                        return@flow
-                    }
-            } else {
-                appData = null
-                destinationPath
+            val finalDestinationPath: String?
+            when {
+                isExternalStorageContentUriUseCase(destinationPath) -> {
+                    appData = null
+                    finalDestinationPath = getExternalPathByContentUriUseCase(destinationPath)
+                }
+
+                fileSystemRepository.isSDCardPath(destinationPath)
+                        || fileSystemRepository.isContentUri(destinationPath) -> {
+                    finalDestinationPath =
+                        transferRepository.getOrCreateSDCardTransfersCacheFolder()?.path?.plus(File.separator)
+
+                    appData =
+                        TransferAppData.SdCardDownload(finalDestinationPath ?: "", destinationPath)
+                }
+
+                else -> {
+                    appData = null
+                    finalDestinationPath = destinationPath
+                }
+            }
+            if (finalDestinationPath == null) {
+                nodes.forEach {
+                    emit(
+                        MultiTransferEvent.TransferNotStarted(
+                            it.id,
+                            LocalStorageException(null, null)
+                        )
+                    )
+                }
+                return@flow
             }
             fileSystemRepository.createDirectory(finalDestinationPath)
             if (!doesPathHaveSufficientSpaceForNodesUseCase(finalDestinationPath, nodes)) {

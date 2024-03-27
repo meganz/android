@@ -21,6 +21,8 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.file.DoesPathHaveSufficientSpaceForNodesUseCase
+import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
+import mega.privacy.android.domain.usecase.file.IsExternalStorageContentUriUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -52,6 +54,8 @@ class StartDownloadsWithWorkerUseCaseTest {
     private val isDownloadsWorkerStartedUseCase: IsDownloadsWorkerStartedUseCase =
         mock()
     private val transferRepository = mock<TransferRepository>()
+    private val getExternalPathByContentUriUseCase = mock<GetExternalPathByContentUriUseCase>()
+    private val isExternalStorageContentUriUseCase = mock<IsExternalStorageContentUriUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -63,7 +67,9 @@ class StartDownloadsWithWorkerUseCaseTest {
                 startDownloadWorkerUseCase = startDownloadWorkerUseCase,
                 isDownloadsWorkerStartedUseCase = isDownloadsWorkerStartedUseCase,
                 cancelCancelTokenUseCase = cancelCancelTokenUseCase,
-                transferRepository = transferRepository
+                transferRepository = transferRepository,
+                getExternalPathByContentUriUseCase = getExternalPathByContentUriUseCase,
+                isExternalStorageContentUriUseCase = isExternalStorageContentUriUseCase,
             )
     }
 
@@ -77,13 +83,16 @@ class StartDownloadsWithWorkerUseCaseTest {
             startDownloadWorkerUseCase,
             isDownloadsWorkerStartedUseCase,
             transferRepository,
+            getExternalPathByContentUriUseCase,
         )
         commonStub()
     }
 
     private suspend fun commonStub() {
         whenever(fileSystemRepository.isSDCardPath(any())).thenReturn(false)
+        whenever(fileSystemRepository.isContentUri(any())).thenReturn(false)
         whenever(doesPathHaveSufficientSpaceForNodesUseCase(any(), any())).thenReturn(true)
+        whenever(isExternalStorageContentUriUseCase(any())).thenReturn(false)
     }
 
     @Test
@@ -199,13 +208,16 @@ class StartDownloadsWithWorkerUseCaseTest {
 
     @Test
     fun `test that an exception is thrown when download node throws an exception`() = runTest {
+        class TestError : RuntimeException("test")
+
+        val expectedError = TestError()
         mockFlow(
             flow {
-                throw (RuntimeException())
+                throw (expectedError)
             }
         )
         underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
-            awaitError()
+            assertThat(awaitError()).isInstanceOf(TestError::class.java)
         }
     }
 
@@ -239,21 +251,39 @@ class StartDownloadsWithWorkerUseCaseTest {
     }
 
     @Test
-    fun `test that app data is set with original path when download points to sd`() = runTest {
-        val cachePath = "cachePath"
-        val expectedAppData = TransferAppData.SdCardDownload(DESTINATION_PATH_FOLDER, null)
-        whenever(
-            downloadNodesUseCase(any(), any(), anyOrNull(), any())
-        ).thenAnswer { emptyFlow<MultiTransferEvent>() }
-        whenever(fileSystemRepository.isSDCardPath(DESTINATION_PATH_FOLDER)).thenReturn(true)
-        whenever(transferRepository.getOrCreateSDCardTransfersCacheFolder())
-            .thenReturn(File(cachePath))
-        underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
-            awaitComplete()
+    fun `test that destination is set by getExternalPathByContentUriUseCase when download points to external storage path`() =
+        runTest {
+            val cachePath = "cachePath"
+            whenever(
+                downloadNodesUseCase(any(), any(), anyOrNull(), any())
+            ).thenAnswer { emptyFlow<MultiTransferEvent>() }
+            whenever(isExternalStorageContentUriUseCase(DESTINATION_PATH_FOLDER)).thenReturn(true)
+            whenever(getExternalPathByContentUriUseCase(DESTINATION_PATH_FOLDER))
+                .thenReturn(cachePath)
+            underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
+                awaitComplete()
+            }
+            verify(downloadNodesUseCase)
+                .invoke(any(), eq(cachePath), anyOrNull(), any())
         }
-        verify(downloadNodesUseCase)
-            .invoke(any(), anyOrNull(), eq(expectedAppData), any())
-    }
+
+    @Test
+    fun `test that app data is set with correct target path and uri when download points to sd`() =
+        runTest {
+            val cachePath = "cachePath/"
+            val expectedAppData = TransferAppData.SdCardDownload(cachePath, DESTINATION_PATH_FOLDER)
+            whenever(
+                downloadNodesUseCase(any(), any(), anyOrNull(), any())
+            ).thenAnswer { emptyFlow<MultiTransferEvent>() }
+            whenever(fileSystemRepository.isSDCardPath(DESTINATION_PATH_FOLDER)).thenReturn(true)
+            whenever(transferRepository.getOrCreateSDCardTransfersCacheFolder())
+                .thenReturn(File(cachePath))
+            underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
+                awaitComplete()
+            }
+            verify(downloadNodesUseCase)
+                .invoke(any(), anyOrNull(), eq(expectedAppData), any())
+        }
 
     private fun mockNodes() = nodeIds.map { mock<TypedFileNode>() }
 

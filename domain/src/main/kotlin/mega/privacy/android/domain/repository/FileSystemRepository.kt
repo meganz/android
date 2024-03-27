@@ -296,13 +296,12 @@ interface FileSystemRepository {
     suspend fun isSDCardCachePath(localPath: String): Boolean
 
     /**
-     * Moves a [file] to a [targetPath] on the sd. It first copies the file to the [targetPath] and then deletes the original one
+     * Moves a [file] to a [destinationUri] on the sd. It first copies the file to the [destinationUri] and then deletes the original one
      *
      * @param file the file to be moved
-     * @param targetPath the target path where the file will be moved (excluding the name of the file itself)
-     * @param sdCardUriString an uri pointing to the Sd card for permission reasons. It should point the same path than [targetPath] or an ancestor in its folder hierarchy. In android we can't access the Sd card directly (except cache folder)
+     * @param destinationUri the target uri where the file will be moved (excluding the name of the file itself)
      */
-    suspend fun moveFileToSd(file: File, targetPath: String, sdCardUriString: String): Boolean
+    suspend fun moveFileToSd(file: File, destinationUri: String, subFolders: List<String>): Boolean
 
     /**
      * Create new image uri

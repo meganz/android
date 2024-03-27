@@ -4,25 +4,22 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.transfer.DestinationUriAndSubFolders
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.repository.FileSystemRepository
-import mega.privacy.android.domain.repository.TransferRepository
-import mega.privacy.android.domain.usecase.transfers.downloads.GetOrCreateStorageDownloadLocationUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import java.io.File
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -31,11 +28,9 @@ class HandleSDCardEventUseCaseTest {
 
     private val insertSdTransferUseCase = mock<InsertSdTransferUseCase>()
     private val deleteSdTransferByTagUseCase = mock<DeleteSdTransferByTagUseCase>()
-    val getOrCreateStorageDownloadLocationUseCase =
-        mock<GetOrCreateStorageDownloadLocationUseCase>()
     private val moveFileToSdCardUseCase = mock<MoveFileToSdCardUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
-    private val transfersRepository = mock<TransferRepository>()
+    private val getTransferDestinationUriUseCase = mock<GetTransferDestinationUriUseCase>()
 
     private val scope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -45,10 +40,9 @@ class HandleSDCardEventUseCaseTest {
         underTest = HandleSDCardEventUseCase(
             insertSdTransferUseCase,
             deleteSdTransferByTagUseCase,
-            getOrCreateStorageDownloadLocationUseCase,
             moveFileToSdCardUseCase,
             fileSystemRepository,
-            transfersRepository,
+            getTransferDestinationUriUseCase,
             scope,
         )
     }
@@ -58,10 +52,9 @@ class HandleSDCardEventUseCaseTest {
         reset(
             insertSdTransferUseCase,
             deleteSdTransferByTagUseCase,
-            getOrCreateStorageDownloadLocationUseCase,
             moveFileToSdCardUseCase,
             fileSystemRepository,
-            transfersRepository,
+            getTransferDestinationUriUseCase,
         )
     }
 
@@ -78,34 +71,12 @@ class HandleSDCardEventUseCaseTest {
         runTest {
             val transfer = mockTransfer()
             whenever(fileSystemRepository.isSDCardCachePath(any())).thenReturn(true)
-            whenever(transfer.isRootTransfer).thenReturn(true)
+            val subFolders = mock<List<String>>()
+            whenever(getTransferDestinationUriUseCase(transfer))
+                .thenReturn(DestinationUriAndSubFolders(TARGET_PATH, subFolders))
             val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
             underTest(transferEvent)
-            verify(moveFileToSdCardUseCase).invoke(any(), eq(TARGET_PATH))
-        }
-
-    @Test
-    fun `test that file is moved to the destination specified by its own path in the sd saved path when no root transfer is finished`() =
-        runTest {
-            val transfer = mockTransfer()
-            val sdPath = "sdPath"
-            val cachePath = "cachePath"
-            val destination = "someFolder"
-            val fileName = "finalFile.txt"
-            val fileLocalPath = "$cachePath/$destination/$fileName"
-            val expectedPath = "$sdPath/$destination"
-            val cacheFolder = mock<File> {
-                on { path } doReturn cachePath
-            }
-            whenever(transfer.isRootTransfer).thenReturn(false)
-            whenever(transfer.localPath).thenReturn(fileLocalPath)
-            whenever(fileSystemRepository.isSDCardCachePath(any())).thenReturn(true)
-            whenever(transfersRepository.getOrCreateSDCardTransfersCacheFolder())
-                .thenReturn(cacheFolder)
-            whenever(getOrCreateStorageDownloadLocationUseCase()).thenReturn(sdPath)
-            val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
-            underTest(transferEvent)
-            verify(moveFileToSdCardUseCase).invoke(eq(File(fileLocalPath)), eq(expectedPath))
+            verify(moveFileToSdCardUseCase).invoke(any(), eq(TARGET_PATH), eq(subFolders))
         }
 
     @Test
