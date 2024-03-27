@@ -1002,4 +1002,15 @@ interface ChatRepository {
         divider: Long?,
         numClientsPerUser: Long?,
     )
+
+    /**
+     * Set the chat's retention time
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param period retention timeframe in seconds, after which older messages in the chat are automatically deleted
+     */
+    suspend fun setChatRetentionTime(
+        chatId: Long,
+        period: Long,
+    )
 }

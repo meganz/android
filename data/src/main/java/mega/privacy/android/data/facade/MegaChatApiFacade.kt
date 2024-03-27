@@ -858,4 +858,12 @@ internal class MegaChatApiFacade @Inject constructor(
     override suspend fun removeFailedMessage(chatId: Long, rowId: Long) {
         chatApi.removeUnsentMessage(chatId, rowId)
     }
+
+    override fun setChatRetentionTime(
+        chatId: Long,
+        period: Long,
+        listener: MegaChatRequestListenerInterface,
+    ) {
+        chatApi.setChatRetentionTime(chatId, period, listener)
+    }
 }

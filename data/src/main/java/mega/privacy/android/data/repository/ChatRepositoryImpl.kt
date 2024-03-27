@@ -131,7 +131,6 @@ import kotlin.coroutines.suspendCoroutine
  * @property databaseHandler
  * @property chatStorageGateway
  * @property typedMessageEntityMapper
- * @property messagePagingInfoMapper
  * @property richPreviewEntityMapper
  * @property giphyEntityMapper
  * @property chatGeolocationEntityMapper
@@ -574,15 +573,6 @@ internal class ChatRepositoryImpl @Inject constructor(
                 MegaChatApi.CHAT_OPTION_WAITING_ROOM,
                 chatOptionsBitMask
             )
-        }
-
-    private fun onRequestQueryChatLinkCompleted(continuation: Continuation<ChatRequest>) =
-        { request: MegaChatRequest, error: MegaChatError ->
-            if (error.errorCode == MegaChatError.ERROR_OK || error.errorCode == MegaChatError.ERROR_NOENT) {
-                continuation.resumeWith(Result.success(chatRequestMapper(request)))
-            } else {
-                continuation.failWithError(error, "onRequestQueryChatLinkCompleted")
-            }
         }
 
     override suspend fun inviteContact(email: String): InviteContactRequest =
@@ -1381,4 +1371,23 @@ internal class ChatRepositoryImpl @Inject constructor(
             continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
         }
     }
+
+    override suspend fun setChatRetentionTime(chatId: Long, period: Long) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getChatRequestListener("setChatRetentionTime") {
+                    Timber.d("Establish the retention time successfully")
+                }
+                megaChatApiGateway.setChatRetentionTime(
+                    chatId = chatId,
+                    period = period,
+                    listener = listener
+                )
+                continuation.invokeOnCancellation {
+                    megaChatApiGateway.removeRequestListener(
+                        listener
+                    )
+                }
+            }
+        }
 }

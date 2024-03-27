@@ -1126,7 +1126,7 @@ class ChatRepositoryImplTest {
 
     @Test
     internal fun `test that message updates are returned for monitor message updates`() = runTest {
-        val updates = listOf<ChatRoomUpdate>(
+        val updates = listOf(
             ChatRoomUpdate.OnHistoryTruncatedByRetentionTime(mock()),
             ChatRoomUpdate.OnMessageLoaded(mock()),
             ChatRoomUpdate.OnMessageReceived(mock()),
@@ -1147,5 +1147,28 @@ class ChatRepositoryImplTest {
             val events = cancelAndConsumeRemainingEvents()
             assertThat(events).hasSize(updates.size)
         }
+    }
+
+    @Test
+    fun `test that the chat's retention time is set with correct parameters`() = runTest {
+        val chatId = 123L
+        val period = 321L
+        whenever(
+            megaChatApiGateway.setChatRetentionTime(
+                eq(chatId),
+                eq(period),
+                any()
+            )
+        ).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                megaChatErrorSuccess,
+            )
+        }
+
+        underTest.setChatRetentionTime(chatId, period)
+
+        verify(megaChatApiGateway).setChatRetentionTime(eq(chatId), eq(period), any())
     }
 }

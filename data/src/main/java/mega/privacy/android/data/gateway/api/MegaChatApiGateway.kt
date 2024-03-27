@@ -1389,7 +1389,7 @@ interface MegaChatApiGateway {
      * It automatically disconnect to this chat, remove all internal data related, and make
      * a cache cleanup in order to clean all the related records.
      *
-     * @param chatid MegaChatHandle that identifies the chat room
+     * @param chatId MegaChatHandle that identifies the chat room
      */
     suspend fun closeChatPreview(chatId: Long)
 
@@ -1844,4 +1844,25 @@ interface MegaChatApiGateway {
      * @param rowId
      */
     suspend fun removeFailedMessage(chatId: Long, rowId: Long)
+
+    /**
+     * This function allows a logged in operator/moderator to specify a message retention
+     * timeframe in seconds, after which older messages in the chat are automatically deleted.
+     * In order to disable the feature, the period of time can be set to zero (infinite).
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_SET_RETENTION_TIME
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     * - MegaChatRequest::getNumber - Returns the retention timeframe in seconds
+     *
+     * On the onRequestFinish error, the error code associated to the MegaChatError can be:
+     * - MegaChatError::ERROR_ARGS - If the chatId is invalid
+     * - MegaChatError::ERROR_NOENT - If there isn't any chat with the specified chatId.
+     * - MegaChatError::ERROR_ACCESS - If the logged in user doesn't have operator privileges
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param period retention timeframe in seconds, after which older messages in the chat are automatically deleted
+     * @param listener MegaChatRequestListener to track this request. This is an optional parameter
+     */
+    fun setChatRetentionTime(chatId: Long, period: Long, listener: MegaChatRequestListenerInterface)
 }
