@@ -41,6 +41,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.components.transferWidget.TransfersWidgetView
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.globalmanagement.TransfersManagement
@@ -221,79 +222,80 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             val bottomSheetNavigator = rememberBottomSheetNavigator()
             val navHostController = rememberNavController(bottomSheetNavigator)
             val coroutineScope = rememberCoroutineScope()
-
-            MegaAppTheme(isDark = themeMode.isDarkMode()) {
-                MegaScaffold(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .systemBarsPadding()
-                        .imePadding(),
-                    scaffoldState = scaffoldState,
-                    floatingActionButton = {
-                        AnimatedVisibility(
-                            visible = transferState.widgetVisible,
-                            enter = scaleIn(animationSpecs, initialScale = animationScale) +
-                                    fadeIn(animationSpecs),
-                            exit = scaleOut(animationSpecs, targetScale = animationScale) +
-                                    fadeOut(animationSpecs),
-                            modifier = Modifier.navigationBarsPadding(),
-                        ) {
-                            TransfersWidgetView(
-                                transfersData = transferState.transfersInfo,
-                                onClick = ::transfersWidgetClicked,
-                            )
-                        }
-                    },
-                ) { padding ->
-                    ConstraintLayout(
+            SessionContainer {
+                MegaAppTheme(isDark = themeMode.isDarkMode()) {
+                    MegaScaffold(
                         modifier = Modifier
-                            .padding(padding)
                             .fillMaxSize()
-                    ) {
-                        val (audioPlayer, searchContainer) = createRefs()
-                        MiniAudioPlayerView(
+                            .systemBarsPadding()
+                            .imePadding(),
+                        scaffoldState = scaffoldState,
+                        floatingActionButton = {
+                            AnimatedVisibility(
+                                visible = transferState.widgetVisible,
+                                enter = scaleIn(animationSpecs, initialScale = animationScale) +
+                                        fadeIn(animationSpecs),
+                                exit = scaleOut(animationSpecs, targetScale = animationScale) +
+                                        fadeOut(animationSpecs),
+                                modifier = Modifier.navigationBarsPadding(),
+                            ) {
+                                TransfersWidgetView(
+                                    transfersData = transferState.transfersInfo,
+                                    onClick = ::transfersWidgetClicked,
+                                )
+                            }
+                        },
+                    ) { padding ->
+                        ConstraintLayout(
                             modifier = Modifier
-                                .constrainAs(audioPlayer) {
-                                    bottom.linkTo(parent.bottom)
-                                }
-                                .fillMaxWidth(),
-                            lifecycle = lifecycle,
-                        )
+                                .padding(padding)
+                                .fillMaxSize()
+                        ) {
+                            val (audioPlayer, searchContainer) = createRefs()
+                            MiniAudioPlayerView(
+                                modifier = Modifier
+                                    .constrainAs(audioPlayer) {
+                                        bottom.linkTo(parent.bottom)
+                                    }
+                                    .fillMaxWidth(),
+                                lifecycle = lifecycle,
+                            )
 
-                        SearchNavHostController(
-                            modifier = Modifier
-                                .constrainAs(searchContainer) {
-                                    top.linkTo(parent.top)
-                                    bottom.linkTo(audioPlayer.top)
-                                    height = Dimension.fillToConstraints
-                                }
-                                .fillMaxWidth(),
-                            viewModel = viewModel,
-                            nodeActionsViewModel = nodeActionsViewModel,
-                            navigateToLink = ::navigateToLink,
-                            showSortOrderBottomSheet = ::showSortOrderBottomSheet,
-                            trackAnalytics = ::trackAnalytics,
-                            nodeActionHandler = bottomSheetActionHandler,
-                            navHostController = navHostController,
-                            bottomSheetNavigator = bottomSheetNavigator,
-                            listToStringWithDelimitersMapper = listToStringWithDelimitersMapper,
-                            handleClick = {
-                                coroutineScope.launch {
-                                    when (it) {
-                                        is TypedFileNode -> openFileClicked(it)
-                                        is TypedFolderNode -> openFolderClicked(it.id.longValue)
-                                        else -> Timber.e("Unsupported click")
+                            SearchNavHostController(
+                                modifier = Modifier
+                                    .constrainAs(searchContainer) {
+                                        top.linkTo(parent.top)
+                                        bottom.linkTo(audioPlayer.top)
+                                        height = Dimension.fillToConstraints
+                                    }
+                                    .fillMaxWidth(),
+                                viewModel = viewModel,
+                                nodeActionsViewModel = nodeActionsViewModel,
+                                navigateToLink = ::navigateToLink,
+                                showSortOrderBottomSheet = ::showSortOrderBottomSheet,
+                                trackAnalytics = ::trackAnalytics,
+                                nodeActionHandler = bottomSheetActionHandler,
+                                navHostController = navHostController,
+                                bottomSheetNavigator = bottomSheetNavigator,
+                                listToStringWithDelimitersMapper = listToStringWithDelimitersMapper,
+                                handleClick = {
+                                    coroutineScope.launch {
+                                        when (it) {
+                                            is TypedFileNode -> openFileClicked(it)
+                                            is TypedFolderNode -> openFolderClicked(it.id.longValue)
+                                            else -> Timber.e("Unsupported click")
+                                        }
+                                    }
+                                },
+                                onBackPressed = {
+                                    if (viewModel.state.value.selectedNodes.isNotEmpty()) {
+                                        viewModel.clearSelection()
+                                    } else {
+                                        onBackPressedDispatcher.onBackPressed()
                                     }
                                 }
-                            },
-                            onBackPressed = {
-                                if (viewModel.state.value.selectedNodes.isNotEmpty()) {
-                                    viewModel.clearSelection()
-                                } else {
-                                    onBackPressedDispatcher.onBackPressed()
-                                }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
 
