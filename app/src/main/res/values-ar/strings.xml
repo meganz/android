@@ -2913,12 +2913,6 @@
     <string name="error_remove_business_contact">لا يمكنك إزالة %1$s كجهة اتصال لأنها جزء من حساب الأعمال الخاص بك.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">حدثت مشكلة في الدفعة الأخيرة. يرجى الوصول إلى ميغا MEGA باستخدام متصفح سطح المكتب لمزيد من المعلومات.</string>
-    <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">الحساب غير مفعل</string>
-    <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">تم إلغاء تفعيل حساب الأعمال Business الخاص بك بسبب فشل الدفع. لن تتمكن من الوصول إلى البيانات المخزنة في حسابك. للقيام بالدفع وإعادة تفعيل اشتراكك، قم بتسجيل الدخول إلى ميغا MEGA من المتصفح.</string>
-    <!-- A message which is shown to sub-users of expired business accounts. -->
-    <string name="expired_user_business_text">حسابك [B]معلق[/B] حالياً. يمكنك فقط تصفح بياناتك.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
     <string name="camera_uploads_business_alert">لا يمكن لميغا MEGA الوصول إلى بياناتك. ومع ذلك، يمكن لمسؤول حساب الأعمال الوصول إلى ترفيعات الكاميرا الخاصة بك.</string>
     <!-- General label to alert user that somehting went wrong -->
@@ -3383,15 +3377,6 @@
     <string name="months_view_button">أشهر</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
     <string name="years_view_button">سنين</string>
-    <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
-    <plurals name="cu_upload_progress">
-        <item quantity="zero">جاري الترفيع، %1$d ملف معلق</item>
-        <item quantity="one">جاري الترفيع، %1$d ملف معلق</item>
-        <item quantity="two">جاري الترفيع، %1$d ملفان معلقان</item>
-        <item quantity="few">جاري الترفيع، %1$d ملفات معلقة</item>
-        <item quantity="many">جاري الترفيع، %1$d ملف معلق</item>
-        <item quantity="other">جاري الترفيع، %1$d ملف معلق</item>
-    </plurals>
     <!-- Text to show as production api server option -->
     <string name="production_api_server">Production</string>
     <!-- Title to show in a dialog to change api server -->
@@ -5616,8 +5601,6 @@
     <string name="account_upgrade_account_buy_button_title_pro_ii">اشتر برو Pro&#160;II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_iii">اشتر برو Pro&#160;III</string>
-    <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
-    <string name="account_upgrade_account_terms_of_service_link">شروط الخدمة</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
     <string name="cloud_drive_subtitle_link_access_password">يمكن فقط للأشخاص الذين لديهم كلمة المرور فتح الرابط</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
@@ -6210,6 +6193,7 @@
     <string name="account_upgrade_subscription_details">يتم تجديد الاشتراكات تلقائيًا لفترات اشتراك متتالية من نفس المدة وبنفس سعر الفترة الأولية المختارة. يمكنك إيقاف التجديد التلقائي لاشتراك ميغا برو MEGA&#160;Pro الخاص بك في موعد لا يتجاوز 24 ساعة قبل استحقاق دفعة الاشتراك التالية عبر الاشتراكات في [A]غوغل بلاي Google Play[/A].</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">السماح بالوصول إلى معرض الصور الخاص بك</string>
+    <!--  -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">منح اذن الوصول</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">التحديث مطلوب</string>
@@ -6272,7 +6256,7 @@
     <!-- Button text to change SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_action_button">تغيير</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
-    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">الباقات المجانية لها حد 60 دقيقة لكل اجتماع. [A]قم بالترقية الآن.[/A]</string>
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]باقتك المجانية لها حد 60 دقيقة للاجتماعات. يتمتع مستخدمو برو Pro بمكالمات غير محدودة وما يصل إلى 1000 مشارك.[/A] [B]قم بالترقية الآن.[/B]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_monthly_with_price">سيتم محاسبتك بمبلغ %1$s على الفور وسيتم تجديد اشتراكك تلقائيًا بعد 1&#160;شهر بمبلغ %2$s في الشهر. سيتم فرض رسوم على حساب غوغل بلاي Google&#160;Play الخاص بك للتجديد في غضون 24&#160;ساعة من نهاية كل فترة دفع. لإلغاء اشتراكك يجب عليك إيقاف التجديد التلقائي لاشتراك MEGA&#160;Pro ميغا برو الخاص بك قبل 24&#160;ساعة على الأقل من نهاية فترة الفاتورة عبر الاشتراكات في [A]غوغل بلاي Google&#160;Play[/A].\nمن خلال ترقية حسابك فإنك توافق على [B]شروط خدمة[/B] و [C]سياسة الخصوصية[/C] الخاصين بميغا MEGA.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
@@ -6313,7 +6297,42 @@
     <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
     <string name="notifications_screen_notification_promo_expiration_time">تنتهي الصلاحية في %1$s الساعة %2$s</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
-    <string name="meetings_free_call_organiser_number_of_participants_warning">[A]As a free user, you can only add up to 100 participants to this call. Need more?[/A]&#160;[B]Upgrade now[/B]</string>
+    <string name="meetings_free_call_organiser_number_of_participants_warning">Only 100 participants can join the call. Any additional participants will only be able to send and receive messages. The organiser can upgrade to Pro to remove these restrictions.</string>
     <!-- Warning Message for non organiser for Free Call -->
     <string name="meetings_free_call_non_organiser_number_of_participants_warning">يمكن لـ 100&#160;مشارك فقط الانضمام إلى المكالمة. لن يتمكن أي مشارك إضافي إلا من إرسال المحادثات وقراءتها. اطلب من المنظم إزالة هذا التقييد.</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_low">منخفضة</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Medium Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_medium">متوسط</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to High Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_high">عالية</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos are automatically uploaded by Camera Uploads without any Video Compression -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_original">الأصلي</string>
+    <!-- Warning shown when the recording of audio permission is required for sending a voice clip and it has been denied by the user -->
+    <string name="chat_microphone_permissions_denied_for_voice_clip">You denied MEGA access to your microphone. If you’d like to record a voice clip, allow MEGA permission to do so.</string>
+    <!-- Free plan limitation dialog title for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">لا يمكن الانضمام</string>
+    <!-- Free plan limitation dialogue description for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Only 100 participants can join the call. Any additional participants will only be able to send and receive messages. The organiser can upgrade to Pro to remove these restrictions.</string>
+    <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">حسنًا، فهمت ذلك</string>
+    <!-- The title of the hidden nodes feature -->
+    <string name="hidden_nodes">Hidden files and folders</string>
+    <!-- Hidden nodes benefit: hide files and folders -->
+    <string name="hidden_nodes_benefit_title_hide_files_folders">Hide important files and folders</string>
+    <!-- Hidden nodes benefit description: hide files and folders -->
+    <string name="hidden_nodes_benefit_description_hide_files_folders">You can conceal sensitive files and folders for privacy. Only you can reveal them, either individually or by temporarily displaying hidden items from the settings.</string>
+    <!-- Hidden nodes benefit: exclude from timeline -->
+    <string name="hidden_nodes_benefit_title_exclude_timeline">Exclude from Timeline</string>
+    <!-- Hidden nodes benefit description: exclude from timeline -->
+    <string name="hidden_nodes_benefit_description_exclude_timeline">Hidden items are only accessible through the Cloud drive and will not appear in your Photos, Albums or Recents.</string>
+    <!-- Hidden nodes benefit: out of sight -->
+    <string name="hidden_nodes_benefit_title_out_of_sight">Out of sight</string>
+    <!-- Hidden nodes benefit description: out of sight -->
+    <string name="hidden_nodes_benefit_description_out_of_sight">You decide when hidden files are visible. There is a new setting to show hidden items temporarily.</string>
+    <!-- The snackbar message of hidden nodes operation -->
+    <plurals name="hidden_nodes_result_message">
+        <item quantity="one">%1$d item hidden</item>
+        <item quantity="other">%1$d items hidden</item>
+    </plurals>
 </resources>

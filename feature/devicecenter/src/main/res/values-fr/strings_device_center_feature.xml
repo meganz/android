@@ -178,8 +178,9 @@
     </plurals>
     <!-- String which indicates the number of folders contained into a device/folder -->
     <plurals name="device_center_info_num_folders">
-        <item quantity="one">%1$d folder</item>
-        <item quantity="other">%1$d folders</item>
+        <item quantity="one">%1$d&#160;dossier</item>
+        <item quantity="many">%1$d de dossiers</item>
+        <item quantity="other">%1$d&#160;dossiers</item>
     </plurals>
     <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="device_center_info_num_folders_and_files">
