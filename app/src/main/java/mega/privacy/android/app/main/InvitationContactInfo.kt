@@ -2,6 +2,7 @@ package mega.privacy.android.app.main
 
 import android.graphics.Bitmap
 import android.os.Parcelable
+import androidx.annotation.ColorRes
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -12,7 +13,7 @@ import kotlinx.parcelize.Parcelize
  * @property type type of the contact info
  * @property filteredContactInfos Phone numbers and emails which don't exist on MEGA
  * @property displayInfo display info of the contact
- * @property avatarColor the avatar color of the contact
+ * @property avatarColorResId Contact's avatar color ID
  * @property handle the contact handle
  * @property bitmap the contact bitmap
  * @property isHighlighted indicates whether the contact is selected or not
@@ -24,7 +25,7 @@ data class InvitationContactInfo @JvmOverloads constructor(
     val type: Int = 0,
     val filteredContactInfos: List<String> = emptyList(),
     var displayInfo: String = "",
-    val avatarColor: Int = 0,
+    @ColorRes val avatarColorResId: Int = 0,
     val handle: String? = null,
     var bitmap: Bitmap? = null,
     var isHighlighted: Boolean = false,
@@ -54,7 +55,7 @@ data class InvitationContactInfo @JvmOverloads constructor(
     public override fun clone(): Any = super.clone()
 
     override fun toString(): String =
-        "\n{id=$id, isHighlighted=$isHighlighted, type=$type, bitmap=$bitmap, name='$name', displayInfo='$displayInfo', handle='$handle', avatarColor='$avatarColor'}"
+        "\n{id=$id, isHighlighted=$isHighlighted, type=$type, bitmap=$bitmap, name='$name', displayInfo='$displayInfo', handle='$handle', avatarColorResId='$avatarColorResId'}"
 
     companion object {
         /**
@@ -86,12 +87,12 @@ data class InvitationContactInfo @JvmOverloads constructor(
         fun createManualInput(
             inputString: String,
             type: Int,
-            avatarColor: Int,
+            @ColorRes avatarColorResId: Int,
         ) = InvitationContactInfo(
             id = inputString.hashCode().toLong(),
             type = type,
             displayInfo = inputString,
-            avatarColor = avatarColor
+            avatarColorResId = avatarColorResId
         )
     }
 }

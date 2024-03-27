@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
@@ -209,7 +210,8 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
             // create default one if unable to get user pre-set avatar
             if (bitmap == null) {
                 Timber.d("create default avatar as unable to get user pre-set one");
-                bitmap = getDefaultAvatar(contact.getAvatarColor(), contact.getContactName(), AVATAR_SIZE, true, false);
+                int avatarColor = ContextCompat.getColor(context, contact.getAvatarColorResId());
+                bitmap = getDefaultAvatar(avatarColor, contact.getContactName(), AVATAR_SIZE, true, false);
             }
             contact.setBitmap(bitmap);
             holder.imageView.setImageBitmap(bitmap);

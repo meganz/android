@@ -1,6 +1,7 @@
 package mega.privacy.android.app.main
 
 import android.content.Context
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,12 +14,17 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT_HEADER
 import mega.privacy.android.app.main.model.InviteContactFilterUiState
 import mega.privacy.android.app.main.model.InviteContactUiState
 import mega.privacy.android.app.utils.contacts.ContactsFilter
 import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.contact.FilterLocalContactsByEmailUseCase
+import mega.privacy.android.domain.usecase.contact.FilterPendingOrAcceptedLocalContactsByEmailUseCase
+import mega.privacy.android.domain.usecase.contact.GetLocalContactsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import timber.log.Timber
 import java.lang.ref.WeakReference
@@ -31,7 +37,11 @@ import javax.inject.Inject
 class InviteContactViewModel @Inject constructor(
     @ApplicationContext applicationContext: Context,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getLocalContactsUseCase: GetLocalContactsUseCase,
+    private val filterLocalContactsByEmailUseCase: FilterLocalContactsByEmailUseCase,
+    private val filterPendingOrAcceptedLocalContactsByEmailUseCase: FilterPendingOrAcceptedLocalContactsByEmailUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val context = WeakReference(applicationContext)
@@ -58,8 +68,11 @@ class InviteContactViewModel @Inject constructor(
     var allContacts: List<InvitationContactInfo> = emptyList()
         private set
 
+    private lateinit var currentSearchQuery: String
+
     init {
         getEnabledFeatures()
+        updateCurrentSearchQuery()
     }
 
     private fun getEnabledFeatures() {
@@ -75,6 +88,59 @@ class InviteContactViewModel @Inject constructor(
      * Check if given feature flag is enabled or not
      */
     fun isFeatureEnabled(feature: Feature) = uiState.value.enabledFeatureFlags.contains(feature)
+
+    /**
+     * Initialize the list of contacts
+     */
+    fun initializeContacts() = viewModelScope.launch {
+        runCatching {
+            localContactToInvitationContactInfo(getLocalContactsUseCase())
+        }.onSuccess { localContacts ->
+            initializeFilteredContacts(localContacts)
+            initializeAllContacts(_filterUiState.value.filteredContacts)
+            _uiState.update { it.copy(onContactsInitialized = true) }
+        }.onFailure {
+            Timber.e("Failed to get local contacts", it)
+        }
+    }
+
+    private suspend fun localContactToInvitationContactInfo(localContact: List<LocalContact>) =
+        buildList {
+            Timber.d("megaContactToContactInfo %s", localContact.size)
+
+            if (localContact.isEmpty()) return@buildList
+
+            add(
+                InvitationContactInfo(
+                    id = ID_PHONE_CONTACTS_HEADER,
+                    name = context.get()?.getString(R.string.contacts_phone).orEmpty(),
+                    type = TYPE_PHONE_CONTACT_HEADER
+                )
+            )
+
+            // Filter contacts if the emails exist in the MEGA contact
+            val filteredMEGAContactList = filterLocalContactsByEmailUseCase(localContact)
+
+            // Filter out pending contacts by email
+            val filteredPendingMEGAContactList =
+                filterPendingOrAcceptedLocalContactsByEmailUseCase(filteredMEGAContactList)
+
+            filteredPendingMEGAContactList.forEach {
+                val phoneNumberList = it.phoneNumbers + it.emails
+                if (phoneNumberList.isNotEmpty()) {
+                    add(
+                        InvitationContactInfo(
+                            id = it.id,
+                            name = it.name,
+                            type = TYPE_PHONE_CONTACT,
+                            filteredContactInfos = phoneNumberList,
+                            displayInfo = phoneNumberList[0],
+                            avatarColorResId = R.color.grey_500_grey_400
+                        )
+                    )
+                }
+            }
+        }
 
     /**
      * Initialize all available contacts. Keeping all contacts for records.
@@ -136,6 +202,21 @@ class InviteContactViewModel @Inject constructor(
     }
 
     /**
+     * Update current search query
+     */
+    fun onSearchQueryChange(query: String?) {
+        if (query == currentSearchQuery) return
+
+        savedStateHandle[CONTACT_SEARCH_QUERY] = query.orEmpty()
+        updateCurrentSearchQuery()
+        filterContacts(query.orEmpty())
+    }
+
+    private fun updateCurrentSearchQuery() {
+        currentSearchQuery = savedStateHandle.get<String>(key = CONTACT_SEARCH_QUERY).orEmpty()
+    }
+
+    /**
      * Filter contacts based on the given query
      *
      * @param query The user's input
@@ -193,7 +274,7 @@ class InviteContactViewModel @Inject constructor(
         displayLabel: String,
         nameWithoutSpace: String,
     ): Boolean {
-        if (type != InvitationContactInfo.TYPE_PHONE_CONTACT) return false
+        if (type != TYPE_PHONE_CONTACT) return false
 
         return query.isValid(name, displayLabel, nameWithoutSpace)
     }
@@ -204,10 +285,19 @@ class InviteContactViewModel @Inject constructor(
         nameWithoutSpace: String,
     ) = name.contains(this) || displayLabel.contains(this) || nameWithoutSpace.contains(this)
 
+    /**
+     * Reset the onContactsInitialized state
+     */
+    fun resetOnContactsInitializedState() {
+        _uiState.update { it.copy(onContactsInitialized = false) }
+    }
+
     companion object {
         /**
          * View's ID for the header
          */
         const val ID_PHONE_CONTACTS_HEADER = -1L
+
+        private const val CONTACT_SEARCH_QUERY = "CONTACT_SEARCH_QUERY"
     }
 }

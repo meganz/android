@@ -34,14 +34,15 @@ class FilterLocalContactsByEmailUseCase @Inject constructor(
         }
 
     private suspend fun filterOutExistingContactEmails(localContact: LocalContact): LocalContact {
-        val newEmailList = mutableListOf<String>()
+        val newEmailList = mutableListOf<String>().apply {
+            addAll(localContact.emails)
+        }
         contactsRepository.getAvailableContacts().forEach { user ->
             val filteredEmails = localContact.emails.filterNot { email ->
                 isAMegaContactByEmailUseCase(user, email)
             }
-            if (filteredEmails.isNotEmpty()) {
-                newEmailList.addAll(filteredEmails)
-            }
+            newEmailList.clear()
+            newEmailList.addAll(filteredEmails)
         }
 
         return LocalContact(

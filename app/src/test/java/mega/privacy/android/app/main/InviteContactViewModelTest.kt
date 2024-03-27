@@ -1,6 +1,7 @@
 package mega.privacy.android.app.main
 
 import android.content.Context
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
@@ -9,6 +10,10 @@ import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT_HEADER
 import mega.privacy.android.app.main.InviteContactViewModel.Companion.ID_PHONE_CONTACTS_HEADER
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.contacts.LocalContact
+import mega.privacy.android.domain.usecase.contact.FilterLocalContactsByEmailUseCase
+import mega.privacy.android.domain.usecase.contact.FilterPendingOrAcceptedLocalContactsByEmailUseCase
+import mega.privacy.android.domain.usecase.contact.GetLocalContactsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -32,15 +37,31 @@ class InviteContactViewModelTest {
 
     private val context: Context = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val getLocalContactsUseCase: GetLocalContactsUseCase = mock()
+    private val filterLocalContactsByEmailUseCase: FilterLocalContactsByEmailUseCase = mock()
+    private val filterPendingOrAcceptedLocalContactsByEmailUseCase: FilterPendingOrAcceptedLocalContactsByEmailUseCase =
+        mock()
+    private val defaultQuery = "defaultQuery"
+
+    private lateinit var savedStateHandle: SavedStateHandle
 
     @BeforeEach
     fun setup() = runTest {
         whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
 
+        savedStateHandle = SavedStateHandle(mapOf("CONTACT_SEARCH_QUERY" to defaultQuery))
+        initializeViewModel()
+    }
+
+    private fun initializeViewModel() {
         underTest = InviteContactViewModel(
             applicationContext = context,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            defaultDispatcher = extension.testDispatcher
+            defaultDispatcher = extension.testDispatcher,
+            getLocalContactsUseCase = getLocalContactsUseCase,
+            filterLocalContactsByEmailUseCase = filterLocalContactsByEmailUseCase,
+            filterPendingOrAcceptedLocalContactsByEmailUseCase = filterPendingOrAcceptedLocalContactsByEmailUseCase,
+            savedStateHandle = savedStateHandle
         )
     }
 
@@ -199,6 +220,134 @@ class InviteContactViewModelTest {
                         id = 126L,
                         type = TYPE_PHONE_CONTACT,
                         name = "query 1"
+                    )
+                )
+                assertThat(expectMostRecentItem().filteredContacts).isEqualTo(expected)
+            }
+        }
+
+    @Test
+    fun `test that no contacts emitted when no local contacts are available`() =
+        runTest {
+            whenever(context.getString(R.string.contacts_phone)).thenReturn("Phone contacts")
+            whenever(getLocalContactsUseCase()).thenReturn(emptyList())
+
+            underTest.initializeContacts()
+
+            underTest.filterUiState.test {
+                awaitItem() // Default value
+                expectNoEvents()
+            }
+        }
+
+    @ParameterizedTest
+    @MethodSource("provideLocalContactsWithAndWithoutPhoneNumbersAndEmail")
+    fun `test that the right list of mapped contact information is returned`(
+        localContacts: List<LocalContact>,
+    ) = runTest {
+        whenever(context.getString(R.string.contacts_phone)).thenReturn("Phone contacts")
+        whenever(getLocalContactsUseCase()).thenReturn(localContacts)
+        whenever(filterLocalContactsByEmailUseCase(localContacts)).thenReturn(localContacts)
+        whenever(filterPendingOrAcceptedLocalContactsByEmailUseCase(localContacts)).thenReturn(
+            localContacts
+        )
+
+        underTest.initializeContacts()
+
+        underTest.filterUiState.test {
+            val expected = mutableListOf<InvitationContactInfo>()
+            localContacts.forEach {
+                val phoneNumberList = it.phoneNumbers + it.emails
+                if (phoneNumberList.isNotEmpty()) {
+                    expected.add(
+                        InvitationContactInfo(
+                            id = it.id,
+                            name = it.name,
+                            type = TYPE_PHONE_CONTACT,
+                            filteredContactInfos = phoneNumberList,
+                            displayInfo = phoneNumberList[0],
+                            avatarColorResId = R.color.grey_500_grey_400
+                        )
+                    )
+                }
+            }
+            assertThat(expectMostRecentItem().filteredContacts).isEqualTo(
+                listOf(
+                    InvitationContactInfo(
+                        id = ID_PHONE_CONTACTS_HEADER,
+                        name = "Phone contacts",
+                        type = TYPE_PHONE_CONTACT_HEADER
+                    )
+                ).plus(expected)
+            )
+        }
+    }
+
+    private fun provideLocalContactsWithAndWithoutPhoneNumbersAndEmail() = Stream.of(
+        Arguments.of(
+            listOf(
+                LocalContact(
+                    id = 1L,
+                    name = "name1",
+                    phoneNumbers = listOf("08123214322")
+                )
+            ),
+        ),
+        Arguments.of(
+            listOf(
+                LocalContact(
+                    id = 2L,
+                    name = "name2",
+                    emails = listOf("test2@test.com")
+                )
+            )
+        ),
+        Arguments.of(
+            listOf(
+                LocalContact(
+                    id = 3L,
+                    name = "name3"
+                )
+            )
+        ),
+        Arguments.of(
+            listOf(
+                LocalContact(
+                    id = 4L,
+                    name = "name4",
+                    phoneNumbers = listOf("08123214322"),
+                    emails = listOf("test4@test.com")
+                )
+            )
+        )
+    )
+
+    @Test
+    fun `test that search query state is updated given a different search query when the search query is changed`() =
+        runTest {
+            val newSearchQuery = "newSearchQuery"
+
+            underTest.onSearchQueryChange(newSearchQuery)
+
+            val actual = savedStateHandle.get<String>(key = "CONTACT_SEARCH_QUERY").orEmpty()
+            assertThat(actual).isEqualTo(newSearchQuery)
+        }
+
+    @Test
+    fun `test that filter contacts is invoked when the search query is changed`() =
+        runTest {
+            whenever(context.getString(R.string.contacts_phone)).thenReturn("Phone contacts")
+            val newSearchQuery = "newSearchQuery"
+
+            underTest.onSearchQueryChange(newSearchQuery)
+
+            underTest.filterUiState.test {
+                val expected = listOf(
+                    // Header
+                    InvitationContactInfo(
+                        ID_PHONE_CONTACTS_HEADER,
+                        context.getString(R.string.contacts_phone),
+                        TYPE_PHONE_CONTACT_HEADER
                     )
                 )
                 assertThat(expectMostRecentItem().filteredContacts).isEqualTo(expected)

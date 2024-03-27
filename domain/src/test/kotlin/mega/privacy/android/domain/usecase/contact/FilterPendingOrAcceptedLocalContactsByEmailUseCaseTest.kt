@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.contact
 
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
@@ -103,6 +103,33 @@ class FilterPendingOrAcceptedLocalContactsByEmailUseCaseTest {
                 emails = listOf()
             )
         )
-        Truth.assertThat(actual).isEqualTo(expected)
+        assertThat(actual).isEqualTo(expected)
     }
+
+    @Test
+    fun `test that the initial list of emails is returned when no outgoing contact requests are available`() =
+        runTest {
+            whenever(contactsRepository.getOutgoingContactRequests()).thenReturn(listOf())
+
+            val email = "test@test.com"
+            val contactID = 1L
+            val userName = "name1"
+            val localContacts = listOf(
+                LocalContact(
+                    id = contactID,
+                    name = userName,
+                    emails = listOf(email)
+                )
+            )
+            val actual = underTest(localContacts)
+
+            val expected = listOf(
+                LocalContact(
+                    id = contactID,
+                    name = userName,
+                    emails = listOf(email)
+                )
+            )
+            assertThat(actual).isEqualTo(expected)
+        }
 }

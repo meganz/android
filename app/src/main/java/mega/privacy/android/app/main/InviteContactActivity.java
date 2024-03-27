@@ -2,9 +2,6 @@ package mega.privacy.android.app.main;
 
 import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_MANUAL_INPUT_EMAIL;
 import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_MANUAL_INPUT_PHONE;
-import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_PHONE_CONTACT;
-import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_PHONE_CONTACT_HEADER;
-import static mega.privacy.android.app.main.InviteContactViewModel.ID_PHONE_CONTACTS_HEADER;
 import static mega.privacy.android.app.utils.CallUtil.isNecessaryDisableLocalCamera;
 import static mega.privacy.android.app.utils.CallUtil.showConfirmationOpenCamera;
 import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_QR;
@@ -28,7 +25,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -59,7 +55,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -92,7 +87,6 @@ import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.contacts.ContactsFilter;
-import mega.privacy.android.app.utils.contacts.ContactsUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -130,7 +124,6 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     private ImageView emptyImageView;
     private TextView emptyTextView, emptySubTextView, noPermissionHeader;
     private ProgressBar progressBar;
-    private int defaultLocalContactAvatarColor;
     private InvitationContactsAdapter invitationContactsAdapter;
     private ArrayList<InvitationContactInfo> phoneContacts, addedContacts;
     private FastScroller fastScroller;
@@ -140,7 +133,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     private LinearLayout itemContainer;
     private Handler handler;
     private LayoutInflater inflater;
-    private boolean isGettingLocalContact, isPermissionGranted, isGetContactCompleted;
+    private boolean isPermissionGranted, isGetContactCompleted;
     private String contactLink;
 
     private ArrayList<String> contactsEmailsSelected, contactsPhoneSelected;
@@ -178,8 +171,6 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         handler = new Handler();
         inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         setContentView(R.layout.activity_invite_contact);
-        Context context = getApplicationContext();
-        defaultLocalContactAvatarColor = ContextCompat.getColor(context, R.color.grey_500_grey_400);
 
         phoneContacts = new ArrayList<>();
         addedContacts = new ArrayList<>();
@@ -269,7 +260,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
             refreshAddedContactsView(true);
             setRecyclersVisibility();
             setTitleAB();
-            if (viewModel.getAllContacts().size() > 0) {
+            if (!viewModel.getAllContacts().isEmpty()) {
                 setEmptyStateVisibility(false);
             } else if (isPermissionGranted) {
                 setEmptyStateVisibility(true);
@@ -333,6 +324,15 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     }
 
     private void collectFlows() {
+        ViewExtensionsKt.collectFlow(this, viewModel.getUiState(), Lifecycle.State.STARTED, uiState -> {
+            if (uiState.getOnContactsInitialized()) {
+                onGetContactCompleted();
+                viewModel.filterContacts(typeContactEditText.getText().toString());
+                viewModel.resetOnContactsInitializedState();
+            }
+            return Unit.INSTANCE;
+        });
+
         ViewExtensionsKt.collectFlow(this, viewModel.getFilterUiState(), Lifecycle.State.STARTED, filterUiState -> {
             if (!filterUiState.getFilteredContacts().isEmpty()) {
                 refreshList();
@@ -406,7 +406,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     private void setTitleAB() {
         Timber.d("setTitleAB");
         if (aB != null) {
-            if (addedContacts.size() > 0) {
+            if (!addedContacts.isEmpty()) {
                 aB.setSubtitle(getResources().getQuantityString(R.plurals.general_selection_num_contacts,
                         addedContacts.size(), addedContacts.size()));
             } else {
@@ -417,7 +417,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
     private void setRecyclersVisibility() {
         Timber.d("setRecyclersVisibility %s", viewModel.getAllContacts().size());
-        if (viewModel.getAllContacts().size() > 0) {
+        if (!viewModel.getAllContacts().isEmpty()) {
             containerContacts.setVisibility(View.VISIBLE);
         } else {
             containerContacts.setVisibility(View.GONE);
@@ -439,7 +439,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         Timber.d("prepareToGetContacts");
         setEmptyStateVisibility(true);
         progressBar.setVisibility(View.VISIBLE);
-        new GetPhoneContactsTask().execute();
+        viewModel.initializeContacts();
     }
 
     private void visibilityFastScroller() {
@@ -581,7 +581,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         }
 
         refreshInviteContactButton();
-        viewModel.filterContacts(typeContactEditText.getText().toString());
+        viewModel.onSearchQueryChange(typeContactEditText.getText().toString());
         refreshKeyboard();
     }
 
@@ -749,60 +749,13 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         handler.postDelayed(() -> scrollView.fullScroll(android.view.View.FOCUS_RIGHT), 100);
     }
 
-    private ArrayList<InvitationContactInfo> localContactToContactInfo(List<ContactsUtil.LocalContact> localContacts) {
-        Timber.d("megaContactToContactInfo %s", localContacts.size());
-        ArrayList<InvitationContactInfo> result = new ArrayList<>();
-        if (localContacts.size() > 0) {
-            InvitationContactInfo megaContactHeader = new InvitationContactInfo(
-                    ID_PHONE_CONTACTS_HEADER,
-                    getString(R.string.contacts_phone),
-                    TYPE_PHONE_CONTACT_HEADER
-            );
-            result.add(megaContactHeader);
-        } else {
-            return result;
-        }
-        for (ContactsUtil.LocalContact contact : localContacts) {
-            long id = contact.getId();
-            String name = contact.getName();
-            List<String> phoneNumberList = contact.getPhoneNumberList();
-            int phoneCount = phoneNumberList.size();
-            List<String> emailList = contact.getEmailList();
-            int emailCount = emailList.size();
-            // if the local contact has any phone number or email found on MEGA, ignore it.
-            if (phoneNumberList.size() < phoneCount || emailList.size() < emailCount) {
-                continue;
-            }
-
-            ContactsFilter.filterOutContacts(megaApi, emailList);
-            ContactsFilter.filterOutPendingContacts(megaApi, emailList);
-            phoneNumberList.addAll(emailList);
-            if (phoneNumberList.size() > 0) {
-                InvitationContactInfo info = new InvitationContactInfo(
-                        id,
-                        name,
-                        TYPE_PHONE_CONTACT,
-                        phoneNumberList,
-                        phoneNumberList.get(0),
-                        defaultLocalContactAvatarColor
-                );
-                result.add(info);
-            }
-        }
-
-        return result;
-    }
-
     private void onGetContactCompleted() {
-        if (isGettingLocalContact) {
-            return;
-        }
         progressBar.setVisibility(View.GONE);
         refreshList();
         setRecyclersVisibility();
         visibilityFastScroller();
 
-        if (viewModel.getAllContacts().size() > 0) {
+        if (!viewModel.getAllContacts().isEmpty()) {
             setEmptyStateVisibility(false);
         } else {
             showEmptyTextView();
@@ -896,10 +849,10 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     private void refreshInviteContactButton() {
         Timber.d("refreshInviteContactButton");
         String stringInEditText = typeContactEditText.getText().toString();
-        boolean isStringValidNow = stringInEditText.length() == 0
+        boolean isStringValidNow = stringInEditText.isEmpty()
                 || isValidEmail(stringInEditText)
                 || isValidPhone(stringInEditText);
-        enableFabButton(addedContacts.size() > 0 && isStringValidNow);
+        enableFabButton(!addedContacts.isEmpty() && isStringValidNow);
     }
 
     private void addContactInfo(String inputString, int type) {
@@ -909,13 +862,13 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
             info = InvitationContactInfo.createManualInput(
                     inputString,
                     TYPE_MANUAL_INPUT_EMAIL,
-                    defaultLocalContactAvatarColor
+                    R.color.grey_500_grey_400
             );
         } else if (type == TYPE_MANUAL_INPUT_PHONE) {
             info = InvitationContactInfo.createManualInput(
                     inputString,
                     TYPE_MANUAL_INPUT_PHONE,
-                    defaultLocalContactAvatarColor
+                    R.color.grey_500_grey_400
             );
         }
         if (info != null) {
@@ -929,37 +882,6 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
             }
         }
         setTitleAB();
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    private class GetPhoneContactsTask extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            Timber.d("GetPhoneContactsTask doInBackground");
-
-            isGettingLocalContact = true;
-
-            //add new value
-            List<ContactsUtil.LocalContact> rawLocalContacts = ContactsUtil.getLocalContactList(getBaseContext());
-            phoneContacts.addAll(localContactToContactInfo(rawLocalContacts));
-
-            viewModel.initializeFilteredContacts(phoneContacts);
-            viewModel.initializeAllContacts(viewModel.getFilterUiState().getValue().getFilteredContacts());
-
-            // This is a temporary work around to avoid a race condition where the filtered contacts
-            // are overwritten by all contacts when there is a configuration change
-            // This async task will be migrated in a separate ticket: AND-17343
-            viewModel.filterContacts(typeContactEditText.getText().toString());
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void avoid) {
-            Timber.d("onPostExecute GetPhoneContactsTask");
-            isGettingLocalContact = false;
-            onGetContactCompleted();
-        }
     }
 
     private void inviteContacts(ArrayList<InvitationContactInfo> addedContacts) {
@@ -978,10 +900,10 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
             }
         }
 
-        if (contactsEmailsSelected.size() > 0) {
+        if (!contactsEmailsSelected.isEmpty()) {
             //phone contact will be invited once email done
             inviteEmailContacts(contactsEmailsSelected);
-        } else if (contactsPhoneSelected.size() > 0) {
+        } else if (!contactsPhoneSelected.isEmpty()) {
             invitePhoneContacts(contactsPhoneSelected);
             finish();
         } else {
@@ -1063,7 +985,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
                 hideKeyboard(InviteContactActivity.this, 0);
                 new Handler().postDelayed(() -> {
-                    if (contactsPhoneSelected.size() > 0) {
+                    if (!contactsPhoneSelected.isEmpty()) {
                         invitePhoneContacts(contactsPhoneSelected);
                     }
                     numberSent = 0;

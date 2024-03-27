@@ -38,14 +38,15 @@ class FilterPendingOrAcceptedLocalContactsByEmailUseCase @Inject constructor(
         }
 
     private suspend fun LocalContact.filterOutPendingContactEmails(): LocalContact {
-        val newEmailList = mutableListOf<String>()
+        val newEmailList = mutableListOf<String>().apply {
+            addAll(emails)
+        }
         contactsRepository.getOutgoingContactRequests().forEach { request ->
             val filteredEmails = emails.filterNot { email ->
                 isContactRequestByEmailInPendingOrAcceptedStateUseCase(request, email)
             }
-            if (filteredEmails.isNotEmpty()) {
-                newEmailList.addAll(filteredEmails)
-            }
+            newEmailList.clear()
+            newEmailList.addAll(filteredEmails)
         }
 
         return LocalContact(

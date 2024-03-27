@@ -89,4 +89,31 @@ class FilterLocalContactsByEmailUseCaseTest {
         )
         assertThat(actual).isEqualTo(expected)
     }
+
+    @Test
+    fun `test that the initial list of emails is returned when no contacts are available`() =
+        runTest {
+            val email = "test@test.com"
+            whenever(contactsRepository.getAvailableContacts()).thenReturn(listOf())
+
+            val contactID = 1L
+            val userName = "name1"
+            val localContacts = listOf(
+                LocalContact(
+                    id = contactID,
+                    name = userName,
+                    emails = listOf(email)
+                )
+            )
+            val actual = underTest(localContacts)
+
+            val expected = listOf(
+                LocalContact(
+                    id = contactID,
+                    name = userName,
+                    emails = listOf(email)
+                )
+            )
+            assertThat(actual).isEqualTo(expected)
+        }
 }
