@@ -50,7 +50,7 @@ internal class SharedItemsImagePreviewMenu @Inject constructor(
     }
 
     override suspend fun isSendToChatMenuVisible(imageNode: ImageNode): Boolean {
-        return haveOwnerOrFullAccessPermission(imageNode)
+        return true
     }
 
     override suspend fun isShareMenuVisible(imageNode: ImageNode): Boolean {
