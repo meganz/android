@@ -77,6 +77,7 @@ import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.meeting.CallType
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
 import mega.privacy.android.domain.entity.meeting.MeetingParticipantNotInCallStatus
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
@@ -523,7 +524,6 @@ class MeetingActivityViewModel @Inject constructor(
             }.onSuccess { call ->
                 call?.let {
                     when (call.status) {
-                        ChatCallStatus.UserNoPresent,
                         ChatCallStatus.TerminatingUserParticipation,
                         ChatCallStatus.Destroyed,
                         -> finishMeetingActivity()
@@ -773,10 +773,27 @@ class MeetingActivityViewModel @Inject constructor(
                     checkIfPresenting(call)
                     call.changes?.apply {
                         if (contains(ChatCallChanges.Status)) {
-                            if (call.status == ChatCallStatus.InProgress) {
-                                checkEphemeralAccountAndWaitingRoom(call)
+                            when (call.status) {
+                                ChatCallStatus.InProgress -> {
+                                    checkEphemeralAccountAndWaitingRoom(call)
+                                }
+
+                                ChatCallStatus.TerminatingUserParticipation, ChatCallStatus.GenericNotification -> {
+                                    if (call.termCode == ChatCallTermCodeType.CallUsersLimit
+                                        && _state.value.isCallUnlimitedProPlanFeatureFlagEnabled
+                                    ) {
+                                        _state.update { state ->
+                                            state.copy(
+                                                callEndedDueToFreePlanLimits = true
+                                            )
+                                        }
+                                    }
+                                }
+
+                                else -> {}
                             }
                         }
+
                         if (contains(ChatCallChanges.LocalAVFlags)) {
                             val isEnable = call.hasLocalAudio
                             _micLiveData.value = isEnable
@@ -2104,7 +2121,7 @@ class MeetingActivityViewModel @Inject constructor(
      *
      * @param message     Content for snack bar
      */
-    fun triggerSnackbarMessage(message: String) =
+    private fun triggerSnackbarMessage(message: String) =
         _state.update { it.copy(snackbarMsg = triggered(message)) }
 
     /**

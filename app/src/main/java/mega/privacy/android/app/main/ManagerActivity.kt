@@ -190,6 +190,7 @@ import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActiv
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.view.CallRecordingConsentDialog
 import mega.privacy.android.app.presentation.meeting.view.DenyEntryToCallDialog
+import mega.privacy.android.app.presentation.meeting.view.FreePlanLimitParticipantsDialog
 import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.NodeSourceTypeMapper
@@ -544,6 +545,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private lateinit var fragmentLayout: LinearLayout
     private lateinit var waitingRoomComposeView: ComposeView
     private lateinit var callRecordingConsentDialogComposeView: ComposeView
+    private lateinit var freePlanLimitParticipantsDialogComposeView: ComposeView
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var navigationView: NavigationView
     private lateinit var adsComposeView: ComposeView
@@ -1102,6 +1104,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         waitingRoomComposeView = findViewById(R.id.waiting_room_dialog_compose_view)
         callRecordingConsentDialogComposeView =
             findViewById(R.id.call_recording_consent_dialog_compose_view)
+        freePlanLimitParticipantsDialogComposeView =
+            findViewById(R.id.free_plan_limit_dialog_compose_view)
         adsComposeView = findViewById(R.id.ads_web_compose_view)
         fragmentLayout = findViewById(R.id.fragment_layout)
         bottomNavigationView =
@@ -1207,6 +1211,25 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 viewIntent.data = Uri.parse("https://mega.io/privacy")
                                 startActivity(viewIntent)
                             }
+                        )
+                    }
+                }
+            }
+        }
+
+        freePlanLimitParticipantsDialogComposeView.apply {
+            isVisible = true
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+                val isDark = themeMode.isDarkMode()
+                val state by viewModel.state.collectAsStateWithLifecycle()
+                if (state.callEndedDueToFreePlanLimits) {
+                    MegaAppTheme(isDark = isDark) {
+                        FreePlanLimitParticipantsDialog(
+                            onConfirm = {
+                                viewModel.onConsumeShowFreePlanParticipantsLimitDialogEvent()
+                            },
                         )
                     }
                 }
@@ -1971,6 +1994,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             if (managerState.isPushNotificationSettingsUpdatedEvent) {
                 viewModel.onConsumePushNotificationSettingsUpdateEvent()
             }
+
             if (managerState.nodeUpdateReceived) {
                 // Invalidate the menu will collapse/expand the search view and set the query text to ""
                 // (call onQueryTextChanged) (BTW, SearchFragment uses textSubmitted to avoid the query
@@ -5734,6 +5758,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun showOpenLinkDialog(isJoinMeeting: Boolean = false) {
         if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
             val isChatScreen = drawerItem == DrawerItem.CHAT
+
             OpenLinkDialogFragment.newInstance(
                 isChatScreen = isChatScreen,
                 isJoinMeeting = isJoinMeeting

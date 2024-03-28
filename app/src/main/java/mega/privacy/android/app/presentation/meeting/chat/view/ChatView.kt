@@ -498,7 +498,7 @@ internal fun ChatView(
             showReactionPicker = false
         }
 
-        if (callEndedDueToFreePlanLimits && isCallUnlimitedProPlanFeatureFlagEnabled) {
+        if (callEndedDueToFreePlanLimits) {
             showFreePlanLimitParticipantsDialog = true
         }
 

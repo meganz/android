@@ -693,6 +693,7 @@ class ChatViewModel @Inject constructor(
                         when (status) {
                             ChatCallStatus.TerminatingUserParticipation, ChatCallStatus.GenericNotification ->
                                 if (termCode == ChatCallTermCodeType.CallUsersLimit
+                                    && _state.value.isCallUnlimitedProPlanFeatureFlagEnabled
                                 ) {
                                     _state.update { state -> state.copy(callEndedDueToFreePlanLimits = true) }
                                 }

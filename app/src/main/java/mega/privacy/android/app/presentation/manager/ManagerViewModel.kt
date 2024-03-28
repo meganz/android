@@ -39,6 +39,7 @@ import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -80,6 +81,7 @@ import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentEventUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -113,24 +115,19 @@ import javax.inject.Inject
 /**
  * ManagerViewModel
  *
- * @property monitorNodeUpdatesUseCase Use case for monitoring node updates.
- * @property monitorContactUpdates Use case for monitoring contact updates.
  * @property monitorUserAlertUpdates Use case for monitoring user alert updates.
  * @property getNumUnreadUserAlertsUseCase Use case for getting the number of unread user alerts.
  * @property getNumUnreadPromoNotificationsUseCase Use case for getting the number of unread promo notifications.
  * @property sendStatisticsMediaDiscoveryUseCase Use case for sending media discovery statistics.
  * @property savedStateHandle Saved state handle for saving and restoring state related to the ViewModel.
  * @property monitorStorageStateEventUseCase Use case for monitoring storage state events.
- * @property monitorCameraUploadsFolderDestinationUseCase Use case for monitoring camera uploads folder destination.
  * @property getCloudSortOrder Use case for getting the cloud sort order.
- * @property monitorConnectivityUseCase Use case for monitoring connectivity.
  * @property isConnectedToInternetUseCase Use case for checking if the device is connected to the internet.
  * @property getExtendedAccountDetail Use case for getting extended account details.
  * @property getFullAccountInfoUseCase Use case for getting full account info.
  * @property getFeatureFlagValueUseCase Use case for getting the value of a feature flag.
  * @property getUnverifiedIncomingShares Use case for getting unverified incoming shares.
  * @property getUnverifiedOutgoingShares Use case for getting unverified outgoing shares.
- * @property monitorFinishActivityUseCase Use case for monitoring finish activity events.
  * @property requireTwoFactorAuthenticationUseCase Use case for requiring two factor authentication.
  * @property setCopyLatestTargetPathUseCase Use case for setting the latest target path for copy operations.
  * @property setMoveLatestTargetPathUseCase Use case for setting the latest target path for move operations.
@@ -144,9 +141,6 @@ import javax.inject.Inject
  * @property getNodeByIdUseCase Use case for getting a node by its ID.
  * @property deleteOldestCompletedTransfersUseCase Use case for deleting the oldest completed transfers.
  * @property getIncomingContactRequestsUseCase Use case for getting incoming contact requests.
- * @property monitorMyAccountUpdateUseCase Use case for monitoring my account updates.
- * @property monitorUpdatePushNotificationSettingsUseCase Use case for monitoring update push notification settings.
- * @property monitorOfflineNodeAvailabilityUseCase Use case for monitoring offline node availability.
  * @property monitorChatArchivedUseCase Use case for monitoring chat archived events.
  * @property restoreNodesUseCase Use case for restoring nodes.
  * @property checkNodesNameCollisionUseCase Use case for checking nodes name collision.
@@ -158,7 +152,6 @@ import javax.inject.Inject
  * @property renameRecoveryKeyFileUseCase Use case for renaming recovery key file.
  * @property removeShareUseCase Use case for removing shares.
  * @property removeShareResultMapper Mapper for mapping the result of remove share operation.
- * @property getNumUnreadChatsUseCase Use case for getting the number of unread chats.
  * @property disableExportNodesUseCase Use case for disabling export nodes.
  * @property removePublicLinkResultMapper Mapper for mapping the result of remove public link operation.
  * @property dismissPsaUseCase Use case for dismissing PSA.
@@ -245,6 +238,7 @@ class ManagerViewModel @Inject constructor(
     private val hangChatCallUseCase: HangChatCallUseCase,
     private val monitorCallRecordingConsentEventUseCase: MonitorCallRecordingConsentEventUseCase,
     private val monitorCallEndedUseCase: MonitorCallEndedUseCase,
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase
 ) : ViewModel() {
 
     /**
@@ -399,6 +393,22 @@ class ManagerViewModel @Inject constructor(
                 _state.update { it.copy(titleChatArchivedEvent = chatTitle) }
             }
         }
+
+        viewModelScope.launch {
+            monitorChatCallUpdatesUseCase()
+                .filter {
+                    (it.status == ChatCallStatus.TerminatingUserParticipation ||
+                            it.status == ChatCallStatus.GenericNotification) &&
+                            it.termCode == ChatCallTermCodeType.CallUsersLimit
+                }
+                .collect {
+
+                    if (state.value.isCallUnlimitedProPlanFeatureFlagEnabled) {
+                        _state.update { it.copy(callEndedDueToFreePlanLimits = true) }
+                    }
+                }
+        }
+
         viewModelScope.launch {
             monitorBackupFolder()
                 .catch { Timber.w("Exception monitoring backups folder: $it") }
@@ -439,6 +449,14 @@ class ManagerViewModel @Inject constructor(
         viewModelScope.launch {
             val androidSyncEnabled =
                 getFeatureFlagValueUseCase(AppFeatures.AndroidSync)
+
+            _state.update {
+                it.copy(
+                    isCallUnlimitedProPlanFeatureFlagEnabled = getFeatureFlagValueUseCase(
+                        AppFeatures.CallUnlimitedProPlan
+                    )
+                )
+            }
 
             if (androidSyncEnabled) {
                 monitorSyncsUseCase().catch { Timber.e(it) }.collect { syncFolders ->
@@ -701,6 +719,14 @@ class ManagerViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isPushNotificationSettingsUpdatedEvent = false) }
         }
+    }
+
+    /**
+     * Consume show free plan participants limit dialog event
+     *
+     */
+    fun onConsumeShowFreePlanParticipantsLimitDialogEvent() {
+        _state.update { state -> state.copy(callEndedDueToFreePlanLimits = false) }
     }
 
     /**

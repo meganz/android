@@ -34,6 +34,8 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property isRecordingConsentAccepted             True if recording consent dialog has been already accepted or False otherwise.
  * @property callInProgressChatId                   Chat ID of the current call in progress.
  * @property deviceCenterPreviousBottomNavigationItem  A potentially nullable Integer that holds the
+ * @property callEndedDueToFreePlanLimits               State event to show the force free plan limit participants dialog.
+ * @property isCallUnlimitedProPlanFeatureFlagEnabled   True, if Call Unlimited Pro Plan feature flag enabled. False, otherwise.
  * previous Bottom Navigation item before accessing Device Center
  */
 data class ManagerState(
@@ -60,4 +62,6 @@ data class ManagerState(
     val isRecordingConsentAccepted: Boolean = false,
     val callInProgressChatId: Long = -1L,
     val deviceCenterPreviousBottomNavigationItem: Int? = null,
+    val callEndedDueToFreePlanLimits: Boolean = false,
+    val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
 )

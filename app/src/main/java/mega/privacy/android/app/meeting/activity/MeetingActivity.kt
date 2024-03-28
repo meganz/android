@@ -53,7 +53,6 @@ import mega.privacy.android.app.utils.ScheduledMeetingDateUtil.getAppropriateStr
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
-import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -92,6 +91,8 @@ class MeetingActivity : PasscodeActivity() {
         const val MEETING_BOTTOM_PANEL_EXPANDED = "meeting_bottom_panel_expanded"
         const val MEETING_CALL_RECORDING = "meeting_call_recording"
         const val MEETING_IS_RINGIN_ALL = "meeting_is_ringing_all"
+        const val MEETING_FREE_PLAN_USERS_LIMIT = "meeting_free_plan_users_limit"
+
 
         fun getIntentOngoingCall(context: Context, chatId: Long): Intent {
             return Intent(context, MeetingActivity::class.java).apply {
@@ -103,9 +104,6 @@ class MeetingActivity : PasscodeActivity() {
 
     @Inject
     lateinit var notificationManager: NotificationManagerCompat
-
-    @Inject
-    lateinit var getThemeMode: GetThemeMode
 
     @Inject
     lateinit var navigator: MegaNavigator
@@ -395,6 +393,7 @@ class MeetingActivity : PasscodeActivity() {
                 startActivity(
                     Intent(this, LeftMeetingActivity::class.java)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        .putExtra(MEETING_FREE_PLAN_USERS_LIMIT, state.callEndedDueToFreePlanLimits)
                 )
                 finish()
             }

@@ -84,6 +84,7 @@ import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentEventUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -297,6 +298,10 @@ class ManagerViewModelTest {
         onBlocking { invoke() }.thenReturn(emptyFlow())
     }
 
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock {
+        onBlocking { invoke() }.thenReturn(emptyFlow())
+    }
+
     private fun initViewModel() {
         underTest = ManagerViewModel(
             monitorNodeUpdatesUseCase = mock {
@@ -371,6 +376,7 @@ class ManagerViewModelTest {
             hangChatCallUseCase = hangChatCallUseCase,
             monitorCallRecordingConsentEventUseCase = monitorCallRecordingConsentEventUseCase,
             monitorCallEndedUseCase = monitorCallEndedUseCase,
+            monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase
         )
     }
 
@@ -421,6 +427,7 @@ class ManagerViewModelTest {
         whenever(monitorUserUpdates()).thenReturn(emptyFlow())
         whenever(monitorCallRecordingConsentEventUseCase()).thenReturn(emptyFlow())
         whenever(monitorCallEndedUseCase()).thenReturn(emptyFlow())
+        whenever(monitorChatCallUpdatesUseCase()).thenReturn(emptyFlow())
         whenever(monitorChatArchivedUseCase()).thenReturn(flowOf("Chat Title"))
         whenever(monitorPushNotificationSettingsUpdate()).thenReturn(flowOf(true))
         wheneverBlocking { getPrimarySyncHandleUseCase() }.thenReturn(0L)

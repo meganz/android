@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
@@ -33,6 +34,7 @@ internal fun BaseMegaAlertDialog(
     content = text?.composeLet {
         Text(
             text = text,
+            fontWeight = FontWeight.Medium,
             style = MaterialTheme.typography.subtitle1,
             color = MegaTheme.colors.text.secondary
         )
@@ -98,6 +100,7 @@ internal fun BaseMegaAlertDialog(
     text = {
         Text(
             text = text,
+            fontWeight = FontWeight.Medium,
             style = MaterialTheme.typography.subtitle1,
             color = MegaTheme.colors.text.secondary
         )
@@ -133,6 +136,7 @@ private fun BaseMegaAlertDialog(
                     }
                     .fillMaxWidth(),
                 text = it,
+                fontWeight = FontWeight.Medium,
                 style = MaterialTheme.typography.h6,
                 color = MegaTheme.colors.text.primary,
             )
