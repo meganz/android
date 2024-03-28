@@ -11,7 +11,6 @@ internal enum class FragmentTag {
     TRANSFERS_PAGE,
     RECENT_CHAT,
     SYNC,
-    RUBBISH_BIN,
     NOTIFICATIONS,
     TURN_ON_NOTIFICATIONS,
     PERMISSIONS,
@@ -28,7 +27,6 @@ internal enum class FragmentTag {
             CLOUD_DRIVE -> "fileBrowserFragment"
             HOMEPAGE -> "homepageFragment"
             SYNC -> "syncFragment"
-            RUBBISH_BIN -> "rubbishBinFragment"
             PHOTOS -> "photosFragment"
             BACKUPS -> "backupsFragment"
             INCOMING_SHARES -> "incomingSharesFragment"

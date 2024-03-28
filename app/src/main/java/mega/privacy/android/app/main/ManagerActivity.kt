@@ -8338,10 +8338,16 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             DrawerItem.BACKUPS -> {
-                backupsFragment?.updateBackupsHandle(handle)
+                backupsFragment?.let {
+                    it.updateBackupsHandle(handle)
+                    it.refreshBackupsNodes()
+                }
                 refreshFragment(FragmentTag.BACKUPS.tag)
             }
-
+            DrawerItem.RUBBISH_BIN -> {
+                rubbishBinViewModel.setRubbishBinHandle(handle)
+                refreshFragment(FragmentTag.RUBBISH_BIN_COMPOSE.tag)
+            }
             else -> {}
         }
     }
@@ -8503,7 +8509,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             selectDrawerItem(DrawerItem.CLOUD_DRIVE)
         } else if (parentNode.handle == megaApi.rubbishNode?.handle) {
             rubbishBinViewModel.setRubbishBinHandle(node.parentHandle)
-            refreshFragment(FragmentTag.RUBBISH_BIN.tag)
+            refreshFragment(FragmentTag.RUBBISH_BIN_COMPOSE.tag)
             selectDrawerItem(DrawerItem.RUBBISH_BIN)
         } else if (parentNode.isInShare) {
             if (enabledIncomingSharesCompose) {
