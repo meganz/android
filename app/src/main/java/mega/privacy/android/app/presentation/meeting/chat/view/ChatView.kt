@@ -1032,6 +1032,8 @@ internal fun ChatView(
                         context,
                         action.email
                     )
+
+                    is ActionToManage.CloseChat -> onBackPressed()
                 }
             }
         }

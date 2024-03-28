@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.model
 
-import mega.privacy.android.domain.entity.chat.messages.TypedMessage
-
 /**
  * Sealed class defining all the possible actions to manage in view.
  */
@@ -25,4 +23,10 @@ sealed class ActionToManage {
      * @property email Contact email.
      */
     data class OpenContactInfo(val email: String) : ActionToManage()
+
+    /**
+     * Close chat
+     *
+     */
+    data object CloseChat : ActionToManage()
 }
