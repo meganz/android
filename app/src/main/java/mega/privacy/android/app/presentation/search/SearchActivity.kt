@@ -23,8 +23,12 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.core.view.WindowCompat
@@ -109,6 +113,7 @@ import javax.inject.Inject
 /**
  * Search activity to search Nodes and display
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @AndroidEntryPoint
 class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     private val viewModel: SearchActivityViewModel by viewModels()
@@ -228,7 +233,8 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                         modifier = Modifier
                             .fillMaxSize()
                             .systemBarsPadding()
-                            .imePadding(),
+                            .imePadding()
+                            .semantics { testTagsAsResourceId = true },
                         scaffoldState = scaffoldState,
                         floatingActionButton = {
                             AnimatedVisibility(
@@ -242,6 +248,9 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                 TransfersWidgetView(
                                     transfersData = transferState.transfersInfo,
                                     onClick = ::transfersWidgetClicked,
+                                    modifier = Modifier.testTag(
+                                        SEARCH_SCREEN_TRANSFERS_WIDGET_TEST_TAG
+                                    )
                                 )
                             }
                         },
@@ -257,7 +266,8 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                     .constrainAs(audioPlayer) {
                                         bottom.linkTo(parent.bottom)
                                     }
-                                    .fillMaxWidth(),
+                                    .fillMaxWidth()
+                                    .testTag(SEARCH_SCREEN_MINI_AUDIO_PLAYER_TEST_TAG),
                                 lifecycle = lifecycle,
                             )
 
@@ -718,5 +728,14 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             transfersManagement.setHasNotToBeShowDueToTransferOverQuota(true)
         }
     }
-
 }
+
+/**
+ * search screen mini audio player test tag
+ */
+const val SEARCH_SCREEN_MINI_AUDIO_PLAYER_TEST_TAG = "search_screen:mini_audio_player"
+
+/**
+ * search screen transfers widget test tag
+ */
+const val SEARCH_SCREEN_TRANSFERS_WIDGET_TEST_TAG = "search_screen:transfers_widget_view"

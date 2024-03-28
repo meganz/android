@@ -8,10 +8,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -39,6 +42,7 @@ import timber.log.Timber
 /**
  * Node options bottom sheet
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun NodeOptionsBottomSheetContent(
     handler: NodeActionHandler,
@@ -86,6 +90,7 @@ internal fun NodeOptionsBottomSheetContent(
     }
 
     NodeListViewItem(
+        modifier = Modifier.semantics { testTagsAsResourceId = true },
         title = node?.name.orEmpty(),
         titleColor = if (node?.isTakenDown == true) TextColor.Error else TextColor.Primary,
         titleOverflow = LongTextBehaviour.MiddleEllipsis,
@@ -101,7 +106,7 @@ internal fun NodeOptionsBottomSheetContent(
         accessPermissionIcon = uiState.accessPermissionIcon,
     )
     MegaDivider(dividerType = DividerType.SmallStartPadding)
-    LazyColumn {
+    LazyColumn(modifier = Modifier.semantics { testTagsAsResourceId = true }) {
         sortedMap.value
             .forEachIndexed { index, actions ->
                 items(actions) { item: BottomSheetMenuItem ->

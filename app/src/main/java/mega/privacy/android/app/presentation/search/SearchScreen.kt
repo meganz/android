@@ -61,7 +61,7 @@ fun SearchScreen(
         }
     }
     SearchComposeView(
-        modifier = Modifier.semantics { testTagsAsResourceId = true },
+        modifier = modifier.semantics { testTagsAsResourceId = true },
         state = uiState,
         sortOrder = stringResource(
             SortByHeaderViewModel.orderNameMap[uiState.sortOrder]

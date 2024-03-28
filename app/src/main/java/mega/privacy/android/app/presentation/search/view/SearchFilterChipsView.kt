@@ -13,7 +13,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -33,6 +37,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  * @param filters [SearchFilter]
  * @param updateFilter updates filter selection
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SearchFilterChipsView(
     filters: List<SearchFilter>,
@@ -44,7 +49,7 @@ fun SearchFilterChipsView(
     val coroutineScope = rememberCoroutineScope()
 
     LazyRow(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().semantics { testTagsAsResourceId = true },
         contentPadding = PaddingValues(8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -54,6 +59,7 @@ fun SearchFilterChipsView(
             val selectedChip = filters[item]
             val isChecked = selectedFilter == selectedChip
             TextButtonWithIconChipForSearch(
+                modifier = Modifier.testTag(SEARCH_FILTER_CHIP_TEST_TAG),
                 isChecked = isChecked,
                 text = filters[item].name,
                 onClick = {
@@ -108,3 +114,8 @@ internal class SearchStatePreviewsProvider : PreviewParameterProvider<SearchStat
         )
     }
 }
+
+/**
+ * Test tag for search filter chip
+ */
+const val SEARCH_FILTER_CHIP_TEST_TAG = "search_filter_chips:chip_title"

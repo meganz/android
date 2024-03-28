@@ -22,7 +22,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
@@ -30,6 +29,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -117,13 +117,17 @@ fun CollapsedSearchAppBar(
     TopAppBar(
         title = {
             Text(
+                modifier = Modifier.testTag(SEARCH_TOOLBAR_TITLE_VIEW_TEST_TAG),
                 text = title,
                 style = MaterialTheme.typography.subtitle1,
                 fontWeight = FontWeight.Medium
             )
         },
         navigationIcon = {
-            IconButton(onClick = onBackPressed) {
+            IconButton(
+                modifier = Modifier.testTag(SEARCH_TOOLBAR_BACK_BUTTON_TEST_TAG),
+                onClick = onBackPressed
+            ) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = "Back button",
@@ -132,7 +136,10 @@ fun CollapsedSearchAppBar(
             }
         },
         actions = {
-            IconButton(onClick = { onSearchClicked() }) {
+            IconButton(
+                modifier = Modifier.testTag(SEARCH_TOOLBAR_SEARCH_BUTTON_TEST_TAG),
+                onClick = { onSearchClicked() },
+            ) {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.ic_search),
                     contentDescription = "Search Icon",
@@ -157,7 +164,6 @@ fun CollapsedSearchAppBar(
 /**
  * The expanded search app bar
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ExpandedSearchAppBar(
     text: String,
@@ -182,7 +188,8 @@ fun ExpandedSearchAppBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 5.dp, end = 5.dp)
-                .focusRequester(focusRequester),
+                .focusRequester(focusRequester)
+                .testTag(SEARCH_TOOLBAR_TEXT_VIEW_TEST_TAG),
             value = text,
             onValueChange = { onSearchTextChange(it) },
             placeholder = {
@@ -195,7 +202,10 @@ fun ExpandedSearchAppBar(
             textStyle = TextStyle(fontSize = MaterialTheme.typography.subtitle1.fontSize),
             singleLine = true,
             leadingIcon = {
-                IconButton(onClick = onCloseClicked) {
+                IconButton(
+                    modifier = Modifier.testTag(SEARCH_TOOLBAR_BACK_BUTTON_TEST_TAG),
+                    onClick = onCloseClicked
+                ) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
                         contentDescription = "Search Icon",
@@ -207,7 +217,9 @@ fun ExpandedSearchAppBar(
                 if (text.isEmpty()) {
                     //No icon
                 } else {
-                    IconButton(onClick = { onSearchTextChange("") }) {
+                    IconButton(
+                        modifier = Modifier.testTag(SEARCH_TOOLBAR_CLOSE_BUTTON_TEST_TAG),
+                        onClick = { onSearchTextChange("") }) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Close Icon",
@@ -268,3 +280,28 @@ fun SearchAppBarPreview() {
         elevation = false
     )
 }
+
+/**
+ * Search toolbar search text view test tag
+ */
+const val SEARCH_TOOLBAR_TEXT_VIEW_TEST_TAG = "search_toolbar:search_text_view"
+
+/**
+ * Search toolbar close button test tag
+ */
+const val SEARCH_TOOLBAR_CLOSE_BUTTON_TEST_TAG = "search_toolbar:close_button"
+
+/**
+ * Search toolbar back button test tag
+ */
+const val SEARCH_TOOLBAR_BACK_BUTTON_TEST_TAG = "search_toolbar:back_button"
+
+/**
+ * Search toolbar search button test tag
+ */
+const val SEARCH_TOOLBAR_SEARCH_BUTTON_TEST_TAG = "search_toolbar:search_button"
+
+/**
+ * Search toolbar more button test tag
+ */
+const val SEARCH_TOOLBAR_TITLE_VIEW_TEST_TAG = "search_toolbar:title_view"

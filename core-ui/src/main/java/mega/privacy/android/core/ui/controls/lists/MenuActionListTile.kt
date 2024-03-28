@@ -16,13 +16,15 @@ import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.dividers.DividerType
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.core.ui.controls.text.LongTextBehaviour
@@ -77,6 +79,7 @@ fun MenuActionListTile(
  * @param trailingItem composable widget which will be placed at the trailing end
  * @param modifier
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MenuActionListTile(
     text: String,
@@ -98,7 +101,8 @@ fun MenuActionListTile(
                         onActionClicked?.invoke()
                     }
                 }
-                .padding(16.dp),
+                .padding(16.dp)
+                .semantics { testTagsAsResourceId = true },
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (icon != null) {

@@ -45,7 +45,6 @@ import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.images.ThumbnailView
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.color_button_brand
-import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
@@ -263,6 +262,7 @@ fun NodeListViewItem(
                                 if (showMenuButton) Visibility.Visible else Visibility.Gone
                         }
                         .clickable { onMenuClick() }
+                        .testTag(MORE_ICON_TEST_TAG)
                 )
 
                 Row(
@@ -282,7 +282,8 @@ fun NodeListViewItem(
 
                     MiddleEllipsisText(
                         text = name,
-                        modifier = Modifier.widthIn(max = if (isScreenOrientationLandscape()) 275.dp else 190.dp),
+                        modifier = Modifier.widthIn(max = if (isScreenOrientationLandscape()) 275.dp else 190.dp)
+                            .testTag(NODE_TITLE_TEXT_TEST_TAG),
                         style = MaterialTheme.typography.subtitle1,
                         color = if (isTakenDown || isUnverifiedShare) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.textColorPrimary,
                     )
@@ -292,7 +293,7 @@ fun NodeListViewItem(
                                 .size(10.dp)
                                 .background(
                                     shape = CircleShape, color = it
-                                )
+                                ).testTag(LABEL_TEST_TAG)
                         ) {}
                     }
                     if (isFavourite) {
@@ -382,7 +383,8 @@ fun NodeListViewItem(
                                 visibility = Visibility.Visible
                             }
                             .padding(end = 4.dp)
-                            .size(21.dp),
+                            .size(21.dp)
+                            .testTag(SHARES_ICON_TEST_TAG),
                         colorFilter = ColorFilter.tint(
                             MaterialTheme.colors.textColorSecondary
                         ),
@@ -397,7 +399,7 @@ fun NodeListViewItem(
                             end.linkTo(threeDots.start)
                             visibility =
                                 if (nodeAvailableOffline) Visibility.Visible else Visibility.Gone
-                        },
+                        }.testTag(AVAILABLE_OFFLINE_ICON_TEST_TAG),
                     colorFilter = ColorFilter.tint(
                         MaterialTheme.colors.textColorSecondary
                     ),
@@ -413,6 +415,21 @@ fun NodeListViewItem(
  * Test tag for info text
  */
 const val INFO_TEXT_TEST_TAG = "node_list_view_item:text_info"
+
+/**
+ * Test tag for shares text
+ */
+const val SHARES_ICON_TEST_TAG = "node_list_view_item:shares_icon"
+
+/**
+ * Test tag for available offline
+ */
+const val AVAILABLE_OFFLINE_ICON_TEST_TAG = "node_list_view_item:available_offline"
+
+/**
+ * Test tag for node title
+ */
+const val NODE_TITLE_TEXT_TEST_TAG = "node_list_view_item:node_title"
 
 /**
  * Text tag for selected item
@@ -453,6 +470,16 @@ const val VERIFIED_TEST_TAG = "node_list_view_item:icon_verified"
  * Test tag for the Info Icon
  */
 const val INFO_ICON_TEST_TAG = "node_list_view_item:icon_info_icon"
+
+/**
+ * Test tag for more icon
+ */
+const val MORE_ICON_TEST_TAG = "node_list_view_item:more_icon"
+
+/**
+ * Test tag for the label
+ */
+const val LABEL_TEST_TAG = "node_list_view_item:label"
 
 
 @CombinedThemePreviews
