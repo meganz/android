@@ -31,12 +31,12 @@ class FolderContentListHolder(
                 if (!isSelected) {
                     if (item.isFolder) {
                         hierarchy.setPlaceholderImage(IconPackR.drawable.ic_folder_medium_solid)
-                        setActualImageResource(IconPackR.drawable.ic_folder_medium_solid)
+                        hierarchy.setPlaceholderImage(IconPackR.drawable.ic_folder_medium_solid)
                     } else {
                         hierarchy.setPlaceholderImage(MimeTypeList.typeForName(item.name).iconResourceId)
 
                         if (item.isSelected) {
-                            setActualImageResource(CoreUiR.drawable.ic_select_folder)
+                            hierarchy.setPlaceholderImage(CoreUiR.drawable.ic_select_folder)
                         } else {
                             setImageURI(null as Uri?)
                             setImageRequest(

@@ -30,7 +30,7 @@ class OfflineGridFileViewHolder(
         if (node.thumbnail != null) {
             binding.thumbnail.setImageURI(Uri.fromFile(node.thumbnail))
         } else {
-            binding.thumbnail.setActualImageResource(placeHolderRes)
+            binding.thumbnail.hierarchy.setPlaceholderImage(placeHolderRes)
         }
 
         val params = binding.thumbnail.layoutParams

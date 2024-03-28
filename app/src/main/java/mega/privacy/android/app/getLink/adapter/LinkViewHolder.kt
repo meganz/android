@@ -1,12 +1,12 @@
 package mega.privacy.android.app.getLink.adapter
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import android.content.Context
 import android.net.Uri
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.zhpan.bannerview.utils.BannerUtils.dp2px
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemLinkBinding
 import mega.privacy.android.app.getLink.data.LinkItem
@@ -54,13 +54,13 @@ class LinkViewHolder(
 
         when {
             node.isFolder -> {
-                binding.thumbnailImage.setActualImageResource(IconPackR.drawable.ic_folder_medium_solid)
+                binding.thumbnailImage.hierarchy.setPlaceholderImage(IconPackR.drawable.ic_folder_medium_solid)
             }
             item.thumbnail != null -> {
                 binding.thumbnailImage.setImageURI(Uri.fromFile(item.thumbnail))
             }
             else -> {
-                binding.thumbnailImage.setActualImageResource(MimeTypeList.typeForName(node.name).iconResourceId)
+                binding.thumbnailImage.hierarchy.setPlaceholderImage(MimeTypeList.typeForName(node.name).iconResourceId)
             }
         }
 

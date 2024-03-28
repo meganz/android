@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.homepage
 
+import mega.privacy.android.core.R as CoreUiR
 import android.content.Context
 import android.net.Uri
 import android.view.View
@@ -15,7 +16,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.core.R as CoreUiR
 import java.io.File
 
 @Suppress("UNCHECKED_CAST")
@@ -45,7 +45,7 @@ fun setListItemThumbnail(
             }
             else -> {
                 hierarchy.setOverlayImage(null)
-                setActualImageResource(defaultThumbnail)
+                hierarchy.setPlaceholderImage(defaultThumbnail)
             }
         }
     }
@@ -57,7 +57,7 @@ fun setNodeGridThumbnail(imageView: SimpleDraweeView, file: File?, defaultThumbn
         if (isFileAvailable(file)) {
             setImageURI(Uri.fromFile(file))
         } else {
-            setActualImageResource(defaultThumbnail)
+            hierarchy.setPlaceholderImage(defaultThumbnail)
         }
 
         val params = layoutParams

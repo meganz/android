@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.offline.adapter.viewholder
 
+import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as IconPackR
 import android.net.Uri
 import android.view.View
 import android.widget.FrameLayout
@@ -7,8 +9,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.facebook.drawee.generic.RoundingParams
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.core.R as CoreUiR
-import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.app.databinding.OfflineItemListBinding
 import mega.privacy.android.app.presentation.offline.model.OfflineNode
 import mega.privacy.android.app.utils.Util.dp2px
@@ -41,7 +41,7 @@ class OfflineListViewHolder(
                 if (node.thumbnail != null) {
                     setImageURI(Uri.fromFile(node.thumbnail))
                 } else {
-                    setActualImageResource(if (node.node.isFolder) IconPackR.drawable.ic_folder_medium_solid else placeHolderRes)
+                    hierarchy.setPlaceholderImage(if (node.node.isFolder) IconPackR.drawable.ic_folder_medium_solid else placeHolderRes)
                 }
 
                 hierarchy.roundingParams = RoundingParams.fromCornersRadius(5F)

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.modalbottomsheet
 
+import mega.privacy.android.icon.pack.R as IconPackR
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -11,13 +12,12 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isGone
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
-import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.databinding.BottomSheetOfflineItemBinding
-import mega.privacy.android.app.presentation.offline.adapter.OfflineNodeListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.parcelable
+import mega.privacy.android.app.presentation.offline.adapter.OfflineNodeListener
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.OfflineUtils
@@ -78,7 +78,7 @@ internal class OfflineOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFr
                     binding.offlineThumbnail.layoutParams = params
                     binding.offlineThumbnail.setImageURI(Uri.fromFile(file))
                 } else {
-                    binding.offlineThumbnail.setActualImageResource(
+                    binding.offlineThumbnail.hierarchy.setPlaceholderImage(
                         typeForName(
                             nodeOffline.name
                         ).iconResourceId
