@@ -69,6 +69,7 @@ import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
+import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.CloseChatPreviewUseCase
 import mega.privacy.android.domain.usecase.chat.EnableGeolocationUseCase
@@ -188,6 +189,7 @@ class ChatViewModel @Inject constructor(
     private val unmuteChatNotificationUseCase: UnmuteChatNotificationUseCase,
     private val clearChatHistoryUseCase: ClearChatHistoryUseCase,
     private val archiveChatUseCase: ArchiveChatUseCase,
+    private val broadcastChatArchivedUseCase: BroadcastChatArchivedUseCase,
     private val endCallUseCase: EndCallUseCase,
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
     private val startCallUseCase: StartCallUseCase,
@@ -845,7 +847,16 @@ class ChatViewModel @Inject constructor(
     fun archiveChat() {
         viewModelScope.launch {
             runCatching { archiveChatUseCase(chatId, true) }
-                .onFailure {
+                .onSuccess {
+                    broadcastChatArchivedUseCase(_state.value.title.orEmpty())
+                    _state.update { state ->
+                        state.copy(
+                            actionToManageEvent = triggered(
+                                ActionToManage.CloseChat
+                            )
+                        )
+                    }
+                }.onFailure {
                     Timber.e("Error archiving chat $it")
                     _state.update { state ->
                         state.copy(
@@ -867,6 +878,18 @@ class ChatViewModel @Inject constructor(
     fun unarchiveChat() {
         viewModelScope.launch {
             runCatching { archiveChatUseCase(chatId, false) }
+                .onSuccess {
+                    _state.update { state ->
+                        state.copy(
+                            infoToShowEvent = triggered(
+                                InfoToShow.StringWithParams(
+                                    stringId = R.string.success_unarchive_chat,
+                                    args = state.title?.let { title -> listOf(title) }.orEmpty()
+                                )
+                            )
+                        )
+                    }
+                }
                 .onFailure {
                     Timber.e("Error unarchiving chat $it")
                     _state.update { state ->

@@ -76,6 +76,7 @@ import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
+import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.CloseChatPreviewUseCase
 import mega.privacy.android.domain.usecase.chat.EnableGeolocationUseCase
@@ -301,6 +302,7 @@ internal class ChatViewModelTest {
         on { invoke() } doReturn emptyFlow()
     }
     private val leaveChatUseCase = mock<LeaveChatUseCase>()
+    private val broadcastChatArchivedUseCase = mock<BroadcastChatArchivedUseCase>()
 
 
     @BeforeEach
@@ -364,7 +366,8 @@ internal class ChatViewModelTest {
             getCacheFileUseCase,
             recordAudioUseCase,
             deleteFileUseCase,
-            leaveChatUseCase
+            leaveChatUseCase,
+            broadcastChatArchivedUseCase
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
@@ -470,7 +473,8 @@ internal class ChatViewModelTest {
             recordAudioUseCase = recordAudioUseCase,
             deleteFileUseCase = deleteFileUseCase,
             leaveChatUseCase = leaveChatUseCase,
-            monitorLeaveChatUseCase = monitorLeaveChatUseCase
+            monitorLeaveChatUseCase = monitorLeaveChatUseCase,
+            broadcastChatArchivedUseCase = broadcastChatArchivedUseCase
         )
     }
 
@@ -1750,6 +1754,7 @@ internal class ChatViewModelTest {
     fun `test that archive finish with error and shows it`() = runTest {
         whenever(archiveChatUseCase(chatId = chatId, true)).thenThrow(RuntimeException())
         underTest.archiveChat()
+        verifyNoInteractions(broadcastChatArchivedUseCase)
         underTest.state.test {
             val result = ((awaitItem().infoToShowEvent as StateEventWithContentTriggered).content
                     as InfoToShow.StringWithParams).stringId
@@ -1761,8 +1766,12 @@ internal class ChatViewModelTest {
     fun `test that archive finish with success`() = runTest {
         whenever(archiveChatUseCase(chatId = chatId, true)).thenReturn(Unit)
         underTest.archiveChat()
+        verify(broadcastChatArchivedUseCase).invoke(any())
         underTest.state.test {
-            assertThat(awaitItem().infoToShowEvent)
+            val item = awaitItem()
+            assertThat((item.actionToManageEvent as StateEventWithContentTriggered).content)
+                .isInstanceOf(ActionToManage.CloseChat::class.java)
+            assertThat(item.infoToShowEvent)
                 .isInstanceOf(StateEventWithContentConsumed::class.java)
         }
     }
