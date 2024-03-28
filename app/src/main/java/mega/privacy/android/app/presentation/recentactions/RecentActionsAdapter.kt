@@ -19,13 +19,13 @@ import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefa
 import mega.privacy.android.app.presentation.extensions.getQuantityStringOrDefault
 import mega.privacy.android.app.presentation.recentactions.RecentActionsAdapter.RecentActionViewHolder
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
-import mega.privacy.android.app.presentation.recentactions.model.RecentActionsSharesType
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.node.Node
 import nz.mega.sdk.MegaNode
 import timber.log.Timber

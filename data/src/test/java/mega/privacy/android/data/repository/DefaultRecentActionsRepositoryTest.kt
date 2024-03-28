@@ -8,6 +8,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapper
 import mega.privacy.android.data.mapper.recentactions.RecentActionsMapper
 import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.RecentActionsRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -54,7 +55,7 @@ class DefaultRecentActionsRepositoryTest {
             isMedia = true,
             isUpdate = true,
             timestamp = 0L,
-            parentHandle = 1L,
+            parentNodeId = NodeId(1L),
             userEmail = "1",
             nodes = emptyList(),
         )

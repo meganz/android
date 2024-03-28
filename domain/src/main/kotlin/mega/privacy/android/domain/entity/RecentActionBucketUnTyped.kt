@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity
 
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 
 /**
@@ -7,7 +8,7 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
  *
  * @property timestamp
  * @property userEmail
- * @property parentHandle
+ * @property parentNodeId
  * @property isUpdate
  * @property isMedia
  * @property nodes
@@ -15,7 +16,7 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
 data class RecentActionBucketUnTyped(
     val timestamp: Long,
     val userEmail: String,
-    val parentHandle: Long,
+    val parentNodeId: NodeId,
     val isUpdate: Boolean,
     val isMedia: Boolean,
     val nodes: List<UnTypedNode>,

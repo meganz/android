@@ -3,6 +3,7 @@ package mega.privacy.android.data.mapper.recentactions
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaRecentActionBucket
 import javax.inject.Inject
 
@@ -15,7 +16,7 @@ internal class RecentActionBucketMapper @Inject constructor(private val nodeMapp
     ) = RecentActionBucketUnTyped(
         timestamp = megaRecentActionBucket.timestamp,
         userEmail = megaRecentActionBucket.userEmail,
-        parentHandle = megaRecentActionBucket.parentHandle,
+        parentNodeId = NodeId(megaRecentActionBucket.parentHandle),
         isUpdate = megaRecentActionBucket.isUpdate,
         isMedia = megaRecentActionBucket.isMedia,
         nodes = (0 until megaRecentActionBucket.nodes.size()).map {

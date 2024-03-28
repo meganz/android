@@ -57,6 +57,7 @@ import javax.inject.Inject
 /**
  * Recent actions page
  */
+@Deprecated("Should be removed when Compose implementation is released")
 @AndroidEntryPoint
 class RecentActionsFragment : Fragment() {
 

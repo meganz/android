@@ -55,7 +55,7 @@ class RecentActionBucketMapperTest {
         assertThat(actual).isInstanceOf(RecentActionBucketUnTyped::class.java)
         assertThat(actual.timestamp).isEqualTo(recentActionBucket.timestamp)
         assertThat(actual.userEmail).isEqualTo(recentActionBucket.userEmail)
-        assertThat(actual.parentHandle).isEqualTo(recentActionBucket.parentHandle)
+        assertThat(actual.parentNodeId.longValue).isEqualTo(recentActionBucket.parentHandle)
         assertThat(actual.isUpdate).isEqualTo(recentActionBucket.isUpdate)
         assertThat(actual.isMedia).isEqualTo(recentActionBucket.isMedia)
         assertThat(actual.nodes.size).isEqualTo(megaNodeList.size())

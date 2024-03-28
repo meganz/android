@@ -217,7 +217,8 @@ class RecentActionBucketFragment : Fragment() {
     private fun setupHeaderView() {
         if (viewModel.bucket.value?.isMedia == false) {
             val folder =
-                megaApi.getNodeByHandle(viewModel.bucket.value?.parentHandle ?: return) ?: return
+                megaApi.getNodeByHandle(viewModel.bucket.value?.parentNodeId?.longValue ?: return)
+                    ?: return
             binding.folderNameText.text = folder.name
 
             binding.actionImage.setImageDrawable(

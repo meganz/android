@@ -13,9 +13,9 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.recentactions.RecentActionsViewModel
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
-import mega.privacy.android.app.presentation.recentactions.model.RecentActionsSharesType
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -29,7 +29,7 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
-import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
+import mega.privacy.android.domain.usecase.recentactions.LegacyGetRecentActionsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import org.junit.jupiter.api.BeforeEach
@@ -48,7 +48,7 @@ import org.mockito.kotlin.whenever
 class RecentActionsViewModelTest {
     private lateinit var underTest: RecentActionsViewModel
 
-    private val getRecentActionsUseCase = mock<GetRecentActionsUseCase>()
+    private val getRecentActionsUseCase = mock<LegacyGetRecentActionsUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
 
     private val getVisibleContactsUseCase = mock<GetVisibleContactsUseCase>()
@@ -68,7 +68,7 @@ class RecentActionsViewModelTest {
 
     private val megaRecentActionBucket = mock<RecentActionBucket> {
         on { this.nodes }.thenReturn(listOf(node))
-        on { this.parentHandle }.thenReturn(321)
+        on { this.parentNodeId }.thenReturn(NodeId(321))
         on { this.isMedia }.thenReturn(false)
         on { this.timestamp }.thenReturn(0L)
         on { this.userEmail }.thenReturn("aaa@aaa.com")
@@ -77,7 +77,7 @@ class RecentActionsViewModelTest {
 
     private val megaRecentActionBucket2 = mock<RecentActionBucket> {
         on { this.nodes }.thenReturn(listOf(node))
-        on { this.parentHandle }.thenReturn(111)
+        on { this.parentNodeId }.thenReturn(NodeId(111))
         on { this.isMedia }.thenReturn(false)
         on { this.timestamp }.thenReturn(0L)
         on { this.userEmail }.thenReturn("aaa@aaa.com")
@@ -86,7 +86,7 @@ class RecentActionsViewModelTest {
 
     private val megaRecentActionBucket3 = mock<RecentActionBucket> {
         on { this.nodes }.thenReturn(listOf(node))
-        on { this.parentHandle }.thenReturn(111)
+        on { this.parentNodeId }.thenReturn(NodeId(111))
         on { this.isMedia }.thenReturn(false)
         on { this.timestamp }.thenReturn(1L)
         on { this.userEmail }.thenReturn("aaa@aaa.com")

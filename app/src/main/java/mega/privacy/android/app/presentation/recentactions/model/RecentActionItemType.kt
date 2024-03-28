@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.recentactions.model
 
 import com.brandongogetap.stickyheaders.exposed.StickyHeader
 import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.entity.RecentActionsSharesType
 import nz.mega.sdk.MegaRecentActionBucket
 
 /**
@@ -9,6 +10,7 @@ import nz.mega.sdk.MegaRecentActionBucket
  *
  *  @property timestamp the timestamp of the item
  */
+@Deprecated("Should be removed when Compose implementation is released")
 sealed class RecentActionItemType(val timestamp: Long) {
 
     /**
@@ -37,27 +39,3 @@ sealed class RecentActionItemType(val timestamp: Long) {
         RecentActionItemType(timestamp = _timestamp), StickyHeader
 }
 
-/**
- * Shares type of the parent folder of a node in the recent actions
- */
-enum class RecentActionsSharesType {
-    /**
-     * Not a shared node
-     */
-    NONE,
-
-    /**
-     * Node in incoming shares
-     */
-    INCOMING_SHARES,
-
-    /**
-     * Node in outgoing shares
-     */
-    OUTGOING_SHARES,
-
-    /**
-     * Node in pending outgoing shares
-     */
-    PENDING_OUTGOING_SHARES,
-}

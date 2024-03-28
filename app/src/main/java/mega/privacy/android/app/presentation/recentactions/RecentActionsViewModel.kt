@@ -13,19 +13,18 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
-import mega.privacy.android.app.presentation.recentactions.model.RecentActionsSharesType
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsState
 import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.FolderNode
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
-import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
+import mega.privacy.android.domain.usecase.recentactions.LegacyGetRecentActionsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import timber.log.Timber
@@ -43,9 +42,10 @@ import javax.inject.Inject
  * @param monitorHideRecentActivityUseCase
  * @param monitorNodeUpdatesUseCase
  */
+@Deprecated("Should be removed when Compose implementation is released")
 @HiltViewModel
 class RecentActionsViewModel @Inject constructor(
-    private val getRecentActionsUseCase: GetRecentActionsUseCase,
+    private val getRecentActionsUseCase: LegacyGetRecentActionsUseCase,
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
     private val setHideRecentActivityUseCase: SetHideRecentActivityUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
@@ -189,7 +189,7 @@ class RecentActionsViewModel @Inject constructor(
                     .getOrDefault(false)
             val isNodeKeyVerified =
                 bucket.nodes[0].isNodeKeyDecrypted || areCredentialsVerified
-            val parentNode = getNodeByIdUseCase(NodeId(bucket.parentHandle))
+            val parentNode = getNodeByIdUseCase(bucket.parentNodeId)
             val sharesType = getParentSharesType(parentNode)
             recentItemList.add(
                 RecentActionItemType.Item(
