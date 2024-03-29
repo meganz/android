@@ -10,11 +10,14 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
@@ -25,6 +28,9 @@ import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSe
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.data.mapper.FileDurationMapper
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.SvgFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
@@ -110,14 +116,12 @@ class FileBrowserViewModel @Inject constructor(
     private val handleStack = Stack<Long>()
 
     init {
-        monitorMediaDiscovery()
         refreshNodes()
-        monitorFileBrowserChildrenNodes()
+        monitorMediaDiscovery()
         checkViewType()
-        monitorRefreshSession()
         changeTransferOverQuotaBannerVisibility()
-        monitorOfflineNodes()
         monitorConnectivity()
+        monitorNodeUpdates()
     }
 
     private fun monitorConnectivity() {
@@ -134,14 +138,6 @@ class FileBrowserViewModel @Inject constructor(
      * @return the [FileBrowserState]
      */
     fun state() = _state.value
-
-    private fun monitorRefreshSession() {
-        viewModelScope.launch {
-            monitorRefreshSessionUseCase().collect {
-                setPendingRefreshNodes()
-            }
-        }
-    }
 
     /**
      * This will monitor media discovery from [MonitorMediaDiscoveryView] and update
@@ -171,25 +167,16 @@ class FileBrowserViewModel @Inject constructor(
         }
     }
 
-    /**
-     * This will monitor FileBrowserNodeUpdates from [MonitorNodeUpdatesUseCase] and
-     * will update [FileBrowserState.nodesList]
-     */
-    private fun monitorFileBrowserChildrenNodes() {
+    private fun monitorNodeUpdates() {
         viewModelScope.launch {
-            monitorNodeUpdatesUseCase().catch {
-                Timber.e(it)
-            }.collect {
-                checkForNodeIsInRubbish(it.changes)
-            }
-        }
-    }
-
-    private fun monitorOfflineNodes() {
-        viewModelScope.launch {
-            monitorOfflineNodeUpdatesUseCase().collect {
-                setPendingRefreshNodes()
-            }
+            merge(
+                monitorNodeUpdatesUseCase().map { checkForNodeIsInRubbish(it.changes) },
+                monitorOfflineNodeUpdatesUseCase().drop(1),
+                monitorRefreshSessionUseCase(),
+            ).conflate()
+                .collectLatest {
+                    setPendingRefreshNodes()
+                }
         }
     }
 
@@ -213,7 +200,6 @@ class FileBrowserViewModel @Inject constructor(
                 }
             }
         }
-        setPendingRefreshNodes()
     }
 
 
@@ -312,9 +298,9 @@ class FileBrowserViewModel @Inject constructor(
             } else {
                 nodes.firstOrNull { node ->
                     node is TypedFolderNode
-                            || MimeTypeList.typeForName(node.name).isSvgMimeType
-                            || (!MimeTypeList.typeForName(node.name).isImage
-                            && !MimeTypeList.typeForName(node.name).isVideoMimeType)
+                            || (node as? FileNode)?.type is SvgFileTypeInfo
+                            || (node as? FileNode)?.type !is ImageFileTypeInfo
+                            && (node as? FileNode)?.type !is VideoFileTypeInfo
                 }?.let {
                     false
                 } ?: true
@@ -802,7 +788,7 @@ class FileBrowserViewModel @Inject constructor(
      * Hide or unhide the node
      */
     fun hideOrUnhideNodes(nodeIds: List<NodeId>, hide: Boolean) = viewModelScope.launch {
-        for (nodeId in nodeIds) {
+        nodeIds.map { nodeId ->
             async {
                 runCatching {
                     updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = hide)
