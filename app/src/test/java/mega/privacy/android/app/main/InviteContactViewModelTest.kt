@@ -151,21 +151,12 @@ class InviteContactViewModelTest {
     }
 
     @Test
-    fun `test that the filtered contact list contains only a header item when there are no contacts available`() =
+    fun `test that an empty list is returned as the filtered contacts when there are no contacts available`() =
         runTest {
-            whenever(context.getString(R.string.contacts_phone)).thenReturn("Phone contacts")
-
             underTest.filterContacts("query")
 
             underTest.filterUiState.test {
-                val expected = listOf(
-                    InvitationContactInfo(
-                        ID_PHONE_CONTACTS_HEADER,
-                        "Phone contacts",
-                        TYPE_PHONE_CONTACT_HEADER
-                    )
-                )
-                assertThat(expectMostRecentItem().filteredContacts).isEqualTo(expected)
+                assertThat(expectMostRecentItem().filteredContacts).isEqualTo(emptyList<InvitationContactInfo>())
             }
         }
 
@@ -342,15 +333,7 @@ class InviteContactViewModelTest {
             underTest.onSearchQueryChange(newSearchQuery)
 
             underTest.filterUiState.test {
-                val expected = listOf(
-                    // Header
-                    InvitationContactInfo(
-                        ID_PHONE_CONTACTS_HEADER,
-                        context.getString(R.string.contacts_phone),
-                        TYPE_PHONE_CONTACT_HEADER
-                    )
-                )
-                assertThat(expectMostRecentItem().filteredContacts).isEqualTo(expected)
+                assertThat(expectMostRecentItem().filteredContacts).isEqualTo(emptyList<InvitationContactInfo>())
             }
         }
 
