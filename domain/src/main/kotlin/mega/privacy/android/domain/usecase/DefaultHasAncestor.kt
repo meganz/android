@@ -7,16 +7,14 @@ import javax.inject.Inject
 /**
  * Default has ancestor
  *
- * @property fileSystemRepository
+ * @property nodeRepository
  */
 class DefaultHasAncestor @Inject constructor(
     private val nodeRepository: NodeRepository,
 ) : HasAncestor {
 
     override suspend fun invoke(targetNodeId: NodeId, ancestorId: NodeId): Boolean {
-        val node = nodeRepository.getNodeById(targetNodeId) ?: return false
-        val currentId = node.id
-        val parentId = node.parentId
-        return currentId == ancestorId || invoke(parentId, ancestorId)
+        return targetNodeId == ancestorId
+                || invoke(nodeRepository.getParentNodeId(targetNodeId) ?: return false, ancestorId)
     }
 }

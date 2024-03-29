@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
 
 /**
  * Add node type
+ * If you want to add type for nodes, use [AddNodesTypeUseCase] instead
  */
 fun interface AddNodeType {
     /**

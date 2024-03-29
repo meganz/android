@@ -1097,6 +1097,17 @@ class NodeRepositoryImplTest {
         }
     }
 
+    @Test
+    fun `test that get parent id returns the correct parent id`() = runTest {
+        val nodeId = NodeId(1L)
+        val megaNode = mock<MegaNode> {
+            on { parentHandle }.thenReturn(2L)
+        }
+        whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
+        val actual = underTest.getParentNodeId(nodeId)
+        assertThat(actual).isEqualTo(NodeId(2L))
+    }
+
     private fun provideNodeId() = Stream.of(
         Arguments.of(null),
         Arguments.of(NodeId(2L)),

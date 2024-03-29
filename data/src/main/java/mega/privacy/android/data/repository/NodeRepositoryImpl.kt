@@ -236,6 +236,12 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getParentNodeId(nodeId: NodeId): NodeId? = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
+            NodeId(it.parentHandle)
+        }
+    }
+
     override suspend fun doesNodeExist(nodeId: NodeId): Boolean = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(nodeId.longValue) != null
     }

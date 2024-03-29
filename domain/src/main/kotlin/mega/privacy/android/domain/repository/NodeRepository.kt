@@ -111,6 +111,14 @@ interface NodeRepository {
     suspend fun getNodeById(nodeId: NodeId): Node?
 
     /**
+     * Get parent node id
+     *
+     * @param nodeId
+     * @return
+     */
+    suspend fun getParentNodeId(nodeId: NodeId): NodeId?
+
+    /**
      * Checks if a Node exists
      *
      * @param nodeId

@@ -3,7 +3,6 @@ package mega.privacy.android.domain.usecase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.NodeRepository
 import org.junit.Before
@@ -25,12 +24,6 @@ class DefaultHasAncestorTest {
 
     @Test
     fun `test that true is returned if the ids are the same`() = runTest {
-        val Node = mock<Node> { on { id }.thenReturn(targetNode) }
-
-        nodeRepository.stub {
-            onBlocking { getNodeById(targetNode) }.thenReturn(Node)
-        }
-
         val actual = underTest(targetNode, targetNode)
         assertThat(actual).isTrue()
     }
@@ -38,12 +31,9 @@ class DefaultHasAncestorTest {
     @Test
     fun `test that true is returned if direct parent is the ancestor`() = runTest {
         val ancestor = NodeId(targetNode.longValue + 1)
-        val Node = mock<Node> { on { parentId }.thenReturn(ancestor) }
-        val ancestorNode = mock<Node> { on { id }.thenReturn(ancestor) }
 
         nodeRepository.stub {
-            onBlocking { getNodeById(targetNode) }.thenReturn(Node)
-            onBlocking { getNodeById(ancestor) }.thenReturn(ancestorNode)
+            onBlocking { getParentNodeId(targetNode) }.thenReturn(ancestor)
         }
         val actual = underTest(targetNode, ancestor)
         assertThat(actual).isTrue()
@@ -52,9 +42,9 @@ class DefaultHasAncestorTest {
     @Test
     fun `test that false is returned if the target node is null`() = runTest {
         nodeRepository.stub {
-            onBlocking { getNodeById(targetNode) }.thenReturn(null)
+            onBlocking { getParentNodeId(targetNode) }.thenReturn(null)
         }
-        val actual = underTest(targetNode, targetNode)
+        val actual = underTest(targetNode, NodeId(13L))
         assertThat(actual).isFalse()
     }
 
@@ -63,14 +53,10 @@ class DefaultHasAncestorTest {
         runTest {
             val ancestor = NodeId(targetNode.longValue + 1)
             val directParentId = NodeId(ancestor.longValue + 1)
-            val Node = mock<Node> { on { parentId }.thenReturn(directParentId) }
-            val directParent = mock<Node> { on { parentId }.thenReturn(ancestor) }
-            val ancestorNode = mock<Node> { on { id }.thenReturn(ancestor) }
 
             nodeRepository.stub {
-                onBlocking { getNodeById(targetNode) }.thenReturn(Node)
-                onBlocking { getNodeById(directParentId) }.thenReturn(directParent)
-                onBlocking { getNodeById(ancestor) }.thenReturn(ancestorNode)
+                onBlocking { getParentNodeId(targetNode) }.thenReturn(directParentId)
+                onBlocking { getParentNodeId(directParentId) }.thenReturn(ancestor)
             }
             val actual = underTest(targetNode, ancestor)
             assertThat(actual).isTrue()
@@ -80,20 +66,15 @@ class DefaultHasAncestorTest {
     fun `test that true is returned if distant ancestor is the ancestor`() = runTest {
         val ancestor = NodeId(targetNode.longValue + 1)
         val directParentId = NodeId(ancestor.longValue + 1)
-        val Node = mock<Node> { on { parentId }.thenReturn(directParentId) }
-        val directParent = mock<Node> {
-            on { parentId }.thenReturn(directParentId,
-                directParentId,
-                directParentId,
-                directParentId,
-                ancestor)
-        }
-        val ancestorNode = mock<Node> { on { id }.thenReturn(ancestor) }
 
         nodeRepository.stub {
-            onBlocking { getNodeById(targetNode) }.thenReturn(Node)
-            onBlocking { getNodeById(directParentId) }.thenReturn(directParent)
-            onBlocking { getNodeById(ancestor) }.thenReturn(ancestorNode)
+            onBlocking { getParentNodeId(targetNode) }.thenReturn(directParentId)
+            onBlocking { getParentNodeId(directParentId) }
+                .thenReturn(directParentId)
+                .thenReturn(directParentId)
+                .thenReturn(directParentId)
+                .thenReturn(directParentId)
+                .thenReturn(ancestor)
         }
         val actual = underTest(targetNode, ancestor)
         assertThat(actual).isTrue()
