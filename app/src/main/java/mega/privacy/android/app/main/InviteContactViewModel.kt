@@ -172,8 +172,8 @@ class InviteContactViewModel @Inject constructor(
             }
 
             _filterUiState.update {
-                it.copy(
-                    filteredContacts = listOf(
+                val newFilteredContacts = if (phoneContacts.isNotEmpty()) {
+                    listOf(
                         // Header
                         InvitationContactInfo(
                             ID_PHONE_CONTACTS_HEADER,
@@ -181,7 +181,8 @@ class InviteContactViewModel @Inject constructor(
                             TYPE_PHONE_CONTACT_HEADER
                         )
                     ).plus(phoneContacts)
-                )
+                } else emptyList()
+                it.copy(filteredContacts = newFilteredContacts)
             }
         }
     }

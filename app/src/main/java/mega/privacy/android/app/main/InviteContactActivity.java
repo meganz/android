@@ -334,10 +334,8 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
     private void collectFlows() {
         ViewExtensionsKt.collectFlow(this, viewModel.getFilterUiState(), Lifecycle.State.STARTED, filterUiState -> {
-            if (!filterUiState.getFilteredContacts().isEmpty()) {
-                refreshList();
-                visibilityFastScroller();
-            }
+            refreshList();
+            visibilityFastScroller();
             return Unit.INSTANCE;
         });
     }
