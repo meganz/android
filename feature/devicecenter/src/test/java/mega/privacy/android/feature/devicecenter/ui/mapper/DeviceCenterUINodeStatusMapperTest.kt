@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
+import mega.privacy.android.shared.sync.DeviceFolderUINodeErrorMessageMapper
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

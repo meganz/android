@@ -42,6 +42,8 @@ include(":navigation")
 include(":legacy-core-ui")
 include(":icon-pack")
 include(":shared:theme")
+include(":shared:resources")
+include(":shared:sync")
 
 println("isServerBuild = ${isServerBuild()}")
 buildCache {

@@ -5,10 +5,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.icon.DeviceIconType
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
+import mega.privacy.android.shared.resources.R
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
@@ -52,8 +52,8 @@ private class DeviceCenterUINodeStatusProvider :
         DeviceCenterUINodeStatus.Offline,
         DeviceCenterUINodeStatus.Paused,
         DeviceCenterUINodeStatus.Stopped,
-        DeviceCenterUINodeStatus.Overquota(specificErrorMessage = R.string.device_center_list_view_item_sub_state_storage_overquota),
-        DeviceCenterUINodeStatus.Error(specificErrorMessage = R.string.device_center_list_view_item_sub_state_put_nodes_error),
-        DeviceCenterUINodeStatus.Blocked(specificErrorMessage = R.string.device_center_list_view_item_sub_state_account_blocked),
+        DeviceCenterUINodeStatus.Overquota(specificErrorMessage = R.string.general_sync_storage_overquota),
+        DeviceCenterUINodeStatus.Error(specificErrorMessage = R.string.general_sync_put_nodes_error),
+        DeviceCenterUINodeStatus.Blocked(specificErrorMessage = R.string.general_sync_account_blocked),
     ).asSequence()
 }

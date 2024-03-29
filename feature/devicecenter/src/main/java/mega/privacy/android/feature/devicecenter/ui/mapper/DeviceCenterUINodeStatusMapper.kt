@@ -2,6 +2,7 @@ package mega.privacy.android.feature.devicecenter.ui.mapper
 
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceCenterNodeStatus
 import mega.privacy.android.feature.devicecenter.ui.model.status.DeviceCenterUINodeStatus
+import mega.privacy.android.shared.sync.DeviceFolderUINodeErrorMessageMapper
 import javax.inject.Inject
 
 /**

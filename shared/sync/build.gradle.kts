@@ -7,10 +7,8 @@ plugins {
     id("de.mannodermaus.android-junit5")
 }
 
-apply(from = "${project.rootDir}/tools/util.gradle")
-apply(from = "${project.rootDir}/tools/sdk.gradle")
-
 android {
+    namespace = "mega.privacy.android.shared.sync"
     val compileSdkVersion: Int by rootProject.extra
     compileSdk = compileSdkVersion
     val buildTools: String by rootProject.extra
@@ -27,11 +25,6 @@ android {
     defaultConfig {
         val minSdkVersion: Int by rootProject.extra
         minSdk = minSdkVersion
-
-        val targetSdkVersion: Int by rootProject.extra
-        targetSdk = targetSdkVersion
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     compileOptions {
@@ -43,7 +36,6 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
-            isReturnDefaultValues = true
         }
     }
 
@@ -64,39 +56,17 @@ android {
         abortOnError = false
         xmlOutput = file("build/reports/lint-results.xml")
     }
-    namespace = "mega.privacy.android.feature.devicecenter"
-}
+    dependencies {
+        lintChecks(project(":lint"))
+        implementation(project(":core-ui"))
 
-tasks.withType<Test> {
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
+        implementation(platform(androidx.compose.bom))
+        implementation(androidx.bundles.compose.bom)
+    }
 }
-
 dependencies {
-    implementation(project(":core:formatter"))
-    lintChecks(project(":lint"))
-
-    implementation(project(":analytics"))
     implementation(project(":domain"))
-    implementation(project(":navigation"))
-    implementation(project(":data"))
-    implementation(project(":core-ui"))
-    implementation(project(":shared:theme"))
-    implementation(project(":shared:sync"))
     implementation(project(":shared:resources"))
-    implementation(project(":legacy-core-ui"))
-    implementation(project(":icon-pack"))
-
-    testImplementation(project(":core-test"))
-    testImplementation(project(":core-ui-test"))
-
-    implementation(lib.mega.analytics)
-    implementation(lib.kotlin.ktx)
-    implementation(lib.logging.timber)
-    implementation(androidx.appcompat)
-    implementation(androidx.fragment)
-    implementation(google.material)
-    implementation(androidx.lifecycle.viewmodel)
-    implementation(androidx.lifecycle.service)
     implementation(google.hilt.android)
 
     val shouldApplyDefaultConfiguration: Closure<Boolean> by rootProject.extra
@@ -107,21 +77,8 @@ dependencies {
         kapt(androidx.hilt.compiler)
     }
 
-    // Compose
-    implementation(androidx.lifecycle.runtime.compose)
-    implementation(androidx.compose.activity)
-    implementation(androidx.compose.viewmodel)
-    implementation(platform(androidx.compose.bom))
-    implementation(androidx.bundles.compose.bom)
-    implementation(lib.compose.state.events)
-    implementation(androidx.hilt.navigation)
-    implementation(androidx.constraintlayout.compose)
-    implementation(lib.compose.state.events)
-
     testImplementation(testlib.junit)
     testImplementation(testlib.junit.test.ktx)
-    testImplementation(testlib.espresso)
-    testImplementation(testlib.compose.junit)
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.arch.core.test)
@@ -133,4 +90,8 @@ dependencies {
     testRuntimeOnly(testlib.junit.jupiter.engine)
     testImplementation(platform(testlib.junit5.bom))
     testImplementation(testlib.bundles.junit5.api)
+}
+
+tasks.withType<Test> {
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
 }
