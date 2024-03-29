@@ -1317,7 +1317,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     val tabIconColor =
-                        ContextCompat.getColor(applicationContext, R.color.color_button_brand)
+                        ContextCompat.getColor(applicationContext, R.color.color_border_interactive)
                     tab.icon?.setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN)
                 }
 

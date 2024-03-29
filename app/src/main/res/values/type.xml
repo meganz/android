@@ -78,7 +78,7 @@
     </style>
 
     <style name="TextAppearance.Mega.Subtitle1.Red">
-        <item name="android:textColor">@color/color_button_brand</item>
+        <item name="android:textColor">@color/color_text_error</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle1.Grey38White38">

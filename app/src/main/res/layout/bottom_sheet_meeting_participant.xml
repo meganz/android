@@ -173,9 +173,9 @@
                     style="@style/BottomSheetItem"
                     android:show="@{viewModel.showRemoveItem()}"
                     android:text="@string/remove_participant_menu_item"
-                    android:textColor="@color/color_button_brand"
+                    android:textColor="@color/color_text_error"
                     app:drawableStartCompat="@drawable/ic_x_medium_regular_outline"
-                    app:drawableTint="@color/color_button_brand" />
+                    app:drawableTint="@color/color_support_error" />
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </LinearLayout>

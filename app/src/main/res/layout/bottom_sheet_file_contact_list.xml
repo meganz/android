@@ -90,7 +90,7 @@
             android:id="@+id/file_contact_list_option_permissions_layout"
             style="@style/BottomSheetOption"
             android:text="@string/file_properties_shared_folder_change_permissions"
-            app:drawableStartCompat="@drawable/ic_change_permissions" />
+            app:drawableStartCompat="@drawable/ic_key_02_medium_regular_outline" />
 
         <View
             android:id="@+id/separator_change_permissions"

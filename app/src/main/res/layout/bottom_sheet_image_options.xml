@@ -148,7 +148,7 @@
                 android:id="@+id/option_open_with"
                 style="@style/BottomSheetOption"
                 android:text="@string/external_play"
-                app:drawableStartCompat="@drawable/ic_open_with" />
+                app:drawableStartCompat="@drawable/ic_external_link_medium_regular_outline" />
 
             <TextView
                 android:id="@+id/option_forward"

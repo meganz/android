@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.model.menuaction
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -12,7 +13,7 @@ import javax.inject.Inject
  */
 class VerifyMenuAction @Inject constructor() : MenuActionWithIcon {
     @Composable
-    override fun getIconPainter() = painterResource(id = R.drawable.ic_change_permissions)
+    override fun getIconPainter() = painterResource(id = iconPackR.drawable.ic_key_02_medium_regular_outline)
 
     @Composable
     override fun getDescription() =

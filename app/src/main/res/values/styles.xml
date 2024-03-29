@@ -34,7 +34,7 @@
     </style>
 
     <style name="ThemeOverlay.Mega.Button.TextButton.Red" parent="">
-        <item name="colorPrimary">@color/red_600_red_300</item>
+        <item name="colorPrimary">@color/color_text_error</item>
     </style>
 
     <!-- Outlined button -->
@@ -191,9 +191,9 @@
 
     <!-- Tab layout -->
     <style name="Widget.Mega.TabLayout" parent="Widget.Design.TabLayout">
-        <item name="tabIndicatorColor">@color/red_600_red_300</item>
+        <item name="tabIndicatorColor">@color/color_border_interactive</item>
         <item name="tabIndicatorHeight">2dp</item>
-        <item name="tabSelectedTextColor">@color/red_600_red_300</item>
+        <item name="tabSelectedTextColor">@color/color_border_interactive</item>
         <item name="tabTextAppearance">@style/TextAppearance.Mega.Tab</item>
         <item name="tabMaxWidth">0dp</item>
         <item name="tabIconTint">@color/grey_054_white_054</item>
@@ -403,7 +403,7 @@
         <item name="android:layout_height">16dp</item>
         <item name="android:layout_centerVertical">true</item>
         <item name="android:background">@null</item>
-        <item name="android:tint">@color/red_800_red_400</item>
+        <item name="android:tint">@color/color_button_brand</item>
         <item name="android:visibility">gone</item>
     </style>
 
@@ -655,7 +655,8 @@
 
     <style name="BottomSheetOption.Red">
         <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle1.Red</item>
-        <item name="drawableTint">@color/color_button_brand</item>
+        <item name="android:textColor">@color/color_text_error</item>
+        <item name="drawableTint">@color/color_support_error</item>
     </style>
 
     <style name="CallBanner">

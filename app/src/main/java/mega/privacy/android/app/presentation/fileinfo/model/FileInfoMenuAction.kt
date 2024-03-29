@@ -117,7 +117,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
         ), SelectionModeAction
 
         object ChangePermission : MenuActionString(
-            R.drawable.ic_change_permissions_w,
+            IconPackR.drawable.ic_key_02_medium_regular_outline,
             R.string.file_properties_shared_folder_change_permissions,
             TEST_TAG_CHANGE_PERMISSION_SELECT_MODE_ACTION
         ), SelectionModeAction

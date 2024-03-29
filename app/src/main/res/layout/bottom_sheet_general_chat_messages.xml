@@ -40,7 +40,7 @@
                 android:id="@+id/open_with_layout"
                 style="@style/BottomSheetOption"
                 android:text="@string/external_play"
-                app:drawableStartCompat="@drawable/ic_open_with" />
+                app:drawableStartCompat="@drawable/ic_external_link_medium_regular_outline" />
 
             <LinearLayout
                 android:id="@+id/forward_separator"

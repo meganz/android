@@ -295,7 +295,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isOpenWithMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = R.drawable.ic_open_with),
+                        icon = painterResource(id = mega.privacy.android.icon.pack.R.drawable.ic_external_link_medium_regular_outline),
                         text = stringResource(id = R.string.external_play),
                         onActionClicked = onClickOpenWith,
                         dividerType = null,

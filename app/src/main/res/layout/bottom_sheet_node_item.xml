@@ -143,7 +143,7 @@
                 style="@style/BottomSheetOption"
                 android:text="@string/shared_items_bottom_sheet_menu_verify_user"
                 android:visibility="gone"
-                app:drawableStartCompat="@drawable/ic_change_permissions"/>
+                app:drawableStartCompat="@drawable/ic_key_02_medium_regular_outline"/>
 
             <View
                 android:id="@+id/separator_info_option"
@@ -271,7 +271,7 @@
                 android:id="@+id/open_with_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/external_play"
-                app:drawableStartCompat="@drawable/ic_open_with"/>
+                app:drawableStartCompat="@drawable/ic_external_link_medium_regular_outline"/>
 
             <TextView
                 android:id="@+id/open_folder_option"
