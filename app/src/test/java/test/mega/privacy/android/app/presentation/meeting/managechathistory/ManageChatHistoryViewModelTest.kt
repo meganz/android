@@ -2,10 +2,8 @@ package test.mega.privacy.android.app.presentation.meeting.managechathistory
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.managechathistory.ManageChatHistoryViewModel
@@ -14,19 +12,20 @@ import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRetentionTimeUpdateUseCase
+import mega.privacy.android.domain.usecase.chat.SetChatRetentionTimeUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
-import test.mega.privacy.android.app.AnalyticsTestExtension
 
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ManageChatHistoryViewModelTest {
 
@@ -35,28 +34,17 @@ class ManageChatHistoryViewModelTest {
     private val monitorChatRetentionTimeUpdateUseCase =
         mock<MonitorChatRetentionTimeUpdateUseCase>()
     private val clearChatHistoryUseCase = mock<ClearChatHistoryUseCase>()
+    private val setChatRetentionTimeUseCase = mock<SetChatRetentionTimeUseCase>()
     private val snackBarHandler = mock<SnackBarHandler>()
 
     private val chatId = 123L
-
-    companion object {
-        @OptIn(ExperimentalCoroutinesApi::class)
-        private val testDispatcher = UnconfinedTestDispatcher()
-
-        @JvmField
-        @RegisterExtension
-        val extension = CoroutineMainDispatcherExtension(testDispatcher)
-
-        @JvmField
-        @RegisterExtension
-        val analyticsTestExtension = AnalyticsTestExtension()
-    }
 
     @BeforeAll
     fun setUp() {
         underTest = ManageChatHistoryViewModel(
             monitorChatRetentionTimeUpdateUseCase = monitorChatRetentionTimeUpdateUseCase,
             clearChatHistoryUseCase = clearChatHistoryUseCase,
+            setChatRetentionTimeUseCase = setChatRetentionTimeUseCase,
             snackBarHandler = snackBarHandler
         )
     }
@@ -141,5 +129,14 @@ class ManageChatHistoryViewModelTest {
                 resId = R.string.clear_history_error,
                 snackbarDuration = MegaSnackbarDuration.Long
             )
+        }
+
+    @Test
+    fun `test that chat's retention time use case is invoked with the correct parameters`() =
+        runTest {
+            val period = 321L
+            underTest.setChatRetentionTime(chatId = chatId, period = period)
+
+            verify(setChatRetentionTimeUseCase).invoke(chatId, period)
         }
 }

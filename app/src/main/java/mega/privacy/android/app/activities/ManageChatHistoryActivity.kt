@@ -11,11 +11,9 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityManageChatHistoryBinding
-import mega.privacy.android.app.listeners.SetRetentionTimeListener
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ClearChatConfirmationDialog
 import mega.privacy.android.app.presentation.meeting.managechathistory.ManageChatHistoryViewModel
@@ -516,11 +514,12 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
 
             R.id.history_retention_switch_layout -> {
                 if (binding.historyRetentionSwitch.isChecked) {
-                    MegaApplication.getInstance().megaChatApi.setChatRetentionTime(
-                        chat!!.chatId,
-                        DISABLED_RETENTION_TIME,
-                        SetRetentionTimeListener(this)
-                    )
+                    chat?.apply {
+                        viewModel.setChatRetentionTime(
+                            chatId = chatId,
+                            period = DISABLED_RETENTION_TIME
+                        )
+                    }
                 } else {
                     createHistoryRetentionAlertDialog(this, chatId, true)
                 }
@@ -558,10 +557,9 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
                 }
 
                 val totalSeconds = binding.numberPicker.value * secondInOption
-                megaChatApi.setChatRetentionTime(
-                    chatId,
-                    totalSeconds.toLong(),
-                    SetRetentionTimeListener(this)
+                viewModel.setChatRetentionTime(
+                    chatId = chatId,
+                    period = totalSeconds.toLong()
                 )
             }
         }

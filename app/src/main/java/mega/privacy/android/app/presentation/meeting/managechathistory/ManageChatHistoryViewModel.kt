@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRetentionTimeUpdateUseCase
 import timber.log.Timber
+import mega.privacy.android.domain.usecase.chat.SetChatRetentionTimeUseCase
 import javax.inject.Inject
 
 /**
@@ -26,6 +27,7 @@ import javax.inject.Inject
 class ManageChatHistoryViewModel @Inject constructor(
     private val monitorChatRetentionTimeUpdateUseCase: MonitorChatRetentionTimeUpdateUseCase,
     private val clearChatHistoryUseCase: ClearChatHistoryUseCase,
+    private val setChatRetentionTimeUseCase: SetChatRetentionTimeUseCase,
     private val snackBarHandler: SnackBarHandler,
 ) : ViewModel() {
 
@@ -74,6 +76,19 @@ class ManageChatHistoryViewModel @Inject constructor(
                         snackbarDuration = MegaSnackbarDuration.Long
                     )
                 }
+        }
+    }
+
+    /**
+     * Update the chat retention time
+     *
+     * @param chatId Chat room ID
+     * @param period Retention timeframe in seconds
+     */
+    fun setChatRetentionTime(chatId: Long, period: Long) {
+        viewModelScope.launch {
+            runCatching { setChatRetentionTimeUseCase(chatId = chatId, period = period) }
+                .onFailure { Timber.e("Error setting retention time", it) }
         }
     }
 
