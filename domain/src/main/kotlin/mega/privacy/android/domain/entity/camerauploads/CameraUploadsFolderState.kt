@@ -17,6 +17,7 @@ import kotlin.math.roundToInt
  * @property bytesUploadedCount Number of bytes uploaded
  * @property pendingCount Number of files remaining to be uploaded
  * @property progress current progress of Camera Uploads process for the folder. A [Int] between 0 and 100
+ * @property uploadTags the list of transfer tags for pending or active uploads, used to cancel them when needed
  */
 data class CameraUploadsFolderState(
     val lastTimestamp: Long = -1,
@@ -25,7 +26,8 @@ data class CameraUploadsFolderState(
     val uploadedCount: Int = 0,
     val bytesToUploadCount: Long = 0,
     val bytesFinishedUploadedCount: Long = 0,
-    val bytesInProgressUploadedTable: Hashtable<Long, Long> = Hashtable()
+    val bytesInProgressUploadedTable: Hashtable<Long, Long> = Hashtable(),
+    val uploadTags: List<Int> = emptyList(),
 ) {
     val bytesUploadedCount: Long
         get() = bytesFinishedUploadedCount + bytesInProgressUploadedTable.values.sum()

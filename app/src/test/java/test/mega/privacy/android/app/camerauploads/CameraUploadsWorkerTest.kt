@@ -15,6 +15,8 @@ import androidx.work.impl.utils.taskexecutor.WorkManagerTaskExecutor
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -61,6 +63,7 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
@@ -106,8 +109,9 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
+import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.uploads.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import org.junit.Before
@@ -160,8 +164,10 @@ class CameraUploadsWorkerTest {
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase = mock()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val handleLocalIpChangeUseCase: HandleLocalIpChangeUseCase = mock()
-    private val cancelAllUploadTransfersUseCase: CancelAllUploadTransfersUseCase = mock()
-    private val checkOrCreateCameraUploadsNodeUseCase: CheckOrCreateCameraUploadsNodeUseCase = mock()
+    private val cancelTransferByTagUseCase: CancelTransferByTagUseCase = mock()
+    private val getTransferByTagUseCase: GetTransferByTagUseCase = mock()
+    private val checkOrCreateCameraUploadsNodeUseCase: CheckOrCreateCameraUploadsNodeUseCase =
+        mock()
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase =
         mock()
     private val resetTotalUploadsUseCase: ResetTotalUploadsUseCase = mock()
@@ -259,7 +265,8 @@ class CameraUploadsWorkerTest {
                 backgroundFastLoginUseCase = backgroundFastLoginUseCase,
                 monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
                 handleLocalIpChangeUseCase = handleLocalIpChangeUseCase,
-                cancelAllUploadTransfersUseCase = cancelAllUploadTransfersUseCase,
+                cancelTransferByTagUseCase = cancelTransferByTagUseCase,
+                getTransferByTagUseCase = getTransferByTagUseCase,
                 checkOrCreateCameraUploadsNodeUseCase = checkOrCreateCameraUploadsNodeUseCase,
                 establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
                 resetTotalUploadsUseCase = resetTotalUploadsUseCase,
@@ -1393,12 +1400,49 @@ class CameraUploadsWorkerTest {
         }
 
     @Test
-    fun `test that all pending transfers are cancelled when the worker complete with failure`() =
+    fun `test that all transfers are cancelled when the worker complete with failure`() =
         runTest {
-            whenever(isPrimaryFolderPathValidUseCase(primaryLocalPath)).thenReturn(false)
-            val result = underTest.doWork()
-            verify(cancelAllUploadTransfersUseCase).invoke()
-            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+            val fakeFlow = MutableStateFlow(true)
+            val record = mock<CameraUploadsRecord> {
+                on { folderType }.thenReturn(CameraUploadFolderType.Primary)
+            }
+            val list = listOf(record)
+            val size = 2L // in MB
+            val file = mock<File> {
+                on { length() }.thenReturn(size * 1024 * 1024)
+            }
+            setupDefaultProcessingFilesConditionMocks(list)
+            whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
+            whenever(getFileByPathUseCase(record.filePath)).thenReturn(file)
+
+            val uploadTag = 100
+            val transfer = mock<Transfer> {
+                on { tag }.thenReturn(uploadTag)
+                on { isFinished }.thenReturn(false)
+            }
+            val toUploadEvent = CameraUploadsTransferProgress.ToUpload(
+                record = record,
+                transferEvent = TransferEvent.TransferStartEvent(transfer = transfer),
+            )
+            val flow = channelFlow {
+                send(toUploadEvent)
+                fakeFlow.emit(false)
+            }
+            whenever(monitorConnectivityUseCase()).thenReturn(fakeFlow)
+            whenever(getTransferByTagUseCase(uploadTag)).thenReturn(transfer)
+            whenever(
+                uploadCameraUploadsRecordsUseCase(
+                    list,
+                    NodeId(primaryNodeHandle),
+                    NodeId(secondaryNodeHandle),
+                    tempPath
+                )
+            ).thenReturn(flow)
+
+            underTest.doWork()
+
+
+            verify(cancelTransferByTagUseCase).invoke(uploadTag)
         }
 
     @Test
