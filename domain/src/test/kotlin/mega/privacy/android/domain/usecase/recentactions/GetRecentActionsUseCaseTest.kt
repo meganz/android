@@ -1,11 +1,16 @@
 package mega.privacy.android.domain.usecase.recentactions
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
+import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.UserAccount
+import mega.privacy.android.domain.entity.contacts.ContactData
+import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -38,6 +43,19 @@ class GetRecentActionsUseCaseTest {
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getAccountDetailsUseCase = mock<GetAccountDetailsUseCase>()
     private val areCredentialsVerifiedUseCase = mock<AreCredentialsVerifiedUseCase>()
+    private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
+
+    private val dummyNode1 = mock<FileNode> {
+        on { isNodeKeyDecrypted }.thenReturn(true)
+    }
+    private val dummyRecentActionBucketUnTyped = RecentActionBucketUnTyped(
+        timestamp = 0L,
+        userEmail = "aaa@aaa.com",
+        parentNodeId = NodeId(321L),
+        isUpdate = false,
+        isMedia = false,
+        nodes = listOf(dummyNode1)
+    )
 
     @BeforeEach
     fun setUp() {
@@ -49,6 +67,7 @@ class GetRecentActionsUseCaseTest {
             getNodeByIdUseCase = getNodeByIdUseCase,
             getAccountDetailsUseCase = getAccountDetailsUseCase,
             areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
+            coroutineDispatcher = ioDispatcher
         )
     }
 
@@ -164,47 +183,36 @@ class GetRecentActionsUseCaseTest {
                 ),
             )
             whenever(recentActionsRepository.getRecentActions()).thenReturn(list)
+
             underTest()
+
             verify(areCredentialsVerifiedUseCase).invoke(any())
         }
 
     @Test
-    fun `test that isCurrentUserOwner is invoked for each RecentActionBucket`() = runBlockingTest {
-        val list = listOf(
-            RecentActionBucketUnTyped(
-                timestamp = 0L,
-                userEmail = "aaa@aaa.com",
-                parentNodeId = NodeId(0L),
-                isUpdate = false,
-                isMedia = false,
-                nodes = listOf(mock<FileNode>())
-            ),
+    fun `test that isCurrentUserOwner is invoked for each RecentActionBucket`() = runTest {
+        whenever(recentActionsRepository.getRecentActions()).thenReturn(
+            listOf(dummyRecentActionBucketUnTyped)
         )
-        whenever(recentActionsRepository.getRecentActions()).thenReturn(list)
+
         underTest()
+
         verify(getAccountDetailsUseCase).invoke(false)
     }
 
     @Test
-    fun `test that isCurrentUserOwner is false when email doesn't match`() = runBlockingTest {
-        val node1 = mock<FileNode>()
-        val list = listOf(
-            RecentActionBucketUnTyped(
-                timestamp = 0L,
-                userEmail = "aaa@aaa.com",
-                parentNodeId = NodeId(0L),
-                isUpdate = false,
-                isMedia = false,
-                nodes = listOf(node1)
-            ),
-        )
+    fun `test that isCurrentUserOwner is false when email doesn't match`() = runTest {
         val userAccount = mock<UserAccount> {
             on { email }.thenReturn("ccc@gmail.com")
         }
-        whenever(addNodeType(node1)).thenReturn(mock<TypedFileNode>())
+        whenever(addNodeType(dummyNode1)).thenReturn(mock<TypedFileNode>())
         whenever(getAccountDetailsUseCase(false)).thenReturn(userAccount)
-        whenever(recentActionsRepository.getRecentActions()).thenReturn(list)
+        whenever(recentActionsRepository.getRecentActions()).thenReturn(
+            listOf(dummyRecentActionBucketUnTyped)
+        )
+
         val result = underTest()
+
         assertThat(result[0].currentUserIsOwner).isFalse()
         verify(getAccountDetailsUseCase).invoke(false)
     }
@@ -232,7 +240,180 @@ class GetRecentActionsUseCaseTest {
                 ),
             )
             whenever(recentActionsRepository.getRecentActions()).thenReturn(list)
+
             val result = underTest()
+
             assertThat(result).isEmpty()
+        }
+
+    @Test
+    fun `test that the recent action user name item is populated with the fullName if retrieved from email`() =
+        runTest {
+            val expected = "FirstName LastName"
+            val contact = mock<ContactData> {
+                on { fullName }.thenReturn(expected)
+            }
+            val contactItem = mock<ContactItem> {
+                on { email }.thenReturn("aaa@aaa.com")
+                on { contactData }.thenReturn(contact)
+            }
+            val userAccount = mock<UserAccount> {
+                on { email }.thenReturn("aaa@aaa.com")
+            }
+            whenever(addNodeType(dummyNode1)).thenReturn(mock<TypedFileNode>())
+            whenever(getAccountDetailsUseCase(false)).thenReturn(userAccount)
+            whenever(getVisibleContactsUseCase()).thenReturn(listOf(contactItem))
+            whenever(recentActionsRepository.getRecentActions()).thenReturn(
+                listOf(dummyRecentActionBucketUnTyped)
+            )
+
+            val result = underTest()
+
+            assertThat(result[0].userName).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that the recent action user name item is populated with empty string if not retrieved from email`() =
+        runTest {
+            val expected = ""
+            val contactItem = mock<ContactItem> {
+                on { email }.thenReturn("aaa@aaa.com")
+                on { contactData }.thenReturn(mock())
+            }
+            val userAccount = mock<UserAccount> {
+                on { email }.thenReturn("aaa@aaa.com")
+            }
+            whenever(addNodeType(dummyNode1)).thenReturn(mock<TypedFileNode>())
+            whenever(getAccountDetailsUseCase(false)).thenReturn(userAccount)
+            whenever(getVisibleContactsUseCase()).thenReturn(listOf(contactItem))
+            whenever(recentActionsRepository.getRecentActions()).thenReturn(
+                listOf(dummyRecentActionBucketUnTyped)
+            )
+
+            val result = underTest()
+
+            assertThat(result[0].userName).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that the recent action parent folder name item is set to empty string if not retrieved from the parent node`() =
+        runTest {
+            val parentNode = mock<TypedFolderNode> {
+                on { parentId }.thenReturn(NodeId(1L))
+            }
+            val expected = ""
+            whenever(getNodeByIdUseCase(NodeId(321L))).thenReturn(parentNode)
+            whenever(addNodeType(dummyNode1)).thenReturn(mock<TypedFileNode>())
+            whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(null)
+            whenever(recentActionsRepository.getRecentActions()).thenReturn(
+                listOf(dummyRecentActionBucketUnTyped)
+            )
+
+            val result = underTest()
+
+            assertThat(result[0].parentFolderName).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that the recent action parent folder name item is set if retrieved from the parent node`() =
+        runTest {
+            val expected = "Cloud drive"
+            val parentNode = mock<TypedFolderNode> {
+                on { parentId }.thenReturn(NodeId(1L))
+                on { name }.thenReturn(expected)
+            }
+            whenever(getNodeByIdUseCase(NodeId(321L))).thenReturn(parentNode)
+            whenever(addNodeType(dummyNode1)).thenReturn(mock<TypedFileNode>())
+            whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(null)
+            whenever(recentActionsRepository.getRecentActions()).thenReturn(
+                listOf(dummyRecentActionBucketUnTyped)
+            )
+
+            val result = underTest()
+
+            assertThat(result[0].parentFolderName).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that the recent action shares type item is set to INCOMING_SHARES if parent root node is in incoming shares`() =
+        runTest {
+            val expected = RecentActionsSharesType.INCOMING_SHARES
+            val parentNode = mock<TypedFolderNode> {
+                on { parentId }.thenReturn(NodeId(1L))
+                on { isIncomingShare }.thenReturn(true)
+            }
+            whenever(getNodeByIdUseCase(NodeId(321L))).thenReturn(parentNode)
+            whenever(addNodeType(dummyNode1)).thenReturn(mock<TypedFileNode>())
+            whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(null)
+            whenever(recentActionsRepository.getRecentActions()).thenReturn(
+                listOf(dummyRecentActionBucketUnTyped)
+            )
+
+            val result = underTest()
+
+            assertThat(result[0].parentFolderSharesType).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that the recent action shares type item is set to OUTGOING_SHARES if parent root node is in incoming shares`() =
+        runTest {
+            val expected = RecentActionsSharesType.OUTGOING_SHARES
+            val parentNode = mock<TypedFolderNode> {
+                on { parentId }.thenReturn(NodeId(1L))
+                on { isShared }.thenReturn(true)
+            }
+            whenever(getNodeByIdUseCase(NodeId(321L))).thenReturn(parentNode)
+            whenever(addNodeType(dummyNode1)).thenReturn(mock<TypedFileNode>())
+            whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(null)
+            whenever(recentActionsRepository.getRecentActions()).thenReturn(
+                listOf(dummyRecentActionBucketUnTyped)
+            )
+
+            val result = underTest()
+
+            assertThat(result[0].parentFolderSharesType).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that the recent action shares type item is set to PENDING_OUTGOING_SHARES if parent root node is in incoming shares`() =
+        runTest {
+            val expected = RecentActionsSharesType.PENDING_OUTGOING_SHARES
+            val parentNode = mock<TypedFolderNode> {
+                on { parentId }.thenReturn(NodeId(1L))
+                on { isPendingShare }.thenReturn(true)
+            }
+
+            whenever(getNodeByIdUseCase(NodeId(321L))).thenReturn(parentNode)
+            whenever(addNodeType(dummyNode1)).thenReturn(mock<TypedFileNode>())
+            whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(null)
+            whenever(recentActionsRepository.getRecentActions()).thenReturn(
+                listOf(dummyRecentActionBucketUnTyped)
+            )
+
+            val result = underTest()
+
+            assertThat(result[0].parentFolderSharesType).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that the recent action shares type item is set to NONE if parent root node is in incoming shares`() =
+        runTest {
+            val expected = RecentActionsSharesType.NONE
+            val parentNode = mock<TypedFolderNode> {
+                on { parentId }.thenReturn(NodeId(1L))
+                on { isIncomingShare }.thenReturn(false)
+                on { isShared }.thenReturn(false)
+                on { isPendingShare }.thenReturn(false)
+            }
+            whenever(getNodeByIdUseCase(NodeId(321L))).thenReturn(parentNode)
+            whenever(addNodeType(dummyNode1)).thenReturn(mock<TypedFileNode>())
+            whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(null)
+            whenever(recentActionsRepository.getRecentActions()).thenReturn(
+                listOf(dummyRecentActionBucketUnTyped)
+            )
+
+            val result = underTest()
+
+            assertThat(result[0].parentFolderSharesType).isEqualTo(expected)
         }
 }
