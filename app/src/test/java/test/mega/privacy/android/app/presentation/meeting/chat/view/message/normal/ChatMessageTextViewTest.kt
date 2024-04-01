@@ -81,6 +81,19 @@ class ChatMessageTextViewTest {
         ).assertExists()
     }
 
+    @Test
+    fun `test that edited tag is not shown`() {
+        initComposeRuleContent(
+            text = "Hello World",
+            isMe = true,
+            isEdited = false,
+        )
+        composeTestRule.onNodeWithText(
+            text = composeTestRule.activity.getString(R.string.edited_message_text),
+            substring = true
+        ).assertDoesNotExist()
+    }
+
     private fun initComposeRuleContent(
         text: String,
         isMe: Boolean = false,

@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.meeting.chat.view.message
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -27,7 +28,7 @@ internal fun getMessageText(
     message: String,
     isEdited: Boolean,
 ) = buildAnnotatedString {
-    append(toFormattedText(message))
+    append(message.toFormattedText())
     if (isEdited) {
         append(" ")
         withStyle(
@@ -41,8 +42,8 @@ internal fun getMessageText(
     }
 }
 
-@Composable
-private fun toFormattedText(text: String): AnnotatedString {
+internal fun String.toFormattedText(): AnnotatedString {
+    val text = this
     val formatList = buildList {
         text.forEachIndexed { index, char ->
             when (char) {
@@ -95,7 +96,7 @@ private fun toFormattedText(text: String): AnnotatedString {
                     if (isMultiQuote) format.formatEnd + 3
                     else format.formatEnd + 1
                 val endIndex =
-                    if (index == formatList.size - 1) text.length - 1
+                    if (index == formatList.size - 1) text.length
                     else formatList[index + 1].formatStart
                 append(text.substring(startIndex, endIndex))
             }
@@ -194,28 +195,7 @@ private fun String.getFormat(formatList: List<Format>, index: Int, formatType: F
         }
 
         val isMultiQuote = formatType == FormatType.MultiQuote
-        val formatCharsSize = if (isMultiQuote) 3 else 1
-        val endIndex = indexOf(tag, index + formatCharsSize)
-
-        if (endIndex == -1) {
-            // No final format char found
-            return@let null
-        }
-
-        val breaksSimpleFormat = !isMultiQuote && substring(index, endIndex).contains('\n')
-        val isEndOfText = endIndex == this.length - formatCharsSize
-        var indexBeforeFormat = endIndex - 1
-        var indexAfterFormat = endIndex + formatCharsSize
-        val isValidFormat = !breaksSimpleFormat
-                && this[indexBeforeFormat] != ' '
-                && this[indexBeforeFormat] != '\n'
-                && (isEndOfText
-                || this[indexAfterFormat] == ' '
-                || this[indexAfterFormat] == '\n')
-
-        if (!isValidFormat) {
-            return@let null
-        }
+        val endIndex = getEndFormatIndex(tag, isMultiQuote, index) ?: return@let null
 
         val formatTypeList = buildList {
             add(formatType)
@@ -234,8 +214,8 @@ private fun String.getFormat(formatList: List<Format>, index: Int, formatType: F
             }
         }
 
-        indexAfterFormat = index + formatTypeList.size
-        indexBeforeFormat = endIndex - formatTypeList.size
+        val indexAfterFormat = index + formatTypeList.size + if (isMultiQuote) 2 else 0
+        val indexBeforeFormat = endIndex - formatTypeList.size
 
         if (this[indexAfterFormat] != ' ' && this[indexAfterFormat] != '\n'
             && this[indexBeforeFormat] != ' ' && this[indexBeforeFormat] != '\n'
@@ -251,6 +231,41 @@ private fun String.getFormat(formatList: List<Format>, index: Int, formatType: F
             null
         }
     }
+
+private fun String.getEndFormatIndex(tag: String, isMultiQuote: Boolean, startIndex: Int): Int? {
+    val formatCharsSize = if (isMultiQuote) 3 else 1
+    var endIndex = indexOf(tag, startIndex + formatCharsSize)
+    var newStartIndex = -1
+
+    while (endIndex != -1) {
+        val breaksSimpleFormat = !isMultiQuote && substring(startIndex, endIndex).contains('\n')
+        val isEndOfText = endIndex == this.length - formatCharsSize
+        val indexBeforeFormat = endIndex - 1
+        val indexAfterFormat = endIndex + formatCharsSize
+        if (newStartIndex == -1 && this[indexBeforeFormat] == ' ' || this[indexBeforeFormat] == '\n') {
+            newStartIndex = endIndex
+        }
+
+        if (!breaksSimpleFormat
+            && this[indexBeforeFormat] != ' '
+            && this[indexBeforeFormat] != '\n'
+            && (isEndOfText
+                    || this[indexAfterFormat] == ' '
+                    || this[indexAfterFormat] == '\n')
+        ) {
+            if (newStartIndex == -1) {
+                return endIndex
+            } else {
+                newStartIndex = -1
+            }
+        }
+
+        endIndex = indexOf(tag, endIndex + formatCharsSize)
+    }
+
+    // No final format char found
+    return null
+}
 
 private fun findExtraFormatTypes(
     text: String,
@@ -283,11 +298,10 @@ private fun List<Format>.isAlreadyPartOfAFormat(index: Int) =
         }
     }?.let { true } ?: false
 
-@Composable
 private fun String.applyFormat(format: Format) = buildAnnotatedString {
     with(format) {
         withStyle(
-            style = megaSpanStyle(
+            style = SpanStyle(
                 fontWeight = FontWeight.Bold.takeIf { type.contains(FormatType.Bold) },
                 fontStyle = FontStyle.Italic.takeIf { type.contains(FormatType.Italic) },
                 textDecoration = TextDecoration.LineThrough.takeIf { type.contains(FormatType.Strikethrough) },
