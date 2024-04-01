@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.VIDE
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsUiState
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadOptionUiItem
 import mega.privacy.android.app.presentation.settings.camerauploads.model.VideoQualityUiItem
+import mega.privacy.android.app.presentation.settings.camerauploads.tiles.CAMERA_UPLOADS_LOCAL_FOLDER_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.CAMERA_UPLOADS_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.FILE_UPLOAD_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.HOW_TO_UPLOAD_TILE
@@ -50,7 +51,11 @@ internal class SettingsCameraUploadsViewTest {
         initializeComposeContent(isCameraUploadsEnabled = true)
 
         listOf(
-            HOW_TO_UPLOAD_TILE, FILE_UPLOAD_TILE, KEEP_FILE_NAMES_TILE, MEDIA_UPLOADS_TILE
+            HOW_TO_UPLOAD_TILE,
+            FILE_UPLOAD_TILE,
+            KEEP_FILE_NAMES_TILE,
+            CAMERA_UPLOADS_LOCAL_FOLDER_TILE,
+            MEDIA_UPLOADS_TILE,
         ).forEach { tag ->
             composeTestRule.onNodeWithTag(tag).apply {
                 performScrollTo()
@@ -247,17 +252,18 @@ internal class SettingsCameraUploadsViewTest {
                     videoQualityUiItem = videoQualityUiItem,
                 ),
                 onBusinessAccountPromptDismissed = {},
+                onCameraUploadsProcessStarted = {},
                 onCameraUploadsStateChanged = {},
                 onChargingDuringVideoCompressionStateChanged = {},
-                onIncludeLocationTagsStateChanged = {},
                 onHowToUploadPromptOptionSelected = {},
+                onIncludeLocationTagsStateChanged = {},
                 onKeepFileNamesStateChanged = {},
+                onLocalPrimaryFolderSelected = {},
                 onMediaPermissionsGranted = {},
+                onMediaUploadsStateChanged = {},
                 onNewVideoCompressionSizeLimitProvided = {},
                 onRegularBusinessAccountSubUserPromptAcknowledged = {},
                 onRequestPermissionsStateChanged = {},
-                onMediaUploadsStateChanged = {},
-                onSettingsScreenPaused = {},
                 onUploadOptionUiItemSelected = {},
                 onVideoQualityUiItemSelected = {},
             )

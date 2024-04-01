@@ -18,14 +18,17 @@ import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
+import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableMediaUploadsSettingsUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
@@ -33,12 +36,14 @@ import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSize
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
@@ -67,7 +72,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
@@ -84,9 +88,11 @@ internal class SettingsCameraUploadsViewModelTest {
     private val areUploadFileNamesKeptUseCase = mock<AreUploadFileNamesKeptUseCase>()
     private val checkEnableCameraUploadsStatusUseCase =
         mock<CheckEnableCameraUploadsStatusUseCase>()
+    private val clearCameraUploadsRecordUseCase = mock<ClearCameraUploadsRecordUseCase>()
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase =
         mock<DeleteCameraUploadsTemporaryRootDirectoryUseCase>()
     private val disableMediaUploadsSettingsUseCase = mock<DisableMediaUploadsSettingsUseCase>()
+    private val getPrimaryFolderPathUseCase = mock<GetPrimaryFolderPathUseCase>()
     private val getSecondaryFolderPathUseCase = mock<GetSecondaryFolderPathUseCase>()
     private val getUploadOptionUseCase = mock<GetUploadOptionUseCase>()
     private val getUploadVideoQualityUseCase = mock<GetUploadVideoQualityUseCase>()
@@ -96,6 +102,7 @@ internal class SettingsCameraUploadsViewModelTest {
     private val isChargingRequiredForVideoCompressionUseCase =
         mock<IsChargingRequiredForVideoCompressionUseCase>()
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
+    private val isPrimaryFolderPathValidUseCase = mock<IsPrimaryFolderPathValidUseCase>()
     private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
     private val isSecondaryFolderPathValidUseCase = mock<IsSecondaryFolderPathValidUseCase>()
     private val listenToNewMediaUseCase = mock<ListenToNewMediaUseCase>()
@@ -104,6 +111,7 @@ internal class SettingsCameraUploadsViewModelTest {
     private val setChargingRequiredForVideoCompressionUseCase =
         mock<SetChargingRequiredForVideoCompressionUseCase>()
     private val setLocationTagsEnabledUseCase = mock<SetLocationTagsEnabledUseCase>()
+    private val setPrimaryFolderPathUseCase = mock<SetPrimaryFolderPathUseCase>()
     private val setSecondaryFolderLocalPathUseCase = mock<SetSecondaryFolderLocalPathUseCase>()
     private val setUploadFileNamesKeptUseCase = mock<SetUploadFileNamesKeptUseCase>()
     private val setUploadOptionUseCase = mock<SetUploadOptionUseCase>()
@@ -124,8 +132,10 @@ internal class SettingsCameraUploadsViewModelTest {
             areLocationTagsEnabledUseCase,
             areUploadFileNamesKeptUseCase,
             checkEnableCameraUploadsStatusUseCase,
+            clearCameraUploadsRecordUseCase,
             deleteCameraUploadsTemporaryRootDirectoryUseCase,
             disableMediaUploadsSettingsUseCase,
+            getPrimaryFolderPathUseCase,
             getSecondaryFolderPathUseCase,
             getUploadOptionUseCase,
             getUploadVideoQualityUseCase,
@@ -134,6 +144,7 @@ internal class SettingsCameraUploadsViewModelTest {
             isCameraUploadsEnabledUseCase,
             isChargingRequiredForVideoCompressionUseCase,
             isConnectedToInternetUseCase,
+            isPrimaryFolderPathValidUseCase,
             isSecondaryFolderEnabled,
             isSecondaryFolderPathValidUseCase,
             listenToNewMediaUseCase,
@@ -141,6 +152,7 @@ internal class SettingsCameraUploadsViewModelTest {
             setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompressionUseCase,
             setLocationTagsEnabledUseCase,
+            setPrimaryFolderPathUseCase,
             setSecondaryFolderLocalPathUseCase,
             setUploadFileNamesKeptUseCase,
             setUploadOptionUseCase,
@@ -163,6 +175,7 @@ internal class SettingsCameraUploadsViewModelTest {
         isCameraUploadsEnabled: Boolean = true,
         isMediaUploadsEnabled: Boolean = true,
         maximumNonChargingVideoCompressionSize: Int = 500,
+        primaryFolderPath: String = "primary/folder/path",
         requireChargingDuringVideoCompression: Boolean = true,
         secondaryFolderPath: String = "secondary/folder/path",
         shouldIncludeLocationTags: Boolean = true,
@@ -171,8 +184,9 @@ internal class SettingsCameraUploadsViewModelTest {
         videoQuality: VideoQuality = VideoQuality.ORIGINAL,
     ) {
         whenever(areLocationTagsEnabledUseCase()).thenReturn(shouldIncludeLocationTags)
-        whenever(getSecondaryFolderPathUseCase()).thenReturn(secondaryFolderPath)
         whenever(areUploadFileNamesKeptUseCase()).thenReturn(shouldKeepUploadFileNames)
+        whenever(getPrimaryFolderPathUseCase()).thenReturn(primaryFolderPath)
+        whenever(getSecondaryFolderPathUseCase()).thenReturn(secondaryFolderPath)
         whenever(getUploadOptionUseCase()).thenReturn(uploadOption)
         whenever(getUploadVideoQualityUseCase()).thenReturn(videoQuality)
         whenever(getVideoCompressionSizeLimitUseCase()).thenReturn(
@@ -189,8 +203,10 @@ internal class SettingsCameraUploadsViewModelTest {
             areLocationTagsEnabledUseCase = areLocationTagsEnabledUseCase,
             areUploadFileNamesKeptUseCase = areUploadFileNamesKeptUseCase,
             checkEnableCameraUploadsStatusUseCase = checkEnableCameraUploadsStatusUseCase,
+            clearCameraUploadsRecordUseCase = clearCameraUploadsRecordUseCase,
             deleteCameraUploadsTemporaryRootDirectoryUseCase = deleteCameraUploadsTemporaryRootDirectoryUseCase,
             disableMediaUploadsSettingsUseCase = disableMediaUploadsSettingsUseCase,
+            getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
             getSecondaryFolderPathUseCase = getSecondaryFolderPathUseCase,
             getUploadOptionUseCase = getUploadOptionUseCase,
             getUploadVideoQualityUseCase = getUploadVideoQualityUseCase,
@@ -199,6 +215,7 @@ internal class SettingsCameraUploadsViewModelTest {
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             isChargingRequiredForVideoCompressionUseCase = isChargingRequiredForVideoCompressionUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
+            isPrimaryFolderPathValidUseCase = isPrimaryFolderPathValidUseCase,
             isSecondaryFolderEnabled = isSecondaryFolderEnabled,
             isSecondaryFolderPathValidUseCase = isSecondaryFolderPathValidUseCase,
             listenToNewMediaUseCase = listenToNewMediaUseCase,
@@ -206,6 +223,7 @@ internal class SettingsCameraUploadsViewModelTest {
             setCameraUploadsByWifiUseCase = setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompressionUseCase = setChargingRequiredForVideoCompressionUseCase,
             setLocationTagsEnabledUseCase = setLocationTagsEnabledUseCase,
+            setPrimaryFolderPathUseCase = setPrimaryFolderPathUseCase,
             setSecondaryFolderLocalPathUseCase = setSecondaryFolderLocalPathUseCase,
             setUploadFileNamesKeptUseCase = setUploadFileNamesKeptUseCase,
             setUploadOptionUseCase = setUploadOptionUseCase,
@@ -446,55 +464,21 @@ internal class SettingsCameraUploadsViewModelTest {
                 }
             }
 
-        @ParameterizedTest(name = "when the camera uploads status is {0}")
-        @EnumSource(
-            value = EnableCameraUploadsStatus::class,
-            names = ["SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT", "SHOW_SUSPENDED_MASTER_BUSINESS_ACCOUNT_PROMPT"]
-        )
-        fun `test that a suspended business account prompt is shown`(
-            cameraUploadsStatus: EnableCameraUploadsStatus,
-        ) = runTest {
-            whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(cameraUploadsStatus)
-            initializeUnderTest()
-
-            underTest.onMediaPermissionsGranted()
-
-            underTest.uiState.test {
-                assertThat(awaitItem().businessAccountPromptType).isEqualTo(cameraUploadsStatus)
-            }
-        }
-
         @Test
-        fun `test that camera uploads is not started when camera uploads is disabled and the user pauses the settings screen`() =
+        fun `test that the exception is caught when attempting to start the camera uploads process`() =
             runTest {
-                initializeUnderTest()
-                whenever(isConnectedToInternetUseCase()).thenReturn(true)
-
-                // Disable Camera Uploads
-                underTest.onCameraUploadsStateChanged(newState = false)
-                // Exit the Settings Screen
-                underTest.onSettingsScreenPaused()
-
-                verifyNoInteractions(startCameraUploadUseCase, listenToNewMediaUseCase)
-            }
-
-        @Test
-        fun `test that the exception is caught when attempting to start camera uploads upon pausing the settings screen`() =
-            runTest {
-                // This assumes that Camera Uploads is already enabled
                 initializeUnderTest()
                 whenever(startCameraUploadUseCase()).thenThrow(RuntimeException())
 
-                assertDoesNotThrow { underTest.onSettingsScreenPaused() }
+                assertDoesNotThrow { underTest.onCameraUploadsProcessStarted() }
             }
 
         @Test
-        fun `test that camera uploads is started when camera uploads is enabled and the user pauses the settings screen`() =
+        fun `test that the camera uploads process is started`() =
             runTest {
-                // This assumes that Camera Uploads is already enabled
                 initializeUnderTest()
 
-                underTest.onSettingsScreenPaused()
+                underTest.onCameraUploadsProcessStarted()
 
                 verify(startCameraUploadUseCase).invoke()
                 verify(listenToNewMediaUseCase).invoke(forceEnqueue = false)
@@ -784,6 +768,100 @@ internal class SettingsCameraUploadsViewModelTest {
                         expectedNewVideoCompressionSize
                     )
                 }
+            }
+    }
+
+    /**
+     * The Test Group that verifies behaviors when changing the Camera Uploads Local Primary Folder
+     */
+    @Nested
+    @DisplayName("Camera Uploads - Local Folder Selection")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    internal inner class CameraUploadsLocalFolderSelectionTestGroup {
+        @Test
+        fun `test that an error snackbar is shown when changing the local primary folder throws an exception`() =
+            runTest {
+                initializeUnderTest()
+                whenever(isPrimaryFolderPathValidUseCase(any())).thenThrow(RuntimeException())
+
+                assertDoesNotThrow { underTest.onLocalPrimaryFolderSelected("new/primary/folder/path") }
+                verify(snackBarHandler).postSnackbarMessage(
+                    resId = R.string.general_error,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
+
+        @Test
+        fun `test that an error snackbar is shown when the new local primary folder is invalid`() =
+            runTest {
+                initializeUnderTest()
+                whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(false)
+
+                underTest.onLocalPrimaryFolderSelected("new/primary/folder/path")
+                snackBarHandler.postSnackbarMessage(
+                    resId = R.string.error_invalid_folder_selected,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
+
+        @Test
+        fun `test that an error snackbar is shown when the new local primary folder is null`() =
+            runTest {
+                initializeUnderTest()
+
+                underTest.onLocalPrimaryFolderSelected(null)
+
+                snackBarHandler.postSnackbarMessage(
+                    resId = R.string.error_invalid_folder_selected,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
+
+        @Test
+        fun `test that the new local primary folder is set`() = runTest {
+            initializeUnderTest()
+            whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(true)
+            val expectedLocalPrimaryFolder = "new/primary/folder/path"
+
+            underTest.onLocalPrimaryFolderSelected(expectedLocalPrimaryFolder)
+
+            verify(setPrimaryFolderPathUseCase).invoke(expectedLocalPrimaryFolder)
+            underTest.uiState.test {
+                assertThat(awaitItem().primaryFolderPath).isEqualTo(expectedLocalPrimaryFolder)
+            }
+        }
+
+        @Test
+        fun `test that setting the new local primary folder also deletes the camera uploads temporary root directory`() =
+            runTest {
+                initializeUnderTest()
+                whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(true)
+
+                underTest.onLocalPrimaryFolderSelected("new/primary/folder/path")
+
+                verify(deleteCameraUploadsTemporaryRootDirectoryUseCase).invoke()
+            }
+
+        @Test
+        fun `test that setting the new local primary folder also clears the primary folder records`() =
+            runTest {
+                initializeUnderTest()
+                whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(true)
+
+                underTest.onLocalPrimaryFolderSelected("new/primary/folder/path")
+
+                verify(clearCameraUploadsRecordUseCase).invoke(listOf(CameraUploadFolderType.Primary))
+            }
+
+        @Test
+        fun `test that setting the new local primary folder also stops the ongoing camera uploads process`() =
+            runTest {
+                initializeUnderTest()
+                whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(true)
+
+                underTest.onLocalPrimaryFolderSelected("new/primary/folder/path")
+
+                verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
             }
     }
 

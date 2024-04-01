@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
  * @property isMediaUploadsEnabled true if Media Uploads is enabled
  * @property maximumNonChargingVideoCompressionSize The maximum aggregated Video Size that can be
  * compressed without having to charge the Device
+ * @property primaryFolderPath The Camera Uploads Local Primary Folder Path
  * @property requestPermissions State Event that triggers a request to grant Camera Uploads
  * permissions
  * @property requireChargingDuringVideoCompression, If true, the Device needs to be charged when
@@ -30,6 +31,7 @@ internal data class SettingsCameraUploadsUiState(
     val isCameraUploadsEnabled: Boolean = false,
     val isMediaUploadsEnabled: Boolean = false,
     val maximumNonChargingVideoCompressionSize: Int = 200,
+    val primaryFolderPath: String = "",
     val requestPermissions: StateEvent = consumed,
     val requireChargingDuringVideoCompression: Boolean = true,
     val secondaryFolderPath: String = "",

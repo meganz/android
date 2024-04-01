@@ -20,13 +20,16 @@ import mega.privacy.android.app.presentation.settings.camerauploads.model.VideoQ
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
+import mega.privacy.android.domain.usecase.camerauploads.ClearCameraUploadsRecordUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableMediaUploadsSettingsUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
@@ -34,12 +37,14 @@ import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSize
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
@@ -62,8 +67,11 @@ import javax.inject.Inject
  * uploading content
  * @property checkEnableCameraUploadsStatusUseCase Checks the Camera Uploads status and determine if it
  * can be ran
+ * @property clearCameraUploadsRecordUseCase Clears the Records of either the Camera Uploads or Media
+ * Uploads Folder
  * @property deleteCameraUploadsTemporaryRootDirectoryUseCase Deletes the temporary Camera Uploads Cache Folder
  * @property disableMediaUploadsSettingsUseCase Disables Media Uploads
+ * @property getPrimaryFolderPathUseCase Gets the Camera Uploads Primary Folder Path
  * @property getSecondaryFolderPathUseCase Gets the Media Uploads Secondary Folder Path
  * @property getUploadOptionUseCase Gets the type of content being uploaded by Camera Uploads
  * @property getUploadVideoQualityUseCase Gets the Video Quality of Videos being uploaded by Camera Uploads
@@ -75,6 +83,7 @@ import javax.inject.Inject
  * @property isChargingRequiredForVideoCompressionUseCase Checks whether or not the Device should be
  * charged when compressing Videos
  * @property isConnectedToInternetUseCase Checks if the User is connected to the Internet or not
+ * @property isPrimaryFolderPathValidUseCase Checks if the Camera Uploads Primary Folder Path is valid or not
  * @property isSecondaryFolderEnabled Checks if Media Uploads (the Secondary Folder) is enabled or not
  * @property isSecondaryFolderPathValidUseCase Checks if the Media Uploads Secondary Folder Path is valid or not
  * @property listenToNewMediaUseCase Listens to new Photos and Videos captured by the Device
@@ -83,6 +92,7 @@ import javax.inject.Inject
  * @property setChargingRequiredForVideoCompressionUseCase Sets whether or not the Device should be
  * charged when compressing Videos
  * @property setLocationTagsEnabledUseCase Sets whether or not Location Tags are added in Photo uploads
+ * @property setPrimaryFolderPathUseCase Set the new Camera Uploads Primary Folder Path
  * @property setSecondaryFolderLocalPathUseCase Sets the new Media Uploads Secondary Folder Path
  * @property setUploadFileNamesKeptUseCase Sets whether or not existing filenames should be used
  * when uploading content
@@ -105,8 +115,10 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val areLocationTagsEnabledUseCase: AreLocationTagsEnabledUseCase,
     private val areUploadFileNamesKeptUseCase: AreUploadFileNamesKeptUseCase,
     private val checkEnableCameraUploadsStatusUseCase: CheckEnableCameraUploadsStatusUseCase,
+    private val clearCameraUploadsRecordUseCase: ClearCameraUploadsRecordUseCase,
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase,
     private val disableMediaUploadsSettingsUseCase: DisableMediaUploadsSettingsUseCase,
+    private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
     private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase,
     private val getUploadOptionUseCase: GetUploadOptionUseCase,
     private val getUploadVideoQualityUseCase: GetUploadVideoQualityUseCase,
@@ -115,6 +127,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val isChargingRequiredForVideoCompressionUseCase: IsChargingRequiredForVideoCompressionUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
+    private val isPrimaryFolderPathValidUseCase: IsPrimaryFolderPathValidUseCase,
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
     private val isSecondaryFolderPathValidUseCase: IsSecondaryFolderPathValidUseCase,
     private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
@@ -122,6 +135,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val setCameraUploadsByWifiUseCase: SetCameraUploadsByWifiUseCase,
     private val setChargingRequiredForVideoCompressionUseCase: SetChargingRequiredForVideoCompressionUseCase,
     private val setLocationTagsEnabledUseCase: SetLocationTagsEnabledUseCase,
+    private val setPrimaryFolderPathUseCase: SetPrimaryFolderPathUseCase,
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase,
     private val setUploadFileNamesKeptUseCase: SetUploadFileNamesKeptUseCase,
     private val setUploadOptionUseCase: SetUploadOptionUseCase,
@@ -160,6 +174,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 val isMediaUploadsEnabled = async { isSecondaryFolderEnabled() }
                 val maximumNonChargingVideoCompressionSize =
                     async { getVideoCompressionSizeLimitUseCase() }
+                val primaryFolderPath = async { getPrimaryFolderPathUseCase() }
                 val requireChargingDuringVideoCompression =
                     async { isChargingRequiredForVideoCompressionUseCase() }
                 val secondaryFolderPath = async { getSecondaryFolderPathUseCase() }
@@ -174,6 +189,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                         isCameraUploadsEnabled = isCameraUploadsEnabled.await(),
                         isMediaUploadsEnabled = isMediaUploadsEnabled.await(),
                         maximumNonChargingVideoCompressionSize = maximumNonChargingVideoCompressionSize.await(),
+                        primaryFolderPath = primaryFolderPath.await(),
                         requireChargingDuringVideoCompression = requireChargingDuringVideoCompression.await(),
                         secondaryFolderPath = secondaryFolderPath.await(),
                         shouldIncludeLocationTags = shouldIncludeLocationTags.await(),
@@ -298,21 +314,16 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * When the User triggers onPause() in the Settings screen, start Camera Uploads if the
-     * functionality is enabled
+     * Starts the Camera Uploads process
      */
-    fun onSettingsScreenPaused() {
-        if (_uiState.value.isCameraUploadsEnabled) {
-            viewModelScope.launch {
-                runCatching {
-                    startCameraUploadUseCase()
-                    listenToNewMediaUseCase(forceEnqueue = false)
-                }.onFailure { exception ->
-                    Timber.e("An error occurred when starting Camera Uploads", exception)
-                }
+    fun onCameraUploadsProcessStarted() {
+        viewModelScope.launch {
+            runCatching {
+                startCameraUploadUseCase()
+                listenToNewMediaUseCase(forceEnqueue = false)
+            }.onFailure { exception ->
+                Timber.e("An error occurred when starting Camera Uploads", exception)
             }
-        } else {
-            Timber.d("Camera Uploads is not started because it is disabled")
         }
     }
 
@@ -512,6 +523,51 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             }.onFailure { exception ->
                 Timber.e("An error occurred when changing the Media Uploads state", exception)
                 showGenericErrorSnackbar()
+            }
+        }
+    }
+
+    /**
+     * Sets the new Local Camera Uploads Folder after selecting from the Device File Explorer. Doing
+     * this removes the Camera Uploads temporary root directory, clears the Primary Folder Records
+     * and stops Camera Uploads
+     *
+     * @param newPrimaryFolderPath The new Primary Folder path, which may be nullable
+     */
+    fun onLocalPrimaryFolderSelected(newPrimaryFolderPath: String?) {
+        viewModelScope.launch {
+            runCatching {
+                newPrimaryFolderPath?.let { primaryFolderPath ->
+                    if (isPrimaryFolderPathValidUseCase(primaryFolderPath)) {
+                        setPrimaryFolderPathUseCase(primaryFolderPath)
+                        deleteCameraUploadsTemporaryRootDirectoryUseCase()
+                        clearCameraUploadsRecordUseCase(listOf(CameraUploadFolderType.Primary))
+                        stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
+
+                        _uiState.update { it.copy(primaryFolderPath = primaryFolderPath) }
+                    } else {
+                        Timber.d("The new Camera Uploads Local Folder is invalid")
+                        snackBarHandler.postSnackbarMessage(
+                            resId = R.string.error_invalid_folder_selected,
+                            snackbarDuration = MegaSnackbarDuration.Long,
+                        )
+                    }
+                } ?: run {
+                    Timber.d("The new Camera Uploads Local Folder is null")
+                    snackBarHandler.postSnackbarMessage(
+                        resId = R.string.error_invalid_folder_selected,
+                        snackbarDuration = MegaSnackbarDuration.Long,
+                    )
+                }
+            }.onFailure { exception ->
+                Timber.e(
+                    "An error occurred when changing the Camera Uploads Local Folder",
+                    exception,
+                )
+                snackBarHandler.postSnackbarMessage(
+                    resId = R.string.general_error,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
             }
         }
     }
