@@ -43,6 +43,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
+import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
@@ -81,11 +82,13 @@ import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.GetUsersCallLimitRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.SetUsersCallLimitRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -284,6 +287,8 @@ class ManagerViewModelTest {
     private val startMeetingInWaitingRoomChatUseCase: StartMeetingInWaitingRoomChatUseCase = mock()
     private val answerChatCallUseCase: AnswerChatCallUseCase = mock()
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase = mock()
+    private val setUsersCallLimitRemindersUseCase: SetUsersCallLimitRemindersUseCase = mock()
+    private val getUsersCallLimitRemindersUseCase: GetUsersCallLimitRemindersUseCase = mock()
     private val rtcAudioManagerGateway: RTCAudioManagerGateway = mock()
     private val chatManagement: ChatManagement = mock()
     private val passcodeManagement: PasscodeManagement = mock()
@@ -376,7 +381,9 @@ class ManagerViewModelTest {
             hangChatCallUseCase = hangChatCallUseCase,
             monitorCallRecordingConsentEventUseCase = monitorCallRecordingConsentEventUseCase,
             monitorCallEndedUseCase = monitorCallEndedUseCase,
-            monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase
+            monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
+            getUsersCallLimitRemindersUseCase = getUsersCallLimitRemindersUseCase,
+            setUsersCallLimitRemindersUseCase = setUsersCallLimitRemindersUseCase
         )
     }
 
@@ -421,8 +428,11 @@ class ManagerViewModelTest {
             hangChatCallUseCase,
             monitorChatArchivedUseCase,
             monitorPushNotificationSettingsUpdate,
+            getUsersCallLimitRemindersUseCase,
+            setUsersCallLimitRemindersUseCase,
         )
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+        whenever(getUsersCallLimitRemindersUseCase()).thenReturn(flowOf(UsersCallLimitReminders.Enabled))
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(true)
         whenever(monitorUserUpdates()).thenReturn(emptyFlow())
         whenever(monitorCallRecordingConsentEventUseCase()).thenReturn(emptyFlow())

@@ -95,7 +95,7 @@ class MeetingActivity : PasscodeActivity() {
 
 
         fun getIntentOngoingCall(context: Context, chatId: Long): Intent {
-            return Intent(context, MeetingActivity::class.java).apply {
+           return Intent(context, MeetingActivity::class.java).apply {
                 putExtra(MEETING_CHAT_ID, chatId)
                 action = MEETING_ACTION_IN
             }
@@ -389,12 +389,17 @@ class MeetingActivity : PasscodeActivity() {
 
     private fun collectFlows() {
         collectFlow(meetingViewModel.state) { state: MeetingState ->
+
             if (state.shouldLaunchLeftMeetingActivity) {
                 startActivity(
                     Intent(this, LeftMeetingActivity::class.java)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                         .putExtra(MEETING_FREE_PLAN_USERS_LIMIT, state.callEndedDueToFreePlanLimits)
                 )
+                finish()
+            }
+
+            if (state.callEndedDueToFreePlanLimits) {
                 finish()
             }
 
@@ -522,6 +527,7 @@ class MeetingActivity : PasscodeActivity() {
             }
 
             meetingAction = it.action
+            meetingViewModel.setAction(meetingAction)
         }
     }
 

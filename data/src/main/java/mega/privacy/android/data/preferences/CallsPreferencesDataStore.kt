@@ -17,6 +17,7 @@ import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
 import mega.privacy.android.domain.entity.CallsSoundNotifications
+import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import java.io.IOException
@@ -45,6 +46,8 @@ internal class CallsPreferencesDataStore @Inject constructor(
         stringPreferencesKey("CALLS_MEETING_REMINDERS")
     private val waitingRoomRemindersPreferenceKey =
         stringPreferencesKey("WAITING_ROOM_REMINDERS")
+    private val usersCallLimitRemindersPreferenceKey =
+        stringPreferencesKey("USERS_CALL_LIMIT_REMINDERS")
 
     override fun getCallsSoundNotificationsPreference(): Flow<CallsSoundNotifications> =
         context.callsDataStore.data
@@ -106,6 +109,21 @@ internal class CallsPreferencesDataStore @Inject constructor(
                 )
             }
 
+    override fun getUsersCallLimitRemindersPreference(): Flow<UsersCallLimitReminders> =
+        context.callsDataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }.map { preferences ->
+                UsersCallLimitReminders.valueOf(
+                    preferences[usersCallLimitRemindersPreferenceKey]
+                        ?: UsersCallLimitReminders.DEFAULT.name
+                )
+            }
+
     override suspend fun setCallsSoundNotificationsPreference(soundNotifications: CallsSoundNotifications) {
         withContext(ioDispatcher) {
             context.callsDataStore.edit {
@@ -134,6 +152,14 @@ internal class CallsPreferencesDataStore @Inject constructor(
         withContext(ioDispatcher) {
             context.callsDataStore.edit {
                 it[waitingRoomRemindersPreferenceKey] = waitingRoomReminders.name
+            }
+        }
+    }
+
+    override suspend fun setUsersCallLimitRemindersPreference(usersCallLimitReminders: UsersCallLimitReminders) {
+        withContext(ioDispatcher) {
+            context.callsDataStore.edit {
+                it[usersCallLimitRemindersPreferenceKey] = usersCallLimitReminders.name
             }
         }
     }

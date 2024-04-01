@@ -330,6 +330,15 @@ class MeetingActivityViewModel @Inject constructor(
         }
 
     /**
+     * Set meeting action
+     *
+     * @param action meeting action type
+     */
+    fun setAction(action: String?) {
+        _state.update { it.copy(action = action) }
+    }
+
+    /**
      * Send event that in Meeting fragment is visible or not
      *
      * @param isVisible True if the fragment it visible, false otherwise.
@@ -522,11 +531,22 @@ class MeetingActivityViewModel @Inject constructor(
             runCatching {
                 getChatCallUseCase(_state.value.chatId)
             }.onSuccess { call ->
+                if (call == null) {
+                    finishMeetingActivity()
+                }
+
                 call?.let {
                     when (call.status) {
+                        ChatCallStatus.UserNoPresent -> {
+                            if (_state.value.action == MeetingActivity.MEETING_ACTION_IN) {
+                                finishMeetingActivity()
+                            }
+                        }
+
                         ChatCallStatus.TerminatingUserParticipation,
                         ChatCallStatus.Destroyed,
                         -> finishMeetingActivity()
+
 
                         else -> {
                             checkIfPresenting(it)

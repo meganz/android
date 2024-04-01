@@ -119,6 +119,7 @@ import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserVisibility
@@ -498,7 +499,9 @@ internal fun ChatView(
             showReactionPicker = false
         }
 
-        if (callEndedDueToFreePlanLimits) {
+        if (callEndedDueToFreePlanLimits && isCallUnlimitedProPlanFeatureFlagEnabled
+            && usersCallLimitReminders == UsersCallLimitReminders.Enabled
+        ) {
             showFreePlanLimitParticipantsDialog = true
         }
 

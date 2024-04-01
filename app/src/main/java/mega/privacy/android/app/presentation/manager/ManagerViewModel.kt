@@ -42,6 +42,7 @@ import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
+import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -78,11 +79,13 @@ import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.GetUsersCallLimitRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.SetUsersCallLimitRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -169,6 +172,8 @@ import javax.inject.Inject
  * @property monitorSyncsUseCase Use case for monitoring syncs.
  * @property monitorChatSessionUpdatesUseCase Use case for monitoring chat session updates.
  * @property hangChatCallUseCase Use case for hanging a chat call.
+ * @property setUsersCallLimitRemindersUseCase      [SetUsersCallLimitRemindersUseCase]
+ * @property getUsersCallLimitRemindersUseCase      [GetUsersCallLimitRemindersUseCase]
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -238,7 +243,9 @@ class ManagerViewModel @Inject constructor(
     private val hangChatCallUseCase: HangChatCallUseCase,
     private val monitorCallRecordingConsentEventUseCase: MonitorCallRecordingConsentEventUseCase,
     private val monitorCallEndedUseCase: MonitorCallEndedUseCase,
-    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
+    private val setUsersCallLimitRemindersUseCase: SetUsersCallLimitRemindersUseCase,
+    private val getUsersCallLimitRemindersUseCase: GetUsersCallLimitRemindersUseCase
 ) : ViewModel() {
 
     /**
@@ -323,6 +330,8 @@ class ManagerViewModel @Inject constructor(
     private var monitorChatSessionUpdatesJob: Job? = null
 
     init {
+        checkUsersCallLimitReminders()
+
         viewModelScope.launch {
             val order = getCloudSortOrder()
             combine(
@@ -726,6 +735,7 @@ class ManagerViewModel @Inject constructor(
      *
      */
     fun onConsumeShowFreePlanParticipantsLimitDialogEvent() {
+        setUsersCallLimitReminderDisabled()
         _state.update { state -> state.copy(callEndedDueToFreePlanLimits = false) }
     }
 
@@ -1280,6 +1290,26 @@ class ManagerViewModel @Inject constructor(
      */
     fun setDeviceCenterPreviousBottomNavigationItem(previousItem: Int?) {
         _state.update { it.copy(deviceCenterPreviousBottomNavigationItem = previousItem) }
+    }
+
+    /**
+     * Check users call limit reminders
+     */
+    private fun checkUsersCallLimitReminders() {
+        viewModelScope.launch {
+            getUsersCallLimitRemindersUseCase().collectLatest { result ->
+                _state.update { it.copy(usersCallLimitReminders = result) }
+            }
+        }
+    }
+
+    /**
+     * Disable users call limit reminder
+     */
+    private fun setUsersCallLimitReminderDisabled() = viewModelScope.launch {
+        runCatching {
+            setUsersCallLimitRemindersUseCase(UsersCallLimitReminders.Disabled)
+        }
     }
 
     internal companion object {

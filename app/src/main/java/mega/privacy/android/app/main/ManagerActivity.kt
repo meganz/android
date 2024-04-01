@@ -299,6 +299,7 @@ import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
+import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
@@ -1224,7 +1225,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
                 val state by viewModel.state.collectAsStateWithLifecycle()
-                if (state.callEndedDueToFreePlanLimits) {
+                if (state.callEndedDueToFreePlanLimits && state.isCallUnlimitedProPlanFeatureFlagEnabled &&
+                    state.usersCallLimitReminders == UsersCallLimitReminders.Enabled
+                ) {
                     MegaAppTheme(isDark = isDark) {
                         FreePlanLimitParticipantsDialog(
                             onConfirm = {

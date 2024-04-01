@@ -62,6 +62,7 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
@@ -132,10 +133,12 @@ import mega.privacy.android.domain.usecase.file.CreateNewImageUriUseCase
 import mega.privacy.android.domain.usecase.file.DeleteFileUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.GetUsersCallLimitRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatStatusConnectedForCallUseCase
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
+import mega.privacy.android.domain.usecase.meeting.SetUsersCallLimitRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
@@ -298,6 +301,8 @@ internal class ChatViewModelTest {
     private val editLocationMessageUseCase = mock<EditLocationMessageUseCase>()
     private val getChatFromContactMessagesUseCase = mock<GetChatFromContactMessagesUseCase>()
     private val getCacheFileUseCase = mock<GetCacheFileUseCase>()
+    private val setUsersCallLimitRemindersUseCase = mock<SetUsersCallLimitRemindersUseCase>()
+    private val getUsersCallLimitRemindersUseCase = mock<GetUsersCallLimitRemindersUseCase>()
     private val recordAudioUseCase = mock<RecordAudioUseCase>()
     private val deleteFileUseCase = mock<DeleteFileUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
@@ -371,9 +376,12 @@ internal class ChatViewModelTest {
             deleteFileUseCase,
             getFeatureFlagValueUseCase,
             leaveChatUseCase,
-            broadcastChatArchivedUseCase
+            broadcastChatArchivedUseCase,
+            setUsersCallLimitRemindersUseCase,
+            getUsersCallLimitRemindersUseCase
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(getUsersCallLimitRemindersUseCase()).thenReturn(flowOf(UsersCallLimitReminders.Enabled))
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
         wheneverBlocking { monitorChatRoomUpdates(any()) } doReturn emptyFlow()
         wheneverBlocking { monitorUpdatePushNotificationSettingsUseCase() } doReturn emptyFlow()
@@ -480,7 +488,9 @@ internal class ChatViewModelTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             leaveChatUseCase = leaveChatUseCase,
             monitorLeaveChatUseCase = monitorLeaveChatUseCase,
-            broadcastChatArchivedUseCase = broadcastChatArchivedUseCase
+            broadcastChatArchivedUseCase = broadcastChatArchivedUseCase,
+            setUsersCallLimitRemindersUseCase = setUsersCallLimitRemindersUseCase,
+            getUsersCallLimitRemindersUseCase = getUsersCallLimitRemindersUseCase
         )
     }
 

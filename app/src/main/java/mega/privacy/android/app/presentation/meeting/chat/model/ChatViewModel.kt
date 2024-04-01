@@ -54,6 +54,7 @@ import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
+import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -126,9 +127,11 @@ import mega.privacy.android.domain.usecase.file.CreateNewImageUriUseCase
 import mega.privacy.android.domain.usecase.file.DeleteFileUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.GetUsersCallLimitRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatStatusConnectedForCallUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
+import mega.privacy.android.domain.usecase.meeting.SetUsersCallLimitRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.StartCallUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
@@ -162,6 +165,8 @@ const val EXTRA_LINK = "LINK"
  * @property monitorUpdatePushNotificationSettingsUseCase
  * @property monitorUserChatStatusByHandleUseCase
  * @property getFeatureFlagValueUseCase
+ * @property setUsersCallLimitRemindersUseCase
+ * @property getUsersCallLimitRemindersUseCase
  * @property state UI state.
  *
  * @param savedStateHandle
@@ -245,6 +250,8 @@ class ChatViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorLeaveChatUseCase: MonitorLeaveChatUseCase,
     private val leaveChatUseCase: LeaveChatUseCase,
+    private val setUsersCallLimitRemindersUseCase: SetUsersCallLimitRemindersUseCase,
+    private val getUsersCallLimitRemindersUseCase: GetUsersCallLimitRemindersUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -271,6 +278,7 @@ class ChatViewModel @Inject constructor(
 
     init {
         checkFeatureFlag()
+        checkUsersCallLimitReminders()
         getMyUserHandle()
         checkGeolocation()
         monitorStorageStateEvent()
@@ -318,6 +326,15 @@ class ChatViewModel @Inject constructor(
                         _state.update { state -> state.copy(sendingText = preference.draftMessage) }
                     }
                 }
+        }
+    }
+
+    /**
+     * Enable or disable users call limit reminder
+     */
+    private fun setUsersCallLimitReminder(enabled: Boolean) = viewModelScope.launch {
+        runCatching {
+            setUsersCallLimitRemindersUseCase(if (enabled) UsersCallLimitReminders.Enabled else UsersCallLimitReminders.Disabled)
         }
     }
 
@@ -942,6 +959,7 @@ class ChatViewModel @Inject constructor(
      * Start a call.
      */
     fun startCall(video: Boolean) {
+        setUsersCallLimitReminder(enabled = true)
         viewModelScope.launch {
             runCatching { startCallUseCase(chatId, video) }
                 .onSuccess { call ->
@@ -979,6 +997,7 @@ class ChatViewModel @Inject constructor(
      * Start or join a meeting.
      */
     fun onStartOrJoinMeeting(isStarted: Boolean) {
+        setUsersCallLimitReminder(enabled = true)
         val isWaitingRoom = state.value.isWaitingRoom
         if (isStarted) {
             val isHost = state.value.myPermission == ChatRoomPermission.Moderator
@@ -997,6 +1016,7 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun startWaitingRoomMeeting() {
+        setUsersCallLimitReminder(enabled = true)
         val isHost = state.value.myPermission == ChatRoomPermission.Moderator
         if (isHost) {
             viewModelScope.launch {
@@ -1020,6 +1040,7 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun startMeeting() {
+        setUsersCallLimitReminder(enabled = true)
         viewModelScope.launch {
             runCatching {
                 val scheduledMeeting = requireNotNull(state.value.scheduledMeeting)
@@ -1434,10 +1455,22 @@ class ChatViewModel @Inject constructor(
     }
 
     /**
+     * Check users call limit reminders
+     */
+    private fun checkUsersCallLimitReminders() {
+        viewModelScope.launch {
+            getUsersCallLimitRemindersUseCase().collectLatest { result ->
+                _state.update { it.copy(usersCallLimitReminders = result) }
+            }
+        }
+    }
+
+    /**
      * Consume show free plan participants limit dialog event
      *
      */
     fun consumeShowFreePlanParticipantsLimitDialogEvent() {
+        setUsersCallLimitReminder(enabled = false)
         _state.update { state -> state.copy(callEndedDueToFreePlanLimits = false) }
     }
 

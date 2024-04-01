@@ -5365,7 +5365,7 @@
     <!-- Free plan limitation dialog title for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Cannot join</string>
     <!-- Free plan limitation dialogue description for scheduled meeting calls with more than 100 participants -->
-    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Only 100 participants can join the call. Any additional participants will only be able to send and receive messages. The organiser can upgrade to Pro to remove these restrictions.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">This call can only support 100 participants. Ask the organiser to remove this restriction.</string>
     <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">OK, got it</string>
     <!-- The title of the hidden nodes feature -->

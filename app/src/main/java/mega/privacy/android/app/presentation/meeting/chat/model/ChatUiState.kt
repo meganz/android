@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 
 /**
  * Chat ui state
@@ -48,6 +49,7 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
  * @property actionToManageEvent [ActionToManage].
  * @property callEndedDueToFreePlanLimits  State event to show the force free plan limit participants dialog.
  * @property isCallUnlimitedProPlanFeatureFlagEnabled   True, if Call Unlimited Pro Plan feature flag enabled. False, otherwise.
+ * @property usersCallLimitReminders   [UsersCallLimitReminders]
  */
 data class ChatUiState(
     val chat: ChatRoom? = null,
@@ -83,6 +85,7 @@ data class ChatUiState(
     val actionToManageEvent: StateEventWithContent<ActionToManage> = consumed(),
     val callEndedDueToFreePlanLimits: Boolean = false,
     val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
+    val usersCallLimitReminders: UsersCallLimitReminders = UsersCallLimitReminders.Enabled
 ) {
 
     /**

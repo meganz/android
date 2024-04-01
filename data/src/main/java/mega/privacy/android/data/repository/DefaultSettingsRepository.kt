@@ -30,6 +30,7 @@ import mega.privacy.android.domain.entity.CallsMeetingReminders
 import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
@@ -283,6 +284,14 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setWaitingRoomReminders(waitingRoomReminders: WaitingRoomReminders) =
         withContext(ioDispatcher) {
             callsPreferencesGateway.setWaitingRoomRemindersPreference(waitingRoomReminders)
+        }
+
+    override fun getUsersCallLimitReminders(): Flow<UsersCallLimitReminders> =
+        callsPreferencesGateway.getUsersCallLimitRemindersPreference()
+
+    override suspend fun setUsersCallLimitReminders(usersCallLimitReminders: UsersCallLimitReminders) =
+        withContext(ioDispatcher) {
+            callsPreferencesGateway.setUsersCallLimitRemindersPreference(usersCallLimitReminders)
         }
 
     override suspend fun setStringPreference(key: String?, value: String?) =

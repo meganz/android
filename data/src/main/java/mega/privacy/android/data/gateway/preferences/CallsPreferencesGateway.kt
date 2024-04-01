@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
 import mega.privacy.android.domain.entity.CallsSoundNotifications
+import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 
 interface CallsPreferencesGateway {
@@ -37,6 +38,13 @@ interface CallsPreferencesGateway {
     fun getWaitingRoomRemindersPreference(): Flow<WaitingRoomReminders>
 
     /**
+     * Get users call limit reminders preference
+     *
+     * @return If waiting room reminders are enabled or disabled.
+     */
+    fun getUsersCallLimitRemindersPreference(): Flow<UsersCallLimitReminders>
+
+    /**
      * Enable or disable notification sounds are enabled when there are changes in participants in group calls or meetings.
      *
      * @param soundNotifications True, if must be enabled. False, if must be disabled.
@@ -63,6 +71,13 @@ interface CallsPreferencesGateway {
      * @param waitingRoomReminders True, if must be enabled. False, if must be disabled.
      */
     suspend fun setWaitingRoomRemindersPreference(waitingRoomReminders: WaitingRoomReminders)
+
+    /**
+     * Enable or disable users call limit reminders preference
+     *
+     * @param usersCallLimitReminders True, if must be enabled. False, if must be disabled.
+     */
+    suspend fun setUsersCallLimitRemindersPreference(usersCallLimitReminders: UsersCallLimitReminders)
 
     /**
      * Clears calls preferences.

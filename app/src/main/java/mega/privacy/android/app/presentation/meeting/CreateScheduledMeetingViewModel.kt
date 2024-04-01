@@ -7,12 +7,10 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getZoneEndTime
 import mega.privacy.android.app.presentation.extensions.getZoneStartTime
 import mega.privacy.android.app.presentation.extensions.meeting.DropdownType
@@ -49,14 +47,11 @@ import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.SetOpenInvite
-import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
-import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.chat.InviteParticipantToChatUseCase
 import mega.privacy.android.domain.usecase.chat.RemoveParticipantFromChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetOpenInviteUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactItem
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.CreateChatroomAndSchedMeetingUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomRemindersUseCase
@@ -121,7 +116,6 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val setWaitingRoomUseCase: SetWaitingRoomUseCase,
     private val setWaitingRoomRemindersUseCase: SetWaitingRoomRemindersUseCase,
-
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CreateScheduledMeetingState())
