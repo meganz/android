@@ -27,6 +27,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.business.BusinessAccountPromptHandler
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.FileUploadDialog
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.HowToUploadDialog
+import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.VideoCompressionSizeInputDialog
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.VideoQualityDialog
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsUiState
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
@@ -38,8 +39,9 @@ import mega.privacy.android.app.presentation.settings.camerauploads.tiles.FileUp
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.HowToUploadTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.IncludeLocationTagsTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.KeepFileNamesTile
-import mega.privacy.android.app.presentation.settings.camerauploads.tiles.RequireChargingDuringVideoCompressionTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.MediaUploadsTile
+import mega.privacy.android.app.presentation.settings.camerauploads.tiles.RequireChargingDuringVideoCompressionTile
+import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VideoCompressionTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VideoQualityTile
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
@@ -62,6 +64,8 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  * [UploadConnectionType] from the How to Upload prompt
  * @param onKeepFileNamesStateChanged Lambda to execute when the Keep File Names state changes
  * @param onMediaPermissionsGranted Lambda to execute when the User has granted the Media Permissions
+ * @param onNewVideoCompressionSizeLimitProvided Lambda to execute upon providing a new maximum
+ * aggregate Video Size that can be compressed without having to charge the Device
  * @param onRegularBusinessAccountSubUserPromptAcknowledged Lambda to execute when the Business
  * Account Sub-User acknowledges that the Business Account Administrator can access the content
  * in Camera Uploads
@@ -85,6 +89,7 @@ internal fun SettingsCameraUploadsView(
     onHowToUploadPromptOptionSelected: (UploadConnectionType) -> Unit,
     onKeepFileNamesStateChanged: (Boolean) -> Unit,
     onMediaPermissionsGranted: () -> Unit,
+    onNewVideoCompressionSizeLimitProvided: (Int) -> Unit,
     onRegularBusinessAccountSubUserPromptAcknowledged: () -> Unit,
     onRequestPermissionsStateChanged: (StateEvent) -> Unit,
     onMediaUploadsStateChanged: (Boolean) -> Unit,
@@ -97,6 +102,7 @@ internal fun SettingsCameraUploadsView(
 
     var showFileUploadPrompt by rememberSaveable { mutableStateOf(false) }
     var showHowToUploadPrompt by rememberSaveable { mutableStateOf(false) }
+    var showVideoCompressionSizeInputPrompt by rememberSaveable { mutableStateOf(false) }
     var showVideoQualityPrompt by rememberSaveable { mutableStateOf(false) }
 
     // When the User triggers the onPause Lifecycle Event, check if Camera Uploads can be started
@@ -161,6 +167,15 @@ internal fun SettingsCameraUploadsView(
                     onDismissRequest = { showHowToUploadPrompt = false },
                 )
             }
+            if (showVideoCompressionSizeInputPrompt) {
+                VideoCompressionSizeInputDialog(
+                    onNewSizeProvided = { newVideoCompressionSize ->
+                        showVideoCompressionSizeInputPrompt = false
+                        onNewVideoCompressionSizeLimitProvided.invoke(newVideoCompressionSize)
+                    },
+                    onDismiss = { showVideoCompressionSizeInputPrompt = false },
+                )
+            }
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
@@ -198,6 +213,12 @@ internal fun SettingsCameraUploadsView(
                             isChecked = uiState.requireChargingDuringVideoCompression,
                             onCheckedChange = onChargingDuringVideoCompressionStateChanged,
                         )
+                        if (uiState.requireChargingDuringVideoCompression) {
+                            VideoCompressionTile(
+                                maximumNonChargingVideoCompressionSize = uiState.maximumNonChargingVideoCompressionSize,
+                                onItemClicked = { showVideoCompressionSizeInputPrompt = true },
+                            )
+                        }
                     }
                     KeepFileNamesTile(
                         isChecked = uiState.shouldKeepUploadFileNames,
@@ -234,6 +255,7 @@ private fun SettingsCameraUploadsViewPreview(
             onHowToUploadPromptOptionSelected = {},
             onKeepFileNamesStateChanged = {},
             onMediaPermissionsGranted = {},
+            onNewVideoCompressionSizeLimitProvided = {},
             onRequestPermissionsStateChanged = {},
             onMediaUploadsStateChanged = {},
             onSettingsScreenPaused = {},

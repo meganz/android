@@ -44,6 +44,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocal
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupDefaultSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupMediaUploadsSettingUseCase
@@ -87,6 +88,8 @@ import javax.inject.Inject
  * when uploading content
  * @property setUploadOptionUseCase Sets the new type of content being uploaded by Camera Uploads
  * @property setUploadVideoQualityUseCase Sets the new Video Quality of Videos being uploaded by Camera Uploads
+ * @property setVideoCompressionSizeLimitUseCase Sets the new maximum aggregate Video Size that can
+ * be compressed without having to charge the Device
  * @property setupCameraUploadsSettingUseCase If true, this enables Camera Uploads. Otherwise, the
  * feature is disabled
  * @property setupDefaultSecondaryFolderUseCase Establishes a default Media Uploads Secondary Folder
@@ -123,6 +126,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val setUploadFileNamesKeptUseCase: SetUploadFileNamesKeptUseCase,
     private val setUploadOptionUseCase: SetUploadOptionUseCase,
     private val setUploadVideoQualityUseCase: SetUploadVideoQualityUseCase,
+    private val setVideoCompressionSizeLimitUseCase: SetVideoCompressionSizeLimitUseCase,
     private val setupCameraUploadsSettingUseCase: SetupCameraUploadsSettingUseCase,
     private val setupDefaultSecondaryFolderUseCase: SetupDefaultSecondaryFolderUseCase,
     private val setupMediaUploadsSettingUseCase: SetupMediaUploadsSettingUseCase,
@@ -438,6 +442,28 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             }.onFailure { exception ->
                 Timber.e(
                     "An error occurred when changing the Video Compression Charging State",
+                    exception,
+                )
+                showGenericErrorSnackbar()
+            }
+        }
+    }
+
+    /**
+     * Sets the new maximum aggregate Video Size that can be compressed without having to charge the
+     * Device. Doing this stops the ongoing Camera Uploads process
+     *
+     * @param newVideoCompressionSize The new maximum Video Size
+     */
+    fun onNewVideoCompressionSizeLimitProvided(newVideoCompressionSize: Int) {
+        viewModelScope.launch {
+            runCatching {
+                setVideoCompressionSizeLimitUseCase(newVideoCompressionSize)
+                stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
+                _uiState.update { it.copy(maximumNonChargingVideoCompressionSize = newVideoCompressionSize) }
+            }.onFailure { exception ->
+                Timber.e(
+                    "An error occurred when changing the new maximum Video Compression Size Limit",
                     exception,
                 )
                 showGenericErrorSnackbar()

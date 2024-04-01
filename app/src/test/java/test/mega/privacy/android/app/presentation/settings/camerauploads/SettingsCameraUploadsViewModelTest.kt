@@ -43,6 +43,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocal
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupDefaultSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupMediaUploadsSettingUseCase
@@ -107,6 +108,7 @@ internal class SettingsCameraUploadsViewModelTest {
     private val setUploadFileNamesKeptUseCase = mock<SetUploadFileNamesKeptUseCase>()
     private val setUploadOptionUseCase = mock<SetUploadOptionUseCase>()
     private val setUploadVideoQualityUseCase = mock<SetUploadVideoQualityUseCase>()
+    private val setVideoCompressionSizeLimitUseCase = mock<SetVideoCompressionSizeLimitUseCase>()
     private val setupCameraUploadsSettingUseCase = mock<SetupCameraUploadsSettingUseCase>()
     private val setupDefaultSecondaryFolderUseCase = mock<SetupDefaultSecondaryFolderUseCase>()
     private val setupMediaUploadsSettingUseCase = mock<SetupMediaUploadsSettingUseCase>()
@@ -143,6 +145,7 @@ internal class SettingsCameraUploadsViewModelTest {
             setUploadFileNamesKeptUseCase,
             setUploadOptionUseCase,
             setUploadVideoQualityUseCase,
+            setVideoCompressionSizeLimitUseCase,
             setupCameraUploadsSettingUseCase,
             setupDefaultSecondaryFolderUseCase,
             setupMediaUploadsSettingUseCase,
@@ -207,6 +210,7 @@ internal class SettingsCameraUploadsViewModelTest {
             setUploadFileNamesKeptUseCase = setUploadFileNamesKeptUseCase,
             setUploadOptionUseCase = setUploadOptionUseCase,
             setUploadVideoQualityUseCase = setUploadVideoQualityUseCase,
+            setVideoCompressionSizeLimitUseCase = setVideoCompressionSizeLimitUseCase,
             setupCameraUploadsSettingUseCase = setupCameraUploadsSettingUseCase,
             setupDefaultSecondaryFolderUseCase = setupDefaultSecondaryFolderUseCase,
             setupMediaUploadsSettingUseCase = setupMediaUploadsSettingUseCase,
@@ -742,6 +746,45 @@ internal class SettingsCameraUploadsViewModelTest {
                 )
             }
         }
+    }
+
+    /**
+     * The Test Group that verifies behaviors when setting the new maximum aggregate Video Size that
+     * can be compressed without having to charge the Device
+     */
+    @Nested
+    @DisplayName("Video Compression")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    internal inner class VideoCompressionTestGroup {
+        @Test
+        fun `test that an error snackbar is shown when changing the maximum video compression size throws an exception`() =
+            runTest {
+                initializeUnderTest()
+                whenever(setVideoCompressionSizeLimitUseCase(any())).thenThrow(RuntimeException())
+
+                assertDoesNotThrow { underTest.onNewVideoCompressionSizeLimitProvided(500) }
+                verify(snackBarHandler).postSnackbarMessage(
+                    resId = R.string.general_error,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
+
+        @Test
+        fun `test that changing the maximum video compression size stops camera uploads`() =
+            runTest {
+                val expectedNewVideoCompressionSize = 500
+                initializeUnderTest()
+
+                underTest.onNewVideoCompressionSizeLimitProvided(expectedNewVideoCompressionSize)
+
+                verify(setVideoCompressionSizeLimitUseCase).invoke(expectedNewVideoCompressionSize)
+                verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
+                underTest.uiState.test {
+                    assertThat(awaitItem().maximumNonChargingVideoCompressionSize).isEqualTo(
+                        expectedNewVideoCompressionSize
+                    )
+                }
+            }
     }
 
     /**

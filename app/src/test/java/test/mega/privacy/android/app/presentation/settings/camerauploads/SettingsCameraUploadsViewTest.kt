@@ -10,6 +10,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.SETTINGS_CAM
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsView
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.FILE_UPLOAD_DIALOG
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.HOW_TO_UPLOAD_DIALOG
+import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.VIDEO_COMPRESSION_SIZE_INPUT_DIALOG
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.VIDEO_QUALITY_DIALOG
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsUiState
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadOptionUiItem
@@ -21,6 +22,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.tiles.INCLUD
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.KEEP_FILE_NAMES_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.MEDIA_UPLOADS_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.REQUIRE_CHARGING_DURING_VIDEO_COMPRESSION_TILE
+import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VIDEO_COMPRESSION_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VIDEO_QUALITY_TILE
 import org.junit.Rule
 import org.junit.Test
@@ -50,8 +52,10 @@ internal class SettingsCameraUploadsViewTest {
         listOf(
             HOW_TO_UPLOAD_TILE, FILE_UPLOAD_TILE, KEEP_FILE_NAMES_TILE, MEDIA_UPLOADS_TILE
         ).forEach { tag ->
-            // performScrollTo() is used to make all of the Composable items viewable in the viewport
-            composeTestRule.onNodeWithTag(tag).performScrollTo().assertIsDisplayed()
+            composeTestRule.onNodeWithTag(tag).apply {
+                performScrollTo()
+                assertIsDisplayed()
+            }
         }
     }
 
@@ -72,7 +76,10 @@ internal class SettingsCameraUploadsViewTest {
             uploadOptionUiItem = UploadOptionUiItem.PhotosOnly,
         )
 
-        composeTestRule.onNodeWithTag(INCLUDE_LOCATION_TAGS_TILE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(INCLUDE_LOCATION_TAGS_TILE).apply {
+            performScrollTo()
+            assertIsDisplayed()
+        }
     }
 
     @Test
@@ -82,7 +89,10 @@ internal class SettingsCameraUploadsViewTest {
             uploadOptionUiItem = UploadOptionUiItem.PhotosOnly,
         )
 
-        composeTestRule.onNodeWithTag(INCLUDE_LOCATION_TAGS_TILE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(INCLUDE_LOCATION_TAGS_TILE).apply {
+            performScrollTo()
+            assertIsDisplayed()
+        }
     }
 
     @Test
@@ -102,7 +112,10 @@ internal class SettingsCameraUploadsViewTest {
             uploadOptionUiItem = UploadOptionUiItem.VideosOnly,
         )
 
-        composeTestRule.onNodeWithTag(VIDEO_QUALITY_TILE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(VIDEO_QUALITY_TILE).apply {
+            performScrollTo()
+            assertIsDisplayed()
+        }
     }
 
     @Test
@@ -112,7 +125,10 @@ internal class SettingsCameraUploadsViewTest {
             uploadOptionUiItem = UploadOptionUiItem.PhotosAndVideos,
         )
 
-        composeTestRule.onNodeWithTag(VIDEO_QUALITY_TILE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(VIDEO_QUALITY_TILE).apply {
+            performScrollTo()
+            assertIsDisplayed()
+        }
     }
 
     @Test
@@ -123,8 +139,37 @@ internal class SettingsCameraUploadsViewTest {
             videoQualityUiItem = VideoQualityUiItem.Medium,
         )
 
-        composeTestRule.onNodeWithTag(REQUIRE_CHARGING_DURING_VIDEO_COMPRESSION_TILE)
-            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(REQUIRE_CHARGING_DURING_VIDEO_COMPRESSION_TILE).apply {
+            performScrollTo()
+            assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that the video compression tile is hidden when charging is not required during video compression`() {
+        initializeComposeContent(
+            isCameraUploadsEnabled = true,
+            requireChargingDuringVideoCompression = false,
+            uploadOptionUiItem = UploadOptionUiItem.VideosOnly,
+            videoQualityUiItem = VideoQualityUiItem.Medium,
+        )
+
+        composeTestRule.onNodeWithTag(VIDEO_COMPRESSION_TILE).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the video compression tile is shown when charging is required during video compression`() {
+        initializeComposeContent(
+            isCameraUploadsEnabled = true,
+            requireChargingDuringVideoCompression = true,
+            uploadOptionUiItem = UploadOptionUiItem.VideosOnly,
+            videoQualityUiItem = VideoQualityUiItem.Medium,
+        )
+
+        composeTestRule.onNodeWithTag(VIDEO_COMPRESSION_TILE).apply {
+            performScrollTo()
+            assertIsDisplayed()
+        }
     }
 
     @Test
@@ -132,6 +177,7 @@ internal class SettingsCameraUploadsViewTest {
         initializeComposeContent(isCameraUploadsEnabled = true)
 
         composeTestRule.onNodeWithTag(HOW_TO_UPLOAD_TILE).apply {
+            performScrollTo()
             assertIsDisplayed()
             performClick()
         }
@@ -144,6 +190,7 @@ internal class SettingsCameraUploadsViewTest {
         initializeComposeContent(isCameraUploadsEnabled = true)
 
         composeTestRule.onNodeWithTag(FILE_UPLOAD_TILE).apply {
+            performScrollTo()
             assertIsDisplayed()
             performClick()
         }
@@ -159,6 +206,7 @@ internal class SettingsCameraUploadsViewTest {
         )
 
         composeTestRule.onNodeWithTag(VIDEO_QUALITY_TILE).apply {
+            performScrollTo()
             assertIsDisplayed()
             performClick()
         }
@@ -166,8 +214,27 @@ internal class SettingsCameraUploadsViewTest {
         composeTestRule.onNodeWithTag(VIDEO_QUALITY_DIALOG).assertIsDisplayed()
     }
 
+    @Test
+    fun `test that the video compression size input prompt is shown when the user clicks the video compression tile`() {
+        initializeComposeContent(
+            isCameraUploadsEnabled = true,
+            requireChargingDuringVideoCompression = true,
+            uploadOptionUiItem = UploadOptionUiItem.VideosOnly,
+            videoQualityUiItem = VideoQualityUiItem.Medium,
+        )
+
+        composeTestRule.onNodeWithTag(VIDEO_COMPRESSION_TILE).apply {
+            performScrollTo()
+            assertIsDisplayed()
+            performClick()
+        }
+
+        composeTestRule.onNodeWithTag(VIDEO_COMPRESSION_SIZE_INPUT_DIALOG).assertIsDisplayed()
+    }
+
     private fun initializeComposeContent(
         isCameraUploadsEnabled: Boolean = false,
+        requireChargingDuringVideoCompression: Boolean = true,
         uploadOptionUiItem: UploadOptionUiItem = UploadOptionUiItem.PhotosOnly,
         videoQualityUiItem: VideoQualityUiItem = VideoQualityUiItem.Original,
     ) {
@@ -175,6 +242,7 @@ internal class SettingsCameraUploadsViewTest {
             SettingsCameraUploadsView(
                 uiState = SettingsCameraUploadsUiState(
                     isCameraUploadsEnabled = isCameraUploadsEnabled,
+                    requireChargingDuringVideoCompression = requireChargingDuringVideoCompression,
                     uploadOptionUiItem = uploadOptionUiItem,
                     videoQualityUiItem = videoQualityUiItem,
                 ),
@@ -185,6 +253,7 @@ internal class SettingsCameraUploadsViewTest {
                 onHowToUploadPromptOptionSelected = {},
                 onKeepFileNamesStateChanged = {},
                 onMediaPermissionsGranted = {},
+                onNewVideoCompressionSizeLimitProvided = {},
                 onRegularBusinessAccountSubUserPromptAcknowledged = {},
                 onRequestPermissionsStateChanged = {},
                 onMediaUploadsStateChanged = {},

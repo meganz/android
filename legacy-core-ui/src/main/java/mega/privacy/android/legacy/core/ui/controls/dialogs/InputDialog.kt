@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.LocalAbsoluteElevation
 import androidx.compose.material.MaterialTheme
@@ -24,6 +25,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
@@ -43,6 +45,8 @@ import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
  * @param onDismiss to be triggered when dialog is hidden, wither with cancel button, confirm button, back or outside press.
  * @param dismissOnClickOutside if true, the dialog will be dismiss when the user taps outside of the dialog, default to true.
  * @param dismissOnBackPress if true, the dialog will be dismiss when the user does back action, default to true.
+ * @param keyboardActions Specifies Keyboard Actions to be performed
+ * @param keyboardType Specifies the type of keys available for the Keyboard (e.g. Text, Number)
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -59,6 +63,8 @@ fun InputDialog(
     error: String? = null,
     dismissOnClickOutside: Boolean = true,
     dismissOnBackPress: Boolean = true,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    keyboardType: KeyboardType = KeyboardType.Text,
     onInputChange: (String) -> Unit = {},
 ) {
     var textFieldValue by remember {
@@ -110,6 +116,8 @@ fun InputDialog(
                             onInputChange(it.text)
                         },
                         textFieldValue = textFieldValue,
+                        keyboardActions = keyboardActions,
+                        keyboardType = keyboardType,
                         errorText = error,
                     )
                 }

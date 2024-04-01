@@ -49,6 +49,7 @@ import mega.privacy.android.core.ui.theme.MegaTheme
  * @param modifier        [Modifier]
  * @param text            Typed text.
  * @param errorText       Error to show if any.
+ * @param keyboardType Specifies the type of keys available for the Keyboard (e.g. Text, Number)
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -60,6 +61,7 @@ fun GenericTextField(
     errorText: String? = null,
     singleLine: Boolean = true,
     imeAction: ImeAction = ImeAction.Done,
+    keyboardType: KeyboardType = KeyboardType.Text,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     colors: TextFieldColors = TextFieldDefaults.textFieldColors(
         textColor = MegaTheme.colors.text.primary,
@@ -90,7 +92,7 @@ fun GenericTextField(
             textStyle = MaterialTheme.typography.body1.copy(color = MegaTheme.colors.text.primary),
             cursorBrush = SolidColor(colors.cursorColor(isError).value),
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
+                keyboardType = keyboardType,
                 imeAction = imeAction
             ),
             keyboardActions = keyboardActions,
@@ -119,6 +121,7 @@ fun GenericTextField(
  * @param onTextChange    Action required for notifying about text changes.
  * @param placeholder     String to show when the field is empty.
  * @param imeAction       [ImeAction]
+ * @param keyboardType Specifies the type of keys available for the Keyboard (e.g. Text, Number)
  * @param keyboardActions [KeyboardActions]
  * @param modifier        [Modifier]
  * @param errorText       Error to show if any.
@@ -132,6 +135,7 @@ fun GenericTextField(
     placeholder: String = "",
     errorText: String? = null,
     imeAction: ImeAction = ImeAction.Done,
+    keyboardType: KeyboardType = KeyboardType.Text,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     colors: TextFieldColors = TextFieldDefaults.textFieldColors(
         textColor = MegaTheme.colors.text.primary,
@@ -163,7 +167,7 @@ fun GenericTextField(
             textStyle = MaterialTheme.typography.body1.copy(color = MegaTheme.colors.text.primary),
             cursorBrush = SolidColor(colors.cursorColor(isError).value),
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
+                keyboardType = keyboardType,
                 imeAction = imeAction
             ),
             keyboardActions = keyboardActions,
