@@ -1,6 +1,7 @@
 package mega.privacy.android.legacy.core.ui.controls.appbar
 
 import android.content.res.Configuration
+import android.view.ViewTreeObserver
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -20,8 +21,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
@@ -29,6 +37,8 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -37,6 +47,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import mega.privacy.android.core.ui.controls.appbar.ProvideDefaultMegaAppBarColors
 import mega.privacy.android.core.ui.controls.menus.MenuActions
 import mega.privacy.android.core.ui.model.MenuAction
@@ -181,6 +193,9 @@ fun ExpandedSearchAppBar(
         elevation = if (elevation) AppBarDefaults.TopAppBarElevation else 0.dp,
         color = MaterialTheme.colors.surface
     ) {
+        val initialLaunch = rememberSaveable { mutableStateOf(true) }
+        val keyboardVisibleInPreviousConfiguration by keyboardAsState()
+
         val focusRequester = remember { FocusRequester() }
         val iconColor = if (MaterialTheme.colors.isLight) Color.Black else Color.White
         val keyboardController = LocalSoftwareKeyboardController.current
@@ -214,9 +229,7 @@ fun ExpandedSearchAppBar(
                 }
             },
             trailingIcon = {
-                if (text.isEmpty()) {
-                    //No icon
-                } else {
+                if (text.isNotEmpty()) {
                     IconButton(
                         modifier = Modifier.testTag(SEARCH_TOOLBAR_CLOSE_BUTTON_TEST_TAG),
                         onClick = { onSearchTextChange("") }) {
@@ -245,9 +258,31 @@ fun ExpandedSearchAppBar(
         )
 
         SideEffect {
-            focusRequester.requestFocus()
+            if (initialLaunch.value || keyboardVisibleInPreviousConfiguration) {
+                initialLaunch.value = false
+                focusRequester.requestFocus()
+            }
         }
     }
+}
+
+@Composable
+private fun keyboardAsState(): State<Boolean> {
+    val view = LocalView.current
+    var isImeVisible by remember { mutableStateOf(false) }
+
+    DisposableEffect(LocalWindowInfo.current) {
+        val listener = ViewTreeObserver.OnPreDrawListener {
+            isImeVisible = ViewCompat.getRootWindowInsets(view)
+                ?.isVisible(WindowInsetsCompat.Type.ime()) == true
+            true
+        }
+        view.viewTreeObserver.addOnPreDrawListener(listener)
+        onDispose {
+            view.viewTreeObserver.removeOnPreDrawListener(listener)
+        }
+    }
+    return rememberUpdatedState(isImeVisible)
 }
 
 /**
