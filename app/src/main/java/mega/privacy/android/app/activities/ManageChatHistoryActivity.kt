@@ -7,12 +7,17 @@ import android.widget.NumberPicker.OnScrollListener
 import android.widget.NumberPicker.OnValueChangeListener
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityManageChatHistoryBinding
 import mega.privacy.android.app.listeners.SetRetentionTimeListener
+import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ClearChatConfirmationDialog
 import mega.privacy.android.app.presentation.meeting.managechathistory.ManageChatHistoryViewModel
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.createHistoryRetentionAlertDialog
@@ -26,12 +31,17 @@ import mega.privacy.android.app.utils.Constants.SECONDS_IN_MONTH_30
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_WEEK
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_YEAR
 import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRoom
 import timber.log.Timber
 import java.util.Locale
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
     companion object {
         private const val OPTION_HOURS = 0
@@ -49,6 +59,12 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
         private const val MINIMUM_VALUE_TEXT_PICKER = 0
         private const val MAXIMUM_VALUE_TEXT_PICKER = 4
     }
+
+    /**
+     * Current theme
+     */
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
 
     internal val viewModel: ManageChatHistoryViewModel by viewModels()
 
@@ -105,6 +121,28 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
         binding = ActivityManageChatHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.composeView.setContent {
+            val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            MegaAppTheme(isDark = themeMode.isDarkMode()) {
+                if (uiState.shouldShowClearChatConfirmation) {
+                    chat?.apply {
+                        ClearChatConfirmationDialog(
+                            isMeeting = isMeeting,
+                            onConfirm = {
+                                viewModel.apply {
+                                    dismissClearChatConfirmation()
+                                    clearChatHistory(chatId)
+                                }
+                            },
+                            onDismiss = viewModel::dismissClearChatConfirmation
+                        )
+                    }
+                }
+            }
+        }
+
         onBackPressedDispatcher.addCallback(this, onBackPressCallback)
 
         setSupportActionBar(binding.manageChatToolbar)
@@ -156,7 +194,7 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
     }
 
     private fun collectFlows() {
-        collectFlow(viewModel.state, Lifecycle.State.STARTED) { state ->
+        collectFlow(viewModel.uiState, Lifecycle.State.STARTED) { state ->
             state.retentionTimeUpdate?.let {
                 updateRetentionTimeUI(it)
                 viewModel.onRetentionTimeUpdateConsumed()
@@ -406,18 +444,23 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
             OPTION_HOURS -> {
                 return MAXIMUM_VALUE_NUMBER_PICKER_HOURS
             }
+
             OPTION_DAYS -> {
                 return MAXIMUM_VALUE_NUMBER_PICKER_DAYS
             }
+
             OPTION_WEEKS -> {
                 return MAXIMUM_VALUE_NUMBER_PICKER_WEEKS
             }
+
             OPTION_MONTHS -> {
                 return MAXIMUM_VALUE_NUMBER_PICKER_MONTHS
             }
+
             OPTION_YEARS -> {
                 return MINIMUM_VALUE_NUMBER_PICKER
             }
+
             else -> {
                 return 0
             }
@@ -468,7 +511,7 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
     override fun onClick(v: View) {
         when (v.id) {
             R.id.clear_chat_history_layout -> {
-                ChatUtil.showConfirmationClearChat(this, chat)
+                viewModel.showClearChatConfirmation()
             }
 
             R.id.history_retention_switch_layout -> {
@@ -496,15 +539,19 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
                     OPTION_HOURS -> {
                         secondInOption = SECONDS_IN_HOUR
                     }
+
                     OPTION_DAYS -> {
                         secondInOption = SECONDS_IN_DAY
                     }
+
                     OPTION_WEEKS -> {
                         secondInOption = SECONDS_IN_WEEK
                     }
+
                     OPTION_MONTHS -> {
                         secondInOption = SECONDS_IN_MONTH_30
                     }
+
                     OPTION_YEARS -> {
                         secondInOption = SECONDS_IN_YEAR
                     }

@@ -8,23 +8,30 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.managechathistory.model.ManageChatHistoryUIState
+import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
+import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
+import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRetentionTimeUpdateUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * ViewModel to manage chat history.
  *
- * @property state The state of the UI.
+ * @property uiState The state of the UI.
  */
 @HiltViewModel
 class ManageChatHistoryViewModel @Inject constructor(
     private val monitorChatRetentionTimeUpdateUseCase: MonitorChatRetentionTimeUpdateUseCase,
+    private val clearChatHistoryUseCase: ClearChatHistoryUseCase,
+    private val snackBarHandler: SnackBarHandler,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(ManageChatHistoryUIState())
+    private val _uiState = MutableStateFlow(ManageChatHistoryUIState())
 
-    val state: StateFlow<ManageChatHistoryUIState> = _state
+    val uiState: StateFlow<ManageChatHistoryUIState> = _uiState
 
     /**
      * Monitor chat retention time update.
@@ -34,7 +41,7 @@ class ManageChatHistoryViewModel @Inject constructor(
     fun monitorChatRetentionTimeUpdate(chatId: Long) {
         viewModelScope.launch {
             monitorChatRetentionTimeUpdateUseCase(chatId).collectLatest { retentionTime ->
-                _state.update { state -> state.copy(retentionTimeUpdate = retentionTime) }
+                _uiState.update { state -> state.copy(retentionTimeUpdate = retentionTime) }
             }
         }
     }
@@ -43,6 +50,44 @@ class ManageChatHistoryViewModel @Inject constructor(
      * Update retention time.
      */
     fun onRetentionTimeUpdateConsumed() {
-        _state.update { state -> state.copy(retentionTimeUpdate = null) }
+        _uiState.update { state -> state.copy(retentionTimeUpdate = null) }
+    }
+
+    /**
+     * Clear chat history
+     *
+     * @param chatId The chat room ID
+     */
+    fun clearChatHistory(chatId: Long) {
+        viewModelScope.launch {
+            runCatching { clearChatHistoryUseCase(chatId) }
+                .onSuccess {
+                    snackBarHandler.postSnackbarMessage(
+                        resId = R.string.clear_history_success,
+                        snackbarDuration = MegaSnackbarDuration.Long,
+                    )
+                }
+                .onFailure {
+                    Timber.e("Error clearing history", it)
+                    snackBarHandler.postSnackbarMessage(
+                        resId = R.string.clear_history_error,
+                        snackbarDuration = MegaSnackbarDuration.Long
+                    )
+                }
+        }
+    }
+
+    /**
+     * Show clear chat confirmation
+     */
+    fun showClearChatConfirmation() {
+        _uiState.update { it.copy(shouldShowClearChatConfirmation = true) }
+    }
+
+    /**
+     * Dismiss the clear chat confirmation
+     */
+    fun dismissClearChatConfirmation() {
+        _uiState.update { it.copy(shouldShowClearChatConfirmation = false) }
     }
 }
