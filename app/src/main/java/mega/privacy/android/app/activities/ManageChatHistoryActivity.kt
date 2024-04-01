@@ -8,7 +8,6 @@ import android.widget.NumberPicker.OnValueChangeListener
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -22,7 +21,6 @@ import mega.privacy.android.app.utils.ChatUtil.createHistoryRetentionAlertDialog
 import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.DISABLED_RETENTION_TIME
 import mega.privacy.android.app.utils.Constants.EMAIL
-import mega.privacy.android.app.utils.Constants.IS_FROM_CONTACTS
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_DAY
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_HOUR
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_MONTH_30
@@ -30,11 +28,9 @@ import mega.privacy.android.app.utils.Constants.SECONDS_IN_WEEK
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_YEAR
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.theme.MegaAppTheme
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaChatRoom
 import timber.log.Timber
 import java.util.Locale
 import javax.inject.Inject
@@ -66,10 +62,6 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
 
     internal val viewModel: ManageChatHistoryViewModel by viewModels()
 
-    private var chat: MegaChatRoom? = null
-    private var chatId = MEGACHAT_INVALID_HANDLE
-    private var contactHandle = INVALID_HANDLE
-    private var isFromContacts = false
     private lateinit var binding: ActivityManageChatHistoryBinding
 
     private val onBackPressCallback = object : OnBackPressedCallback(true) {
@@ -87,33 +79,11 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
             finish()
         }
 
-        chatId = intent.extras!!.getLong(CHAT_ID)
-        isFromContacts = intent.extras!!.getBoolean(IS_FROM_CONTACTS)
+        viewModel.initializeChatRoom(
+            chatId = intent.extras?.getLong(CHAT_ID),
+            email = intent.extras?.getString(EMAIL)
+        )
 
-        if (chatId != MEGACHAT_INVALID_HANDLE) {
-            chat = megaChatApi.getChatRoom(chatId)
-        } else {
-            val email = intent.extras!!.getString(EMAIL)
-
-            if (TextUtil.isTextEmpty(email)) {
-                Timber.e("Cannot init view, contact' email is empty")
-                finish()
-            }
-
-            val contact = megaApi.getContact(email)
-            if (contact == null) {
-                Timber.e("Cannot init view, contact is null")
-                finish()
-            }
-
-            contactHandle = contact?.handle!!
-
-            chat = megaChatApi.getChatRoomByUser(contactHandle)
-            if (chat != null)
-                chatId = chat?.chatId!!
-        }
-
-        monitorUpdates(chatId)
         collectFlows()
 
         binding = ActivityManageChatHistoryBinding.inflate(layoutInflater)
@@ -122,10 +92,11 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
         binding.composeView.setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val chatRoomUiState by viewModel.chatRoomUiState.collectAsStateWithLifecycle()
 
             MegaAppTheme(isDark = themeMode.isDarkMode()) {
                 if (uiState.shouldShowClearChatConfirmation) {
-                    chat?.apply {
+                    chatRoomUiState?.apply {
                         ClearChatConfirmationDialog(
                             isMeeting = isMeeting,
                             onConfirm = {
@@ -142,7 +113,27 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
         }
 
         onBackPressedDispatcher.addCallback(this, onBackPressCallback)
+    }
 
+    private fun collectFlows() {
+        collectFlow(viewModel.uiState) { uiState ->
+            uiState.retentionTimeUpdate?.let {
+                updateRetentionTimeUI(it)
+                viewModel.onRetentionTimeUpdateConsumed()
+            }
+
+            if (uiState.shouldNavigateUp) {
+                finish()
+                viewModel.onNavigatedUp()
+            }
+        }
+
+        collectFlow(viewModel.chatRoomUiState) { chatRoom ->
+            setupUI(chatRoom)
+        }
+    }
+
+    private fun setupUI(chat: ChatRoom?) {
         setSupportActionBar(binding.manageChatToolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
@@ -170,13 +161,13 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
             Timber.d("The chat exists")
             binding.historyRetentionSwitchLayout.setOnClickListener(this)
             binding.clearChatHistoryLayout.setOnClickListener(this)
-            binding.clearChatHistoryLayoutTitle.text = if (chat?.isMeeting == true) {
+            binding.clearChatHistoryLayoutTitle.text = if (chat.isMeeting) {
                 getString(R.string.meetings_manage_history_clear)
             } else {
                 getString(R.string.title_properties_clear_chat_history)
             }
 
-            val seconds = chat!!.retentionTime
+            val seconds = chat.retentionTime
             updateRetentionTimeUI(seconds)
 
             binding.numberPicker.setOnScrollListener(onScrollListenerPickerNumber)
@@ -184,19 +175,6 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
             binding.textPicker.setOnScrollListener(onScrollListenerPickerText)
             binding.textPicker.setOnValueChangedListener(onValueChangeListenerPickerText)
             binding.pickerButton.setOnClickListener(this)
-        }
-    }
-
-    private fun monitorUpdates(chatId: Long) {
-        viewModel.monitorChatRetentionTimeUpdate(chatId)
-    }
-
-    private fun collectFlows() {
-        collectFlow(viewModel.uiState, Lifecycle.State.STARTED) { state ->
-            state.retentionTimeUpdate?.let {
-                updateRetentionTimeUI(it)
-                viewModel.onRetentionTimeUpdateConsumed()
-            }
         }
     }
 
@@ -514,19 +492,17 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
 
             R.id.history_retention_switch_layout -> {
                 if (binding.historyRetentionSwitch.isChecked) {
-                    chat?.apply {
-                        viewModel.setChatRetentionTime(
-                            chatId = chatId,
-                            period = DISABLED_RETENTION_TIME
-                        )
-                    }
+                    viewModel.setChatRetentionTime(
+                        chatId = viewModel.chatRoomId,
+                        period = DISABLED_RETENTION_TIME
+                    )
                 } else {
-                    createHistoryRetentionAlertDialog(this, chatId, true)
+                    createHistoryRetentionAlertDialog(this, viewModel.chatRoomId, true)
                 }
             }
 
             R.id.retention_time_text_layout -> {
-                createHistoryRetentionAlertDialog(this, chatId, false)
+                createHistoryRetentionAlertDialog(this, viewModel.chatRoomId, false)
             }
 
             R.id.picker_button -> {
@@ -558,7 +534,7 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
 
                 val totalSeconds = binding.numberPicker.value * secondInOption
                 viewModel.setChatRetentionTime(
-                    chatId = chatId,
+                    viewModel.chatRoomId,
                     period = totalSeconds.toLong()
                 )
             }
