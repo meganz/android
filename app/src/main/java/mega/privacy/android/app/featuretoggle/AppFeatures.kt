@@ -14,12 +14,21 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
  */
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
+
+    /**
+     * Enables the report issue button on the login screen
+     */
+    LoginReportIssueButton(
+        "Enables the report issue button on the login screen feature",
+        false,
+    ),
+
     /**
      * Enables new document section flag
      */
     NewDocumentSection(
         "Enable new document section flag",
-        true
+        true,
     ),
 
     /**
