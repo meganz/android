@@ -799,7 +799,8 @@ class MeetingActivityViewModel @Inject constructor(
                                 }
 
                                 ChatCallStatus.TerminatingUserParticipation, ChatCallStatus.GenericNotification -> {
-                                    if (call.termCode == ChatCallTermCodeType.CallUsersLimit
+                                    Timber.d("Chat call termCode: ${call.termCode}")
+                                    if (call.termCode == ChatCallTermCodeType.CallUsersLimit || call.termCode == ChatCallTermCodeType.TooManyParticipants
                                         && _state.value.isCallUnlimitedProPlanFeatureFlagEnabled
                                     ) {
                                         _state.update { state ->
