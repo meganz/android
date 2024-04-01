@@ -49,8 +49,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextIndent
@@ -83,7 +81,6 @@ import mega.privacy.android.core.ui.model.MegaSpanStyleWithAnnotation
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.Typography
-import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.black_yellow_700
 import mega.privacy.android.core.ui.theme.extensions.body2medium
 import mega.privacy.android.core.ui.theme.extensions.body4
@@ -570,25 +567,10 @@ private fun FeaturesOfPlans(
                 modifier = modifier
             )
             MegaText(
-                text = stringResource(id = R.string.account_upgrade_account_description_feature_backup),
-                textColor = TextColor.Primary,
-                style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
-                modifier = modifier
-            )
-            MegaText(
                 text = stringResource(id = R.string.account_upgrade_account_description_feature_rewind),
                 textColor = TextColor.Primary,
                 style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
                 modifier = modifier
-            )
-            MegaText(
-                text = stringResource(id = R.string.account_upgrade_account_description_feature_rubbish_bin),
-                textColor = TextColor.Primary,
-                style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
-                modifier = Modifier.padding(
-                    start = 10.dp,
-                    bottom = if (showNoAdsFeature || showNewFeatures) 12.dp else 0.dp
-                )
             )
             if (showNewFeatures) {
                 MegaText(
@@ -603,10 +585,28 @@ private fun FeaturesOfPlans(
                     style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
                     modifier = Modifier.padding(
                         start = 10.dp,
-                        bottom = if (showNoAdsFeature) 12.dp else 0.dp
+                        bottom = 12.dp
                     )
                 )
             }
+            MegaText(
+                text = stringResource(id = R.string.account_upgrade_account_description_feature_rubbish_bin),
+                textColor = TextColor.Primary,
+                style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
+                modifier = Modifier.padding(
+                    start = 10.dp,
+                    bottom = 12.dp
+                )
+            )
+            MegaText(
+                text = stringResource(id = R.string.account_upgrade_account_description_priority_support),
+                textColor = TextColor.Primary,
+                style = MaterialTheme.typography.body2.copy(textIndent = textIndent),
+                modifier = Modifier.padding(
+                    start = 10.dp,
+                    bottom = if (showNoAdsFeature) 12.dp else 0.dp
+                )
+            )
             if (showNoAdsFeature) {
                 MegaText(
                     text = stringResource(id = R.string.account_upgrade_account_description_feature_advertisement),
@@ -897,3 +897,4 @@ private class UpgradeAccountPreviewProvider :
         )
     }
 }
+
