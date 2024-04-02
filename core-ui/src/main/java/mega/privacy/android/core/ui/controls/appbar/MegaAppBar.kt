@@ -288,6 +288,7 @@ internal fun BaseMegaAppBar(
                     iconId = when (appBarType) {
                         AppBarType.BACK_NAVIGATION -> R.drawable.ic_back
                         AppBarType.MENU -> R.drawable.ic_menu
+                        AppBarType.CLOSE -> R.drawable.ic_universal_close
                         else -> return@Box
                     },
                     modifier = Modifier.testTag(APP_BAR_BACK_BUTTON_TAG),
@@ -359,6 +360,7 @@ internal fun BaseMegaAppBar(
                     iconId = when (appBarType) {
                         AppBarType.BACK_NAVIGATION -> R.drawable.ic_back
                         AppBarType.MENU -> R.drawable.ic_menu
+                        AppBarType.CLOSE -> R.drawable.ic_universal_close
                         else -> return@Box
                     },
                     modifier = Modifier.testTag(APP_BAR_BACK_BUTTON_TAG),
@@ -558,6 +560,11 @@ enum class AppBarType {
      * Menu
      */
     MENU,
+
+    /**
+     * Close
+     */
+    CLOSE,
 
     /**
      * None
