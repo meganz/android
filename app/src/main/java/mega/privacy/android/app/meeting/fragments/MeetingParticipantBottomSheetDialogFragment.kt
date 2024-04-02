@@ -19,7 +19,8 @@ import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.navigation.MegaNavigator
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatRoom
 import javax.inject.Inject
 
 /**
@@ -113,7 +114,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
         listenAction(binding.sendMessage) {
             // Open chat page
             val chatId = bottomViewModel.sendMessage()
-            if (chatId > 0L) {
+            if (chatId != -1L) {
                 navigator.openChat(
                     context = requireActivity(),
                     chatId = chatId,
