@@ -237,7 +237,11 @@ interface TransferRepository {
      *
      * @param transfer
      */
-    suspend fun addCompletedTransfer(transfer: Transfer, megaException: MegaException?)
+    suspend fun addCompletedTransfer(
+        transfer: Transfer,
+        megaException: MegaException?,
+        transferPath: String? = null,
+    )
 
     /**
      * Add completed transfers if not exist

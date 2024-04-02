@@ -464,9 +464,13 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaLocalRoomGateway.getAllCompletedTransfers(size)
             .flowOn(ioDispatcher)
 
-    override suspend fun addCompletedTransfer(transfer: Transfer, megaException: MegaException?) {
+    override suspend fun addCompletedTransfer(
+        transfer: Transfer,
+        megaException: MegaException?,
+        transferPath: String?,
+    ) {
         withContext(ioDispatcher) {
-            val completedTransfer = completedTransferMapper(transfer, megaException)
+            val completedTransfer = completedTransferMapper(transfer, megaException, transferPath)
             megaLocalRoomGateway.addCompletedTransfer(completedTransfer)
             appEventGateway.broadcastCompletedTransfer(completedTransfer)
         }

@@ -40,9 +40,14 @@ class CompletedTransferMapper @Inject constructor(
      *
      * @param transfer
      * @param error
+     * @param transferPath path if it's different from the one specified in [transfer], this happens when sdk downloads the file to the cache and then it's moved to its final destination. See GetTransferDestinationUriUseCase
      * @return a [CompletedTransfer]
      */
-    suspend operator fun invoke(transfer: Transfer, error: MegaException?) =
+    suspend operator fun invoke(
+        transfer: Transfer,
+        error: MegaException?,
+        transferPath: String? = transfer.getSDCardTransferPath(),
+    ) =
         withContext(ioDispatcher) {
             val isOffline = isOffline(transfer)
             CompletedTransfer(
@@ -52,7 +57,7 @@ class CompletedTransferMapper @Inject constructor(
                 size = getSizeString(transfer.totalBytes),
                 handle = transfer.nodeHandle,
                 isOffline = isOffline,
-                path = formatTransferPath(transfer, isOffline),
+                path = transferPath ?: formatTransferPath(transfer, isOffline),
                 timestamp = deviceGateway.now,
                 error = error?.let { getErrorString(transfer, it) },
                 originalPath = transfer.localPath,
@@ -81,22 +86,19 @@ class CompletedTransferMapper @Inject constructor(
      * @return a formatted String representation of the transfer path
      */
     private suspend fun formatTransferPath(transfer: Transfer, isOffline: Boolean): String =
-        transfer.getSDCardTransferPath()?.takeUnless { it.isBlank() }
-            ?: run {
-                when (transfer.transferType) {
-                    TransferType.GENERAL_UPLOAD, TransferType.CU_UPLOAD, TransferType.CHAT_UPLOAD ->
-                        formatNodePath(transfer.parentHandle)
+        when (transfer.transferType) {
+            TransferType.GENERAL_UPLOAD, TransferType.CU_UPLOAD, TransferType.CHAT_UPLOAD ->
+                formatNodePath(transfer.parentHandle)
 
-                    TransferType.DOWNLOAD -> {
-                        if (isOffline)
-                            formatOfflineNodePath(transfer.parentPath, transfer.nodeHandle)
-                        else
-                            transfer.parentPath
-                    }
-
-                    TransferType.NONE -> ""
-                }.removeSuffix(File.separator)
+            TransferType.DOWNLOAD -> {
+                if (isOffline)
+                    formatOfflineNodePath(transfer.parentPath, transfer.nodeHandle)
+                else
+                    transfer.parentPath
             }
+
+            TransferType.NONE -> ""
+        }.removeSuffix(File.separator)
 
     /**
      * Get a formatted string of the size

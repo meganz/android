@@ -579,8 +579,9 @@ class DefaultTransfersRepositoryTest {
             val transfer = mock<Transfer>()
             val error = mock<MegaException>()
             val expected = mock<CompletedTransfer>()
-            whenever(completedTransferMapper(transfer, error)).thenReturn(expected)
-            underTest.addCompletedTransfer(transfer, error)
+            val path = "path"
+            whenever(completedTransferMapper(transfer, error, path)).thenReturn(expected)
+            underTest.addCompletedTransfer(transfer, error, path)
             verify(megaLocalRoomGateway).addCompletedTransfer(expected)
             verify(appEventGateway).broadcastCompletedTransfer(expected)
         }

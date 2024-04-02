@@ -8516,7 +8516,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
                     false -> {
                         val file = getFileFromUri(transfer.path)
-                        if (file == null || !FileUtil.isFileAvailable(file)) {
+                        if (file?.exists() != true) {
                             showSnackbar(
                                 Constants.SNACKBAR_TYPE,
                                 getString(R.string.location_not_exist),
