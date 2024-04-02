@@ -66,6 +66,7 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
+import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
 import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
 import mega.privacy.android.app.utils.MegaNodeUtil.showShareOption
@@ -1106,6 +1107,11 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
      * @param menu Menu object
      */
     private fun setDefaultOptionsToolbar(menu: Menu) {
+        val isInSharedItems = type in listOf(
+            Constants.INCOMING_SHARES_ADAPTER,
+            Constants.OUTGOING_SHARES_ADAPTER,
+            Constants.LINKS_ADAPTER
+        )
         val downloadMenuItem = menu.findItem(R.id.pdf_viewer_download)
         val chatMenuItem = menu.findItem(R.id.pdf_viewer_chat)
         val propertiesMenuItem = menu.findItem(R.id.pdf_viewer_properties)
@@ -1122,6 +1128,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         val saveForOfflineMenuItem = menu.findItem(R.id.chat_pdf_viewer_save_for_offline)
         val chatRemoveMenuItem = menu.findItem(R.id.chat_pdf_viewer_remove)
         var node = megaApi.getNodeByHandle(handle)
+        val parentNode = node?.let { megaApi.getRootParentNode(it) }
         if (node == null) {
             getLinkMenuItem.isVisible = false
             removeLinkMenuItem.isVisible = false
@@ -1197,8 +1204,19 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             }
             downloadMenuItem.isVisible = true
         }
-        hideMenuItem.isVisible = isHiddenNodesEnabled && node?.isMarkedSensitive == false
-        unhideMenuItem.isVisible = isHiddenNodesEnabled && node?.isMarkedSensitive == true
+        val shouldShowHideNode =
+            isHiddenNodesEnabled
+                    && !isInSharedItems
+                    && parentNode?.isInShare == false
+                    && node?.isMarkedSensitive == false
+        val shouldShowUnhideNode =
+            isHiddenNodesEnabled
+                    && !isInSharedItems
+                    && parentNode?.isInShare == false
+                    && node?.isMarkedSensitive == true
+
+        hideMenuItem.isVisible = shouldShowHideNode
+        unhideMenuItem.isVisible = shouldShowUnhideNode
         importMenuItem.isVisible = false
         saveForOfflineMenuItem.isVisible = false
         chatRemoveMenuItem.isVisible = false

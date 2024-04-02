@@ -96,9 +96,11 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_FROM
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.LINKS_ADAPTER
 import mega.privacy.android.app.utils.Constants.MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS
 import mega.privacy.android.app.utils.Constants.NAME
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
+import mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.app.utils.Constants.SEARCH_ADAPTER
@@ -109,6 +111,7 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util.isDarkMode
@@ -1104,6 +1107,11 @@ class VideoPlayerActivity : MediaPlayerActivity() {
         }
 
         intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE).let { adapterType ->
+            val isInSharedItems = adapterType in listOf(
+                INCOMING_SHARES_ADAPTER,
+                OUTGOING_SHARES_ADAPTER,
+                LINKS_ADAPTER
+            )
             when (currentFragmentId) {
                 R.id.video_playlist -> {
                     menu.toggleAllMenuItemsVisibility(false)
@@ -1202,11 +1210,21 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                             menu.findItem(R.id.properties).isVisible =
                                 currentFragmentId == R.id.video_main_player
 
-                            menu.findItem(R.id.hide).isVisible =
-                                isHiddenNodesEnabled && !node.isMarkedSensitive
+                            val shouldShowHideNode =
+                                isHiddenNodesEnabled
+                                        && !isInSharedItems
+                                        && !megaApi.getRootParentNode(node).isInShare
+                                        && !node.isMarkedSensitive
 
-                            menu.findItem(R.id.unhide).isVisible =
-                                isHiddenNodesEnabled && node.isMarkedSensitive
+                            val shouldShowUnhideNode =
+                                isHiddenNodesEnabled
+                                        && !isInSharedItems
+                                        && !megaApi.getRootParentNode(node).isInShare
+                                        && node.isMarkedSensitive
+
+                            menu.findItem(R.id.hide).isVisible = shouldShowHideNode
+
+                            menu.findItem(R.id.unhide).isVisible = shouldShowUnhideNode
 
                             menu.findItem(R.id.share).isVisible =
                                 currentFragmentId == R.id.video_main_player

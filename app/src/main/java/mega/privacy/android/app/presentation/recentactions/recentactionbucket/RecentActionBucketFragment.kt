@@ -399,7 +399,7 @@ class RecentActionBucketFragment : Fragment() {
     ) = viewLifecycleOwner.lifecycleScope.launch {
         val handles = getNodesHandles(true)
         val intent = if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview)) {
-            val menuOptionSource = if (megaApi.getRootParentNode(node).isShared) {
+            val menuOptionSource = if (megaApi.getRootParentNode(node).isInShare) {
                 ImagePreviewMenuSource.SHARED_ITEMS
             } else {
                 ImagePreviewMenuSource.DEFAULT

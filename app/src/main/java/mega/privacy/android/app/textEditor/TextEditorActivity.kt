@@ -49,17 +49,21 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmD
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ANIMATION_DURATION
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_HOME_PAGE
+import mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_TO
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_TO
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_TO
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.LINKS_ADAPTER
 import mega.privacy.android.app.utils.Constants.LONG_SNACKBAR_DURATION
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
+import mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER
@@ -70,6 +74,7 @@ import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
+import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
@@ -473,6 +478,13 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
                 else -> {
                     val node = viewModel.getNode()
+                    val parentNode = node?.let { megaApi.getRootParentNode(it) }
+                    val adapterType = viewModel.getAdapterType()
+                    val isInSharedItems = adapterType in listOf(
+                        INCOMING_SHARES_ADAPTER,
+                        OUTGOING_SHARES_ADAPTER,
+                        LINKS_ADAPTER
+                    )
                     if (megaApi.isInRubbish(node)) {
                         menu.toggleAllMenuItemsVisibility(false)
                         menu.findItem(R.id.action_remove).isVisible = true
@@ -516,10 +528,17 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     menu.findItem(R.id.action_remove).isVisible = false
                     menu.findItem(R.id.chat_action_save_for_offline).isVisible = false
                     menu.findItem(R.id.chat_action_remove).isVisible = false
-                    menu.findItem(R.id.action_hide).isVisible =
-                        isHiddenNodesEnabled && node?.isMarkedSensitive == false
-                    menu.findItem(R.id.action_unhide).isVisible =
-                        isHiddenNodesEnabled && node?.isMarkedSensitive == true
+                    val shouldShowHideNode =
+                        (isHiddenNodesEnabled
+                                && !isInSharedItems
+                                && parentNode?.isInShare == false) && !node.isMarkedSensitive
+
+                    val shouldShowUnhideNode =
+                        (isHiddenNodesEnabled
+                                && !isInSharedItems
+                                && parentNode?.isInShare == false) && node.isMarkedSensitive
+                    menu.findItem(R.id.action_hide).isVisible = shouldShowHideNode
+                    menu.findItem(R.id.action_unhide).isVisible = shouldShowUnhideNode
                     menu.findItem(R.id.action_save).isVisible = false
                 }
             }
