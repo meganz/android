@@ -21,7 +21,7 @@ import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
 
 /**
@@ -32,7 +32,7 @@ import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
 abstract class AbstractTransferNodesUseCase<T, R>(
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
     private val invalidateCancelTokenUseCase: InvalidateCancelTokenUseCase,
-    private val addOrUpdateActiveTransferUseCase: AddOrUpdateActiveTransferUseCase,
+    private val handleTransferEventUseCase: HandleTransferEventUseCase,
     private val handleSDCardEventUseCase: HandleSDCardEventUseCase,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
 ) {
@@ -78,7 +78,7 @@ abstract class AbstractTransferNodesUseCase<T, R>(
                             }
                             handleSDCardEventUseCase(transferEvent)
                             //update active transfers db
-                            addOrUpdateActiveTransferUseCase(transferEvent)
+                            handleTransferEventUseCase(transferEvent)
 
                             //keep track of file counters
                             if (transferEvent.isFileTransfer) {
@@ -158,7 +158,7 @@ abstract class AbstractTransferNodesUseCase<T, R>(
                 .collect { transferEvent ->
                     withContext(NonCancellable) {
                         handleSDCardEventUseCase(transferEvent)
-                        addOrUpdateActiveTransferUseCase(transferEvent)
+                        handleTransferEventUseCase(transferEvent)
                     }
                 }
         }

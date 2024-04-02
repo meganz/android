@@ -23,10 +23,9 @@ import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -49,7 +48,7 @@ class UploadFilesUseCaseTest {
 
     private val cancelCancelTokenUseCase = mock<CancelCancelTokenUseCase>()
     private val invalidateCancelTokenUseCase = mock<InvalidateCancelTokenUseCase>()
-    private val addOrUpdateActiveTransferUseCase = mock<AddOrUpdateActiveTransferUseCase>()
+    private val handleTransferEventUseCase = mock<HandleTransferEventUseCase>()
     private val handleSDCardEventUseCase = mock<HandleSDCardEventUseCase>()
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val transferRepository = mock<TransferRepository>()
@@ -66,7 +65,7 @@ class UploadFilesUseCaseTest {
             UploadFilesUseCase(
                 cancelCancelTokenUseCase = cancelCancelTokenUseCase,
                 invalidateCancelTokenUseCase = invalidateCancelTokenUseCase,
-                addOrUpdateActiveTransferUseCase = addOrUpdateActiveTransferUseCase,
+                handleTransferEventUseCase = handleTransferEventUseCase,
                 handleSDCardEventUseCase = handleSDCardEventUseCase,
                 monitorTransferEventsUseCase = monitorTransferEventsUseCase,
                 transferRepository = transferRepository,
@@ -77,7 +76,7 @@ class UploadFilesUseCaseTest {
     fun resetMocks() {
         reset(
             transferRepository, cancelTokenRepository, fileSystemRepository,
-            addOrUpdateActiveTransferUseCase, fileNode, invalidateCancelTokenUseCase,
+            handleTransferEventUseCase, fileNode, invalidateCancelTokenUseCase,
             cancelCancelTokenUseCase, transfer, handleSDCardEventUseCase,
             monitorTransferEventsUseCase,
         )
@@ -274,7 +273,7 @@ class UploadFilesUseCaseTest {
                     cancelAndConsumeRemainingEvents()
                 }
             verify(
-                addOrUpdateActiveTransferUseCase,
+                handleTransferEventUseCase,
                 Times(fileNodesAndNullNames.size * 3)
             ).invoke(any())
         }

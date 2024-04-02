@@ -22,9 +22,9 @@ import org.mockito.kotlin.verify
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class AddOrUpdateActiveTransferUseCaseTest {
+class HandleTransferEventUseCaseTest {
 
-    private lateinit var underTest: AddOrUpdateActiveTransferUseCase
+    private lateinit var underTest: HandleTransferEventUseCase
 
     private val transferRepository = mock<TransferRepository>()
     private val broadcastBusinessAccountExpiredUseCase =
@@ -33,7 +33,7 @@ class AddOrUpdateActiveTransferUseCaseTest {
 
     @BeforeAll
     fun setUp() {
-        underTest = AddOrUpdateActiveTransferUseCase(
+        underTest = HandleTransferEventUseCase(
             transferRepository = transferRepository,
             broadcastBusinessAccountExpiredUseCase = broadcastBusinessAccountExpiredUseCase,
             broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,

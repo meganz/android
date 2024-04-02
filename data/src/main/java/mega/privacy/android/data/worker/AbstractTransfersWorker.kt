@@ -28,7 +28,7 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
@@ -45,7 +45,7 @@ abstract class AbstractTransfersWorker(
     private val type: TransferType,
     private val ioDispatcher: CoroutineDispatcher,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
-    private val addOrUpdateActiveTransferUseCase: AddOrUpdateActiveTransferUseCase,
+    private val handleTransferEventUseCase: HandleTransferEventUseCase,
     private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
@@ -155,7 +155,7 @@ abstract class AbstractTransfersWorker(
                 .filter { it.transfer.transferType == type }
                 .collect { transferEvent ->
                     onTransferEventReceived(transferEvent)
-                    addOrUpdateActiveTransferUseCase(transferEvent)
+                    handleTransferEventUseCase(transferEvent)
                 }
         }
 

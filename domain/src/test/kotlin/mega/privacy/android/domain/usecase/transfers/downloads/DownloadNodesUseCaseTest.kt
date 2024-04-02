@@ -33,7 +33,7 @@ import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -66,7 +66,7 @@ class DownloadNodesUseCaseTest {
     private val invalidateCancelTokenUseCase: InvalidateCancelTokenUseCase = mock()
     private val fileSystemRepository: FileSystemRepository = mock()
     private val transfer: Transfer = mock()
-    private val addOrUpdateActiveTransferUseCase: AddOrUpdateActiveTransferUseCase = mock()
+    private val handleTransferEventUseCase: HandleTransferEventUseCase = mock()
     private val handleSDCardEventUseCase: HandleSDCardEventUseCase = mock()
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
 
@@ -78,7 +78,7 @@ class DownloadNodesUseCaseTest {
             DownloadNodesUseCase(
                 cancelCancelTokenUseCase = cancelCancelTokenUseCase,
                 invalidateCancelTokenUseCase = invalidateCancelTokenUseCase,
-                addOrUpdateActiveTransferUseCase = addOrUpdateActiveTransferUseCase,
+                handleTransferEventUseCase = handleTransferEventUseCase,
                 handleSDCardEventUseCase = handleSDCardEventUseCase,
                 monitorTransferEventsUseCase = monitorTransferEventsUseCase,
                 transferRepository = transferRepository,
@@ -90,7 +90,7 @@ class DownloadNodesUseCaseTest {
     fun resetMocks() {
         reset(
             transferRepository, cancelTokenRepository, fileSystemRepository,
-            addOrUpdateActiveTransferUseCase, fileNode, folderNode, invalidateCancelTokenUseCase,
+            handleTransferEventUseCase, fileNode, folderNode, invalidateCancelTokenUseCase,
             cancelCancelTokenUseCase, transfer, handleSDCardEventUseCase,
             monitorTransferEventsUseCase,
         )
@@ -293,7 +293,7 @@ class DownloadNodesUseCaseTest {
                 cancelAndConsumeRemainingEvents()
             }
             verify(
-                addOrUpdateActiveTransferUseCase,
+                handleTransferEventUseCase,
                 Times(nodeIds.size * flow.count())
             ).invoke(any())
         }
@@ -473,10 +473,10 @@ class DownloadNodesUseCaseTest {
                 //verify it's received if corresponds
                 if (childTransferEvent) {
                     verify(handleSDCardEventUseCase)(globalEvent)
-                    verify(addOrUpdateActiveTransferUseCase)(globalEvent)
+                    verify(handleTransferEventUseCase)(globalEvent)
                 } else {
                     verify(handleSDCardEventUseCase, times(0))(globalEvent)
-                    verify(addOrUpdateActiveTransferUseCase, times(0))(globalEvent)
+                    verify(handleTransferEventUseCase, times(0))(globalEvent)
                 }
                 cancelAndIgnoreRemainingEvents()
             }

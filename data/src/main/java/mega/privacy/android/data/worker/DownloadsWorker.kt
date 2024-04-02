@@ -16,7 +16,7 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
@@ -36,7 +36,7 @@ class DownloadsWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
-    addOrUpdateActiveTransferUseCase: AddOrUpdateActiveTransferUseCase,
+    handleTransferEventUseCase: HandleTransferEventUseCase,
     monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
     areTransfersPausedUseCase: AreTransfersPausedUseCase,
     getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
@@ -56,7 +56,7 @@ class DownloadsWorker @AssistedInject constructor(
     TransferType.DOWNLOAD,
     ioDispatcher,
     monitorTransferEventsUseCase,
-    addOrUpdateActiveTransferUseCase,
+    handleTransferEventUseCase,
     monitorOngoingActiveTransfersUseCase,
     areTransfersPausedUseCase,
     getActiveTransferTotalsUseCase,

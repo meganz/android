@@ -9,7 +9,7 @@ import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
 import mega.privacy.android.domain.usecase.transfers.shared.AbstractTransferNodesUseCase
 import java.io.File
@@ -21,14 +21,14 @@ import javax.inject.Inject
 class UploadFilesUseCase @Inject constructor(
     cancelCancelTokenUseCase: CancelCancelTokenUseCase,
     invalidateCancelTokenUseCase: InvalidateCancelTokenUseCase,
-    addOrUpdateActiveTransferUseCase: AddOrUpdateActiveTransferUseCase,
+    handleTransferEventUseCase: HandleTransferEventUseCase,
     handleSDCardEventUseCase: HandleSDCardEventUseCase,
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val transferRepository: TransferRepository,
 ) : AbstractTransferNodesUseCase<File, String>(
     cancelCancelTokenUseCase,
     invalidateCancelTokenUseCase,
-    addOrUpdateActiveTransferUseCase,
+    handleTransferEventUseCase,
     handleSDCardEventUseCase,
     monitorTransferEventsUseCase,
 ) {

@@ -39,7 +39,7 @@ import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMes
 import mega.privacy.android.domain.usecase.chat.message.CheckFinishedChatUploadsUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
@@ -72,7 +72,7 @@ class ChatUploadsWorkerTest {
 
     private val attachNodeWithPendingMessageUseCase = mock<AttachNodeWithPendingMessageUseCase>()
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
-    private val addOrUpdateActiveTransferUseCase = mock<AddOrUpdateActiveTransferUseCase>()
+    private val handleTransferEventUseCase = mock<HandleTransferEventUseCase>()
     private val monitorOngoingActiveTransfersUseCase = mock<MonitorOngoingActiveTransfersUseCase>()
     private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
     private val getActiveTransferTotalsUseCase = mock<GetActiveTransferTotalsUseCase>()
@@ -116,7 +116,7 @@ class ChatUploadsWorkerTest {
             ),
             ioDispatcher = ioDispatcher,
             monitorTransferEventsUseCase,
-            addOrUpdateActiveTransferUseCase,
+            handleTransferEventUseCase,
             monitorOngoingActiveTransfersUseCase,
             areTransfersPausedUseCase,
             getActiveTransferTotalsUseCase,

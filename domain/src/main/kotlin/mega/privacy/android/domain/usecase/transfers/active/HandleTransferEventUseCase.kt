@@ -15,7 +15,7 @@ import javax.inject.Inject
  *
  * @property transferRepository
  */
-class AddOrUpdateActiveTransferUseCase @Inject internal constructor(
+class HandleTransferEventUseCase @Inject internal constructor(
     private val transferRepository: TransferRepository,
     private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
     private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,

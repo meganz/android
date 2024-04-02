@@ -21,7 +21,7 @@ import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMes
 import mega.privacy.android.domain.usecase.chat.message.CheckFinishedChatUploadsUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
@@ -39,7 +39,7 @@ class ChatUploadsWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
-    addOrUpdateActiveTransferUseCase: AddOrUpdateActiveTransferUseCase,
+    handleTransferEventUseCase: HandleTransferEventUseCase,
     monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
     areTransfersPausedUseCase: AreTransfersPausedUseCase,
     getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
@@ -58,7 +58,7 @@ class ChatUploadsWorker @AssistedInject constructor(
     TransferType.CHAT_UPLOAD,
     ioDispatcher,
     monitorTransferEventsUseCase,
-    addOrUpdateActiveTransferUseCase,
+    handleTransferEventUseCase,
     monitorOngoingActiveTransfersUseCase,
     areTransfersPausedUseCase,
     getActiveTransferTotalsUseCase,

@@ -37,7 +37,7 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.AddOrUpdateActiveTransferUseCase
+import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
@@ -73,7 +73,7 @@ class DownloadsWorkerTest {
     private lateinit var workDatabase: WorkDatabase
 
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
-    private val addOrUpdateActiveTransferUseCase = mock<AddOrUpdateActiveTransferUseCase>()
+    private val handleTransferEventUseCase = mock<HandleTransferEventUseCase>()
     private val handleSDCardEventUseCase = mock<HandleSDCardEventUseCase>()
     private val handleAvailableOfflineEventUseCase = mock<HandleAvailableOfflineEventUseCase>()
     private val monitorOngoingActiveTransfersUseCase =
@@ -119,7 +119,7 @@ class DownloadsWorkerTest {
             ),
             ioDispatcher = ioDispatcher,
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
-            addOrUpdateActiveTransferUseCase = addOrUpdateActiveTransferUseCase,
+            handleTransferEventUseCase = handleTransferEventUseCase,
             areTransfersPausedUseCase = areTransfersPausedUseCase,
             monitorOngoingActiveTransfersUseCase = monitorOngoingActiveTransfersUseCase,
             getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
