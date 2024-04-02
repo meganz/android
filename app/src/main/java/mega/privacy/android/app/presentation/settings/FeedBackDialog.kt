@@ -102,12 +102,16 @@ class FeedBackDialog : DialogFragment() {
     }
 
     private fun sendEmail(subject: String, body: String) {
-        val emailIntent = Intent(Intent.ACTION_SEND)
+        val emailIntent = Intent(Intent.ACTION_SENDTO)
         emailIntent.type = Constants.TYPE_TEXT_PLAIN
         emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(Constants.MAIL_ANDROID))
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
         emailIntent.putExtra(Intent.EXTRA_TEXT, body)
-        startActivity(Intent.createChooser(emailIntent, " "))
+        context?.packageManager?.let { packageManager ->
+            if (emailIntent.resolveActivity(packageManager) != null) {
+                startActivity(emailIntent)
+            }
+        }
     }
 
     companion object {
