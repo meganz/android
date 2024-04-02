@@ -54,6 +54,7 @@ import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.main.megachat.MegaChatParticipant;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
+import mega.privacy.android.app.presentation.meeting.view.ParticipantsLimitWarningView;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -187,6 +188,8 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         private View observersSeparator;
         private RoundedImageView avatarImageView;
         private EmojiTextView infoTitleChatText;
+
+        private ParticipantsLimitWarningView participantsLimitWarningView;
     }
 
     @Override
@@ -203,6 +206,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
 
                 holderHeader.editImageView = v.findViewById(R.id.chat_group_contact_properties_edit_icon);
                 holderHeader.editImageView.setOnClickListener(this);
+                holderHeader.participantsLimitWarningView = v.findViewById(R.id.participants_limit_warning_view);
 
                 //Notifications Layout
                 holderHeader.notificationsLayout = v.findViewById(R.id.chat_group_contact_properties_notifications_layout);
@@ -706,6 +710,21 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
     public void updateParticipant(int positionInArray, ArrayList<MegaChatParticipant> participants) {
         this.participants = participants;
         notifyItemChanged(getParticipantPositionInAdapter(positionInArray));
+    }
+
+    /**
+     * Updates a participants warning
+     */
+    public void updateParticipantWarning(Boolean shouldShowWarning) {
+        ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
+        if (holderHeader != null) {
+            if (shouldShowWarning) {
+                holderHeader.participantsLimitWarningView.setModerator(getChat().getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR);
+                holderHeader.participantsLimitWarningView.setVisibility(View.VISIBLE);
+            } else {
+                holderHeader.participantsLimitWarningView.setVisibility(View.GONE);
+            }
+        }
     }
 
     /**

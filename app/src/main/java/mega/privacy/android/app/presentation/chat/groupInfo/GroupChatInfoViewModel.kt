@@ -30,6 +30,7 @@ import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
@@ -72,6 +73,7 @@ class GroupChatInfoViewModel @Inject constructor(
     private val broadcastLeaveChatUseCase: BroadcastLeaveChatUseCase,
     private val monitorSFUServerUpgradeUseCase: MonitorSFUServerUpgradeUseCase,
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
+    private val getChatCallUseCase: GetChatCallUseCase,
 ) : BaseRxViewModel() {
 
     /**
@@ -126,6 +128,7 @@ class GroupChatInfoViewModel @Inject constructor(
                     chatId = newChatId
                 )
             }
+            getChatCall()
         }
     }
 
@@ -286,5 +289,20 @@ class GroupChatInfoViewModel @Inject constructor(
      */
     fun onForceUpdateDialogDismissed() {
         _state.update { it.copy(showForceUpdateDialog = false) }
+    }
+
+    /**
+     * Get chat call updates
+     */
+    private fun getChatCall() {
+        viewModelScope.launch {
+            runCatching {
+                getChatCallUseCase(_state.value.chatId)?.let { call ->
+                    _state.update { it.copy(call = call) }
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 }

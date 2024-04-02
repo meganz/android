@@ -793,6 +793,7 @@ class MeetingActivityViewModel @Inject constructor(
                     checkIfPresenting(call)
                     call.changes?.apply {
                         if (contains(ChatCallChanges.Status)) {
+                            Timber.d("Chat call status: ${call.status}")
                             when (call.status) {
                                 ChatCallStatus.InProgress -> {
                                     checkEphemeralAccountAndWaitingRoom(call)

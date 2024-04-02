@@ -4,6 +4,7 @@
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <LinearLayout
@@ -586,5 +587,13 @@
             android:text="@string/participants_chat_label"
             android:textAppearance="?attr/textAppearanceSubtitle2" />
     </RelativeLayout>
+
+    <mega.privacy.android.app.presentation.meeting.view.ParticipantsLimitWarningView
+        android:id="@+id/participants_limit_warning_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible"
+        />
 
 </LinearLayout>

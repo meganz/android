@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.chat.groupInfo
 
+import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -11,11 +13,13 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
@@ -53,6 +57,7 @@ class GroupChatInfoViewModelTest {
     private val broadcastChatArchivedUseCase: BroadcastChatArchivedUseCase = mock()
     private val broadcastLeaveChatUseCase: BroadcastLeaveChatUseCase = mock()
     private val monitorSFUServerUpgradeUseCase: MonitorSFUServerUpgradeUseCase = mock()
+    private val getChatCallUseCase: GetChatCallUseCase = mock()
 
     private val connectivityFlow = MutableSharedFlow<Boolean>()
     private val updatePushNotificationSettings = MutableSharedFlow<Boolean>()
@@ -86,7 +91,8 @@ class GroupChatInfoViewModelTest {
             monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase,
             broadcastChatArchivedUseCase = broadcastChatArchivedUseCase,
             broadcastLeaveChatUseCase = broadcastLeaveChatUseCase,
-            monitorSFUServerUpgradeUseCase = monitorSFUServerUpgradeUseCase
+            monitorSFUServerUpgradeUseCase = monitorSFUServerUpgradeUseCase,
+            getChatCallUseCase = getChatCallUseCase
         )
     }
 
@@ -114,6 +120,33 @@ class GroupChatInfoViewModelTest {
         verify(chatApiGateway).getChatCall(chatID)
     }
 
+    @Test
+    fun `test that new chatId and call are set when setChatId is invoked`() =
+        runTest {
+            val newChatId = 456L
+            val call = mock<ChatCall>()
+            whenever(getChatCallUseCase.invoke(newChatId)).thenReturn(call)
+            underTest.setChatId(newChatId)
+            underTest.state.test {
+                val item = awaitItem()
+                assertThat(item.chatId).isEqualTo(newChatId)
+                assertThat(item.call).isEqualTo(call)
+            }
+        }
+
+    @Test
+    fun `test that call is not set if there is no existing call when setChatId is invoked`() =
+        runTest {
+            val newChatId = 456L
+            whenever(getChatCallUseCase.invoke(newChatId)).thenReturn(null)
+            underTest.setChatId(newChatId)
+            underTest.state.test {
+                val item = awaitItem()
+                assertThat(item.chatId).isEqualTo(newChatId)
+                assertThat(item.call).isNull()
+            }
+        }
+
     @After
     fun tearDown() {
         Dispatchers.resetMain()
@@ -130,7 +163,8 @@ class GroupChatInfoViewModelTest {
             sendStatisticsMeetingsUseCase,
             monitorUpdatePushNotificationSettingsUseCase,
             broadcastChatArchivedUseCase,
-            broadcastLeaveChatUseCase
+            broadcastLeaveChatUseCase,
+            getChatCallUseCase
         )
     }
 }

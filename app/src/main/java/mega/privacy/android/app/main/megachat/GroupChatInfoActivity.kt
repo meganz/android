@@ -23,9 +23,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -35,7 +32,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MegaApplication.Companion.userWaitingForCall
 import mega.privacy.android.app.R
@@ -60,6 +56,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.Participan
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
 import mega.privacy.android.app.presentation.chat.groupInfo.GroupChatInfoViewModel
+import mega.privacy.android.app.presentation.meeting.model.MeetingState.Companion.FREE_PLAN_PARTICIPANTS_LIMIT
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.utils.AlertDialogUtil.createForceAppUpdateDialog
@@ -75,6 +72,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MAX_USER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.TextUtil
@@ -143,6 +141,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     var selectedHandleParticipant: Long = 0
     var participantsCount: Long = 0
     var endCallForAllShouldBeVisible = false
+    var callUsersLimit = -1
 
     var chat: MegaChatRoom? = null
         set(value) {
@@ -244,19 +243,22 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 chatManagement.openChatRoom(chat!!.chatId)
             }
 
-            lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                    viewModel.state.collect { (_, error, enabled) ->
-                        if (error != null) {
-                            showSnackbar(getString(error))
-                            adapter?.updateAllowAddParticipants(getChatRoom().isOpenInvite)
-                        } else if (enabled != null) {
-                            adapter?.updateAllowAddParticipants(enabled)
-                            updateAdapterHeader()
-                            updateParticipants()
-                            invalidateOptionsMenu()
-                        }
-                    }
+            collectFlow(viewModel.state) { (_, call, error, enabled) ->
+                if (error != null) {
+                    showSnackbar(getString(error))
+                    adapter?.updateAllowAddParticipants(getChatRoom().isOpenInvite)
+                } else if (enabled != null) {
+                    adapter?.updateAllowAddParticipants(enabled)
+                    updateAdapterHeader()
+                    updateParticipants()
+                    invalidateOptionsMenu()
+                }
+                call?.let {
+                    callUsersLimit = it.callUsersLimit.takeIf { limit -> limit != -1 }
+                        ?: FREE_PLAN_PARTICIPANTS_LIMIT
+                    adapter?.updateParticipantWarning(
+                        participantsCount >= callUsersLimit
+                    )
                 }
             }
 
@@ -521,6 +523,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                     INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
                     getString(R.string.add_participants_menu_item)
                 )
+                intent.putExtra(INTENT_EXTRA_KEY_MAX_USER, callUsersLimit)
 
                 @Suppress("deprecation")
                 startActivityForResult(intent, Constants.REQUEST_ADD_PARTICIPANTS)
