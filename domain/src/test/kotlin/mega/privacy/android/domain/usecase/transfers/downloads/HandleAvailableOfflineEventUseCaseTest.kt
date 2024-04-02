@@ -4,6 +4,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.offline.IsOfflineTransferUseCase
@@ -52,9 +53,7 @@ class HandleAvailableOfflineEventUseCaseTest {
     @Test
     fun `test that offline node information is saved when a finish event for an offline download transfer is received`() =
         runTest {
-            val transfer = mock<Transfer> {
-                on { it.nodeHandle } doReturn nodeId
-            }
+            val transfer = mockTransfer()
             val event = mock<TransferEvent.TransferFinishEvent> {
                 on { it.transfer } doReturn transfer
             }
@@ -68,9 +67,7 @@ class HandleAvailableOfflineEventUseCaseTest {
     @Test
     fun `test that offline node information is not invoked when a finish event for not offline download transfer is received`() =
         runTest {
-            val transfer = mock<Transfer> {
-                on { it.nodeHandle } doReturn nodeId
-            }
+            val transfer = mockTransfer()
             val event = mock<TransferEvent.TransferFinishEvent> {
                 on { it.transfer } doReturn transfer
             }
@@ -81,12 +78,15 @@ class HandleAvailableOfflineEventUseCaseTest {
             verifyNoInteractions(saveOfflineNodeInformationUseCase)
         }
 
+    private fun mockTransfer() = mock<Transfer> {
+        on { it.nodeHandle } doReturn nodeId
+        on { it.transferType } doReturn TransferType.DOWNLOAD
+    }
+
     @Test
     fun `test that offline node information is not invoked when a finish event with error is received`() =
         runTest {
-            val transfer = mock<Transfer> {
-                on { it.nodeHandle } doReturn nodeId
-            }
+            val transfer = mockTransfer()
             val error = mock<MegaException>()
             val event = mock<TransferEvent.TransferFinishEvent> {
                 on { it.transfer } doReturn transfer
@@ -116,9 +116,7 @@ class HandleAvailableOfflineEventUseCaseTest {
     @Test
     fun `test that broadcastOfflineFileAvailabilityUseCase is invoked when a finish event for an offline download transfer is received`() =
         runTest {
-            val transfer = mock<Transfer> {
-                on { it.nodeHandle } doReturn nodeId
-            }
+            val transfer = mockTransfer()
             val event = mock<TransferEvent.TransferFinishEvent> {
                 on { it.transfer } doReturn transfer
             }
@@ -131,9 +129,7 @@ class HandleAvailableOfflineEventUseCaseTest {
 
     private fun provideNotFinishEvents(): List<TransferEvent> {
 
-        val transfer = mock<Transfer> {
-            on { it.nodeHandle } doReturn nodeId
-        }
+        val transfer = mockTransfer()
         return listOf(
             mock<TransferEvent.TransferStartEvent> {
                 on { it.transfer } doReturn transfer

@@ -16,14 +16,12 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
+import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.HandleAvailableOfflineEventUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
-import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
 import timber.log.Timber
 
 /**
@@ -47,9 +45,7 @@ class DownloadsWorker @AssistedInject constructor(
     clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
     private val downloadNotificationMapper: DownloadNotificationMapper,
     private val transfersFinishedNotificationMapper: TransfersFinishedNotificationMapper,
-    private val handleSDCardEventUseCase: HandleSDCardEventUseCase,
     private val scanMediaFileUseCase: ScanMediaFileUseCase,
-    private val handleAvailableOfflineEventUseCase: HandleAvailableOfflineEventUseCase,
 ) : AbstractTransfersWorker(
     context,
     workerParams,
@@ -79,8 +75,6 @@ class DownloadsWorker @AssistedInject constructor(
         transfersFinishedNotificationMapper(activeTransferTotals)
 
     override suspend fun onTransferEventReceived(event: TransferEvent) {
-        handleSDCardEventUseCase(event)
-        handleAvailableOfflineEventUseCase(event)
         if (event is TransferEvent.TransferFinishEvent) {
             runCatching {
                 scanMediaFileUseCase(arrayOf(event.transfer.localPath), arrayOf(""))

@@ -34,7 +34,6 @@ import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
-import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -67,7 +66,6 @@ class DownloadNodesUseCaseTest {
     private val fileSystemRepository: FileSystemRepository = mock()
     private val transfer: Transfer = mock()
     private val handleTransferEventUseCase: HandleTransferEventUseCase = mock()
-    private val handleSDCardEventUseCase: HandleSDCardEventUseCase = mock()
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
 
     private lateinit var underTest: DownloadNodesUseCase
@@ -79,7 +77,6 @@ class DownloadNodesUseCaseTest {
                 cancelCancelTokenUseCase = cancelCancelTokenUseCase,
                 invalidateCancelTokenUseCase = invalidateCancelTokenUseCase,
                 handleTransferEventUseCase = handleTransferEventUseCase,
-                handleSDCardEventUseCase = handleSDCardEventUseCase,
                 monitorTransferEventsUseCase = monitorTransferEventsUseCase,
                 transferRepository = transferRepository,
                 fileSystemRepository = fileSystemRepository,
@@ -91,7 +88,7 @@ class DownloadNodesUseCaseTest {
         reset(
             transferRepository, cancelTokenRepository, fileSystemRepository,
             handleTransferEventUseCase, fileNode, folderNode, invalidateCancelTokenUseCase,
-            cancelCancelTokenUseCase, transfer, handleSDCardEventUseCase,
+            cancelCancelTokenUseCase, transfer,
             monitorTransferEventsUseCase,
         )
         commonStub()
@@ -299,36 +296,6 @@ class DownloadNodesUseCaseTest {
         }
 
     @Test
-    fun `test that handleSDCardEventUseCase is invoked when each transfer is updated`() =
-        runTest {
-            whenever(transfer.isFolderTransfer).thenReturn(false)
-            val flow = flowOf(
-                mock<TransferEvent.TransferStartEvent> { on { it.transfer }.thenReturn(transfer) },
-                mock<TransferEvent.TransferUpdateEvent> { on { it.transfer }.thenReturn(transfer) },
-                mock<TransferEvent.TransferFinishEvent> { on { it.transfer }.thenReturn(transfer) },
-            )
-            fileNodes.forEach {
-                whenever(
-                    transferRepository.startDownload(
-                        it, DESTINATION_PATH_FOLDER, null, false,
-                    )
-                ).thenReturn(flow)
-            }
-            underTest(
-                fileNodes,
-                DESTINATION_PATH_FOLDER,
-                null,
-                false
-            ).filterIsInstance<MultiTransferEvent.SingleTransferEvent>().test {
-                cancelAndConsumeRemainingEvents()
-            }
-            verify(
-                handleSDCardEventUseCase,
-                Times(nodeIds.size * flow.count())
-            ).invoke(any())
-        }
-
-    @Test
     fun `test that single event with is finish scanning event flag to true is emitted when each node finishes it is scanned`() =
         runTest {
             val transfers = folderNodes.associateWith { node ->
@@ -472,10 +439,8 @@ class DownloadNodesUseCaseTest {
 
                 //verify it's received if corresponds
                 if (childTransferEvent) {
-                    verify(handleSDCardEventUseCase)(globalEvent)
                     verify(handleTransferEventUseCase)(globalEvent)
                 } else {
-                    verify(handleSDCardEventUseCase, times(0))(globalEvent)
                     verify(handleTransferEventUseCase, times(0))(globalEvent)
                 }
                 cancelAndIgnoreRemainingEvents()

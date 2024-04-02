@@ -22,7 +22,6 @@ import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
-import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
 
 /**
  * Helper class to implement common logic for transfer multiple items (upload or download)
@@ -33,7 +32,6 @@ abstract class AbstractTransferNodesUseCase<T, R>(
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
     private val invalidateCancelTokenUseCase: InvalidateCancelTokenUseCase,
     private val handleTransferEventUseCase: HandleTransferEventUseCase,
-    private val handleSDCardEventUseCase: HandleSDCardEventUseCase,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
 ) {
 
@@ -76,8 +74,7 @@ abstract class AbstractTransferNodesUseCase<T, R>(
                             if (transferEvent is TransferEvent.TransferStartEvent) {
                                 rootTags += transferEvent.transfer.tag
                             }
-                            handleSDCardEventUseCase(transferEvent)
-                            //update active transfers db
+                            //update active transfers db, sd transfers, etc.
                             handleTransferEventUseCase(transferEvent)
 
                             //keep track of file counters
@@ -157,7 +154,6 @@ abstract class AbstractTransferNodesUseCase<T, R>(
                 }
                 .collect { transferEvent ->
                     withContext(NonCancellable) {
-                        handleSDCardEventUseCase(transferEvent)
                         handleTransferEventUseCase(transferEvent)
                     }
                 }

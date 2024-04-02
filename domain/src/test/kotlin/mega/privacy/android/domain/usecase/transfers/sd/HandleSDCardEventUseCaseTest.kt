@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.transfer.DestinationUriAndSubFolders
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.repository.FileSystemRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -30,7 +31,6 @@ class HandleSDCardEventUseCaseTest {
     private val deleteSdTransferByTagUseCase = mock<DeleteSdTransferByTagUseCase>()
     private val moveFileToSdCardUseCase = mock<MoveFileToSdCardUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
-    private val getTransferDestinationUriUseCase = mock<GetTransferDestinationUriUseCase>()
 
     private val scope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -42,7 +42,6 @@ class HandleSDCardEventUseCaseTest {
             deleteSdTransferByTagUseCase,
             moveFileToSdCardUseCase,
             fileSystemRepository,
-            getTransferDestinationUriUseCase,
             scope,
         )
     }
@@ -54,7 +53,6 @@ class HandleSDCardEventUseCaseTest {
             deleteSdTransferByTagUseCase,
             moveFileToSdCardUseCase,
             fileSystemRepository,
-            getTransferDestinationUriUseCase,
         )
     }
 
@@ -63,20 +61,18 @@ class HandleSDCardEventUseCaseTest {
         val transfer = mockTransfer()
         val transferEvent = TransferEvent.TransferStartEvent(transfer)
         whenever(fileSystemRepository.isSDCardCachePath(any())).thenReturn(false)
-        underTest(transferEvent)
+        underTest(transferEvent, null)
         verify(insertSdTransferUseCase)(any())
     }
 
     @Test
-    fun `test that file is moved to destination specified in app data when root transfer is finished`() =
+    fun `test that file is moved to destination specified in DestinationUriAndSubFolders when transfer is finished`() =
         runTest {
             val transfer = mockTransfer()
             whenever(fileSystemRepository.isSDCardCachePath(any())).thenReturn(true)
             val subFolders = mock<List<String>>()
-            whenever(getTransferDestinationUriUseCase(transfer))
-                .thenReturn(DestinationUriAndSubFolders(TARGET_PATH, subFolders))
             val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
-            underTest(transferEvent)
+            underTest(transferEvent, DestinationUriAndSubFolders(TARGET_PATH, subFolders))
             verify(moveFileToSdCardUseCase).invoke(any(), eq(TARGET_PATH), eq(subFolders))
         }
 
@@ -87,7 +83,7 @@ class HandleSDCardEventUseCaseTest {
             whenever(transfer.isRootTransfer).thenReturn(true)
             whenever(transfer.isFolderTransfer).thenReturn(true)
             val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
-            underTest(transferEvent)
+            underTest(transferEvent, null)
             verify(deleteSdTransferByTagUseCase)(any())
         }
 
@@ -98,21 +94,25 @@ class HandleSDCardEventUseCaseTest {
             whenever(transfer.isRootTransfer).thenReturn(true)
             whenever(transfer.isFolderTransfer).thenReturn(true)
             whenever(transfer.appData).thenReturn(emptyList())
+            whenever(fileSystemRepository.isSDCardCachePath(any())).thenReturn(false)
             val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
-            underTest(transferEvent)
+            underTest(transferEvent, null)
             verifyNoInteractions(deleteSdTransferByTagUseCase)
         }
 
     private fun mockTransfer() =
         mock<Transfer> {
             on { nodeHandle }.thenReturn(1L)
-            on { appData }.thenReturn(listOf(TransferAppData.SdCardDownload(TARGET_PATH, null)))
+            on { appData }.thenReturn(
+                listOf(TransferAppData.SdCardDownload(TARGET_PATH, TARGET_PATH))
+            )
             on { tag }.thenReturn(1)
             on { fileName }.thenReturn("name")
             on { totalBytes }.thenReturn(11L)
             on { nodeHandle }.thenReturn(1L)
             on { localPath }.thenReturn("localPath")
             on { isFolderTransfer }.thenReturn(false)
+            on { transferType }.thenReturn(TransferType.DOWNLOAD)
         }
 
     private companion object {

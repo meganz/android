@@ -56,26 +56,26 @@ class StartDownloadsWithWorkerUseCase @Inject constructor(
         }
         //wrap the downloadNodesUseCase flow to be able to execute suspended functions
         return flow {
-            val finalDestinationPath = getExternalPathByContentUriUseCase(destinationPathOrUri)
             val appData: TransferAppData?
             val destinationPathForSdk: String?
             when {
                 isExternalStorageContentUriUseCase(destinationPathOrUri) -> {
                     appData = null
-                    destinationPathForSdk = finalDestinationPath?.plus(File.separator)
+                    destinationPathForSdk =
+                        getExternalPathByContentUriUseCase(destinationPathOrUri)?.ensureEndsWithFileSeparator()
                 }
 
                 fileSystemRepository.isSDCardPath(destinationPathOrUri)
                         || fileSystemRepository.isContentUri(destinationPathOrUri) -> {
                     destinationPathForSdk =
-                        transferRepository.getOrCreateSDCardTransfersCacheFolder()?.path?.plus(File.separator)
+                        transferRepository.getOrCreateSDCardTransfersCacheFolder()?.path?.ensureEndsWithFileSeparator()
                     appData =
                         TransferAppData.SdCardDownload(destinationPathOrUri, destinationPathOrUri)
                 }
 
                 else -> {
                     appData = null
-                    destinationPathForSdk = finalDestinationPath?.plus(File.separator)
+                    destinationPathForSdk = destinationPathOrUri.ensureEndsWithFileSeparator()
                 }
             }
             if (destinationPathForSdk == null) {
@@ -111,4 +111,11 @@ class StartDownloadsWithWorkerUseCase @Inject constructor(
             }
         }
     }
+
+    private fun String.ensureEndsWithFileSeparator() =
+        if (this.endsWith(File.separator)) {
+            this
+        } else {
+            this.plus(File.separator)
+        }
 }

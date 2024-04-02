@@ -24,7 +24,6 @@ import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
-import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -49,7 +48,6 @@ class UploadFilesUseCaseTest {
     private val cancelCancelTokenUseCase = mock<CancelCancelTokenUseCase>()
     private val invalidateCancelTokenUseCase = mock<InvalidateCancelTokenUseCase>()
     private val handleTransferEventUseCase = mock<HandleTransferEventUseCase>()
-    private val handleSDCardEventUseCase = mock<HandleSDCardEventUseCase>()
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val transferRepository = mock<TransferRepository>()
     private val cancelTokenRepository = mock<CancelTokenRepository>()
@@ -66,7 +64,6 @@ class UploadFilesUseCaseTest {
                 cancelCancelTokenUseCase = cancelCancelTokenUseCase,
                 invalidateCancelTokenUseCase = invalidateCancelTokenUseCase,
                 handleTransferEventUseCase = handleTransferEventUseCase,
-                handleSDCardEventUseCase = handleSDCardEventUseCase,
                 monitorTransferEventsUseCase = monitorTransferEventsUseCase,
                 transferRepository = transferRepository,
             )
@@ -77,7 +74,7 @@ class UploadFilesUseCaseTest {
         reset(
             transferRepository, cancelTokenRepository, fileSystemRepository,
             handleTransferEventUseCase, fileNode, invalidateCancelTokenUseCase,
-            cancelCancelTokenUseCase, transfer, handleSDCardEventUseCase,
+            cancelCancelTokenUseCase, transfer,
             monitorTransferEventsUseCase,
         )
         commonStub()
@@ -274,24 +271,6 @@ class UploadFilesUseCaseTest {
                 }
             verify(
                 handleTransferEventUseCase,
-                Times(fileNodesAndNullNames.size * 3)
-            ).invoke(any())
-        }
-
-    @Test
-    fun `test that handleSDCardEventUseCase is invoked when each transfer is updated`() =
-        runTest {
-            stubSingleEvents()
-            underTest(
-                fileNodesAndNullNames, parentId, null,
-                isHighPriority = false,
-                isSourceTemporary = false
-            )
-                .filterIsInstance<MultiTransferEvent.SingleTransferEvent>().test {
-                    cancelAndConsumeRemainingEvents()
-                }
-            verify(
-                handleSDCardEventUseCase,
                 Times(fileNodesAndNullNames.size * 3)
             ).invoke(any())
         }

@@ -5,6 +5,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.offline.IsOfflineTransferUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
@@ -23,7 +24,7 @@ class HandleAvailableOfflineEventUseCase @Inject constructor(
      * Invoke
      */
     suspend operator fun invoke(event: TransferEvent) {
-        if (event is TransferEvent.TransferFinishEvent && event.error == null) {
+        if (event is TransferEvent.TransferFinishEvent && event.transfer.transferType == TransferType.DOWNLOAD && event.error == null) {
             // saveOfflineNodeInformationUseCase takes a while and the worker can cancel the job, so we need to launch it in a non cancellable context
             withContext(NonCancellable) {
                 launch {
