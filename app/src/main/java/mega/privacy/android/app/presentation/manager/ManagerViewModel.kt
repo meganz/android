@@ -530,7 +530,6 @@ class ManagerViewModel @Inject constructor(
 
     private suspend fun getEnabledFeatures(): Set<Feature> {
         return setOfNotNull(
-            AppFeatures.QRCodeCompose.takeIf { getFeatureFlagValueUseCase(it) },
             ABTestFeatures.dmca.takeIf { getFeatureFlagValueUseCase(it) },
         )
     }

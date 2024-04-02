@@ -79,9 +79,7 @@ import mega.privacy.android.app.components.ContactInfoListDialog;
 import mega.privacy.android.app.components.ContactsDividerDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.components.scrollBar.FastScrollerScrollListener;
-import mega.privacy.android.app.featuretoggle.AppFeatures;
 import mega.privacy.android.app.main.adapters.InvitationContactsAdapter;
-import mega.privacy.android.app.presentation.qrcode.QRCodeActivity;
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity;
 import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -494,23 +492,13 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
     public void initScanQR() {
         Timber.d("initScanQR");
-        Intent intent;
-        if (viewModel.isFeatureEnabled(AppFeatures.QRCodeCompose)) {
-            intent = new Intent(this, QRCodeComposeActivity.class);
-        } else {
-            intent = new Intent(this, QRCodeActivity.class);
-        }
+        Intent intent = new Intent(this, QRCodeComposeActivity.class);
         intent.putExtra(OPEN_SCAN_QR, true);
         startQRActivity(intent);
     }
 
     private void initMyQr() {
-        Intent intent;
-        if (viewModel.isFeatureEnabled(AppFeatures.QRCodeCompose)) {
-            intent = new Intent(this, QRCodeComposeActivity.class);
-        } else {
-            intent = new Intent(this, QRCodeActivity.class);
-        }
+        Intent intent = new Intent(this, QRCodeComposeActivity.class);
         startQRActivity(intent);
     }
 

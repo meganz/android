@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.model.AddContactState
-import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import timber.log.Timber
@@ -36,13 +35,6 @@ class AddContactViewModel @Inject constructor(
 
     private fun getEnabledFeatures() {
         viewModelScope.launch {
-            val enabledFeatures = setOfNotNull(
-                AppFeatures.QRCodeCompose.takeIf { getFeatureFlagValueUseCase(it) },
-            )
-            _state.update { it.copy(enabledFeatureFlags = enabledFeatures) }
-        }
-
-        viewModelScope.launch {
             getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan).let { flag ->
                 _state.update { state ->
                     state.copy(
@@ -64,11 +56,6 @@ class AddContactViewModel @Inject constructor(
             }
         }
     }
-
-    /**
-     * Check if given feature flag is enabled or not
-     */
-    fun isFeatureEnabled(feature: Feature) = state.value.enabledFeatureFlags.contains(feature)
 
     /**
      * Check if Call Unlimited Pro Plan feature flag is enabled or not

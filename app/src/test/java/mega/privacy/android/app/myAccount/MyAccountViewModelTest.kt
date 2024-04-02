@@ -12,7 +12,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -50,7 +49,6 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
@@ -109,7 +107,6 @@ internal class MyAccountViewModelTest {
     private val updateCurrentUserName: UpdateCurrentUserName = mock()
     private val getCurrentUserEmail: GetCurrentUserEmail = mock()
     private val monitorVerificationStatus: MonitorVerificationStatus = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val getExportMasterKeyUseCase: GetExportMasterKeyUseCase = mock()
     private val broadcastRefreshSessionUseCase: BroadcastRefreshSessionUseCase = mock()
     private val logoutUseCase: LogoutUseCase = mock()
@@ -141,7 +138,6 @@ internal class MyAccountViewModelTest {
             )
         ).thenReturn("name")
         whenever(getCurrentUserEmail()).thenReturn(null)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.QRCodeCompose)).thenReturn(false)
         whenever(monitorUserUpdates()).thenReturn(userUpdatesFlow)
         whenever(monitorVerificationStatus()).thenReturn(verificationStatusFlow)
         whenever(monitorBackupFolder()).thenReturn(backupFolderFlow)
@@ -178,7 +174,6 @@ internal class MyAccountViewModelTest {
             updateCurrentUserName = updateCurrentUserName,
             getCurrentUserEmail = getCurrentUserEmail,
             monitorVerificationStatus = monitorVerificationStatus,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getExportMasterKeyUseCase = getExportMasterKeyUseCase,
             broadcastRefreshSessionUseCase = broadcastRefreshSessionUseCase,
             logoutUseCase = logoutUseCase,
@@ -539,7 +534,6 @@ internal class MyAccountViewModelTest {
             updateCurrentUserName,
             getCurrentUserEmail,
             monitorVerificationStatus,
-            getFeatureFlagValueUseCase,
             getExportMasterKeyUseCase,
             broadcastRefreshSessionUseCase,
             logoutUseCase,

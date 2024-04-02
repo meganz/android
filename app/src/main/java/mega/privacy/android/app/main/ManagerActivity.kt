@@ -214,9 +214,7 @@ import mega.privacy.android.app.presentation.photos.PhotosFragment
 import mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumContentFragment
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
-import mega.privacy.android.app.presentation.qrcode.QRCodeActivity
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
-import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeFragment
 import mega.privacy.android.app.presentation.recentactions.recentactionbucket.RecentActionBucketFragment
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinComposeFragment
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
@@ -5187,15 +5185,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     fun openQR(openScanQr: Boolean) {
-        if (openScanQr) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, ScanCodeFragment()).commitNowAllowingStateLoss()
-        }
-
-        val qrIntent = if (viewModel.state.value.enabledFlags.contains(AppFeatures.QRCodeCompose))
-            Intent(this, QRCodeComposeActivity::class.java)
-        else
-            Intent(this, QRCodeActivity::class.java)
+        val qrIntent = Intent(this, QRCodeComposeActivity::class.java)
         qrIntent.putExtra(Constants.OPEN_SCAN_QR, openScanQr)
         startActivity(qrIntent)
     }

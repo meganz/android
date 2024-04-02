@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
@@ -67,7 +66,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
@@ -102,7 +100,6 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
@@ -150,7 +147,6 @@ import javax.inject.Inject
  * @property updateCurrentUserName
  * @property getCurrentUserEmail
  * @property monitorVerificationStatus
- * @property getFeatureFlagValueUseCase
  * @property snackBarHandler Handler used to display a Snackbar
  */
 @HiltViewModel
@@ -185,7 +181,6 @@ class MyAccountViewModel @Inject constructor(
     private val updateCurrentUserName: UpdateCurrentUserName,
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val monitorVerificationStatus: MonitorVerificationStatus,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getExportMasterKeyUseCase: GetExportMasterKeyUseCase,
     private val broadcastRefreshSessionUseCase: BroadcastRefreshSessionUseCase,
     private val logoutUseCase: LogoutUseCase,
@@ -232,7 +227,6 @@ class MyAccountViewModel @Inject constructor(
         refreshNumberOfSubscription(false)
         refreshUserName(false)
         refreshCurrentUserEmail()
-        getEnabledFeatures()
 
         viewModelScope.launch {
             flow {
@@ -279,20 +273,6 @@ class MyAccountViewModel @Inject constructor(
                 }
         }
     }
-
-    private fun getEnabledFeatures() {
-        viewModelScope.launch {
-            val enabledFeatures = setOfNotNull(
-                AppFeatures.QRCodeCompose.takeIf { getFeatureFlagValueUseCase(it) }
-            )
-            _state.update { it.copy(enabledFeatureFlags = enabledFeatures) }
-        }
-    }
-
-    /**
-     * Check if given feature flag is enabled or not
-     */
-    fun isFeatureEnabled(feature: Feature) = state.value.enabledFeatureFlags.contains(feature)
 
     override fun onCleared() {
         super.onCleared()

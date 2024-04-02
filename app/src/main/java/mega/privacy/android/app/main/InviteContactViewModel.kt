@@ -13,13 +13,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT
 import mega.privacy.android.app.main.InvitationContactInfo.Companion.TYPE_PHONE_CONTACT_HEADER
 import mega.privacy.android.app.main.model.InviteContactFilterUiState
 import mega.privacy.android.app.main.model.InviteContactUiState
 import mega.privacy.android.app.utils.contacts.ContactsFilter
-import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.contact.FilterLocalContactsByEmailUseCase
@@ -71,23 +69,8 @@ class InviteContactViewModel @Inject constructor(
     private lateinit var currentSearchQuery: String
 
     init {
-        getEnabledFeatures()
         updateCurrentSearchQuery()
     }
-
-    private fun getEnabledFeatures() {
-        viewModelScope.launch {
-            val enabledFeatures = setOfNotNull(
-                AppFeatures.QRCodeCompose.takeIf { getFeatureFlagValueUseCase(it) }
-            )
-            _uiState.update { it.copy(enabledFeatureFlags = enabledFeatures) }
-        }
-    }
-
-    /**
-     * Check if given feature flag is enabled or not
-     */
-    fun isFeatureEnabled(feature: Feature) = uiState.value.enabledFeatureFlags.contains(feature)
 
     /**
      * Initialize the list of contacts

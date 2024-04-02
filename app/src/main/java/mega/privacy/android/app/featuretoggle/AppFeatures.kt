@@ -212,11 +212,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     PromoNotifications("Enable promotional notifications", false),
 
     /**
-     * To switch into new QRCode compose screen with Google code scanner
-     */
-    QRCodeCompose("Enable compose for QRCode with google code scanner", true),
-
-    /**
      * To switch into new chat activity
      * Enabled version 11.10
      */

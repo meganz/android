@@ -406,7 +406,6 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing" />
-        <activity android:name=".presentation.qrcode.QRCodeActivity" />
         <activity
             android:name=".presentation.qrcode.QRCodeComposeActivity"
             android:configChanges="orientation|screenSize" />
