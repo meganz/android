@@ -50,19 +50,22 @@ internal fun PromoNotificationItemView(
     val hasIcon = notification.iconURL.isNotBlank()
     val description = notification.description
     val timeText = TimeUtils.formatTime(notification.endTimeStamp)
-    val dateText = TimeUtils.formatDateAndTime(
-        LocalContext.current,
+    val dateText = TimeUtils.formatDate(
         notification.endTimeStamp,
-        TimeUtils.DATE_SHORT_FORMAT
+        TimeUtils.DATE_MM_DD_YYYY_FORMAT,
+        LocalContext.current,
     )
     val dateAndTimeString = stringResource(
         id = R.string.notifications_screen_notification_promo_expiration_time,
         dateText,
         timeText
     )
+
     Column(modifier = modifier
         .clickable { onClick() }
-        .background(color = MaterialTheme.colors.grey_020_grey_800)
+        .background(
+            color = MaterialTheme.colors.grey_020_grey_800
+        )
         .testTag(PROMO_NOTIFICATION_TEST_TAG)
         .fillMaxWidth()
         .wrapContentHeight()) {
@@ -145,9 +148,10 @@ internal fun PromoNotificationItemView(
                 modifier = Modifier
                     .padding(start = 16.dp, end = 16.dp, top = 8.dp)
                     .fillMaxWidth()
+                    .align(Alignment.CenterHorizontally)
                     .height(115.dp)
                     .testTag(PROMO_PREVIEW_TEST_TAG),
-                contentScale = ContentScale.FillWidth,
+                contentScale = ContentScale.Fit,
             )
             NotificationDate(
                 dateText = dateAndTimeString,
@@ -177,9 +181,10 @@ private fun PromoNotificationItemPreview(
         iconURL = "https://www.pngkey.com/png/detail/137-1377870_canvas-sample-sample-image-url.png",
         imageURL = if (hasPreview) "https://www.pngkey.com/png/detail/137-1377870_canvas-sample-sample-image-url.png" else "",
         startTimeStamp = 1,
-        endTimeStamp = 1665513960,
+        endTimeStamp = if (hasPreview) 1712053179 else 1743668379,
         actionName = "Action name",
-        actionURL = "https://www.mega.co.nz"
+        actionURL = "https://www.mega.co.nz",
+        isNew = hasPreview
     )
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         PromoNotificationItemView(

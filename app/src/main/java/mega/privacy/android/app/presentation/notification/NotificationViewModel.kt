@@ -49,33 +49,32 @@ class NotificationViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getPromoNotifications()
-        }
-        viewModelScope.launch {
             monitorUserAlertsUseCase().mapLatest { list ->
                 list.map { notificationMapper(it) }
-            }.collect {
+            }.collect { userAlerts ->
                 _state.update { state ->
                     state.copy(
-                        notifications = it,
-                        scrollToTop = areNewItemsAdded(it, state.notifications)
+                        notifications = userAlerts,
+                        promoNotifications = getPromoNotifications(),
+                        scrollToTop = areNewItemsAdded(userAlerts, state.notifications)
                     )
                 }
             }
         }
     }
 
-    private suspend fun getPromoNotifications() {
+    private suspend fun getPromoNotifications() =
         runCatching {
             isPromoNotificationsEnabled = getFeatureFlagValueUseCase(AppFeatures.PromoNotifications)
             if (isPromoNotificationsEnabled) {
-                val promoNotifications = getPromoNotificationsUseCase()
-                _state.update { it.copy(promoNotifications = promoNotifications) }
+                getPromoNotificationsUseCase()
+            } else {
+                emptyList()
             }
         }.onFailure {
             Timber.e("Failed to fetch promo notifications with error: ${it.message}")
-        }
-    }
+        }.getOrDefault(emptyList())
+
 
     private fun areNewItemsAdded(
         it: List<Notification>,
@@ -95,17 +94,13 @@ class NotificationViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            if (isPromoNotificationsEnabled) {
-                val lastReadPromoNotificationID =
-                    state.value.promoNotifications.firstOrNull()?.promoID
-                lastReadPromoNotificationID?.let {
-                    launch {
-                        runCatching {
-                            setLastReadNotificationUseCase(it)
-                        }.onFailure {
-                            Timber.e("Failed to set last read notification with error: ${it.message}")
-                        }
-                    }
+            val lastReadPromoNotificationID =
+                state.value.promoNotifications.firstOrNull()?.promoID
+            lastReadPromoNotificationID?.let {
+                runCatching {
+                    setLastReadNotificationUseCase(it)
+                }.onFailure {
+                    Timber.e("Failed to set last read notification with error: ${it.message}")
                 }
             }
         }

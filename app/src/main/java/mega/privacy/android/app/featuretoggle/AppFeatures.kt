@@ -209,7 +209,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * To enable showing promo notifications in Notifications screen
      */
-    PromoNotifications("Enable promotional notifications", false),
+    PromoNotifications("Enable promotional notifications", true),
 
     /**
      * To switch into new chat activity

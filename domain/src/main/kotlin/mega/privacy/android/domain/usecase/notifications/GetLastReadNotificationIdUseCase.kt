@@ -6,7 +6,7 @@ import javax.inject.Inject
 /**
  * Get last read notification ID
  */
-class GetLastReadNotificationIDUseCase @Inject constructor(
+class GetLastReadNotificationIdUseCase @Inject constructor(
     private val notificationsRepository: NotificationsRepository,
 ) {
     /**

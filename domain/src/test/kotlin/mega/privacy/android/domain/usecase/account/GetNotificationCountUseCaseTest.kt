@@ -9,7 +9,7 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.notifications.GetFeatureNotificationCountUseCase
-import mega.privacy.android.domain.usecase.notifications.GetPromoNotificationsUseCase
+import mega.privacy.android.domain.usecase.notifications.GetNumUnreadPromoNotificationsUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -34,7 +34,8 @@ class GetNotificationCountUseCaseTest {
     private val getNumUnreadChatsUseCase = mock<GetNumUnreadChatsUseCase>()
     private val getFeatureNotificationCountUseCase = mock<GetFeatureNotificationCountUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
-    private val getPromoNotificationsUseCase = mock<GetPromoNotificationsUseCase>()
+    private val getNumUnreadPromoNotificationsUseCase =
+        mock<GetNumUnreadPromoNotificationsUseCase>()
     private val featureNotifications = setOf(getFeatureNotificationCountUseCase)
 
 
@@ -46,7 +47,7 @@ class GetNotificationCountUseCaseTest {
             getIncomingContactRequestsUseCase = getIncomingContactRequestsUseCase,
             getNumUnreadChatsUseCase = getNumUnreadChatsUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            getPromoNotificationsUseCase = getPromoNotificationsUseCase,
+            getNumUnreadPromoNotificationsUseCase = getNumUnreadPromoNotificationsUseCase,
             featureNotifications = featureNotifications,
         )
     }
@@ -60,7 +61,7 @@ class GetNotificationCountUseCaseTest {
             getNumUnreadChatsUseCase,
             getFeatureNotificationCountUseCase,
             getFeatureFlagValueUseCase,
-            getPromoNotificationsUseCase,
+            getNumUnreadPromoNotificationsUseCase,
         )
     }
 
@@ -73,7 +74,7 @@ class GetNotificationCountUseCaseTest {
     fun `test that the notification count is correct`(
         withChatNotifications: Boolean,
         isPromoNotificationsFeatureEnabled: Boolean,
-        promoNotificationsList: List<PromoNotification>,
+        unreadPromoNotificationsCount: Int,
         rootNodeExists: Boolean,
         numUnreadUserAlerts: Int,
         numIncomingContactRequests: Int,
@@ -82,7 +83,7 @@ class GetNotificationCountUseCaseTest {
         expectedResult: Int,
     ) = runTest {
         whenever(getFeatureFlagValueUseCase(any())).thenReturn(isPromoNotificationsFeatureEnabled)
-        whenever(getPromoNotificationsUseCase()).thenReturn(promoNotificationsList)
+        whenever(getNumUnreadPromoNotificationsUseCase()).thenReturn(unreadPromoNotificationsCount)
         whenever(rootNodeExistsUseCase()).thenReturn(rootNodeExists)
         whenever(getNumUnreadUserAlertsUseCase()).thenReturn(numUnreadUserAlerts)
         whenever(getFeatureNotificationCountUseCase()).thenReturn(featureNotification)
@@ -114,22 +115,22 @@ class GetNotificationCountUseCaseTest {
         @JvmStatic
         private fun provideParameters(): Stream<Arguments?>? =
             Stream.of(
-                Arguments.of(false, false, emptyList<PromoNotification>(), true, 1, 2, 4, 0, 3),
-                Arguments.of(true, false, emptyList<PromoNotification>(), true, 1, 2, 4, 0, 7),
-                Arguments.of(false, true, emptyList<PromoNotification>(), true, 1, 2, 4, 0, 3),
-                Arguments.of(true, true, emptyList<PromoNotification>(), true, 1, 2, 4, 0, 7),
-                Arguments.of(false, false, emptyList<PromoNotification>(), false, 1, 2, 4, 0, 0),
-                Arguments.of(true, false, emptyList<PromoNotification>(), false, 1, 2, 4, 0, 0),
-                Arguments.of(false, true, emptyList<PromoNotification>(), false, 1, 2, 4, 0, 0),
-                Arguments.of(true, true, emptyList<PromoNotification>(), false, 1, 2, 4, 0, 0),
-                Arguments.of(false, false, listOf(promoNotification), true, 1, 2, 4, 0, 3),
-                Arguments.of(true, false, listOf(promoNotification), true, 1, 2, 4, 0, 7),
-                Arguments.of(false, true, listOf(promoNotification), true, 1, 2, 4, 0, 4),
-                Arguments.of(true, true, listOf(promoNotification), true, 1, 2, 4, 0, 8),
-                Arguments.of(false, false, listOf(promoNotification), false, 1, 2, 4, 0, 0),
-                Arguments.of(true, false, listOf(promoNotification), false, 1, 2, 4, 0, 0),
-                Arguments.of(false, true, listOf(promoNotification), false, 1, 2, 4, 0, 0),
-                Arguments.of(true, true, listOf(promoNotification), false, 1, 2, 4, 0, 0),
+                Arguments.of(false, false, 0, true, 1, 2, 4, 0, 3),
+                Arguments.of(true, false, 0, true, 1, 2, 4, 0, 7),
+                Arguments.of(false, true, 0, true, 1, 2, 4, 0, 3),
+                Arguments.of(true, true, 0, true, 1, 2, 4, 0, 7),
+                Arguments.of(false, false, 0, false, 1, 2, 4, 0, 0),
+                Arguments.of(true, false, 0, false, 1, 2, 4, 0, 0),
+                Arguments.of(false, true, 0, false, 1, 2, 4, 0, 0),
+                Arguments.of(true, true, 0, false, 1, 2, 4, 0, 0),
+                Arguments.of(false, false, 1, true, 1, 2, 4, 0, 3),
+                Arguments.of(true, false, 1, true, 1, 2, 4, 0, 7),
+                Arguments.of(false, true, 1, true, 1, 2, 4, 0, 4),
+                Arguments.of(true, true, 1, true, 1, 2, 4, 0, 8),
+                Arguments.of(false, false, 1, false, 1, 2, 4, 0, 0),
+                Arguments.of(true, false, 1, false, 1, 2, 4, 0, 0),
+                Arguments.of(false, true, 1, false, 1, 2, 4, 0, 0),
+                Arguments.of(true, true, 1, false, 1, 2, 4, 0, 0),
             )
     }
 }

@@ -12,6 +12,7 @@ package mega.privacy.android.domain.entity.notifications
  * @property endTimeStamp    End time of the promotional notification, when it will become expired
  * @property actionName      Name of the action to be performed when the user taps the promotional notification
  * @property actionURL       URL of the action to be performed when the user taps the promotional notification
+ * @property isNew           Flag to indicate if the promotional notification is new
  */
 data class PromoNotification(
     val promoID: Long,
@@ -23,4 +24,5 @@ data class PromoNotification(
     val endTimeStamp: Long,
     val actionName: String,
     val actionURL: String,
+    val isNew: Boolean = false,
 )

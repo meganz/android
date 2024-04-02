@@ -7,7 +7,7 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.notifications.GetFeatureNotificationCountUseCase
-import mega.privacy.android.domain.usecase.notifications.GetPromoNotificationsUseCase
+import mega.privacy.android.domain.usecase.notifications.GetNumUnreadPromoNotificationsUseCase
 import javax.inject.Inject
 
 /**
@@ -16,7 +16,7 @@ import javax.inject.Inject
 class GetNotificationCountUseCase @Inject constructor(
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val getNumUnreadUserAlertsUseCase: GetNumUnreadUserAlertsUseCase,
-    private val getPromoNotificationsUseCase: GetPromoNotificationsUseCase,
+    private val getNumUnreadPromoNotificationsUseCase: GetNumUnreadPromoNotificationsUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getIncomingContactRequestsUseCase: GetIncomingContactRequestsUseCase,
     private val getNumUnreadChatsUseCase: GetNumUnreadChatsUseCase,
@@ -32,7 +32,7 @@ class GetNotificationCountUseCase @Inject constructor(
     suspend operator fun invoke(withChatNotifications: Boolean, promoFeatureFlag: Feature) =
         if (rootNodeExistsUseCase()) {
             val promoNotificationCount = if (getFeatureFlagValueUseCase(promoFeatureFlag)) {
-                getPromoNotificationsUseCase().size
+                getNumUnreadPromoNotificationsUseCase()
             } else {
                 0
             }
