@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.legacy.core.ui.controls.modifier.skeletonEffect
+import mega.privacy.android.core.ui.utils.shimmerEffect
 
 @Composable
 internal fun PhotosSkeletonView() {
@@ -61,7 +61,7 @@ internal fun PhotosSkeletonView() {
                         modifier = Modifier
                             .wrapContentSize()
                             .padding(start = 16.dp, top = 14.dp, bottom = 14.dp)
-                            .skeletonEffect(),
+                            .shimmerEffect(),
                     )
                 }
             } else {
@@ -70,7 +70,7 @@ internal fun PhotosSkeletonView() {
                         .padding(all = 1.5.dp)
                         .fillMaxWidth()
                         .aspectRatio(1f)
-                        .skeletonEffect(),
+                        .shimmerEffect(),
                 )
             }
         }
@@ -107,20 +107,20 @@ internal fun AlbumListSkeletonView() {
                         .padding(all = 1.5.dp)
                         .fillMaxWidth()
                         .aspectRatio(1f)
-                        .skeletonEffect(),
+                        .shimmerEffect(),
                 )
                 Text(
                     text = "Album names",
                     modifier = Modifier
                         .wrapContentSize()
                         .padding(top = 10.dp, bottom = 3.dp)
-                        .skeletonEffect(),
+                        .shimmerEffect(),
                 )
                 Text(
                     text = "number",
                     modifier = Modifier
                         .wrapContentSize()
-                        .skeletonEffect(),
+                        .shimmerEffect(),
                 )
             }
         }
@@ -161,7 +161,7 @@ private fun AlbumBig2SmallSkeletonView(
                 .width(smallWidth * 2)
                 .height(smallWidth * 2 + 1.dp)
                 .aspectRatio(1f)
-                .skeletonEffect(),
+                .shimmerEffect(),
         )
         Column(
             verticalArrangement = Arrangement.SpaceBetween,
@@ -171,7 +171,7 @@ private fun AlbumBig2SmallSkeletonView(
                     .width(smallWidth)
                     .height(smallWidth)
                     .aspectRatio(1f)
-                    .skeletonEffect(),
+                    .shimmerEffect(),
             )
             Spacer(
                 modifier = Modifier.height(1.dp)
@@ -181,7 +181,7 @@ private fun AlbumBig2SmallSkeletonView(
                     .width(smallWidth)
                     .height(smallWidth)
                     .aspectRatio(1f)
-                    .skeletonEffect(),
+                    .shimmerEffect(),
             )
         }
     }
@@ -200,21 +200,21 @@ private fun AlbumSmall3ItemSkeletonView(
                 .width(smallWidth)
                 .height(smallWidth)
                 .aspectRatio(1f)
-                .skeletonEffect(),
+                .shimmerEffect(),
         )
         Spacer(
             modifier = Modifier
                 .width(smallWidth)
                 .height(smallWidth)
                 .aspectRatio(1f)
-                .skeletonEffect(),
+                .shimmerEffect(),
         )
         Spacer(
             modifier = Modifier
                 .width(smallWidth)
                 .height(smallWidth)
                 .aspectRatio(1f)
-                .skeletonEffect(),
+                .shimmerEffect(),
         )
     }
 }
@@ -235,7 +235,7 @@ private fun AlbumSmall2BigSkeletonView(
                     .width(smallWidth)
                     .height(smallWidth)
                     .aspectRatio(1f)
-                    .skeletonEffect(),
+                    .shimmerEffect(),
             )
             Spacer(
                 modifier = Modifier.height(1.dp)
@@ -245,7 +245,7 @@ private fun AlbumSmall2BigSkeletonView(
                     .width(smallWidth)
                     .height(smallWidth)
                     .aspectRatio(1f)
-                    .skeletonEffect(),
+                    .shimmerEffect(),
             )
         }
         Spacer(
@@ -253,7 +253,7 @@ private fun AlbumSmall2BigSkeletonView(
                 .width(smallWidth * 2)
                 .height(smallWidth * 2 + 1.dp)
                 .aspectRatio(1f)
-                .skeletonEffect(),
+                .shimmerEffect(),
         )
     }
 }

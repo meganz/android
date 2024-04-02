@@ -29,7 +29,7 @@ fun ListItemLoadingSkeleton() {
     Row(
         modifier = Modifier
             .testTag(LIST_ITEM_LOADING_SKELETON)
-            .padding(12.dp),
+            .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Spacer(
