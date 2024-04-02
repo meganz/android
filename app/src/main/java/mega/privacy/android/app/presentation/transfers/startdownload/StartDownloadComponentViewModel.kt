@@ -168,6 +168,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
         startDownloadNode: TransferTriggerEvent.StartDownloadNode,
         destinationUri: Uri,
     ) {
+        Timber.d("Selected destination $destinationUri")
         viewModelScope.launch {
             startDownloadNodes(startDownloadNode, destinationUri.toString())
             if (shouldPromptToSaveDestinationUseCase()) {
@@ -187,7 +188,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
             startDownloadNodes(
                 nodes = listOf(node),
                 isHighPriority = true,
-                getPath = {
+                getUri = {
                     getFilePreviewDownloadPathUseCase()
                 },
             )
@@ -215,7 +216,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                 startDownloadNodes(
                     nodes = siblingNodes,
                     isHighPriority = startDownloadNode.isHighPriority,
-                    getPath = {
+                    getUri = {
                         destination?.ensureSuffix(File.separator)
                     },
                 )
@@ -232,7 +233,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
             startDownloadNodes(
                 nodes = listOf(node),
                 isHighPriority,
-                getPath = {
+                getUri = {
                     getOfflinePathForNodeUseCase(node)
                 },
             )
@@ -245,7 +246,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
     private suspend fun startDownloadNodes(
         nodes: List<TypedNode>,
         isHighPriority: Boolean,
-        getPath: suspend () -> String?,
+        getUri: suspend () -> String?,
     ) {
         monitorDownloadFinishJob?.cancel()
         clearActiveTransfersIfFinishedUseCase(TransferType.DOWNLOAD)
@@ -255,15 +256,15 @@ internal class StartDownloadComponentViewModel @Inject constructor(
         }
         var lastError: Throwable? = null
         val terminalEvent = runCatching {
-            getPath().also {
+            getUri().also {
                 if (it.isNullOrBlank()) {
                     throw NullPointerException("path not found!")
                 }
             }
         }.onFailure { lastError = it }
-            .getOrNull()?.let { path ->
+            .getOrNull()?.let { uri ->
                 startDownloadsWithWorkerUseCase(
-                    destinationPath = path,
+                    destinationPathOrUri = uri,
                     nodes = nodes,
                     isHighPriority = isHighPriority,
                 ).catch {

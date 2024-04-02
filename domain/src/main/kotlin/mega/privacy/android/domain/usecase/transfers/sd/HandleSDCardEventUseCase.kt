@@ -32,13 +32,21 @@ class HandleSDCardEventUseCase @Inject constructor(
         when (transferEvent) {
             is TransferEvent.TransferStartEvent -> {
                 if (transfer.isSDCardDownload()) {
+                    val path = if (!transfer.isFolderTransfer
+                        && fileSystemRepository.isSDCardCachePath(transfer.localPath)
+                    ) {
+                        getTransferDestinationUriUseCase(transfer)?.destinationUri
+                            ?: transfer.localPath
+                    } else {
+                        transfer.localPath
+                    }.takeIf { it.isNotEmpty() } ?: transfer.parentPath
                     insertSdTransferUseCase(
                         SdTransfer(
                             transfer.tag,
                             transfer.fileName,
                             transfer.totalBytes.toString(),
                             transfer.nodeHandle.toString(),
-                            transfer.localPath,
+                            path,
                             transfer.appData
                         )
                     )

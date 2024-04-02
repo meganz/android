@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.transfer
 
+import java.io.File
+
 /**
  * Data class to return the result of GetTransferDestinationUriUseCase.
  * @property destinationUri the destination uri for the transfer
@@ -8,4 +10,9 @@ package mega.privacy.android.domain.entity.transfer
 data class DestinationUriAndSubFolders(
     val destinationUri: String,
     val subFolders: List<String> = emptyList(),
-)
+) {
+    override fun toString() = destinationUri + subFolders.joinToString(
+        separator = File.separator,
+        postfix = File.separator
+    )
+}

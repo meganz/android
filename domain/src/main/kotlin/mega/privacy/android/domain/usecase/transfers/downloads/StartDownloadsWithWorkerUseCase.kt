@@ -41,44 +41,44 @@ class StartDownloadsWithWorkerUseCase @Inject constructor(
     /**
      * Invoke
      * @param nodes The desired nodes to download
-     * @param destinationPath Full path to the destination folder of [nodes]. If this path does not exist it will try to create it.
+     * @param destinationPathOrUri Full path to the destination folder of [nodes]. If this path does not exist it will try to create it.
      * @param isHighPriority Puts the transfer on top of the download queue.
      *
      * @return a flow of [MultiTransferEvent]s to monitor the download state and progress
      */
     operator fun invoke(
         nodes: List<TypedNode>,
-        destinationPath: String,
+        destinationPathOrUri: String,
         isHighPriority: Boolean,
     ): Flow<MultiTransferEvent> {
-        if (destinationPath.isEmpty()) {
+        if (destinationPathOrUri.isEmpty()) {
             return nodes.asFlow().map { MultiTransferEvent.TransferNotStarted(it.id, null) }
         }
         //wrap the downloadNodesUseCase flow to be able to execute suspended functions
         return flow {
+            val finalDestinationPath = getExternalPathByContentUriUseCase(destinationPathOrUri)
             val appData: TransferAppData?
-            val finalDestinationPath: String?
+            val destinationPathForSdk: String?
             when {
-                isExternalStorageContentUriUseCase(destinationPath) -> {
+                isExternalStorageContentUriUseCase(destinationPathOrUri) -> {
                     appData = null
-                    finalDestinationPath = getExternalPathByContentUriUseCase(destinationPath)
+                    destinationPathForSdk = finalDestinationPath?.plus(File.separator)
                 }
 
-                fileSystemRepository.isSDCardPath(destinationPath)
-                        || fileSystemRepository.isContentUri(destinationPath) -> {
-                    finalDestinationPath =
+                fileSystemRepository.isSDCardPath(destinationPathOrUri)
+                        || fileSystemRepository.isContentUri(destinationPathOrUri) -> {
+                    destinationPathForSdk =
                         transferRepository.getOrCreateSDCardTransfersCacheFolder()?.path?.plus(File.separator)
-
                     appData =
-                        TransferAppData.SdCardDownload(finalDestinationPath ?: "", destinationPath)
+                        TransferAppData.SdCardDownload(destinationPathOrUri, destinationPathOrUri)
                 }
 
                 else -> {
                     appData = null
-                    finalDestinationPath = destinationPath
+                    destinationPathForSdk = finalDestinationPath?.plus(File.separator)
                 }
             }
-            if (finalDestinationPath == null) {
+            if (destinationPathForSdk == null) {
                 nodes.forEach {
                     emit(
                         MultiTransferEvent.TransferNotStarted(
@@ -89,15 +89,15 @@ class StartDownloadsWithWorkerUseCase @Inject constructor(
                 }
                 return@flow
             }
-            fileSystemRepository.createDirectory(finalDestinationPath)
-            if (!doesPathHaveSufficientSpaceForNodesUseCase(finalDestinationPath, nodes)) {
+            fileSystemRepository.createDirectory(destinationPathForSdk)
+            if (!doesPathHaveSufficientSpaceForNodesUseCase(destinationPathForSdk, nodes)) {
                 emit(MultiTransferEvent.InsufficientSpace)
             } else {
                 startTransfersAndWorker(
                     doTransfers = {
                         downloadNodesUseCase(
                             nodes,
-                            finalDestinationPath,
+                            destinationPathForSdk,
                             appData = appData,
                             isHighPriority = isHighPriority
                         )

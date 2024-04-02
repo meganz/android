@@ -62,6 +62,7 @@ class HandleSDCardEventUseCaseTest {
     fun `test that insertSdTransferUseCase is invoked for sd transfers start event`() = runTest {
         val transfer = mockTransfer()
         val transferEvent = TransferEvent.TransferStartEvent(transfer)
+        whenever(fileSystemRepository.isSDCardCachePath(any())).thenReturn(false)
         underTest(transferEvent)
         verify(insertSdTransferUseCase)(any())
     }

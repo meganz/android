@@ -20,6 +20,7 @@ import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.ContactsContract
@@ -59,9 +60,11 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.GravityCompat
 import androidx.core.view.MenuItemCompat
 import androidx.core.view.isVisible
+import androidx.documentfile.provider.DocumentFile
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
@@ -77,6 +80,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.WorkManager
+import com.anggrayudi.storage.file.getAbsolutePath
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
@@ -8511,8 +8515,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
 
                     false -> {
-                        val file = transfer.path?.let { File(it) }
-                        if (!FileUtil.isFileAvailable(file)) {
+                        val file = getFileFromUri(transfer.path)
+                        if (file == null || !FileUtil.isFileAvailable(file)) {
                             showSnackbar(
                                 Constants.SNACKBAR_TYPE,
                                 getString(R.string.location_not_exist),
@@ -8522,7 +8526,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         }
                         val intent = Intent(this, FileStorageActivity::class.java)
                         intent.action = FileStorageActivity.Mode.BROWSE_FILES.action
-                        intent.putExtra(FileStorageActivity.EXTRA_PATH, transfer.path)
+                        intent.putExtra(FileStorageActivity.EXTRA_PATH, file.path)
                         startActivity(intent)
                     }
 
@@ -8541,6 +8545,27 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             else -> {
                 Timber.d("Unable to retrieve transfer type")
             }
+        }
+    }
+
+    private fun getFileFromUri(stringUri: String): File? {
+        val uri = stringUri.toUri()
+        return if (uri.scheme == "content") {
+            val documentFile = DocumentFile.fromTreeUri(this, uri)
+            if (documentFile == null) {
+                Timber.e("DocumentFile is null")
+                null
+            } else {
+                var file = File(documentFile.getAbsolutePath(this))
+                if (!file.exists()) {
+                    //best effort, probably a subfolder of downloads, but we can't access it as a file
+                    file =
+                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                }
+                file
+            }
+        } else {
+            File(stringUri)
         }
     }
 

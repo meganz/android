@@ -359,7 +359,7 @@ class FileFacade @Inject constructor(
 
     override suspend fun isExternalStorageContentUri(uriString: String) =
         with(Uri.parse(uriString)) {
-            scheme == "content" && path?.startsWith("com.android.externalstorage") == true
+            scheme == "content" && authority?.startsWith("com.android.externalstorage") == true
         }
 
     override suspend fun getFileNameFromUri(uriString: String): String? {

@@ -3,7 +3,6 @@ package mega.privacy.android.domain.usecase.transfers.sd
 import mega.privacy.android.domain.entity.transfer.DestinationUriAndSubFolders
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.entity.transfer.getSDCardTransferPath
 import mega.privacy.android.domain.entity.transfer.getSDCardTransferUri
 import mega.privacy.android.domain.repository.TransferRepository
 import java.io.File
@@ -35,7 +34,7 @@ class GetTransferDestinationUriUseCase @Inject constructor(
             else -> {
                 transfer.folderTransferTag?.let { rootTag ->
                     transferRepository.getSdTransferByTag(rootTag)?.let { rootSdTransfer ->
-                        rootSdTransfer.getSDCardTransferPath()?.let { rootPath ->
+                        rootSdTransfer.path.let { rootPath ->
                             val missingFolders = transfer.parentPath
                                 .removePrefix(rootPath)
                                 .split(File.separator)

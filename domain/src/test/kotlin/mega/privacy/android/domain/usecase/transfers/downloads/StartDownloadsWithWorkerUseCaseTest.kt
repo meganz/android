@@ -93,6 +93,9 @@ class StartDownloadsWithWorkerUseCaseTest {
         whenever(fileSystemRepository.isContentUri(any())).thenReturn(false)
         whenever(doesPathHaveSufficientSpaceForNodesUseCase(any(), any())).thenReturn(true)
         whenever(isExternalStorageContentUriUseCase(any())).thenReturn(false)
+        whenever(getExternalPathByContentUriUseCase(DESTINATION_PATH_FOLDER)).thenReturn(
+            DESTINATION_PATH_FOLDER
+        )
     }
 
     @Test
@@ -101,7 +104,7 @@ class StartDownloadsWithWorkerUseCaseTest {
         underTest(nodes, DESTINATION_PATH_FOLDER, false).test {
             cancelAndIgnoreRemainingEvents()
         }
-        verify(fileSystemRepository).createDirectory(DESTINATION_PATH_FOLDER)
+        verify(fileSystemRepository).createDirectory(DESTINATION_PATH_FOLDER + File.separator)
     }
 
     @Test
@@ -264,14 +267,15 @@ class StartDownloadsWithWorkerUseCaseTest {
                 awaitComplete()
             }
             verify(downloadNodesUseCase)
-                .invoke(any(), eq(cachePath), anyOrNull(), any())
+                .invoke(any(), eq(cachePath + File.separator), anyOrNull(), any())
         }
 
     @Test
     fun `test that app data is set with correct target path and uri when download points to sd`() =
         runTest {
             val cachePath = "cachePath/"
-            val expectedAppData = TransferAppData.SdCardDownload(cachePath, DESTINATION_PATH_FOLDER)
+            val expectedAppData =
+                TransferAppData.SdCardDownload(DESTINATION_PATH_FOLDER, DESTINATION_PATH_FOLDER)
             whenever(
                 downloadNodesUseCase(any(), any(), anyOrNull(), any())
             ).thenAnswer { emptyFlow<MultiTransferEvent>() }
