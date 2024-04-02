@@ -1,12 +1,8 @@
 package mega.privacy.android.app.camera.model
 
-internal enum class CameraOption {
-    Photo,
-    Video;
+import mega.privacy.android.app.camera.state.CaptureMode
 
-    val inverse: CameraOption
-        get() = when (this) {
-            Photo -> Video
-            Video -> Photo
-        }
+internal enum class CameraOption(val mode: CaptureMode) {
+    Photo(CaptureMode.Image),
+    Video(CaptureMode.Video);
 }

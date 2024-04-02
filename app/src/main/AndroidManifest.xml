@@ -720,6 +720,9 @@
             android:name=".presentation.hidenode.HiddenNodesOnboardingActivity"
             android:label=""
             android:launchMode="singleTop" />
+        <activity
+            android:name="mega.privacy.android.app.camera.CameraActivity"
+            android:launchMode="singleTop" />
     </application>
 
 </manifest>
