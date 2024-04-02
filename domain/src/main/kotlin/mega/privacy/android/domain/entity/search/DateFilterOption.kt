@@ -2,38 +2,35 @@ package mega.privacy.android.domain.entity.search
 
 /**
  * Enum class to represent the date modified filter options
- *
- * @param title The title of the filter option
  */
-// TODO Create mapper like SearchFilterMapper to get strings with context
-enum class DateFilterOption(val title: String) {
+enum class DateFilterOption {
     /**
      * today filter option
      */
-    Today("Today"),
+    Today,
 
     /**
      * last 7 days filter option
      */
-    Last7Days("Last 7 days"),
+    Last7Days,
 
     /**
      * last 30 days filter option
      */
-    Last30Days("Last 30 days"),
+    Last30Days,
 
     /**
      * this year filter option
      */
-    ThisYear("This year"),
+    ThisYear,
 
     /**
      * last year filter option
      */
-    LastYear("Last year"),
+    LastYear,
 
     /**
      * older filter option
      */
-    Older("Older"),
+    Older,
 }

@@ -2,14 +2,11 @@ package mega.privacy.android.app.presentation.search.view
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.search.SearchActivityViewModel
-import mega.privacy.android.domain.entity.search.DateFilterOption
-import mega.privacy.android.app.presentation.search.model.FilterOptionEntity
-import mega.privacy.android.domain.entity.search.TypeFilterOption
 import mega.privacy.android.app.presentation.search.navigation.DATE_ADDED
 import mega.privacy.android.app.presentation.search.navigation.DATE_MODIFIED
 import mega.privacy.android.app.presentation.search.navigation.TYPE
@@ -23,9 +20,7 @@ internal fun SearchFilterBottomSheetContent(
     onDismiss: () -> Unit,
     viewModel: SearchActivityViewModel,
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
     val keyboardController = LocalSoftwareKeyboardController.current
-
     LaunchedEffect(Unit) {
         keyboardController?.hide()
     }
@@ -33,62 +28,14 @@ internal fun SearchFilterBottomSheetContent(
     BottomSheetContentLayout(
         modifier = Modifier,
         title = when (filter) {
-            TYPE -> "Type"
-            DATE_MODIFIED -> "Last modified"
-            DATE_ADDED -> "Date added"
+            TYPE -> stringResource(id = R.string.search_dropdown_chip_filter_type_file_type)
+            DATE_MODIFIED -> stringResource(id = R.string.search_dropdown_chip_filter_type_last_modified)
+            DATE_ADDED -> stringResource(id = R.string.search_dropdown_chip_filter_type_date_added)
             else -> "Unknown"
         },
-        options = when (filter) {
-            TYPE ->
-                TypeFilterOption.entries.map { option ->
-                    FilterOptionEntity(
-                        option.ordinal,
-                        option.title,
-                        option == state.typeSelectedFilterOption
-                    )
-                }
-
-            DATE_MODIFIED ->
-                DateFilterOption.entries.map { option ->
-                    FilterOptionEntity(
-                        option.ordinal,
-                        option.title,
-                        option == state.dateModifiedSelectedFilterOption
-                    )
-                }
-
-            DATE_ADDED -> DateFilterOption.entries.map { option ->
-                FilterOptionEntity(
-                    option.ordinal,
-                    option.title,
-                    option == state.dateAddedSelectedFilterOption
-                )
-            }
-
-            else -> emptyList()
-        },
+        options = viewModel.getFilterOptions(filter),
         onItemSelected = { item ->
-            when (filter) {
-                TYPE -> {
-                    val typeOption = TypeFilterOption.entries.getOrNull(item.id)
-                        ?.takeIf { it.ordinal != state.typeSelectedFilterOption?.ordinal }
-                    viewModel.setTypeSelectedFilterOption(typeOption)
-                }
-
-                DATE_MODIFIED -> {
-                    val dateModifiedOption = DateFilterOption.entries.getOrNull(item.id)
-                        ?.takeIf { it.ordinal != state.dateModifiedSelectedFilterOption?.ordinal }
-
-                    viewModel.setDateModifiedSelectedFilterOption(dateModifiedOption)
-                }
-
-                DATE_ADDED -> {
-                    val dateAddedOption = DateFilterOption.entries.getOrNull(item.id)
-                        ?.takeIf { it.ordinal != state.dateAddedSelectedFilterOption?.ordinal }
-
-                    viewModel.setDateAddedSelectedFilterOption(dateAddedOption)
-                }
-            }
+            viewModel.updateFilterEntity(filter, item)
             onDismiss()
         }
     )

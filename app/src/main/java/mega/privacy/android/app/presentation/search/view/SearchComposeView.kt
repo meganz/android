@@ -142,25 +142,31 @@ fun SearchComposeView(
                         chipItems = listOf(
                             ChipItem(
                                 isSelected = state.typeSelectedFilterOption != null,
-                                notSelectedTitle = "Type",
-                                selectedFilterTitle = state.typeSelectedFilterOption?.title
-                                    ?: "Type",
+                                notSelectedTitle = stringResource(id = R.string.search_dropdown_chip_filter_type_file_type),
+                                selectedFilterTitle = state.typeSelectedFilterOption?.name
+                                    ?: stringResource(
+                                        id = R.string.search_dropdown_chip_filter_type_file_type
+                                    ),
                                 onFilterClicked = { onFilterClicked(TYPE) },
                                 testTag = TYPE_DROPDOWN_CHIP_TEST_TAG,
                             ),
                             ChipItem(
                                 isSelected = state.dateModifiedSelectedFilterOption != null,
-                                notSelectedTitle = "Last modified",
-                                selectedFilterTitle = state.dateModifiedSelectedFilterOption?.title
-                                    ?: "Last modified",
+                                notSelectedTitle = stringResource(id = R.string.search_dropdown_chip_filter_type_last_modified),
+                                selectedFilterTitle = state.dateModifiedSelectedFilterOption?.name
+                                    ?: stringResource(
+                                        id = R.string.search_dropdown_chip_filter_type_last_modified
+                                    ),
                                 onFilterClicked = { onFilterClicked(DATE_MODIFIED) },
                                 testTag = DATE_MODIFIED_DROPDOWN_CHIP_TEST_TAG,
                             ),
                             ChipItem(
                                 isSelected = state.dateAddedSelectedFilterOption != null,
-                                notSelectedTitle = "Date added",
-                                selectedFilterTitle = state.dateAddedSelectedFilterOption?.title
-                                    ?: "Date added",
+                                notSelectedTitle = stringResource(id = R.string.search_dropdown_chip_filter_type_date_added),
+                                selectedFilterTitle = state.dateAddedSelectedFilterOption?.name
+                                    ?: stringResource(
+                                        id = R.string.search_dropdown_chip_filter_type_date_added
+                                    ),
                                 onFilterClicked = { onFilterClicked(DATE_ADDED) },
                                 testTag = DATE_ADDED_DROPDOWN_CHIP_TEST_TAG,
                             ),

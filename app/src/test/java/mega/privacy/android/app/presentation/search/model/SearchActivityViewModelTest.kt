@@ -11,8 +11,10 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.search.SearchActivityViewModel
+import mega.privacy.android.app.presentation.search.mapper.DateFilterOptionStringMapper
 import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
 import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
+import mega.privacy.android.app.presentation.search.mapper.TypeFilterOptionStringMapper
 import mega.privacy.android.app.presentation.search.mapper.TypeFilterToSearchMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
@@ -72,6 +74,8 @@ class SearchActivityViewModelTest {
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
     private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode = mock()
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase = mock()
+    private val typeFilterStringMapper: TypeFilterOptionStringMapper = mock()
+    private val dateFilterStringMapper: DateFilterOptionStringMapper = mock()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
 
     private val nodeList = mutableListOf<TypedNode>()
@@ -103,6 +107,8 @@ class SearchActivityViewModelTest {
             typeFilterToSearchMapper = typeFilterToSearchMapper,
             emptySearchViewMapper = emptySearchViewMapper,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
+            typeFilterOptionStringMapper = typeFilterStringMapper,
+            dateFilterOptionStringMapper = dateFilterStringMapper,
         )
     }
 

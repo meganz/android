@@ -81,7 +81,7 @@ private fun SearchFilterBottomSheetPreview() {
             options = TypeFilterOption.entries.map { option ->
                 FilterOptionEntity(
                     id = option.ordinal,
-                    title = option.title,
+                    title = "Type",
                     isSelected = true
                 )
             },
