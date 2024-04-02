@@ -245,7 +245,7 @@ class ManagerViewModel @Inject constructor(
     private val monitorCallEndedUseCase: MonitorCallEndedUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val setUsersCallLimitRemindersUseCase: SetUsersCallLimitRemindersUseCase,
-    private val getUsersCallLimitRemindersUseCase: GetUsersCallLimitRemindersUseCase
+    private val getUsersCallLimitRemindersUseCase: GetUsersCallLimitRemindersUseCase,
 ) : ViewModel() {
 
     /**
@@ -405,15 +405,26 @@ class ManagerViewModel @Inject constructor(
 
         viewModelScope.launch {
             monitorChatCallUpdatesUseCase()
-                .filter {
-                    (it.status == ChatCallStatus.TerminatingUserParticipation ||
-                            it.status == ChatCallStatus.GenericNotification) &&
-                            it.termCode == ChatCallTermCodeType.CallUsersLimit
-                }
                 .collect {
+                    it.apply {
+                        when (status) {
+                            ChatCallStatus.TerminatingUserParticipation, ChatCallStatus.GenericNotification ->
+                                if (termCode == ChatCallTermCodeType.CallUsersLimit
+                                    && _state.value.isCallUnlimitedProPlanFeatureFlagEnabled
+                                ) {
+                                    _state.update { state -> state.copy(callEndedDueToFreePlanLimits = true) }
+                                } else if (termCode == ChatCallTermCodeType.CallDurationLimit && _state.value.isCallUnlimitedProPlanFeatureFlagEnabled) {
+                                    if (it.isOwnClientCaller) {
+                                        _state.update { state ->
+                                            state.copy(
+                                                shouldUpgradeToProPlan = true
+                                            )
+                                        }
+                                    }
+                                }
 
-                    if (state.value.isCallUnlimitedProPlanFeatureFlagEnabled) {
-                        _state.update { it.copy(callEndedDueToFreePlanLimits = true) }
+                            else -> {}
+                        }
                     }
                 }
         }
@@ -737,6 +748,14 @@ class ManagerViewModel @Inject constructor(
     fun onConsumeShowFreePlanParticipantsLimitDialogEvent() {
         setUsersCallLimitReminderDisabled()
         _state.update { state -> state.copy(callEndedDueToFreePlanLimits = false) }
+    }
+
+    /**
+     * Consume ShouldUpgradeToProPlan
+     *
+     */
+    fun onConsumeShouldUpgradeToProPlan() {
+        _state.update { state -> state.copy(shouldUpgradeToProPlan = false) }
     }
 
     /**

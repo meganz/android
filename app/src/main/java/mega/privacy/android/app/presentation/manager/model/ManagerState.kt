@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property callInProgressChatId                   Chat ID of the current call in progress.
  * @property deviceCenterPreviousBottomNavigationItem  A potentially nullable Integer that holds the
  * @property callEndedDueToFreePlanLimits               State event to show the force free plan limit participants dialog.
+ * @property shouldUpgradeToProPlan                     State to show the upgrade to Pro plan dialog.
  * @property isCallUnlimitedProPlanFeatureFlagEnabled   True, if Call Unlimited Pro Plan feature flag enabled. False, otherwise.
  * @property usersCallLimitReminders   [UsersCallLimitReminders]
  * previous Bottom Navigation item before accessing Device Center
@@ -65,6 +66,7 @@ data class ManagerState(
     val callInProgressChatId: Long = -1L,
     val deviceCenterPreviousBottomNavigationItem: Int? = null,
     val callEndedDueToFreePlanLimits: Boolean = false,
+    val shouldUpgradeToProPlan: Boolean = false,
     val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
     val usersCallLimitReminders: UsersCallLimitReminders = UsersCallLimitReminders.Enabled
 )

@@ -48,6 +48,7 @@ import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
  * @property downloadEvent Event to start a download.
  * @property actionToManageEvent [ActionToManage].
  * @property callEndedDueToFreePlanLimits  State event to show the force free plan limit participants dialog.
+ * @property shouldUpgradeToProPlan State event to show the upgrade to Pro plan dialog.
  * @property isCallUnlimitedProPlanFeatureFlagEnabled   True, if Call Unlimited Pro Plan feature flag enabled. False, otherwise.
  * @property usersCallLimitReminders   [UsersCallLimitReminders]
  */
@@ -84,6 +85,7 @@ data class ChatUiState(
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val actionToManageEvent: StateEventWithContent<ActionToManage> = consumed(),
     val callEndedDueToFreePlanLimits: Boolean = false,
+    val shouldUpgradeToProPlan: Boolean = false,
     val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
     val usersCallLimitReminders: UsersCallLimitReminders = UsersCallLimitReminders.Enabled
 ) {

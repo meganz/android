@@ -713,6 +713,14 @@ class ChatViewModel @Inject constructor(
                                     && _state.value.isCallUnlimitedProPlanFeatureFlagEnabled
                                 ) {
                                     _state.update { state -> state.copy(callEndedDueToFreePlanLimits = true) }
+                                } else if (termCode == ChatCallTermCodeType.CallDurationLimit && _state.value.isCallUnlimitedProPlanFeatureFlagEnabled) {
+                                    if (it.isOwnClientCaller) {
+                                        _state.update { state ->
+                                            state.copy(
+                                                shouldUpgradeToProPlan = true
+                                            )
+                                        }
+                                    }
                                 }
 
                             else -> {}
@@ -1649,6 +1657,14 @@ class ChatViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * Consume ShouldUpgradeToProPlan
+     *
+     */
+    fun onConsumeShouldUpgradeToProPlan() {
+        _state.update { state -> state.copy(shouldUpgradeToProPlan = false) }
     }
 
     companion object {

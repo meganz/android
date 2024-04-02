@@ -102,6 +102,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatToolbar
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.MessageNotSentBottomSheet
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.MessageOptionsBottomSheet
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ReactionsInfoBottomSheet
+import mega.privacy.android.app.presentation.meeting.chat.view.sheet.UpgradeProPlanBottomSheet
 import mega.privacy.android.app.presentation.meeting.view.FreePlanLimitParticipantsDialog
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
@@ -181,7 +182,8 @@ internal fun ChatView(
         consumeDownloadEvent = viewModel::consumeDownloadEvent,
         onActionToManageEventConsumed = viewModel::onActionToManageEventConsumed,
         onVoiceClipRecordEvent = viewModel::onVoiceClipRecordEvent,
-        onConfirmFreePlanParticipantsLimitDialogEvent = viewModel::consumeShowFreePlanParticipantsLimitDialogEvent
+        onConfirmFreePlanParticipantsLimitDialogEvent = viewModel::consumeShowFreePlanParticipantsLimitDialogEvent,
+        onConsumeShouldUpgradeToProPlan = viewModel::onConsumeShouldUpgradeToProPlan,
     )
 }
 
@@ -276,6 +278,7 @@ internal fun ChatView(
     onActionToManageEventConsumed: () -> Unit = {},
     onVoiceClipRecordEvent: (VoiceClipRecordEvent) -> Unit = {},
     onConfirmFreePlanParticipantsLimitDialogEvent: () -> Unit = {},
+    onConsumeShouldUpgradeToProPlan: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -364,6 +367,13 @@ internal fun ChatView(
                 selectedReaction = ""
                 reactionList = emptyList()
             }
+            true
+        }
+    )
+
+    val upgradeToProPlanBottomSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        confirmValueChange = {
             true
         }
     )
@@ -493,6 +503,11 @@ internal fun ChatView(
         val isToolbarModalShown by derivedStateOf {
             toolbarModalSheetState.currentValue != ModalBottomSheetValue.Hidden
         }
+
+        val isUpgradeToProPlanShown by derivedStateOf {
+            upgradeToProPlanBottomSheetState.currentValue != ModalBottomSheetValue.Hidden
+        }
+
         val noBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
 
         if (!isMessageOptionsModalShown && addingReactionTo == null) {
@@ -515,6 +530,7 @@ internal fun ChatView(
                 isReactionInfoModalShown -> reactionInfoBottomSheetState
                 isToolbarModalShown -> toolbarModalSheetState
                 isMessageNotSentModalShown -> messageNotSentBottomSheetState
+                isUpgradeToProPlanShown -> upgradeToProPlanBottomSheetState
                 else -> noBottomSheetState
             },
             sheetBody = {
@@ -648,6 +664,14 @@ internal fun ChatView(
                             },
                             onAttachFiles = onAttachFiles
                         )
+                    }
+
+                    isUpgradeToProPlanShown -> {
+                        UpgradeProPlanBottomSheet {
+                            coroutineScope.launch {
+                                upgradeToProPlanBottomSheetState.hide()
+                            }
+                        }
                     }
                 }
             },
@@ -1022,6 +1046,13 @@ internal fun ChatView(
             ) { options ->
                 muteNotificationDialogOptions = options
                 showMutePushNotificationDialog = true
+            }
+
+            LaunchedEffect(shouldUpgradeToProPlan) {
+                if (shouldUpgradeToProPlan) {
+                    upgradeToProPlanBottomSheetState.show()
+                    onConsumeShouldUpgradeToProPlan()
+                }
             }
 
             EventEffect(

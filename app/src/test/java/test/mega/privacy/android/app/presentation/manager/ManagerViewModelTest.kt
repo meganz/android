@@ -40,9 +40,12 @@ import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.UserAlert
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
+import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
@@ -121,8 +124,11 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -132,6 +138,7 @@ import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import test.mega.privacy.android.app.InstantExecutorExtension
 import test.mega.privacy.android.app.domain.usecase.FakeMonitorBackupFolder
+import java.util.stream.Stream
 import kotlin.test.assertFalse
 
 @ExperimentalCoroutinesApi
@@ -190,8 +197,7 @@ class ManagerViewModelTest {
     private val monitorSyncStalledIssuesUseCase = mock<MonitorSyncStalledIssuesUseCase> {
         onBlocking { invoke() }.thenReturn(emptyFlow())
     }
-    private val getFeatureFlagValueUseCase =
-        mock<GetFeatureFlagValueUseCase> { onBlocking { invoke(any()) }.thenReturn(false) }
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val shareDataList = listOf(
         ShareData(
             user = "user",
@@ -302,10 +308,12 @@ class ManagerViewModelTest {
     private val monitorCallEndedUseCase: MonitorCallEndedUseCase = mock {
         onBlocking { invoke() }.thenReturn(emptyFlow())
     }
+    private val fakeCallUpdatesFlow = MutableSharedFlow<ChatCall>()
 
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock {
-        onBlocking { invoke() }.thenReturn(emptyFlow())
+        onBlocking { invoke() }.thenReturn(fakeCallUpdatesFlow)
     }
+
 
     private fun initViewModel() {
         underTest = ManagerViewModel(
@@ -437,7 +445,6 @@ class ManagerViewModelTest {
         whenever(monitorUserUpdates()).thenReturn(emptyFlow())
         whenever(monitorCallRecordingConsentEventUseCase()).thenReturn(emptyFlow())
         whenever(monitorCallEndedUseCase()).thenReturn(emptyFlow())
-        whenever(monitorChatCallUpdatesUseCase()).thenReturn(emptyFlow())
         whenever(monitorChatArchivedUseCase()).thenReturn(flowOf("Chat Title"))
         whenever(monitorPushNotificationSettingsUpdate()).thenReturn(flowOf(true))
         wheneverBlocking { getPrimarySyncHandleUseCase() }.thenReturn(0L)
@@ -1319,6 +1326,54 @@ class ManagerViewModelTest {
             assertThat(awaitItem().deviceCenterPreviousBottomNavigationItem).isEqualTo(previousItem)
         }
     }
+
+    @ParameterizedTest(name = " when call status is {0}")
+    @MethodSource("provideChatCallStatusParameters")
+    fun `test that call is ended when user limit is reached`(chatCallStatus: ChatCallStatus) =
+        runTest {
+            whenever(
+                getFeatureFlagValueUseCase(
+                    AppFeatures.CallUnlimitedProPlan
+                )
+            ).thenReturn(true)
+            initViewModel()
+            advanceUntilIdle()
+            val call = mock<ChatCall> {
+                on { status } doReturn chatCallStatus
+                on { termCode } doReturn ChatCallTermCodeType.CallUsersLimit
+            }
+            fakeCallUpdatesFlow.emit(call)
+            underTest.state.test {
+                assertThat(awaitItem().callEndedDueToFreePlanLimits).isTrue()
+            }
+        }
+
+    @ParameterizedTest(name = " when call status is {0}")
+    @MethodSource("provideChatCallStatusParameters")
+    fun `test that call is ended when duration limit is reached`(chatCallStatus: ChatCallStatus) =
+        runTest {
+            whenever(
+                getFeatureFlagValueUseCase(
+                    AppFeatures.CallUnlimitedProPlan
+                )
+            ).thenReturn(true)
+            initViewModel()
+            advanceUntilIdle()
+            val call = mock<ChatCall> {
+                on { status } doReturn chatCallStatus
+                on { termCode } doReturn ChatCallTermCodeType.CallDurationLimit
+                on { isOwnClientCaller } doReturn true
+            }
+            fakeCallUpdatesFlow.emit(call)
+            underTest.state.test {
+                assertThat(awaitItem().shouldUpgradeToProPlan).isTrue()
+            }
+        }
+
+    private fun provideChatCallStatusParameters(): Stream<Arguments> = Stream.of(
+        Arguments.of(ChatCallStatus.TerminatingUserParticipation),
+        Arguments.of(ChatCallStatus.GenericNotification),
+    )
 
     companion object {
         @JvmField

@@ -43,9 +43,19 @@ import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -188,6 +198,7 @@ import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.mapper.RestoreNodeResultMapper
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
+import mega.privacy.android.app.presentation.meeting.chat.view.sheet.UpgradeProPlanBottomSheet
 import mega.privacy.android.app.presentation.meeting.view.CallRecordingConsentDialog
 import mega.privacy.android.app.presentation.meeting.view.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.FreePlanLimitParticipantsDialog
@@ -290,6 +301,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
+import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -1139,6 +1151,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
 
+    @SuppressLint("UnrememberedMutableState")
+    @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
     private fun setInitialViewProperties() {
         viewPagerShares.offscreenPageLimit = 3
         getProLayout.setBackgroundColor(
@@ -1225,15 +1239,55 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
                 val state by viewModel.state.collectAsStateWithLifecycle()
-                if (state.callEndedDueToFreePlanLimits && state.isCallUnlimitedProPlanFeatureFlagEnabled &&
-                    state.usersCallLimitReminders == UsersCallLimitReminders.Enabled
-                ) {
-                    MegaAppTheme(isDark = isDark) {
-                        FreePlanLimitParticipantsDialog(
-                            onConfirm = {
-                                viewModel.onConsumeShowFreePlanParticipantsLimitDialogEvent()
-                            },
-                        )
+                val coroutineScope = rememberCoroutineScope()
+                val upgradeToProPlanBottomSheetState = rememberModalBottomSheetState(
+                    initialValue = ModalBottomSheetValue.Hidden,
+                    confirmValueChange = {
+                        true
+                    }
+                )
+                val isUpgradeToProPlanShown by derivedStateOf {
+                    Timber.d("Current Bottom Sheet state ${upgradeToProPlanBottomSheetState.currentValue}")
+                    upgradeToProPlanBottomSheetState.currentValue != ModalBottomSheetValue.Hidden
+                }
+
+                val noBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+                MegaAppTheme(isDark = isDark) {
+                    LaunchedEffect(state.shouldUpgradeToProPlan) {
+                        if (state.shouldUpgradeToProPlan) {
+                            upgradeToProPlanBottomSheetState.show()
+                            viewModel.onConsumeShouldUpgradeToProPlan()
+                        }
+                    }
+
+                    BottomSheet(
+                        modifier = Modifier.semantics {
+                            testTagsAsResourceId = true
+                        },
+                        modalSheetState = when {
+                            isUpgradeToProPlanShown -> upgradeToProPlanBottomSheetState
+                            else -> noBottomSheetState
+                        },
+                        sheetBody = {
+                            when {
+                                isUpgradeToProPlanShown -> {
+                                    UpgradeProPlanBottomSheet {
+                                        coroutineScope.launch {
+                                            upgradeToProPlanBottomSheetState.hide()
+                                        }
+                                    }
+                                }
+                            }
+                        }) {
+                        if (state.callEndedDueToFreePlanLimits && state.isCallUnlimitedProPlanFeatureFlagEnabled &&
+                            state.usersCallLimitReminders == UsersCallLimitReminders.Enabled
+                        ) {
+                            FreePlanLimitParticipantsDialog(
+                                onConfirm = {
+                                    viewModel.onConsumeShowFreePlanParticipantsLimitDialogEvent()
+                                },
+                            )
+                        }
                     }
                 }
             }
@@ -8347,10 +8401,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 refreshFragment(FragmentTag.BACKUPS.tag)
             }
+
             DrawerItem.RUBBISH_BIN -> {
                 rubbishBinViewModel.setRubbishBinHandle(handle)
                 refreshFragment(FragmentTag.RUBBISH_BIN_COMPOSE.tag)
             }
+
             else -> {}
         }
     }

@@ -63,6 +63,7 @@ import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
+import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
@@ -2945,6 +2946,54 @@ internal class ChatViewModelTest {
             flow.emit(345L)
             verifyNoInteractions(leaveChatUseCase)
         }
+
+    @ParameterizedTest(name = " when call status is {0}")
+    @MethodSource("provideChatCallStatusParameters")
+    fun `test that has call is ended when user limit is reached`(chatCallStatus: ChatCallStatus) =
+        runTest {
+            val flow = MutableSharedFlow<ChatCall>()
+            val call = mock<ChatCall> {
+                on { this.chatId } doReturn chatId
+                on { status } doReturn chatCallStatus
+                on { termCode } doReturn ChatCallTermCodeType.CallUsersLimit
+            }
+            whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+            whenever(monitorCallInChatUseCase(chatId)).thenReturn(flow)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan)).thenReturn(true)
+            initTestClass()
+            flow.emit(call)
+            advanceUntilIdle()
+            underTest.state.test {
+                assertThat(awaitItem().callEndedDueToFreePlanLimits).isTrue()
+            }
+        }
+
+    @ParameterizedTest(name = " when call status is {0}")
+    @MethodSource("provideChatCallStatusParameters")
+    fun `test that has call is ended when call duration limit is reached`(chatCallStatus: ChatCallStatus) =
+        runTest {
+            val flow = MutableSharedFlow<ChatCall>()
+            val call = mock<ChatCall> {
+                on { this.chatId } doReturn chatId
+                on { status } doReturn chatCallStatus
+                on { termCode } doReturn ChatCallTermCodeType.CallDurationLimit
+                on { isOwnClientCaller } doReturn true
+            }
+            whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+            whenever(monitorCallInChatUseCase(chatId)).thenReturn(flow)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan)).thenReturn(true)
+            initTestClass()
+            flow.emit(call)
+            advanceUntilIdle()
+            underTest.state.test {
+                assertThat(awaitItem().shouldUpgradeToProPlan).isTrue()
+            }
+        }
+
+    private fun provideChatCallStatusParameters(): Stream<Arguments> = Stream.of(
+        Arguments.of(ChatCallStatus.TerminatingUserParticipation),
+        Arguments.of(ChatCallStatus.GenericNotification),
+    )
 
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)

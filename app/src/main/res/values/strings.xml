@@ -5389,4 +5389,10 @@
     </plurals>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_priority_support">&#8226;&#160;Priority support</string>
+    <!-- The title of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_title">Upgrade to Pro to get unlimited calls</string>
+    <!-- The body of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_body">Your call reached the 60 minute limit and has ended. Pro users have unlimited calls and up to 1000 participants.</string>
+    <!-- The button text of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_button">Upgrade now</string>
 </resources>
