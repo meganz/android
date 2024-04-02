@@ -1,11 +1,11 @@
 package mega.privacy.android.app.camera
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.net.Uri
 import androidx.camera.core.ImageCapture
 import androidx.camera.video.FileDescriptorOutputOptions
 import androidx.camera.view.video.AudioConfig
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -64,16 +64,13 @@ internal class CameraViewModel @Inject constructor(
         }
     }
 
-    fun captureVideo(cameraState: CameraState) {
+    @SuppressLint("MissingPermission")
+    fun captureVideo(cameraState: CameraState, hasRecordAudioPermission: Boolean) {
         viewModelScope.launch {
             if (cameraState.isRecording) {
                 cameraState.stopRecording()
             } else {
                 val savedUri = createNewVideoUri() ?: return@launch
-                val hasRecordAudioPermission = ContextCompat.checkSelfPermission(
-                    application,
-                    android.Manifest.permission.RECORD_AUDIO
-                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
                 withContext(ioDispatcher) {
                     application.contentResolver.openFileDescriptor(savedUri, "rw")
                 }?.let { fileDescriptor ->

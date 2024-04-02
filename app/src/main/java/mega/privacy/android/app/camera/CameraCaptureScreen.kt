@@ -1,5 +1,6 @@
 package mega.privacy.android.app.camera
 
+import android.Manifest
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -20,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -35,9 +38,11 @@ import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.core.ui.controls.camera.CameraBottomAppBar
 import mega.privacy.android.core.ui.controls.camera.CameraTimer
 import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.core.ui.utils.rememberPermissionState
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 internal fun CameraCaptureScreen(
     onOpenVideoPreview: (Uri) -> Unit,
@@ -50,6 +55,7 @@ internal fun CameraCaptureScreen(
     var camSelector by rememberSaveableCamSelector(CamSelector.Back)
     var cameraOption by rememberSaveable { mutableStateOf(CameraOption.Photo) }
     val isRecording by rememberUpdatedState(cameraState.isRecording)
+    val audioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
 
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
@@ -144,7 +150,7 @@ internal fun CameraCaptureScreen(
                     if (cameraOption == CameraOption.Photo) {
                         viewModel.takePicture(cameraState)
                     } else {
-                        viewModel.captureVideo(cameraState)
+                        viewModel.captureVideo(cameraState, audioPermissionState.status.isGranted)
                     }
                 },
                 onOpenGallery = {

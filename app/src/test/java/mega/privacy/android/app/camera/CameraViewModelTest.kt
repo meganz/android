@@ -1,44 +1,31 @@
 package mega.privacy.android.app.camera
 
 import android.app.Application
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.camera.state.CameraState
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.file.CreateNewImageUriUseCase
 import mega.privacy.android.domain.usecase.file.CreateNewVideoUriUseCase
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class CameraViewModelTest {
     private lateinit var underTest: CameraViewModel
     private val createNewImageUriUseCase: CreateNewImageUriUseCase = mock()
     private val createNewVideoUriUseCase: CreateNewVideoUriUseCase = mock()
     private val application: Application = mock()
-    private val testDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
     @BeforeAll
     fun setup() {
-        Dispatchers.setMain(testDispatcher)
         initTestClass()
-    }
-
-    @AfterAll
-    fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @BeforeEach
@@ -58,7 +45,7 @@ internal class CameraViewModelTest {
         val cameraState = mock<CameraState> {
             on { isRecording }.thenReturn(false)
         }
-        underTest.captureVideo(cameraState)
+        underTest.captureVideo(cameraState, false)
 
         verify(createNewVideoUriUseCase).invoke(any())
     }
@@ -68,7 +55,7 @@ internal class CameraViewModelTest {
         val cameraState = mock<CameraState> {
             on { isRecording }.thenReturn(true)
         }
-        underTest.captureVideo(cameraState)
+        underTest.captureVideo(cameraState, false)
 
         verify(cameraState).stopRecording()
     }
@@ -78,7 +65,7 @@ internal class CameraViewModelTest {
         val cameraState = mock<CameraState> {
             on { isRecording }.thenReturn(false)
         }
-        underTest.captureVideo(cameraState)
+        underTest.captureVideo(cameraState, false)
 
         verify(createNewVideoUriUseCase).invoke(any())
     }
@@ -88,7 +75,13 @@ internal class CameraViewModelTest {
             createNewImageUriUseCase,
             createNewVideoUriUseCase,
             application,
-            testDispatcher
+            extension.testDispatcher
         )
+    }
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val extension = CoroutineMainDispatcherExtension()
     }
 }

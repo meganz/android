@@ -3,8 +3,8 @@ package mega.privacy.android.app.camera
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
@@ -15,7 +15,7 @@ import mega.privacy.android.app.camera.preview.videoPreviewScreen
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @AndroidEntryPoint
-internal class CameraActivity : AppCompatActivity() {
+internal class CameraActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,23 +27,15 @@ internal class CameraActivity : AppCompatActivity() {
                 NavHost(navController = navController, startDestination = CAMERA_CAPTURE_ROUTE) {
                     cameraCaptureScreen(
                         onFinish = ::setResult,
-                        onOpenVideoPreview = { uri ->
-                            navController.navigateToVideoPreview(uri)
-                        },
-                        onOpenPhotoPreview = { uri ->
-                            navController.navigateToPhotoPreview(uri)
-                        }
+                        onOpenVideoPreview = navController::navigateToVideoPreview,
+                        onOpenPhotoPreview = navController::navigateToPhotoPreview
                     )
                     videoPreviewScreen(
-                        onBackPressed = {
-                            navController.popBackStack()
-                        },
+                        onBackPressed = navController::popBackStack,
                         onSendVideo = ::setResult
                     )
                     photoPreviewScreen(
-                        onBackPressed = {
-                            navController.popBackStack()
-                        },
+                        onBackPressed = navController::popBackStack,
                         onSendPhoto = ::setResult
                     )
                 }

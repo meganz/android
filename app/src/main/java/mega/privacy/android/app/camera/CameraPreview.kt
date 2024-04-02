@@ -51,13 +51,13 @@ fun CameraPreview(
 @SuppressLint("RestrictedApi")
 @Composable
 internal fun CameraPreviewContent(
-    modifier: Modifier,
     cameraState: CameraState,
     camSelector: CamSelector,
     captureMode: CaptureMode,
     flashMode: FlashMode,
     enableTorch: Boolean,
     videoQualitySelector: QualitySelector,
+    modifier: Modifier = Modifier,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraIsInitialized by rememberUpdatedState(cameraState.isInitialized)
