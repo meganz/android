@@ -64,7 +64,6 @@ import mega.privacy.android.app.presentation.weakaccountprotection.WeakAccountPr
 import mega.privacy.android.app.psa.PsaWebBrowser
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption
-import mega.privacy.android.app.upgradeAccount.payment.PaymentActivity
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
@@ -1358,8 +1357,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             PurchaseType.DOWNGRADE
         }
         when {
-            this is PaymentActivity ||
-                    this is MyAccountActivity && myAccountInfo.isUpgradeFromAccount()
+            this is MyAccountActivity && myAccountInfo.isUpgradeFromAccount()
                     || this is ManagerActivity && myAccountInfo.isUpgradeFromManager()
                     || this is FileManagementPreferencesActivity && myAccountInfo.isUpgradeFromSettings() -> {
                 purchaseType = type

@@ -652,10 +652,6 @@
             android:label="@string/choose_account_fragment"
             android:launchMode="singleTop" />
         <activity
-            android:name=".upgradeAccount.payment.PaymentActivity"
-            android:label="@string/payment"
-            android:launchMode="singleTop" />
-        <activity
             android:name=".mediaplayer.SelectSubtitleFileActivity"
             android:launchMode="singleTop" />
         <activity

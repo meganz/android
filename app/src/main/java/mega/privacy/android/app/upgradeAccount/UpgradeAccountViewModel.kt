@@ -1,6 +1,5 @@
 package mega.privacy.android.app.upgradeAccount
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,7 +19,6 @@ import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
 import mega.privacy.android.app.upgradeAccount.model.UserSubscription
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Subscription
@@ -76,10 +74,6 @@ class UpgradeAccountViewModel @Inject constructor(
         )
     )
     val state: StateFlow<UpgradeAccountState> = _state
-
-    private val upgradeClick = SingleLiveEvent<Int>()
-
-    fun onUpgradeClick(): LiveData<Int> = upgradeClick
 
     init {
         viewModelScope.launch {

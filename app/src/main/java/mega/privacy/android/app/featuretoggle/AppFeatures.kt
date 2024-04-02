@@ -182,11 +182,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     AppTest("This is a test toggle. It does nothing", false),
 
     /**
-     * To switch into new Plans page UI
-     */
-    PlansPageUpdate("Enable new design for Upgrade account view", false),
-
-    /**
      * To switch into new Offline Screen Compose UI
      */
     OfflineCompose("Enable compose for Offline Screen", false),
@@ -227,14 +222,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     ChooseAccountScreenVariantA(
         "Enable new design (Variant A) for ChooseAccount screen (Onboarding Upselling dialog)",
-        false
-    ),
-
-    /**
-     * To show promotional dynamic messages in Notifications
-     */
-    NotificationCenter(
-        "To show promotional dynamic messages in Notifications",
         false
     ),
 

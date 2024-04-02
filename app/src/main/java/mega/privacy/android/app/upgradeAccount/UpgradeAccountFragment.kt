@@ -25,9 +25,7 @@ import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
-import mega.privacy.android.app.upgradeAccount.payment.PaymentActivity
 import mega.privacy.android.app.upgradeAccount.view.UpgradeAccountView
-import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.billing.PaymentUtils
 import mega.privacy.android.data.qualifier.MegaApi
@@ -75,7 +73,6 @@ class UpgradeAccountFragment : Fragment() {
         savedInstanceState: Bundle?,
     ) = ComposeView(requireContext()).apply {
         setContent { UpgradeAccountBody() }
-        setupObservers()
         viewLifecycleOwner.collectFlow(billingViewModel.billingUpdateEvent) {
             if (it is BillingEvent.OnPurchaseUpdate) {
                 onPurchasesUpdated(it.purchases)
@@ -139,41 +136,6 @@ class UpgradeAccountFragment : Fragment() {
         }
     }
 
-    private fun setupObservers() {
-        upgradeAccountViewModel.onUpgradeClick().observe(viewLifecycleOwner) { upgradeType ->
-            startActivity(
-                Intent(context, PaymentActivity::class.java)
-                    .putExtra(PaymentActivity.UPGRADE_TYPE, upgradeType)
-            )
-        }
-    }
-
-    /**
-     * Shows the selected payment plan.
-     *
-     * @param accountType Selected payment plan.
-     */
-    private fun onPlanClicked(accountType: AccountType) {
-        with(upgradeAccountViewModel) {
-            if (!isBillingAvailable()) {
-                Timber.w("Billing not available")
-                setBillingWarningVisibility(true)
-                return
-            }
-            val upgradeType = convertAccountTypeToInt(accountType)
-            currentPaymentCheck(upgradeType)
-        }
-    }
-
-    private fun onCustomLabelClick(currentSubscriptionPlan: AccountType) {
-        val accountTypeInt = convertAccountTypeToInt(currentSubscriptionPlan)
-        AlertsAndWarnings.askForCustomizedPlan(
-            requireContext(),
-            megaApi.myEmail,
-            accountTypeInt
-        )
-    }
-
     private fun startPurchase(
         isMonthlySelected: Boolean,
         chosenPlan: Int,
@@ -184,16 +146,6 @@ class UpgradeAccountFragment : Fragment() {
                 isMonthlySelected,
                 chosenPlan
             )
-        )
-    }
-
-    private fun onDialogPositiveButtonClicked(upgradeType: Int) {
-        upgradeAccountViewModel.setShowBuyNewSubscriptionDialog(
-            showBuyNewSubscriptionDialog = false
-        )
-        startActivity(
-            Intent(context, PaymentActivity::class.java)
-                .putExtra(PaymentActivity.UPGRADE_TYPE, upgradeType)
         )
     }
 
