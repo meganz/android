@@ -344,6 +344,7 @@
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
             android:name=".presentation.meeting.chat.ChatHostActivity"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity android:name=".presentation.contactinfo.ContactInfoActivity" />
         <activity android:name=".presentation.fileinfo.FileInfoActivity" />
