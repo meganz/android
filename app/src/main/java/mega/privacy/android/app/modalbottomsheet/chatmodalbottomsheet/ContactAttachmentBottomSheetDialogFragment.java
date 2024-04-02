@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -109,10 +110,10 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
         titleMailContactChatPanel = contentView.findViewById(R.id.contact_attachment_chat_mail_text);
         contactImageView = contentView.findViewById(R.id.contact_attachment_thumbnail);
 
-        LinearLayout optionView = contentView.findViewById(R.id.option_view_layout);
-        LinearLayout optionInfo = contentView.findViewById(R.id.option_info_layout);
-        LinearLayout optionStartConversation = contentView.findViewById(R.id.option_start_conversation_layout);
-        LinearLayout optionInvite = contentView.findViewById(R.id.option_invite_layout);
+        TextView optionView = contentView.findViewById(R.id.option_view);
+        TextView optionInfo = contentView.findViewById(R.id.option_info);
+        TextView optionStartConversation = contentView.findViewById(R.id.option_start_conversation);
+        TextView optionInvite = contentView.findViewById(R.id.option_invite);
 
         optionView.setOnClickListener(this);
         optionInfo.setOnClickListener(this);
@@ -277,7 +278,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
         long numUsers = message.getMessage().getUsersCount();
 
         int id = v.getId();
-        if (id == R.id.option_info_layout) {
+        if (id == R.id.option_info) {
             if (!isOnline(requireContext())) {
                 ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
                 return;
@@ -300,10 +301,10 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 boolean isChatRoomOpen = chatRoom != null && !chatRoom.isGroup() && contactHandle == chatRoom.getPeerHandle(0);
                 ContactUtil.openContactInfoActivity(requireActivity(), contactEmail, isChatRoomOpen);
             }
-        } else if (id == R.id.option_view_layout) {
+        } else if (id == R.id.option_view) {
             Timber.d("View option");
             ContactUtil.openContactAttachmentActivity(requireActivity(), chatId, messageId);
-        } else if (id == R.id.option_invite_layout) {
+        } else if (id == R.id.option_invite) {
             if (!isOnline(requireContext())) {
                 ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
                 return;
@@ -328,7 +329,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
             } else if (email != null) {
                 cC.inviteContact(email);
             }
-        } else if (id == R.id.option_start_conversation_layout) {
+        } else if (id == R.id.option_start_conversation) {
             if (requireActivity() instanceof ChatActivity) {
                 if (numUsers == 1) {
                     ((ChatActivity) requireActivity()).startConversation(message.getMessage().getUserHandle(0));

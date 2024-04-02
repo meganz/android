@@ -91,7 +91,7 @@
 
             <!-- Options -->
             <TextView
-                android:id="@+id/option_download_layout"
+                android:id="@+id/option_download"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_save_to_device"
                 app:drawableStartCompat="@drawable/ic_download_medium_regular_outline"/>
@@ -104,7 +104,7 @@
                 android:background="@color/grey_012_white_012" />
 
             <TextView
-                android:id="@+id/option_revert_layout"
+                android:id="@+id/option_revert"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_revert"
                 app:drawableStartCompat="@drawable/ic_clock_rotate_medium_regular_outline"/>
@@ -117,7 +117,7 @@
                 android:background="@color/grey_012_white_012" />
 
             <TextView
-                android:id="@+id/option_delete_layout"
+                android:id="@+id/option_delete"
                 style="@style/BottomSheetOption.Red"
                 android:text="@string/delete_button"
                 app:drawableStartCompat="@drawable/ic_x_medium_regular_outline"/>

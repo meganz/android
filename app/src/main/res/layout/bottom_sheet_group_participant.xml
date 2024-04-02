@@ -104,14 +104,14 @@
 
             <!--Contact info-->
             <TextView
-                android:id="@+id/contact_info_group_participants_chat_layout"
+                android:id="@+id/contact_info_group_participants_chat"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_info"
                 app:drawableStartCompat="@drawable/ic_info_medium_regular_outline"/>
 
             <!--Edit profile-->
             <TextView
-                android:id="@+id/edit_profile_group_participants_chat_layout"
+                android:id="@+id/edit_profile_group_participants_chat"
                 style="@style/BottomSheetOption"
                 android:text="@string/group_chat_edit_profile_label"
                 app:drawableStartCompat="@drawable/ic_pen_2_medium_regular_outline"/>
@@ -133,7 +133,7 @@
 
             <!--Send msg-->
             <TextView
-                android:id="@+id/start_chat_group_participants_chat_layout"
+                android:id="@+id/start_chat_group_participants_chat"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_send_message"
                 app:drawableStartCompat="@drawable/ic_message_chat_circle_medium_regular_outline"/>
@@ -148,14 +148,14 @@
 
             <!--Change Permissions-->
             <TextView
-                android:id="@+id/change_permissions_group_participants_chat_layout"
+                android:id="@+id/change_permissions_group_participants_chat"
                 style="@style/BottomSheetOption"
                 android:text="@string/file_properties_shared_folder_change_permissions"
                 app:drawableStartCompat="@drawable/ic_key_02_medium_regular_outline"/>
 
             <!--Invite a non-contact-->
             <TextView
-                android:id="@+id/invite_group_participants_chat_layout"
+                android:id="@+id/invite_group_participants_chat"
                 style="@style/BottomSheetOption"
                 android:text="@string/menu_add_contact"
                 app:drawableStartCompat="@drawable/ic_plus_circle_medium_regular_outline"/>
@@ -170,7 +170,7 @@
 
             <!--Leave chat-->
             <TextView
-                android:id="@+id/leave_group_participants_chat_layout"
+                android:id="@+id/leave_group_participants_chat"
                 style="@style/BottomSheetOption.Red"
                 android:text="@string/title_properties_chat_leave_chat"
                 app:drawableStartCompat="@drawable/ic_log_out_02_medium_regular_outline"/>
@@ -185,7 +185,7 @@
 
             <!--Remove contact-->
             <TextView
-                android:id="@+id/remove_group_participants_chat_layout"
+                android:id="@+id/remove_group_participants_chat"
                 style="@style/BottomSheetOption.Red"
                 android:text="@string/remove_participant_menu_item"
                 app:drawableStartCompat="@drawable/ic_x_medium_regular_outline"/>

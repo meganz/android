@@ -78,7 +78,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         nodeName = contentView.findViewById(R.id.node_attachment_name_text);
         nodeInfo = contentView.findViewById(R.id.node_attachment_info_text);
 
-        optionView = contentView.findViewById(R.id.option_view_layout);
+        optionView = contentView.findViewById(R.id.option_view);
 
         if (savedInstanceState != null) {
             chatId = savedInstanceState.getLong(CHAT_ID, MEGACHAT_INVALID_HANDLE);
@@ -116,8 +116,8 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         }
 
 
-        LinearLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
-        LinearLayout optionImport = contentView.findViewById(R.id.option_import_layout);
+        TextView optionDownload = contentView.findViewById(R.id.option_download);
+        TextView optionImport = contentView.findViewById(R.id.option_import);
         LinearLayout optionSaveOffline = contentView.findViewById(R.id.option_save_offline_layout);
         SwitchMaterial offlineSwitch = contentView.findViewById(R.id.option_save_offline_switch);
 
@@ -220,14 +220,14 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         messagesSelected.add(message);
 
         int id = v.getId();
-        if (id == R.id.option_download_layout) {
+        if (id == R.id.option_download) {
             Timber.d("Download option");
             if (node == null) {
                 Timber.w("The selected node is NULL");
                 return;
             }
             ((NodeAttachmentHistoryActivity) requireActivity()).downloadMessageNode(nodeList, messageId);
-        } else if (id == R.id.option_import_layout) {
+        } else if (id == R.id.option_import) {
             if (node == null) {
                 Timber.w("The selected node is NULL");
                 return;

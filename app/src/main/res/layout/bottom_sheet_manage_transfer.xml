@@ -103,7 +103,7 @@
 
                 <!-- Options -->
                 <TextView
-                    android:id="@+id/option_view_layout"
+                    android:id="@+id/option_view"
                     style="@style/BottomSheetOption"
                     android:text="@string/view_in_folder_label"
                     app:drawableStartCompat="@drawable/ic_search_large_medium_regular_outline"/>
@@ -116,7 +116,7 @@
                     android:background="@color/grey_012_white_012" />
 
                 <TextView
-                    android:id="@+id/option_get_link_layout"
+                    android:id="@+id/option_get_link"
                     style="@style/BottomSheetOption"
                     android:text="@{@plurals/get_links(1)}"
                     app:drawableStartCompat="@drawable/ic_link01_medium_regular_outline"/>
@@ -129,7 +129,7 @@
                     android:background="@color/grey_012_white_012" />
 
                 <TextView
-                    android:id="@+id/option_retry_layout"
+                    android:id="@+id/option_retry"
                     style="@style/BottomSheetOption"
                     android:text="@string/general_retry"
                     app:drawableStartCompat="@drawable/ic_rotate_ccw_medium_regular_outline"/>
@@ -142,7 +142,7 @@
                     android:background="@color/grey_012_white_012" />
 
                 <TextView
-                    android:id="@+id/option_clear_layout"
+                    android:id="@+id/option_clear"
                     style="@style/BottomSheetOption.Red"
                     android:text="@string/general_clear"
                     app:drawableStartCompat="@drawable/ic_x_medium_regular_outline"/>

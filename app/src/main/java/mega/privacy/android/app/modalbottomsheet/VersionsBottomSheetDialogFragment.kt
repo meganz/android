@@ -66,9 +66,9 @@ class VersionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
      */
     private fun BottomSheetVersionsFileBinding.setupViews() {
         with(this) {
-            optionDownloadLayout.setOnClickListener { handleDownloadClick() }
-            optionRevertLayout.setOnClickListener { handleRevertClick() }
-            optionDeleteLayout.setOnClickListener { handleDeleteClick() }
+            optionDownload.setOnClickListener { handleDownloadClick() }
+            optionRevert.setOnClickListener { handleRevertClick() }
+            optionDelete.setOnClickListener { handleDeleteClick() }
 
             versionsFileNameText.maxWidth = Util.scaleWidthPx(200, resources.displayMetrics)
             versionsFileInfoText.maxWidth = Util.scaleWidthPx(200, resources.displayMetrics)
@@ -136,9 +136,9 @@ class VersionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     node = node,
                     nodeThumb = versionsFileThumbnail,
                 )
-                optionDeleteLayout.isVisible = uiState.canDeleteVersion
+                optionDelete.isVisible = uiState.canDeleteVersion
                 separatorDelete.isVisible = uiState.canDeleteVersion
-                optionRevertLayout.isVisible = uiState.canRevertVersion
+                optionRevert.isVisible = uiState.canRevertVersion
                 separatorRevert.isVisible = uiState.canRevertVersion
             }
         }

@@ -39,8 +39,8 @@ public class ContactNicknameBottomSheetDialogFragment extends BaseBottomSheetDia
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        contentView.findViewById(R.id.edit_nickname_layout).setOnClickListener(this);
-        contentView.findViewById(R.id.remove_nickname_layout).setOnClickListener(this);
+        contentView.findViewById(R.id.edit_nickname).setOnClickListener(this);
+        contentView.findViewById(R.id.remove_nickname).setOnClickListener(this);
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -48,9 +48,9 @@ public class ContactNicknameBottomSheetDialogFragment extends BaseBottomSheetDia
     public void onClick(View v) {
         if (contactInfoActivity == null) return;
         int id = v.getId();
-        if (id == R.id.edit_nickname_layout) {
+        if (id == R.id.edit_nickname) {
             contactInfoActivity.showConfirmationSetNickname(nickname);
-        } else if (id == R.id.remove_nickname_layout) {
+        } else if (id == R.id.remove_nickname) {
             viewModel.updateNickName(null);
         }
 

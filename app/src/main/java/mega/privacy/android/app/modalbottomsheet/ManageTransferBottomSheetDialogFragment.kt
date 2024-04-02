@@ -66,13 +66,13 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
         val stateIcon = contentView.findViewById<ImageView>(R.id.manage_transfer_completed_image)
         val name = contentView.findViewById<TextView>(R.id.manage_transfer_filename)
         val location = contentView.findViewById<TextView>(R.id.manage_transfer_location)
-        val viewInFolderOption = contentView.findViewById<LinearLayout>(R.id.option_view_layout)
+        val viewInFolderOption = contentView.findViewById<TextView>(R.id.option_view)
         viewInFolderOption.setOnClickListener(this)
-        val getLinkOption = contentView.findViewById<LinearLayout>(R.id.option_get_link_layout)
+        val getLinkOption = contentView.findViewById<TextView>(R.id.option_get_link)
         getLinkOption.setOnClickListener(this)
-        val clearOption = contentView.findViewById<LinearLayout>(R.id.option_clear_layout)
+        val clearOption = contentView.findViewById<TextView>(R.id.option_clear)
         clearOption.setOnClickListener(this)
-        val retryOption = contentView.findViewById<LinearLayout>(R.id.option_retry_layout)
+        val retryOption = contentView.findViewById<TextView>(R.id.option_retry)
         retryOption.setOnClickListener(this)
         name.text = transfer.fileName
         if (transfer.type == MegaTransfer.TYPE_DOWNLOAD) {
@@ -159,7 +159,7 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
     override fun onClick(v: View) {
         val transfer = transfer ?: return
         val id = v.id
-        if (id == R.id.option_view_layout) {
+        if (id == R.id.option_view) {
             if (transfer.type == MegaTransfer.TYPE_UPLOAD && !Util.isOnline(requireContext())) {
                 managerActivity.showSnackbar(
                     Constants.SNACKBAR_TYPE,
@@ -169,7 +169,7 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
             } else {
                 managerActivity.openTransferLocation(transfer)
             }
-        } else if (id == R.id.option_get_link_layout) {
+        } else if (id == R.id.option_get_link) {
             if (!Util.isOnline(requireContext())) {
                 managerActivity.showSnackbar(
                     Constants.SNACKBAR_TYPE,
@@ -179,9 +179,9 @@ internal class ManageTransferBottomSheetDialogFragment : BaseBottomSheetDialogFr
             } else {
                 managerActivity.showGetLinkActivity(handle)
             }
-        } else if (id == R.id.option_clear_layout) {
+        } else if (id == R.id.option_clear) {
             viewModel.completedTransferRemoved(transfer, true)
-        } else if (id == R.id.option_retry_layout) {
+        } else if (id == R.id.option_retry) {
             if (!Util.isOnline(requireContext())) {
                 managerActivity.showSnackbar(
                     Constants.SNACKBAR_TYPE,

@@ -37,7 +37,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/open_with_layout"
+                android:id="@+id/open_with"
                 style="@style/BottomSheetOption"
                 android:text="@string/external_play"
                 app:drawableStartCompat="@drawable/ic_external_link_medium_regular_outline" />
@@ -51,7 +51,7 @@
                 android:orientation="vertical" />
 
             <TextView
-                android:id="@+id/forward_layout"
+                android:id="@+id/forward"
                 style="@style/BottomSheetOption"
                 android:visibility="gone"
                 tools:visibility="visible"
@@ -67,7 +67,7 @@
                 android:orientation="vertical" />
 
             <TextView
-                android:id="@+id/edit_layout"
+                android:id="@+id/edit"
                 style="@style/BottomSheetOption"
                 android:visibility="gone"
                 tools:visibility="visible"
@@ -83,7 +83,7 @@
                 android:orientation="vertical" />
 
             <TextView
-                android:id="@+id/copy_layout"
+                android:id="@+id/copy"
                 style="@style/BottomSheetOption"
                 android:visibility="gone"
                 tools:visibility="visible"
@@ -99,7 +99,7 @@
                 android:orientation="vertical" />
 
             <TextView
-                android:id="@+id/share_layout"
+                android:id="@+id/share"
                 style="@style/BottomSheetOption"
                 android:visibility="gone"
                 tools:visibility="visible"
@@ -115,7 +115,7 @@
                 android:orientation="vertical" />
 
             <TextView
-                android:id="@+id/select_layout"
+                android:id="@+id/select"
                 style="@style/BottomSheetOption"
                 android:visibility="gone"
                 tools:visibility="visible"
@@ -131,7 +131,7 @@
                 android:orientation="vertical" />
 
             <TextView
-                android:id="@+id/option_view_layout"
+                android:id="@+id/option_view"
                 style="@style/BottomSheetOption"
                 android:visibility="gone"
                 tools:visibility="visible"
@@ -147,7 +147,7 @@
                 android:orientation="vertical" />
 
             <TextView
-                android:id="@+id/option_start_conversation_layout"
+                android:id="@+id/option_start_conversation"
                 style="@style/BottomSheetOption"
                 android:visibility="gone"
                 tools:visibility="visible"
@@ -155,7 +155,7 @@
                 app:drawableStartCompat="@drawable/ic_send_message_modal" />
 
             <TextView
-                android:id="@+id/option_invite_layout"
+                android:id="@+id/option_invite"
                 style="@style/BottomSheetOption"
                 android:visibility="gone"
                 tools:visibility="visible"
@@ -171,7 +171,7 @@
                 android:orientation="vertical" />
 
             <TextView
-                android:id="@+id/option_import_layout"
+                android:id="@+id/option_import"
                 style="@style/BottomSheetOption"
                 android:visibility="gone"
                 tools:visibility="visible"
@@ -179,7 +179,7 @@
                 app:drawableStartCompat="@drawable/ic_cloud_upload_medium_regular_outline" />
 
             <TextView
-                android:id="@+id/option_download_layout"
+                android:id="@+id/option_download"
                 style="@style/BottomSheetOption"
                 android:visibility="gone"
                 tools:visibility="visible"
@@ -217,7 +217,7 @@
                 android:orientation="vertical" />
 
             <TextView
-                android:id="@+id/delete_layout"
+                android:id="@+id/delete"
                 style="@style/BottomSheetOption.Red"
                 android:visibility="gone"
                 tools:visibility="visible"

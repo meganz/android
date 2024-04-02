@@ -70,19 +70,19 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/option_view_layout"
+                android:id="@+id/option_view"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_view"
                 app:drawableStartCompat="@drawable/ic_info_medium_regular_outline"/>
 
             <TextView
-                android:id="@+id/option_import_layout"
+                android:id="@+id/option_import"
                 style="@style/BottomSheetOption"
                 android:text="@string/add_to_cloud_node_chat"
                 app:drawableStartCompat="@drawable/ic_cloud_upload_medium_regular_outline"/>
 
             <TextView
-                android:id="@+id/option_download_layout"
+                android:id="@+id/option_download"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_save_to_device"
                 app:drawableStartCompat="@drawable/ic_download_medium_regular_outline"/>

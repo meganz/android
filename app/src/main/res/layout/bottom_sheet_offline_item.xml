@@ -73,7 +73,7 @@
 
             <!-- Options -->
             <TextView
-                android:id="@+id/option_properties_layout"
+                android:id="@+id/option_properties"
                 style="@style/BottomSheetOption"
                 android:text="@string/view_in_folder_label"
                 app:drawableStartCompat="@drawable/ic_info_medium_regular_outline"/>
@@ -85,7 +85,7 @@
                 android:background="@color/grey_012_white_012" />
 
             <TextView
-                android:id="@+id/option_open_with_layout"
+                android:id="@+id/option_open_with"
                 style="@style/BottomSheetOption"
                 android:text="@string/external_play"
                 app:drawableStartCompat="@drawable/ic_external_link_medium_regular_outline"/>
@@ -98,7 +98,7 @@
                 android:background="@color/grey_012_white_012" />
 
             <TextView
-                android:id="@+id/option_share_layout"
+                android:id="@+id/option_share"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_share"
                 app:drawableStartCompat="@drawable/ic_share_network_medium_regular_outline"/>
@@ -111,7 +111,7 @@
                 android:background="@color/grey_012_white_012" />
 
             <TextView
-                android:id="@+id/option_download_layout"
+                android:id="@+id/option_download"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_save_to_device"
                 app:drawableStartCompat="@drawable/ic_download_medium_regular_outline"/>
@@ -123,7 +123,7 @@
                 android:background="@color/grey_012_white_012"/>
 
             <TextView
-                android:id="@+id/option_delete_offline_layout"
+                android:id="@+id/option_delete_offline"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_delete_offline"
                 app:drawableStartCompat="@drawable/ic_x_medium_regular_outline"/>

@@ -45,13 +45,13 @@
 
             <!-- Options -->
             <TextView
-                android:id="@+id/edit_nickname_layout"
+                android:id="@+id/edit_nickname"
                 style="@style/BottomSheetOption"
                 android:text="@string/title_edit_profile_info"
                 app:drawableStartCompat="@drawable/ic_pen_2_medium_regular_outline"/>
 
             <TextView
-                android:id="@+id/remove_nickname_layout"
+                android:id="@+id/remove_nickname"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_remove"
                 app:drawableStartCompat="@drawable/ic_x_medium_regular_outline"/>

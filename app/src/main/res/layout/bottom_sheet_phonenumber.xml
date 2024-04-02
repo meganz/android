@@ -38,13 +38,13 @@
 
             <!-- Options -->
             <TextView
-                android:id="@+id/modify_phonenumber_layout"
+                android:id="@+id/modify_phonenumber"
                 style="@style/BottomSheetOption"
                 android:text="@string/option_modify_phone_number"
                 app:drawableStartCompat="@drawable/ic_pen_2_medium_regular_outline" />
 
             <TextView
-                android:id="@+id/remove_phonenumber_layout"
+                android:id="@+id/remove_phonenumber"
                 style="@style/BottomSheetOption.Red"
                 android:text="@string/general_remove"
                 app:drawableStartCompat="@drawable/ic_x_medium_regular_outline" />

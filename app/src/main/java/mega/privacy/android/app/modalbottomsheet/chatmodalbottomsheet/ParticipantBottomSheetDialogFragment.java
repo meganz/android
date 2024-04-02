@@ -121,20 +121,20 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         TextView titleMailContactChatPanel = contentView.findViewById(R.id.group_participants_chat_mail_text);
         contactImageView = contentView.findViewById(R.id.sliding_group_participants_chat_list_thumbnail);
 
-        TextView optionContactInfoChat = contentView.findViewById(R.id.contact_info_group_participants_chat_layout);
-        TextView optionEditProfileChat = contentView.findViewById(R.id.edit_profile_group_participants_chat_layout);
+        TextView optionContactInfoChat = contentView.findViewById(R.id.contact_info_group_participants_chat);
+        TextView optionEditProfileChat = contentView.findViewById(R.id.edit_profile_group_participants_chat);
 
-        TextView optionStartConversationChat = contentView.findViewById(R.id.start_chat_group_participants_chat_layout);
+        TextView optionStartConversationChat = contentView.findViewById(R.id.start_chat_group_participants_chat);
         TextView optionStartCall = contentView.findViewById(R.id.contact_list_option_call_layout);
-        TextView optionLeaveChat = contentView.findViewById(R.id.leave_group_participants_chat_layout);
+        TextView optionLeaveChat = contentView.findViewById(R.id.leave_group_participants_chat);
         if (megaChatApi.getChatRoom(chatId) != null && megaChatApi.getChatRoom(chatId).isMeeting()) {
             optionLeaveChat.setText(R.string.meetings_info_leave_option);
         } else {
             optionLeaveChat.setText(R.string.title_properties_chat_leave_chat);
         }
-        TextView optionChangePermissionsChat = contentView.findViewById(R.id.change_permissions_group_participants_chat_layout);
-        TextView optionRemoveParticipantChat = contentView.findViewById(R.id.remove_group_participants_chat_layout);
-        TextView optionInvite = contentView.findViewById(R.id.invite_group_participants_chat_layout);
+        TextView optionChangePermissionsChat = contentView.findViewById(R.id.change_permissions_group_participants_chat);
+        TextView optionRemoveParticipantChat = contentView.findViewById(R.id.remove_group_participants_chat);
+        TextView optionInvite = contentView.findViewById(R.id.invite_group_participants_chat);
 
         optionChangePermissionsChat.setOnClickListener(this);
         optionRemoveParticipantChat.setOnClickListener(this);
@@ -264,9 +264,9 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == R.id.contact_info_group_participants_chat_layout) {
+        if (id == R.id.contact_info_group_participants_chat) {
             ContactUtil.openContactInfoActivity(requireActivity(), chatC.getParticipantEmail(participantHandle));
-        } else if (id == R.id.start_chat_group_participants_chat_layout) {
+        } else if (id == R.id.start_chat_group_participants_chat) {
             if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
                 if (viewModel != null) {
                     viewModel.onSendMsgTap();
@@ -285,7 +285,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     ((GroupChatInfoActivity) requireActivity()).startCall();
                 }
             }
-        } else if (id == R.id.change_permissions_group_participants_chat_layout) {
+        } else if (id == R.id.change_permissions_group_participants_chat) {
             if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
                 if (viewModel != null) {
                     viewModel.onChangePermissionsTap();
@@ -293,7 +293,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
             } else if (requireActivity() instanceof GroupChatInfoActivity) {
                 ((GroupChatInfoActivity) requireActivity()).showChangePermissionsDialog(participantHandle, selectedChat);
             }
-        } else if (id == R.id.remove_group_participants_chat_layout) {
+        } else if (id == R.id.remove_group_participants_chat) {
             if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
                 if (viewModel != null) {
                     viewModel.onRemoveParticipantTap(true);
@@ -301,10 +301,10 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
             } else if (requireActivity() instanceof GroupChatInfoActivity) {
                 ((GroupChatInfoActivity) requireActivity()).showRemoveParticipantConfirmation(participantHandle);
             }
-        } else if (id == R.id.edit_profile_group_participants_chat_layout) {
+        } else if (id == R.id.edit_profile_group_participants_chat) {
             Intent editProfile = new Intent(requireActivity(), MyAccountActivity.class);
             startActivity(editProfile);
-        } else if (id == R.id.leave_group_participants_chat_layout) {
+        } else if (id == R.id.leave_group_participants_chat) {
             if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
                 if (viewModel != null) {
                     viewModel.onLeaveGroupTap();
@@ -312,7 +312,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
             } else if (requireActivity() instanceof GroupChatInfoActivity) {
                 ((GroupChatInfoActivity) requireActivity()).showConfirmationLeaveChat();
             }
-        } else if (id == R.id.invite_group_participants_chat_layout) {
+        } else if (id == R.id.invite_group_participants_chat) {
             if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
                 if (viewModel != null) {
                     viewModel.onInviteContactTap();
