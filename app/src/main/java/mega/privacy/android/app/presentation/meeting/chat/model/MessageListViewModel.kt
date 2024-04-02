@@ -245,6 +245,9 @@ class MessageListViewModel @Inject constructor(
      * @param message Message
      */
     fun updateLatestMessage(message: TypedMessage?) {
+        if (latestMessageId.longValue == -1L && message != null) {
+            setMessageSeen(message.msgId)
+        }
         latestMessageId.longValue = message?.msgId ?: -1L
         if (message?.isMine == true) {
             // if user sent a message, reset the extraUnreadCount and remove unread header

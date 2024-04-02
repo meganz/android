@@ -145,8 +145,12 @@ internal class MessageListViewModelTest {
             on { msgId } doReturn messageId
             on { isMine } doReturn true
         }
+        assertThat(underTest.latestMessageId.longValue).isEqualTo(-1L)
         underTest.updateLatestMessage(typedMessage)
         assertThat(underTest.latestMessageId.longValue).isEqualTo(messageId)
+        underTest.updateLatestMessage(typedMessage)
+        // verify call only once
+        verify(setMessageSeenUseCase).invoke(chatId, messageId)
         underTest.state.test {
             val actual = awaitItem()
             assertThat(actual.lastSeenMessageId).isEqualTo(-1L)

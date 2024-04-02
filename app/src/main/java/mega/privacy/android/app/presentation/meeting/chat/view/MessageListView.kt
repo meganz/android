@@ -143,9 +143,6 @@ internal fun MessageListView(
                 it is ChatUnreadHeaderMessage
             }.takeIf { it != -1 }?.let {
                 unreadHeaderPosition = it
-                pagingItems.itemSnapshotList.firstOrNull()?.id?.let { lastMessageId ->
-                    viewModel.setMessageSeen(lastMessageId)
-                }
             }
         }
         val latestMessage = pagingItems.itemSnapshotList.firstOrNull()?.message
