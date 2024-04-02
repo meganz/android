@@ -176,58 +176,41 @@ boolean shouldUsePrebuiltSdk() {
     ```
 
 2. Copy below generated libraries to root of MEGA code
-- `shared/build/outputs/aar/shared-release.aar`
-- `analytics-core/build/outputs/aar/analytics-core-release.aar`
-- `analytics-annotations/build/outputs/aar/analytics-annotations-release.aar`
+   - `shared/build/outputs/aar/shared-release.aar`
+   - `analytics-core/build/outputs/aar/analytics-core-release.aar`
+   - `analytics-annotations/build/outputs/aar/analytics-annotations-release.aar`
 
 3. Modify MEGA code to depend on local AAR files
 
-    1. In `app/build.gradle.kts`
-
-        change
-        ```kotlin
-            implementation(lib.mega.analytics)
-        ```
-        to
-
+    1. Search `implementation(lib.mega.analytics)` in whole project, and replace all occurrences with below code. Note you may need to add a `..` to the path if the `build.gradle.kts` is in a subproject.  
         ```kotlin
         //    implementation(lib.mega.analytics)
             implementation(files("../shared-release.aar"))
             implementation(files("../analytics-core-release.aar"))
-            implementation(files("../analytics-annotations-release.aar"))
+            implementation(files("../analytics-annotations-release.aar")) 
         ```
+       
+### 12. Disable library dependencies
+1. in root `build.gradle.kts`, comment out below codes.
+    ```kotlin
+        maven {
+            url =
+                uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/megagradle")
+        }
+    ```
+   and
+    ```kotlin
+        classpath(tools.mega.gradle)
+    ```
+   and
+    ```kotlin
+        tasks.register<mega.privacy.megagradle.PreReleaseTask>("preRelease")
+        tasks.register<mega.privacy.megagradle.ReleaseTask>("release")
+        tasks.register<mega.privacy.megagradle.PostReleaseTask>("postRelease")
+        tasks.register<mega.privacy.megagradle.CreateJiraVersionTask>("createJiraVersion")
+    ```
 
-    2. In `core-ui-test/build.gradle.kts`
-
-        change
-        ```kotlin
-            implementation(lib.mega.analytics)
-        ```
-        to
-        ```kotlin
-        //    implementation(lib.mega.analytics)
-            compileOnly(files("../shared-release.aar"))
-            compileOnly(files("../analytics-core-release.aar"))
-            compileOnly(files("../analytics-annotations-release.aar"))
-        ```
-
-    3. In `analytics/build.gradle.kts`
-
-        change
-        ```kotlin
-            // Analytics
-            implementation(lib.mega.analytics)
-        ```
-        to
-        ```kotlin
-            // Analytics
-        //    implementation(lib.mega.analytics)
-            compileOnly(files("../shared-release.aar"))
-            compileOnly(files("../analytics-core-release.aar"))
-            compileOnly(files("../analytics-annotations-release.aar"))
-        ```
-
-### 12. Run the project
+### 13. Run the project
 
 Open the project with Android Studio, let it build the project and hit _*Run*_.
 
