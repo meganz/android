@@ -28,9 +28,7 @@ data class ChatRichLinkUiMessage(
     ) {
         val uriHandler = LocalUriHandler.current
         ChatRichLinkMessageView(
-            isMe = message.isMine,
-            preview = message.chatRichPreviewInfo,
-            content = message.content,
+            message = message,
             modifier = initialiseModifier {
                 message.chatRichPreviewInfo?.url?.let {
                     uriHandler.openUri(

@@ -9,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
@@ -20,7 +22,7 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
  * Chat rick link message
  *
  * @param modifier Modifier
- * @param isMe Whether the message is sent by me
+ * @param isMine Whether the message is sent by me
  * @param title Title
  * @param contentTitle Content title
  * @param contentDescription Content description
@@ -31,11 +33,11 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
  */
 @Composable
 fun ChatRichLinkMessage(
-    isMe: Boolean,
+    isMine: Boolean,
     title: String,
     contentTitle: String,
     contentDescription: String,
-    content: String,
+    content: AnnotatedString,
     host: String,
     image: Painter?,
     icon: Painter?,
@@ -43,7 +45,7 @@ fun ChatRichLinkMessage(
 ) {
     ChatBubble(
         modifier = modifier,
-        isMe = isMe,
+        isMe = isMine,
         content = {
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(
@@ -77,11 +79,11 @@ private fun ChatRickLinkMessagePreview(
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         ChatRichLinkMessage(
             modifier = Modifier,
-            isMe = isMe,
+            isMine = isMe,
             title = "Title",
             contentTitle = "Content Title",
             contentDescription = "is a caldera in the Sunda Strait between the islands of Java and Sumatra in the Indonesian province of Lampung. It is located in the most densely populated island of Java. The name is Indonesian for 'Child of Krakatoa'.",
-            content = "https://mega.nz",
+            content = buildAnnotatedString { append("https://mega.nz") },
             host = "mega.nz",
             image = painterResource(R.drawable.ic_select_folder),
             icon = painterResource(R.drawable.ic_select_folder),
