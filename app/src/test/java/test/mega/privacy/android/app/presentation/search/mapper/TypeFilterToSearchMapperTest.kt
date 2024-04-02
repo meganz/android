@@ -2,7 +2,7 @@ package test.mega.privacy.android.app.presentation.search.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.presentation.search.mapper.TypeFilterToSearchMapper
-import mega.privacy.android.app.presentation.search.model.TypeFilterOption
+import mega.privacy.android.domain.entity.search.TypeFilterOption
 import mega.privacy.android.domain.entity.search.SearchCategory
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance

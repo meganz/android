@@ -5,17 +5,20 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
+import mega.privacy.android.data.mapper.search.DateFilterOptionLongMapper
 import mega.privacy.android.data.mapper.search.SearchCategoryIntMapper
 import mega.privacy.android.data.mapper.search.SearchCategoryMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaSearchFilter
 import javax.inject.Inject
 
 /**
@@ -28,6 +31,7 @@ internal class SearchRepositoryImpl @Inject constructor(
     private val searchCategoryIntMapper: SearchCategoryIntMapper,
     private val nodeMapper: NodeMapper,
     private val sortOrderIntMapper: SortOrderIntMapper,
+    private val dateFilterOptionLongMapper: DateFilterOptionLongMapper,
     private val cancelTokenProvider: CancelTokenProvider,
     private val getLinksSortOrder: GetLinksSortOrder,
     private val megaApiGateway: MegaApiGateway,
@@ -48,29 +52,56 @@ internal class SearchRepositoryImpl @Inject constructor(
         searchCategory: SearchCategory,
         query: String,
         order: SortOrder,
+        modificationDate: DateFilterOption?,
+        creationDate: DateFilterOption?,
     ): List<UnTypedNode> = withContext(ioDispatcher) {
         nodeId?.let {
-            if (query.isEmpty() && searchCategory == SearchCategory.ALL) {
+            if (query.isEmpty() && searchCategory == SearchCategory.ALL && modificationDate == null && creationDate == null) {
                 getNodeChildren(it, order)
             } else {
                 val megaCancelToken = cancelTokenProvider.getOrCreateCancelToken()
                 megaApiGateway.getMegaNodeByHandle(it.longValue)?.let { megaNode ->
-                    val searchList = if (searchCategory == SearchCategory.ALL) {
-                        megaApiGateway.search(
-                            parent = megaNode,
-                            query = query,
+                    val searchList = if (modificationDate != null || creationDate != null) {
+                        megaApiGateway.searchWithFilter(
+                            filter = MegaSearchFilter.createInstance().apply {
+                                byLocationHandle(megaNode.handle)
+                                byName(query)
+                                byCategory(searchCategoryIntMapper(searchCategory))
+                                dateFilterOptionLongMapper(modificationDate).apply {
+                                    byModificationTime(
+                                        first,
+                                        second
+                                    )
+                                }
+                                dateFilterOptionLongMapper(creationDate).apply {
+                                    byCreationTime(
+                                        first,
+                                        second
+                                    )
+                                }
+                            },
+                            order = sortOrderIntMapper(order),
                             megaCancelToken = megaCancelToken,
-                            order = sortOrderIntMapper(order)
                         )
                     } else {
-                        megaApiGateway.searchByType(
-                            parentNode = megaNode,
-                            searchString = query,
-                            cancelToken = megaCancelToken,
-                            recursive = true,
-                            order = sortOrderIntMapper(order),
-                            type = searchCategoryIntMapper(searchCategory)
-                        )
+                        // TODO Remove deprecated megaApiGateway.search() and megaApiGateway.searchByType()
+                        if (searchCategory == SearchCategory.ALL) {
+                            megaApiGateway.search(
+                                parent = megaNode,
+                                query = query,
+                                megaCancelToken = megaCancelToken,
+                                order = sortOrderIntMapper(order)
+                            )
+                        } else {
+                            megaApiGateway.searchByType(
+                                parentNode = megaNode,
+                                searchString = query,
+                                cancelToken = megaCancelToken,
+                                recursive = true,
+                                order = sortOrderIntMapper(order),
+                                type = searchCategoryIntMapper(searchCategory)
+                            )
+                        }
                     }
                     searchList.map { item -> nodeMapper(item) }
                 }

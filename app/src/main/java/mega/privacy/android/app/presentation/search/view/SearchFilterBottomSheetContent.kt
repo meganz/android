@@ -7,9 +7,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.presentation.search.SearchActivityViewModel
-import mega.privacy.android.app.presentation.search.model.DateFilterOption
+import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.app.presentation.search.model.FilterOptionEntity
-import mega.privacy.android.app.presentation.search.model.TypeFilterOption
+import mega.privacy.android.domain.entity.search.TypeFilterOption
 import mega.privacy.android.app.presentation.search.navigation.DATE_ADDED
 import mega.privacy.android.app.presentation.search.navigation.DATE_MODIFIED
 import mega.privacy.android.app.presentation.search.navigation.TYPE

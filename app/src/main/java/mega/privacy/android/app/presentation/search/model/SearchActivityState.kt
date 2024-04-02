@@ -10,6 +10,8 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.search.DateFilterOption
+import mega.privacy.android.domain.entity.search.TypeFilterOption
 
 /**
  * State for SearchActivity

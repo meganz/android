@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.search.mapper
 
-import mega.privacy.android.app.presentation.search.model.TypeFilterOption
+import mega.privacy.android.domain.entity.search.TypeFilterOption
 import mega.privacy.android.domain.entity.search.SearchCategory
 import javax.inject.Inject
 

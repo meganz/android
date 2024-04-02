@@ -1,31 +1,29 @@
 package mega.privacy.android.domain.usecase.search
 
 import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.repository.SearchRepository
-import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.node.AddNodesTypeUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class SearchInNodesUseCaseTest {
     private lateinit var underTest: SearchInNodesUseCase
-    private val addNodeType: AddNodeType = mock()
+    private val addNodesTypeUseCase: AddNodesTypeUseCase = mock()
     private val searchRepository: SearchRepository = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
 
     @Before
     fun setUp() {
         underTest = SearchInNodesUseCase(
-            addNodeType = addNodeType,
+            addNodesTypeUseCase = addNodesTypeUseCase,
             searchRepository = searchRepository,
             getCloudSortOrder = getCloudSortOrder
         )
@@ -50,9 +48,7 @@ class SearchInNodesUseCaseTest {
                     on { name }.thenReturn(nodeName[index])
                 }
             }
-            folderNodes.forEachIndexed { index, node ->
-                whenever(addNodeType(node)).thenReturn(typedFolderNodes[index])
-            }
+            whenever(addNodesTypeUseCase(folderNodes)).thenReturn(typedFolderNodes)
             whenever(
                 searchRepository.search(
                     nodeId = parentNodeId,

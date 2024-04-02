@@ -17,6 +17,7 @@ import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaPushNotificationSettings
 import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaSearchFilter
 import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElementList
 import nz.mega.sdk.MegaSetList
@@ -2382,6 +2383,19 @@ interface MegaApiGateway {
         query: String,
         megaCancelToken: MegaCancelToken,
         order: Int,
+    ): List<MegaNode>
+
+    /**
+     * Search query with search filter
+     *
+     * @param filter filter to apply [MegaSearchFilter]
+     * @param order [SortOrder]
+     * @param megaCancelToken [MegaCancelToken]
+     */
+    suspend fun searchWithFilter(
+        filter: MegaSearchFilter,
+        order: Int,
+        megaCancelToken: MegaCancelToken,
     ): List<MegaNode>
 
     /**

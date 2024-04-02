@@ -44,9 +44,9 @@ internal fun NavGraphBuilder.shareFolderAccessDialogNavigation(
                     isFromBackups = isFromBackups,
                     onDismiss = {
                         navHostController.navigateUp()
-                    })
-            }
-                .onFailure { exception -> Timber.e(exception) }
+                    },
+                )
+            }.onFailure { exception -> Timber.e(exception) }
         }
     }
 }

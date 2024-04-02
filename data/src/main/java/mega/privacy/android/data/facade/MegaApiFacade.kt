@@ -35,6 +35,7 @@ import nz.mega.sdk.MegaPushNotificationSettingsAndroid
 import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaSearchFilter
 import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaSetElementList
@@ -1202,6 +1203,18 @@ internal class MegaApiFacade @Inject constructor(
             megaCancelToken,
             true,
             order
+        )
+    }
+
+    override suspend fun searchWithFilter(
+        filter: MegaSearchFilter,
+        order: Int,
+        megaCancelToken: MegaCancelToken,
+    ): List<MegaNode> {
+        return megaApi.search(
+            filter,
+            order,
+            megaCancelToken
         )
     }
 

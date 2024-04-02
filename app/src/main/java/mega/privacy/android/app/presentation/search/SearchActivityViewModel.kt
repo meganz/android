@@ -18,10 +18,10 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
 import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
 import mega.privacy.android.app.presentation.search.mapper.TypeFilterToSearchMapper
-import mega.privacy.android.app.presentation.search.model.DateFilterOption
+import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.app.presentation.search.model.SearchActivityState
 import mega.privacy.android.app.presentation.search.model.SearchFilter
-import mega.privacy.android.app.presentation.search.model.TypeFilterOption
+import mega.privacy.android.domain.entity.search.TypeFilterOption
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodeSourceType.OTHER
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -155,7 +155,9 @@ class SearchActivityViewModel @Inject constructor(
                         parentHandle = parentHandle,
                         nodeSourceType = nodeSourceType,
                         isFirstLevel = isFirstLevel,
-                        searchCategory = typeFilterToSearchMapper(state.value.typeSelectedFilterOption)
+                        searchCategory = typeFilterToSearchMapper(state.value.typeSelectedFilterOption),
+                        modificationDate = state.value.dateModifiedSelectedFilterOption,
+                        creationDate = state.value.dateAddedSelectedFilterOption,
                     )
                 } else {
                     searchNodesUseCase(

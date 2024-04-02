@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
+import mega.privacy.android.data.mapper.search.DateFilterOptionLongMapper
 import mega.privacy.android.data.mapper.search.SearchCategoryIntMapper
 import mega.privacy.android.data.mapper.search.SearchCategoryMapper
 import mega.privacy.android.domain.entity.SortOrder
@@ -36,6 +37,7 @@ class SearchRepositoryImplTest {
     private val cancelTokenProvider: CancelTokenProvider = mock()
     private val getLinksSortOrder: GetLinksSortOrder = mock()
     private val sortOrderIntMapper: SortOrderIntMapper = mock()
+    private val dateFilterOptionLongMapper: DateFilterOptionLongMapper = mock()
     private val megaCancelToken: MegaCancelToken = mock()
 
     @BeforeAll
@@ -48,7 +50,8 @@ class SearchRepositoryImplTest {
             ioDispatcher = ioDispatcher,
             cancelTokenProvider = cancelTokenProvider,
             getLinksSortOrder = getLinksSortOrder,
-            sortOrderIntMapper = sortOrderIntMapper
+            sortOrderIntMapper = sortOrderIntMapper,
+            dateFilterOptionLongMapper = dateFilterOptionLongMapper,
         )
     }
 

@@ -24,7 +24,9 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.TypeFilterOption
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase

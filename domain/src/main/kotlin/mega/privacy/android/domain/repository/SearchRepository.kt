@@ -3,6 +3,7 @@ package mega.privacy.android.domain.repository
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchCategory
 
 /**
@@ -25,12 +26,16 @@ interface SearchRepository {
      * @param searchCategory Search Category for search
      * @param query string to be search
      * @param order oder in which result should be there
+     * @param modificationDate modified date filter if set [DateFilterOption]
+     * @param creationDate added date filter if set [DateFilterOption]
      */
     suspend fun search(
         nodeId: NodeId?,
         searchCategory: SearchCategory = SearchCategory.ALL,
         query: String,
-        order: SortOrder
+        order: SortOrder,
+        modificationDate: DateFilterOption? = null,
+        creationDate: DateFilterOption? = null,
     ): List<UnTypedNode>
 
     /**
