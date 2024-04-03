@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -47,6 +48,7 @@ import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * SearchActivity View Model
@@ -90,6 +92,7 @@ class SearchActivityViewModel @Inject constructor(
      * public UI State
      */
     val state: StateFlow<SearchActivityState> = _state
+    private var searchJob: Job? = null
 
     private val isFirstLevel = stateHandle.get<Boolean>(SearchActivity.IS_FIRST_LEVEL) ?: false
     private val nodeSourceType =
@@ -155,8 +158,9 @@ class SearchActivityViewModel @Inject constructor(
      * Perform search by entering query or change in search type
      */
     private fun performSearch() {
+        searchJob?.cancel()
         _state.update { it.copy(isSearching = true) }
-        viewModelScope.launch {
+        searchJob = viewModelScope.launch {
             runCatching {
                 cancelCancelTokenUseCase()
                 if (state.value.dropdownChipsEnabled == true) {
@@ -188,6 +192,9 @@ class SearchActivityViewModel @Inject constructor(
 
     private fun onSearchFailure(ex: Throwable) {
         Timber.e(ex)
+        if (ex is CancellationException) {
+            return
+        }
         val emptyState = getEmptySearchState()
         _state.update {
             it.copy(
@@ -209,7 +216,7 @@ class SearchActivityViewModel @Inject constructor(
                 )
             }
         } else {
-            val nodeUIItems = searchResults.map { typedNode ->
+            val nodeUIItems = searchResults.distinctBy { it.id.longValue }.map { typedNode ->
                 NodeUIItem(node = typedNode, isSelected = false)
             }
             _state.update { state ->
