@@ -1108,6 +1108,35 @@ class NodeRepositoryImplTest {
         assertThat(actual).isEqualTo(NodeId(2L))
     }
 
+    @Test
+    fun `test that isEmptyFolder returns true when folder is empty`() = runTest {
+        val typedNode = mock<TypedFolderNode> {
+            on { id }.thenReturn(NodeId(1L))
+        }
+        val parentNode = mock<MegaNode> {
+            on { handle }.thenReturn(1L)
+            on { isFolder }.thenReturn(true)
+        }
+        val childNode1 = mock<MegaNode> {
+            on { handle }.thenReturn(2L)
+            on { isFolder }.thenReturn(true)
+        }
+        val childNode2 = mock<MegaNode> {
+            on { handle }.thenReturn(3L)
+            on { isFolder }.thenReturn(true)
+        }
+        val childNodes = listOf(childNode1, childNode2)
+        whenever(megaApiGateway.getMegaNodeByHandle(1L)).thenReturn(parentNode)
+        whenever(megaApiGateway.getMegaNodeByHandle(2L)).thenReturn(null)
+        whenever(megaApiGateway.getMegaNodeByHandle(3L)).thenReturn(null)
+        whenever(megaApiGateway.getChildrenByNode(parentNode)).thenReturn(childNodes)
+        whenever(megaApiGateway.getChildrenByNode(childNode1)).thenReturn(emptyList())
+        whenever(megaApiGateway.getChildrenByNode(childNode2)).thenReturn(emptyList())
+
+        val actual = underTest.isEmptyFolder(typedNode)
+        assertThat(actual).isTrue()
+    }
+
     private fun provideNodeId() = Stream.of(
         Arguments.of(null),
         Arguments.of(NodeId(2L)),

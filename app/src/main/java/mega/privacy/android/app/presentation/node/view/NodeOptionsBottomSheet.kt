@@ -59,7 +59,7 @@ internal fun NodeOptionsBottomSheetContent(
         keyboardController?.hide()
         viewModel.getBottomSheetOptions(nodeId)
     }
-    val sortedMap = remember(node?.id?.longValue) {
+    val sortedMap = remember(uiState.actions) {
         mutableStateOf(
             uiState.actions
                 .groupBy { it.group }
@@ -89,22 +89,24 @@ internal fun NodeOptionsBottomSheetContent(
         )
     }
 
-    NodeListViewItem(
-        modifier = Modifier.semantics { testTagsAsResourceId = true },
-        title = node?.name.orEmpty(),
-        titleColor = if (node?.isTakenDown == true) TextColor.Error else TextColor.Primary,
-        titleOverflow = LongTextBehaviour.MiddleEllipsis,
-        subtitle = uiState.shareInfo ?: getOutShareInfo() ?: when (node) {
-            is FileNode -> node.fileInfo()
-            is FolderNode -> node.folderInfo()
-            else -> ""
-        },
-        showVersion = node?.hasVersion == true,
-        icon = (node as? TypedFolderNode)?.getIcon()
-            ?: MimeTypeList.typeForName(node?.name).iconResourceId,
-        thumbnailData = node?.id?.let { ThumbnailRequest(it) },
-        accessPermissionIcon = uiState.accessPermissionIcon,
-    )
+    if (uiState.node != null) {
+        NodeListViewItem(
+            modifier = Modifier.semantics { testTagsAsResourceId = true },
+            title = node?.name.orEmpty(),
+            titleColor = if (node?.isTakenDown == true) TextColor.Error else TextColor.Primary,
+            titleOverflow = LongTextBehaviour.MiddleEllipsis,
+            subtitle = uiState.shareInfo ?: getOutShareInfo() ?: when (node) {
+                is FileNode -> node.fileInfo()
+                is FolderNode -> node.folderInfo()
+                else -> ""
+            },
+            showVersion = node?.hasVersion == true,
+            icon = (node as? TypedFolderNode)?.getIcon()
+                ?: MimeTypeList.typeForName(node?.name).iconResourceId,
+            thumbnailData = node?.id?.let { ThumbnailRequest(it) },
+            accessPermissionIcon = uiState.accessPermissionIcon,
+        )
+    }
     MegaDivider(dividerType = DividerType.SmallStartPadding)
     LazyColumn(modifier = Modifier.semantics { testTagsAsResourceId = true }) {
         sortedMap.value

@@ -45,6 +45,7 @@ import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
@@ -1084,4 +1085,27 @@ internal class NodeRepositoryImpl @Inject constructor(
                 }
             }
         }
+
+    override suspend fun isEmptyFolder(node: TypedNode): Boolean {
+        if (node is FileNode) return false
+        if (node is FolderNode) {
+            megaApiGateway.getMegaNodeByHandle(node.id.longValue)?.let { parent ->
+                isChildrenEmpty(parent)
+            }
+        }
+        return true
+    }
+
+    private suspend fun isChildrenEmpty(parent: MegaNode): Boolean {
+        megaApiGateway.getChildrenByNode(parent).let {
+            if (it.isNotEmpty()) {
+                it.forEach { childNode ->
+                    if (childNode.isFolder.not() || isChildrenEmpty(childNode).not()) {
+                        return false
+                    }
+                }
+            }
+            return true
+        }
+    }
 }

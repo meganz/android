@@ -29,6 +29,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -38,9 +39,6 @@ import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.search.model.SearchActivityState
 import mega.privacy.android.app.presentation.search.model.SearchFilter
-import mega.privacy.android.app.presentation.search.navigation.DATE_ADDED
-import mega.privacy.android.app.presentation.search.navigation.DATE_MODIFIED
-import mega.privacy.android.app.presentation.search.navigation.TYPE
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -84,6 +82,7 @@ fun SearchComposeView(
     navHostController: NavHostController,
     nodeActionHandler: NodeActionHandler,
     clearSelection: () -> Unit,
+    clearResetScrollEvent: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
@@ -95,9 +94,16 @@ fun SearchComposeView(
         mutableStateOf(state.searchQuery)
     }
 
-    searchQuery.useDebounce(onChange = {
-        updateSearchQuery(it)
-    })
+    searchQuery.useDebounce(
+        onChange = {
+            updateSearchQuery(it)
+        },
+    )
+
+    EventEffect(event = state.resetScroll, onConsumed = clearResetScrollEvent) {
+        listState.scrollToItem(0)
+        gridState.scrollToItem(0)
+    }
 
     state.errorMessageId?.let {
         val errorMessage = stringResource(id = it)
@@ -137,52 +143,7 @@ fun SearchComposeView(
     ) { padding ->
         Column {
             if (state.nodeSourceType == NodeSourceType.CLOUD_DRIVE || state.nodeSourceType == NodeSourceType.HOME) {
-                if (state.dropdownChipsEnabled) {
-                    DropdownChipToolbar(
-                        chipItems = listOf(
-                            ChipItem(
-                                isSelected = state.typeSelectedFilterOption != null,
-                                notSelectedTitle = stringResource(id = R.string.search_dropdown_chip_filter_type_file_type),
-                                selectedFilterTitle = state.typeSelectedFilterOption?.name
-                                    ?: stringResource(
-                                        id = R.string.search_dropdown_chip_filter_type_file_type
-                                    ),
-                                onFilterClicked = { onFilterClicked(TYPE) },
-                                testTag = TYPE_DROPDOWN_CHIP_TEST_TAG,
-                            ),
-                            ChipItem(
-                                isSelected = state.dateModifiedSelectedFilterOption != null,
-                                notSelectedTitle = stringResource(id = R.string.search_dropdown_chip_filter_type_last_modified),
-                                selectedFilterTitle = state.dateModifiedSelectedFilterOption?.name
-                                    ?: stringResource(
-                                        id = R.string.search_dropdown_chip_filter_type_last_modified
-                                    ),
-                                onFilterClicked = { onFilterClicked(DATE_MODIFIED) },
-                                testTag = DATE_MODIFIED_DROPDOWN_CHIP_TEST_TAG,
-                            ),
-                            ChipItem(
-                                isSelected = state.dateAddedSelectedFilterOption != null,
-                                notSelectedTitle = stringResource(id = R.string.search_dropdown_chip_filter_type_date_added),
-                                selectedFilterTitle = state.dateAddedSelectedFilterOption?.name
-                                    ?: stringResource(
-                                        id = R.string.search_dropdown_chip_filter_type_date_added
-                                    ),
-                                onFilterClicked = { onFilterClicked(DATE_ADDED) },
-                                testTag = DATE_ADDED_DROPDOWN_CHIP_TEST_TAG,
-                            ),
-                        ),
-                        enabled = !state.isSearching,
-                    )
-                } else {
-                    SearchFilterChipsView(
-                        filters = state.filters,
-                        selectedFilter = state.selectedFilter,
-                        updateFilter = {
-                            trackAnalytics(it)
-                            updateFilter(it)
-                        }
-                    )
-                }
+                FilterChipsView(state, onFilterClicked, updateFilter, trackAnalytics)
             }
             if (state.isSearching) {
                 LoadingStateView(
@@ -265,7 +226,8 @@ private fun PreviewSearchComposeView() {
             LocalContext.current as SearchActivity,
             hiltViewModel()
         ),
-        clearSelection = {}
+        clearSelection = {},
+        clearResetScrollEvent = {}
     )
 }
 

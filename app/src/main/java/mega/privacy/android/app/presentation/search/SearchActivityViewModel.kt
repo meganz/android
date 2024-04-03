@@ -5,6 +5,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -157,7 +159,7 @@ class SearchActivityViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 cancelCancelTokenUseCase()
-                if (state.value.dropdownChipsEnabled) {
+                if (state.value.dropdownChipsEnabled == true) {
                     searchNodesUseCase(
                         query = state.value.searchQuery,
                         parentHandle = parentHandle,
@@ -222,7 +224,7 @@ class SearchActivityViewModel @Inject constructor(
     }
 
     private fun getEmptySearchState() =
-        if (state.value.dropdownChipsEnabled) {
+        if (state.value.dropdownChipsEnabled == true) {
             emptySearchViewMapper(
                 isSearchChipEnabled = true,
                 category = typeFilterToSearchMapper(state.value.typeSelectedFilterOption),
@@ -242,7 +244,12 @@ class SearchActivityViewModel @Inject constructor(
      * @param selectedChip
      */
     fun updateFilter(selectedChip: SearchFilter?) {
-        _state.update { it.copy(selectedFilter = selectedChip.takeIf { selectedChip?.filter != state.value.selectedFilter?.filter }) }
+        _state.update {
+            it.copy(
+                selectedFilter = selectedChip.takeIf { selectedChip?.filter != state.value.selectedFilter?.filter },
+                resetScroll = triggered
+            )
+        }
         viewModelScope.launch { performSearch() }
     }
 
@@ -347,6 +354,7 @@ class SearchActivityViewModel @Inject constructor(
         _state.update {
             it.copy(
                 typeSelectedFilterOption = typeFilterOption,
+                resetScroll = triggered
             )
         }
         viewModelScope.launch { performSearch() }
@@ -359,6 +367,7 @@ class SearchActivityViewModel @Inject constructor(
         _state.update {
             it.copy(
                 dateModifiedSelectedFilterOption = dateFilterOption,
+                resetScroll = triggered
             )
         }
         viewModelScope.launch { performSearch() }
@@ -371,6 +380,7 @@ class SearchActivityViewModel @Inject constructor(
         _state.update {
             it.copy(
                 dateAddedSelectedFilterOption = dateFilterOption,
+                resetScroll = triggered
             )
         }
         viewModelScope.launch { performSearch() }
@@ -477,6 +487,15 @@ class SearchActivityViewModel @Inject constructor(
 
                 setDateAddedSelectedFilterOption(dateAddedOption)
             }
+        }
+    }
+
+    /**
+     * Clear reset scroll
+     */
+    fun clearResetScroll() {
+        _state.update {
+            it.copy(resetScroll = consumed)
         }
     }
 }

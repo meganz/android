@@ -754,4 +754,10 @@ interface NodeRepository {
      * @return the handle of the new folder
      */
     suspend fun createFolder(name: String, parentNodeId: NodeId?): NodeId
+
+    /**
+     * Checks if the folder node contains any files in any of its child nodes
+     * @param node the folder node to check
+     */
+    suspend fun isEmptyFolder(node: TypedNode): Boolean
 }

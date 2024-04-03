@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.search.model
 
 import androidx.annotation.StringRes
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.view.ToolbarMenuItem
@@ -34,9 +36,10 @@ import mega.privacy.android.domain.entity.search.TypeFilterOption
  * @property selectedNodes selected nodes
  * @property nodeNameCollisionResult result of node name collision
  * @property moveRequestResult result of move request
+ * @property resetScroll to reset scroll position
  */
 data class SearchActivityState(
-    val dropdownChipsEnabled: Boolean = false,
+    val dropdownChipsEnabled: Boolean? = null,
     val searchItemList: List<NodeUIItem<TypedNode>> = emptyList(),
     val isSearching: Boolean = true,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
@@ -55,4 +58,5 @@ data class SearchActivityState(
     val nodeSourceType: NodeSourceType = NodeSourceType.OTHER,
     val nodeNameCollisionResult: NodeNameCollisionResult? = null,
     val moveRequestResult: Result<MoveRequestResult>? = null,
+    val resetScroll: StateEvent = consumed
 )
