@@ -2,10 +2,17 @@ package mega.privacy.android.domain.usecase.transfers.chatuploads
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
+import mega.privacy.android.domain.exception.ResourceAlreadyExistsMegaException
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
+import mega.privacy.android.domain.usecase.node.GetChildNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -14,6 +21,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -27,14 +35,18 @@ class GetMyChatsFilesFolderIdUseCaseTest {
     private val chatRepository = mock<ChatRepository>()
     private val createFolderNodeUseCase = mock<CreateFolderNodeUseCase>()
     private val isNodeInRubbishOrDeletedUseCase = mock<IsNodeInRubbishOrDeletedUseCase>()
+    private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
+    private val getChildNodeUseCase = mock<GetChildNodeUseCase>()
 
     @BeforeAll
     fun setup() {
         underTest = GetMyChatsFilesFolderIdUseCase(
-            createFolderNodeUseCase,
-            fileSystemRepository,
-            chatRepository,
-            isNodeInRubbishOrDeletedUseCase,
+            createFolderNodeUseCase = createFolderNodeUseCase,
+            fileSystemRepository = fileSystemRepository,
+            chatRepository = chatRepository,
+            isNodeInRubbishOrDeletedUseCase = isNodeInRubbishOrDeletedUseCase,
+            getChildNodeUseCase = getChildNodeUseCase,
+            getRootNodeUseCase = getRootNodeUseCase,
         )
     }
 
@@ -45,6 +57,8 @@ class GetMyChatsFilesFolderIdUseCaseTest {
             chatRepository,
             createFolderNodeUseCase,
             isNodeInRubbishOrDeletedUseCase,
+            getRootNodeUseCase,
+            getChildNodeUseCase,
         )
 
     @Test
@@ -104,6 +118,57 @@ class GetMyChatsFilesFolderIdUseCaseTest {
             underTest()
         }
     }
+
+    @Test
+    fun `test that pre-existing folder is set to MyChatFilesFolder when a normal folder with default chat folder name already exists`() =
+        runTest {
+            val folderName = "My chat files"
+            val folderHandle = 11L
+            val rootNodeHandle = 0L
+            val rootNode = mock<Node> {
+                on { id } doReturn NodeId(rootNodeHandle)
+            }
+
+            whenever(fileSystemRepository.getMyChatsFilesFolderId()).thenReturn(null)
+            whenever(chatRepository.getDefaultChatFolderName()).thenReturn(folderName)
+            whenever(fileSystemRepository.setMyChatFilesFolder(any())).thenReturn(folderHandle)
+            whenever(createFolderNodeUseCase(folderName)).thenAnswer {
+                throw ResourceAlreadyExistsMegaException(
+                    errorCode = 0,
+                    errorString = null,
+                    value = folderHandle,
+                )
+            }
+
+            whenever(getRootNodeUseCase()).thenReturn(rootNode)
+
+            val existingFolderNode = mock<FolderNode> {
+                on { id } doReturn NodeId(folderHandle)
+            }
+            whenever(getChildNodeUseCase(NodeId(rootNodeHandle), folderName))
+                .thenReturn(existingFolderNode)
+
+            assertThat(underTest()).isEqualTo(NodeId(folderHandle))
+        }
+
+    @Test
+    fun `test that exception is thrown when create chat files folder fails due to error that is other than already_exists`() =
+        runTest {
+            val folderName = "My chat files"
+            val folderHandle = 11L
+
+            whenever(fileSystemRepository.getMyChatsFilesFolderId()).thenReturn(null)
+            whenever(chatRepository.getDefaultChatFolderName()).thenReturn(folderName)
+            whenever(fileSystemRepository.setMyChatFilesFolder(any())).thenReturn(folderHandle)
+            whenever(createFolderNodeUseCase(folderName)).thenAnswer {
+                throw NotEnoughQuotaMegaException(
+                    errorCode = 0,
+                    errorString = null,
+                )
+            }
+
+            assertThrows<MegaException> { underTest() }
+        }
 
     private suspend fun stubFolderCreation(handle: Long = 11L, folderName: String = "Folder name") {
         whenever(fileSystemRepository.getMyChatsFilesFolderId()).thenReturn(null)
