@@ -1068,6 +1068,7 @@ class ChatViewModel @Inject constructor(
      * Answers a call.
      */
     fun onAnswerCall() {
+        setUsersCallLimitReminder(enabled = true)
         viewModelScope.launch {
             chatManagement.addJoiningCallChatId(chatId)
             runCatching {
