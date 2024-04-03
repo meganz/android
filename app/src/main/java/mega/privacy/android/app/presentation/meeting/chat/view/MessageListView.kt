@@ -16,8 +16,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -211,11 +213,15 @@ internal fun MessageListView(
                             currentItem.message?.let { deselectItem(it) }
                         }
                     }
+                    val haptic = LocalHapticFeedback.current
                     Box(modifier = Modifier.sizeIn(minHeight = 10.dp)) {
                         currentItem.MessageListItem(
                             state = messageState,
                             onLongClick = {
-                                if (uiState.haveWritePermission) onMessageLongClick(it)
+                                if (uiState.haveWritePermission) {
+                                    onMessageLongClick(it)
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                }
                             },
                             onMoreReactionsClicked = onMoreReactionsClicked,
                             onReactionClicked = onReactionClicked,
