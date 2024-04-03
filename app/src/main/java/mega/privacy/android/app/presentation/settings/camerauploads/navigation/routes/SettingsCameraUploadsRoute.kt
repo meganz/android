@@ -30,6 +30,7 @@ internal fun SettingsCameraUploadsRoute(
         onMediaPermissionsGranted = viewModel::onMediaPermissionsGranted,
         onMediaUploadsStateChanged = viewModel::onMediaUploadsStateChanged,
         onNewVideoCompressionSizeLimitProvided = viewModel::onNewVideoCompressionSizeLimitProvided,
+        onPrimaryFolderNodeSelected = viewModel::onPrimaryFolderNodeSelected,
         onRegularBusinessAccountSubUserPromptAcknowledged = viewModel::onRegularBusinessAccountSubUserPromptAcknowledged,
         onRequestPermissionsStateChanged = viewModel::onRequestPermissionsStateChanged,
         onUploadOptionUiItemSelected = viewModel::onUploadOptionUiItemSelected,
