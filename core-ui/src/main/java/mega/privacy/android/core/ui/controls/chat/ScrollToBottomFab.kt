@@ -6,10 +6,8 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -17,8 +15,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
+import mega.privacy.android.core.ui.controls.buttons.FloatingActionButtonStyle
+import mega.privacy.android.core.ui.controls.buttons.MegaFloatingActionButton
 import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -44,15 +46,14 @@ fun ScrollToBottomFab(
     onClick: () -> Unit,
 ) {
     Box(modifier = modifier) {
-        FloatingActionButton(
+        MegaFloatingActionButton(
             modifier = Modifier
                 .conditional(unreadCount > 0) {
                     padding(top = 6.dp, start = 6.dp)
                 }
-                .size(40.dp)
                 .testTag(SCROLL_TO_BOTTOM_FAB_TEST_TAG),
             onClick = onClick,
-            shape = CircleShape,
+            style = FloatingActionButtonStyle.SmallWithoutElevation,
             backgroundColor = MegaTheme.colors.icon.primary
         ) {
             Box(
@@ -85,16 +86,14 @@ private fun Int.formatUnreadCount(): String = if (this > 99) "+99" else "$this"
 
 @CombinedThemePreviews
 @Composable
-private fun ScrollToBottomFabPreview() {
+private fun ScrollToBottomFabPreview(
+    @PreviewParameter(UnreadCountProvider::class) unreadCount: Int,
+) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        ScrollToBottomFab(onClick = {}, unreadCount = 1)
+        ScrollToBottomFab(onClick = {}, unreadCount = unreadCount)
     }
 }
 
-@CombinedThemePreviews
-@Composable
-private fun ScrollToBottomFabPreviewLargeNumber() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
-        ScrollToBottomFab(onClick = {}, unreadCount = 199)
-    }
+private class UnreadCountProvider : PreviewParameterProvider<Int> {
+    override val values: Sequence<Int> = sequenceOf(0, 1, 99, 199)
 }
