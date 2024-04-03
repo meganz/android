@@ -1129,4 +1129,87 @@ internal class SettingsCameraUploadsViewModelTest {
             verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
         }
     }
+
+    /**
+     * The Test Group that verifies behaviors when changing the Media Uploads Local Secondary Folder
+     */
+    @Nested
+    @DisplayName("Media Uploads - Local Folder Selection")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    internal inner class MediaUploadsLocalFolderSelectionTestGroup {
+        @Test
+        fun `test that an error snackbar is shown when changing the local secondary folder throws an exception`() =
+            runTest {
+                initializeUnderTest()
+                whenever(isSecondaryFolderPathValidUseCase(any())).thenThrow(RuntimeException())
+
+                assertDoesNotThrow { underTest.onLocalSecondaryFolderSelected("new/secondary/folder/path") }
+                verify(snackBarHandler).postSnackbarMessage(
+                    resId = R.string.general_error,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
+
+        @Test
+        fun `test that an error snackbar is shown when the new local secondary folder is invalid`() =
+            runTest {
+                initializeUnderTest()
+                whenever(isSecondaryFolderPathValidUseCase(any())).thenReturn(false)
+
+                underTest.onLocalSecondaryFolderSelected("new/secondary/folder/path")
+                snackBarHandler.postSnackbarMessage(
+                    resId = R.string.error_invalid_folder_selected,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
+
+        @Test
+        fun `test that an error snackbar is shown when the new local secondary folder is null`() =
+            runTest {
+                initializeUnderTest()
+
+                underTest.onLocalSecondaryFolderSelected(null)
+
+                snackBarHandler.postSnackbarMessage(
+                    resId = R.string.error_invalid_folder_selected,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
+
+        @Test
+        fun `test that the new local secondary folder is set`() = runTest {
+            initializeUnderTest()
+            whenever(isSecondaryFolderPathValidUseCase(any())).thenReturn(true)
+            val expectedLocalSecondaryFolder = "new/secondary/folder/path"
+
+            underTest.onLocalSecondaryFolderSelected(expectedLocalSecondaryFolder)
+
+            verify(setSecondaryFolderLocalPathUseCase).invoke(expectedLocalSecondaryFolder)
+            underTest.uiState.test {
+                assertThat(awaitItem().secondaryFolderPath).isEqualTo(expectedLocalSecondaryFolder)
+            }
+        }
+
+        @Test
+        fun `test that setting the new local secondary folder also clears the secondary folder records`() =
+            runTest {
+                initializeUnderTest()
+                whenever(isSecondaryFolderPathValidUseCase(any())).thenReturn(true)
+
+                underTest.onLocalSecondaryFolderSelected("new/secondary/folder/path")
+
+                verify(clearCameraUploadsRecordUseCase).invoke(listOf(CameraUploadFolderType.Secondary))
+            }
+
+        @Test
+        fun `test that setting the new local secondary folder also stops the ongoing camera uploads process`() =
+            runTest {
+                initializeUnderTest()
+                whenever(isSecondaryFolderPathValidUseCase(any())).thenReturn(true)
+
+                underTest.onLocalSecondaryFolderSelected("new/secondary/folder/path")
+
+                verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
+            }
+    }
 }

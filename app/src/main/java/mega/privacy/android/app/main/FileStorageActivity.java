@@ -74,8 +74,10 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
     private static final int REQUEST_PICK_DOWNLOAD_FOLDER = 1144;
 
     public enum PickFolderType {
-        CU_FOLDER("CU_FOLDER"),
-        MU_FOLDER("MU_FOLDER"),
+        /**
+         * Used to select a new Primary or Secondary Folder
+         */
+        CAMERA_UPLOADS_FOLDER("CAMERA_UPLOADS_FOLDER"),
         DOWNLOAD_FOLDER("DOWNLOAD_FOLDER"),
         NONE_ONLY_DOWNLOAD("NONE_ONLY_DOWNLOAD");
 
@@ -137,7 +139,6 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
     private TextView emptyTextView;
 
     private PickFolderType pickFolderType;
-    private boolean isCUOrMUFolder;
     private String prompt;
 
     private Stack<Integer> lastPositionStack;
@@ -187,7 +188,7 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
         if (intent.getBooleanExtra(EXTRA_SAVE_RECOVERY_KEY, false)) {
             createRKFile();
             return;
-        } else if (isCUOrMUFolder) {
+        } else if (pickFolderType == PickFolderType.CAMERA_UPLOADS_FOLDER) {
             openPickCUFolderFromSystem();
             return;
         } else if (pickFolderType == PickFolderType.DOWNLOAD_FOLDER) {
@@ -349,16 +350,11 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
     private void setPickFolderType(String pickFolderString) {
         if (isTextEmpty(pickFolderString)) {
             pickFolderType = PickFolderType.NONE_ONLY_DOWNLOAD;
-        } else if (pickFolderString.equals(PickFolderType.CU_FOLDER.getFolderType())) {
-            pickFolderType = PickFolderType.CU_FOLDER;
-        } else if (pickFolderString.equals(PickFolderType.MU_FOLDER.getFolderType())) {
-            pickFolderType = PickFolderType.MU_FOLDER;
+        } else if (pickFolderString.equals(PickFolderType.CAMERA_UPLOADS_FOLDER.getFolderType())) {
+            pickFolderType = PickFolderType.CAMERA_UPLOADS_FOLDER;
         } else if (pickFolderString.equals(PickFolderType.DOWNLOAD_FOLDER.getFolderType())) {
             pickFolderType = PickFolderType.DOWNLOAD_FOLDER;
         }
-
-        isCUOrMUFolder = pickFolderType.equals(PickFolderType.CU_FOLDER)
-                || pickFolderType.equals(PickFolderType.MU_FOLDER);
     }
 
     /**

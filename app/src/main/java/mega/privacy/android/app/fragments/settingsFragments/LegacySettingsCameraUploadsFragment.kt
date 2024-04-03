@@ -309,7 +309,7 @@ class LegacySettingsCameraUploadsFragment : SettingsBaseFragment(),
                     action = FileStorageActivity.Mode.PICK_FOLDER.action
                     putExtra(
                         FileStorageActivity.PICK_FOLDER_TYPE,
-                        FileStorageActivity.PickFolderType.CU_FOLDER.folderType
+                        FileStorageActivity.PickFolderType.CAMERA_UPLOADS_FOLDER.folderType,
                     )
                 }
                 startActivityForResult(intent, REQUEST_PRIMARY_FOLDER)
@@ -336,7 +336,7 @@ class LegacySettingsCameraUploadsFragment : SettingsBaseFragment(),
                     action = FileStorageActivity.Mode.PICK_FOLDER.action
                     putExtra(
                         FileStorageActivity.PICK_FOLDER_TYPE,
-                        FileStorageActivity.PickFolderType.MU_FOLDER.folderType
+                        FileStorageActivity.PickFolderType.CAMERA_UPLOADS_FOLDER.folderType,
                     )
                 }
                 startActivityForResult(intent, REQUEST_SECONDARY_FOLDER)

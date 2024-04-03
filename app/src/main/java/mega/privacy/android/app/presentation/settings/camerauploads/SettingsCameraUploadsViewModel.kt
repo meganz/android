@@ -654,6 +654,40 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
+     * Sets the new Local Media Uploads Folder after selecting from the Device File Explorer. Doing
+     * this clears the Secondary Folder Records and stops the ongoing Camera Uploads process
+     *
+     * @param newSecondaryFolderPath The new Secondary Folder path, which may be nullable
+     */
+    fun onLocalSecondaryFolderSelected(newSecondaryFolderPath: String?) {
+        viewModelScope.launch {
+            runCatching {
+                newSecondaryFolderPath?.let { secondaryFolderPath ->
+                    if (isSecondaryFolderPathValidUseCase(secondaryFolderPath)) {
+                        setSecondaryFolderLocalPathUseCase(secondaryFolderPath)
+                        clearCameraUploadsRecordUseCase(listOf(CameraUploadFolderType.Secondary))
+                        stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
+
+                        _uiState.update { it.copy(secondaryFolderPath = secondaryFolderPath) }
+                    } else {
+                        Timber.d("The new Media Uploads Local Folder is invalid")
+                        showInvalidFolderSnackbar()
+                    }
+                } ?: run {
+                    Timber.d("The new Media Uploads Local Folder is null")
+                    showInvalidFolderSnackbar()
+                }
+            }.onFailure { exception ->
+                Timber.e(
+                    "An error occurred when changing the Media Uploads Local Folder",
+                    exception,
+                )
+                showGenericErrorSnackbar()
+            }
+        }
+    }
+
+    /**
      * Uses [SnackBarHandler] to display a generic Error Message
      */
     private fun showGenericErrorSnackbar() = showSnackbar(R.string.general_error)

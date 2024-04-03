@@ -27,6 +27,7 @@ internal fun SettingsCameraUploadsRoute(
         onIncludeLocationTagsStateChanged = viewModel::onIncludeLocationTagsStateChanged,
         onKeepFileNamesStateChanged = viewModel::onKeepFileNamesStateChanged,
         onLocalPrimaryFolderSelected = viewModel::onLocalPrimaryFolderSelected,
+        onLocalSecondaryFolderSelected = viewModel::onLocalSecondaryFolderSelected,
         onMediaPermissionsGranted = viewModel::onMediaPermissionsGranted,
         onMediaUploadsStateChanged = viewModel::onMediaUploadsStateChanged,
         onNewVideoCompressionSizeLimitProvided = viewModel::onNewVideoCompressionSizeLimitProvided,
