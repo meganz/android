@@ -18,7 +18,7 @@ import mega.privacy.android.domain.usecase.CanDeleteAccount
 import mega.privacy.android.domain.usecase.FetchAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.GetChatImageQuality
 import mega.privacy.android.domain.usecase.GetPreference
-import mega.privacy.android.domain.usecase.GetSupportEmail
+import mega.privacy.android.domain.usecase.GetSupportEmailUseCase
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
@@ -186,7 +186,7 @@ object TestSettingsModule {
         mock { on { invoke(anyOrNull(), any()) }.thenAnswer { flowOf(it.arguments[1]) } }
 
     @Provides
-    fun provideGetSupportEmail(): GetSupportEmail = mock()
+    fun provideGetSupportEmail(): GetSupportEmailUseCase = mock()
 
     @Provides
     @ElementsIntoSet

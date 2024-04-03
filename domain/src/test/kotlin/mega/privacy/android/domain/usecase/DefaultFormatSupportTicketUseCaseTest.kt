@@ -4,8 +4,8 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.SupportTicket
 import org.junit.Test
 
-class DefaultFormatSupportTicketTest {
-    private val underTest = DefaultFormatSupportTicket()
+class DefaultFormatSupportTicketUseCaseTest {
+    private val underTest = FormatSupportTicketUseCase()
 
     private val expectedAndroidAppVersion = "expectedAndroidAppVersion"
     private val expectedSdkVersion = "expectedSdkVersion"

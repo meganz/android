@@ -5,16 +5,14 @@ import mega.privacy.android.domain.repository.EnvironmentRepository
 import javax.inject.Inject
 
 /**
- * Default create support ticket
+ * Create support ticket
  *
- * @property environmentRepository
- * @property getAccountDetailsUseCase
  */
-class DefaultCreateSupportTicket @Inject constructor(
+class CreateSupportTicketUseCase @Inject constructor(
     private val environmentRepository: EnvironmentRepository,
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
-) : CreateSupportTicket {
-    override suspend fun invoke(
+) {
+    suspend operator fun invoke(
         description: String,
         logFileName: String?,
     ): SupportTicket {

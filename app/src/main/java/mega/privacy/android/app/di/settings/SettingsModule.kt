@@ -8,11 +8,9 @@ import dagger.multibindings.ElementsIntoSet
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.domain.repository.LoggingRepository
 import mega.privacy.android.domain.repository.SettingsRepository
-import mega.privacy.android.domain.repository.SupportRepository
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.GetPreference
-import mega.privacy.android.domain.usecase.GetSupportEmail
 import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.SetChatLogsEnabled
 import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
@@ -27,9 +25,6 @@ import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 abstract class SettingsModule {
 
     companion object {
-        @Provides
-        fun provideGetSupportEmail(supportRepository: SupportRepository): GetSupportEmail =
-            GetSupportEmail(supportRepository::getSupportEmail)
 
         @Provides
         @ElementsIntoSet

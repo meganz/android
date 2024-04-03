@@ -29,7 +29,7 @@ import mega.privacy.android.domain.entity.SubmitIssueRequest
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
-import mega.privacy.android.domain.usecase.GetSupportEmail
+import mega.privacy.android.domain.usecase.GetSupportEmailUseCase
 import mega.privacy.android.domain.usecase.SubmitIssueUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -54,7 +54,7 @@ class ReportIssueViewModel @Inject constructor(
     private val areSdkLogsEnabled: AreSdkLogsEnabled,
     private val areChatLogsEnabled: AreChatLogsEnabled,
     private val submitIssueUseCase: SubmitIssueUseCase,
-    private val getSupportEmail: GetSupportEmail,
+    private val getSupportEmailUseCase: GetSupportEmailUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
@@ -196,7 +196,7 @@ class ReportIssueViewModel @Inject constructor(
             else -> {
                 _state.update {
                     it.copy(
-                        result = SubmitIssueResult.Failure(getSupportEmail()),
+                        result = SubmitIssueResult.Failure(getSupportEmailUseCase()),
                         uploadProgress = null
                     )
                 }

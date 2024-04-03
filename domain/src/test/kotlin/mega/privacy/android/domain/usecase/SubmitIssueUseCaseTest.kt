@@ -10,8 +10,8 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.SubmitIssueRequest
 import mega.privacy.android.domain.entity.SupportTicket
-import mega.privacy.android.domain.repository.LoggingRepository
 import mega.privacy.android.domain.repository.SupportRepository
+import mega.privacy.android.domain.usecase.logging.GetZippedLogsUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -47,68 +47,67 @@ class SubmitIssueUseCaseTest {
     private val percentage = 1F
     private val formattedSupportTicket = "formattedSupportTicket"
 
-    private val loggingRepository = mock<LoggingRepository>()
     private val supportRepository = mock<SupportRepository>()
-    private val createSupportTicket = mock<CreateSupportTicket>()
-    private val formatSupportTicket = mock<FormatSupportTicket>()
-
+    private val createSupportTicketUseCase = mock<CreateSupportTicketUseCase>()
+    private val formatSupportTicketUseCase = mock<FormatSupportTicketUseCase>()
+    private val getZippedLogsUseCase = mock<GetZippedLogsUseCase>()
 
     @BeforeEach
     fun setUp() {
-        loggingRepository.stub {
-            onBlocking { compressLogs() }.thenReturn(compressedLogs)
+        getZippedLogsUseCase.stub {
+            onBlocking { invoke() }.thenReturn(compressedLogs)
         }
 
         supportRepository.stub {
             on { uploadFile(compressedLogs) }.thenReturn(flowOf(percentage))
         }
 
-        createSupportTicket.stub {
+        createSupportTicketUseCase.stub {
             onBlocking {
                 invoke(supportTicket.description, supportTicket.logFileName)
             }.thenReturn(supportTicket)
         }
 
-        formatSupportTicket.stub {
+        formatSupportTicketUseCase.stub {
             on {
                 invoke(any())
             }.thenReturn(formattedSupportTicket)
         }
 
         underTest = SubmitIssueUseCase(
-            loggingRepository = loggingRepository,
             supportRepository = supportRepository,
-            createSupportTicket = createSupportTicket,
-            formatSupportTicket = formatSupportTicket,
+            createSupportTicketUseCase = createSupportTicketUseCase,
+            formatSupportTicketUseCase = formatSupportTicketUseCase,
+            getZippedLogsUseCase = getZippedLogsUseCase,
         )
     }
 
     @AfterEach
     fun resetMocks() {
         Mockito.clearInvocations(
-            loggingRepository,
+            getZippedLogsUseCase,
             supportRepository,
-            createSupportTicket,
-            formatSupportTicket,
+            createSupportTicketUseCase,
+            formatSupportTicketUseCase,
         )
         reset(
-            loggingRepository,
+            getZippedLogsUseCase,
             supportRepository,
-            createSupportTicket,
-            formatSupportTicket,
+            createSupportTicketUseCase,
+            formatSupportTicketUseCase,
         )
     }
 
     @Test
     fun `test that logs are compressed when include logs is set to true`() = runTest {
         underTest.call(true).test { cancelAndIgnoreRemainingEvents() }
-        verify(loggingRepository).compressLogs()
+        verify(getZippedLogsUseCase).invoke()
     }
 
     @Test
     fun `test that logs are not compressed when include logs is set to false`() = runTest {
         underTest.call(false).test { cancelAndIgnoreRemainingEvents() }
-        verify(loggingRepository, never()).compressLogs()
+        verify(getZippedLogsUseCase, never()).invoke()
     }
 
     @Test
@@ -129,19 +128,19 @@ class SubmitIssueUseCaseTest {
     fun `test that support ticket is created`() = runTest {
         underTest.call(false).test { cancelAndIgnoreRemainingEvents() }
 
-        verify(createSupportTicket).invoke(supportTicket.description, null)
+        verify(createSupportTicketUseCase).invoke(supportTicket.description, null)
     }
 
     @Test
     fun `test that support ticket is created with log file name if include logs is set to true`() =
         runTest {
             val compressedLogs = File("log/path/file.zip")
-            whenever(loggingRepository.compressLogs()).thenReturn(compressedLogs)
+            whenever(getZippedLogsUseCase()).thenReturn(compressedLogs)
             whenever(supportRepository.uploadFile(any())).thenReturn(emptyFlow())
 
             underTest.call(true).test { cancelAndIgnoreRemainingEvents() }
 
-            verify(createSupportTicket).invoke(supportTicket.description, compressedLogs.name)
+            verify(createSupportTicketUseCase).invoke(supportTicket.description, compressedLogs.name)
         }
 
     @Test
@@ -149,7 +148,7 @@ class SubmitIssueUseCaseTest {
 
         underTest.call(true).test { cancelAndIgnoreRemainingEvents() }
 
-        verify(formatSupportTicket).invoke(supportTicket)
+        verify(formatSupportTicketUseCase).invoke(supportTicket)
     }
 
     @Test
@@ -168,8 +167,8 @@ class SubmitIssueUseCaseTest {
     fun `test that ticket is not created if cancelled`() = runTest {
         underTest.call(true).first()
 
-        verify(loggingRepository).compressLogs()
-        verify(formatSupportTicket, never()).invoke(any())
+        verify(getZippedLogsUseCase).invoke()
+        verify(formatSupportTicketUseCase, never()).invoke(any())
         verify(supportRepository, never()).logTicket(any())
     }
 

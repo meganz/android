@@ -19,8 +19,8 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
-class DefaultCreateSupportTicketTest {
-    private lateinit var underTest: CreateSupportTicket
+class DefaultCreateSupportTicketUseCaseTest {
+    private lateinit var underTest: CreateSupportTicketUseCase
     private val deviceRepository = mock<EnvironmentRepository>()
     private val getAccountDetailsUseCase = mock<GetAccountDetailsUseCase>()
 
@@ -71,7 +71,7 @@ class DefaultCreateSupportTicketTest {
             )
         }
 
-        underTest = DefaultCreateSupportTicket(
+        underTest = CreateSupportTicketUseCase(
             environmentRepository = deviceRepository,
             getAccountDetailsUseCase = getAccountDetailsUseCase
         )

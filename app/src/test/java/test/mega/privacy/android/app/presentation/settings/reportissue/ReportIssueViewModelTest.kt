@@ -24,7 +24,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
-import mega.privacy.android.domain.usecase.GetSupportEmail
+import mega.privacy.android.domain.usecase.GetSupportEmailUseCase
 import mega.privacy.android.domain.usecase.SubmitIssueUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -62,7 +62,7 @@ class ReportIssueViewModelTest {
         mock<MonitorConnectivityUseCase>()
 
     private val supportEmail = "Support@Email.address"
-    private val getSupportEmail = mock<GetSupportEmail>()
+    private val getSupportEmail = mock<GetSupportEmailUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeEach
@@ -90,7 +90,7 @@ class ReportIssueViewModelTest {
             savedStateHandle = savedStateHandle,
             ioDispatcher = StandardTestDispatcher(),
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            getSupportEmail = getSupportEmail,
+            getSupportEmailUseCase = getSupportEmail,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }

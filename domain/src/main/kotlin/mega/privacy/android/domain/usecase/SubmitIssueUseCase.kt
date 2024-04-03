@@ -9,23 +9,23 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.isActive
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.SubmitIssueRequest
-import mega.privacy.android.domain.repository.LoggingRepository
 import mega.privacy.android.domain.repository.SupportRepository
+import mega.privacy.android.domain.usecase.logging.GetZippedLogsUseCase
 import javax.inject.Inject
 
 /**
  * SubmitIssueUseCase
  *
- * @property loggingRepository
  * @property supportRepository
- * @property createSupportTicket
- * @property formatSupportTicket
+ * @property createSupportTicketUseCase
+ * @property formatSupportTicketUseCase
+ * @property getZippedLogsUseCase
  */
 class SubmitIssueUseCase @Inject constructor(
-    private val loggingRepository: LoggingRepository,
     private val supportRepository: SupportRepository,
-    private val createSupportTicket: CreateSupportTicket,
-    private val formatSupportTicket: FormatSupportTicket,
+    private val createSupportTicketUseCase: CreateSupportTicketUseCase,
+    private val formatSupportTicketUseCase: FormatSupportTicketUseCase,
+    private val getZippedLogsUseCase: GetZippedLogsUseCase,
 ) {
     /**
      * Invoke
@@ -46,7 +46,7 @@ class SubmitIssueUseCase @Inject constructor(
     private suspend fun FlowCollector<Progress>.uploadLogs(
         includeLogs: Boolean,
     ): String? {
-        val logs = if (shouldCompressLogs(includeLogs)) loggingRepository.compressLogs() else null
+        val logs = if (shouldCompressLogs(includeLogs)) getZippedLogsUseCase() else null
         logs?.let {
             emitAll(
                 supportRepository.uploadFile(it)
@@ -62,8 +62,8 @@ class SubmitIssueUseCase @Inject constructor(
     private suspend fun createFormattedSupportTicket(
         description: String,
         logFileName: String?,
-    ) = formatSupportTicket(
-        createSupportTicket(description, logFileName)
+    ) = formatSupportTicketUseCase(
+        createSupportTicketUseCase(description, logFileName)
     )
 
 }
