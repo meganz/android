@@ -27,7 +27,7 @@ class ManagerRedirectIntentMapper @Inject constructor(private val activity: Acti
      *
      * @param intent
      */
-    operator fun invoke(intent: Intent, enabledFeatureFlags: Set<Feature>): Intent? {
+    operator fun invoke(intent: Intent): Intent? {
         Timber.d("Handle redirect intent action ${intent.action}")
         return when (intent.action) {
             Constants.ACTION_IMPORT_LINK_FETCH_NODES -> Intent(activity, LoginActivity::class.java)

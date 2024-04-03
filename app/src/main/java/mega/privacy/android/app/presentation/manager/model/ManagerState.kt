@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.manager.model
 
-import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -20,7 +19,6 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property shouldAlertUserAboutSecurityUpgrade
  * @property showSyncSection
  * @property show2FADialog
- * @property enabledFlags
  * @property isPushNotificationSettingsUpdatedEvent
  * @property titleChatArchivedEvent
  * @property restoreNodeResult
@@ -50,7 +48,6 @@ data class ManagerState(
     val shouldAlertUserAboutSecurityUpgrade: Boolean = false,
     val showSyncSection: Boolean = false,
     val show2FADialog: Boolean = false,
-    val enabledFlags: Set<Feature> = emptySet(),
     val isPushNotificationSettingsUpdatedEvent: Boolean = false,
     val titleChatArchivedEvent: String? = null,
     val restoreNodeResult: Result<RestoreNodeResult>? = null,

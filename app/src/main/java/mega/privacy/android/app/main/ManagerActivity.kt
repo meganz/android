@@ -1912,7 +1912,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         managerRedirectIntentMapper(
             intent = intent,
-            enabledFeatureFlags = viewModel.state().enabledFlags,
         )?.let { redirectIntent ->
             startActivity(redirectIntent)
             finish()

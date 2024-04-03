@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkResultMapper
 import mega.privacy.android.app.main.dialog.shares.RemoveShareResultMapper
@@ -32,7 +31,6 @@ import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
-import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.chat.ChatCall
@@ -338,13 +336,11 @@ class ManagerViewModel @Inject constructor(
                 isFirstLogin,
                 flowOf(getUnverifiedIncomingShares(order) + getUnverifiedOutgoingShares(order))
                     .map { it.size },
-                flowOf(getEnabledFeatures()),
-            ) { firstLogin: Boolean, pendingShares: Int, features: Set<Feature> ->
+            ) { firstLogin: Boolean, pendingShares: Int ->
                 { state: ManagerState ->
                     state.copy(
                         isFirstLogin = firstLogin,
                         pendingActionsCount = state.pendingActionsCount + pendingShares,
-                        enabledFlags = features
                     )
                 }
             }.collectLatest {
@@ -527,12 +523,6 @@ class ManagerViewModel @Inject constructor(
      * @return the [ManagerState]
      */
     fun state() = _state.value
-
-    private suspend fun getEnabledFeatures(): Set<Feature> {
-        return setOfNotNull(
-            ABTestFeatures.dmca.takeIf { getFeatureFlagValueUseCase(it) },
-        )
-    }
 
     /**
      * Cache up-to-date incoming contact requests in view model
