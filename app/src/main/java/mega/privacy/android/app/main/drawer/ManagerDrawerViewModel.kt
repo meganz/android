@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
-import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.domain.entity.Feature
@@ -180,7 +179,6 @@ internal class ManagerDrawerViewModel @Inject constructor(
     private suspend fun getEnabledFeatures(): Set<Feature> {
         return setOfNotNull(
             AppFeatures.AndroidSync.takeIf { getFeatureFlagValueUseCase(it) },
-            ABTestFeatures.dmca.takeIf { getFeatureFlagValueUseCase(it) },
         )
     }
 

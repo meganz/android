@@ -5473,13 +5473,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      */
     fun exitBackupsPage() {
         handleSuperBackPressed()
-        val isDeviceCenterFeatureFlagEnabled =
-            viewModel.state.value.enabledFlags.contains(ABTestFeatures.dmca)
-        if (isDeviceCenterFeatureFlagEnabled) {
-            selectDrawerItem(DrawerItem.DEVICE_CENTER)
-        } else {
-            goBackToBottomNavigationItem(bottomNavigationCurrentItem)
-        }
+        selectDrawerItem(DrawerItem.DEVICE_CENTER)
     }
 
     /**

@@ -26,7 +26,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.databinding.NavigationViewLayoutBinding
-import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.main.DrawerItem
@@ -157,13 +156,11 @@ internal class ManagerDrawerFragment : Fragment() {
         viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
             setContactStatus(uiState.userChatStatus)
             // For QA Builds, show Backups when the Device Center Feature Flag is also disabled
-            binding.backupsSection.isVisible =
-                !uiState.enabledFlags.contains(ABTestFeatures.dmca) && uiState.hasBackupsChildren
+            binding.backupsSection.isVisible = false
             setDrawerLayout(uiState.isRootNodeExist && uiState.isConnected)
             binding.navigationDrawerAddPhoneNumberContainer.isVisible = uiState.canVerifyPhoneNumber
             binding.syncSection.isVisible = uiState.enabledFlags.contains(AppFeatures.AndroidSync)
-            binding.deviceCenterSection.isVisible =
-                uiState.enabledFlags.contains(ABTestFeatures.dmca)
+            binding.deviceCenterSection.isVisible = true
             binding.notificationSectionPromoTag.isVisible = uiState.showPromoTag
         }
         viewLifecycleOwner.collectFlow(managerViewModel.numUnreadUserAlerts) { result ->
