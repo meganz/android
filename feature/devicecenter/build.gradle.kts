@@ -1,4 +1,5 @@
 import groovy.lang.Closure
+import mega.privacy.android.build.preBuiltSdkDependency
 
 plugins {
     id("com.android.library")
@@ -8,7 +9,6 @@ plugins {
 }
 
 apply(from = "${project.rootDir}/tools/util.gradle")
-apply(from = "${project.rootDir}/tools/sdk.gradle")
 
 android {
     val compileSdkVersion: Int by rootProject.extra
@@ -72,6 +72,8 @@ tasks.withType<Test> {
 }
 
 dependencies {
+    preBuiltSdkDependency(rootProject.extra)
+
     implementation(project(":core:formatter"))
     lintChecks(project(":lint"))
 

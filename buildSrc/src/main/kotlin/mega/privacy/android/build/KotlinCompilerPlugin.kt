@@ -1,3 +1,5 @@
+package mega.privacy.android.build
+
 import groovy.lang.Closure
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.invocation.Gradle

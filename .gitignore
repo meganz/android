@@ -19,7 +19,7 @@
 .idea/androidTestResultsUserPreferences.xml
 .idea/deploymentTargetDropDown.xml
 .idea/shelf/*
-.idea/copilot/
+*/.idea/copilot/
 
 # Sensitive or high-churn files:
 .idea/dataSources.ids

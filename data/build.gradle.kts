@@ -1,4 +1,5 @@
 import groovy.lang.Closure
+import mega.privacy.android.build.preBuiltSdkDependency
 
 plugins {
     id("com.android.library")
@@ -12,7 +13,6 @@ plugins {
 apply(plugin = "jacoco")
 apply(from = "${project.rootDir}/tools/jacoco.gradle")
 apply(from = "${project.rootDir}/tools/util.gradle")
-apply(from = "${project.rootDir}/tools/sdk.gradle")
 
 android {
     val compileSdkVersion: Int by rootProject.extra
@@ -94,6 +94,7 @@ android.testVariants.all {
 
 dependencies {
     implementation(project(":domain"))
+    preBuiltSdkDependency(rootProject.extra)
 
     implementation(lib.coroutines.core)
     implementation(lib.kotlin.serialisation)

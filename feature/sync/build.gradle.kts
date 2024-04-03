@@ -1,4 +1,5 @@
 import groovy.lang.Closure
+import mega.privacy.android.build.preBuiltSdkDependency
 
 plugins {
     id("com.android.library")
@@ -9,7 +10,6 @@ plugins {
 }
 
 apply(from = "${project.rootDir}/tools/util.gradle")
-apply(from = "${project.rootDir}/tools/sdk.gradle")
 
 android {
     namespace = "mega.privacy.android.feature.sync"
@@ -78,6 +78,7 @@ dependencies {
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
     lintChecks(project(":lint"))
+    preBuiltSdkDependency(rootProject.extra)
 
     implementation(project(":domain"))
     implementation(project(":data"))

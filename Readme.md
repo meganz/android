@@ -154,13 +154,16 @@ In case of an error (seen in the log file mentioned) due to licenses not accepte
 Download the link https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k, uncompress it and put the folders `debug` and `release` in the path `app/src/`.
 
 ### 10. Disable pre-built SDK
-Open `tools/util.gradle`, change method `shouldUsePrebuiltSdk()` to below.
-```groovy
-boolean shouldUsePrebuiltSdk() {
-    return false
-//    String usePrebuiltSdk = System.getenv("USE_PREBUILT_SDK")
-//    return usePrebuiltSdk == null || usePrebuiltSdk != "false"
-}
+Open `buildSrc/src/main/kotlin/mega/privacy/android/build/PrebuiltSdkDependencyPlugin.kt`, change method `shouldUsePrebuiltSdk()` to below.
+```kotlin
+fun shouldUsePrebuiltSdk(): Boolean = false
+//        System.getenv("USE_PREBUILT_SDK")?.let { it != "false" } ?: true
+```
+
+Open `settings.gradle.kts`, change method `shouldUsePrebuiltSdk()` to below:
+```kotlin
+fun shouldUsePrebuiltSdk(): Boolean = false
+//        System.getenv("USE_PREBUILT_SDK")?.let { it != "false" } ?: true
 ```
 
 ### 11. Build mobile analytics library locally 

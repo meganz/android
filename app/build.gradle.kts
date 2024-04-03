@@ -1,4 +1,5 @@
 import groovy.lang.Closure
+import mega.privacy.android.build.preBuiltSdkDependency
 
 plugins {
     id("com.android.application")
@@ -16,7 +17,6 @@ plugins {
 }
 
 apply(from = "${project.rootDir}/tools/util.gradle")
-apply(from = "${project.rootDir}/tools/sdk.gradle")
 
 configurations {
     jacocoAnt
@@ -305,6 +305,7 @@ dependencies {
     implementation(project(":feature:sync"))
     implementation(project(":feature:devicecenter"))
     implementation(project(":shared:resources"))
+    preBuiltSdkDependency(rootProject.extra)
 
     //Test Modules
     testImplementation(project(":core-test"))
