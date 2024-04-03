@@ -3,6 +3,7 @@ package mega.privacy.android.core.ui.controls.snackbars
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarData
@@ -11,12 +12,14 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.MegaColors
 import mega.privacy.android.core.ui.theme.MegaTheme
 import mega.privacy.android.core.ui.utils.composeLet
 
@@ -66,6 +69,15 @@ private fun SnackbarButton(
         style = MaterialTheme.typography.button
     )
 }
+
+private val MegaColors.snackBarButtonColors
+    @Composable
+    get() = ButtonDefaults.buttonColors(
+        backgroundColor = Color.Transparent,
+        contentColor = text.inverseAccent,
+        disabledBackgroundColor = Color.Transparent,
+        disabledContentColor = text.disabled,
+    )
 
 @CombinedThemePreviews
 @Composable

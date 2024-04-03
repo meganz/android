@@ -5,7 +5,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.graphics.Color
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.tokens.SemanticTokens
 
@@ -20,14 +19,6 @@ internal data class MegaColors(
 
     val isDark = !isLight
 
-    val snackBarButtonColors
-        @Composable
-        get() = ButtonDefaults.buttonColors(
-            backgroundColor = Color.Transparent,
-            contentColor = text.inverse,
-            disabledBackgroundColor = Color.Transparent,
-            disabledContentColor = text.disabled,
-        )
     val raisedButtonColors
         @Composable
         get() = ButtonDefaults.buttonColors(
