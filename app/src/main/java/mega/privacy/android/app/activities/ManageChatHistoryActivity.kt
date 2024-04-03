@@ -8,6 +8,7 @@ import android.widget.NumberPicker.OnValueChangeListener
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -16,8 +17,8 @@ import mega.privacy.android.app.databinding.ActivityManageChatHistoryBinding
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ClearChatConfirmationDialog
 import mega.privacy.android.app.presentation.meeting.managechathistory.ManageChatHistoryViewModel
+import mega.privacy.android.app.presentation.meeting.managechathistory.view.dialog.ChatHistoryRetentionConfirmationDialog
 import mega.privacy.android.app.utils.ChatUtil
-import mega.privacy.android.app.utils.ChatUtil.createHistoryRetentionAlertDialog
 import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.DISABLED_RETENTION_TIME
 import mega.privacy.android.app.utils.Constants.EMAIL
@@ -109,6 +110,22 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
                         )
                     }
                 }
+
+                if (uiState.shouldShowHistoryRetentionConfirmation) {
+                    ChatHistoryRetentionConfirmationDialog(
+                        selectedOption = uiState.selectedHistoryRetentionTimeOption,
+                        onOptionSelected = viewModel::updateHistoryRetentionTimeConfirmation,
+                        confirmButtonText = stringResource(id = uiState.confirmButtonStringId),
+                        isConfirmButtonEnable = { uiState.isConfirmButtonEnable },
+                        onDismissRequest = viewModel::dismissHistoryRetentionConfirmation,
+                        onConfirmClick = {
+                            viewModel.apply {
+                                onNewRetentionTimeConfirmed(it)
+                                dismissHistoryRetentionConfirmation()
+                            }
+                        }
+                    )
+                }
             }
         }
 
@@ -117,15 +134,19 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
 
     private fun collectFlows() {
         collectFlow(viewModel.uiState) { uiState ->
-            uiState.retentionTimeUpdate?.let {
-                updateRetentionTimeUI(it)
-                viewModel.onRetentionTimeUpdateConsumed()
-            }
-
             if (uiState.shouldNavigateUp) {
                 finish()
                 viewModel.onNavigatedUp()
             }
+
+            if (uiState.shouldShowCustomTimePicker) {
+                showPickers(viewModel.retentionTimeUiState.value)
+                viewModel.onCustomTimePickerSet()
+            }
+        }
+
+        collectFlow(viewModel.retentionTimeUiState) { retentionTime ->
+            updateRetentionTimeUI(retentionTime)
         }
 
         collectFlow(viewModel.chatRoomUiState) { chatRoom ->
@@ -492,17 +513,14 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
 
             R.id.history_retention_switch_layout -> {
                 if (binding.historyRetentionSwitch.isChecked) {
-                    viewModel.setChatRetentionTime(
-                        chatId = viewModel.chatRoomId,
-                        period = DISABLED_RETENTION_TIME
-                    )
+                    viewModel.setChatRetentionTime(period = DISABLED_RETENTION_TIME)
                 } else {
-                    createHistoryRetentionAlertDialog(this, viewModel.chatRoomId, true)
+                    viewModel.showHistoryRetentionConfirmation()
                 }
             }
 
             R.id.retention_time_text_layout -> {
-                createHistoryRetentionAlertDialog(this, viewModel.chatRoomId, false)
+                viewModel.showHistoryRetentionConfirmation()
             }
 
             R.id.picker_button -> {
@@ -533,10 +551,7 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
                 }
 
                 val totalSeconds = binding.numberPicker.value * secondInOption
-                viewModel.setChatRetentionTime(
-                    viewModel.chatRoomId,
-                    period = totalSeconds.toLong()
-                )
+                viewModel.setChatRetentionTime(period = totalSeconds.toLong())
             }
         }
     }

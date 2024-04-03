@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.managechathistory.view.dialog
 
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performClick
@@ -20,24 +19,6 @@ class ChatHistoryRetentionConfirmationDialogTest {
     val composeRule = createComposeRule()
 
     @Test
-    fun `test that the string 'next' is displayed when the custom option is selected`() {
-        composeRule.apply {
-            setDialog(currentOption = ChatHistoryRetentionOption.Custom)
-
-            onNodeWithText(R.string.general_next).assertIsDisplayed()
-        }
-    }
-
-    @Test
-    fun `test that the string 'OK' is displayed when an option other than the custom option is selected`() {
-        composeRule.apply {
-            setDialog(currentOption = ChatHistoryRetentionOption.Day)
-
-            onNodeWithText(R.string.general_ok).assertIsDisplayed()
-        }
-    }
-
-    @Test
     fun `test that the dismiss request callback is invoked when the cancel button is clicked`() {
         composeRule.apply {
             var isDismissRequestInvoked = false
@@ -53,12 +34,12 @@ class ChatHistoryRetentionConfirmationDialogTest {
 
     @Test
     fun `test that the confirm callback is invoked with the correct selected option when the confirm button is clicked`() {
-        val currentOption = ChatHistoryRetentionOption.Day
+        val currentOption = ChatHistoryRetentionOption.OneDay
 
         composeRule.apply {
             var confirmOption: ChatHistoryRetentionOption? = null
             setDialog(
-                currentOption = currentOption,
+                selectedOption = currentOption,
                 onConfirmClick = { confirmOption = it }
             )
 
@@ -68,14 +49,36 @@ class ChatHistoryRetentionConfirmationDialogTest {
         }
     }
 
+    @Test
+    fun `test that the option selected callback is invoked when an option is chosen`() {
+        val option = ChatHistoryRetentionOption.OneDay
+
+        composeRule.apply {
+            var selectedOption: ChatHistoryRetentionOption? = null
+            setDialog(
+                onOptionSelected = { selectedOption = it }
+            )
+
+            onNodeWithText(option.stringId).performClick()
+
+            assertThat(selectedOption).isEqualTo(option)
+        }
+    }
+
     private fun ComposeContentTestRule.setDialog(
-        currentOption: ChatHistoryRetentionOption = ChatHistoryRetentionOption.Disabled,
+        selectedOption: ChatHistoryRetentionOption = ChatHistoryRetentionOption.Disabled,
+        onOptionSelected: (option: ChatHistoryRetentionOption) -> Unit = {},
+        confirmButtonText: String = "OK",
+        isConfirmButtonEnable: () -> Boolean = { true },
         onDismissRequest: () -> Unit = {},
         onConfirmClick: (option: ChatHistoryRetentionOption) -> Unit = {},
     ) {
         setContent {
             ChatHistoryRetentionConfirmationDialog(
-                currentOption = currentOption,
+                selectedOption = selectedOption,
+                onOptionSelected = onOptionSelected,
+                confirmButtonText = confirmButtonText,
+                isConfirmButtonEnable = isConfirmButtonEnable,
                 onDismissRequest = onDismissRequest,
                 onConfirmClick = onConfirmClick
             )
