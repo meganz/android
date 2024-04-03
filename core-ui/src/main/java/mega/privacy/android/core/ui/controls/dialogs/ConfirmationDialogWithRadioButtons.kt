@@ -47,6 +47,7 @@ fun <T> ConfirmationDialogWithRadioButtons(
     modifier: Modifier = Modifier,
     cancelButtonText: String? = null,
     confirmButtonText: String? = null,
+    isConfirmButtonEnable: (() -> Boolean)? = null,
     onConfirmRequest: (T) -> Unit = {},
     titleText: String = "",
     subTitleText: String = "",
@@ -138,7 +139,8 @@ fun <T> ConfirmationDialogWithRadioButtons(
                         }
                         if (!confirmButtonText.isNullOrEmpty()) {
                             TextMegaButton(
-                                enabled = selectedOption != null,
+                                enabled = isConfirmButtonEnable?.invoke()
+                                    ?: (selectedOption != null),
                                 text = confirmButtonText,
                                 onClick = { selectedOption?.let(onConfirmRequest) },
                             )
