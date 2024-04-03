@@ -1,14 +1,7 @@
 package mega.privacy.android.feature.sync.ui.newfolderpair
 
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction.LocalFolderSelected
@@ -39,7 +32,8 @@ internal fun SyncNewFolderScreenRoute(
             viewModel.handleAction(NextClicked)
             openNextScreen(state.value)
         },
-        syncPermissionsManager = syncPermissionsManager
+        syncPermissionsManager = syncPermissionsManager,
+        onBackClicked = onBackClicked,
     )
 
     val onBack = {

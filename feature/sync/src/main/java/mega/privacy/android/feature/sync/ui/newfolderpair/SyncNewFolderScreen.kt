@@ -3,7 +3,6 @@ package mega.privacy.android.feature.sync.ui.newfolderpair
 import android.Manifest
 import android.content.res.Configuration
 import android.net.Uri
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -51,10 +50,8 @@ internal fun SyncNewFolderScreen(
     selectMegaFolderClicked: () -> Unit,
     syncClicked: () -> Unit,
     syncPermissionsManager: SyncPermissionsManager,
+    onBackClicked: () -> Unit,
 ) {
-    val onBackPressedDispatcher =
-        LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
     Scaffold(
         topBar = {
             MegaAppBar(
@@ -62,7 +59,7 @@ internal fun SyncNewFolderScreen(
                 appBarType = AppBarType.BACK_NAVIGATION,
                 title = stringResource(R.string.sync_toolbar_title),
                 subtitle = stringResource(id = R.string.sync_choose_folders),
-                onNavigationPressed = { onBackPressedDispatcher?.onBackPressed() },
+                onNavigationPressed = { onBackClicked() },
                 elevation = 0.dp
             )
         }, content = { paddingValues ->
@@ -88,7 +85,6 @@ internal fun SyncNewFolderScreen(
 
 @Composable
 private fun SyncNewFolderScreenContent(
-    modifier: Modifier = Modifier,
     localFolderSelected: (Uri) -> Unit,
     selectMegaFolderClicked: () -> Unit,
     folderNameChanged: (String) -> Unit,
@@ -97,6 +93,7 @@ private fun SyncNewFolderScreenContent(
     selectedMegaFolder: RemoteFolder?,
     syncClicked: () -> Unit,
     syncPermissionsManager: SyncPermissionsManager,
+    modifier: Modifier = Modifier,
 ) {
     var showSyncPermissionBanner by rememberSaveable {
         mutableStateOf(false)
@@ -216,7 +213,8 @@ private fun PreviewSyncNewFolderScreen() {
             folderNameChanged = {},
             selectMegaFolderClicked = {},
             syncClicked = {},
-            syncPermissionsManager = SyncPermissionsManager(LocalContext.current)
+            syncPermissionsManager = SyncPermissionsManager(LocalContext.current),
+            onBackClicked = {},
         )
     }
 }
