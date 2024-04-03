@@ -191,10 +191,10 @@ class SearchActivityViewModel @Inject constructor(
     }
 
     private fun onSearchFailure(ex: Throwable) {
-        Timber.e(ex)
         if (ex is CancellationException) {
             return
         }
+        Timber.e(ex)
         val emptyState = getEmptySearchState()
         _state.update {
             it.copy(
