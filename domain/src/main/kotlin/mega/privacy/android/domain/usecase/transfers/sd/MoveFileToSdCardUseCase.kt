@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.transfers.sd
 
 import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.repository.SettingsRepository
 import java.io.File
 import javax.inject.Inject
 
@@ -9,11 +10,14 @@ import javax.inject.Inject
  */
 class MoveFileToSdCardUseCase @Inject constructor(
     private val fileSystemRepository: FileSystemRepository,
+    private val settingsRepository: SettingsRepository,
 ) {
     /**
      * invoke
      */
     suspend operator fun invoke(file: File, destinationUri: String, subFolders: List<String>) {
-        fileSystemRepository.moveFileToSd(file, destinationUri, subFolders)
+        val destination = destinationUri.takeUnless { it.startsWith(File.separator) }
+            ?: settingsRepository.getDownloadToSdCardUri()
+        fileSystemRepository.moveFileToSd(file, destination ?: destinationUri, subFolders)
     }
 }

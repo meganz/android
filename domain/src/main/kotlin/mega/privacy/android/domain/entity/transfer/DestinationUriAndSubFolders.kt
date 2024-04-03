@@ -11,8 +11,15 @@ data class DestinationUriAndSubFolders(
     val destinationUri: String,
     val subFolders: List<String> = emptyList(),
 ) {
-    override fun toString() = destinationUri + subFolders.joinToString(
-        separator = File.separator,
-        postfix = File.separator
-    )
+    override fun toString() = destinationUri.ensureEndsWithFileSeparator() +
+            if (subFolders.isNotEmpty()) {
+                subFolders.joinToString(separator = File.separator).ensureEndsWithFileSeparator()
+            } else ""
+
+    private fun String.ensureEndsWithFileSeparator() =
+        if (this.endsWith(File.separator)) {
+            this
+        } else {
+            this.plus(File.separator)
+        }
 }
