@@ -1,10 +1,13 @@
 package test.mega.privacy.android.app.presentation.transfers.startdownload
 
 import android.net.Uri
-import com.google.common.truth.Truth
+import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -140,9 +143,13 @@ class StartDownloadComponentViewModelTest {
         initialStub()
     }
 
+    private val monitorActiveTransferFinishedFlow = MutableSharedFlow<Int>()
+
     private fun initialStub() {
         whenever(monitorOngoingActiveTransfersUseCase(any())).thenReturn(emptyFlow())
-        whenever(monitorActiveTransferFinishedUseCase(any())).thenReturn(emptyFlow())
+        whenever(monitorActiveTransferFinishedUseCase(any())).thenReturn(
+            monitorActiveTransferFinishedFlow
+        )
     }
 
     @ParameterizedTest
@@ -225,7 +232,7 @@ class StartDownloadComponentViewModelTest {
                 })
             })
             underTest.startDownload(TransferTriggerEvent.StartDownloadNode(nodes))
-            Truth.assertThat(underTest.uiState.value.jobInProgressState)
+            assertThat(underTest.uiState.value.jobInProgressState)
                 .isEqualTo(StartDownloadTransferJobInProgress.ProcessingFiles)
         }
 
@@ -317,9 +324,9 @@ class StartDownloadComponentViewModelTest {
 
             underTest.startDownloadWithDestination(startDownloadNode, destinationUri)
 
-            Truth.assertThat(underTest.uiState.value.promptSaveDestination)
+            assertThat(underTest.uiState.value.promptSaveDestination)
                 .isInstanceOf(StateEventWithContentTriggered::class.java)
-            Truth.assertThat((underTest.uiState.value.promptSaveDestination as StateEventWithContentTriggered).content)
+            assertThat((underTest.uiState.value.promptSaveDestination as StateEventWithContentTriggered).content)
                 .isEqualTo(uriString)
 
         }
@@ -346,6 +353,24 @@ class StartDownloadComponentViewModelTest {
             verify(setStorageDownloadAskAlwaysUseCase).invoke(false)
         }
 
+    @Test
+    fun `test that event is emitted when monitorActiveTransferFinishedUseCase emits a value and transferTriggerEvent is StartDownloadNode`() =
+        runTest {
+            setup()
+            underTest.startDownload(TransferTriggerEvent.StartDownloadNode(listOf(mock()))) //to set transferTriggerEvent to StartDownloadNode
+            underTest.uiState.test {
+                val finished = 2
+                awaitItem() //current value doesn't matter
+                monitorActiveTransferFinishedFlow.emit(finished)
+                val expected =
+                    triggered(StartDownloadTransferEvent.MessagePlural.FinishDownloading(finished))
+
+                val actual = awaitItem().oneOffViewEvent
+
+                assertThat(actual).isEqualTo(expected)
+            }
+        }
+
     private fun provideDownloadNodeParameters() = listOf(
         Arguments.of(
             mock<MultiTransferEvent.SingleTransferEvent> {
@@ -366,9 +391,9 @@ class StartDownloadComponentViewModelTest {
     )
 
     private fun assertCurrentEventIsEqualTo(event: StartDownloadTransferEvent) {
-        Truth.assertThat(underTest.uiState.value.oneOffViewEvent)
+        assertThat(underTest.uiState.value.oneOffViewEvent)
             .isInstanceOf(StateEventWithContentTriggered::class.java)
-        Truth.assertThat((underTest.uiState.value.oneOffViewEvent as StateEventWithContentTriggered).content)
+        assertThat((underTest.uiState.value.oneOffViewEvent as StateEventWithContentTriggered).content)
             .isEqualTo(event)
     }
 

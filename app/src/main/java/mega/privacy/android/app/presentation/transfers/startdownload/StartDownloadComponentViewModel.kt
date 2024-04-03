@@ -86,6 +86,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
 
     init {
         checkRating()
+        monitorDownloadFinish()
     }
 
     /**
@@ -421,7 +422,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                         StartDownloadTransferEvent.Message.FinishOffline
                     }
 
-                    is TransferTriggerEvent.StartDownloadNode -> {
+                    is TransferTriggerEvent.StartDownloadNode, null -> {
                         StartDownloadTransferEvent.MessagePlural.FinishDownloading(
                             totalNodes
                         )
