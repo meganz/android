@@ -11,10 +11,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
@@ -49,12 +51,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.apiserver.view.ChangeApiServerDialog
 import mega.privacy.android.app.presentation.extensions.login.error
 import mega.privacy.android.app.presentation.extensions.messageId
@@ -62,7 +66,6 @@ import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.presentation.twofactorauthentication.view.TwoFactorAuthenticationField
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
@@ -77,6 +80,7 @@ import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.FetchNodesTemporaryError
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
  * Login fragment view.
@@ -279,12 +283,22 @@ private fun RequireLogin(
             text = state.password ?: "",
             errorText = state.passwordError?.let { stringResource(id = it.error) }
         )
-        RaisedDefaultMegaButton(
+        TextMegaButton(
             modifier = Modifier.padding(
-                start = 22.dp,
-                top = if (state.passwordError != null) 24.dp else 44.dp,
-                end = 22.dp
+                start = 14.dp,
+                top = if (state.passwordError != null) 24.dp else 44.dp
             ),
+            textId = R.string.forgot_pass,
+            onClick = onForgotPassword
+        )
+        RaisedDefaultMegaButton(
+            modifier = Modifier
+                .padding(
+                    start = 22.dp,
+                    top = 44.dp,
+                    end = 22.dp
+                )
+                .fillMaxWidth(),
             textId = R.string.login_text,
             onClick = { clickLogin(onLoginClicked, focusManager) },
             enabled = !state.isLocalLogoutInProgress
@@ -306,11 +320,28 @@ private fun RequireLogin(
                 style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.secondary)
             )
         }
-        TextMegaButton(
-            modifier = Modifier.padding(start = 14.dp, top = 34.dp),
-            textId = R.string.forgot_pass,
-            onClick = onForgotPassword
-        )
+        if (state.enabledFlags.contains(AppFeatures.LoginReportIssueButton)) {
+            Row(
+                modifier = Modifier
+                    .clickable {
+                        TODO()
+                    }
+                    .padding(start = 22.dp, top = 18.dp, end = 22.dp),
+            ) {
+                Text(
+                    text = stringResource(id = R.string.general_login_label_trouble_logging_in),
+                    style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorPrimary)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = stringResource(id = R.string.general_login_button_report_your_issue),
+                    style = MaterialTheme.typography.subtitle2.copy(
+                        color = MaterialTheme.colors.textColorPrimary,
+                        textDecoration = TextDecoration.Underline
+                    )
+                )
+            }
+        }
         Row(modifier = Modifier.padding(end = 22.dp)) {
             Text(
                 modifier = Modifier
