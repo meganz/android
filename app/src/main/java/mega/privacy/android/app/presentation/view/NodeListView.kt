@@ -9,11 +9,14 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -59,6 +62,7 @@ import nz.mega.sdk.MegaNode
  * @param showChangeViewType whether to show change view type button
  * @param listContentPadding the content padding of the list/lazyColumn
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun <T : TypedNode> NodeListView(
     nodeUIItemList: List<NodeUIItem<T>>,
@@ -79,7 +83,11 @@ fun <T : TypedNode> NodeListView(
     showPublicLinkCreationTime: Boolean = false,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
-    LazyColumn(state = listState, modifier = modifier, contentPadding = listContentPadding) {
+    LazyColumn(
+        state = listState,
+        modifier = modifier.semantics { testTagsAsResourceId = true },
+        contentPadding = listContentPadding
+    ) {
         if (showSortOrder || showChangeViewType) {
             item(
                 key = "header"

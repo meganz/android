@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package mega.privacy.android.app.presentation.clouddrive.ui
 
 import androidx.compose.foundation.layout.Column
@@ -8,10 +10,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -40,6 +45,7 @@ import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
  * @param onDisputeTakeDownClicked
  * @param onLinkClicked
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FileBrowserComposeView(
     uiState: FileBrowserState,
@@ -71,7 +77,7 @@ fun FileBrowserComposeView(
         )
     }
 
-    Column {
+    Column(modifier = Modifier.semantics { testTagsAsResourceId = true }) {
         uiState.errorMessage?.let { errorMessage ->
             WarningBanner(textString = stringResource(id = errorMessage), onCloseClick = null)
         }
