@@ -101,7 +101,7 @@
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">名前の変更に失敗しました。</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
-    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">この同期用の.megaignoreファイルを作成できませんでした。</string>
+    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">この同期用の.megaignoreファイルを作成できませんでした</string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
     <string name="device_center_list_view_item_sub_state_sync_config_read_failure">同期構成を読み取れませんでした。後でもう一度試すか、フォルダのアクセス許可を確認してください。</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->

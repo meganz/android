@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
+    <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
+    <string name="general_sync_no_error">No sync error</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
+    <string name="general_sync_unsupported_file_system">MEGA nu poate sincroniza sau backup pentru acest folder deoarece sistemul de fișiere de pe dispozitiv nu este acceptat.</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
+    <string name="general_sync_invalid_remote_type">Folderul ales nu poate fi sincronizat</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
+    <string name="general_sync_invalid_local_type">Un fișier nu poate fi sincronizat individual. Trebuie să configurați sincronizarea dintr-un folder.</string>
+    <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
+    <string name="general_sync_initial_scan_failed">Scanarea inițială a eșuat. Va trebui să reactivați sincronizarea sau backupul din aplicația desktop.</string>
+    <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
+    <string name="general_sync_remote_node_not_found">Folder in MEGA can’t be located as it’s been moved or deleted, or you might not have access</string>
+    <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
+    <string name="general_sync_storage_overquota">Unable to sync or back up this folder as your storage is full</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
+    <string name="general_sync_account_expired">Unable to sync or back up this folder as your plan has expired</string>
+    <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
+    <string name="general_sync_foreign_target_overshare">Folder can’t be synced as the user who shared this folder has reached their storage limit</string>
+    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
+    <string name="general_sync_remote_path_has_changed">Folder in MEGA can’t be located as it’s been moved or deleted, or you might not have access</string>
+    <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
+    <string name="general_sync_share_non_full_access">Folder can’t be synced as it’s a shared folder that you don’t have full access to</string>
+    <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
+    <string name="general_sync_put_nodes_error">Files in this folder can’t be synced or backed up. You’ll need to re-enable the sync or backup from the Desktop app.</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
+    <string name="general_sync_active_sync_below_path">Folder can’t be synced as it already contains synced folders</string>
+    <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
+    <string name="general_sync_vboxsharedfolder_unsupported">MEGA can’t sync or back up VirtualBox folders</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
+    <string name="general_sync_account_blocked">Unable to sync or back up this folder as the account has been blocked</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
+    <string name="general_sync_unknown_temporary_error">Problemă la sincronizarea sau backup a acestui folder. Încercați din nou mai târziu. Dacă problema persistă, contactați Asistența.</string>
+    <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
+    <string name="general_sync_too_many_action_packets">Contul a fost reîncărcat. Toate actualizările ratate ale backupurilor sau ale sincronizărilor nu au fost aplicate.</string>
+    <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
+    <string name="general_sync_logged_out">Sincronizarea sau backupul au fost oprite pe măsură ce parcă v-ați deconectat de la aplicația Desktop. Conectați-vă din nou prin aplicația Desktop și reluați sincronizarea sau backup-ul.</string>
+    <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
+    <string name="general_sync_missing_parent_node">N/A</string>
+    <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
+    <string name="general_sync_backup_source_not_below_drive">Folderul din unitatea externă nu poate fi localizat.</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
+    <string name="general_sync_active_sync_same_path">There’s already a synced folder at the same location</string>
+    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
+    <string name="general_sync_could_not_move_cloud_nodes">Redenumirea a eșuat.</string>
+    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
+    <string name="general_sync_could_not_create_ignore_file">Couldn’t create a .megaignore file for this sync</string>
+    <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
+    <string name="general_sync_config_read_failure">Nu am putut citi configurația de sincronizare. Încercați din nou mai târziu sau verificați permisiunile folder.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
+    <string name="general_sync_unknown_drive_path">Calea către unitatea de sincronizare este necunoscută.</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
+    <string name="general_sync_invalid_scan_interval">Interval de analiză invalid. Verificați configurarea intervalului de analiză și încercați din nou.</string>
+    <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
+    <string name="general_sync_notification_system_unavailable">Nu am putut comunica cu locația folderului. Verificați dacă locația este accesibilă și permisiunile pentru locația folderului sunt acordate.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
+    <string name="general_sync_unable_to_add_watch">Imposibil de adăugat un ceas de sistem de fișiere. Asigurați-vă că există suficient spațiu liber și memorie și că ați acordat permisiuni pentru locația folderului.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
+    <string name="general_sync_unable_to_retrieve_root_fsid">Nu am putut citi locația de sincronizare. Verificați dacă locația este accesibilă și permisiunile pentru locația folderului sunt acordate.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
+    <string name="general_sync_unable_to_open_database">Unable to open state cache database</string>
+    <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
+    <string name="general_sync_insufficient_disk_space">Insufficient storage space on your device</string>
+    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
+    <string name="general_sync_failure_accessing_persistent_storage">Nu am putut citi locația de sincronizare. Verificați dacă locația este accesibilă și permisiunile pentru locația folderului sunt acordate.</string>
+    <!-- The name for specific Sub States to indicate that an unknown error occurred -->
+    <string name="general_sync_message_unknown_error">An unknown error occurred. Contact Support.</string>
+    <!-- The name for specific Sub States to indicate that something went wrong -->
+    <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
+    <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
+    <string name="general_sync_message_node_in_rubbish_bin">Folder can’t be synced or backed up as the MEGA folder is in the Rubbish bin.</string>
+    <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
+    <string name="general_sync_message_cannot_locate_local_drive_now">Folder in your device can’t be located right now. Try again later.</string>
+    <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
+    <string name="general_sync_message_cannot_locate_local_drive">Folderul din dispozitiv dvs. nu poate fi localizat</string>
+    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
+    <string name="general_sync_message_folder_backup_issue_due_to_recent_changes">Problem syncing or backing up this folder because of changes to the MEGA folder. Stop the sync or backup and try setting it up again in the Desktop app, or contact Support.</string>
+    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
+    <string name="general_sync_message_folder_backup_issue">Problemă la sincronizarea sau backup a acestui folder. Opriți sincronizarea sau backup-ul și încercați să o configurați din nou în aplicația Desktop sau contactați Asistența.</string>
+    <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
+    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Folderul nu poate fi sincronizat, deoarece se află deja într-un folder sincronizat.</string>
+    <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
+    <string name="general_sync_local_filesystem_mismatch">Fișierele din acest folder nu pot fi sincronizate sau backup-uite. Va trebui să reactivați sincronizarea sau backupul din aplicația desktop.</string>
+</resources>

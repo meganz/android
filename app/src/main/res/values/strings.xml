@@ -84,8 +84,6 @@
     <string name="action_refresh">Refresh</string>
     <!-- Menu item -->
     <string name="action_sort_by">Sort by</string>
-    <!-- Menu item -->
-    <string name="action_help">Help</string>
     <!-- Change from a free account to paying MEGA -->
     <string name="action_upgrade_account">Upgrade account</string>
     <!-- Menu item to select all the elements of a list -->
@@ -1520,10 +1518,6 @@
     <string name="save_cloud_drive">To Cloud drive</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
     <string name="save_file_system">To file system</string>
-    <!-- Title of QR code section -->
-    <string name="section_my_code">My code</string>
-    <!-- Title of QR code scan section -->
-    <string name="section_scan_code">Scan code</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">MEGA users who scan your QR code will be automatically added to your contact list.</string>
     <!-- Text shown when it has been copied the QR code link -->
@@ -2228,18 +2222,8 @@
     <string name="subtitle_incoming_contact_request_accepted">[B]Contact request from [/B][A]%s [/A][B]was accepted[/B]</string>
     <!-- Subtitle of the historic notification for incoming contact request declined -->
     <string name="subtitle_incoming_contact_request_denied">[B]Contact request from [/B][A]%s [/A][B]was declined[/B]</string>
-    <!-- Subtitle of the Upgrade account section -->
-    <string name="type_of_my_account">Your current account is [A]%s[/A]</string>
     <!-- Footnote to clarify the storage space is subject to the achievement program -->
     <string name="footnote_achievements">Subject to your participation in our achievements program.</string>
-    <!-- Title label for the current payment method during account upgrading -->
-    <string name="payment_method">Payment method</string>
-    <!-- title of billing period -->
-    <string name="billing_period_title">Billing period</string>
-    <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]Billed monthly[/A] %s/month</string>
-    <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Billed yearly[/A] %s/year</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">Cancel</string>
     <!-- dialog option continue in alert dialog -->
@@ -2248,8 +2232,6 @@
     <string name="payment_method_google_wallet">[A]Google Pay[/A] (subscription)</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
     <string name="new_label_notification_item">New</string>
-    <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
-    <string name="label_custom_plan">To upgrade your current subscription, please contact our support team for a [A]custom plan[/A].</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">file name</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
@@ -2404,8 +2386,6 @@
     <string name="current_location_label">Send your current location</string>
     <!-- Label layout on maps activity that permits send current location. Placeholder is the current location -->
     <string name="current_location_landscape_label">Send your current location: [A]%1$s[/A]</string>
-    <!-- Label layout on maps activity indicating nearby places -->
-    <string name="nearby_places_label">Nearby places</string>
     <!-- Message shown in a dialog explaining the consequences of accesing the location -->
     <string name="explanation_send_location">This location will be opened using a third party maps provider outside the end-to-end encrypted MEGA platform.</string>
     <!-- Title of the location marker set by the user -->
@@ -2470,8 +2450,6 @@
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
     <string name="no_contacts_invite">You have no MEGA contacts. Please invite friends from the Contacts section.</string>
-    <!-- Invite button for chat top cell -->
-    <string name="invite_more">Invite more</string>
     <!-- Title of first tour screen -->
     <string name="title_tour_one">You hold the keys</string>
     <!-- Content of first tour screen -->
@@ -3325,8 +3303,6 @@
     <string name="show_activity_action">Show activity</string>
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">[B]Recents[/B] activity hidden</string>
-    <!-- Label indicating video original quality -->
-    <string name="original_quality">Original quality</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
     <string name="setting_fingerprint">Fingerprint ID</string>
     <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
@@ -3385,8 +3361,6 @@
     <string name="backup_remove_root_folder">You are deleting your backups folder. This will remove all the backups you have set. Are you sure you want to do this?</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">Move “%1s” to Rubbish bin</string>
-    <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_disable_confirm">Disable backup</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Read-only</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
@@ -3403,12 +3377,6 @@
     <string name="upload_files">Upload files</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Upload folder</string>
-    <!-- Title of the Payments screen -->
-    <string name="payment">Payment</string>
-    <!-- Label indicating payment methods -->
-    <string name="payment_methods">Payment methods</string>
-    <!-- Button to proceed with a payment -->
-    <string name="proceed">Proceed</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Remove as host</string>
     <!-- Title message of existing subscription dialog -->
@@ -4462,12 +4430,18 @@
         <item quantity="one">Couldn’t copy %1$d item</item>
         <item quantity="other">Couldn’t copy %1$d items</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Copied %1$d item,&#160;</item>
         <item quantity="other">Copied %1$d items,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">couldn’t copy %1$d item</item>
         <item quantity="other">couldn’t copy %1$d items</item>
@@ -4739,8 +4713,6 @@
     <string name="account_upgrade_account_description_feature_link">&#8226;&#160;Links with expiry dates</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;Transfer quota sharing</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Automatic backups</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days of deleted data on Pro&#160;Lite and up to 180 days on Pro&#160;I, II, and III</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->

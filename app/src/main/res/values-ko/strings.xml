@@ -84,8 +84,6 @@
     <string name="action_refresh">새로 고침</string>
     <!-- Menu item -->
     <string name="action_sort_by">정렬 기준</string>
-    <!-- Menu item -->
-    <string name="action_help">도움말</string>
     <!-- Change from a free account to paying MEGA -->
     <string name="action_upgrade_account">계정 업그레이드</string>
     <!-- Menu item to select all the elements of a list -->
@@ -1486,10 +1484,6 @@
     <string name="save_cloud_drive">클라우드 드라이브로</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
     <string name="save_file_system">파일 시스템으로</string>
-    <!-- Title of QR code section -->
-    <string name="section_my_code">내 코드</string>
-    <!-- Title of QR code scan section -->
-    <string name="section_scan_code">코드 스캔</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">당신의 QR 코드를 스캔한 MEGA 이용자는 자동으로 연락처 목록에 추가됩니다.</string>
     <!-- Text shown when it has been copied the QR code link -->
@@ -2181,18 +2175,8 @@
     <string name="subtitle_incoming_contact_request_accepted">[A]%s님이 보낸 [/A][B]연락처 요청을 [/B][B]수락하였습니다[/B]</string>
     <!-- Subtitle of the historic notification for incoming contact request declined -->
     <string name="subtitle_incoming_contact_request_denied">[A]%s님이 보낸 [/A][B]연락처 요청을 [/B][B]거절하였습니다[/B]</string>
-    <!-- Subtitle of the Upgrade account section -->
-    <string name="type_of_my_account">현재 계정은 [A]%s[/A]입니다</string>
     <!-- Footnote to clarify the storage space is subject to the achievement program -->
     <string name="footnote_achievements">도전 과제 프로그램에 참여할 수 있습니다.</string>
-    <!-- Title label for the current payment method during account upgrading -->
-    <string name="payment_method">결제 수단</string>
-    <!-- title of billing period -->
-    <string name="billing_period_title">결제 주기</string>
-    <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]월간 결제[/A] %s/월</string>
-    <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]연간 결제[/A] %s/년</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">취소</string>
     <!-- dialog option continue in alert dialog -->
@@ -2201,8 +2185,6 @@
     <string name="payment_method_google_wallet">[A]Google Pay[/A](구독)</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
     <string name="new_label_notification_item">신규</string>
-    <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
-    <string name="label_custom_plan">현재 구독을 업그레이드하려면, 우리의 고객지원 팀에 [A]개별 요금제[/A]에 대해 문의하세요.</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">파일명</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
@@ -2347,8 +2329,6 @@
     <string name="current_location_label">현재 위치 전송</string>
     <!-- Label layout on maps activity that permits send current location. Placeholder is the current location -->
     <string name="current_location_landscape_label">현재 위치 전송: [A]%1$s[/A]</string>
-    <!-- Label layout on maps activity indicating nearby places -->
-    <string name="nearby_places_label">근처의 장소</string>
     <!-- Message shown in a dialog explaining the consequences of accesing the location -->
     <string name="explanation_send_location">이 위치는 MEGA의 종단간 암호화 플랫폼 밖의 제3자 지도 제공자에서 열릴 것입니다.</string>
     <!-- Title of the location marker set by the user -->
@@ -2407,8 +2387,6 @@
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
     <string name="no_contacts_invite">MEGA 연락처가 없습니다. 연락처 부문에서 친구들을 초대하세요.</string>
-    <!-- Invite button for chat top cell -->
-    <string name="invite_more">더 초대하기</string>
     <!-- Title of first tour screen -->
     <string name="title_tour_one">당신이 열쇠를 갖습니다</string>
     <!-- Content of first tour screen -->
@@ -2573,12 +2551,6 @@
     <string name="error_remove_business_contact">%1$s님의 연락처는 당신의 비즈니스 계정의 일부이기 때문에 삭제할 수 없습니다.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">지난 결제에 문제가 있었습니다. 자세한 정보를 보려면 데스크톱 브라우저를 이용하여 MEGA에 접속하세요.</string>
-    <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">계정 비활성화됨</string>
-    <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">당신의 비즈니스 계정은 결제 실패로 인해 비활성화 되었습니다. 계정 안에 있는 데이터에 접근하지 못할 것입니다. 결제를 하고 구독을 재활성화 하려면, 브라우저에서 MEGA에 로그인 하세요.</string>
-    <!-- A message which is shown to sub-users of expired business accounts. -->
-    <string name="expired_user_business_text">당신의 계정은 현재 [B]정지[/B]되었습니다. 당신의 데이터를 탐색만할 수 있습니다.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
     <string name="camera_uploads_business_alert">MEGA는 당신의 데이터에 접근할 수 없습니다. 그러나 당신의 비즈니스 계정 관리자는 당신의 카메라 업로드에 접근할 수 있습니다.</string>
     <!-- General label to alert user that somehting went wrong -->
@@ -2993,10 +2965,6 @@
     <string name="months_view_button">월</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
     <string name="years_view_button">년</string>
-    <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
-    <plurals name="cu_upload_progress">
-        <item quantity="other">업로드 진행 중, 파일 %1$d개 대기 중</item>
-    </plurals>
     <!-- Text to show as production api server option -->
     <string name="production_api_server">운영</string>
     <!-- Title to show in a dialog to change api server -->
@@ -3243,8 +3211,6 @@
     <string name="show_activity_action">활동 보기</string>
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">[B]최근[/B] 활동 숨겨짐</string>
-    <!-- Label indicating video original quality -->
-    <string name="original_quality">원본 품질</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
     <string name="setting_fingerprint">지문 ID</string>
     <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
@@ -3303,8 +3269,6 @@
     <string name="backup_remove_root_folder">백업 폴더를 삭제하려고 합니다. 이것은 당신이 설정한 모든 백업을 삭제합니다. 정말 하시겠습니까?</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">“%1s”을/를 휴지통으로 이동</string>
-    <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_disable_confirm">백업 비활성화</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">읽기 전용</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
@@ -3321,12 +3285,6 @@
     <string name="upload_files">파일 업로드</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">폴더 업로드</string>
-    <!-- Title of the Payments screen -->
-    <string name="payment">결제</string>
-    <!-- Label indicating payment methods -->
-    <string name="payment_methods">결제 수단</string>
-    <!-- Button to proceed with a payment -->
-    <string name="proceed">진행</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">주최자에서 해임</string>
     <!-- Title message of existing subscription dialog -->
@@ -4537,8 +4495,6 @@
     <string name="account_upgrade_account_description_feature_link">&#8226;&#160;만료일이 있는 링크</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;전송 할당량 공유</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;자동 백업</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Lite는 최대 90일, Pro&#160;I, II, 그리고 III은 최대 180일의 삭제한 데이터 되돌리기</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
@@ -4551,8 +4507,6 @@
     <string name="account_upgrade_account_buy_button_title_pro_ii">Pro&#160;II 구입</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_iii">Pro&#160;III 구입</string>
-    <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
-    <string name="account_upgrade_account_terms_of_service_link">이용 약관</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
     <string name="cloud_drive_subtitle_link_access_password">비밀번호가 있는 사람만 링크를 열 수 있습니다</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
@@ -5035,6 +4989,7 @@
     <string name="account_upgrade_subscription_details">구독은 처음 선택한 기간과 같은 기간 그리고 같은 가격으로 연속적으로 자동 갱신 됩니다. MEGA&#160;Pro 구독 자동 갱신을 [A]Google Play[/A]의 구독을 통해 다음 구독의 결제 24시간 전에 취소할 수 있습니다.</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">갤러리에 접근 허용</string>
+    <!--  -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">접근 허가</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">업데이트가 필요합니다</string>
@@ -5087,7 +5042,7 @@
     <!-- Button text to change SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_action_button">변경</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
-    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">무료 요금제는 회의마다 60분의 제한이 있습니다. [A]지금 업그레이드.[/A]</string>
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]무료 요금제는 회의에 60분 제한이 있습니다. Pro 이용자는 무제한 통화와 최대 1,000명의 참여자가 가능합니다.[/A] [B]지금 업그레이드.[/B]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_monthly_with_price">즉시 %1$s이/가 청구될 것이며 구독은 1개월 후 자동으로 매월 %2$s으로 갱신됩니다. 당신의 Google&#160;Play 계정은 매 결제 주기 말일로부터 24시간 내에 청구될 것입니다. 구독을 취소하려면 [A]Google&#160;Play[/A]의 구독을 통해 결제 주기 말일의 24시간 전에 MEGA&#160;Pro 구독의 자동 갱신을 비활성화해야 합니다.\n계정을 업그레이드 함으로써, 당신은 MEGA의 [B]이용 약관[/B]과 [C]개인정보 처리 방침[/C]에 동의하는 것입니다.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
@@ -5115,16 +5070,87 @@
     <!-- The negative button text of the Dialog shown to upgrade meeting from the free version -->
     <string name="meetings_in_call_warning_dialog_negative_button">나중에</string>
     <!-- The snackbar message of the time left for the current free call -->
-    <string name="meetings_in_call_warning_timer_message">This free call will end in %s</string>
+    <string name="meetings_in_call_warning_timer_message">이 무료 통화는 %s 내에 종료됩니다</string>
     <!-- The title of the Dialog shown to upgrade meeting from the free version -->
     <plurals name="meetings_in_call_warning_dialog_title">
-        <item quantity="one">Your free call will end in %d minute</item>
-        <item quantity="other">Your free call will end in %d minutes</item>
+        <item quantity="other">당신의 무료 통화는 %d분 내에 종료됩니다</item>
     </plurals>
     <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
     <string name="notifications_screen_notification_promo_expiration_time">%1$s %2$s에 만료됨</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
-    <string name="meetings_free_call_organiser_number_of_participants_warning">[A]As a free user, you can only add up to 100 participants to this call. Need more?[/A]&#160;[B]Upgrade now[/B]</string>
+    <string name="meetings_free_call_organiser_number_of_participants_warning">100명의 참여자만 통화에 참여할 수 있습니다. 모든 추가 참여자는 메시지를 보내고 받을 수만 있습니다. 주최자는 Pro로 업그레이드하여 이러한 제한을 없앨 수 있습니다.</string>
     <!-- Warning Message for non organiser for Free Call -->
     <string name="meetings_free_call_non_organiser_number_of_participants_warning">100명의 참여자만 통화에 참여할 수 있습니다. 추가 참여자는 대화를 읽고 보내기만 할 수 있습니다. 주최자에게 이 제한을 없애달라고 요청하세요.</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_low">낮음</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Medium Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_medium">보통</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to High Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_high">높음</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos are automatically uploaded by Camera Uploads without any Video Compression -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_original">원본</string>
+    <!-- Warning shown when the recording of audio permission is required for sending a voice clip and it has been denied by the user -->
+    <string name="chat_microphone_permissions_denied_for_voice_clip">당신은 MEGA가 당신의 마이크에 접근하는 것을 거부하였습니다. 음성 클립을 녹음하려면, MEGA가 할 수 있도록 권한을 허용하세요.</string>
+    <!-- Free plan limitation dialog title for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">참여할 수 없음</string>
+    <!-- Free plan limitation dialogue description for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">이 통화는 100명의 참여자만 지원합니다. 주최자에게 이 제한을 없앨 것을 요청하세요.</string>
+    <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">알겠습니다</string>
+    <!-- The title of the hidden nodes feature -->
+    <string name="hidden_nodes">숨겨진 파일과 폴더</string>
+    <!-- Hidden nodes benefit: hide files and folders -->
+    <string name="hidden_nodes_benefit_title_hide_files_folders">중요한 파일과 폴더 숨기기</string>
+    <!-- Hidden nodes benefit description: hide files and folders -->
+    <string name="hidden_nodes_benefit_description_hide_files_folders">개인 정보 보호를 위해 민감한 파일 및 폴더를 숨길 수 있습니다. 당신만 그것들을 개별적으로 또는 일시적으로 숨겨진 항목들을 설정에서 나타나게 할 수 있습니다.</string>
+    <!-- Hidden nodes benefit: exclude from timeline -->
+    <string name="hidden_nodes_benefit_title_exclude_timeline">연표에서 제외</string>
+    <!-- Hidden nodes benefit description: exclude from timeline -->
+    <string name="hidden_nodes_benefit_description_exclude_timeline">숨겨진 항목은 클라우드 드라이브를 통해서만 접근 가능하며 사진, 사진첩 또는 최근 항목에 나타나지 않습니다.</string>
+    <!-- Hidden nodes benefit: out of sight -->
+    <string name="hidden_nodes_benefit_title_out_of_sight">시야 범위 밖</string>
+    <!-- Hidden nodes benefit description: out of sight -->
+    <string name="hidden_nodes_benefit_description_out_of_sight">숨겨진 파일이 보일 때를 정할 수 있습니다. 숨겨진 항목을 일시적으로 보이게 하는 새로운 설정이 있습니다.</string>
+    <!-- The snackbar message of hidden nodes operation -->
+    <plurals name="hidden_nodes_result_message">
+        <item quantity="other">%1$d개 항목 숨겨짐</item>
+    </plurals>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_priority_support">&#8226;&#160;우선 지원</string>
+    <!-- The title of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_title">무제한 통화를 하려면 Pro로 업그레이드 하세요</string>
+    <!-- The body of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_body">당신의 통화가 60분 제한에 도달하여 종료되었습니다. Pro 이용자들은 무제한 통화와 최대 1,000명까지 참여할 수 있습니다.</string>
+    <!-- The button text of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_button">지금 업그레이드</string>
+    <!-- Search drop down chips filter type file type -->
+    <string name="search_dropdown_chip_filter_type_file_type">형식</string>
+    <!-- Search drop down chips filter type file type images -->
+    <string name="search_dropdown_chip_filter_type_file_type_images">이미지</string>
+    <!-- Search drop down chips filter type file type videos -->
+    <string name="search_dropdown_chip_filter_type_file_type_video">동영상</string>
+    <!-- Search drop down chips filter type file type audio -->
+    <string name="search_dropdown_chip_filter_type_file_type_audio">음성</string>
+    <!-- Search drop down chips filter type file type documents -->
+    <string name="search_dropdown_chip_filter_type_file_type_documents">문서</string>
+    <!-- Search drop down chips filter type date added -->
+    <string name="search_dropdown_chip_filter_type_date_added">추가된 날짜</string>
+    <!-- Search drop down chips filter type last modified -->
+    <string name="search_dropdown_chip_filter_type_last_modified">최종 수정일</string>
+    <!-- Search drop down chips filter type date modified today -->
+    <string name="search_dropdown_chip_filter_type_date_today">오늘</string>
+    <!-- Search drop down chips filter type date modified last 7 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_seven_days">최근 7일</string>
+    <!-- Search drop down chips filter type date modified last 30 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_thirty_days">최근 30일</string>
+    <!-- Search drop down chips filter type date modified this year -->
+    <string name="search_dropdown_chip_filter_type_date_this_year">올해</string>
+    <!-- Search drop down chips filter type date modified last year -->
+    <string name="search_dropdown_chip_filter_type_date_last_year">지난 해</string>
+    <!-- Search drop down chips filter type date modified older -->
+    <string name="search_dropdown_chip_filter_type_date_older">더 오래됨</string>
+    <!-- String below login button next to button for reporting a login issue -->
+    <string name="general_login_label_trouble_logging_in">로그인에 문제가 있나요?</string>
+    <!-- Button text for reporting an issue on the login screen -->
+    <string name="general_login_button_report_your_issue">문제 신고</string>
 </resources>

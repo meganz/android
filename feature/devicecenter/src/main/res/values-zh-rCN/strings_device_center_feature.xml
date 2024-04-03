@@ -101,7 +101,7 @@
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">重命名失败。</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
-    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">无法为此同步创建.megaignore文件。</string>
+    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">Couldn’t create a .megaignore file for this sync</string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
     <string name="device_center_list_view_item_sub_state_sync_config_read_failure">无法读取同步配置。稍后重试或检查文件夹权限。</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
@@ -176,8 +176,7 @@
     </plurals>
     <!-- String which indicates the number of folders contained into a device/folder -->
     <plurals name="device_center_info_num_folders">
-        <item quantity="one">%1$d folder</item>
-        <item quantity="other">%1$d folders</item>
+        <item quantity="other">%1$d个文件夹</item>
     </plurals>
     <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="device_center_info_num_folders_and_files">

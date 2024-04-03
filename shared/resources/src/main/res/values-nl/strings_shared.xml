@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
+    <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
+    <string name="general_sync_no_error">Geen synchronisatiefout</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
+    <string name="general_sync_unsupported_file_system">MEGA kan geen synchronisatie of back-up van deze map maken omdat het bestandsysteem op uw apparaat niet ondersteund is.</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
+    <string name="general_sync_invalid_remote_type">De map die u heeft gekozen, kan niet worden gesynchroniseerd</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
+    <string name="general_sync_invalid_local_type">Een bestand kan niet individueel gesynchroniseerd worden. U moet de synchronisatie vanuit de map instellen.</string>
+    <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
+    <string name="general_sync_initial_scan_failed">Eerste scan mislukt. U moet uw synchronisatie of back-up opnieuw inschakelen via de desktop-applicatie.</string>
+    <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
+    <string name="general_sync_remote_node_not_found">De map in MEGA kan niet worden gevonden omdat deze is verplaatst of verwijderd, of u heeft misschien geen toegang</string>
+    <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
+    <string name="general_sync_storage_overquota">Unable to sync or back up this folder as your storage is full</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
+    <string name="general_sync_account_expired">U kunt deze map niet synchroniseren of er een back-up van maken omdat uw abonnement is verlopen</string>
+    <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
+    <string name="general_sync_foreign_target_overshare">De map kan niet worden gesynchroniseerd omdat de gebruiker die deze map heeft gedeeld de opslaglimiet heeft bereikt</string>
+    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
+    <string name="general_sync_remote_path_has_changed">De map in MEGA kan niet worden gevonden omdat deze is verplaatst of verwijderd, of u heeft misschien geen toegang</string>
+    <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
+    <string name="general_sync_share_non_full_access">De map kan niet worden gesynchroniseerd omdat het een gedeelde map is waar u geen volledige toegang tot heeft</string>
+    <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
+    <string name="general_sync_put_nodes_error">Bestanden in deze map kunnen niet worden gesynchroniseerd of er kan geen back-up van worden gemaakt. U moet het synchroniseren of backuppen opnieuw inschakelen via de Desktop-applicatie.</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
+    <string name="general_sync_active_sync_below_path">De map kan niet worden gesynchroniseerd omdat deze al gesynchroniseerde mappen bevat</string>
+    <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
+    <string name="general_sync_vboxsharedfolder_unsupported">MEGA kan VirtualBox-mappen niet synchroniseren of er een back-up van maken</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
+    <string name="general_sync_account_blocked">Unable to sync or back up this folder as the account has been blocked</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
+    <string name="general_sync_unknown_temporary_error">Probleem bij het synchroniseren of back-uppen van deze map. Probeer het later nog eens. Neem contact op met de ondersteuning als het probleem zich blijft voordoen.</string>
+    <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
+    <string name="general_sync_too_many_action_packets">Account opnieuw geladen. Eventuele gemiste updates voor uw back-ups of synchronisaties zijn niet toegepast.</string>
+    <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
+    <string name="general_sync_logged_out">Synchronisatie of back-up is gestopt omdat het lijkt alsof u bent afgemeld bij de Desktop-applicatie. Meld u opnieuw aan via de Desktop-applicatie en hervat de synchronisatie of back-up.</string>
+    <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
+    <string name="general_sync_missing_parent_node">N/A</string>
+    <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
+    <string name="general_sync_backup_source_not_below_drive">Map in lokale schijf kan niet gevonden worden.</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
+    <string name="general_sync_active_sync_same_path">Er is al een gesynchroniseerde map op dezelfde lokatie</string>
+    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
+    <string name="general_sync_could_not_move_cloud_nodes">Hernoemen is mislukt.</string>
+    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
+    <string name="general_sync_could_not_create_ignore_file">Kon geen .megaignore bestand aanmaken voor deze synchronisatie</string>
+    <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
+    <string name="general_sync_config_read_failure">Kon de synchronisatieconfiguratie niet lezen. Probeer het later opnieuw of controleer de mapmachtigingen.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
+    <string name="general_sync_unknown_drive_path">Het schijfpad van Sync is onbekend.</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
+    <string name="general_sync_invalid_scan_interval">Ongeldig scaninterval. Controleer de instellingen voor het scaninterval en probeer het opnieuw.</string>
+    <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
+    <string name="general_sync_notification_system_unavailable">Did you mean: Couldn\’t communicate with the folder location. Check the location is accessible and permissions for the folder location are granted. Kan niet communiceren met de maplocatie. Controleer of de locatie toegankelijk is en of er machtigingen voor de maplocatie zijn verleend.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
+    <string name="general_sync_unable_to_add_watch">Kan geen bestandssysteembewaking toevoegen. Zorg ervoor dat er voldoende vrije ruimte en geheugen is en dat u machtigingen hebt verleend voor de maplocatie.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
+    <string name="general_sync_unable_to_retrieve_root_fsid">Kan de synchronisatielocatie niet lezen. Controleer of de locatie toegankelijk is en of er machtigingen voor de maplocatie zijn verleend.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
+    <string name="general_sync_unable_to_open_database">Kan de statuscachedatabase niet openen</string>
+    <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
+    <string name="general_sync_insufficient_disk_space">Onvoldoende opslagruimte op uw apparaat</string>
+    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
+    <string name="general_sync_failure_accessing_persistent_storage">Kan de synchronisatielocatie niet lezen. Controleer of de locatie toegankelijk is en of er machtigingen voor de maplocatie zijn verleend.</string>
+    <!-- The name for specific Sub States to indicate that an unknown error occurred -->
+    <string name="general_sync_message_unknown_error">Er is een onbekende fout opgetreden. Neem contact op met de klantenservice.</string>
+    <!-- The name for specific Sub States to indicate that something went wrong -->
+    <string name="general_sync_message_something_went_wrong">Er is iets misgegaan.</string>
+    <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
+    <string name="general_sync_message_node_in_rubbish_bin">De map kan niet worden gesynchroniseerd of er kan geen back-up van worden gemaakt omdat de MEGA-map zich in de Prullenbak bevindt.</string>
+    <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
+    <string name="general_sync_message_cannot_locate_local_drive_now">De map op uw apparaat kan op dit moment niet worden gevonden. Probeer het later nog eens.</string>
+    <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
+    <string name="general_sync_message_cannot_locate_local_drive">De map op uw apparaat kan niet worden gevonden</string>
+    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
+    <string name="general_sync_message_folder_backup_issue_due_to_recent_changes">Probleem bij het synchroniseren of maken van een reservekopie van deze map vanwege wijzigingen in de MEGA-map. Stop het synchroniseren of de backup en probeer het opnieuw in te stellen in de Desktop-applicatie, of neem contact op met de klantenservice.</string>
+    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
+    <string name="general_sync_message_folder_backup_issue">Probleem bij het synchroniseren of back-uppen van deze map. Stop de synchronisatie of back-up en probeer deze opnieuw in te stellen in de Desktop-applicatie, of neem contact op met de ondersteuning.</string>
+    <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
+    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Map kan niet gesynchroniseert worden omdat het al binnen een gesynchroniseerde map is.</string>
+    <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
+    <string name="general_sync_local_filesystem_mismatch">Bestanden in deze map kunnen niet worden gesynchroniseerd of er kan geen back-up van worden gemaakt. U moet de synchronisatie of back-up opnieuw inschakelen via de desktop-applicatie.</string>
+</resources>

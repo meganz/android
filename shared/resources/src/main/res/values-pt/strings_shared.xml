@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
+    <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
+    <string name="general_sync_no_error">Não há erros de sincronização</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
+    <string name="general_sync_unsupported_file_system">O MEGA não pode sincronizar ou fazer backup desta pasta porque o sistema de arquivos do seu dispositivo não é suportado.</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
+    <string name="general_sync_invalid_remote_type">Não é possível sincronizar a pasta selecionada</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
+    <string name="general_sync_invalid_local_type">Um arquivo não pode ser sincronizado individualmente. Você precisa configurar a sincronização a partir de uma pasta.</string>
+    <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
+    <string name="general_sync_initial_scan_failed">Falha no escaneio inicial. Você precisa reativar a sua sincronização ou o seu backup no aplicativo para desktop.</string>
+    <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
+    <string name="general_sync_remote_node_not_found">Não foi possível localizar a pasta no MEGA porque ela foi movida ou deletada, ou pode ser que você não tenha acesso a ela.</string>
+    <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
+    <string name="general_sync_storage_overquota">Unable to sync or back up this folder as your storage is full</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
+    <string name="general_sync_account_expired">Não foi possível sincronizar ou fazer backup dessa pasta porque o seu plano expirou.</string>
+    <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
+    <string name="general_sync_foreign_target_overshare">Não é possível sincronizar esta pasta porque a conta do usuário que a compartilhou alcançou o limite de armazenamento.</string>
+    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
+    <string name="general_sync_remote_path_has_changed">Não foi possível localizar a pasta no MEGA porque ela foi movida ou deletada, ou pode ser que você não tenha acesso a ela.</string>
+    <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
+    <string name="general_sync_share_non_full_access">Não é possível sincronizar esta pasta porque é uma pasta compartilhada à qual você não tem acesso total.</string>
+    <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
+    <string name="general_sync_put_nodes_error">Não foi possível sincronizar ou fazer backup dos arquivos nesta pasta. Você precisa reativar a sua sincronização ou o seu backup no aplicativo para desktop.</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
+    <string name="general_sync_active_sync_below_path">Não é possível sincronizar esta pasta porque ela contém pastas sincronizadas.</string>
+    <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
+    <string name="general_sync_vboxsharedfolder_unsupported">O MEGA não pode sincronizar ou fazer backup das pastas do VirtualBox.</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
+    <string name="general_sync_account_blocked">Unable to sync or back up this folder as the account has been blocked</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
+    <string name="general_sync_unknown_temporary_error">Não foi possível sincronizar ou fazer o backup desta pasta. Tente novamente mais tarde. Se o problema persistir, entre em contato com a nossa equipe de Suporte.</string>
+    <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
+    <string name="general_sync_too_many_action_packets">A sua conta foi recarregada. Nenhuma atualização pendente dos seus backups ou das suas sincronizações não foi feita.</string>
+    <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
+    <string name="general_sync_logged_out">A sincronização ou o backup foram interrompidos porque você parece ter se desconectado do aplicativo para desktop. Faça login novamente no aplicativo para desktop e para retomar a sincronização ou o backup.</string>
+    <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
+    <string name="general_sync_missing_parent_node">N/A</string>
+    <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
+    <string name="general_sync_backup_source_not_below_drive">Não é possível localizar a pasta na unidade externa.</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
+    <string name="general_sync_active_sync_same_path">Já existe uma pasta sincronizada no mesmo local.</string>
+    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
+    <string name="general_sync_could_not_move_cloud_nodes">Não foi possível renomear.</string>
+    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
+    <string name="general_sync_could_not_create_ignore_file">Não foi possível criar um arquivo .megaignore para essa sincronização.</string>
+    <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
+    <string name="general_sync_config_read_failure">Não foi possível ler a configuração da sincronização. Tente novamente mais tarde ou verifique as permissões da pasta.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
+    <string name="general_sync_unknown_drive_path">O caminho da unidade de sincronização é desconhecido.</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
+    <string name="general_sync_invalid_scan_interval">O intervalo de escaneado é inválido. Verifique a configuração do intervalo de escaneado e tente novamente.</string>
+    <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
+    <string name="general_sync_notification_system_unavailable">Não foi possível se comunicar com a localização da pasta. Verifique se o local está acessível e se as permissões para a localização da pasta foram concedidas.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
+    <string name="general_sync_unable_to_add_watch">Não é possível adicionar um monitor do sistema de arquivos. Verifique se há espaço livre e memória suficientes e se você tem permissões para a acessar a localização da pasta.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
+    <string name="general_sync_unable_to_retrieve_root_fsid">Não foi possível ler a localização da sincronização. Verifique se o local está acessível e se as permissões para a localização da pasta foram concedidas.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
+    <string name="general_sync_unable_to_open_database">Não é possível abrir o banco de dados de cache de estado</string>
+    <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
+    <string name="general_sync_insufficient_disk_space">Não há espaço de armazenamento suficiente no seu dispositivo.</string>
+    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
+    <string name="general_sync_failure_accessing_persistent_storage">Não foi possível ler a localização da sincronização. Verifique se o local está acessível e se as permissões para a localização da pasta foram concedidas.</string>
+    <!-- The name for specific Sub States to indicate that an unknown error occurred -->
+    <string name="general_sync_message_unknown_error">Ocorreu um erro desconhecido - entre em contato com o Suporte.</string>
+    <!-- The name for specific Sub States to indicate that something went wrong -->
+    <string name="general_sync_message_something_went_wrong">Algo deu errado.</string>
+    <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
+    <string name="general_sync_message_node_in_rubbish_bin">Não é possível sincronizar ou fazer backup porque a pasta no MEGA está na Lixeira.</string>
+    <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
+    <string name="general_sync_message_cannot_locate_local_drive_now">Não foi possível localizar a pasta no seu dispositivo - tente novamente mais tarde.</string>
+    <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
+    <string name="general_sync_message_cannot_locate_local_drive">Não foi possível localizar a pasta no seu dispositivo</string>
+    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
+    <string name="general_sync_message_folder_backup_issue_due_to_recent_changes">Não foi possível sincronizar ou fazer o backup desta pasta devido a alterações na pasta no MEGA. Cancele a sincronização ou o backup e tente configurá-lo novamente no aplicativo para desktop, ou entre em contato com a nossa equipe de Suporte.</string>
+    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
+    <string name="general_sync_message_folder_backup_issue">Não foi possível sincronizar ou fazer o backup desta pasta. Cancele a sincronização ou o backup e tente configurá-lo novamente no aplicativo para desktop, ou entre em contato com a nossa equipe de Suporte.</string>
+    <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
+    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Não é possível sincronizar esta pasta porque está dentro de uma pasta sincronizada.</string>
+    <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
+    <string name="general_sync_local_filesystem_mismatch">Não foi possível sincronizar ou fazer backup dos arquivos nesta pasta. Você precisa reativar a sua sincronização ou o seu backup no aplicativo para desktop.</string>
+</resources>

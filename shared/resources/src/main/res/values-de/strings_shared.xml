@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
+    <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
+    <string name="general_sync_no_error">No sync error</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
+    <string name="general_sync_unsupported_file_system">MEGA kann diesen Ordner nicht synchronisieren oder sichern, da das Dateisystem Ihres Geräts nicht unterstützt wird.</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
+    <string name="general_sync_invalid_remote_type">Der gewählte Ordner kann nicht synchronisiert werden</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
+    <string name="general_sync_invalid_local_type">Dateien können nicht einzeln synchronisiert werden. Sie müssen die Synchronisierung für einen Ordner einrichten.</string>
+    <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
+    <string name="general_sync_initial_scan_failed">Der Anfangsscan ist fehlgeschlagen. Sie müssen die Synchronisierung bzw. das Backup in der Desktop-App wieder aktivieren.</string>
+    <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
+    <string name="general_sync_remote_node_not_found">Der Ordner wurde auf MEGA nicht gefunden, da er verschoben oder gelöscht wurde oder Sie keinen Zugriff auf ihn haben.</string>
+    <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
+    <string name="general_sync_storage_overquota">Unable to sync or back up this folder as your storage is full</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
+    <string name="general_sync_account_expired">Dieser Ordner kann nicht synchronisiert oder gesichert werden, da Ihr Paket abgelaufen ist</string>
+    <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
+    <string name="general_sync_foreign_target_overshare">Der Ordner kann nicht synchronisiert werden, da der freigebende Benutzer sein Speicherplatzlimit erreicht hat</string>
+    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
+    <string name="general_sync_remote_path_has_changed">Der Ordner wurde auf MEGA nicht gefunden, da er verschoben oder gelöscht wurde oder Sie keinen Zugriff auf ihn haben.</string>
+    <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
+    <string name="general_sync_share_non_full_access">Der Ordner kann nicht synchronisiert werden, da es sich um einen freigegebenen Ordner handelt, auf den Sie keinen Vollzugriff haben</string>
+    <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
+    <string name="general_sync_put_nodes_error">Die Dateien in diesem Ordner können nicht synchronisiert oder gesichert werden. Sie müssen die Synchronisierung bzw. das Backup in der Desktop-App wieder aktivieren.</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
+    <string name="general_sync_active_sync_below_path">Der Ordner kann nicht synchronisiert werden, da er bereits synchronisierte Ordner enthält</string>
+    <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
+    <string name="general_sync_vboxsharedfolder_unsupported">MEGA kann VirtualBox-Ordner nicht synchronisieren oder sichern</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
+    <string name="general_sync_account_blocked">Unable to sync or back up this folder as the account has been blocked</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
+    <string name="general_sync_unknown_temporary_error">Problem bei der Synchronisierung oder Sicherung dieses Ordners. Bitte versuchen Sie es später erneut. Wenn das Problem weiterhin besteht, wenden Sie sich an den Support.</string>
+    <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
+    <string name="general_sync_too_many_action_packets">Account neu geladen. Verpasste Updates Ihrer Backups oder Synchronisierungen wurden nicht übernommen.</string>
+    <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
+    <string name="general_sync_logged_out">Die Synchronisierung oder das Backup wurde angehalten, da Sie sich anscheinend in der Desktop-App ausgeloggt haben. Loggen Sie sich in der Desktop-App wieder ein und aktivieren Sie die Synchronisierung bzw. das Backup erneut.</string>
+    <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
+    <string name="general_sync_missing_parent_node">N/A</string>
+    <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
+    <string name="general_sync_backup_source_not_below_drive">Ordner auf externem Laufwerk nicht gefunden.</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
+    <string name="general_sync_active_sync_same_path">Es gibt bereits einen synchronisierten Ordner an demselben Ort</string>
+    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
+    <string name="general_sync_could_not_move_cloud_nodes">Die Umbenennung ist fehlgeschlagen.</string>
+    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
+    <string name="general_sync_could_not_create_ignore_file">Für diese Synchronisierung konnte keine .megaignore-Datei erstellt werden</string>
+    <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
+    <string name="general_sync_config_read_failure">Synchronisierungskonfigurationen konnten nicht vom Laufwerk gelesen werden.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
+    <string name="general_sync_unknown_drive_path">Laufwerkspfad der Synchronisierung ist unbekannt</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
+    <string name="general_sync_invalid_scan_interval">Ungültiges Scan-Intervall</string>
+    <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
+    <string name="general_sync_notification_system_unavailable">Beim Subsystem für Dateisystem-Benachrichtigungen ist ein nicht behebbarer Fehler aufgetreten.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
+    <string name="general_sync_unable_to_add_watch">Eine Dateisystemüberwachung konnte nicht angelegt werden.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
+    <string name="general_sync_unable_to_retrieve_root_fsid">Die FSID eines Synchronisierungs-Stammordners konnte nicht abgerufen werden.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
+    <string name="general_sync_unable_to_open_database">Unable to open state cache database</string>
+    <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
+    <string name="general_sync_insufficient_disk_space">Unzureichender Speicherplatz auf Ihrem Gerät</string>
+    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
+    <string name="general_sync_failure_accessing_persistent_storage">Die FSID eines Synchronisierungs-Stammordners konnte nicht abgerufen werden.</string>
+    <!-- The name for specific Sub States to indicate that an unknown error occurred -->
+    <string name="general_sync_message_unknown_error">Ein unbekannter Fehler ist aufgetreten. Wenden Sie sich an den Support.</string>
+    <!-- The name for specific Sub States to indicate that something went wrong -->
+    <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
+    <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
+    <string name="general_sync_message_node_in_rubbish_bin">Der Ordner kann nicht synchronisiert oder gesichert werden, da sich der MEGA-Ordner im Papierkorb befindet.</string>
+    <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
+    <string name="general_sync_message_cannot_locate_local_drive_now">Der Ordner auf Ihrem Gerät kann derzeit nicht gefunden werden. Versuchen Sie es später erneut.</string>
+    <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
+    <string name="general_sync_message_cannot_locate_local_drive">Der Ordner auf Ihrem Gerät kann nicht gefunden werden</string>
+    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
+    <string name="general_sync_message_folder_backup_issue_due_to_recent_changes">Problem bei der Synchronisierung oder Sicherung dieses Ordners aufgrund von Änderungen am MEGA-Ordner. Beenden Sie die Synchronisierung bzw. das Backup und richten Sie sie in der Desktop-App erneut ein oder wenden Sie sich an den Support.</string>
+    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
+    <string name="general_sync_message_folder_backup_issue">Problem bei der Synchronisierung oder Sicherung dieses Ordners. Beenden Sie die Synchronisierung bzw. das Backup und richten Sie sie in der Desktop-App erneut ein oder wenden Sie sich an den Support.</string>
+    <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
+    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Der Ordner kann nicht synchronisiert werden, da er sich bereits innerhalb eines synchronisierten Ordners befindet.</string>
+    <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
+    <string name="general_sync_local_filesystem_mismatch">Die Dateien in diesem Ordner können nicht synchronisiert oder gesichert werden. Sie müssen die Synchronisierung bzw. das Backup in der Desktop-App wieder aktivieren.</string>
+</resources>

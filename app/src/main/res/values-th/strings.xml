@@ -84,8 +84,6 @@
     <string name="action_refresh">รีเฟรช</string>
     <!-- Menu item -->
     <string name="action_sort_by">เรียงตาม</string>
-    <!-- Menu item -->
-    <string name="action_help">ช่วยเหลือ</string>
     <!-- Change from a free account to paying MEGA -->
     <string name="action_upgrade_account">อัปเกรดบัญชี</string>
     <!-- Menu item to select all the elements of a list -->
@@ -772,7 +770,7 @@
     <!-- Button to park an account -->
     <string name="park_account_button">เก็บบัญชี</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">This is the last step to park your account, please enter your new password. Your data will be retained for at least 60 days. If you recall your parked account’s password, contact support&#64;mega.nz</string>
+    <string name="park_account_text_last_step">นี่เป็นขั้นตอนสุดท้ายในการเก็บบัญชีของคุณ กรุณากรอกรหัสผ่านใหม่ของคุณ ข้อมูลของคุณจะถูกเก็บไว้อย่างน้อย 60 วัน ถ้าคุณจำรหัสผ่านของบัญชีที่เก็บไว้ได้ ติดต่อ support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">กรอกรหัสผ่านใหม่</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
@@ -1486,10 +1484,6 @@
     <string name="save_cloud_drive">ไปยังคลาวด์ไดร์ฟ</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
     <string name="save_file_system">ไปยังไฟล์ระบบ</string>
-    <!-- Title of QR code section -->
-    <string name="section_my_code">โค้ดของฉัน</string>
-    <!-- Title of QR code scan section -->
-    <string name="section_scan_code">สแกนโค้ด</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">ผู้ใช้ MEGA ที่สแกนคิวอาร์โค้ดของคุณ จะถูกเพิ่มลงในรายชื่อผู้ติดต่อของคุณโดยอัตโนมัติ</string>
     <!-- Text shown when it has been copied the QR code link -->
@@ -2181,18 +2175,8 @@
     <string name="subtitle_incoming_contact_request_accepted">[B]คำขอติดต่อจาก [/B][A]%s [/A][B]ถูกยอมรับแล้ว[/B]</string>
     <!-- Subtitle of the historic notification for incoming contact request declined -->
     <string name="subtitle_incoming_contact_request_denied">[B]คำขอติดต่อจาก [/B][A]%s [/A][B]ถูกปฏิเสธแล้ว[/B]</string>
-    <!-- Subtitle of the Upgrade account section -->
-    <string name="type_of_my_account">บัญชีปัจจุบันของคุณคือ [A]%s[/A]</string>
     <!-- Footnote to clarify the storage space is subject to the achievement program -->
     <string name="footnote_achievements">ขึ้นอยู่กับการมีส่วนร่วมในโครงการความสำเร็จของเรา</string>
-    <!-- Title label for the current payment method during account upgrading -->
-    <string name="payment_method">วิธีการชำระเงิน</string>
-    <!-- title of billing period -->
-    <string name="billing_period_title">ระยะเวลาการเรียกเก็บเงิน</string>
-    <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]เรียกเก็บเงินรายเดือน[/A] %s/เดือน</string>
-    <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]เรียกเก็บเงินรายปี[/A] %s/ปี</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">ยกเลิก</string>
     <!-- dialog option continue in alert dialog -->
@@ -2201,8 +2185,6 @@
     <string name="payment_method_google_wallet">[A]Google Pay[/A] (การสมัครใช้งาน)</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
     <string name="new_label_notification_item">ใหม่</string>
-    <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
-    <string name="label_custom_plan">หากต้องการอัปเกรดการสมัครสมาชิกปัจจุบันของคุณ กรุณาติดต่อฝ่ายสนับสนุนของเราเพื่อเลือก[A]แผนกำหนดเอง[/A]</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">ชื่อไฟล์</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
@@ -2347,8 +2329,6 @@
     <string name="current_location_label">ส่งตำแหน่งปัจจุบันของคุณ</string>
     <!-- Label layout on maps activity that permits send current location. Placeholder is the current location -->
     <string name="current_location_landscape_label">ส่งตำแหน่งปัจจุบันของคุณ: [A]%1$s[/A]</string>
-    <!-- Label layout on maps activity indicating nearby places -->
-    <string name="nearby_places_label">สถานที่ใกล้เคียง</string>
     <!-- Message shown in a dialog explaining the consequences of accesing the location -->
     <string name="explanation_send_location">ตำแหน่งนี้จะเปิดขึ้นโดยใช้ผู้ให้บริการแผนที่บุคคลที่สามนอกแพลตฟอร์ม MEGA ที่เข้ารหัสลับแบบต้นทางถึงปลายทาง</string>
     <!-- Title of the location marker set by the user -->
@@ -2407,8 +2387,6 @@
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
     <string name="no_contacts_invite">คุณไม่มีรายชื่อผู้ติดต่อ MEGA กรุณาเชิญเพื่อน ๆ จากส่วนผู้ติดต่อ</string>
-    <!-- Invite button for chat top cell -->
-    <string name="invite_more">เชิญเพิ่มเติม</string>
     <!-- Title of first tour screen -->
     <string name="title_tour_one">คุณคือผู้ถือกุญแจ</string>
     <!-- Content of first tour screen -->
@@ -2573,12 +2551,6 @@
     <string name="error_remove_business_contact">คุณไม่สามารถลบ %1$s ออกจากการเป็นผู้ติดต่อได้เนื่องจากเป็นส่วนหนึ่งของบัญชีธุรกิจของคุณ</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">เกิดปัญหากับการชำระเงินครั้งล่าสุดของคุณ กรุณาไปที่เว็บ MEGA ผ่านเบราว์เซอร์เดสก์ท็อปเพื่อดูข้อมูลเพิ่มเติม</string>
-    <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">บัญชีถูกปิดใช้งาน</string>
-    <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">บัญชีธุรกิจของคุณถูกปิดใช้งานเนื่องจากการชำระเงินไม่สำเร็จ คุณจะไม่สามารถเข้าถึงข้อมูลของคุณได้ กรุณาเข้าสู่ระบบ MEGA ผ่านเบราว์เซอร์เพื่อดำเนินการชำระเงินและเปิดใช้การสมัครใช้งานของคุณอีกครั้ง</string>
-    <!-- A message which is shown to sub-users of expired business accounts. -->
-    <string name="expired_user_business_text">บัญชีของคุณ[B]ถูกระงับ[/B]ในขณะนี้ คุณสามารถเรียกดูได้แค่ข้อมูลของคุณเท่านั้น</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
     <string name="camera_uploads_business_alert">MEGA ไม่สามารถเข้าถึงข้อมูลของคุณได้ อย่างไรก็ตาม ผู้ดูแลระบบบัญชีธุรกิจของคุณจะยังสามารถเข้าถึงการอัปโหลดจากกล้องของคุณได้</string>
     <!-- General label to alert user that somehting went wrong -->
@@ -2993,10 +2965,6 @@
     <string name="months_view_button">เดือน</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
     <string name="years_view_button">ปี</string>
-    <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
-    <plurals name="cu_upload_progress">
-        <item quantity="other">กำลังอยู่ในระหว่างอัปโหลด มี %1$d ไฟล์รอดำเนินการ</item>
-    </plurals>
     <!-- Text to show as production api server option -->
     <string name="production_api_server">โปรดักชั่น (ใช้งานจริง)</string>
     <!-- Title to show in a dialog to change api server -->
@@ -3243,8 +3211,6 @@
     <string name="show_activity_action">แสดงกิจกรรม</string>
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">มีกิจกรรม[B]ล่าสุด[/B]ที่ซ่อนอยู่</string>
-    <!-- Label indicating video original quality -->
-    <string name="original_quality">คุณภาพดั้งเดิม</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
     <string name="setting_fingerprint">รหัสลายนิ้วมือ</string>
     <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
@@ -3303,8 +3269,6 @@
     <string name="backup_remove_root_folder">คุณกำลังลบโฟลเดอร์ข้อมูลสำรองของคุณ การดำเนินการนี้จะลบข้อมูลสำรองทั้งหมดที่คุณตั้งค่าไว้ คุณแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">ย้าย “%1s” ไปที่ถังขยะ</string>
-    <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_disable_confirm">ปิดสำรองข้อมูล</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">อ่านอย่างเดียว</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
@@ -3321,12 +3285,6 @@
     <string name="upload_files">อัปโหลดไฟล์</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">อัปโหลดโฟลเดอร์</string>
-    <!-- Title of the Payments screen -->
-    <string name="payment">ชำระเงิน</string>
-    <!-- Label indicating payment methods -->
-    <string name="payment_methods">วิธีการชำระเงิน</string>
-    <!-- Button to proceed with a payment -->
-    <string name="proceed">ดำเนินการต่อ</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">ถอนสิทธิ์การเป็นผู้จัดการประชุม</string>
     <!-- Title message of existing subscription dialog -->
@@ -3690,7 +3648,7 @@
     <!-- Title of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_title">[B]ไม่มีรายการใน[/B][A]สำรองข้อมูล[/A]</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_body">นี่คือที่จัดเก็บไฟล์และโฟลเดอร์สำหรับสำรองข้อมูล รายการที่สำรองไว้ของคุณเป็นแบบ \“อ่านอย่างเดียว\“ เพื่อป้องกันไม่ให้ถูกแก้ไขโดยไม่ได้ตั้งใจในไดรฟ์ระบบคลาวด์ของคุณ\nคุณสามารถสำรองข้อมูลไฟล์ต่าง ๆ ได้จากคอมพิวเตอร์ของคุณไปยัง MEGA โดยใช้แอปเดสก์ท็อปของเรา</string>
+    <string name="backups_empty_state_body">นี่คือที่จัดเก็บไฟล์และโฟลเดอร์สำหรับสำรองข้อมูล รายการที่สำรองไว้ของคุณเป็นแบบ “อ่านอย่างเดียว” เพื่อป้องกันไม่ให้ถูกแก้ไขโดยไม่ได้ตั้งใจในไดรฟ์ระบบคลาวด์ของคุณ\nคุณสามารถสำรองข้อมูลไฟล์ต่าง ๆ ได้จากคอมพิวเตอร์ของคุณไปยัง MEGA โดยใช้แอปเดสก์ท็อปของเรา</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">บัญชี MEGA ของคุณถูกระงับเนื่องจากมีข้อกล่าวหาการละเมิดลิขสิทธิ์ซ้ำหลายครั้ง ซึ่งหมายความว่าคุณไม่สามารถเข้าถึงบัญชีหรือข้อมูลภายในได้ \nกรุณาตรวจสอบอีเมลของเราเพื่อข้อมูลเพิ่มเติมเกี่ยวกับวิธีการยื่นข้อโต้แย้ง</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -4537,10 +4495,8 @@
     <string name="account_upgrade_account_description_feature_link">&#8226;&#160;ตั้งค่าวันหมดอายุลิงก์ได้</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;แชร์โควต้าการถ่ายโอนได้</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;ตั้งค่าการสำรองข้อมูลอัตโนมัติได้</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days of deleted data on Pro&#160;Lite and up to 180 days on Pro&#160;I, II, and III</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;ใช้ฟีเจอร์ย้อนกลับไฟล์ที่ถูกลบได้ โดย Pro&#160;Lite ย้อนกลับได้ถึง 90 วัน ส่วน Pro&#160;I, II และ III ย้อนกลับได้ถึง 180 วัน</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;สร้างกำหนดการล้างถังขยะได้ตั้งแต่ 7 วันถึง 10 ปี</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4551,8 +4507,6 @@
     <string name="account_upgrade_account_buy_button_title_pro_ii">ซื้อ Pro&#160;II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_iii">ซื้อ Pro&#160;III</string>
-    <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
-    <string name="account_upgrade_account_terms_of_service_link">เงื่อนไขการให้บริการ</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
     <string name="cloud_drive_subtitle_link_access_password">เฉพาะผู้ที่มีรหัสผ่านเท่านั้นที่สามารถเปิดลิงก์ได้</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
@@ -5035,6 +4989,7 @@
     <string name="account_upgrade_subscription_details">เมื่อสมัครใช้งานแล้ว ระบบจะต่ออายุสมาชิกให้อัตโนมัติตามระยะเวลาและราคาเดิมที่เลือกไว้ คุณสามารถยกเลิกการต่ออายุสมาชิก MEGA&#160;Pro อัตโนมัติได้ไม่เกิน 24 ชั่วโมงก่อนวันครบกำหนดชำระค่าสมาชิกครั้งต่อไปผ่านระบบสมาชิกใน [A]Google Play[/A]</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">อนุญาตให้เข้าถึงแกลเลอรี่ของคุณ</string>
+    <!--  -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">ให้สิทธิ์เข้าถึง</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">จำเป็นต้องได้รับการอัปเดต</string>
@@ -5069,7 +5024,7 @@
         <item quantity="other">การอัปโหลดจากกล้องเสร็จสมบูรณ์ มี %1$d ไฟล์ที่อัปโหลดแล้ว</item>
     </plurals>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
-    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Your free plan has a 60-minute limit on meetings. Pro users have unlimited calls and up to 1000 participants.[/A] [B]Upgrade now.[/B]</string>
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]แผนฟรีของคุณมีข้อจำกัดเวลาการประชุม 60 นาที ผู้ใช้ Pro สามารถโทรได้ไม่จำกัดและมีผู้เข้าร่วมประชุมได้สูงสุด 1000 คน[/A] [B]อัปเกรดเลย[/B]</string>
     <!-- Bottom sheet button to hide a node/file -->
     <string name="general_hide_node">ซ่อน</string>
     <!-- Bottom sheet button to unhide a node/file -->
@@ -5087,7 +5042,7 @@
     <!-- Button text to change SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_action_button">เปลี่ยน</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
-    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Free plans have a limit of 60 minutes per meeting. [A]Upgrade now.[/A]</string>
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]แผนฟรีของคุณมีข้อจำกัดเวลาการประชุม 60 นาที ผู้ใช้ Pro สามารถโทรได้ไม่จำกัดและมีผู้เข้าร่วมประชุมได้สูงสุด 1000 คน[/A] [B]อัปเกรดเลย[/B]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_monthly_with_price">คุณจะถูกเรียกเก็บเงิน %1$s ทันที และการสมัครใช้งานของคุณจะต่ออายุโดยอัตโนมัติหลังจาก 1&#160;เดือน ในราคา %2$s ต่อเดือน บัญชี Google&#160;Play ของคุณจะถูกเรียกเก็บเงินเพื่อใช้ในการต่ออายุภายใน 24&#160;ชั่วโมงก่อนสิ้นสุดรอบการเรียกเก็บเงินแต่ละรอบ หากต้องการยกเลิกการสมัครใช้งาน คุณต้องปิดการต่ออายุการสมัครใช้งาน MEGA&#160;Pro ของคุณแบบอัตโนมัติอย่างน้อย 24&#160;ชั่วโมงก่อนสิ้นสุดรอบการเรียกเก็บเงินของคุณ ผ่านเมนูการสมัครใช้งานใน [A]Google&#160;Play[/A] \nเมื่อคุณอัปเกรดบัญชีของคุณ แสดงว่าคุณยอมรับ[B]เงื่อนไขการให้บริการ[/B]และ[C]นโยบายสิทธิส่วนบุคคล[/C]ของ MEGA</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
@@ -5095,7 +5050,7 @@
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in monthly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_monthly_without_price">คุณจะถูกเรียกเก็บเงินทันที และการสมัครใช้งานของคุณจะต่ออายุโดยอัตโนมัติหลังจาก 1&#160;เดือน บัญชี Google&#160;Play ของคุณจะถูกเรียกเก็บเงินเพื่อใช้ในการต่ออายุภายใน 24&#160;ชั่วโมงก่อนสิ้นสุดรอบการเรียกเก็บเงินแต่ละรอบ หากต้องการยกเลิกการสมัครใช้งาน คุณต้องปิดการต่ออายุการสมัครใช้งาน MEGA&#160;Pro ของคุณแบบอัตโนมัติอย่างน้อย 24&#160;ชั่วโมงก่อนสิ้นสุดรอบการเรียกเก็บเงินของคุณ ผ่านเมนูการสมัครใช้งานใน [A]Google&#160;Play[/A] \nเมื่อคุณอัปเกรดบัญชีของคุณ แสดงว่าคุณยอมรับ[B]เงื่อนไขการให้บริการ[/B]และ[C]นโยบายสิทธิส่วนบุคคล[/C]ของ MEGA</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
-    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">คุณจะถูกเรียกเก็บเงินทันที และการสมัครใช้งานของคุณจะต่ออายุโดยอัตโนมัติหลังจาก 12&#160;เดือน บัญชี Google&#160;Play ของคุณจะถูกเรียกเก็บเงินเพื่อใช้ในการต่ออายุภายใน 24&#160;ชั่วโมงก่อนสิ้นสุดรอบการเรียกเก็บเงินแต่ละรอบ หากต้องการยกเลิกการสมัครใช้งาน คุณต้องปิดการต่ออายุการสมัครใช้งาน MEGA&#160;Pro ของคุณแบบอัตโนมัติอย่างน้อย 24&#160;ชั่วโมงก่อนสิ้นสุดรอบการเรียกเก็บเงินของคุณ ผ่านเมนูการสมัครใช้งานใน [A]Google&#160;Play[/A] \nเมื่อคุณอัปเกรดบัญชีของคุณ แสดงว่าคุณยอมรับ[B]เงื่อนไขการให้บริการ[/B]และ[C]นโยบายสิทธิส่วนบุคคล[/C]ของ MEGA</string>
+    <string name="account_upgrade_account_subscription_details_body_yearly_without_price">คุณจะถูกเรียกเก็บเงินทันที และการสมัครใช้งานของคุณจะต่ออายุหลังจาก 12&#160;เดือนโดยอัตโนมัติ บัญชี Google&#160;Play ของคุณจะถูกเรียกเก็บเงินเพื่อใช้ในการต่ออายุภายใน 24&#160;ชั่วโมงก่อนสิ้นสุดรอบการเรียกเก็บเงินแต่ละรอบ หากต้องการยกเลิกการสมัครใช้งาน คุณต้องปิดการต่ออายุการสมัครใช้งาน MEGA&#160;Pro ของคุณแบบอัตโนมัติอย่างน้อย 24&#160;ชั่วโมงก่อนสิ้นสุดรอบการเรียกเก็บเงินของคุณ ผ่านเมนูการสมัครใช้งานใน [A]Google&#160;Play[/A] \nเมื่อคุณอัปเกรดบัญชีของคุณ แสดงว่าคุณยอมรับ[B]เงื่อนไขการให้บริการ[/B]และ[C]นโยบายสิทธิส่วนบุคคล[/C]ของ MEGA</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_title">บัญชีธุรกิจถูกปิดการใช้งานแล้ว</string>
     <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->
@@ -5105,9 +5060,9 @@
     <!-- The button of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_button">โอเค เข้าใจแล้ว</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to host call or meetings without any restrictions. -->
-    <string name="account_upgrade_account_description_feature_meetings">&#8226;&#160;Host calls and meetings with unlimited participants and no time restrictions</string>
+    <string name="account_upgrade_account_description_feature_meetings">&#8226;&#160;โทรและประชุมได้แบบไม่จำกัดจำนวนผู้เข้าร่วมและไม่มีข้อจำกัดด้านเวลา</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to use MEGA VPN product. -->
-    <string name="account_upgrade_account_description_feature_vpn">&#8226;&#160;Stay private online with our high-speed VPN</string>
+    <string name="account_upgrade_account_description_feature_vpn">&#8226;&#160;ปกป้องความเป็นส่วนตัวของคุณบนโลกออนไลน์ด้วย VPN ความเร็วสูงของเรา</string>
     <!-- The body of the Dialog shown to upgrade meeting from the free version -->
     <string name="meetings_in_call_warning_dialog_body">ต้องการคุยต่อนานกว่านี้หรือไม่ สมัครใช้งานแผน Pro จะสามารถโทรได้ไม่อั้น</string>
     <!-- The action button text of the Dialog shown to upgrade meeting from the free version -->
@@ -5115,16 +5070,87 @@
     <!-- The negative button text of the Dialog shown to upgrade meeting from the free version -->
     <string name="meetings_in_call_warning_dialog_negative_button">ไม่ใช่ตอนนี้</string>
     <!-- The snackbar message of the time left for the current free call -->
-    <string name="meetings_in_call_warning_timer_message">This free call will end in %s</string>
+    <string name="meetings_in_call_warning_timer_message">การโทรฟรีนี้จะสิ้นสุดลงใน %s</string>
     <!-- The title of the Dialog shown to upgrade meeting from the free version -->
     <plurals name="meetings_in_call_warning_dialog_title">
-        <item quantity="one">Your free call will end in %d minute</item>
-        <item quantity="other">Your free call will end in %d minutes</item>
+        <item quantity="other">การโทรฟรีของคุณจะสิ้นสุดลงใน %d นาที</item>
     </plurals>
     <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
     <string name="notifications_screen_notification_promo_expiration_time">หมดอายุในวันที่ %1$s เวลา %2$s</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
-    <string name="meetings_free_call_organiser_number_of_participants_warning">[A]As a free user, you can only add up to 100 participants to this call. Need more?[/A]&#160;[B]Upgrade now[/B]</string>
+    <string name="meetings_free_call_organiser_number_of_participants_warning">ผู้เข้าร่วมสามารถเข้าร่วมการโทรได้สูงสุด 100&#160;คนเท่านั้น หากมีผู้เข้าร่วมมากกว่านั้น จะสามารถส่งและรับข้อความได้อย่างเดียว ผู้จัดการประชุมสามารถอัปเกรดเป็นแผน Pro เพื่อยกเลิกข้อจำกัดนี้ได้</string>
     <!-- Warning Message for non organiser for Free Call -->
     <string name="meetings_free_call_non_organiser_number_of_participants_warning">ผู้เข้าร่วมสามารถเข้าร่วมการโทรได้สูงสุด 100&#160;คนเท่านั้น หากมีผู้เข้าร่วมเพิ่มเติม จะสามารถส่งและอ่านข้อความในแชทได้เท่านั้น กรุณาขอให้ผู้จัดการประชุมยกเลิกข้อจำกัดนี้ก่อน</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_low">ต่ำ</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Medium Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_medium">ปานกลาง</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to High Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_high">สูง</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos are automatically uploaded by Camera Uploads without any Video Compression -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_original">ต้นฉบับ</string>
+    <!-- Warning shown when the recording of audio permission is required for sending a voice clip and it has been denied by the user -->
+    <string name="chat_microphone_permissions_denied_for_voice_clip">MEGA ไม่สามารถเข้าถึงไมโครโฟนของคุณได้ หากคุณต้องการบันทึกคลิปเสียง ต้องอนุญาต MEGA ให้สามารถเข้าถึงไมโครโฟนของคุณ</string>
+    <!-- Free plan limitation dialog title for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">ไม่สามารถเข้าร่วมได้</string>
+    <!-- Free plan limitation dialogue description for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">การโทรนี้รองรับผู้เข้าร่วมได้สูงสุด 100&#160;คน หากต้องการเพิ่มจำนวนผู้เข้าร่วม กรุณาขอให้ผู้จัดการประชุมยกเลิกข้อจำกัดนี้ก่อน</string>
+    <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">โอเค เข้าใจแล้ว</string>
+    <!-- The title of the hidden nodes feature -->
+    <string name="hidden_nodes">ซ่อนไฟล์และโฟลเดอร์</string>
+    <!-- Hidden nodes benefit: hide files and folders -->
+    <string name="hidden_nodes_benefit_title_hide_files_folders">ซ่อนไฟล์และโฟลเดอร์สำคัญ</string>
+    <!-- Hidden nodes benefit description: hide files and folders -->
+    <string name="hidden_nodes_benefit_description_hide_files_folders">เก็บไฟล์และโฟลเดอร์ลับไว้ส่วนตัว เฉพาะคุณเท่านั้นที่สามารถดูได้ โดยสามารถเลือกดูทีละรายการ หรือแสดงไฟล์ที่ซ่อนไว้ชั่วคราวจากการตั้งค่า</string>
+    <!-- Hidden nodes benefit: exclude from timeline -->
+    <string name="hidden_nodes_benefit_title_exclude_timeline">ไม่แสดงในไทม์ไลน์</string>
+    <!-- Hidden nodes benefit description: exclude from timeline -->
+    <string name="hidden_nodes_benefit_description_exclude_timeline">รายการที่ซ่อนจะมองเห็นได้เฉพาะในคลาวด์ไดร์ฟเท่านั้น และจะไม่ปรากฏในรูปภาพ อัลบั้ม หรือรายการล่าสุด</string>
+    <!-- Hidden nodes benefit: out of sight -->
+    <string name="hidden_nodes_benefit_title_out_of_sight">แสดงไฟล์ที่ซ่อนอยู่</string>
+    <!-- Hidden nodes benefit description: out of sight -->
+    <string name="hidden_nodes_benefit_description_out_of_sight">คุณสามารถเลือกได้ว่าต้องการให้ไฟล์ที่ซ่อนอยู่ปรากฏหรือไม่ มีการตั้งค่าใหม่ที่ช่วยให้คุณแสดงไฟล์ที่ซ่อนอยู่ชั่วคราวได้</string>
+    <!-- The snackbar message of hidden nodes operation -->
+    <plurals name="hidden_nodes_result_message">
+        <item quantity="other">%1$d รายการถูกซ่อน</item>
+    </plurals>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_priority_support">&#8226;&#160;Priority support</string>
+    <!-- The title of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_title">อัปเกรดเป็นแผน Pro เพื่อโทรได้ไม่อั้น</string>
+    <!-- The body of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_body">Your call reached the 60 minute limit and has ended. Pro users have unlimited calls and up to 1000 participants.</string>
+    <!-- The button text of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_button">อัปเกรดตอนนี้</string>
+    <!-- Search drop down chips filter type file type -->
+    <string name="search_dropdown_chip_filter_type_file_type">ประเภท</string>
+    <!-- Search drop down chips filter type file type images -->
+    <string name="search_dropdown_chip_filter_type_file_type_images">รูปภาพ</string>
+    <!-- Search drop down chips filter type file type videos -->
+    <string name="search_dropdown_chip_filter_type_file_type_video">วิดีโอ</string>
+    <!-- Search drop down chips filter type file type audio -->
+    <string name="search_dropdown_chip_filter_type_file_type_audio">เสียง</string>
+    <!-- Search drop down chips filter type file type documents -->
+    <string name="search_dropdown_chip_filter_type_file_type_documents">เอกสาร</string>
+    <!-- Search drop down chips filter type date added -->
+    <string name="search_dropdown_chip_filter_type_date_added">วันที่เพิ่ม</string>
+    <!-- Search drop down chips filter type last modified -->
+    <string name="search_dropdown_chip_filter_type_last_modified">วันที่แก้ไข</string>
+    <!-- Search drop down chips filter type date modified today -->
+    <string name="search_dropdown_chip_filter_type_date_today">วันนี้</string>
+    <!-- Search drop down chips filter type date modified last 7 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_seven_days">7 วันที่ผ่านมา</string>
+    <!-- Search drop down chips filter type date modified last 30 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_thirty_days">30 วันที่ผ่านมา</string>
+    <!-- Search drop down chips filter type date modified this year -->
+    <string name="search_dropdown_chip_filter_type_date_this_year">ปีนี้</string>
+    <!-- Search drop down chips filter type date modified last year -->
+    <string name="search_dropdown_chip_filter_type_date_last_year">ปีที่แล้ว</string>
+    <!-- Search drop down chips filter type date modified older -->
+    <string name="search_dropdown_chip_filter_type_date_older">เก่ากว่า</string>
+    <!-- String below login button next to button for reporting a login issue -->
+    <string name="general_login_label_trouble_logging_in">Trouble logging in?</string>
+    <!-- Button text for reporting an issue on the login screen -->
+    <string name="general_login_button_report_your_issue">Report your issue</string>
 </resources>

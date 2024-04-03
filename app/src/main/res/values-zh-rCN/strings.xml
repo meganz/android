@@ -84,8 +84,6 @@
     <string name="action_refresh">刷新</string>
     <!-- Menu item -->
     <string name="action_sort_by">排序</string>
-    <!-- Menu item -->
-    <string name="action_help">帮助</string>
     <!-- Change from a free account to paying MEGA -->
     <string name="action_upgrade_account">升级帐户</string>
     <!-- Menu item to select all the elements of a list -->
@@ -772,7 +770,7 @@
     <!-- Button to park an account -->
     <string name="park_account_button">封存</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">This is the last step to park your account, please enter your new password. Your data will be retained for at least 60 days. If you recall your parked account’s password, contact support&#64;mega.nz</string>
+    <string name="park_account_text_last_step">这是封存您的帐户的最后一步，请输入您的新密码。您的数据将保留至少60天。在此期间，如果您想起了已封存帐户的密码，联系support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">请输入新密码</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
@@ -1486,10 +1484,6 @@
     <string name="save_cloud_drive">保存到云盘</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
     <string name="save_file_system">前往文件系统</string>
-    <!-- Title of QR code section -->
-    <string name="section_my_code">我的二维码</string>
-    <!-- Title of QR code scan section -->
-    <string name="section_scan_code">扫描二维码</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">通过扫描二维码添加的用户会自动添加到您的联系人列表中。</string>
     <!-- Text shown when it has been copied the QR code link -->
@@ -1810,7 +1804,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">下次登录您的帐户时，系统会要求您输入身份验证应用程序中提供的6位数验证码。</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Save your <b>recovery key</b> in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
+    <string name="recommendation_2fa_enabled">为避免您无法访问应用程序或想要禁用双重验证时出现问题，请将您的<b>恢复密钥</b>保存到安全的位置。</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">验证码无效</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2181,18 +2175,8 @@
     <string name="subtitle_incoming_contact_request_accepted">[B]来自[/B][A]%s [/A][B]的联系人请求已接受[/B]</string>
     <!-- Subtitle of the historic notification for incoming contact request declined -->
     <string name="subtitle_incoming_contact_request_denied">[B]来自[/B][A]%s [/A][B]的联系人请求已拒绝[/B]</string>
-    <!-- Subtitle of the Upgrade account section -->
-    <string name="type_of_my_account">您当前的帐户是[A]%s[/A]</string>
     <!-- Footnote to clarify the storage space is subject to the achievement program -->
     <string name="footnote_achievements">取决于您参与我们的成就奖励计划。</string>
-    <!-- Title label for the current payment method during account upgrading -->
-    <string name="payment_method">付款方式</string>
-    <!-- title of billing period -->
-    <string name="billing_period_title">结算周期</string>
-    <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]按月付费[/A] %s/月</string>
-    <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]按年付费[/A] %s/年</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">取消</string>
     <!-- dialog option continue in alert dialog -->
@@ -2201,8 +2185,6 @@
     <string name="payment_method_google_wallet">[A]Google Pay[/A]（订阅）</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
     <string name="new_label_notification_item">新</string>
-    <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
-    <string name="label_custom_plan">如需升级您的当前订阅，请联系支持团队获取[A]自定义方案[/A]。</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">文件名</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
@@ -2347,8 +2329,6 @@
     <string name="current_location_label">发送您当前的位置</string>
     <!-- Label layout on maps activity that permits send current location. Placeholder is the current location -->
     <string name="current_location_landscape_label">发送您当前的位置：[A]%1$s[/A]</string>
-    <!-- Label layout on maps activity indicating nearby places -->
-    <string name="nearby_places_label">附近地点</string>
     <!-- Message shown in a dialog explaining the consequences of accesing the location -->
     <string name="explanation_send_location">此位置将使用不属于MEGA端到端加密平台的第三方地图提供商打开。</string>
     <!-- Title of the location marker set by the user -->
@@ -2407,8 +2387,6 @@
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
     <string name="no_contacts_invite">您没有MEGA联系人。请从联系人中邀请好友。</string>
-    <!-- Invite button for chat top cell -->
-    <string name="invite_more">邀请更多</string>
     <!-- Title of first tour screen -->
     <string name="title_tour_one">您持有这把密钥</string>
     <!-- Content of first tour screen -->
@@ -2573,12 +2551,6 @@
     <string name="error_remove_business_contact">您无法移除联系人%1$s，因为他们是您企业帐户的用户。</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">您的上一笔付款未成功。请使用网络浏览器登录MEGA后获取详情。</string>
-    <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">帐户已停用</string>
-    <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">由于付款失败，您的企业帐户已被停用。您将无法访问存储在您帐户中的资料。若要付款并重新激活您的订阅，请通过网页浏览器登入MEGA进行。</string>
-    <!-- A message which is shown to sub-users of expired business accounts. -->
-    <string name="expired_user_business_text">您的帐户目前已被[B]暂停[/B]。您只能浏览您的数据。</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
     <string name="camera_uploads_business_alert">MEGA无法访问您的数据，而您的企业帐户管理员可以查看并删除您的相机上传文件。</string>
     <!-- General label to alert user that somehting went wrong -->
@@ -2993,10 +2965,6 @@
     <string name="months_view_button">月</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
     <string name="years_view_button">年</string>
-    <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
-    <plurals name="cu_upload_progress">
-        <item quantity="other">正在上传，%1$d个文件待上传</item>
-    </plurals>
     <!-- Text to show as production api server option -->
     <string name="production_api_server">Production</string>
     <!-- Title to show in a dialog to change api server -->
@@ -3243,8 +3211,6 @@
     <string name="show_activity_action">显示动态</string>
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">[B]近期[/B]动态已隐藏</string>
-    <!-- Label indicating video original quality -->
-    <string name="original_quality">原始画质</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
     <string name="setting_fingerprint">指纹锁</string>
     <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
@@ -3303,8 +3269,6 @@
     <string name="backup_remove_root_folder">备份文件夹将会被删除。此操作将移除您设置的所有备份。您确定要继续吗？</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">将“%1s”移至回收站</string>
-    <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_disable_confirm">停用备份</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">只读</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
@@ -3321,12 +3285,6 @@
     <string name="upload_files">上传文件</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">上传文件夹</string>
-    <!-- Title of the Payments screen -->
-    <string name="payment">付款</string>
-    <!-- Label indicating payment methods -->
-    <string name="payment_methods">付款方式</string>
-    <!-- Button to proceed with a payment -->
-    <string name="proceed">继续</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">移除主持人权限</string>
     <!-- Title message of existing subscription dialog -->
@@ -4537,10 +4495,8 @@
     <string name="account_upgrade_account_description_feature_link">&#8226;&#160;为链接设置到期日期</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;传输流量共享</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;自动备份</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days of deleted data on Pro&#160;Lite and up to 180 days on Pro&#160;I, II, and III</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Lite最多可还原90天已删除的数据，Pro&#160;I、II和III则最多可还原180天</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;安排垃圾桶清理工作7天至10年</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4551,8 +4507,6 @@
     <string name="account_upgrade_account_buy_button_title_pro_ii">购买Pro&#160;II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_iii">购买Pro&#160;III</string>
-    <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
-    <string name="account_upgrade_account_terms_of_service_link">服务条款</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
     <string name="cloud_drive_subtitle_link_access_password">只有拥有密码的人才能打开链接</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
@@ -5035,6 +4989,7 @@
     <string name="account_upgrade_subscription_details">订阅将自动续订，续订周期与初始选择的周期相同，并且以相同的价格进行续订。您可以在下一次订阅付款到期前24小时以内，通过[A]Google Play[/A]订阅界面关闭MEGA&#160;Pro订阅的自动续订功能。</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">允许访问您的图库</string>
+    <!--  -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">授予权限</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">需要更新</string>
@@ -5059,7 +5014,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">上传已暂停。电量低于%1$d%%而且不在充电。</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Camera uploads stopped working. Try re-enabling camera uploads to solve it. If the problem persists, contact support.</string>
+    <string name="photos_camera_uploads_general_issue">相机上传功能已停止运行。尝试重新启用相机上传功能来解决问题。如果问题仍然存在，请联系客服人员。</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="other">正在相机上传，%1$d个文件待处理</item>
@@ -5069,7 +5024,7 @@
         <item quantity="other">相机上传完成，%1$d个文件已上传</item>
     </plurals>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes. -->
-    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]Your free plan has a 60-minute limit on meetings. Pro users have unlimited calls and up to 1000 participants.[/A] [B]Upgrade now.[/B]</string>
+    <string name="meetings_schedule_meeting_free_plan_60_minute_limit_warning">[A]您的免费方案有60分钟的会议时间限制。Pro会员用户具有无限通话时间，并且最多可达1000名参与者。[/A][B]立即升级。[/B]</string>
     <!-- Bottom sheet button to hide a node/file -->
     <string name="general_hide_node">隐藏</string>
     <!-- Bottom sheet button to unhide a node/file -->
@@ -5087,7 +5042,7 @@
     <!-- Button text to change SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_action_button">更改</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
-    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Free plans have a limit of 60 minutes per meeting. [A]Upgrade now.[/A]</string>
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]您的免费方案有60分钟的会议时间限制。Pro会员用户具有无限通话时间，并且最多可达1000名参与者。[/A][B]立即升级。[/B]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_monthly_with_price">您将被立即收取%1$s的费用，并且您的订阅将在1&#160;个月后自动以每月%2$s续订。您的Google&#160;Play帐户将在每个计费周期结束后的24&#160;小时内被收取续订费用。若要取消订阅，您必须在计费周期结束前至少24&#160;小时通过[A]Google&#160;Play[/A]中的订阅停用MEGA&#160;Pro订阅的自动续订。\n升级您的帐户即表示您同意MEGA的[B]服务条款[/B]和[C]隐私政策[/C]。</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
@@ -5097,34 +5052,106 @@
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user is in yearly tab and no subscription plan was selected. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string -->
     <string name="account_upgrade_account_subscription_details_body_yearly_without_price">您将立即被收取费用，并且您的订阅将在12&#160;个月后自动续订。您的Google&#160;Play帐户将在每个计费周期结束后的24&#160;小时内被收取续订费用。若要取消订阅，您必须在计费周期结束前至少24&#160;小时通过[A]Google&#160;Play[/A]中的订阅停用MEGA&#160;Pro订阅的自动续订。\n升级您的帐户即表示您同意MEGA的[B]服务条款[/B]和[C]隐私政策[/C]。</string>
     <!-- The title of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
-    <string name="account_business_account_deactivated_dialog_title">Business account deactivated</string>
+    <string name="account_business_account_deactivated_dialog_title">企业帐户已停用</string>
     <!-- The body of the Dialog shown to a suspended Business Account Sub-User -->
-    <string name="account_business_account_deactivated_dialog_sub_user_body">Your Business account has been deactivated due to payment failure. You can only browse your data.\nAsk your Business account administrator to resolve the issue.</string>
+    <string name="account_business_account_deactivated_dialog_sub_user_body">由于付款失败，您的企业帐户已被停用。您只能浏览您的数据。\n请您的企业帐户管理员解决此问题。</string>
     <!-- The body of the Dialog shown to a suspended Business Account Administrator -->
-    <string name="account_business_account_deactivated_dialog_admin_body">Your Business account has been deactivated due to payment failure. You can only browse your data.\nTo make a payment and reactivate your subscription, log in to MEGA through a browser.</string>
+    <string name="account_business_account_deactivated_dialog_admin_body">由于付款失败，您的企业帐户已被停用。您只能浏览您的数据。\n若要付款并重新激活您的订阅，请通过浏览器登入MEGA。</string>
     <!-- The button of the Dialog shown to a suspended Business Account User, regardless if the User is a Sub-User or Administrator -->
     <string name="account_business_account_deactivated_dialog_button">好的，明白了</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to host call or meetings without any restrictions. -->
-    <string name="account_upgrade_account_description_feature_meetings">&#8226;&#160;Host calls and meetings with unlimited participants and no time restrictions</string>
+    <string name="account_upgrade_account_description_feature_meetings">&#8226;&#160;主持通话和会议，参与者人数和通话时间无限</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to use MEGA VPN product. -->
-    <string name="account_upgrade_account_description_feature_vpn">&#8226;&#160;Stay private online with our high-speed VPN</string>
+    <string name="account_upgrade_account_description_feature_vpn">&#8226;&#160;使用我们的高速VPN保持在线隐私</string>
     <!-- The body of the Dialog shown to upgrade meeting from the free version -->
-    <string name="meetings_in_call_warning_dialog_body">Need more time? Pro plans have unlimited calls.</string>
+    <string name="meetings_in_call_warning_dialog_body">需要更多时间？Pro方案具有无限通话。</string>
     <!-- The action button text of the Dialog shown to upgrade meeting from the free version -->
     <string name="meetings_in_call_warning_dialog_action_button">升级为Pro帐户</string>
     <!-- The negative button text of the Dialog shown to upgrade meeting from the free version -->
     <string name="meetings_in_call_warning_dialog_negative_button">现在不用</string>
     <!-- The snackbar message of the time left for the current free call -->
-    <string name="meetings_in_call_warning_timer_message">This free call will end in %s</string>
+    <string name="meetings_in_call_warning_timer_message">此免费通话将在%s结束</string>
     <!-- The title of the Dialog shown to upgrade meeting from the free version -->
     <plurals name="meetings_in_call_warning_dialog_title">
-        <item quantity="one">Your free call will end in %d minute</item>
-        <item quantity="other">Your free call will end in %d minutes</item>
+        <item quantity="other">您的免费通话将在%d分钟后结束</item>
     </plurals>
     <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
     <string name="notifications_screen_notification_promo_expiration_time">%1$s%2$s到期</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
-    <string name="meetings_free_call_organiser_number_of_participants_warning">[A]As a free user, you can only add up to 100 participants to this call. Need more?[/A]&#160;[B]Upgrade now[/B]</string>
+    <string name="meetings_free_call_organiser_number_of_participants_warning">Only 100 participants can join the call. Any additional participants will only be able to send and receive messages. The organiser can upgrade to Pro to remove these restrictions.</string>
     <!-- Warning Message for non organiser for Free Call -->
     <string name="meetings_free_call_non_organiser_number_of_participants_warning">只有100位&#160;参与者可以加入通话。任何其他参与者将只能发送和阅读聊天记录。请求组织者取消此限制。</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_low">低</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Medium Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_medium">中</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to High Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_high">高</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos are automatically uploaded by Camera Uploads without any Video Compression -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_original">原画</string>
+    <!-- Warning shown when the recording of audio permission is required for sending a voice clip and it has been denied by the user -->
+    <string name="chat_microphone_permissions_denied_for_voice_clip">您拒绝MEGA访问您的麦克风。如果您想录制语音片段，请授予MEGA权限。</string>
+    <!-- Free plan limitation dialog title for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">无法加入</string>
+    <!-- Free plan limitation dialogue description for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">此通话只能支持100位参与者。请求组织者移除此限制。</string>
+    <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">好的，明白了</string>
+    <!-- The title of the hidden nodes feature -->
+    <string name="hidden_nodes">Hidden files and folders</string>
+    <!-- Hidden nodes benefit: hide files and folders -->
+    <string name="hidden_nodes_benefit_title_hide_files_folders">Hide important files and folders</string>
+    <!-- Hidden nodes benefit description: hide files and folders -->
+    <string name="hidden_nodes_benefit_description_hide_files_folders">You can conceal sensitive files and folders for privacy. Only you can reveal them, either individually or by temporarily displaying hidden items from the settings.</string>
+    <!-- Hidden nodes benefit: exclude from timeline -->
+    <string name="hidden_nodes_benefit_title_exclude_timeline">Exclude from Timeline</string>
+    <!-- Hidden nodes benefit description: exclude from timeline -->
+    <string name="hidden_nodes_benefit_description_exclude_timeline">Hidden items are only accessible through the Cloud drive and will not appear in your Photos, Albums or Recents.</string>
+    <!-- Hidden nodes benefit: out of sight -->
+    <string name="hidden_nodes_benefit_title_out_of_sight">Out of sight</string>
+    <!-- Hidden nodes benefit description: out of sight -->
+    <string name="hidden_nodes_benefit_description_out_of_sight">You decide when hidden files are visible. There is a new setting to show hidden items temporarily.</string>
+    <!-- The snackbar message of hidden nodes operation -->
+    <plurals name="hidden_nodes_result_message">
+        <item quantity="one">%1$d item hidden</item>
+        <item quantity="other">%1$d items hidden</item>
+    </plurals>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_priority_support">&#8226;&#160;Priority support</string>
+    <!-- The title of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_title">Upgrade to Pro to get unlimited calls</string>
+    <!-- The body of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_body">Your call reached the 60 minute limit and has ended. Pro users have unlimited calls and up to 1000 participants.</string>
+    <!-- The button text of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_button">立即升级</string>
+    <!-- Search drop down chips filter type file type -->
+    <string name="search_dropdown_chip_filter_type_file_type">类型</string>
+    <!-- Search drop down chips filter type file type images -->
+    <string name="search_dropdown_chip_filter_type_file_type_images">图片</string>
+    <!-- Search drop down chips filter type file type videos -->
+    <string name="search_dropdown_chip_filter_type_file_type_video">视频</string>
+    <!-- Search drop down chips filter type file type audio -->
+    <string name="search_dropdown_chip_filter_type_file_type_audio">语音</string>
+    <!-- Search drop down chips filter type file type documents -->
+    <string name="search_dropdown_chip_filter_type_file_type_documents">文档</string>
+    <!-- Search drop down chips filter type date added -->
+    <string name="search_dropdown_chip_filter_type_date_added">添加日期</string>
+    <!-- Search drop down chips filter type last modified -->
+    <string name="search_dropdown_chip_filter_type_last_modified">上次修改</string>
+    <!-- Search drop down chips filter type date modified today -->
+    <string name="search_dropdown_chip_filter_type_date_today">今天</string>
+    <!-- Search drop down chips filter type date modified last 7 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_seven_days">最近7天</string>
+    <!-- Search drop down chips filter type date modified last 30 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_thirty_days">最近30天</string>
+    <!-- Search drop down chips filter type date modified this year -->
+    <string name="search_dropdown_chip_filter_type_date_this_year">今年</string>
+    <!-- Search drop down chips filter type date modified last year -->
+    <string name="search_dropdown_chip_filter_type_date_last_year">去年</string>
+    <!-- Search drop down chips filter type date modified older -->
+    <string name="search_dropdown_chip_filter_type_date_older">较旧的</string>
+    <!-- String below login button next to button for reporting a login issue -->
+    <string name="general_login_label_trouble_logging_in">Trouble logging in?</string>
+    <!-- Button text for reporting an issue on the login screen -->
+    <string name="general_login_button_report_your_issue">Report your issue</string>
 </resources>

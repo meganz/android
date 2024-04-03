@@ -84,8 +84,6 @@
     <string name="action_refresh">更新</string>
     <!-- Menu item -->
     <string name="action_sort_by">並び替え</string>
-    <!-- Menu item -->
-    <string name="action_help">ヘルプ</string>
     <!-- Change from a free account to paying MEGA -->
     <string name="action_upgrade_account">アカウントをアップグレードする</string>
     <!-- Menu item to select all the elements of a list -->
@@ -1486,10 +1484,6 @@
     <string name="save_cloud_drive">クラウドドライブに</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
     <string name="save_file_system">ファイルシステムに</string>
-    <!-- Title of QR code section -->
-    <string name="section_my_code">私のコード</string>
-    <!-- Title of QR code scan section -->
-    <string name="section_scan_code">コードをスキャン</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">あなたのQRコードをスキャンするMEGAユーザー様は自動的にあなたの連絡先リストに追加されます。</string>
     <!-- Text shown when it has been copied the QR code link -->
@@ -2181,18 +2175,8 @@
     <string name="subtitle_incoming_contact_request_accepted">[B][A]%s [/A]さんからの連絡先要求[/B]は[B]受け入れられました[/B]</string>
     <!-- Subtitle of the historic notification for incoming contact request declined -->
     <string name="subtitle_incoming_contact_request_denied">[B][A]%s [/A]さんからの連絡先要求[/B]は[B]拒否されました[/B]</string>
-    <!-- Subtitle of the Upgrade account section -->
-    <string name="type_of_my_account">あなたの現在のアカウントは[A]%s[/A]です</string>
     <!-- Footnote to clarify the storage space is subject to the achievement program -->
     <string name="footnote_achievements">当社の達成プログラムにご参加いただくことを条件とします。</string>
-    <!-- Title label for the current payment method during account upgrading -->
-    <string name="payment_method">お支払い方法</string>
-    <!-- title of billing period -->
-    <string name="billing_period_title">お支払い請求期間</string>
-    <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]毎月払い[/A]%s/月</string>
-    <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]年間払い[/A]%s/年</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">キャンセル</string>
     <!-- dialog option continue in alert dialog -->
@@ -2201,8 +2185,6 @@
     <string name="payment_method_google_wallet">[A]Google Pay[/A]（サブスクリプション）</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
     <string name="new_label_notification_item">新</string>
-    <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
-    <string name="label_custom_plan">あなたの現在のサブスクリプションをアップグレードするには、[A]カスタムプラン[/A]用に当社のサポートにお問い合わせください。</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">ファイル名</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
@@ -2347,8 +2329,6 @@
     <string name="current_location_label">現在地を送信</string>
     <!-- Label layout on maps activity that permits send current location. Placeholder is the current location -->
     <string name="current_location_landscape_label">現在地を送信：[A]%1$s[/A]</string>
-    <!-- Label layout on maps activity indicating nearby places -->
-    <string name="nearby_places_label">近くの場所</string>
     <!-- Message shown in a dialog explaining the consequences of accesing the location -->
     <string name="explanation_send_location">この場所は、エンドツーエンドの暗号化されたMEGAプラットフォームの外部にあるサードパーティのマッププロバイダを使用して開かれます。</string>
     <!-- Title of the location marker set by the user -->
@@ -2407,8 +2387,6 @@
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
     <string name="no_contacts_invite">あなたはMEGAの連絡先がありません。連絡先セクションからご友人をご招待ください。</string>
-    <!-- Invite button for chat top cell -->
-    <string name="invite_more">もっと招待する</string>
     <!-- Title of first tour screen -->
     <string name="title_tour_one">あなたがキーを持っています</string>
     <!-- Content of first tour screen -->
@@ -2573,12 +2551,6 @@
     <string name="error_remove_business_contact">%1$sさんはあなたのビジネスアカウントの一部であるため、連絡先から削除できません。</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">最後のお支払いで問題がありました。詳細については、デスクトップブラウザを使用してMEGAにアクセスしてください。</string>
-    <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">アカウントが無効になっています</string>
-    <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">お支払いが失敗したため、お客様のビジネスアカウントが無効化されました。そのため、アカウントに保存されているデータにアクセスできなくなります。お支払いを行ってサブスクリプションを再開するには、ブラウザからMEGAにログインしてください。</string>
-    <!-- A message which is shown to sub-users of expired business accounts. -->
-    <string name="expired_user_business_text">あなたのアカウントは現在[B]凍結[/B]されています。あなたのデータの閲覧のみ可能です。</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
     <string name="camera_uploads_business_alert">MEGAはお客様のデータにアクセスできません。ただし、ビジネスアカウントの管理者様は、あなたのカメラアップロードにアクセスすることができます。</string>
     <!-- General label to alert user that somehting went wrong -->
@@ -2993,10 +2965,6 @@
     <string name="months_view_button">月</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
     <string name="years_view_button">年</string>
-    <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
-    <plurals name="cu_upload_progress">
-        <item quantity="other">アップロード中、%1$d個のファイルを保留中</item>
-    </plurals>
     <!-- Text to show as production api server option -->
     <string name="production_api_server">本番</string>
     <!-- Title to show in a dialog to change api server -->
@@ -3243,8 +3211,6 @@
     <string name="show_activity_action">アクティビティを表示</string>
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">[B]最近[/B]のアクティビティは非表示です</string>
-    <!-- Label indicating video original quality -->
-    <string name="original_quality">元の品質</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
     <string name="setting_fingerprint">指紋ID</string>
     <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
@@ -3303,8 +3269,6 @@
     <string name="backup_remove_root_folder">バックアップフォルダを削除します。これにより、設定したすべてのバックアップが削除されます。本当にこれを行ってもよろしいですか？</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">「%1s」をごみ箱に移動</string>
-    <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_disable_confirm">バックアップを無効にする</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">読み取り専用</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
@@ -3321,12 +3285,6 @@
     <string name="upload_files">ファイルをアップロード</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">フォルダをアップロード</string>
-    <!-- Title of the Payments screen -->
-    <string name="payment">お支払い</string>
-    <!-- Label indicating payment methods -->
-    <string name="payment_methods">お支払い方法</string>
-    <!-- Button to proceed with a payment -->
-    <string name="proceed">進む</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">主催者として削除</string>
     <!-- Title message of existing subscription dialog -->
@@ -4537,8 +4495,6 @@
     <string name="account_upgrade_account_description_feature_link">&#8226;&#160;有効期限のあるリンク</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;転送容量の共有</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;自動バックアップ</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Liteでは削除されたデータを最大90日、Pro&#160;I、II、IIIでは最大180日巻き戻し</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
@@ -4551,8 +4507,6 @@
     <string name="account_upgrade_account_buy_button_title_pro_ii">Pro&#160;IIを購入</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_iii">Pro&#160;IIIを購入</string>
-    <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
-    <string name="account_upgrade_account_terms_of_service_link">ご利用規約</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
     <string name="cloud_drive_subtitle_link_access_password">パスワードを知っている人だけがリンクを開けます</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
@@ -5035,6 +4989,7 @@
     <string name="account_upgrade_subscription_details">サブスクリプションは、最初に選択した期間と同じ期間および同じ価格で、連続するサブスクリプション期間に対して自動的に更新されます。次のサブスクリプションのお支払い期日の24時間前までに、MEGA&#160;Proサブスクリプションの自動更新をオフに切り替えることができます。これは、[A]Google Play[/A]の「サブスクリプション」から実行できます。</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">ギャラリーへのアクセスを許可する</string>
+    <!--  -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">アクセスを許可</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">アップデートが必要です</string>
@@ -5087,7 +5042,7 @@
     <!-- Button text to change SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_action_button">変更</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
-    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">無料プランでは、1回のミーティングあたり60分の制限があります。[A]ぜひ今すぐアップグレードしてください。[/A]</string>
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]無料プランではミーティングに60分の制限があります。Proユーザー様は無制限の通話と、最大1000人の参加者まで可能です。[/A][B]ぜひ今すぐアップグレードしてください。[/B]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_monthly_with_price">すぐに%1$sが請求され、お客様のサブスクリプションは1&#160;か月後に月額%2$sで自動的に更新されます。Google Playアカウントには、各請求期間の終了から24時間以内に更新料金が請求されます。サブスクリプションをキャンセルするには、請求期間が終了する少なくとも24&#160;時間前に、[A]Google&#160;Play[/A]のサブスクリプション経由でMEGA&#160;Proサブスクリプションの自動更新を無効にする必要があります。\nアカウントをアップグレードすると、MEGAの[B]ご利用規約[/B]および[C]プライバシーポリシー[/C]に同意されたことになります。</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
@@ -5123,7 +5078,79 @@
     <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
     <string name="notifications_screen_notification_promo_expiration_time">%1$s %2$sに期限切れになります</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
-    <string name="meetings_free_call_organiser_number_of_participants_warning">[A]As a free user, you can only add up to 100 participants to this call. Need more?[/A]&#160;[B]Upgrade now[/B]</string>
+    <string name="meetings_free_call_organiser_number_of_participants_warning">通話に参加できる参加者は100名のみです。追加の参加者は、メッセージの送受信のみが可能になります。主催者様はProにアップグレードして、これらの制限を解除できます。</string>
     <!-- Warning Message for non organiser for Free Call -->
     <string name="meetings_free_call_non_organiser_number_of_participants_warning">通話に参加できる参加者は100名のみです。追加の参加者は、チャットの送信と読み取りのみが可能になります。主催者にこの制限を解除するよう依頼してください。</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_low">低い</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Medium Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_medium">普通</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to High Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_high">高い</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos are automatically uploaded by Camera Uploads without any Video Compression -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_original">オリジナル</string>
+    <!-- Warning shown when the recording of audio permission is required for sending a voice clip and it has been denied by the user -->
+    <string name="chat_microphone_permissions_denied_for_voice_clip">MEGAによるマイクへのアクセスを拒否しました。ボイスクリップを録音されたい場合は、MEGAに録音許可を与えてください。</string>
+    <!-- Free plan limitation dialog title for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">参加できません</string>
+    <!-- Free plan limitation dialogue description for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">この通話では100&#160;人の参加者のみをサポートできます。この制限を解除するには、主催者様にご依頼ください。</string>
+    <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">はい、わかりました。</string>
+    <!-- The title of the hidden nodes feature -->
+    <string name="hidden_nodes">ファイルとフォルダを隠す</string>
+    <!-- Hidden nodes benefit: hide files and folders -->
+    <string name="hidden_nodes_benefit_title_hide_files_folders">重要なファイルやフォルダを隠す</string>
+    <!-- Hidden nodes benefit description: hide files and folders -->
+    <string name="hidden_nodes_benefit_description_hide_files_folders">機密性の高いファイルやフォルダを非表示にして、プライバシーを確​​保できます。あなただけが、個別に、または一時的に、設定から非表示項目を表示できます。</string>
+    <!-- Hidden nodes benefit: exclude from timeline -->
+    <string name="hidden_nodes_benefit_title_exclude_timeline">タイムラインから除外</string>
+    <!-- Hidden nodes benefit description: exclude from timeline -->
+    <string name="hidden_nodes_benefit_description_exclude_timeline">非表示項目にはクラウドドライブからのみアクセスでき、写真、アルバム、最近の項目には表示されません。</string>
+    <!-- Hidden nodes benefit: out of sight -->
+    <string name="hidden_nodes_benefit_title_out_of_sight">非表示の解除</string>
+    <!-- Hidden nodes benefit description: out of sight -->
+    <string name="hidden_nodes_benefit_description_out_of_sight">隠しファイルをいつ表示するかを決定します。非表示の項目を一時的に表示する新しい設定が追加されました。</string>
+    <!-- The snackbar message of hidden nodes operation -->
+    <plurals name="hidden_nodes_result_message">
+        <item quantity="other">%1$d項目非表示</item>
+    </plurals>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_priority_support">&#8226; &#160;優先サポート</string>
+    <!-- The title of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_title">Proにアップグレードしていただくと無制限に通話できるようになります</string>
+    <!-- The body of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_body">通話は60分の制限に達したため終了しました。Proユーザー様は、無制限の通話と最大1000人の参加者が利用できます。</string>
+    <!-- The button text of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_button">今すぐアップグレード</string>
+    <!-- Search drop down chips filter type file type -->
+    <string name="search_dropdown_chip_filter_type_file_type">種類</string>
+    <!-- Search drop down chips filter type file type images -->
+    <string name="search_dropdown_chip_filter_type_file_type_images">画像</string>
+    <!-- Search drop down chips filter type file type videos -->
+    <string name="search_dropdown_chip_filter_type_file_type_video">動画</string>
+    <!-- Search drop down chips filter type file type audio -->
+    <string name="search_dropdown_chip_filter_type_file_type_audio">音声</string>
+    <!-- Search drop down chips filter type file type documents -->
+    <string name="search_dropdown_chip_filter_type_file_type_documents">文書</string>
+    <!-- Search drop down chips filter type date added -->
+    <string name="search_dropdown_chip_filter_type_date_added">追加日</string>
+    <!-- Search drop down chips filter type last modified -->
+    <string name="search_dropdown_chip_filter_type_last_modified">最終更新</string>
+    <!-- Search drop down chips filter type date modified today -->
+    <string name="search_dropdown_chip_filter_type_date_today">今日</string>
+    <!-- Search drop down chips filter type date modified last 7 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_seven_days">過去7日間</string>
+    <!-- Search drop down chips filter type date modified last 30 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_thirty_days">過去30日間</string>
+    <!-- Search drop down chips filter type date modified this year -->
+    <string name="search_dropdown_chip_filter_type_date_this_year">今年</string>
+    <!-- Search drop down chips filter type date modified last year -->
+    <string name="search_dropdown_chip_filter_type_date_last_year">去年</string>
+    <!-- Search drop down chips filter type date modified older -->
+    <string name="search_dropdown_chip_filter_type_date_older">それ以前</string>
+    <!-- String below login button next to button for reporting a login issue -->
+    <string name="general_login_label_trouble_logging_in">ログインできませんか？</string>
+    <!-- Button text for reporting an issue on the login screen -->
+    <string name="general_login_button_report_your_issue">問題を報告</string>
 </resources>

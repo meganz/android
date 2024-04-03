@@ -65,7 +65,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_local_type">Un fichier ne peut pas être synchronisé individuellement. Vous devez définir la synchronisation du dossier.</string>
     <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
-    <string name="device_center_list_view_item_sub_state_initial_scan_failed">Échec de l’analyse initiale. Vous devrez réactiver votre synchronisation ou sauvegarde dans l’appli pour ordinateur.</string>
+    <string name="device_center_list_view_item_sub_state_initial_scan_failed">Échec de l’analyse initiale. Vous devez réactiver votre synchronisation ou sauvegarde dans l’appli pour ordinateur.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
     <string name="device_center_list_view_item_sub_state_remote_node_not_found">Impossible de trouver le dossier dans MEGA. Soit il a été déplacé, soit il a été supprimé, soit vous n’y avez pas accès.</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
@@ -79,7 +79,7 @@
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="device_center_list_view_item_sub_state_share_non_full_access">Impossible de synchroniser le dossier, car c’est un dossier partagé sans accès total.</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
-    <string name="device_center_list_view_item_sub_state_put_nodes_error">Les fichiers de ce dossier ne peuvent être ni synchronisés ni sauvegardés. Vous devrez réactiver la synchronisation ou la sauvegarde dans l’appli pour ordinateur.</string>
+    <string name="device_center_list_view_item_sub_state_put_nodes_error">Les fichiers de ce dossier ne peuvent être ni synchronisés ni sauvegardés. Vous devez réactiver la synchronisation ou la sauvegarde dans l’appli pour ordinateur.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
     <string name="device_center_list_view_item_sub_state_active_sync_below_path">Le dossier ne peut pas être synchronisé, car il comprend déjà des dossiers synchronisés.</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
@@ -101,7 +101,7 @@
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">Échec de renommage.</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
-    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">Impossible de créer un fichier .megaignore pour cette synchronisation.</string>
+    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">Impossible de créer un fichier .megaignore pour cette synchronisation</string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
     <string name="device_center_list_view_item_sub_state_sync_config_read_failure">Impossible de lire la configuration de la synchronisation. Réessayez ultérieurement ou vérifiez les droits du dossier.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
@@ -157,11 +157,11 @@
     <!-- Text to show in the Device Center for a No Network State when there is no network connectivity -->
     <string name="device_center_no_network_state">Aucune connexion à Internet</string>
     <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
-    <string name="device_center_list_view_item_sub_state_local_filesystem_mismatch">Les fichiers de ce dossier ne peuvent être ni synchronisés ni sauvegardés. Vous devrez réactiver la synchronisation ou la sauvegarde dans l’appli pour ordinateur.</string>
+    <string name="device_center_list_view_item_sub_state_local_filesystem_mismatch">Les fichiers de ce dossier ne peuvent être ni synchronisés ni sauvegardés. Vous devez réactiver la synchronisation ou la sauvegarde dans l’appli pour ordinateur.</string>
     <!-- Text to display in Device Center for an empty state when inspecting a device where no sync or backup has been configured -->
     <string name="device_center_nothing_setup_state">Rien n’est encore configuré</string>
     <!-- The hint text for the search bar in the Device Center feature when the User is searching for Devices -->
-    <string name="device_center_top_app_bar_search_devices_hint">Recherche d\’appareils</string>
+    <string name="device_center_top_app_bar_search_devices_hint">Recherche d’appareils</string>
     <!-- The hint text for the search bar in the Device Center feature when the User is searching for Syncs -->
     <string name="device_center_top_app_bar_search_syncs_hint">Recherche de synchronisations</string>
     <!-- Text to show in the Device Center when no search results are found -->
@@ -178,8 +178,9 @@
     </plurals>
     <!-- String which indicates the number of folders contained into a device/folder -->
     <plurals name="device_center_info_num_folders">
-        <item quantity="one">%1$d folder</item>
-        <item quantity="other">%1$d folders</item>
+        <item quantity="one">%1$d&#160;dossier</item>
+        <item quantity="many">%1$d de dossiers</item>
+        <item quantity="other">%1$d&#160;dossiers</item>
     </plurals>
     <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="device_center_info_num_folders_and_files">

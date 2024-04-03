@@ -84,8 +84,6 @@
     <string name="action_refresh">Vernieuwen</string>
     <!-- Menu item -->
     <string name="action_sort_by">Sorteren op</string>
-    <!-- Menu item -->
-    <string name="action_help">Help</string>
     <!-- Change from a free account to paying MEGA -->
     <string name="action_upgrade_account">Account upgraden</string>
     <!-- Menu item to select all the elements of a list -->
@@ -1520,10 +1518,6 @@
     <string name="save_cloud_drive">Naar Cloud schijf</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
     <string name="save_file_system">Naar bestandssysteem</string>
-    <!-- Title of QR code section -->
-    <string name="section_my_code">Mijn code</string>
-    <!-- Title of QR code scan section -->
-    <string name="section_scan_code">Code scannen</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">MEGA gebruikers die uw QR-code scannen, worden automatisch toegevoegd aan uw lijst met contactpersonen.</string>
     <!-- Text shown when it has been copied the QR code link -->
@@ -2228,18 +2222,8 @@
     <string name="subtitle_incoming_contact_request_accepted">[B]Contact verzoek van[/B][A]%s [/A][B]was geaccepteerd[/B]</string>
     <!-- Subtitle of the historic notification for incoming contact request declined -->
     <string name="subtitle_incoming_contact_request_denied">[B]Contact verzoek van [/B][A]%s [/A][B]was afgewezen[/B]</string>
-    <!-- Subtitle of the Upgrade account section -->
-    <string name="type_of_my_account">Uw huidige account is [A]%s[/A]</string>
     <!-- Footnote to clarify the storage space is subject to the achievement program -->
     <string name="footnote_achievements">Afhankelijk van uw deelname in ons beloningsprogramma.</string>
-    <!-- Title label for the current payment method during account upgrading -->
-    <string name="payment_method">Betaalmethode</string>
-    <!-- title of billing period -->
-    <string name="billing_period_title">Betaal periode</string>
-    <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]Maandelijks afgeschreven[/A] %s/maand</string>
-    <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Jaarlijks afgeschreven[/A] %s/jaar</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">Annuleren</string>
     <!-- dialog option continue in alert dialog -->
@@ -2248,8 +2232,6 @@
     <string name="payment_method_google_wallet">[A]Google Pay[/A] (abonnement)</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
     <string name="new_label_notification_item">Nieuw</string>
-    <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
-    <string name="label_custom_plan">Als u uw huidige abonnement wilt upgraden, neem dan contact op met ons ondersteuningsteam voor een [A]aangepast plan [/A].</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">bestandsnaam</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
@@ -2404,8 +2386,6 @@
     <string name="current_location_label">Verstuur uw huidige locatie</string>
     <!-- Label layout on maps activity that permits send current location. Placeholder is the current location -->
     <string name="current_location_landscape_label">Verstuur uw huidige locatie: [A]%1$s[/A]</string>
-    <!-- Label layout on maps activity indicating nearby places -->
-    <string name="nearby_places_label">Plaatsen in de buurt</string>
     <!-- Message shown in a dialog explaining the consequences of accesing the location -->
     <string name="explanation_send_location">Deze locatie wordt geopend met behulp van een externe kaartenleverancier buiten de end-to-end gecodeerde MEGA-platform.</string>
     <!-- Title of the location marker set by the user -->
@@ -2470,8 +2450,6 @@
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
     <string name="no_contacts_invite">U heegt geen MEGA contacten. Nodig vrienden uit vanuit de Contacten sectie.</string>
-    <!-- Invite button for chat top cell -->
-    <string name="invite_more">Meer uitnodigen</string>
     <!-- Title of first tour screen -->
     <string name="title_tour_one">U heeft de sleutels</string>
     <!-- Content of first tour screen -->
@@ -2641,12 +2619,6 @@
     <string name="error_remove_business_contact">U kunt %1$s niet verwijderen als contact omdat deze deel uitmaakt van uw zakelijke account.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">Er is een probleem opgetreden met uw laatste betaling. Ga voor meer informatie naar MEGA met een desktopbrowser.</string>
-    <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">Account gedeactiveerd</string>
-    <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Uw Zakelijke account is gedeactiveerd vanwege een mislukte betaling. U heeft geen toegang tot de gegevens die in uw account zijn opgeslagen. Om een ​​betaling uit te voeren en uw abonnement opnieuw te activeren, logt u in op MEGA via een browser.</string>
-    <!-- A message which is shown to sub-users of expired business accounts. -->
-    <string name="expired_user_business_text">Uw account is momenteel [B]geschorst[/B]. U kunt alleen door uw gegevens bladeren.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
     <string name="camera_uploads_business_alert">MEGA heeft geen toegang tot uw gegevens. Uw zakelijke accountbeheerder heeft echter wel toegang tot uw Camera uploads.</string>
     <!-- General label to alert user that somehting went wrong -->
@@ -3071,11 +3043,6 @@
     <string name="months_view_button">Maanden</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
     <string name="years_view_button">Jaren</string>
-    <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
-    <plurals name="cu_upload_progress">
-        <item quantity="one">Upload in behandeling, %1$d bestand wachtend</item>
-        <item quantity="other">Upload in behandeling, %1$d bestanden wachtend</item>
-    </plurals>
     <!-- Text to show as production api server option -->
     <string name="production_api_server">Productie</string>
     <!-- Title to show in a dialog to change api server -->
@@ -3336,8 +3303,6 @@
     <string name="show_activity_action">Activiteit weergeven</string>
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">[B]Recent[/B] activiteit verborgen</string>
-    <!-- Label indicating video original quality -->
-    <string name="original_quality">Originele kwaliteit</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
     <string name="setting_fingerprint">Vingerprint ID</string>
     <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
@@ -3396,8 +3361,6 @@
     <string name="backup_remove_root_folder">U verwijdert uw back-up map. Hiermee worden alle back-ups verwijderd die u hebt ingesteld. Weet u zeker dat u dit wilt doen?</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">Verplaats “%1s” naar Prullenbak</string>
-    <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_disable_confirm">Back-up uitschakelen</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Alleen-lezen</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
@@ -3414,12 +3377,6 @@
     <string name="upload_files">Bestanden uploaden</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Map uploaden</string>
-    <!-- Title of the Payments screen -->
-    <string name="payment">Betaling</string>
-    <!-- Label indicating payment methods -->
-    <string name="payment_methods">Betalingsmethoden</string>
-    <!-- Button to proceed with a payment -->
-    <string name="proceed">Doorgaan</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Verwijderen als gastvrouw/gastheer</string>
     <!-- Title message of existing subscription dialog -->
@@ -4750,8 +4707,6 @@
     <string name="account_upgrade_account_description_feature_link">&#8226;&#160;Links met verloopdatums</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;Overdrachtstegoed deling</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Automatische back-ups</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rewind">&#8226; &#160; Terugspoelen tot 90 dagen aan verwijderde gegevens op Pro &#160; Lite en tot 180 dagen op Pro &#160; I, II en III</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
@@ -4764,8 +4719,6 @@
     <string name="account_upgrade_account_buy_button_title_pro_ii">Pro&#160;II kopen</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_iii">Pro&#160;III kopen</string>
-    <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
-    <string name="account_upgrade_account_terms_of_service_link">Algemene Voorwaarden</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
     <string name="cloud_drive_subtitle_link_access_password">Alleen personen met het wachtwoord kunnen de link openen</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
@@ -5270,6 +5223,7 @@
     <string name="account_upgrade_subscription_details">Abonnementen worden automatisch verlengd voor opeenvolgende abonnementsperioden van dezelfde duur en tegen dezelfde prijs als de gekozen initiële periode. U kunt de automatische verlenging van uw MEGA &#160; Pro-abonnement uiterlijk 24 uur voordat uw volgende abonnementsbetaling verschuldigd is, uitschakelen via Abonnementen in [A]Google Play[/A].</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Geef toegang tot uw gallerij</string>
+    <!--  -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Toegang verlenen</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">Update vereist</string>
@@ -5324,7 +5278,7 @@
     <!-- Button text to change SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_action_button">Wijzigen</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
-    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Gratis abonnementen hebben een limiet van 60 minuten per vergadering. [A]Nu upgraden.[/A]</string>
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]Uw gratis abonnement heeft een limiet van 60 minuten voor vergaderingen. Pro-gebruikers kunnen onbeperkt bellen en tot 1000 deelnemers.[/A] [B]Nu upgraden.[/B]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_monthly_with_price">Er worden onmiddelijk kosten in rekening gebracht %1$s en uw abonnement wordt na 1 &#160; maand automatisch verlengd voor %2$s per maand. Uw Google &#160; Play-account wordt binnen 24 &#160; uur na het einde van elke factureringsperiode in rekening gebracht voor verlenging. Om uw abonnement op te zeggen, moet u de automatische verlenging van uw MEGA &#160; Pro-abonnement ten minste 24 &#160; uur voor het einde van uw factureringsperiode uitschakelen via Abonnementen in [A]Google &#160; Play[/A].\nDoor uw account te upgraden, gaat u akkoord met MEGA\’s [B]Algemene Voorwaarden[/B] en [C]Privacybeleid[/C].</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
@@ -5361,7 +5315,80 @@
     <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
     <string name="notifications_screen_notification_promo_expiration_time">Vervalt op %1$s om %2$s</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
-    <string name="meetings_free_call_organiser_number_of_participants_warning">[A]As a free user, you can only add up to 100 participants to this call. Need more?[/A]&#160;[B]Upgrade now[/B]</string>
+    <string name="meetings_free_call_organiser_number_of_participants_warning">Er kunnen slechts 100 deelnemers deelnemen aan de oproep. Eventuele extra deelnemers kunnen alleen berichten verzenden en ontvangen. De organisator kan upgraden naar Pro om deze beperkingen op te heffen.</string>
     <!-- Warning Message for non organiser for Free Call -->
     <string name="meetings_free_call_non_organiser_number_of_participants_warning">Slechts 100&#160;deelnemers kunnen deelnemen aan de oproep. Eventuele extra deelnemers kunnen alleen gesprekken verzenden en lezen. Vraag de organisator om deze beperking op te heffen.</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_low">Laag</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Medium Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_medium">Gemiddeld</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to High Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_high">Hoog</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos are automatically uploaded by Camera Uploads without any Video Compression -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_original">Orgineel</string>
+    <!-- Warning shown when the recording of audio permission is required for sending a voice clip and it has been denied by the user -->
+    <string name="chat_microphone_permissions_denied_for_voice_clip">U hebt MEGA-toegang tot uw microfoon geweigerd. Als u een stemclip wilt opnemen, geef dan MEGA toestemming om dit te doen.</string>
+    <!-- Free plan limitation dialog title for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Kan niet aansluiten</string>
+    <!-- Free plan limitation dialogue description for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Deze oproep kan slechts 100 deelnemers ondersteunen. Vraag de organisator om deze beperking op te heffen.</string>
+    <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">Ok, ik snap het</string>
+    <!-- The title of the hidden nodes feature -->
+    <string name="hidden_nodes">Verborgen bestanden en mappen</string>
+    <!-- Hidden nodes benefit: hide files and folders -->
+    <string name="hidden_nodes_benefit_title_hide_files_folders">Belangrijke bestanden en mappen verbergen</string>
+    <!-- Hidden nodes benefit description: hide files and folders -->
+    <string name="hidden_nodes_benefit_description_hide_files_folders">U kunt gevoelige bestanden en mappen verbergen voor privacy. Alleen u kunt ze afzonderlijk of door tijdelijk verborgen items in de instellingen weer te geven.</string>
+    <!-- Hidden nodes benefit: exclude from timeline -->
+    <string name="hidden_nodes_benefit_title_exclude_timeline">Uitsluiten van de tijdlijn</string>
+    <!-- Hidden nodes benefit description: exclude from timeline -->
+    <string name="hidden_nodes_benefit_description_exclude_timeline">Verborgen items zijn alleen toegankelijk via de Cloud-schijf en verschijnen niet in uw Foto\’s, Albums of Recent.</string>
+    <!-- Hidden nodes benefit: out of sight -->
+    <string name="hidden_nodes_benefit_title_out_of_sight">Uit het zicht</string>
+    <!-- Hidden nodes benefit description: out of sight -->
+    <string name="hidden_nodes_benefit_description_out_of_sight">U bepaalt zelf wanneer verborgen bestanden zichtbaar zijn. Er is een nieuwe instelling om verborgen items tijdelijk weer te geven.</string>
+    <!-- The snackbar message of hidden nodes operation -->
+    <plurals name="hidden_nodes_result_message">
+        <item quantity="one">%1$d item verborgen</item>
+        <item quantity="other">%1$d items verborgen</item>
+    </plurals>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_priority_support">&#8226; &#160; Prioritaire ondersteuning</string>
+    <!-- The title of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_title">Upgrade naar Pro om ongelimiteerd te kunnen bellen</string>
+    <!-- The body of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_body">Uw gesprek heeft de limiet van 60 minuten bereikt en is beëindigd. Pro-gebruikers kunnen ongelimiteerd bellen en tot 1000 deelnemers.</string>
+    <!-- The button text of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_button">Nu upgraden</string>
+    <!-- Search drop down chips filter type file type -->
+    <string name="search_dropdown_chip_filter_type_file_type">Type</string>
+    <!-- Search drop down chips filter type file type images -->
+    <string name="search_dropdown_chip_filter_type_file_type_images">Afbeeldingen</string>
+    <!-- Search drop down chips filter type file type videos -->
+    <string name="search_dropdown_chip_filter_type_file_type_video">Video</string>
+    <!-- Search drop down chips filter type file type audio -->
+    <string name="search_dropdown_chip_filter_type_file_type_audio">Audio</string>
+    <!-- Search drop down chips filter type file type documents -->
+    <string name="search_dropdown_chip_filter_type_file_type_documents">Documenten</string>
+    <!-- Search drop down chips filter type date added -->
+    <string name="search_dropdown_chip_filter_type_date_added">Datum toegevoegd</string>
+    <!-- Search drop down chips filter type last modified -->
+    <string name="search_dropdown_chip_filter_type_last_modified">Laatst gewijzigd</string>
+    <!-- Search drop down chips filter type date modified today -->
+    <string name="search_dropdown_chip_filter_type_date_today">Vandaag</string>
+    <!-- Search drop down chips filter type date modified last 7 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_seven_days">Laatste 7 dagen</string>
+    <!-- Search drop down chips filter type date modified last 30 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_thirty_days">Laatste 30 dagen</string>
+    <!-- Search drop down chips filter type date modified this year -->
+    <string name="search_dropdown_chip_filter_type_date_this_year">Dit jaar</string>
+    <!-- Search drop down chips filter type date modified last year -->
+    <string name="search_dropdown_chip_filter_type_date_last_year">Laatste jaar</string>
+    <!-- Search drop down chips filter type date modified older -->
+    <string name="search_dropdown_chip_filter_type_date_older">Ouder</string>
+    <!-- String below login button next to button for reporting a login issue -->
+    <string name="general_login_label_trouble_logging_in">Trouble logging in?</string>
+    <!-- Button text for reporting an issue on the login screen -->
+    <string name="general_login_button_report_your_issue">Report your issue</string>
 </resources>

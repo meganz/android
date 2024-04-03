@@ -101,7 +101,7 @@
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">이름 변경 실패.</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
-    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">이 동기화를 위한 .megaignore 파일을 만들 수 없습니다.</string>
+    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">이 동기화를 위한 .megaignore 파일을 만들 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
     <string name="device_center_list_view_item_sub_state_sync_config_read_failure">동기화 설정을 읽을 수 없습니다. 나중에 다시 시도하거나 폴더 권한을 확인하세요.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
@@ -176,13 +176,12 @@
     </plurals>
     <!-- String which indicates the number of folders contained into a device/folder -->
     <plurals name="device_center_info_num_folders">
-        <item quantity="one">%1$d folder</item>
-        <item quantity="other">%1$d folders</item>
+        <item quantity="other">폴더 %1$d개</item>
     </plurals>
     <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
     <plurals name="device_center_info_num_folders_and_files">
         <item quantity="other">폴더 %1$d개&#160;.&#160;</item>
     </plurals>
     <!-- Header of the Info view field for the date and time a folder was added -->
-    <string name="device_center_info_added">Added</string>
+    <string name="device_center_info_added">추가됨</string>
 </resources>

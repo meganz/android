@@ -101,7 +101,7 @@
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">Hernoemen is mislukt.</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
-    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">Kon geen .megaignore bestand aanmaken voor deze synchronisatie.</string>
+    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">Kon geen .megaignore bestand aanmaken voor deze synchronisatie</string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
     <string name="device_center_list_view_item_sub_state_sync_config_read_failure">Kon de synchronisatieconfiguratie niet lezen. Probeer het later opnieuw of controleer de mapmachtigingen.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
+    <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
+    <string name="general_sync_no_error">No sync error</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
+    <string name="general_sync_unsupported_file_system">MEGA không&#160;thể đồng&#160;bộ hoặc sao&#160;lưu thư&#160;mục này bởi vì hệ&#160;thống tệp trên thiết&#160;bị của bạn không&#160;được hỗ&#160;trợ.</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
+    <string name="general_sync_invalid_remote_type">Thư&#160;mục bạn đã chọn không thể đồng&#160;bộ được</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
+    <string name="general_sync_invalid_local_type">Đồng&#160;bộ không&#160;thể thực&#160;hiện với tệp&#160;tin riêng&#160;lẻ. Bạn cần&#160;phải thiết&#160;lập đồng&#160;bộ từ một thư&#160;mục.</string>
+    <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
+    <string name="general_sync_initial_scan_failed">Quét khởi&#160;đầu đã không thành&#160;công. Bạn sẽ cần kích&#160;hoạt lại đồng&#160;bộ hóa hoặc sao&#160;lưu của mình từ Ứng&#160;dụng cho máy&#160;tính.</string>
+    <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
+    <string name="general_sync_remote_node_not_found">Không tìm thấy vị&#160;trí của thư&#160;mục trên MEGA, có thể do đã bị di&#160;chuyển hoặc bị xóa, cũng có thể là bạn không có quyền truy&#160;cập</string>
+    <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
+    <string name="general_sync_storage_overquota">Unable to sync or back up this folder as your storage is full</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
+    <string name="general_sync_account_expired">Không thể đồng&#160;bộ hóa hoặc sao&#160;lưu thư&#160;mục này vì gói đăng&#160;ký của bạn đã hết hạn</string>
+    <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
+    <string name="general_sync_foreign_target_overshare">Thư&#160;mục không thể đồng&#160;bộ được do tài&#160;khoản của người chia&#160;sẻ thư&#160;mục này đã vượt mức không&#160;gian lưu&#160;trữ</string>
+    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
+    <string name="general_sync_remote_path_has_changed">Không tìm thấy vị&#160;trí của thư&#160;mục trên MEGA, có thể do đã bị di&#160;chuyển hoặc bị xóa, cũng có thể là bạn không có quyền truy&#160;cập</string>
+    <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
+    <string name="general_sync_share_non_full_access">Thư&#160;mục không thể đồng&#160;bộ được vì thư&#160;mục này đã chia&#160;sẻ mà không có cấp quyền truy&#160;cập toàn quyền cho bạn</string>
+    <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
+    <string name="general_sync_put_nodes_error">Các tệp&#160;tin trong thư&#160;mục này không thể đồng&#160;bộ hóa hoặc sao lưu được. Bạn sẽ cần phải kích&#160;hoạt lại đồng&#160;bộ hoặc sao lưu từ App cho Máy&#160;tính.</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
+    <string name="general_sync_active_sync_below_path">Thư&#160;mục không thể đồng&#160;bộ được bởi vì nó đang nằm ở trong một thư&#160;mục được đồng&#160;bộ</string>
+    <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
+    <string name="general_sync_vboxsharedfolder_unsupported">MEGA không thể đồng&#160;bộ hóa hoặc sao&#160;lưu các thư&#160;mục VirtualBox</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
+    <string name="general_sync_account_blocked">Unable to sync or back up this folder as the account has been blocked</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
+    <string name="general_sync_unknown_temporary_error">Có sự&#160;cố khi đồng&#160;bộ hóa hoặc sao&#160;lưu thư&#160;mục này. Thử lại sau. Nếu sự&#160;cố vẫn tiếp&#160;diễn, hãy liên&#160;hệ với bộ&#160;phận Hỗ&#160;trợ.</string>
+    <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
+    <string name="general_sync_too_many_action_packets">Đã tải lại tài&#160;khoản. Mọi cập&#160;nhật bị bỏ lỡ đối với các bản sao&#160;lưu hoặc đồng&#160;bộ hóa của bạn chưa có được áp&#160;dụng.</string>
+    <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
+    <string name="general_sync_logged_out">Đồng&#160;bộ hóa hoặc sao&#160;lưu đã bị dừng do có vẻ như bạn đã đăng&#160;xuất khỏi Ứng&#160;dụng cho máy&#160;tính. Đăng&#160;nhập vào lại Ứng&#160;dụng cho máy&#160;tính để tiếp&#160;tục đồng&#160;bộ hóa hoặc sao&#160;lưu.</string>
+    <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
+    <string name="general_sync_missing_parent_node">N/A</string>
+    <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
+    <string name="general_sync_backup_source_not_below_drive">Không tìm thấy vị&#160;trí của thư&#160;mục trong ổ&#160;đĩa ngoài.</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
+    <string name="general_sync_active_sync_same_path">Đã có một thư&#160;mục được đồng&#160;bộ hóa với cùng vị&#160;trí</string>
+    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
+    <string name="general_sync_could_not_move_cloud_nodes">Đổi tên không thành&#160;công.</string>
+    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
+    <string name="general_sync_could_not_create_ignore_file">Không thể tạo tệp .megaignore cho việc đồng bộ này</string>
+    <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
+    <string name="general_sync_config_read_failure">Không thể đọc cấu hình đồng bộ hóa. Thử lại sau hoặc kiểm tra quyền hạn của thư mục.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
+    <string name="general_sync_unknown_drive_path">Không rõ đường dẫn ổ&#160;đĩa cho đồng&#160;bộ này.</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
+    <string name="general_sync_invalid_scan_interval">Khoảng thời&#160;gian quét khởi&#160;đầu không hợp&#160;lệ. Kiểm&#160;tra thiết&#160;lập khoảng thời&#160;gian quét và thử lại.</string>
+    <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
+    <string name="general_sync_notification_system_unavailable">Không thể giao&#160;tiếp với vị&#160;trí thư&#160;mục. Kiểm&#160;tra xem vị&#160;trí có thể truy&#160;cập được hay không và quyền đi tới vị&#160;trí thư&#160;mục đã được cấp phép.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
+    <string name="general_sync_unable_to_add_watch">Không thể thêm đồng&#160;hồ hệ&#160;thống tệp. Hãy đảm&#160;bảo có đủ không&#160;gian và bộ nhớ trống, và bạn đã có cấp quyền truy&#160;cập vào vị&#160;trí thư&#160;mục.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
+    <string name="general_sync_unable_to_retrieve_root_fsid">Không thể đọc được vị&#160;trí thư&#160;mục. Kiểm&#160;tra xem vị&#160;trí có thể truy&#160;cập được hay không và quyền đi tới vị&#160;trí thư&#160;mục đã được cấp phép.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
+    <string name="general_sync_unable_to_open_database">Unable to open state cache database</string>
+    <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
+    <string name="general_sync_insufficient_disk_space">Không đủ không&#160;gian lưu&#160;trữ trong thiết&#160;bị của bạn</string>
+    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
+    <string name="general_sync_failure_accessing_persistent_storage">Không thể đọc được vị&#160;trí thư&#160;mục. Kiểm&#160;tra xem vị&#160;trí có thể truy&#160;cập được hay không và quyền đi tới vị&#160;trí thư&#160;mục đã được cấp phép.</string>
+    <!-- The name for specific Sub States to indicate that an unknown error occurred -->
+    <string name="general_sync_message_unknown_error">Một lỗi không xác&#160;định được đã xảy ra. Hãy liên&#160;hệ với bộ&#160;phận Hỗ&#160;trợ.</string>
+    <!-- The name for specific Sub States to indicate that something went wrong -->
+    <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
+    <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
+    <string name="general_sync_message_node_in_rubbish_bin">Thư&#160;mục không thể đồng&#160;bộ hoặc sao&#160;lưu được bởi vì thư&#160;mục tương&#160;ứng trên MEGA đang nằm trong Thùng&#160;Rác.</string>
+    <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
+    <string name="general_sync_message_cannot_locate_local_drive_now">Hiện không thể xác&#160;định vị&#160;trí thư&#160;mục trong thiết&#160;bị của bạn. Hãy thử lại sau.</string>
+    <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
+    <string name="general_sync_message_cannot_locate_local_drive">Không tìm thấy vị&#160;trí của thư&#160;mục trong thiết&#160;bị của bạn</string>
+    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
+    <string name="general_sync_message_folder_backup_issue_due_to_recent_changes">Có sự&#160;cố đồng&#160;bộ hóa hoặc sao&#160;lưu thư&#160;mục này do các thay&#160;đổi của thư&#160;mục MEGA. Dừng đồng&#160;bộ hóa hoặc sao&#160;lưu và thử thiết&#160;lập lại trong App cho Máy&#160;tính hoặc liên&#160;hệ với bộ&#160;phận Hỗ&#160;trợ.</string>
+    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
+    <string name="general_sync_message_folder_backup_issue">Có sự&#160;cố khi đồng&#160;bộ hóa hoặc sao&#160;lưu thư&#160;mục này. Hãy thử dừng đồng&#160;bộ hóa hoặc sao&#160;lưu và thử thiết&#160;lập lại trong Ứng&#160;dụng cho máy&#160;tính hoặc liên&#160;hệ với bộ&#160;phận Hỗ&#160;Trợ.</string>
+    <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
+    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Thư&#160;mục không thể đồng&#160;bộ được bởi vì nó đang nằm ở trong một thư&#160;mục được đồng&#160;bộ.</string>
+    <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
+    <string name="general_sync_local_filesystem_mismatch">Các tệp&#160;tin trong thư&#160;mục này không thể đồng&#160;bộ hóa hoặc sao lưu được. Bạn sẽ cần phải kích&#160;hoạt lại đồng&#160;bộ hoặc sao lưu từ ứng&#160;dụng cho máy&#160;tính.</string>
+</resources>

@@ -84,8 +84,6 @@
     <string name="action_refresh">Tải lại mới</string>
     <!-- Menu item -->
     <string name="action_sort_by">Xếp theo</string>
-    <!-- Menu item -->
-    <string name="action_help">Trợ Giúp</string>
     <!-- Change from a free account to paying MEGA -->
     <string name="action_upgrade_account">Nâng cấp tài khoản</string>
     <!-- Menu item to select all the elements of a list -->
@@ -1486,10 +1484,6 @@
     <string name="save_cloud_drive">Tới Ổ&#160;Mây</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
     <string name="save_file_system">Vào file system</string>
-    <!-- Title of QR code section -->
-    <string name="section_my_code">Mã của tôi</string>
-    <!-- Title of QR code scan section -->
-    <string name="section_scan_code">Quét mã</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">Bất cứ ai có tài khoản MEGA quét mã ảnh QR này sẽ được tự động thêm vào danh sách tên liên lạc của bạn.</string>
     <!-- Text shown when it has been copied the QR code link -->
@@ -2181,18 +2175,8 @@
     <string name="subtitle_incoming_contact_request_accepted">[B]Lời yêu cầu thêm vào sổ liên lạc từ [/B][A]%s [/A][B]đã được chấp nhận[/B]</string>
     <!-- Subtitle of the historic notification for incoming contact request declined -->
     <string name="subtitle_incoming_contact_request_denied">[B]Lời yêu cầu thêm vào sổ liên lạc từ [/B][A]%s [/A][B]đã bị từ chối[/B]</string>
-    <!-- Subtitle of the Upgrade account section -->
-    <string name="type_of_my_account">Hạng của tài khoản bây giờ là [A]%s[/A]</string>
     <!-- Footnote to clarify the storage space is subject to the achievement program -->
     <string name="footnote_achievements">Tùy thuộc vào việc tham gia của người sử dụng dịch vụ khi thực hiện các nhiệm vụ phần thưởng thành tích.</string>
-    <!-- Title label for the current payment method during account upgrading -->
-    <string name="payment_method">Phương thức thanh toán</string>
-    <!-- title of billing period -->
-    <string name="billing_period_title">Chu kỳ thanh toán</string>
-    <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]Mua hằng tháng[/A] %s/tháng</string>
-    <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Mua thường niên[/A] %s/năm</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">Hủy</string>
     <!-- dialog option continue in alert dialog -->
@@ -2201,8 +2185,6 @@
     <string name="payment_method_google_wallet">[A]Google Pay[/A] (đình kỳ)</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
     <string name="new_label_notification_item">Mới</string>
-    <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
-    <string name="label_custom_plan">Để nâng cấp gói đăng ký dịch vụ hiện tại, quý khách xin liên hệ bộ trợ giúp để mua [A]gói theo nhu cầu[/A].</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">tên tệp&#160;tin</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
@@ -2347,8 +2329,6 @@
     <string name="current_location_label">Gửi vị&#160;trí hiện&#160;tại của bạn</string>
     <!-- Label layout on maps activity that permits send current location. Placeholder is the current location -->
     <string name="current_location_landscape_label">Gửi đi vị trí hiện tại: [A]%1$s[/A]</string>
-    <!-- Label layout on maps activity indicating nearby places -->
-    <string name="nearby_places_label">Địa điểm quanh đây</string>
     <!-- Message shown in a dialog explaining the consequences of accesing the location -->
     <string name="explanation_send_location">Vị trí địa lý này sẽ được mở bằng một ứng dụng cung cấp bản đồ không nằm trong hệ thống hỗ trợ mã hóa đầu-cuối thuộc nền tảng của MEGA.</string>
     <!-- Title of the location marker set by the user -->
@@ -2407,8 +2387,6 @@
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
     <string name="no_contacts_invite">Bạn không có tên nào trong danh sách liên lạc. Xin mời bạn bè cùng tham gia sử dụng MEGA.</string>
-    <!-- Invite button for chat top cell -->
-    <string name="invite_more">Mời thêm</string>
     <!-- Title of first tour screen -->
     <string name="title_tour_one">Chính bạn là người giữ chìa khóa</string>
     <!-- Content of first tour screen -->
@@ -2573,12 +2551,6 @@
     <string name="error_remove_business_contact">Không thể xóa tên %1$s khỏi sổ liên lạc vì đây là nhân viên trong tài khoản Doanh Nghiệp này.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">Có vấn đề phát sinh với việc thanh toán gần đây. Xin truy cập MEGA bằng trình duyệt web trên máy tính để biết thêm thông tin.</string>
-    <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">Tài khoản đã bị vô hiệu hóa</string>
-    <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Tài khoản Doanh Nghiệp của bạn đã bị vô hiệu hóa do việc thanh toán đã không thành công. Bạn sẽ không thể truy cập vào dữ liệu đã được lưu trữ trong tài khoản của mình. Để thanh toán và kích hoạt lại gói đăng ký của bạn, hãy đăng nhập vào MEGA bằng trình duyệt web.</string>
-    <!-- A message which is shown to sub-users of expired business accounts. -->
-    <string name="expired_user_business_text">Tài khoản của bạn hiện đang bị [B]đình chỉ[/B]. Bạn chỉ có khả năng xem duyệt dữ liệu của mình.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
     <string name="camera_uploads_business_alert">MEGA không thể truy cập vào dữ liệu của bạn. Tuy nhiên, chủ điều hành tài khoản doanh nghiệp sẽ có quyền truy cập vào nội dung Đăng Tải Camêra của bạn.</string>
     <!-- General label to alert user that somehting went wrong -->
@@ -2993,10 +2965,6 @@
     <string name="months_view_button">Tháng</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
     <string name="years_view_button">Năm</string>
-    <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
-    <plurals name="cu_upload_progress">
-        <item quantity="other">Việc tải lên đang được thực hiện, %1$d tệp đang chờ</item>
-    </plurals>
     <!-- Text to show as production api server option -->
     <string name="production_api_server">Production</string>
     <!-- Title to show in a dialog to change api server -->
@@ -3243,8 +3211,6 @@
     <string name="show_activity_action">Hiện hoạt&#160;động</string>
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">Hoạt động [B]gần đây[/B] bị ẩn</string>
-    <!-- Label indicating video original quality -->
-    <string name="original_quality">Chất lượng nguyên gốc</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
     <string name="setting_fingerprint">ID dấu vân tay</string>
     <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
@@ -3303,8 +3269,6 @@
     <string name="backup_remove_root_folder">Bạn đang tiến hành xóa đi thư mục chứa bản lưu trữ. Việc này sẽ xóa tất cả các lưu dự phòng bạn đã đặt. Bạn có chắc muốn thực hiện việc này không?</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">Di chuyển “%1s” vào Thùng Rác</string>
-    <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_disable_confirm">Tat luu du phong</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Chỉ-được-xem</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
@@ -3321,12 +3285,6 @@
     <string name="upload_files">Tải lên tệp tin</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Tải lên thư mục</string>
-    <!-- Title of the Payments screen -->
-    <string name="payment">Thanh toán</string>
-    <!-- Label indicating payment methods -->
-    <string name="payment_methods">Phương thức thanh toán</string>
-    <!-- Button to proceed with a payment -->
-    <string name="proceed">Tiến hành</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Loại bỏ chức người chủ trì</string>
     <!-- Title message of existing subscription dialog -->
@@ -4537,8 +4495,6 @@
     <string name="account_upgrade_account_description_feature_link">&#8226;&#160;Đặt thời&#160;hạn cho đường liên&#160;kết</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;Chia&#160;sẻ lượng truyền&#160;tải</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Sao&#160;lưu dự&#160;phòng tự&#160;động</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Tua lại dữ liệu đã xóa trong thời gian lên đến 90 ngày với hạng Pro&#160;Lite và đến 180 ngày với hạng Pro&#160;I, II, và III</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
@@ -4551,8 +4507,6 @@
     <string name="account_upgrade_account_buy_button_title_pro_ii">Mua Pro&#160;II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_iii">Mua Pro&#160;III</string>
-    <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
-    <string name="account_upgrade_account_terms_of_service_link">Điều&#160;Khoản Dịch&#160;Vụ</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
     <string name="cloud_drive_subtitle_link_access_password">Chỉ những người có mật&#160;khẩu mới có thể mở đường liên&#160;kết</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
@@ -5035,6 +4989,7 @@
     <string name="account_upgrade_subscription_details">Các gói đăng&#160;ký được tự&#160;động gia&#160;hạn cho khoảng thời&#160;gian đăng&#160;ký kế tiếp có cùng thời&#160;lượng và ở cùng mức giá như khoảng thời&#160;gian ban&#160;đầu đã chọn. Bạn có thể tắt tự&#160;động gia&#160;hạn gói đăng&#160;ký MEGA&#160;Pro của mình không&#160;được ít hơn 24 giờ trước khi đến kỳ&#160;hạn thanh&#160;toán cho gói đăng&#160;ký tiếp&#160;theo thông qua trang Gói thuê&#160;bao trong  [A]Google Play[/A].</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Cho phép truy&#160;cập vào thư&#160;viện hình&#160;ảnh của bạn</string>
+    <!--  -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Cấp quyền</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">Cần phải cập&#160;nhật</string>
@@ -5087,7 +5042,7 @@
     <!-- Button text to change SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_action_button">Thay đổi</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
-    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Gói miễn&#160;phí có giới&#160;hạn thời lượng cuộc họp là 60 phút mỗi cuộc. [A]Nâng&#160;cấp ngay.[/A]</string>
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]Gói miễn&#160;phí của bạn có giới&#160;hạn cuộc họp là 60 phút. Người dùng Pro có thời&#160;lượng cuộc gọi không giới&#160;hạn và có tối&#160;đa 1000 người tham&#160;gia.[/A] [B]Nâng&#160;cấp ngay bây&#160;giờ.[/B]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_monthly_with_price">Quý khách sẽ phải chi trả %1$s ngay lập tức và gói đăng ký của quý khách sẽ tự động gia hạn sau 1&#160;tháng với giá %2$s mỗi tháng. Tài khoản Google&#160;Play của quý khách sẽ bị tính phí gia hạn trong vòng 24&#160;giờ từ thời điểm kết thúc của mỗi kỳ thanh toán. Để hủy gói đăng ký của mình, quý khách phải tắt tự động gia hạn gói đăng ký MEGA&#160;Pro của mình ít nhất là 24&#160;giờ trước lúc kết thúc thời hạn thanh toán trong trang Gói thuê&#160;bao của [A]Google&#160;Play[/A].\nVới việc nâng cấp tài khoản của mình, quý khách đồng ý với[B]Điều&#160;Khoản Dịch&#160;Vụ[/B] và [C]Chính&#160;Sách Riêng&#160;Tư[/C] của MEGA.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
@@ -5123,7 +5078,79 @@
     <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
     <string name="notifications_screen_notification_promo_expiration_time">Hết hạn vào %1$s lúc %2$s</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
-    <string name="meetings_free_call_organiser_number_of_participants_warning">[A]As a free user, you can only add up to 100 participants to this call. Need more?[/A]&#160;[B]Upgrade now[/B]</string>
+    <string name="meetings_free_call_organiser_number_of_participants_warning">Chỉ có 100 người mới có thể tham&#160;gia cuộc gọi. Bất kỳ người tham&#160;gia nào thêm sẽ chỉ có thể gửi và nhận tin&#160;nhắn. Yêu&#160;cầu ban tổ&#160;chức nâng&#160;cấp lên Pro để loại bỏ hạn&#160;chế này.</string>
     <!-- Warning Message for non organiser for Free Call -->
     <string name="meetings_free_call_non_organiser_number_of_participants_warning">Chỉ có 100 người mới có thể tham&#160;gia cuộc gọi. Bất kỳ người tham&#160;gia nào thêm sẽ chỉ có thể gửi và đọc các cuộc chat. Yêu&#160;cầu ban tổ&#160;chức để loại bỏ hạn&#160;chế này.</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_low">Thấp</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Medium Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_medium">Thường</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to High Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_high">Cao</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos are automatically uploaded by Camera Uploads without any Video Compression -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_original">Nguyên gốc</string>
+    <!-- Warning shown when the recording of audio permission is required for sending a voice clip and it has been denied by the user -->
+    <string name="chat_microphone_permissions_denied_for_voice_clip">Bạn đã từ&#160;chối quyền truy&#160;cập của MEGA dùng micrô của bạn. Nếu bạn muốn chia&#160;sẻ tin&#160;nhắn thoại của mình, hãy cho phép MEGA quyền hạn này.</string>
+    <!-- Free plan limitation dialog title for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Không thể tham&#160;gia</string>
+    <!-- Free plan limitation dialogue description for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Cuộc gọi này chỉ hỗ&#160;trợ được 100 người tham&#160;gia. Hãy yêu&#160;cầu bên tổ&#160;chức để loại bỏ hạn&#160;chế này.</string>
+    <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">OK, hiểu rồi</string>
+    <!-- The title of the hidden nodes feature -->
+    <string name="hidden_nodes">Tệp&#160;tin và thư&#160;mục ẩn</string>
+    <!-- Hidden nodes benefit: hide files and folders -->
+    <string name="hidden_nodes_benefit_title_hide_files_folders">Ẩn đi các tệp&#160;tin và thư&#160;mục quan&#160;trọng</string>
+    <!-- Hidden nodes benefit description: hide files and folders -->
+    <string name="hidden_nodes_benefit_description_hide_files_folders">Bạn có thể giấu đi các tệp&#160;tin và thư&#160;mục riêng&#160;tư của mình. Chỉ có bạn mới có thể hiện những mục đó lại, bằng cách thực&#160;hiện từng cái riêng&#160;lẻ hoặc bật hiển&#160;thị các mục đã ẩn đi trong phần thiết&#160;đặt.</string>
+    <!-- Hidden nodes benefit: exclude from timeline -->
+    <string name="hidden_nodes_benefit_title_exclude_timeline">Loại&#160;trừ khỏi Dòng thời&#160;gian</string>
+    <!-- Hidden nodes benefit description: exclude from timeline -->
+    <string name="hidden_nodes_benefit_description_exclude_timeline">Các mục đã ẩn đi chỉ có thể truy&#160;cập thông qua Ổ&#160;Mây và sẽ không xuất&#160;hiện trong Ảnh, Album hoặc Sử&#160;dụng gần&#160;đây của bạn.</string>
+    <!-- Hidden nodes benefit: out of sight -->
+    <string name="hidden_nodes_benefit_title_out_of_sight">Ra khỏi tầm nhìn</string>
+    <!-- Hidden nodes benefit description: out of sight -->
+    <string name="hidden_nodes_benefit_description_out_of_sight">Bạn tự quyết&#160;định khi bạn muốn các tệp&#160;tin ẩn đi được hiển&#160;thị. Có một mục lựa&#160;chọn mới trong thiết&#160;đặt để hiển&#160;thị các mục ẩn tạm&#160;thời.</string>
+    <!-- The snackbar message of hidden nodes operation -->
+    <plurals name="hidden_nodes_result_message">
+        <item quantity="other">%1$d mục ẩn</item>
+    </plurals>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_priority_support">&#8226;&#160;Hỗ trợ ưu tiên</string>
+    <!-- The title of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_title">Nâng&#160;cấp lên Pro để cuộc gọi không giới&#160;hạn</string>
+    <!-- The body of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_body">Cuộc gọi của bạn đạt đến giới&#160;hạn 60 phút và đã kết&#160;thúc. Người dùng Pro có thời&#160;lượng cuộc gọi không giới&#160;hạn và có thể mời tối&#160;đa 1000 người tham&#160;gia.</string>
+    <!-- The button text of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_button">Nâng&#160;cấp ngay</string>
+    <!-- Search drop down chips filter type file type -->
+    <string name="search_dropdown_chip_filter_type_file_type">Dạng</string>
+    <!-- Search drop down chips filter type file type images -->
+    <string name="search_dropdown_chip_filter_type_file_type_images">Hình</string>
+    <!-- Search drop down chips filter type file type videos -->
+    <string name="search_dropdown_chip_filter_type_file_type_video">Video</string>
+    <!-- Search drop down chips filter type file type audio -->
+    <string name="search_dropdown_chip_filter_type_file_type_audio">Thoại</string>
+    <!-- Search drop down chips filter type file type documents -->
+    <string name="search_dropdown_chip_filter_type_file_type_documents">Tài Liệu</string>
+    <!-- Search drop down chips filter type date added -->
+    <string name="search_dropdown_chip_filter_type_date_added">Ngày đã thêm</string>
+    <!-- Search drop down chips filter type last modified -->
+    <string name="search_dropdown_chip_filter_type_last_modified">Lần sửa cuối</string>
+    <!-- Search drop down chips filter type date modified today -->
+    <string name="search_dropdown_chip_filter_type_date_today">Hôm nay</string>
+    <!-- Search drop down chips filter type date modified last 7 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_seven_days">7 ngày qua</string>
+    <!-- Search drop down chips filter type date modified last 30 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_thirty_days">30 ngày qua</string>
+    <!-- Search drop down chips filter type date modified this year -->
+    <string name="search_dropdown_chip_filter_type_date_this_year">Năm này</string>
+    <!-- Search drop down chips filter type date modified last year -->
+    <string name="search_dropdown_chip_filter_type_date_last_year">Năm vừa qua</string>
+    <!-- Search drop down chips filter type date modified older -->
+    <string name="search_dropdown_chip_filter_type_date_older">Cũ hơn</string>
+    <!-- String below login button next to button for reporting a login issue -->
+    <string name="general_login_label_trouble_logging_in">Gặp sự cố đăng nhập?</string>
+    <!-- Button text for reporting an issue on the login screen -->
+    <string name="general_login_button_report_your_issue">Báo cáo vấn đề của bạn</string>
 </resources>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
+    <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
+    <string name="general_sync_no_error">Aucune erreur de synchronisation</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
+    <string name="general_sync_unsupported_file_system">MEGA ne peut ni synchroniser ni sauvegarder ce dossier, car le système de fichiers de votre appareil n’est pas pris en charge.</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
+    <string name="general_sync_invalid_remote_type">Le dossier que vous avez choisi ne peut pas être synchronisé</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
+    <string name="general_sync_invalid_local_type">Un fichier ne peut pas être synchronisé individuellement. Vous devez définir la synchronisation du dossier.</string>
+    <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
+    <string name="general_sync_initial_scan_failed">Échec de l’analyse initiale. Vous devez réactiver votre synchronisation ou sauvegarde dans l’appli pour ordinateur.</string>
+    <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
+    <string name="general_sync_remote_node_not_found">Impossible de trouver le dossier dans MEGA. Soit il a été déplacé, soit il a été supprimé, soit vous n’y avez pas accès.</string>
+    <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
+    <string name="general_sync_storage_overquota">Unable to sync or back up this folder as your storage is full</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
+    <string name="general_sync_account_expired">Impossible de synchroniser ou sauvegarder ce dossier, car votre abonnement est expiré</string>
+    <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
+    <string name="general_sync_foreign_target_overshare">Le dossier ne peut pas être synchronisé, car l’utilisateur qui l’a partagé a dépassé sa limite d’espace de stockage</string>
+    <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
+    <string name="general_sync_remote_path_has_changed">Impossible de trouver le dossier dans MEGA. Soit il a été déplacé, soit il a été supprimé, soit vous n’y avez pas accès.</string>
+    <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
+    <string name="general_sync_share_non_full_access">Impossible de synchroniser le dossier, car c’est un dossier partagé auquel vous n’avez pas l’accès total.</string>
+    <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
+    <string name="general_sync_put_nodes_error">Les fichiers de ce dossier ne peuvent être ni synchronisés ni sauvegardés. Vous devez réactiver la synchronisation ou la sauvegarde dans l’appli pour ordinateur.</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
+    <string name="general_sync_active_sync_below_path">Le dossier ne peut pas être synchronisé, car il comprend déjà des dossiers synchronisés</string>
+    <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
+    <string name="general_sync_vboxsharedfolder_unsupported">MEGA ne peut ni synchroniser ni sauvegarder les dossiers VirtualBox</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
+    <string name="general_sync_account_blocked">Unable to sync or back up this folder as the account has been blocked</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
+    <string name="general_sync_unknown_temporary_error">Problème de synchronisation ou de sauvegarde de ce dossier. Réessayez ultérieurement. Si la situation persiste, contactez l’assistance.</string>
+    <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
+    <string name="general_sync_too_many_action_packets">Le compte a été rechargé. Toute mise à jour manquée de vos sauvegardes ou synchronisations n’a pas été appliquée.</string>
+    <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
+    <string name="general_sync_logged_out">La synchronisation ou la sauvegarde a été arrêtée, car il semble que vous vous êtes déconnecté de l’appli pour ordinateur. Reconnectez-vous dans l’appli pour ordinateur et reprenez la synchronisation ou la sauvegarde.</string>
+    <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
+    <string name="general_sync_missing_parent_node">N/A</string>
+    <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
+    <string name="general_sync_backup_source_not_below_drive">Impossible de trouver le fichier sur le lecteur externe.</string>
+    <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
+    <string name="general_sync_active_sync_same_path">Un dossier synchronisé porte déjà ce nom dans le même chemin</string>
+    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
+    <string name="general_sync_could_not_move_cloud_nodes">Échec de renommage.</string>
+    <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
+    <string name="general_sync_could_not_create_ignore_file">Impossible de créer un fichier .megaignore pour cette synchronisation</string>
+    <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
+    <string name="general_sync_config_read_failure">Impossible de lire la configuration de la synchronisation. Réessayez ultérieurement ou vérifiez les droits du dossier.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
+    <string name="general_sync_unknown_drive_path">Le chemin du lecteur de la synchronisation est inconnu.</string>
+    <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
+    <string name="general_sync_invalid_scan_interval">L’intervalle d’analyse est invalide. Vérifiez la configuration de l’intervalle d’analyse et réessayez.</string>
+    <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
+    <string name="general_sync_notification_system_unavailable">Impossible de communiquer avec l’emplacement de la synchronisation. Vérifiez que l’emplacement est accessible et que les droits ont été accordés pour l’emplacement du dossier.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
+    <string name="general_sync_unable_to_add_watch">Impossible d’ajouter une surveillance du système de fichier. Assurez-vous qu’il y a suffisamment d’espace et de mémoire libres et que vous avez accordé les droits pour l’emplacement du dossier.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
+    <string name="general_sync_unable_to_retrieve_root_fsid">Impossible de lire l’emplacement de la synchronisation. Vérifiez que l’emplacement est accessible et que les droits ont été accordés pour l’emplacement du dossier.</string>
+    <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
+    <string name="general_sync_unable_to_open_database">Impossible d’ouvrir la base de données d’état du cache</string>
+    <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
+    <string name="general_sync_insufficient_disk_space">L’espace de stockage est insuffisant sur votre appareil</string>
+    <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
+    <string name="general_sync_failure_accessing_persistent_storage">Impossible de lire l’emplacement de la synchronisation. Vérifiez que l’emplacement est accessible et que les droits ont été accordés pour l’emplacement du dossier.</string>
+    <!-- The name for specific Sub States to indicate that an unknown error occurred -->
+    <string name="general_sync_message_unknown_error">Un erreur inconnue est survenue. Contactez l’assistance.</string>
+    <!-- The name for specific Sub States to indicate that something went wrong -->
+    <string name="general_sync_message_something_went_wrong">Un problème est survenu</string>
+    <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
+    <string name="general_sync_message_node_in_rubbish_bin">Le dossier ne peut ni être synchronisé ni sauvegardé, car le dossier MEGA est dans la Corbeille.</string>
+    <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
+    <string name="general_sync_message_cannot_locate_local_drive_now">Impossible de trouver le dossier sur votre appareil. Réessayez plus tard.</string>
+    <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
+    <string name="general_sync_message_cannot_locate_local_drive">Impossible de trouver le dossier sur votre appareil</string>
+    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
+    <string name="general_sync_message_folder_backup_issue_due_to_recent_changes">Problème de synchronisation ou de sauvegarde de ce dossier en raison de modification du dossier MEGA. Arrêtez la synchronisation ou la sauvegarde, puis tentez de la définir de nouveau dans l’appli pour ordinateur ou contactez l’assistance.</string>
+    <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
+    <string name="general_sync_message_folder_backup_issue">Problème de synchronisation ou de sauvegarde de ce dossier. Arrêtez la synchronisation ou la sauvegarde, puis tentez de la définir de nouveau dans l’appli pour ordinateur ou contactez l’assistance.</string>
+    <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
+    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Le dossier ne peut pas être synchronisé, car il fait déjà partie d’un dossier synchronisé.</string>
+    <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
+    <string name="general_sync_local_filesystem_mismatch">Les fichiers de ce dossier ne peuvent être ni synchronisés ni sauvegardés. Vous devez réactiver la synchronisation ou la sauvegarde dans l’appli pour ordinateur.</string>
+</resources>

@@ -84,8 +84,6 @@
     <string name="action_refresh">Refresh</string>
     <!-- Menu item -->
     <string name="action_sort_by">Urutkan berdasar</string>
-    <!-- Menu item -->
-    <string name="action_help">Bantuan</string>
     <!-- Change from a free account to paying MEGA -->
     <string name="action_upgrade_account">Upgrade akun</string>
     <!-- Menu item to select all the elements of a list -->
@@ -1486,10 +1484,6 @@
     <string name="save_cloud_drive">Ke Cloud drive</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
     <string name="save_file_system">Ke sistem file</string>
-    <!-- Title of QR code section -->
-    <string name="section_my_code">Kode saya</string>
-    <!-- Title of QR code scan section -->
-    <string name="section_scan_code">Pindai kode</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">Kontak yang memindai Kode QR anda akan secara otomatis ditambahkan ke daftar kontak anda.</string>
     <!-- Text shown when it has been copied the QR code link -->
@@ -2181,18 +2175,8 @@
     <string name="subtitle_incoming_contact_request_accepted">[B]Permintaan kontak dari [/B][A]%s [/A][B]telah diterima[/B]</string>
     <!-- Subtitle of the historic notification for incoming contact request declined -->
     <string name="subtitle_incoming_contact_request_denied">[B]Permintaan kontak dari [/B][A]%s [/A][B]telah ditolak[/B]</string>
-    <!-- Subtitle of the Upgrade account section -->
-    <string name="type_of_my_account">Akun anda sekarang adalah [A]%s[/A]</string>
     <!-- Footnote to clarify the storage space is subject to the achievement program -->
     <string name="footnote_achievements">Subyek pada partisipasi anda dalam program pencapaian kami.</string>
-    <!-- Title label for the current payment method during account upgrading -->
-    <string name="payment_method">Cara pembayaran</string>
-    <!-- title of billing period -->
-    <string name="billing_period_title">Periode pembayaran</string>
-    <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]Ditagih setiap bulan[/A] %s/bulan</string>
-    <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Ditagih setiap tahun[/A] %s/tahun</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">Batal</string>
     <!-- dialog option continue in alert dialog -->
@@ -2201,8 +2185,6 @@
     <string name="payment_method_google_wallet">[A]Google Pay[/A] (berlangganan)</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
     <string name="new_label_notification_item">Baru</string>
-    <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
-    <string name="label_custom_plan">Untuk meningkatkan langganan anda saat ini, hubungi tim dukungan kami untuk [A]paket khusus[/A].</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">nama file</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
@@ -2347,8 +2329,6 @@
     <string name="current_location_label">Kirim lokasi anda saat ini</string>
     <!-- Label layout on maps activity that permits send current location. Placeholder is the current location -->
     <string name="current_location_landscape_label">Kirim lokasi anda saat ini: [A]%1$s[/A]</string>
-    <!-- Label layout on maps activity indicating nearby places -->
-    <string name="nearby_places_label">Tempat terdekat</string>
     <!-- Message shown in a dialog explaining the consequences of accesing the location -->
     <string name="explanation_send_location">Lokasi ini akan dibuka menggunakan penyedia peta pihak ketiga di luar platform MEGA terenkripsi menyeluruh.</string>
     <!-- Title of the location marker set by the user -->
@@ -2407,8 +2387,6 @@
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
     <string name="no_contacts_invite">Anda tidak memiliki kontak MEGA. Silakan undang teman dari bagian Kontak.</string>
-    <!-- Invite button for chat top cell -->
-    <string name="invite_more">Undang lebih banyak</string>
     <!-- Title of first tour screen -->
     <string name="title_tour_one">Anda memegang kunci</string>
     <!-- Content of first tour screen -->
@@ -2573,12 +2551,6 @@
     <string name="error_remove_business_contact">Anda tidak dapat menghapus %1$s sebagai kontak karena itu adalah bagian dari akun Bisnis anda.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">Terjadi masalah dengan pembayaran terakhir anda. Silakan akses MEGA menggunakan browser desktop untuk informasi lebih lanjut.</string>
-    <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">Akun dinonaktifkan</string>
-    <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Akun Bisnis anda telah dinonaktifkan karena kegagalan pembayaran. Anda tidak akan dapat mengakses data yang disimpan di akun anda. Untuk melakukan pembayaran dan mengaktifkan kembali langganan anda, masuk ke MEGA melalui browser.</string>
-    <!-- A message which is shown to sub-users of expired business accounts. -->
-    <string name="expired_user_business_text">Akun anda saat ini [B]ditangguhkan[/B]. Anda hanya dapat menelusuri data anda.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
     <string name="camera_uploads_business_alert">MEGA tidak dapat mengakses data anda. Namun, administrator akun bisnis anda dapat mengakses Unggahan camera anda.</string>
     <!-- General label to alert user that somehting went wrong -->
@@ -2993,10 +2965,6 @@
     <string name="months_view_button">Bulan</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
     <string name="years_view_button">Tahun</string>
-    <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
-    <plurals name="cu_upload_progress">
-        <item quantity="other">Unggah sedang berlangsung, %1$dfile tertunda</item>
-    </plurals>
     <!-- Text to show as production api server option -->
     <string name="production_api_server">Produksi</string>
     <!-- Title to show in a dialog to change api server -->
@@ -3243,8 +3211,6 @@
     <string name="show_activity_action">Tampilkan aktivitas</string>
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">[B]Terbaru[/B]aktivitas disembunyikan</string>
-    <!-- Label indicating video original quality -->
-    <string name="original_quality">Kualitas asli</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
     <string name="setting_fingerprint">ID sidik jari</string>
     <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
@@ -3303,8 +3269,6 @@
     <string name="backup_remove_root_folder">Anda menghapus folder cadangan anda. Ini akan menghapus semua cadangan yang telah anda atur. Apakah anda yakin ingin melakukan ini?</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">Pindahkan “%1s” ke Tempat Sampah</string>
-    <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_disable_confirm">Nonaktifkan cadangan</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Hanya-baca</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
@@ -3321,12 +3285,6 @@
     <string name="upload_files">Unggah berkas</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Unggah folder</string>
-    <!-- Title of the Payments screen -->
-    <string name="payment">Pembayaran</string>
-    <!-- Label indicating payment methods -->
-    <string name="payment_methods">Metode pembayaran</string>
-    <!-- Button to proceed with a payment -->
-    <string name="proceed">Melanjutkan</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Hapus sebagai tuan rumah</string>
     <!-- Title message of existing subscription dialog -->
@@ -4537,8 +4495,6 @@
     <string name="account_upgrade_account_description_feature_link">&#8226;&#160;Tautan dengan tanggal kedaluwarsa</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;Pembagian kuota transfer</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Cadangan otomatis</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Putar ulang hingga 90 hari data yang dihapus di Pro&#160;Lite dan hingga 180 hari pada Pro&#160;I, II, dan III</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
@@ -4551,8 +4507,6 @@
     <string name="account_upgrade_account_buy_button_title_pro_ii">Beli Pro&#160;II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_iii">Beli Pro&#160;III</string>
-    <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
-    <string name="account_upgrade_account_terms_of_service_link">Persyaratan Layanan</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
     <string name="cloud_drive_subtitle_link_access_password">Hanya orang yang memiliki kata sandi yang dapat membuka tautan tersebut</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
@@ -5035,6 +4989,7 @@
     <string name="account_upgrade_subscription_details">Langganan diperpanjang secara otomatis untuk periode berlangganan berturut-turut dengan durasi yang sama dan dengan harga yang sama dengan periode awal yang dipilih. Anda dapat mematikan perpanjangan otomatis langganan MEGA &#160; Pro anda selambat-lambatnya 24 jam sebelum pembayaran langganan berikutnya jatuh tempo melalui Langganan di [A]Google Play[/A].</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Izinkan akses ke galeri anda</string>
+    <!--  -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Berikan akses</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">Diperlukan pembaruan</string>
@@ -5087,7 +5042,7 @@
     <!-- Button text to change SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_action_button">Ganti</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
-    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Paket gratis memiliki batas 60 menit per rapat. [A]Tingkatkan sekarang.[/A]</string>
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]Paket gratis anda memiliki batas 60 menit untuk rapat. Pengguna pro memiliki panggilan tak terbatas dan hingga 1000 peserta.[/A] [B]Tingkatkan sekarang.[/B]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_monthly_with_price">Anda akan dikenakan biaya %1$s segera dan langganan anda akan diperpanjang secara otomatis setelah 1&#160;bulan untuk %2$s per bulan. Akun Google&#160;Play anda akan dikenakan biaya untuk pembaruan dalam waktu 24&#160;jam setelah akhir setiap periode penagihan. Untuk membatalkan langganan anda, anda harus menonaktifkan perpanjangan otomatis langganan MEGA&#160;Pro anda setidaknya 24&#160;jam sebelum akhir periode penagihan anda melalui Langganan di [A]Google&#160;Play[/A].\nDengan memutakhirkan akun anda, anda menyetujui [B]Ketentuan Layanan[/B] dan [C]Kebijakan Privasi[/C] MEGA.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
@@ -5123,7 +5078,79 @@
     <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
     <string name="notifications_screen_notification_promo_expiration_time">Kedaluwarsa pada %1$s pukul %2$s</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
-    <string name="meetings_free_call_organiser_number_of_participants_warning">[A]As a free user, you can only add up to 100 participants to this call. Need more?[/A]&#160;[B]Upgrade now[/B]</string>
+    <string name="meetings_free_call_organiser_number_of_participants_warning">Hanya 100 peserta yang dapat bergabung dengan panggilan. Setiap peserta tambahan hanya akan dapat mengirim dan menerima pesan. Penyelenggara dapat meningkatkan ke Pro untuk menghapus batasan ini.</string>
     <!-- Warning Message for non organiser for Free Call -->
     <string name="meetings_free_call_non_organiser_number_of_participants_warning">Hanya 100 peserta yang dapat bergabung dengan panggilan. Setiap peserta tambahan hanya akan dapat mengirim dan membaca obrolan. Minta penyelenggara untuk menghapus batasan ini.</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_low">Rendah</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Medium Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_medium">Sedang</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to High Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_high">Tinggi</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos are automatically uploaded by Camera Uploads without any Video Compression -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_original">Original</string>
+    <!-- Warning shown when the recording of audio permission is required for sending a voice clip and it has been denied by the user -->
+    <string name="chat_microphone_permissions_denied_for_voice_clip">Anda menolak akses MEGA ke mikrofon anda. Jika anda ingin merekam klip suara, izinkan izin MEGA untuk melakukannya.</string>
+    <!-- Free plan limitation dialog title for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Tidak dapat bergabung</string>
+    <!-- Free plan limitation dialogue description for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Panggilan ini hanya dapat mendukung 100 peserta. Minta penyelenggara untuk menghapus batasan ini.</string>
+    <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">OK, mengerti</string>
+    <!-- The title of the hidden nodes feature -->
+    <string name="hidden_nodes">File dan folder tersembunyi</string>
+    <!-- Hidden nodes benefit: hide files and folders -->
+    <string name="hidden_nodes_benefit_title_hide_files_folders">Sembunyikan file dan folder penting</string>
+    <!-- Hidden nodes benefit description: hide files and folders -->
+    <string name="hidden_nodes_benefit_description_hide_files_folders">Anda dapat menyembunyikan file dan folder sensitif untuk privasi. Hanya anda yang dapat mengungkapkannya, baik secara individual atau dengan menampilkan item tersembunyi sementara dari pengaturan.</string>
+    <!-- Hidden nodes benefit: exclude from timeline -->
+    <string name="hidden_nodes_benefit_title_exclude_timeline">Kecualikan dari Timeline</string>
+    <!-- Hidden nodes benefit description: exclude from timeline -->
+    <string name="hidden_nodes_benefit_description_exclude_timeline">Item tersembunyi hanya dapat diakses melalui drive Cloud dan tidak akan muncul di Foto, Album, atau Terbaru anda.</string>
+    <!-- Hidden nodes benefit: out of sight -->
+    <string name="hidden_nodes_benefit_title_out_of_sight">Tidak terlihat</string>
+    <!-- Hidden nodes benefit description: out of sight -->
+    <string name="hidden_nodes_benefit_description_out_of_sight">Anda memutuskan kapan file tersembunyi terlihat. Ada pengaturan baru untuk menampilkan item tersembunyi sementara.</string>
+    <!-- The snackbar message of hidden nodes operation -->
+    <plurals name="hidden_nodes_result_message">
+        <item quantity="other">%1$d item tersembunyi</item>
+    </plurals>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_priority_support">&#8226; &#160; Dukungan prioritas</string>
+    <!-- The title of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_title">Tingkatkan ke Pro untuk mendapatkan panggilan tak terbatas</string>
+    <!-- The body of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_body">Panggilan anda mencapai batas 60 menit dan telah berakhir. Pengguna pro memiliki panggilan tak terbatas dan hingga 1000 peserta.</string>
+    <!-- The button text of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_button">Tingkatkan sekarang</string>
+    <!-- Search drop down chips filter type file type -->
+    <string name="search_dropdown_chip_filter_type_file_type">Tipe</string>
+    <!-- Search drop down chips filter type file type images -->
+    <string name="search_dropdown_chip_filter_type_file_type_images">Gambar-gambar</string>
+    <!-- Search drop down chips filter type file type videos -->
+    <string name="search_dropdown_chip_filter_type_file_type_video">Video</string>
+    <!-- Search drop down chips filter type file type audio -->
+    <string name="search_dropdown_chip_filter_type_file_type_audio">Audio</string>
+    <!-- Search drop down chips filter type file type documents -->
+    <string name="search_dropdown_chip_filter_type_file_type_documents">Document</string>
+    <!-- Search drop down chips filter type date added -->
+    <string name="search_dropdown_chip_filter_type_date_added">Tanggal ditambahkan</string>
+    <!-- Search drop down chips filter type last modified -->
+    <string name="search_dropdown_chip_filter_type_last_modified">Terakhir dimodifikasi</string>
+    <!-- Search drop down chips filter type date modified today -->
+    <string name="search_dropdown_chip_filter_type_date_today">Hari ini</string>
+    <!-- Search drop down chips filter type date modified last 7 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_seven_days">7 hari terakhir</string>
+    <!-- Search drop down chips filter type date modified last 30 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_thirty_days">30 hari terakhir</string>
+    <!-- Search drop down chips filter type date modified this year -->
+    <string name="search_dropdown_chip_filter_type_date_this_year">Tahun ini</string>
+    <!-- Search drop down chips filter type date modified last year -->
+    <string name="search_dropdown_chip_filter_type_date_last_year">Tahun lalu</string>
+    <!-- Search drop down chips filter type date modified older -->
+    <string name="search_dropdown_chip_filter_type_date_older">Lama</string>
+    <!-- String below login button next to button for reporting a login issue -->
+    <string name="general_login_label_trouble_logging_in">Kesulitan masuk?</string>
+    <!-- Button text for reporting an issue on the login screen -->
+    <string name="general_login_button_report_your_issue">Laporkan masalah anda</string>
 </resources>

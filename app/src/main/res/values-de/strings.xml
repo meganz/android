@@ -84,8 +84,6 @@
     <string name="action_refresh">Aktualisieren</string>
     <!-- Menu item -->
     <string name="action_sort_by">Sortierung nach</string>
-    <!-- Menu item -->
-    <string name="action_help">Hilfe</string>
     <!-- Change from a free account to paying MEGA -->
     <string name="action_upgrade_account">Accountupgrade</string>
     <!-- Menu item to select all the elements of a list -->
@@ -129,7 +127,7 @@
     <!-- Login button -->
     <string name="login_text">Anmelden</string>
     <!-- email label -->
-    <string name="email_text">E-Mail</string>
+    <string name="email_text">E-Mail-Adresse</string>
     <!-- password label -->
     <string name="password_text">Passwort</string>
     <!-- Hint of the confirmation dialog to get link with password -->
@@ -1286,7 +1284,7 @@
     <!--  -->
     <string name="camera_uploads_cellular_connection">Mobildatennutzung erlauben</string>
     <!--  -->
-    <string name="camera_uploads_upload_videos">Videos uploaden</string>
+    <string name="camera_uploads_upload_videos">Videos hochladen</string>
     <!-- Message when an user avatar has been changed successfully -->
     <string name="success_changing_user_avatar">Profilbild aktualisiert</string>
     <!-- Message when an error ocurred when changing an user avatar -->
@@ -1520,10 +1518,6 @@
     <string name="save_cloud_drive">Im Cloud Drive</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
     <string name="save_file_system">Als Datei speichern</string>
-    <!-- Title of QR code section -->
-    <string name="section_my_code">Mein Code</string>
-    <!-- Title of QR code scan section -->
-    <string name="section_scan_code">Code scannen</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">MEGA-Benutzer, die Ihren QR-Code scannen, werden Ihrer Kontaktliste automatisch hinzugefügt.</string>
     <!-- Text shown when it has been copied the QR code link -->
@@ -1545,7 +1539,7 @@
     <!-- Text shown when it tries to share the QR and occurs an error to process the action -->
     <string name="error_share_qr">Bei der Freigabe der QR-Datei ist ein Fehler aufgetreten.</string>
     <!-- Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action -->
-    <string name="error_upload_qr">Es ist ein Fehler beim Uploaden der QR-Datei aufgetreten. Die Datei existiert möglicherweise nicht.</string>
+    <string name="error_upload_qr">Es ist ein Fehler beim Hochladen der QR-Datei aufgetreten. Die Datei existiert möglicherweise nicht.</string>
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
     <string name="error_download_qr">Es ist ein Fehler beim Herunterladen der QR-Datei aufgetreten. Die Datei existiert möglicherweise nicht.</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
@@ -2228,18 +2222,8 @@
     <string name="subtitle_incoming_contact_request_accepted">[B]Kontaktanfrage von [/B][A]%s [/A][B]angenommen[B]</string>
     <!-- Subtitle of the historic notification for incoming contact request declined -->
     <string name="subtitle_incoming_contact_request_denied">[B]Kontaktanfrage von [/B][A]%s [/A][B]abgelehnt[/B]</string>
-    <!-- Subtitle of the Upgrade account section -->
-    <string name="type_of_my_account">Sie sind unter dem Account [A]%s[/A] eingeloggt</string>
     <!-- Footnote to clarify the storage space is subject to the achievement program -->
     <string name="footnote_achievements">Bei erfolgreicher Teilnahme an unserem Bonusprogramm.</string>
-    <!-- Title label for the current payment method during account upgrading -->
-    <string name="payment_method">Zahlungsmethode</string>
-    <!-- title of billing period -->
-    <string name="billing_period_title">Zahlungsintervall</string>
-    <!-- Option of monthly billing period. Placeholder: purchase price -->
-    <string name="billed_monthly_text">[A]Monatliche Zahlung[/A] %s/Monat</string>
-    <!-- Option of yearly billing period. Placeholder: purchase price -->
-    <string name="billed_yearly_text">[A]Jährliche Zahlung[/A] %s/Jahr</string>
     <!-- dialog option cancel in alert dialog -->
     <string name="button_cancel">Abbrechen</string>
     <!-- dialog option continue in alert dialog -->
@@ -2248,8 +2232,6 @@
     <string name="payment_method_google_wallet">[A]Google Pay[/A] (monatliche/jährliche Zahlung)</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
     <string name="new_label_notification_item">Neu</string>
-    <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
-    <string name="label_custom_plan">Um Ihr aktuelles Abonnement zu upgraden, wenden Sie sich bitte an unser Supportteam, um ein [A]persönliches Angebot[/A] zu erhalten.</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">Dateiname</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
@@ -2330,7 +2312,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">MEGA konfigurieren</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
+    <string name="setup_mega_explanation">Zum Freigeben muss MEGA auf Ihre Medien und Dateien zugreifen können. Für die Nutzung der Leistungsmerkmale und Services dieser App können weitere Berechtigungen erforderlich sein.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Zugriff auf Fotos und (Medien-)dateien erlauben</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -2404,8 +2386,6 @@
     <string name="current_location_label">Standort versenden</string>
     <!-- Label layout on maps activity that permits send current location. Placeholder is the current location -->
     <string name="current_location_landscape_label">Standort versenden: [A]%1$s[/A]</string>
-    <!-- Label layout on maps activity indicating nearby places -->
-    <string name="nearby_places_label">Orte in der Nähe</string>
     <!-- Message shown in a dialog explaining the consequences of accesing the location -->
     <string name="explanation_send_location">Der Standort wird mit einer Dritt-App außerhalb der sicheren MEGA-Umgebung angezeigt. Bitte beachten Sie mögliche Konsequenzen für die Privatsphäre der betroffenen Personen.</string>
     <!-- Title of the location marker set by the user -->
@@ -2470,8 +2450,6 @@
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
     <string name="no_contacts_invite">Sie haben noch keine Kontakte. Bitte laden Sie Freunde, Bekannte oder Kollegen über über den Bereich Kontakte ein.</string>
-    <!-- Invite button for chat top cell -->
-    <string name="invite_more">Weitere Kontakte einladen</string>
     <!-- Title of first tour screen -->
     <string name="title_tour_one">Sie sind der alleinige Inhaber Ihrer Schlüsel</string>
     <!-- Content of first tour screen -->
@@ -2641,12 +2619,6 @@
     <string name="error_remove_business_contact">Sie können %1$s nicht aus Ihren Kontakten entfernen, da diese Person Ihrem Business-Account angehört.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">Bei Ihrer letzten Zahlung ist ein Problem aufgetreten. Bitte öffnen Sie MEGA in einem Desktop-Browser, um weitere Informationen zu erhalten.</string>
-    <!-- A dialog title shown to users when their business account is expired. -->
-    <string name="expired_business_title">Account deaktiviert</string>
-    <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Ihr Business-Account wurde aufgrund einer fehlenden Zahlung deaktiviert. Sie können auf die Daten in Ihrem Account nicht zugreifen. Um eine Zahlung vorzunehmen und Ihr Abonnement erneut zu aktivieren, melden Sie sich in einem Browser bei MEGA an.</string>
-    <!-- A message which is shown to sub-users of expired business accounts. -->
-    <string name="expired_user_business_text">Ihr Account ist [B]gesperrt[/B]. Sie können lediglich lesend auf Ihre Daten zugreifen.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
     <string name="camera_uploads_business_alert">MEGA kann nicht auf Ihre Daten zugreifen. Der Administrator Ihres Business-Accounts kann jedoch auf Ihre Kamera-Uploads zugreifen.</string>
     <!-- General label to alert user that somehting went wrong -->
@@ -3071,11 +3043,6 @@
     <string name="months_view_button">Monate</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
     <string name="years_view_button">Jahre</string>
-    <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
-    <plurals name="cu_upload_progress">
-        <item quantity="one">Upload läuft, noch %1$d Datei</item>
-        <item quantity="other">Upload läuft, noch %1$d Dateien</item>
-    </plurals>
     <!-- Text to show as production api server option -->
     <string name="production_api_server">Produktion</string>
     <!-- Title to show in a dialog to change api server -->
@@ -3336,8 +3303,6 @@
     <string name="show_activity_action">Aktivitäten anzeigen</string>
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">[B]Letzte Aktivitäten[/B] ausgeblendet</string>
-    <!-- Label indicating video original quality -->
-    <string name="original_quality">Originalqualität</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
     <string name="setting_fingerprint">Fingerabdruck-ID</string>
     <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
@@ -3396,8 +3361,6 @@
     <string name="backup_remove_root_folder">Sie sind dabei, Ihren Backup-Ordner zu löschen. Dadurch werden alle eingerichteten Backups entfernt. Sind Sie sicher, dass Sie fortfahren möchten?</string>
     <!-- The title of warning dialog for single folder deleting -->
     <string name="backup_remove_folder_title">„%1s“ in den Papierkorb verschieben</string>
-    <!-- The confirm information of warning dialog for deleting -->
-    <string name="backup_disable_confirm">Backup deaktivieren</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">Schreibgeschützt</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
@@ -3414,12 +3377,6 @@
     <string name="upload_files">Dateien hochladen</string>
     <!-- Action button to upload a folder. -->
     <string name="upload_folder">Ordner hochladen</string>
-    <!-- Title of the Payments screen -->
-    <string name="payment">Zahlungen</string>
-    <!-- Label indicating payment methods -->
-    <string name="payment_methods">Zahlungsmethoden</string>
-    <!-- Button to proceed with a payment -->
-    <string name="proceed">Fortfahren</string>
     <!-- Remove moderator permission and assign standard permission to a meeting participant-->
     <string name="remove_moderator">Gastgeberstatus entziehen</string>
     <!-- Title message of existing subscription dialog -->
@@ -4701,9 +4658,9 @@
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">Datei kann nicht geöffnet werden</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
+    <string name="dialog_taken_down_folder_description">Dieser Ordner wurde gemäß unseren [A]Löschrichtlinien[/A] entfernt. Sie können dieser Löschung widersprechen, wenn Sie glauben, dass uns ein Fehler unterlaufen ist.</string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
+    <string name="dialog_taken_down_file_description">Diese Datei wurde gemäß unseren [A]Löschrichtlinien[/A] entfernt. Sie können dieser Löschung widersprechen, wenn Sie glauben, dass uns ein Fehler unterlaufen ist.</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">Erfordert Pro</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
@@ -4750,8 +4707,6 @@
     <string name="account_upgrade_account_description_feature_link">&#8226;&#160;Links mit Ablaufdatum</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;Teilen des Transfervolumens</string>
-    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Automatische Backups</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Wiederherstellung von gelöschten Daten bis zu 90 Tage lang für Pro&#160;Lite und bis zu 180 Tage lang für Pro&#160;I, II und III</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
@@ -4764,8 +4719,6 @@
     <string name="account_upgrade_account_buy_button_title_pro_ii">Pro&#160;II kaufen</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_iii">Pro&#160;III kaufen</string>
-    <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
-    <string name="account_upgrade_account_terms_of_service_link">Nutzungsbedingungen</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
     <string name="cloud_drive_subtitle_link_access_password">Den Link können nur Personen öffnen, die das Passwort kennen</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
@@ -5270,6 +5223,7 @@
     <string name="account_upgrade_subscription_details">Abonnements werden automatisch für den ursprünglich gewählten Abonnementzeitraum und zum gleichen Preis verlängert. Sie können die automatische Verlängerung Ihres MEGA-Pro-Abonnements bis spätestens 24 Stunden vor Fälligkeit Ihrer nächsten Abonnementzahlung in [A]Google Play[/A] unter Abonnements deaktivieren.</string>
     <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Gewähren Sie Zugriff auf Ihre Galerie</string>
+    <!--  -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Zugriff gewähren</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">Update erforderlich</string>
@@ -5324,7 +5278,7 @@
     <!-- Button text to change SFU Server Id  -->
     <string name="meetings_change_sfu_dialog_action_button">Ändern</string>
     <!-- Free plan limitation text for scheduled meetings calls longer than 60 minutes in edit occurrence dialog. -->
-    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">Kostenlose Pakete sind auf 60 Minuten pro Meeting begrenzt. [A]Jetzt upgraden.[/A]</string>
+    <string name="meetings_edit_occurrence_free_plan_60_minute_limit_warning">[A]Bei Ihrem kostenlosen Paket sind Meetings auf 60 Minuten begrenzt. Pro-Pakete unterliegen keinen zeitlichen Begrenzungen und erlauben bis zu 1000 Teilnehmer.[/A] [B]Jetzt upgraden.[/B]</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects monthly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
     <string name="account_upgrade_account_subscription_details_body_monthly_with_price">Ihnen werden sofort %1$s abgebucht, und Ihr Abonnement wird nach einem Monat automatisch für %2$s pro Monat verlängert. Die Verlängerung wird innerhalb von 24 Stunden vor Ende des Abrechnungszeitraums von Ihrem Google-Play-Account abgebucht. Um Ihr Abonnement zu kündigen, müssen Sie die automatische Verlängerung Ihres MEGA-Pro-Abonnements mindestens 24 Stunden vor Ablauf Ihres Abrechnungszeitraums in [A]Google&#160;Play[/A] unter Abonnements deaktivieren.\nIndem Sie Ihren Account upgraden, erklären Sie sich mit den [B]Nutzungsbedingungen[/B] und der [C]Datenschutzerklärung[/C] von MEGA einverstanden.</string>
     <!-- Body for the subscription details section, which is shown to the user to provide details about subscription. This string is shown if user selects yearly subscription. The placeholders %1$s and %2$s will be replaced with localised price and currency sign (based on Google localisation), for example $4.99. Please keep these placeholders [A], [/A], [B], [/B], [C], [/C]. They will be used to format the string. -->
@@ -5352,16 +5306,89 @@
     <!-- The negative button text of the Dialog shown to upgrade meeting from the free version -->
     <string name="meetings_in_call_warning_dialog_negative_button">Jetzt nicht</string>
     <!-- The snackbar message of the time left for the current free call -->
-    <string name="meetings_in_call_warning_timer_message">This free call will end in %s</string>
+    <string name="meetings_in_call_warning_timer_message">Dieser kostenlose Anruf endet in %s</string>
     <!-- The title of the Dialog shown to upgrade meeting from the free version -->
     <plurals name="meetings_in_call_warning_dialog_title">
-        <item quantity="one">Your free call will end in %d minute</item>
-        <item quantity="other">Your free call will end in %d minutes</item>
+        <item quantity="one">Ihr kostenloser Anruf endet in %d Minute</item>
+        <item quantity="other">Ihr kostenloser Anruf endet in %d Minuten</item>
     </plurals>
     <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
     <string name="notifications_screen_notification_promo_expiration_time">Gültig bis %1$s %2$s</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
-    <string name="meetings_free_call_organiser_number_of_participants_warning">[A]As a free user, you can only add up to 100 participants to this call. Need more?[/A]&#160;[B]Upgrade now[/B]</string>
+    <string name="meetings_free_call_organiser_number_of_participants_warning">Nur 100 Teilnehmer können der Konferenz beitreten. Alle weiteren Teilnehmer können nur Nachrichten senden und empfangen. Der Veranstalter kann auf Pro upgraden, um diese Einschränkungen aufzuheben.</string>
     <!-- Warning Message for non organiser for Free Call -->
     <string name="meetings_free_call_non_organiser_number_of_participants_warning">Nur 100 Teilnehmer können der Konferenz beitreten. Alle weiteren Teilnehmer können nur Chatnachrichten senden und lesen. Bitten Sie den Organisator, diese Einschränkung aufzuheben.</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_low">Niedrig</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Medium Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_medium">Mittel</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to High Quality before being uploaded by Camera Uploads -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_high">Hoch</string>
+    <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos are automatically uploaded by Camera Uploads without any Video Compression -->
+    <string name="settings_camera_uploads_video_quality_dialog_option_original">Original</string>
+    <!-- Warning shown when the recording of audio permission is required for sending a voice clip and it has been denied by the user -->
+    <string name="chat_microphone_permissions_denied_for_voice_clip">Sie haben MEGA den Zugriff auf Ihr Mikrofon verweigert. Wenn Sie eine Sprachnotiz aufnehmen möchten, gewähren Sie MEGA die entsprechende Berechtigung.</string>
+    <!-- Free plan limitation dialog title for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Beitritt nicht möglich</string>
+    <!-- Free plan limitation dialogue description for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Dieser Konferenz können nur 100 Teilnehmer beitreten. Bitten Sie den Organisator, diese Einschränkung aufzuheben.</string>
+    <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">Alles klar</string>
+    <!-- The title of the hidden nodes feature -->
+    <string name="hidden_nodes">Verborgene Dateien und Ordner</string>
+    <!-- Hidden nodes benefit: hide files and folders -->
+    <string name="hidden_nodes_benefit_title_hide_files_folders">Verbergen Sie wichtige Dateien und Ordner</string>
+    <!-- Hidden nodes benefit description: hide files and folders -->
+    <string name="hidden_nodes_benefit_description_hide_files_folders">Sie können sensible Dateien und Ordner zum Schutz Ihrer Privatsphäre verbergen. Nur Sie haben die Möglichkeit, diese Elemente sichtbar zu machen, entweder einzeln oder indem Sie über die Einstellungen verborgene Elemente vorübergehend einblenden.</string>
+    <!-- Hidden nodes benefit: exclude from timeline -->
+    <string name="hidden_nodes_benefit_title_exclude_timeline">Von der Zeitleiste ausschließen</string>
+    <!-- Hidden nodes benefit description: exclude from timeline -->
+    <string name="hidden_nodes_benefit_description_exclude_timeline">Verborgene Elemente sind nur im Cloud Drive zugänglich und erscheinen nicht in Ihren Fotos, Alben oder kürzlich verwendeten Dateien.</string>
+    <!-- Hidden nodes benefit: out of sight -->
+    <string name="hidden_nodes_benefit_title_out_of_sight">Unsichtbar</string>
+    <!-- Hidden nodes benefit description: out of sight -->
+    <string name="hidden_nodes_benefit_description_out_of_sight">Sie entscheiden, wann verborgene Dateien sichtbar sein sollen. Mit einer neuen Einstellung können Sie verborgene Elemente vorübergehend sichtbar machen.</string>
+    <!-- The snackbar message of hidden nodes operation -->
+    <plurals name="hidden_nodes_result_message">
+        <item quantity="one">%1$d Element verborgen</item>
+        <item quantity="other">%1$d Elemente verborgen</item>
+    </plurals>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_priority_support">&#8226;&#160;Priorisierter Kundenservice</string>
+    <!-- The title of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_title">Auf Pro upgraden, um unbegrenzte Anrufe zu führen</string>
+    <!-- The body of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_body">Ihr Anruf hat das Limit von 60 Minuten erreicht und wurde beendet. Pro-Benutzer können unbegrenzt Anrufe führen und bis zu 1000 Teilnehmer einladen.</string>
+    <!-- The button text of the Upgrade bottom sheet dialog  -->
+    <string name="meetings_upgrade_pro_plan_button">Jetzt upgraden</string>
+    <!-- Search drop down chips filter type file type -->
+    <string name="search_dropdown_chip_filter_type_file_type">Typ</string>
+    <!-- Search drop down chips filter type file type images -->
+    <string name="search_dropdown_chip_filter_type_file_type_images">Bilder</string>
+    <!-- Search drop down chips filter type file type videos -->
+    <string name="search_dropdown_chip_filter_type_file_type_video">Video</string>
+    <!-- Search drop down chips filter type file type audio -->
+    <string name="search_dropdown_chip_filter_type_file_type_audio">Sprache</string>
+    <!-- Search drop down chips filter type file type documents -->
+    <string name="search_dropdown_chip_filter_type_file_type_documents">Dokumente</string>
+    <!-- Search drop down chips filter type date added -->
+    <string name="search_dropdown_chip_filter_type_date_added">Hinzugefügt</string>
+    <!-- Search drop down chips filter type last modified -->
+    <string name="search_dropdown_chip_filter_type_last_modified">Zuletzt bearbeitet am</string>
+    <!-- Search drop down chips filter type date modified today -->
+    <string name="search_dropdown_chip_filter_type_date_today">Heute</string>
+    <!-- Search drop down chips filter type date modified last 7 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_seven_days">Letzte 7 Tage</string>
+    <!-- Search drop down chips filter type date modified last 30 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_thirty_days">Letzte 30 Tage</string>
+    <!-- Search drop down chips filter type date modified this year -->
+    <string name="search_dropdown_chip_filter_type_date_this_year">Dieses Jahr</string>
+    <!-- Search drop down chips filter type date modified last year -->
+    <string name="search_dropdown_chip_filter_type_date_last_year">Letztes Jahr</string>
+    <!-- Search drop down chips filter type date modified older -->
+    <string name="search_dropdown_chip_filter_type_date_older">Älter</string>
+    <!-- String below login button next to button for reporting a login issue -->
+    <string name="general_login_label_trouble_logging_in">Probleme beim Einloggen?</string>
+    <!-- Button text for reporting an issue on the login screen -->
+    <string name="general_login_button_report_your_issue">Problem melden</string>
 </resources>
