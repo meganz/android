@@ -12,6 +12,7 @@ import android.widget.CheckedTextView
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.canBeHandled
 import mega.privacy.android.app.service.RATE_APP_URL
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
@@ -102,15 +103,16 @@ class FeedBackDialog : DialogFragment() {
     }
 
     private fun sendEmail(subject: String, body: String) {
-        val emailIntent = Intent(Intent.ACTION_SENDTO)
-        emailIntent.type = Constants.TYPE_TEXT_PLAIN
-        emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(Constants.MAIL_ANDROID))
+        val emailIntent = Intent(
+            Intent.ACTION_SENDTO, Uri.fromParts(
+                "mailto", Constants.MAIL_ANDROID, null
+            )
+        )
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
         emailIntent.putExtra(Intent.EXTRA_TEXT, body)
-        context?.packageManager?.let { packageManager ->
-            if (emailIntent.resolveActivity(packageManager) != null) {
-                startActivity(emailIntent)
-            }
+
+        if (emailIntent.canBeHandled(requireContext())) {
+            startActivity(emailIntent)
         }
     }
 
