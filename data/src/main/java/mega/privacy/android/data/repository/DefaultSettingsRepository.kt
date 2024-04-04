@@ -100,7 +100,8 @@ internal class DefaultSettingsRepository @Inject constructor(
     @ApplicationScope private val appScope: CoroutineScope,
 ) : SettingsRepository {
     private val showHiddenNodesInitialFlow: Flow<Boolean?> = flow<Boolean?> {
-        setShowHiddenItems(enabled = getShowHiddenNodesPreference())
+        val isEnabled = getShowHiddenNodesPreference()
+        showHiddenNodesFlow.update { isEnabled }
     }.stateIn(
         scope = appScope,
         started = SharingStarted.Lazily,
@@ -530,10 +531,13 @@ internal class DefaultSettingsRepository @Inject constructor(
             ?.decodeBase64()
             ?.let { JSONObject(it) }
 
-        val androidJson = ccJson?.getJSONObject(JSON_KEY_ANDROID.value)
-        val sensitivesJson = androidJson?.getJSONObject(JSON_SENSITIVES.value)?.apply {
-            put(JSON_VAL_SHOW_HIDDEN_NODES.value, enabled)
+        val androidJson = try {
+            ccJson?.getJSONObject(JSON_KEY_ANDROID.value)
+        } catch (e: Exception) {
+            JSONObject()
         }
+        val sensitivesJson = JSONObject(mapOf(JSON_VAL_SHOW_HIDDEN_NODES.value to enabled))
+
         androidJson?.put(JSON_SENSITIVES.value, sensitivesJson)
         ccJson?.put(JSON_KEY_ANDROID.value, androidJson)
 
