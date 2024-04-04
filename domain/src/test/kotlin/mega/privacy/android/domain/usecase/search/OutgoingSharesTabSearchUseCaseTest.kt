@@ -15,7 +15,6 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class OutgoingSharesTabSearchUseCaseTest {
     private lateinit var underTest: OutgoingSharesTabSearchUseCase
     private val addNodeType: AddNodeType = mock()
@@ -42,13 +41,13 @@ class OutgoingSharesTabSearchUseCaseTest {
                     on { id }.thenReturn(NodeId(nodeId))
                     on { name }.thenReturn(nodeName[index])
                 }
-            }
+            }.reversed()
             val typedFolderNodes = nodeHandles.mapIndexed { index, nodeId ->
                 mock<TypedFolderNode> {
                     on { id }.thenReturn(NodeId(nodeId))
                     on { name }.thenReturn(nodeName[index])
                 }
-            }
+            }.reversed()
             folderNodes.forEachIndexed { index, node ->
                 whenever(addNodeType(node)).thenReturn(typedFolderNodes[index])
             }
@@ -74,13 +73,13 @@ class OutgoingSharesTabSearchUseCaseTest {
                     on { id }.thenReturn(NodeId(nodeId))
                     on { name }.thenReturn(nodeName[index])
                 }
-            }
+            }.reversed()
             val typedFolderNodes = nodeHandles.mapIndexed { index, nodeId ->
                 mock<TypedFolderNode> {
                     on { id }.thenReturn(NodeId(nodeId))
                     on { name }.thenReturn(nodeName[index])
                 }
-            }
+            }.reversed()
             folderNodes.forEachIndexed { index, node ->
                 whenever(addNodeType(node)).thenReturn(typedFolderNodes[index])
             }

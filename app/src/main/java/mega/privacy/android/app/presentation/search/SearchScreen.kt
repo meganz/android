@@ -101,6 +101,5 @@ fun SearchScreen(
         onBackPressed = onBackPressed,
         navHostController = navHostController,
         nodeActionHandler = nodeActionHandler,
-        clearResetScrollEvent = searchActivityViewModel::clearResetScroll,
     )
 }

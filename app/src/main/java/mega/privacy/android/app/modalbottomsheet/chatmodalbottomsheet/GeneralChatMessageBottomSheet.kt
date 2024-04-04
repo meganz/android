@@ -156,7 +156,7 @@ class GeneralChatMessageBottomSheet : BaseBottomSheetDialogFragment(), View.OnCl
         forwardSeparator = contentView.findViewById(R.id.forward_separator)
         optionForward = contentView.findViewById(R.id.forward)
         editSeparator = contentView.findViewById(R.id.edit_separator)
-        optionEdit = contentView.findViewById(R.id.edit_layout)
+        optionEdit = contentView.findViewById(R.id.edit)
         copySeparator = contentView.findViewById(R.id.copy_separator)
         optionCopy = contentView.findViewById(R.id.copy)
         shareSeparator = contentView.findViewById(R.id.share_separator)

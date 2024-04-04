@@ -30,7 +30,6 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -83,14 +82,23 @@ fun SearchComposeView(
     navHostController: NavHostController,
     nodeActionHandler: NodeActionHandler,
     clearSelection: () -> Unit,
-    clearResetScrollEvent: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var resetScroll by rememberSaveable {
+        mutableStateOf(false)
+    }
+
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
     val scaffoldState = rememberScaffoldState()
     val snackBarHostState = remember { SnackbarHostState() }
     var topBarPadding by remember { mutableStateOf(0.dp) }
+
+    LaunchedEffect(key1 = resetScroll) {
+        listState.scrollToItem(0)
+        gridState.scrollToItem(0)
+    }
+
     var searchQuery by rememberSaveable {
         mutableStateOf(state.searchQuery)
     }
@@ -98,13 +106,10 @@ fun SearchComposeView(
     searchQuery.useDebounce(
         onChange = {
             updateSearchQuery(it)
+            resetScroll = !resetScroll
         },
     )
 
-    EventEffect(event = state.resetScroll, onConsumed = clearResetScrollEvent) {
-        listState.scrollToItem(0)
-        gridState.scrollToItem(0)
-    }
     topBarPadding =
         if (state.navigationLevel.isNotEmpty() && state.nodeSourceType != NodeSourceType.CLOUD_DRIVE && state.nodeSourceType != NodeSourceType.HOME) 8.dp else 0.dp
 
@@ -147,7 +152,13 @@ fun SearchComposeView(
     ) { padding ->
         Column(modifier = Modifier.padding(top = topBarPadding)) {
             if (state.nodeSourceType == NodeSourceType.CLOUD_DRIVE || state.nodeSourceType == NodeSourceType.HOME) {
-                FilterChipsView(state, onFilterClicked, updateFilter, trackAnalytics)
+                FilterChipsView(state, onFilterClicked = {
+                    resetScroll = !resetScroll
+                    onFilterClicked(it)
+                }, updateFilter = {
+                    resetScroll = !resetScroll
+                    updateFilter(it)
+                }, trackAnalytics)
             }
             if (state.isSearching) {
                 LoadingStateView(
@@ -231,7 +242,6 @@ private fun PreviewSearchComposeView() {
             hiltViewModel()
         ),
         clearSelection = {},
-        clearResetScrollEvent = {}
     )
 }
 
