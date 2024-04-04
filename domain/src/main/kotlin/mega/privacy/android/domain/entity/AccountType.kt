@@ -43,5 +43,10 @@ enum class AccountType {
     /**
      *
      */
-    UNKNOWN
+    UNKNOWN;
+
+    /**
+     * Convenient method to check paid account type
+     */
+    val isPaid: Boolean get() = this != FREE && this != UNKNOWN
 }
