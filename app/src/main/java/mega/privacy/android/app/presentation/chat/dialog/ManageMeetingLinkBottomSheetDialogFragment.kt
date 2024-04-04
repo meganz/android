@@ -14,12 +14,11 @@ import mega.privacy.android.app.databinding.BottomSheetManageMeetingLinkBinding
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewModel
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingManagementViewModel
-import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
+import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoUiState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ScheduledMeetingDateUtil
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import nz.mega.sdk.MegaChatApiJava
-import timber.log.Timber
 
 /**
  * Bottom Sheet Dialog that represents the UI for a dialog with the meeting link options
@@ -55,7 +54,7 @@ class ManageMeetingLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment
     }
 
     private fun collectFlows() {
-        collectFlow(viewModel.state) { state: ScheduledMeetingInfoState ->
+        collectFlow(viewModel.uiState) { state: ScheduledMeetingInfoUiState ->
             if (chatRoomId != state.chatId)
                 chatRoomId = state.chatId
 

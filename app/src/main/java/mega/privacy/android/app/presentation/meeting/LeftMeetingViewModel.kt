@@ -11,7 +11,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.meeting.model.LeftMeetingState
-import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 
@@ -19,7 +18,7 @@ import javax.inject.Inject
  * LeftMeeting view model.
  *
  * @property getFeatureFlagValueUseCase Use case for getting the value of a feature flag.
- * @property state                    Current view state as [ScheduledMeetingInfoState]
+ * @property state                    Current view state as [LeftMeetingViewModel]
  */
 @HiltViewModel
 class LeftMeetingViewModel @Inject constructor(

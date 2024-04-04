@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingInfoState
-import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
+import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
 import mega.privacy.android.app.presentation.meeting.view.RecurringMeetingInfoView
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
@@ -48,7 +48,7 @@ class RecurringMeetingInfoViewTest {
             uiState = RecurringMeetingInfoState(
                 occurrencesList = occursList1,
             ),
-            managementState = ScheduledMeetingManagementState(),
+            managementState = ScheduledMeetingManagementUiState(),
         )
 
         composeRule.onNodeWithTag("Occurrence_list_view").assertExists()
@@ -60,7 +60,7 @@ class RecurringMeetingInfoViewTest {
             uiState = RecurringMeetingInfoState(
                 occurrencesList = occursList1,
             ),
-            managementState = ScheduledMeetingManagementState(),
+            managementState = ScheduledMeetingManagementUiState(),
         )
         composeRule.onRoot(useUnmergedTree = true)
         composeRule.onAllNodesWithTag("Occurrence_item_view")[0].assertExists()
@@ -73,7 +73,7 @@ class RecurringMeetingInfoViewTest {
             uiState = RecurringMeetingInfoState(
                 occurrencesList = occursList2,
             ),
-            managementState = ScheduledMeetingManagementState(),
+            managementState = ScheduledMeetingManagementUiState(),
         )
         composeRule.onRoot(useUnmergedTree = true)
         composeRule.onAllNodesWithTag("Occurrence_item_view_date_formatted")[0].assertExists()
@@ -85,7 +85,7 @@ class RecurringMeetingInfoViewTest {
             uiState = RecurringMeetingInfoState(
                 occurrencesList = occursList2, schedTitle = "Title"
             ),
-            managementState = ScheduledMeetingManagementState(),
+            managementState = ScheduledMeetingManagementUiState(),
         )
         composeRule.onRoot(useUnmergedTree = true)
         composeRule.onAllNodesWithTag("Occurrence_item_view_title")[0].assertExists()
@@ -97,7 +97,7 @@ class RecurringMeetingInfoViewTest {
             uiState = RecurringMeetingInfoState(
                 typeOccurs = OccurrenceFrequencyType.Daily,
             ),
-            managementState = ScheduledMeetingManagementState(),
+            managementState = ScheduledMeetingManagementUiState(),
         )
         composeRule.onNodeWithText(R.string.meetings_recurring_meeting_info_occurs_daily_subtitle)
             .assertExists()
@@ -109,7 +109,7 @@ class RecurringMeetingInfoViewTest {
             uiState = RecurringMeetingInfoState(
                 typeOccurs = OccurrenceFrequencyType.Weekly,
             ),
-            managementState = ScheduledMeetingManagementState(),
+            managementState = ScheduledMeetingManagementUiState(),
         )
 
         composeRule.onNodeWithText(R.string.meetings_recurring_meeting_info_occurs_weekly_subtitle)
@@ -122,7 +122,7 @@ class RecurringMeetingInfoViewTest {
             uiState = RecurringMeetingInfoState(
                 typeOccurs = OccurrenceFrequencyType.Monthly,
             ),
-            managementState = ScheduledMeetingManagementState(),
+            managementState = ScheduledMeetingManagementUiState(),
         )
         composeRule.onNodeWithText(R.string.meetings_recurring_meeting_info_occurs_monthly_subtitle)
             .assertExists()
@@ -134,7 +134,7 @@ class RecurringMeetingInfoViewTest {
             uiState = RecurringMeetingInfoState(
                 showSeeMoreButton = true,
             ),
-            managementState = ScheduledMeetingManagementState(),
+            managementState = ScheduledMeetingManagementUiState(),
         )
         composeRule.onNodeWithText(R.string.meetings_recurring_meeting_info_see_more_occurrences_button)
             .assertExists()
@@ -147,7 +147,7 @@ class RecurringMeetingInfoViewTest {
             uiState = RecurringMeetingInfoState(
                 showSeeMoreButton = true,
             ),
-            managementState = ScheduledMeetingManagementState(),
+            managementState = ScheduledMeetingManagementUiState(),
             onSeeMoreClicked = onSeeMoreClicked,
         )
 
@@ -158,7 +158,7 @@ class RecurringMeetingInfoViewTest {
 
     private fun initComposeRuleContent(
         uiState: RecurringMeetingInfoState,
-        managementState: ScheduledMeetingManagementState,
+        managementState: ScheduledMeetingManagementUiState,
     ) {
         composeRule.setContent {
             RecurringMeetingInfoView(
@@ -187,7 +187,7 @@ class RecurringMeetingInfoViewTest {
 
     private fun initComposeRuleContent(
         uiState: RecurringMeetingInfoState,
-        managementState: ScheduledMeetingManagementState,
+        managementState: ScheduledMeetingManagementUiState,
         onSeeMoreClicked: () -> Unit,
     ) {
         composeRule.setContent {
@@ -214,4 +214,3 @@ class RecurringMeetingInfoViewTest {
         }
     }
 }
-

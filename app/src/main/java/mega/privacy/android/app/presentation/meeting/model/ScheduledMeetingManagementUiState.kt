@@ -39,7 +39,7 @@ import java.time.ZonedDateTime
  * @property isCallUnlimitedProPlanFeatureFlagEnabled   True, if Call Unlimited Pro Plan feature flag enabled. False, otherwise.
  * @constructor Create empty Scheduled meeting management state
  */
-data class ScheduledMeetingManagementState(
+data class ScheduledMeetingManagementUiState(
     val finish: Boolean = false,
     val selectedOccurrence: ChatScheduledMeetingOccurr? = null,
     val isChatHistoryEmpty: Boolean? = null,
@@ -133,7 +133,7 @@ data class ScheduledMeetingManagementState(
      *
      * @return True, if has free plan. False, if has pro plan.
      */
-    private fun hasFreePlan() = subscriptionPlan == AccountType.FREE
+    fun hasFreePlan() = subscriptionPlan == AccountType.FREE
 
     companion object {
         /**

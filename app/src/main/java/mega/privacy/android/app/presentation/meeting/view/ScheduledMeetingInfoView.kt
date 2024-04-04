@@ -71,9 +71,10 @@ import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.getRetentionTimeString
+import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
-import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
-import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
+import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoUiState
+import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.theme.black
@@ -103,8 +104,8 @@ import java.util.Locale
  */
 @Composable
 fun ScheduledMeetingInfoView(
-    state: ScheduledMeetingInfoState,
-    managementState: ScheduledMeetingManagementState,
+    state: ScheduledMeetingInfoUiState,
+    managementState: ScheduledMeetingManagementUiState,
     waitingRoomManagementState: WaitingRoomManagementState,
     onEditClicked: () -> Unit,
     onAddParticipantsClicked: () -> Unit,
@@ -127,6 +128,10 @@ fun ScheduledMeetingInfoView(
     onParticipantClicked: (ChatParticipant) -> Unit = {},
     onScrollChange: (Boolean) -> Unit,
 ) {
+    val shouldShowParticipantsLimitWarning =
+        managementState.isCallUnlimitedProPlanFeatureFlagEnabled &&
+                managementState.hasFreePlan() && state.numOfParticipants >= (state.callUsersLimit
+            ?: MeetingState.FREE_PLAN_PARTICIPANTS_LIMIT)
     val listState = rememberLazyListState()
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -207,6 +212,17 @@ fun ScheduledMeetingInfoView(
 
                 item(key = "Participants") { ParticipantsHeader(state = state) }
 
+                if (shouldShowParticipantsLimitWarning) {
+                    item(key = "Warning") {
+                        ParticipantsLimitWarningComposeView(
+                            state.isModerator,
+                            modifier = Modifier.testTag(
+                                SCHEDULE_MEETING_INFO_PARTICIPANTS_WARNING_TAG
+                            ),
+                        )
+                    }
+                }
+
                 item(key = "Add participants") {
                     AddParticipantsButton(
                         state = state,
@@ -260,13 +276,13 @@ fun ScheduledMeetingInfoView(
 /**
  * Scheduled meeting info Alert Dialog
  *
- * @param state                     [ScheduledMeetingInfoState]
+ * @param state                     [ScheduledMeetingInfoUiState]
  * @param onDismiss                 When dismiss the alert dialog
  * @param onLeave                   When leave the group chat room
  */
 @Composable
 private fun LeaveGroupAlertDialog(
-    state: ScheduledMeetingInfoState,
+    state: ScheduledMeetingInfoUiState,
     onDismiss: () -> Unit,
     onLeave: () -> Unit,
 ) {
@@ -285,13 +301,13 @@ private fun LeaveGroupAlertDialog(
 /**
  * Scheduled meeting info Alert Dialog
  *
- * @param state                     [ScheduledMeetingInfoState]
+ * @param state                     [ScheduledMeetingInfoUiState]
  * @param onDismiss                 When dismiss the alert dialog
  * @param onInvite                  When invite participants to group chat room
  */
 @Composable
 private fun AddParticipantsAlertDialog(
-    state: ScheduledMeetingInfoState,
+    state: ScheduledMeetingInfoUiState,
     onDismiss: () -> Unit,
     onInvite: () -> Unit,
 ) {
@@ -321,7 +337,7 @@ private fun AddParticipantsAlertDialog(
 /**
  * Scheduled meeting info App bar view
  *
- * @param state                     [ScheduledMeetingInfoState]
+ * @param state                     [ScheduledMeetingInfoUiState]
  * @param onEditClicked             When edit option is clicked
  * @param onAddParticipantsClicked  When add participants option is clicked
  * @param onBackPressed             When on back pressed option is clicked
@@ -330,7 +346,7 @@ private fun AddParticipantsAlertDialog(
  */
 @Composable
 private fun ScheduledMeetingInfoAppBar(
-    state: ScheduledMeetingInfoState,
+    state: ScheduledMeetingInfoUiState,
     onEditClicked: () -> Unit,
     onAddParticipantsClicked: () -> Unit,
     onBackPressed: () -> Unit,
@@ -386,10 +402,10 @@ private fun ScheduledMeetingInfoAppBar(
 /**
  * Scheduled meeting info title view
  *
- * @param state [ScheduledMeetingInfoState]
+ * @param state [ScheduledMeetingInfoUiState]
  */
 @Composable
-private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoState) {
+private fun ScheduledMeetingTitleView(state: ScheduledMeetingInfoUiState) {
     Column {
         Row(
             modifier = Modifier
@@ -436,10 +452,10 @@ private fun isLight(): Boolean = MaterialTheme.colors.isLight
 /**
  * Scheduled meeting subtitle
  *
- * @param state [ScheduledMeetingInfoState]
+ * @param state [ScheduledMeetingInfoUiState]
  */
 @Composable
-private fun ScheduledMeetingSubtitle(state: ScheduledMeetingInfoState) {
+private fun ScheduledMeetingSubtitle(state: ScheduledMeetingInfoUiState) {
     state.scheduledMeeting?.let { schedMeet ->
         if (schedMeet.isPast()) {
             Text(text = pluralStringResource(
@@ -469,10 +485,10 @@ private fun ScheduledMeetingSubtitle(state: ScheduledMeetingInfoState) {
 /**
  * Create meeting avatar view
  *
- * @param state [ScheduledMeetingInfoState]
+ * @param state [ScheduledMeetingInfoUiState]
  */
 @Composable
-private fun MeetingAvatar(state: ScheduledMeetingInfoState) {
+private fun MeetingAvatar(state: ScheduledMeetingInfoUiState) {
     if (state.isEmptyMeeting()) {
         ChatAvatarView(
             avatarUri = null,
@@ -521,13 +537,13 @@ private fun MeetingAvatar(state: ScheduledMeetingInfoState) {
 /**
  * Control and show the available buttons
  *
- * @param state             [ScheduledMeetingInfoState]
+ * @param state             [ScheduledMeetingInfoUiState]
  * @param action            [ScheduledMeetingInfoAction]
  * @param onButtonClicked
  */
 @Composable
 private fun ActionButton(
-    state: ScheduledMeetingInfoState,
+    state: ScheduledMeetingInfoUiState,
     enabledMeetingLinkOption: Boolean,
     isCallInProgress: Boolean,
     action: ScheduledMeetingInfoAction,
@@ -714,10 +730,10 @@ private fun ActionButton(
 /**
  * Participants header view
  *
- * @param state [ScheduledMeetingInfoState]
+ * @param state [ScheduledMeetingInfoUiState]
  */
 @Composable
-private fun ParticipantsHeader(state: ScheduledMeetingInfoState) {
+private fun ParticipantsHeader(state: ScheduledMeetingInfoUiState) {
     Text(modifier = Modifier.padding(
         start = 16.dp,
         top = 17.dp,
@@ -733,12 +749,12 @@ private fun ParticipantsHeader(state: ScheduledMeetingInfoState) {
 /**
  * Add participants button view
  *
- * @param state [ScheduledMeetingInfoState]
+ * @param state [ScheduledMeetingInfoUiState]
  * @param onAddParticipantsClicked
  */
 @Composable
 private fun AddParticipantsButton(
-    state: ScheduledMeetingInfoState,
+    state: ScheduledMeetingInfoUiState,
     onAddParticipantsClicked: () -> Unit,
 ) {
     if (state.isHost || state.isOpenInvite) {
@@ -775,12 +791,12 @@ private fun AddParticipantsButton(
 /**
  * See more participants in the list button view
  *
- * @param state [ScheduledMeetingInfoState]
+ * @param state [ScheduledMeetingInfoUiState]
  * @param onSeeMoreOrLessClicked
  */
 @Composable
 private fun SeeMoreOrLessParticipantsButton(
-    state: ScheduledMeetingInfoState,
+    state: ScheduledMeetingInfoUiState,
     onSeeMoreOrLessClicked: () -> Unit,
 ) {
     Row(modifier = Modifier
@@ -835,10 +851,10 @@ private fun LeaveGroupButton(
 /**
  * Scheduled meeting info description view
  *
- * @param state [ScheduledMeetingInfoState]
+ * @param state [ScheduledMeetingInfoUiState]
  */
 @Composable
-private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoState) {
+private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoUiState) {
     state.scheduledMeeting?.let { schedMeet ->
         schedMeet.description?.let { description ->
             CustomDivider(withStartPadding = false)
@@ -892,7 +908,7 @@ private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoState) {
 /**
  * Show action buttons options
  *
- * @param state         [ScheduledMeetingInfoState]
+ * @param state         [ScheduledMeetingInfoUiState]
  * @param action        [ScheduledMeetingInfoAction]
  * @param isChecked     True, if the option is checked. False if not
  * @param hasSwitch     True, if the option has a switch. False if not
@@ -900,7 +916,7 @@ private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoState) {
  */
 @Composable
 private fun ActionOption(
-    state: ScheduledMeetingInfoState,
+    state: ScheduledMeetingInfoUiState,
     action: ScheduledMeetingInfoAction,
     isChecked: Boolean,
     hasSwitch: Boolean,
@@ -1215,6 +1231,8 @@ fun getStringForDndTime(seconds: Long): String {
 
 
 internal const val ACTION_BUTTON_OPTION_TAG = "scheduled_meeting_info:action_button_option"
+internal const val SCHEDULE_MEETING_INFO_PARTICIPANTS_WARNING_TAG =
+    "scheduled_meeting_info:participants_warning"
 
 /**
  * Meeting link action button View Preview
@@ -1224,7 +1242,7 @@ internal const val ACTION_BUTTON_OPTION_TAG = "scheduled_meeting_info:action_but
 @Composable
 fun PreviewActionButton() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
-        ActionButton(state = ScheduledMeetingInfoState(
+        ActionButton(state = ScheduledMeetingInfoUiState(
             scheduledMeeting = ChatScheduledMeeting(
                 chatId = -1,
                 schedId = -1,
@@ -1257,7 +1275,7 @@ fun PreviewActionButton() {
 @Composable
 fun PreviewAddParticipantsButton() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
-        AddParticipantsButton(state = ScheduledMeetingInfoState(
+        AddParticipantsButton(state = ScheduledMeetingInfoUiState(
             scheduledMeeting = ChatScheduledMeeting(
                 chatId = -1,
                 schedId = -1,
@@ -1287,7 +1305,7 @@ fun PreviewAddParticipantsButton() {
 fun PreviewScheduledMeetingInfoView() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ScheduledMeetingInfoView(
-            state = ScheduledMeetingInfoState(
+            state = ScheduledMeetingInfoUiState(
                 scheduledMeeting = ChatScheduledMeeting(
                     chatId = -1,
                     schedId = -1,
@@ -1305,7 +1323,7 @@ fun PreviewScheduledMeetingInfoView() {
                     changes = null
                 )
             ),
-            managementState = ScheduledMeetingManagementState(),
+            managementState = ScheduledMeetingManagementUiState(),
             waitingRoomManagementState = WaitingRoomManagementState(),
             onButtonClicked = {},
             onEditClicked = {},

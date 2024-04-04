@@ -179,7 +179,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
             }
         }
 
-        collectFlow(viewModel.state) { state ->
+        collectFlow(viewModel.uiState) { state ->
             if (state.finish) {
                 Timber.d("Finish activity")
                 finish()
@@ -490,7 +490,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     private fun MainComposeView() {
         val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val isDark = themeMode.isDarkMode()
-        val uiState by viewModel.state.collectAsStateWithLifecycle()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()
         val waitingRoomManagementState by waitingRoomManagementViewModel.state.collectAsStateWithLifecycle()
 
@@ -573,7 +573,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
             ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> showConfirmationPrivateChatDialog()
             ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation -> {}
             ScheduledMeetingInfoAction.WaitingRoom -> {
-                if (!viewModel.state.value.enabledWaitingRoomOption) {
+                if (!viewModel.uiState.value.enabledWaitingRoomOption) {
                     Analytics.tracker.trackEvent(WaitingRoomEnableButtonEvent)
                 }
                 viewModel.setWaitingRoom()

@@ -14,7 +14,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.BottomSheetManageChatLinkBinding
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoViewModel
-import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
+import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoUiState
 import mega.privacy.android.app.utils.ChatUtil.showConfirmationRemoveChatLink
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.COPIED_TEXT_LABEL
@@ -68,7 +68,7 @@ class ManageChatLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
     }
 
     private fun collectFlows() {
-        collectFlow(viewModel.state) { state: ScheduledMeetingInfoState ->
+        collectFlow(viewModel.uiState) { state: ScheduledMeetingInfoUiState ->
             myFullName = state.myFullName
         }
     }

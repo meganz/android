@@ -60,6 +60,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
+import timber.log.Timber;
 
 public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaParticipantsChatAdapter.ViewHolderParticipants> implements OnClickListener {
 
@@ -717,6 +718,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
      */
     public void updateParticipantWarning(Boolean shouldShowWarning) {
         ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
+        Timber.d("Holder Header: %s", holderHeader);
         if (holderHeader != null) {
             if (shouldShowWarning) {
                 holderHeader.participantsLimitWarningView.setModerator(getChat().getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR);

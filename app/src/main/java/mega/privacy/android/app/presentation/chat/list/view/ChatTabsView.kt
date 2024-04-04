@@ -44,7 +44,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.model.ChatsTabState
-import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
+import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
 import mega.privacy.android.app.presentation.meeting.view.CancelScheduledMeetingDialog
 import mega.privacy.android.app.presentation.meeting.view.ForceAppUpdateDialog
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
@@ -59,7 +59,7 @@ import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
  * Chat tabs view
  *
  * @param state             [ChatsTabState]
- * @param managementState   [ScheduledMeetingManagementState]
+ * @param managementState   [ScheduledMeetingManagementUiState]
  * @param showMeetingTab    True to show Meeting tab as initial tab or false (default) otherwise
  * @param onTabSelected
  * @param onItemClick
@@ -70,7 +70,7 @@ import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
 @Composable
 fun ChatTabsView(
     state: ChatsTabState,
-    managementState: ScheduledMeetingManagementState,
+    managementState: ScheduledMeetingManagementUiState,
     showMeetingTab: Boolean = false,
     onTabSelected: (ChatTab) -> Unit = {},
     onItemClick: (Long) -> Unit = {},
@@ -283,6 +283,6 @@ private fun FabButton(showFabButton: Boolean, onStartChatClick: () -> Unit) {
 private fun PreviewEmptyView() {
     ChatTabsView(
         state = ChatsTabState(currentUnreadStatus = true to false),
-        managementState = ScheduledMeetingManagementState(),
+        managementState = ScheduledMeetingManagementUiState(),
     )
 }

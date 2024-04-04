@@ -8,7 +8,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.emitAll
@@ -25,7 +25,7 @@ import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETEN
 import mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
-import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
+import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoUiState
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
@@ -54,6 +54,7 @@ import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
+import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
@@ -95,7 +96,8 @@ import javax.inject.Inject
  * @property getStringFromStringResMapper                   [GetStringFromStringResMapper]
  * @property getMyFullNameUseCase                           [GetMyFullNameUseCase]
  * @property monitorUserUpdates                             [MonitorUserUpdates]
- * @property state                    Current view state as [ScheduledMeetingInfoState]
+ * @property getChatCallUseCase                             [GetChatCallUseCase]
+ * @property uiState                    Current view state as [ScheduledMeetingInfoUiState]
  */
 @HiltViewModel
 class ScheduledMeetingInfoViewModel @Inject constructor(
@@ -128,10 +130,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val getMyFullNameUseCase: GetMyFullNameUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val monitorSFUServerUpgradeUseCase: MonitorSFUServerUpgradeUseCase,
+    private val getChatCallUseCase: GetChatCallUseCase,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(ScheduledMeetingInfoState())
-    val state: StateFlow<ScheduledMeetingInfoState> = _state
+    private val _uiState = MutableStateFlow(ScheduledMeetingInfoUiState())
+    val uiState = _uiState.asStateFlow()
 
     val is24HourFormat by lazy { deviceGateway.is24HourFormat() }
 
@@ -176,14 +179,15 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * @param newScheduledMeetingId     Scheduled meeting id.
      */
     fun setChatId(newChatId: Long, newScheduledMeetingId: Long) {
-        if (newChatId != megaChatApiGateway.getChatInvalidHandle() && newChatId != state.value.chatId) {
-            _state.update {
+        if (newChatId != megaChatApiGateway.getChatInvalidHandle() && newChatId != uiState.value.chatId) {
+            _uiState.update {
                 it.copy(
                     chatId = newChatId
                 )
             }
             scheduledMeetingId = newScheduledMeetingId
             getChat()
+            getChatCall()
             getScheduledMeeting()
         }
     }
@@ -194,7 +198,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private fun getChat() =
         viewModelScope.launch {
             runCatching {
-                getChatRoomUseCase(state.value.chatId)
+                getChatRoomUseCase(uiState.value.chatId)
             }.onFailure { exception ->
                 Timber.e("Chat room does not exist, finish $exception")
                 finishActivity()
@@ -203,7 +207,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 chat?.apply {
                     if (isActive) {
                         Timber.d("Chat room is active")
-                        _state.update { state ->
+                        _uiState.update { state ->
                             state.copy(
                                 chatId = chatId,
                                 chatTitle = title,
@@ -211,7 +215,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                 isOpenInvite = isOpenInvite || ownPrivilege == ChatRoomPermission.Moderator,
                                 enabledAllowNonHostAddParticipantsOption = isOpenInvite,
                                 enabledWaitingRoomOption = isWaitingRoom,
-                                isPublic = isPublic
+                                isPublic = isPublic,
+                                myPermission = ownPrivilege,
                             )
                         }
 
@@ -228,11 +233,26 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         }
 
     /**
+     * Get chat call updates
+     */
+    private fun getChatCall() {
+        viewModelScope.launch {
+            runCatching {
+                getChatCallUseCase(_uiState.value.chatId)?.let { call ->
+                    _uiState.update { it.copy(callUsersLimit = call.callUsersLimit) }
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
      * Monitor muted chats updates
      */
     private fun monitorMutedChatsUpdates() = viewModelScope.launch {
         monitorUpdatePushNotificationSettingsUseCase().collectLatest {
-            updateDndSeconds(state.value.chatId)
+            updateDndSeconds(uiState.value.chatId)
         }
     }
 
@@ -241,13 +261,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      */
     private fun loadAllChatParticipants() = viewModelScope.launch {
         runCatching {
-            getChatParticipants(state.value.chatId)
+            getChatParticipants(uiState.value.chatId)
                 .catch { exception ->
                     Timber.e(exception)
                 }
                 .collectLatest { list ->
                     Timber.d("Updated list of participants: list ${list.size}")
-                    _state.update {
+                    _uiState.update {
                         it.copy(participantItemList = list, numOfParticipants = list.size)
                     }
                     updateFirstAndSecondParticipants()
@@ -261,8 +281,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Update first and last participants
      */
     private fun updateFirstAndSecondParticipants() {
-        _state.value.participantItemList.let { list ->
-            _state.update {
+        _uiState.value.participantItemList.let { list ->
+            _uiState.update {
                 it.copy(
                     firstParticipant = if (list.isNotEmpty()) list.first() else null,
                     secondParticipant = if (list.size > 1) list[1] else null
@@ -277,7 +297,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private fun getScheduledMeeting() =
         viewModelScope.launch {
             runCatching {
-                getScheduledMeetingByChat(state.value.chatId)
+                getScheduledMeetingByChat(uiState.value.chatId)
             }.onFailure { exception ->
                 Timber.e("Scheduled meeting does not exist, finish $exception")
                 finishActivity()
@@ -304,7 +324,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private fun getChatRoomUpdates(chatId: Long) =
         viewModelScope.launch {
             monitorChatRoomUpdates(chatId).collectLatest { chat ->
-                _state.update { state ->
+                _uiState.update { state ->
                     with(state) {
                         val hostValue = if (chat.hasChanged(ChatRoomChange.OwnPrivilege)) {
                             Timber.d("Changes in own privilege")
@@ -383,7 +403,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * @param scheduledMeetReceived [ChatScheduledMeeting]
      */
     private fun updateScheduledMeeting(scheduledMeetReceived: ChatScheduledMeeting) {
-        _state.update {
+        _uiState.update {
             it.copy(
                 scheduledMeeting = scheduledMeetReceived,
                 is24HourFormat = is24HourFormat
@@ -398,7 +418,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * @ return True, if it's same. False if not.
      */
     private fun isSameScheduledMeeting(scheduledMeet: ChatScheduledMeeting): Boolean =
-        state.value.chatId == scheduledMeet.chatId
+        uiState.value.chatId == scheduledMeet.chatId
 
     /**
      * Check if is main scheduled meeting
@@ -426,7 +446,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 scheduledMeetReceived.changes?.let { changes ->
                     changes.forEach {
                         Timber.d("Monitor scheduled meeting updated, changes $changes")
-                        if (_state.value.scheduledMeeting == null) {
+                        if (_uiState.value.scheduledMeeting == null) {
                             updateScheduledMeeting(
                                 scheduledMeetReceived = scheduledMeetReceived
                             )
@@ -440,7 +460,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                 )
 
                             ScheduledMeetingChanges.Title ->
-                                _state.update { state ->
+                                _uiState.update { state ->
                                     state.copy(
                                         scheduledMeeting = state.scheduledMeeting?.copy(
                                             title = scheduledMeetReceived.title
@@ -449,7 +469,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                 }
 
                             ScheduledMeetingChanges.Description ->
-                                _state.update { state ->
+                                _uiState.update { state ->
                                     state.copy(
                                         scheduledMeeting = state.scheduledMeeting?.copy(
                                             description = scheduledMeetReceived.description
@@ -457,7 +477,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                     )
                                 }
 
-                            ScheduledMeetingChanges.StartDate -> _state.update { state ->
+                            ScheduledMeetingChanges.StartDate -> _uiState.update { state ->
                                 state.copy(
                                     scheduledMeeting = state.scheduledMeeting?.copy(
                                         startDateTime = scheduledMeetReceived.startDateTime,
@@ -466,7 +486,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             }
 
                             ScheduledMeetingChanges.EndDate,
-                            -> _state.update { state ->
+                            -> _uiState.update { state ->
                                 state.copy(
                                     scheduledMeeting = state.scheduledMeeting?.copy(
                                         startDateTime = scheduledMeetReceived.endDateTime,
@@ -474,7 +494,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                 )
                             }
 
-                            ScheduledMeetingChanges.ParentScheduledMeetingId -> _state.update { state ->
+                            ScheduledMeetingChanges.ParentScheduledMeetingId -> _uiState.update { state ->
                                 state.copy(
                                     scheduledMeeting = state.scheduledMeeting?.copy(
                                         parentSchedId = scheduledMeetReceived.parentSchedId,
@@ -482,7 +502,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                 )
                             }
 
-                            ScheduledMeetingChanges.TimeZone -> _state.update { state ->
+                            ScheduledMeetingChanges.TimeZone -> _uiState.update { state ->
                                 state.copy(
                                     scheduledMeeting = state.scheduledMeeting?.copy(
                                         timezone = scheduledMeetReceived.timezone,
@@ -490,7 +510,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                 )
                             }
 
-                            ScheduledMeetingChanges.Attributes -> _state.update { state ->
+                            ScheduledMeetingChanges.Attributes -> _uiState.update { state ->
                                 state.copy(
                                     scheduledMeeting = state.scheduledMeeting?.copy(
                                         attributes = scheduledMeetReceived.attributes,
@@ -498,7 +518,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                 )
                             }
 
-                            ScheduledMeetingChanges.OverrideDateTime -> _state.update { state ->
+                            ScheduledMeetingChanges.OverrideDateTime -> _uiState.update { state ->
                                 state.copy(
                                     scheduledMeeting = state.scheduledMeeting?.copy(
                                         overrides = scheduledMeetReceived.overrides,
@@ -506,7 +526,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                 )
                             }
 
-                            ScheduledMeetingChanges.ScheduledMeetingsFlags -> _state.update { state ->
+                            ScheduledMeetingChanges.ScheduledMeetingsFlags -> _uiState.update { state ->
                                 state.copy(
                                     scheduledMeeting = state.scheduledMeeting?.copy(
                                         flags = scheduledMeetReceived.flags,
@@ -514,7 +534,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                 )
                             }
 
-                            ScheduledMeetingChanges.RepetitionRules -> _state.update { state ->
+                            ScheduledMeetingChanges.RepetitionRules -> _uiState.update { state ->
                                 state.copy(
                                     scheduledMeeting = state.scheduledMeeting?.copy(
                                         rules = scheduledMeetReceived.rules,
@@ -522,7 +542,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                 )
                             }
 
-                            ScheduledMeetingChanges.CancelledFlag -> _state.update { state ->
+                            ScheduledMeetingChanges.CancelledFlag -> _uiState.update { state ->
                                 state.copy(
                                     scheduledMeeting = state.scheduledMeeting?.copy(
                                         isCanceled = scheduledMeetReceived.isCanceled,
@@ -545,7 +565,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private fun updateDndSeconds(id: Long) {
         getPushNotificationSettingManagement().pushNotificationSetting?.let { push ->
             if (push.isChatDndEnabled(id)) {
-                _state.update {
+                _uiState.update {
                     it.copy(dndSeconds = push.getChatDnd(id))
                 }
 
@@ -553,7 +573,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             }
         }
 
-        _state.update {
+        _uiState.update {
             it.copy(dndSeconds = null)
         }
     }
@@ -565,11 +585,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      */
     private fun updateRetentionTimeSeconds(retentionTime: Long) {
         if (retentionTime == Constants.DISABLED_RETENTION_TIME) {
-            _state.update {
+            _uiState.update {
                 it.copy(retentionTimeSeconds = null)
             }
         } else {
-            _state.update {
+            _uiState.update {
                 it.copy(retentionTimeSeconds = retentionTime)
             }
         }
@@ -579,7 +599,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * See more or less participants in the list.
      */
     fun onSeeMoreOrLessTap() =
-        _state.update { state ->
+        _uiState.update { state ->
             state.copy(seeMoreVisible = !state.seeMoreVisible)
         }
 
@@ -593,13 +613,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 val contactList = getVisibleContactsUseCase()
                 when {
                     contactList.isEmpty() -> {
-                        _state.update {
+                        _uiState.update {
                             it.copy(addParticipantsNoContactsDialog = true, openAddContact = false)
                         }
                     }
 
-                    ChatUtil.areAllMyContactsChatParticipants(state.value.chatId) -> {
-                        _state.update {
+                    ChatUtil.areAllMyContactsChatParticipants(uiState.value.chatId) -> {
+                        _uiState.update {
                             it.copy(
                                 addParticipantsNoContactsLeftToAddDialog = true,
                                 openAddContact = false
@@ -608,7 +628,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     }
 
                     else -> {
-                        _state.update {
+                        _uiState.update {
                             it.copy(openAddContact = true)
                         }
                     }
@@ -627,7 +647,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Send message to a participant
      */
     fun onSendMsgTap() =
-        state.value.selected?.let { participant ->
+        uiState.value.selected?.let { participant ->
             if (isConnected) {
                 viewModelScope.launch {
                     runCatching {
@@ -661,7 +681,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Start call with a participant
      */
     fun onStartCallTap() =
-        state.value.selected?.let { participant ->
+        uiState.value.selected?.let { participant ->
             if (isConnected) {
                 viewModelScope.launch {
                     runCatching {
@@ -718,7 +738,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Change permissions
      */
     fun onChangePermissionsTap() =
-        _state.value.selected?.let {
+        _uiState.value.selected?.let {
             showChangePermissionsDialog(it.privilege)
         }
 
@@ -728,7 +748,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * @param shouldShowDialog True,show dialog.
      */
     fun onRemoveParticipantTap(shouldShowDialog: Boolean) =
-        _state.update {
+        _uiState.update {
             it.copy(openRemoveParticipantDialog = shouldShowDialog)
         }
 
@@ -736,7 +756,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Leave group chat button clicked
      */
     fun onLeaveGroupTap() =
-        _state.update { state ->
+        _uiState.update { state ->
             state.copy(leaveGroupDialog = !state.leaveGroupDialog)
         }
 
@@ -744,7 +764,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Invite contact
      */
     fun onInviteContactTap() =
-        _state.value.selected?.let { participant ->
+        _uiState.value.selected?.let { participant ->
             participant.email?.let { email ->
                 viewModelScope.launch {
                     runCatching {
@@ -812,7 +832,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Remove open add contact screen
      */
     fun removeAddContact() =
-        _state.update {
+        _uiState.update {
             it.copy(openAddContact = null)
         }
 
@@ -824,7 +844,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     fun inviteToChat(contacts: ArrayList<String>) {
         Timber.d("Invite participants")
         viewModelScope.launch {
-            inviteToChat(_state.value.chatId, contacts)
+            inviteToChat(_uiState.value.chatId, contacts)
         }
         triggerSnackbarMessage(
             getStringFromStringResMapper(
@@ -837,7 +857,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Dismiss alert dialogs
      */
     fun dismissDialog() =
-        _state.update { state ->
+        _uiState.update { state ->
             state.copy(
                 leaveGroupDialog = false,
                 addParticipantsNoContactsDialog = false,
@@ -849,7 +869,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Finish activity
      */
     private fun finishActivity() =
-        _state.update { state ->
+        _uiState.update { state ->
             state.copy(finish = true)
         }
 
@@ -859,11 +879,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     fun leaveChat() =
         viewModelScope.launch {
             runCatching {
-                chatManagement.addLeavingChatId(state.value.chatId)
-                leaveChatUseCase(state.value.chatId)
+                chatManagement.addLeavingChatId(uiState.value.chatId)
+                leaveChatUseCase(uiState.value.chatId)
             }.onFailure { exception ->
                 Timber.e(exception)
-                chatManagement.removeLeavingChatId(state.value.chatId)
+                chatManagement.removeLeavingChatId(uiState.value.chatId)
                 dismissDialog()
                 triggerSnackbarMessage(
                     getStringFromStringResMapper(
@@ -872,7 +892,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 )
             }.onSuccess {
                 Timber.d("Chat left ")
-                chatManagement.removeLeavingChatId(state.value.chatId)
+                chatManagement.removeLeavingChatId(uiState.value.chatId)
                 dismissDialog()
                 finishActivity()
             }
@@ -884,7 +904,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * @param participant [ChatParticipant]
      */
     fun onParticipantTap(participant: ChatParticipant) =
-        _state.update {
+        _uiState.update {
             it.copy(selected = participant)
         }
 
@@ -896,7 +916,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             Timber.d("Update option Allow non-host add participants to the chat room")
             viewModelScope.launch {
                 runCatching {
-                    setOpenInvite(state.value.chatId)
+                    setOpenInvite(uiState.value.chatId)
                 }.onFailure { exception ->
                     Timber.e(exception)
                     triggerSnackbarMessage(
@@ -905,14 +925,14 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         )
                     )
                 }.onSuccess { isAllowAddParticipantsEnabled ->
-                    _state.update { state ->
+                    _uiState.update { state ->
                         state.copy(
                             isOpenInvite = isAllowAddParticipantsEnabled || state.isHost,
                             enabledAllowNonHostAddParticipantsOption = isAllowAddParticipantsEnabled,
                         )
                     }
 
-                    if (state.value.enabledWaitingRoomOption && isAllowAddParticipantsEnabled) {
+                    if (uiState.value.enabledWaitingRoomOption && isAllowAddParticipantsEnabled) {
                         setWaitingRoomReminderEnabled()
                     }
                 }
@@ -931,19 +951,19 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      */
     fun setWaitingRoom() =
         viewModelScope.launch {
-            val newValueForWaitingRoomOption = !state.value.enabledWaitingRoomOption
+            val newValueForWaitingRoomOption = !uiState.value.enabledWaitingRoomOption
             runCatching {
-                setWaitingRoomUseCase(state.value.chatId, newValueForWaitingRoomOption)
+                setWaitingRoomUseCase(uiState.value.chatId, newValueForWaitingRoomOption)
             }.onFailure { exception ->
                 Timber.e(exception)
             }.onSuccess {
-                _state.update { state ->
+                _uiState.update { state ->
                     state.copy(
                         enabledWaitingRoomOption = newValueForWaitingRoomOption
                     )
                 }
 
-                if (newValueForWaitingRoomOption && state.value.enabledAllowNonHostAddParticipantsOption) {
+                if (newValueForWaitingRoomOption && uiState.value.enabledAllowNonHostAddParticipantsOption) {
                     setWaitingRoomReminderEnabled()
                 }
             }
@@ -962,7 +982,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Enable encrypted key rotation if there is internet connection, shows an error if not.
      */
     fun enableEncryptedKeyRotation() {
-        if (_state.value.participantItemList.size > MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE) {
+        if (_uiState.value.participantItemList.size > MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE) {
             triggerSnackbarMessage(
                 getStringFromStringResMapper(
                     R.string.warning_make_chat_private
@@ -971,7 +991,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         } else {
             viewModelScope.launch {
                 runCatching {
-                    getPublicChatToPrivate(state.value.chatId)
+                    getPublicChatToPrivate(uiState.value.chatId)
                 }.onFailure { exception ->
                     Timber.e(exception)
                     triggerSnackbarMessage(
@@ -980,7 +1000,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         )
                     )
                 }.onSuccess { _ ->
-                    _state.update { it.copy(isPublic = false) }
+                    _uiState.update { it.copy(isPublic = false) }
                 }
             }
         }
@@ -992,7 +1012,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * @param selectedParticipantPermission [ChatRoomPermission]
      */
     fun showChangePermissionsDialog(selectedParticipantPermission: ChatRoomPermission?) {
-        _state.update { it.copy(showChangePermissionsDialog = selectedParticipantPermission) }
+        _uiState.update { it.copy(showChangePermissionsDialog = selectedParticipantPermission) }
     }
 
     /**
@@ -1001,7 +1021,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * @param chatId Chat id.
      */
     fun openChatRoom(chatId: Long?) =
-        _state.update { it.copy(openChatRoom = chatId) }
+        _uiState.update { it.copy(openChatRoom = chatId) }
 
     /**
      * Open chat call
@@ -1009,7 +1029,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * @param chatCallId Chat id.
      */
     fun openChatCall(chatCallId: Long?) {
-        _state.update { it.copy(openChatCall = chatCallId) }
+        _uiState.update { it.copy(openChatCall = chatCallId) }
     }
 
     /**
@@ -1018,10 +1038,10 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * @param permission [ChatRoomPermission]
      */
     fun updateParticipantPermissions(permission: ChatRoomPermission) =
-        _state.value.selected?.let { participant ->
+        _uiState.value.selected?.let { participant ->
             viewModelScope.launch {
                 runCatching {
-                    updateChatPermissions(state.value.chatId, participant.handle, permission)
+                    updateChatPermissions(uiState.value.chatId, participant.handle, permission)
                 }.onFailure { exception ->
                     Timber.e(exception)
                     triggerSnackbarMessage(
@@ -1037,10 +1057,10 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Remove selected participant from chat
      */
     fun removeSelectedParticipant() =
-        _state.value.selected?.let { participant ->
+        _uiState.value.selected?.let { participant ->
             viewModelScope.launch {
                 runCatching {
-                    removeFromChat(state.value.chatId, participant.handle)
+                    removeFromChat(uiState.value.chatId, participant.handle)
                 }.onFailure { exception ->
                     Timber.e(exception)
                     triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_error))
@@ -1066,7 +1086,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Open send to screen
      */
     fun openSendToChat(shouldOpen: Boolean) {
-        _state.update { it.copy(openSendToChat = shouldOpen) }
+        _uiState.update { it.copy(openSendToChat = shouldOpen) }
     }
 
     /**
@@ -1084,13 +1104,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * @param message     Content for snack bar
      */
     fun triggerSnackbarMessage(message: String) =
-        _state.update { it.copy(snackbarMsg = triggered(message)) }
+        _uiState.update { it.copy(snackbarMsg = triggered(message)) }
 
     /**
      * Reset and notify that snackbarMessage is consumed
      */
     fun onSnackbarMessageConsumed() =
-        _state.update {
+        _uiState.update {
             it.copy(snackbarMsg = consumed())
         }
 
@@ -1102,7 +1122,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             getMyFullNameUseCase()
         }.onSuccess {
             it?.apply {
-                _state.update { state ->
+                _uiState.update { state ->
                     state.copy(
                         myFullName = this,
                     )
@@ -1132,14 +1152,14 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     }
 
     private fun showForceUpdateDialog() {
-        _state.update { it.copy(showForceUpdateDialog = true) }
+        _uiState.update { it.copy(showForceUpdateDialog = true) }
     }
 
     /**
      * Set to false to hide the dialog
      */
     fun onForceUpdateDialogDismissed() {
-        _state.update { it.copy(showForceUpdateDialog = false) }
+        _uiState.update { it.copy(showForceUpdateDialog = false) }
     }
 
     companion object {

@@ -2,16 +2,20 @@ package test.mega.privacy.android.app.presentation.meeting
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.getRetentionTimeString
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
-import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
-import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
+import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoUiState
+import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
+import mega.privacy.android.app.presentation.meeting.view.SCHEDULE_MEETING_INFO_PARTICIPANTS_WARNING_TAG
 import mega.privacy.android.app.presentation.meeting.view.ScheduledMeetingInfoView
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import org.junit.Rule
@@ -29,12 +33,12 @@ class ScheduledMeetingInfoViewTest {
     @Test
     fun `test that meeting link button is shown`() {
         initComposeRuleContent(
-            ScheduledMeetingInfoState(
+            ScheduledMeetingInfoUiState(
                 isHost = true,
                 isPublic = true,
                 scheduledMeeting = getChatScheduledMeeting()
             ),
-            ScheduledMeetingManagementState()
+            ScheduledMeetingManagementUiState()
         )
         composeRule.onNodeWithText(R.string.meeting_link).assertExists()
     }
@@ -43,12 +47,12 @@ class ScheduledMeetingInfoViewTest {
     fun `test that verify meeting link button performs action`() {
         val onButtonClicked = mock<(ScheduledMeetingInfoAction) -> Unit>()
         initComposeRuleContent(
-            ScheduledMeetingInfoState(
+            ScheduledMeetingInfoUiState(
                 isHost = true,
                 isPublic = true,
                 scheduledMeeting = getChatScheduledMeeting()
             ),
-            ScheduledMeetingManagementState(),
+            ScheduledMeetingManagementUiState(),
             onButtonClicked = onButtonClicked
         )
 
@@ -60,12 +64,12 @@ class ScheduledMeetingInfoViewTest {
     @Test
     fun `test that share meeting link button is shown`() {
         initComposeRuleContent(
-            ScheduledMeetingInfoState(
+            ScheduledMeetingInfoUiState(
                 isHost = true,
                 isPublic = true,
                 scheduledMeeting = getChatScheduledMeeting()
             ),
-            ScheduledMeetingManagementState(enabledMeetingLinkOption = true),
+            ScheduledMeetingManagementUiState(enabledMeetingLinkOption = true),
         )
         composeRule.onNodeWithText(R.string.meetings_scheduled_meeting_info_share_meeting_link_label)
             .assertExists()
@@ -75,12 +79,12 @@ class ScheduledMeetingInfoViewTest {
     fun `test that verify share meeting link button performs action`() {
         val onButtonClicked = mock<(ScheduledMeetingInfoAction) -> Unit>()
         initComposeRuleContent(
-            ScheduledMeetingInfoState(
+            ScheduledMeetingInfoUiState(
                 isHost = true,
                 isPublic = true,
                 scheduledMeeting = getChatScheduledMeeting()
             ),
-            ScheduledMeetingManagementState(enabledMeetingLinkOption = true),
+            ScheduledMeetingManagementUiState(enabledMeetingLinkOption = true),
             onButtonClicked = onButtonClicked
         )
 
@@ -93,10 +97,10 @@ class ScheduledMeetingInfoViewTest {
     @Test
     fun `test that chat notifications button is shown`() {
         initComposeRuleContent(
-            ScheduledMeetingInfoState(
+            ScheduledMeetingInfoUiState(
                 scheduledMeeting = getChatScheduledMeeting()
             ),
-            ScheduledMeetingManagementState()
+            ScheduledMeetingManagementUiState()
         )
         composeRule.onNodeWithText(R.string.meetings_info_notifications_option)
             .assertExists()
@@ -106,12 +110,12 @@ class ScheduledMeetingInfoViewTest {
     fun `test that verify chat notifications button performs action`() {
         val onButtonClicked = mock<(ScheduledMeetingInfoAction) -> Unit>()
         initComposeRuleContent(
-            ScheduledMeetingInfoState(
+            ScheduledMeetingInfoUiState(
                 isHost = false,
                 isOpenInvite = true,
                 scheduledMeeting = getChatScheduledMeeting()
             ),
-            ScheduledMeetingManagementState(),
+            ScheduledMeetingManagementUiState(),
             onButtonClicked = onButtonClicked
         )
 
@@ -124,11 +128,11 @@ class ScheduledMeetingInfoViewTest {
     @Test
     fun `test that allow non-hosts to add participants button is shown`() {
         initComposeRuleContent(
-            ScheduledMeetingInfoState(
+            ScheduledMeetingInfoUiState(
                 isHost = true,
                 scheduledMeeting = getChatScheduledMeeting()
             ),
-            ScheduledMeetingManagementState()
+            ScheduledMeetingManagementUiState()
         )
         composeRule.onNodeWithText(R.string.chat_group_chat_info_allow_non_host_participants_option)
             .assertExists()
@@ -138,11 +142,11 @@ class ScheduledMeetingInfoViewTest {
     fun `test that verify allow non-hosts to add participants button performs action`() {
         val onButtonClicked = mock<(ScheduledMeetingInfoAction) -> Unit>()
         initComposeRuleContent(
-            ScheduledMeetingInfoState(
+            ScheduledMeetingInfoUiState(
                 isHost = true,
                 scheduledMeeting = getChatScheduledMeeting()
             ),
-            ScheduledMeetingManagementState(),
+            ScheduledMeetingManagementUiState(),
             onButtonClicked = onButtonClicked
         )
 
@@ -155,10 +159,10 @@ class ScheduledMeetingInfoViewTest {
     @Test
     fun `test that shared files button is shown`() {
         initComposeRuleContent(
-            ScheduledMeetingInfoState(
+            ScheduledMeetingInfoUiState(
                 scheduledMeeting = getChatScheduledMeeting()
             ),
-            ScheduledMeetingManagementState()
+            ScheduledMeetingManagementUiState()
         )
         composeRule.onNodeWithText(R.string.title_chat_shared_files_info)
             .assertExists()
@@ -168,10 +172,10 @@ class ScheduledMeetingInfoViewTest {
     fun `test that verify shared files button performs action`() {
         val onButtonClicked = mock<(ScheduledMeetingInfoAction) -> Unit>()
         initComposeRuleContent(
-            ScheduledMeetingInfoState(
+            ScheduledMeetingInfoUiState(
                 scheduledMeeting = getChatScheduledMeeting()
             ),
-            ScheduledMeetingManagementState(),
+            ScheduledMeetingManagementUiState(),
             onButtonClicked = onButtonClicked
         )
 
@@ -184,12 +188,12 @@ class ScheduledMeetingInfoViewTest {
     @Test
     fun `test that share meeting link non hosts button is shown`() {
         initComposeRuleContent(
-            ScheduledMeetingInfoState(
+            ScheduledMeetingInfoUiState(
                 isHost = false,
                 isPublic = true,
                 scheduledMeeting = getChatScheduledMeeting()
             ),
-            ScheduledMeetingManagementState(
+            ScheduledMeetingManagementUiState(
                 enabledMeetingLinkOption = true,
             )
         )
@@ -201,12 +205,12 @@ class ScheduledMeetingInfoViewTest {
     fun `test that verify share meeting link non hosts button performs action`() {
         val onButtonClicked = mock<(ScheduledMeetingInfoAction) -> Unit>()
         initComposeRuleContent(
-            ScheduledMeetingInfoState(
+            ScheduledMeetingInfoUiState(
                 isHost = false,
                 isPublic = true,
                 scheduledMeeting = getChatScheduledMeeting()
             ),
-            ScheduledMeetingManagementState(
+            ScheduledMeetingManagementUiState(
                 enabledMeetingLinkOption = true,
             ),
             onButtonClicked = onButtonClicked
@@ -221,12 +225,12 @@ class ScheduledMeetingInfoViewTest {
     @Test
     fun `test that enabled encrypted key rotation label is shown`() {
         initComposeRuleContent(
-            ScheduledMeetingInfoState(
+            ScheduledMeetingInfoUiState(
                 isHost = true,
                 isPublic = false,
                 scheduledMeeting = getChatScheduledMeeting()
             ),
-            ScheduledMeetingManagementState(),
+            ScheduledMeetingManagementUiState(),
         )
         composeRule.onNodeWithText(R.string.meetings_info_notifications_option)
             .assertExists()
@@ -235,12 +239,12 @@ class ScheduledMeetingInfoViewTest {
     @Test
     fun `test that add participants option is shown when is open invite`() {
         initComposeRuleContent(
-            ScheduledMeetingInfoState(
+            ScheduledMeetingInfoUiState(
                 isHost = false,
                 isOpenInvite = true,
                 scheduledMeeting = getChatScheduledMeeting()
             ),
-            ScheduledMeetingManagementState(
+            ScheduledMeetingManagementUiState(
                 enabledMeetingLinkOption = true,
                 waitingRoomReminder = WaitingRoomReminders.Enabled
             ),
@@ -337,6 +341,41 @@ class ScheduledMeetingInfoViewTest {
         }
     }
 
+    @Test
+    fun `test that participants warning is shown when user limit is reached`() {
+        initComposeRuleContent(
+            ScheduledMeetingInfoUiState(
+                myPermission = ChatRoomPermission.Moderator,
+                callUsersLimit = 2,
+                numOfParticipants = 2,
+                scheduledMeeting = getChatScheduledMeeting()
+            ),
+            ScheduledMeetingManagementUiState().copy(
+                isCallUnlimitedProPlanFeatureFlagEnabled = true,
+                subscriptionPlan = AccountType.FREE,
+            )
+        )
+        composeRule.onNodeWithTag(SCHEDULE_MEETING_INFO_PARTICIPANTS_WARNING_TAG).assertExists()
+    }
+
+    @Test
+    fun `test that participants warning is not shown when user limit is not reached`() {
+        initComposeRuleContent(
+            ScheduledMeetingInfoUiState(
+                myPermission = ChatRoomPermission.Moderator,
+                callUsersLimit = 10,
+                numOfParticipants = 2,
+                scheduledMeeting = getChatScheduledMeeting()
+            ),
+            ScheduledMeetingManagementUiState().copy(
+                isCallUnlimitedProPlanFeatureFlagEnabled = true,
+                subscriptionPlan = AccountType.FREE,
+            )
+        )
+        composeRule.onNodeWithTag(SCHEDULE_MEETING_INFO_PARTICIPANTS_WARNING_TAG)
+            .assertDoesNotExist()
+    }
+
     private fun getRetentionTime(seconds: Long) =
         getRetentionTimeString(composeRule.activity, timeInSeconds = seconds) ?: ""
 
@@ -360,8 +399,8 @@ class ScheduledMeetingInfoViewTest {
         )
 
     private fun initComposeRuleContent(
-        state: ScheduledMeetingInfoState,
-        managementState: ScheduledMeetingManagementState,
+        state: ScheduledMeetingInfoUiState,
+        managementState: ScheduledMeetingManagementUiState,
     ) {
         composeRule.setContent {
             ScheduledMeetingInfoView(
@@ -393,8 +432,8 @@ class ScheduledMeetingInfoViewTest {
     }
 
     private fun initComposeRuleContent(
-        state: ScheduledMeetingInfoState,
-        managementState: ScheduledMeetingManagementState,
+        state: ScheduledMeetingInfoUiState,
+        managementState: ScheduledMeetingManagementUiState,
         onButtonClicked: (ScheduledMeetingInfoAction) -> Unit = {},
     ) {
         composeRule.setContent {

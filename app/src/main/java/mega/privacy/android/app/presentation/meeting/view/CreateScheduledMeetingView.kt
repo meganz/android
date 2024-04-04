@@ -64,7 +64,7 @@ import mega.privacy.android.app.presentation.extensions.meeting.getUntilZonedDat
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetingState
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
-import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
+import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
@@ -107,7 +107,7 @@ private val dateFormatter by lazy {
 @Composable
 internal fun CreateScheduledMeetingView(
     state: CreateScheduledMeetingState,
-    managementState: ScheduledMeetingManagementState,
+    managementState: ScheduledMeetingManagementUiState,
     onDiscardClicked: () -> Unit,
     onAcceptClicked: () -> Unit,
     onStartTimeClicked: () -> Unit,
@@ -845,7 +845,7 @@ private fun PreviewCreateScheduledMeetingView() {
                 buttons = ScheduleMeetingAction.entries,
                 snackbarMessageContent = consumed()
             ),
-            managementState = ScheduledMeetingManagementState(),
+            managementState = ScheduledMeetingManagementUiState(),
             onButtonClicked = {},
             onDiscardClicked = {},
             onAcceptClicked = {},
@@ -886,7 +886,7 @@ private fun CreateScheduledMeetingViewWithFreePlanLimitWarningPreview() {
                 buttons = ScheduleMeetingAction.entries,
                 snackbarMessageContent = consumed(),
             ),
-            managementState = ScheduledMeetingManagementState(
+            managementState = ScheduledMeetingManagementUiState(
                 isCallUnlimitedProPlanFeatureFlagEnabled = true,
                 subscriptionPlan = AccountType.FREE
             ),

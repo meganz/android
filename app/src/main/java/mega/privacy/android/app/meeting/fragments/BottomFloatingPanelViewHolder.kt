@@ -17,9 +17,7 @@ import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -449,13 +447,10 @@ class BottomFloatingPanelViewHolder(
             setContent {
                 val meetingState by meetingViewModel.state.collectAsStateWithLifecycle()
                 val inMeetingState by inMeetingViewModel.state.collectAsStateWithLifecycle()
-                val shouldShowParticipantsLimitWarning by remember {
-                    derivedStateOf {
-                        meetingState.isCallUnlimitedProPlanFeatureFlagEnabled &&
-                                meetingState.hasFreePlan() && meetingState.chatParticipantsInCall.size >= (inMeetingState.call?.callUsersLimit
-                            ?: FREE_PLAN_PARTICIPANTS_LIMIT)
-                    }
-                }
+                val shouldShowParticipantsLimitWarning =
+                    meetingState.isCallUnlimitedProPlanFeatureFlagEnabled &&
+                            meetingState.hasFreePlan() && meetingState.chatParticipantsInCall.size >= (inMeetingState.call?.callUsersLimit
+                        ?: FREE_PLAN_PARTICIPANTS_LIMIT)
                 MegaAppTheme(isDark = isSystemInDarkTheme()) {
                     ParticipantsBottomPanelView(
                         state = meetingState,

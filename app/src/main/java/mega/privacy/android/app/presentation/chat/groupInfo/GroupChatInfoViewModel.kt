@@ -305,4 +305,11 @@ class GroupChatInfoViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Set the number of participants in the chat
+     */
+    fun setParticipantsCount(participantsCount: Long) {
+        _state.update { it.copy(participantsCount = participantsCount) }
+    }
 }

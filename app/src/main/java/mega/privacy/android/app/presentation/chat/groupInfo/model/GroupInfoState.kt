@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.chat.ChatCall
  * @property resultSetOpenInvite    True if it's enabled, false if not.
  * @property isPushNotificationSettingsUpdatedEvent     Push notification settings updated event
  * @property showForceUpdateDialog  True, shows force update dialog to the user
+ * @property participantsCount      Number of participants in the chat
  */
 data class GroupInfoState(
     val chatId: Long = -1L,
@@ -19,4 +20,5 @@ data class GroupInfoState(
     val resultSetOpenInvite: Boolean? = null,
     val isPushNotificationSettingsUpdatedEvent: Boolean = false,
     val showForceUpdateDialog: Boolean = false,
+    val participantsCount: Long = 0,
 )
