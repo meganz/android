@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.rubbishbin.model
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaNode
@@ -14,7 +15,6 @@ import nz.mega.sdk.MegaNode
  *  @property selectedFileNodes number of selected file [NodeUIItem] on Compose
  *  @property selectedFolderNodes number of selected folder [NodeUIItem] on Compose
  *  @property isInSelection to identify if [NodeUIItem] list is in navigation state
- *  @property currFileNode [FileNode]
  *  @property itemIndex index of item clicked
  *  @property currentViewType ViewType The current ViewType used by the UI
  *  @property sortOrder [SortOrder] of current list
@@ -31,8 +31,6 @@ data class RubbishBinState(
     val selectedFileNodes: Int = 0,
     val selectedFolderNodes: Int = 0,
     val isInSelection: Boolean = false,
-    val currFileNode: FileNode? = null,
-    val itemIndex: Int = -1,
     val currentViewType: ViewType = ViewType.LIST,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
     val selectedNodeHandles: List<Long> = emptyList(),

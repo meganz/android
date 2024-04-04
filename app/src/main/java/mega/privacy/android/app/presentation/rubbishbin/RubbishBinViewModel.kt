@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.rubbishbin
 
-import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,17 +13,16 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -48,7 +46,6 @@ import javax.inject.Inject
  * @param isNodeDeletedFromBackupsUseCase Checks whether the deleted Node came from Backups or not
  * @param setViewType [SetViewType] to set view type
  * @param monitorViewType [MonitorViewType] check view type
- * @param getIntentToOpenFileMapper [GetIntentToOpenFileMapper]
  * @param getRubbishBinFolderUseCase [GetRubbishBinFolderUseCase]
  * @param fileDurationMapper [FileDurationMapper]
  */
@@ -61,7 +58,6 @@ class RubbishBinViewModel @Inject constructor(
     private val setViewType: SetViewType,
     private val monitorViewType: MonitorViewType,
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val getIntentToOpenFileMapper: GetIntentToOpenFileMapper,
     private val getRubbishBinFolderUseCase: GetRubbishBinFolderUseCase,
     private val getNodeByHandle: GetNodeByHandle,
     private val fileDurationMapper: FileDurationMapper,
@@ -152,6 +148,7 @@ class RubbishBinViewModel @Inject constructor(
     fun onSortOrderChanged() {
         setPendingRefreshNodes()
     }
+
     /**
      * This will map list of [Node] to [NodeUIItem]
      */
@@ -185,21 +182,8 @@ class RubbishBinViewModel @Inject constructor(
      * Performs action when folder is clicked from adapter
      * @param handle node handle
      */
-    private fun onFolderItemClicked(handle: Long) {
+    fun onFolderItemClicked(handle: Long) {
         setRubbishBinHandle(handle)
-        onItemPerformedClicked()
-    }
-
-    /**
-     * When item is clicked on activity
-     */
-    fun onItemPerformedClicked() {
-        _state.update {
-            it.copy(
-                currFileNode = null,
-                itemIndex = -1
-            )
-        }
     }
 
     /**
@@ -233,19 +217,6 @@ class RubbishBinViewModel @Inject constructor(
             _state.value.nodeList.indexOfFirst { it.node.id.longValue == nodeUIItem.id.longValue }
         if (_state.value.isInSelection) {
             updateNodeInSelectionState(nodeUIItem = nodeUIItem, index = index)
-        } else {
-            if (nodeUIItem.node is FileNode) {
-                viewModelScope.launch {
-                    _state.update {
-                        it.copy(
-                            itemIndex = index,
-                            currFileNode = nodeUIItem.node
-                        )
-                    }
-                }
-            } else {
-                onFolderItemClicked(nodeUIItem.id.longValue)
-            }
         }
     }
 
@@ -421,16 +392,4 @@ class RubbishBinViewModel @Inject constructor(
     fun markHandledPendingRefresh() {
         _state.update { it.copy(isPendingRefresh = false) }
     }
-
-    /**
-     * Get intent to open [FileNode]
-     * @param activity [Activity]
-     * @param fileNode [FileNode]
-     */
-    suspend fun getIntent(activity: Activity, fileNode: FileNode) =
-        getIntentToOpenFileMapper(
-            activity = activity,
-            fileNode = fileNode,
-            Constants.RUBBISH_BIN_ADAPTER
-        )
 }

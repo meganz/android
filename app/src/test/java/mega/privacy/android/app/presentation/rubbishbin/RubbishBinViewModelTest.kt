@@ -11,7 +11,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -58,7 +57,6 @@ class RubbishBinViewModelTest {
     private val setViewType = mock<SetViewType>()
     private val monitorViewType = mock<MonitorViewType>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
-    private val getIntentToOpenFileMapper = mock<GetIntentToOpenFileMapper>()
     private val getRubbishBinFolderUseCase = mock<GetRubbishBinFolderUseCase>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getRubbishBinNodeChildrenUseCase = mock<GetRubbishBinNodeChildrenUseCase>()
@@ -82,7 +80,6 @@ class RubbishBinViewModelTest {
             setViewType = setViewType,
             monitorViewType = monitorViewType,
             getCloudSortOrder = getCloudSortOrder,
-            getIntentToOpenFileMapper = getIntentToOpenFileMapper,
             getRubbishBinFolderUseCase = getRubbishBinFolderUseCase,
             getNodeByHandle = getNodeByHandle,
             fileDurationMapper = fileDurationMapper,
@@ -100,8 +97,6 @@ class RubbishBinViewModelTest {
             Truth.assertThat(initial.selectedFileNodes).isEqualTo(0)
             Truth.assertThat(initial.selectedFolderNodes).isEqualTo(0)
             Truth.assertThat(initial.isInSelection).isFalse()
-            Truth.assertThat(initial.currFileNode).isNull()
-            Truth.assertThat(initial.itemIndex).isEqualTo(-1)
             Truth.assertThat(initial.currentViewType).isEqualTo(ViewType.LIST)
             Truth.assertThat(initial.sortOrder).isEqualTo(SortOrder.ORDER_NONE)
             Truth.assertThat(initial.selectedNodeHandles).isEmpty()
@@ -311,28 +306,11 @@ class RubbishBinViewModelTest {
         }
 
     @Test
-    fun `test that when any file item is clicked and no other item is selected then it updates FileNode in state`() =
-        runTest {
-            val nodesListItem1 = mock<TypedFolderNode>()
-            val nodesListItem2 = mock<TypedFileNode>()
-            whenever(nodesListItem1.id.longValue).thenReturn(1L)
-            whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getRubbishBinNodeChildrenUseCase(underTest.state.value.rubbishBinHandle)).thenReturn(
-                listOf(nodesListItem1, nodesListItem2)
-            )
-            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
-
-            underTest.refreshNodes()
-            underTest.onItemClicked(
-                NodeUIItem(
-                    node = nodesListItem2,
-                    isSelected = false,
-                    isInvisible = false
-                )
-            )
-            Truth.assertThat(underTest.state.value.currFileNode).isNotNull()
-            Truth.assertThat(underTest.state.value.itemIndex).isNotEqualTo(-1)
-        }
+    fun `test that when folder is selected it calls update handle`() = runTest {
+        val handle = 123456L
+        underTest.onFolderItemClicked(handle)
+        verify(getRubbishBinNodeChildrenUseCase).invoke(handle)
+    }
 
     @Test
     fun `test that restoring nodes will execute the move functionality when backup nodes are selected`() =
@@ -452,7 +430,6 @@ class RubbishBinViewModelTest {
             setViewType,
             monitorViewType,
             getCloudSortOrder,
-            getIntentToOpenFileMapper,
             getRubbishBinFolderUseCase,
             getNodeByHandle,
             getRubbishBinNodeChildrenUseCase,

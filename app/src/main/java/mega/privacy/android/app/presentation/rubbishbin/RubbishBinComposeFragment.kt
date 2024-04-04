@@ -9,22 +9,26 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -37,13 +41,17 @@ import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetD
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
+import mega.privacy.android.app.presentation.node.NodeActionsViewModel
+import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.rubbishbin.view.RubbishBinComposeView
+import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.MegaApiUtils
+import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaChatApiJava
@@ -71,6 +79,7 @@ class RubbishBinComposeFragment : Fragment() {
     lateinit var getThemeMode: GetThemeMode
 
     private val viewModel: RubbishBinViewModel by activityViewModels()
+    private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val managerViewModel: ManagerViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
     private var actionMode: ActionMode? = null
@@ -89,30 +98,61 @@ class RubbishBinComposeFragment : Fragment() {
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by viewModel.state.collectAsStateWithLifecycle()
+                val nodeActionState by nodeActionsViewModel.state.collectAsStateWithLifecycle()
+                val snackbarHostState = remember {
+                    SnackbarHostState()
+                }
+                val scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState)
+
+                var clickedFile: TypedFileNode? by remember {
+                    mutableStateOf(null)
+                }
+
                 MegaAppTheme(isDark = themeMode.isDarkMode()) {
-                    RubbishBinComposeView(
-                        uiState = uiState,
-                        onMenuClick = ::showOptionsMenuForItem,
-                        onItemClicked = viewModel::onItemClicked,
-                        onLongClick = {
-                            viewModel.onLongItemClicked(it)
-                            if (actionMode == null) {
-                                actionMode =
-                                    (requireActivity() as AppCompatActivity).startSupportActionMode(
-                                        ActionBarCallback()
-                                    )
-                            }
-                        },
-                        onSortOrderClick = { showSortByPanel() },
-                        onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
-                        sortOrder = getString(
-                            SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
-                                ?: R.string.sortby_name
-                        ),
-                        emptyState = getEmptyFolderDrawable(uiState.isRubbishBinEmpty),
-                        onLinkClicked = ::navigateToLink,
-                        onDisputeTakeDownClicked = ::navigateToLink
-                    )
+                    MegaScaffold(
+                        scaffoldState = scaffoldState,
+                    ) {
+                        RubbishBinComposeView(
+                            uiState = uiState,
+                            onMenuClick = ::showOptionsMenuForItem,
+                            onItemClicked = {
+                                if (uiState.selectedNodeHandles.isEmpty()) {
+                                    when (it.node) {
+                                        is TypedFileNode -> {
+                                            clickedFile = it.node
+                                        }
+
+                                        is TypedFolderNode -> {
+                                            viewModel.onFolderItemClicked(it.id.longValue)
+                                        }
+
+                                        else -> Timber.e("Unsupported click")
+                                    }
+                                    (requireActivity() as ManagerActivity).setToolbarTitle()
+                                } else {
+                                    viewModel.onItemClicked(it)
+                                }
+                            },
+                            onLongClick = {
+                                viewModel.onLongItemClicked(it)
+                                if (actionMode == null) {
+                                    actionMode =
+                                        (requireActivity() as AppCompatActivity).startSupportActionMode(
+                                            ActionBarCallback()
+                                        )
+                                }
+                            },
+                            onSortOrderClick = { showSortByPanel() },
+                            onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
+                            sortOrder = getString(
+                                SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
+                                    ?: R.string.sortby_name
+                            ),
+                            emptyState = getEmptyFolderDrawable(uiState.isRubbishBinEmpty),
+                            onLinkClicked = ::navigateToLink,
+                            onDisputeTakeDownClicked = ::navigateToLink
+                        )
+                    }
                 }
                 updateActionModeTitle(
                     fileCount = uiState.selectedFileNodes,
@@ -123,7 +163,25 @@ class RubbishBinComposeFragment : Fragment() {
                     selectedNodes = uiState.selectedMegaNodes,
                     selectedNodeHandles = uiState.selectedNodeHandles,
                 )
-                itemClickedEvenReceived(uiState.currFileNode)
+
+                clickedFile?.let {
+                    HandleNodeAction(
+                        typedFileNode = it,
+                        nodeSourceType = Constants.RUBBISH_BIN_ADAPTER,
+                        sortOrder = uiState.sortOrder,
+                        snackBarHostState = snackbarHostState,
+                        onActionHandled = {
+                            clickedFile = null
+                        },
+                        nodeActionsViewModel = nodeActionsViewModel
+                    )
+                }
+
+                StartDownloadComponent(
+                    event = nodeActionState.downloadEvent,
+                    onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
+                    snackBarHostState = snackbarHostState,
+                )
             }
         }
     }
@@ -184,52 +242,6 @@ class RubbishBinComposeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupObserver()
-    }
-
-    /**
-     * On Item click event received from [RubbishBinViewModel]
-     *
-     * @param fileNode [FileNode]
-     */
-    private fun itemClickedEvenReceived(fileNode: FileNode?) {
-        fileNode?.let {
-            openFile(fileNode = it)
-            viewModel.onItemPerformedClicked()
-        } ?: run {
-            (requireActivity() as ManagerActivity).setToolbarTitle()
-        }
-    }
-
-    /**
-     * Open File
-     * @param fileNode [FileNode]
-     */
-    private fun openFile(fileNode: FileNode) {
-        lifecycleScope.launch {
-            runCatching {
-                viewModel.getIntent(
-                    activity = requireActivity(),
-                    fileNode = fileNode
-                )?.let {
-                    if (MegaApiUtils.isIntentAvailable(context, it)) {
-                        startActivity(it)
-                    } else {
-                        Toast.makeText(
-                            context,
-                            getString(R.string.intent_not_available),
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
-            }.onFailure {
-                Timber.e("itemClick:ERROR:httpServerGetLocalLink")
-                (requireActivity() as? ManagerActivity)?.showSnackbar(
-                    type = Constants.SNACKBAR_TYPE,
-                    content = getString(R.string.general_text_error),
-                    chatId = -1,
-                )
-            }
-        }
     }
 
     private inner class ActionBarCallback : ActionMode.Callback {
