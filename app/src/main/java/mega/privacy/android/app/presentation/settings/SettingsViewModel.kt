@@ -39,13 +39,16 @@ import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
+import mega.privacy.android.domain.usecase.setting.SetShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.SetSubFolderMediaDiscoveryEnabledUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -78,6 +81,9 @@ class SettingsViewModel @Inject constructor(
     private val setSubFolderMediaDiscoveryEnabledUseCase: SetSubFolderMediaDiscoveryEnabledUseCase,
     private val monitorSubFolderMediaDiscoverySettingsUseCase: MonitorSubFolderMediaDiscoverySettingsUseCase,
     private val getSessionTransferURLUseCase: GetSessionTransferURLUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val setShowHiddenItemsUseCase: SetShowHiddenItemsUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
 ) : ViewModel() {
     private val state = MutableStateFlow(initialiseState())
     val uiState: StateFlow<SettingsState> = state
@@ -109,6 +115,9 @@ class SettingsViewModel @Inject constructor(
             passcodeLock = false,
             subFolderMediaDiscoveryChecked = true,
             cookiePolicyLink = null,
+            isHiddenNodesEnabled = null,
+            showHiddenItems = false,
+            accountDetail = null,
         )
     }
 
@@ -183,6 +192,18 @@ class SettingsViewModel @Inject constructor(
                             )
                         }
                     },
+                flow { emit(getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) }
+                    .map { enabled ->
+                        { state: SettingsState -> state.copy(isHiddenNodesEnabled = enabled) }
+                    },
+                monitorShowHiddenItemsUseCase()
+                    .map { isEnabled ->
+                        { state: SettingsState -> state.copy(showHiddenItems = isEnabled) }
+                    },
+                monitorAccountDetailUseCase()
+                    .map { accountDetail ->
+                        { state: SettingsState -> state.copy(accountDetail = accountDetail) }
+                    }
             ).catch {
                 Timber.e(it)
             }.collect {
@@ -336,6 +357,15 @@ class SettingsViewModel @Inject constructor(
      */
     fun setSubFolderMediaDiscoveryEnabled(enabled: Boolean) = viewModelScope.launch {
         setSubFolderMediaDiscoveryEnabledUseCase(enabled)
+    }
+
+    /**
+     * Set show hidden items enabled state
+     *
+     * @param enabled true if hidden items should be shown
+     */
+    fun setShowHiddenItemsEnabled(enabled: Boolean) = viewModelScope.launch {
+        setShowHiddenItemsUseCase(enabled)
     }
 
     suspend fun fetchPasscodeEnabled() = refreshPasscodeLockPreference()

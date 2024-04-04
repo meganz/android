@@ -5359,6 +5359,10 @@
         <item quantity="one">%1$d item hidden</item>
         <item quantity="other">%1$d items hidden</item>
     </plurals>
+    <!-- Hidden nodes show items -->
+    <string name="hidden_nodes_show_items">Show hidden items</string>
+    <!-- Hidden nodes show items description -->
+    <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status.</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_priority_support">&#8226;&#160;Priority support</string>
     <!-- The title of the Upgrade bottom sheet dialog  -->

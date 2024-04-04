@@ -3,16 +3,27 @@ package mega.privacy.android.data.repository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.extensions.decodeBase64
+import mega.privacy.android.data.extensions.encodeBase64
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.failWithException
 import mega.privacy.android.data.extensions.getRequestListener
+import mega.privacy.android.data.extensions.getValueFor
 import mega.privacy.android.data.extensions.hasParam
 import mega.privacy.android.data.extensions.isTypeWithParam
 import mega.privacy.android.data.gateway.FileGateway
@@ -32,15 +43,22 @@ import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
+import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_KEY_ANDROID
+import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_KEY_CONTENT_CONSUMPTION
+import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_SENSITIVES
+import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_VAL_SHOW_HIDDEN_NODES
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
 import mega.privacy.android.domain.exception.SettingNotFoundException
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SettingsRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequest.TYPE_GET_ATTR_USER
+import nz.mega.sdk.MegaStringMap
+import org.json.JSONObject
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -63,6 +81,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property uiPreferencesGateway [UIPreferencesGateway]
  * @property startScreenMapper [StartScreenMapper]
  * @property fileManagementPreferencesGateway [FileManagementPreferencesGateway]
+ * @property appScope [CoroutineScope]
  */
 @ExperimentalContracts
 internal class DefaultSettingsRepository @Inject constructor(
@@ -78,7 +97,18 @@ internal class DefaultSettingsRepository @Inject constructor(
     private val uiPreferencesGateway: UIPreferencesGateway,
     private val startScreenMapper: StartScreenMapper,
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway,
+    @ApplicationScope private val appScope: CoroutineScope,
 ) : SettingsRepository {
+    private val showHiddenNodesInitialFlow: Flow<Boolean?> = flow<Boolean?> {
+        setShowHiddenItems(enabled = getShowHiddenNodesPreference())
+    }.stateIn(
+        scope = appScope,
+        started = SharingStarted.Lazily,
+        initialValue = null,
+    )
+
+    private val showHiddenNodesFlow: MutableStateFlow<Boolean?> = MutableStateFlow(null)
+
     init {
         runBlocking {
             initialisePreferences()
@@ -193,6 +223,16 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     override suspend fun setSubfolderMediaDiscoveryEnabled(enabled: Boolean) =
         uiPreferencesGateway.setSubfolderMediaDiscoveryEnabled(enabled)
+
+    override fun monitorShowHiddenItems(): Flow<Boolean> = merge(
+        showHiddenNodesFlow,
+        showHiddenNodesInitialFlow,
+    ).filterNotNull()
+
+    override suspend fun setShowHiddenItems(enabled: Boolean) {
+        showHiddenNodesFlow.update { enabled }
+        setShowHiddenNodesPreference(enabled)
+    }
 
     override suspend fun setOfflineWarningMessageVisibility(isVisible: Boolean) =
         uiPreferencesGateway.setOfflineWarningMessageVisibility(isVisible)
@@ -468,5 +508,85 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     override suspend fun getDownloadToSdCardUri() = withContext(ioDispatcher) {
         databaseHandler.sdCardUri
+    }
+
+    private suspend fun getShowHiddenNodesPreference() = withContext(ioDispatcher) {
+        try {
+            getCCPreferences().getValueFor(JSON_KEY_CONTENT_CONSUMPTION.value)
+                ?.decodeBase64()
+                ?.let { JSONObject(it) }
+                ?.getJSONObject(JSON_KEY_ANDROID.value)
+                ?.getJSONObject(JSON_SENSITIVES.value)
+                ?.getBoolean(JSON_VAL_SHOW_HIDDEN_NODES.value)
+                ?: false
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    private suspend fun setShowHiddenNodesPreference(enabled: Boolean) = withContext(ioDispatcher) {
+        val prefs = getCCPreferences()
+        val ccJson = prefs?.getValueFor(JSON_KEY_CONTENT_CONSUMPTION.value)
+            ?.decodeBase64()
+            ?.let { JSONObject(it) }
+
+        val androidJson = ccJson?.getJSONObject(JSON_KEY_ANDROID.value)
+        val sensitivesJson = androidJson?.getJSONObject(JSON_SENSITIVES.value)?.apply {
+            put(JSON_VAL_SHOW_HIDDEN_NODES.value, enabled)
+        }
+        androidJson?.put(JSON_SENSITIVES.value, sensitivesJson)
+        ccJson?.put(JSON_KEY_ANDROID.value, androidJson)
+
+        val newPrefs = prefs ?: MegaStringMap.createInstance()
+        newPrefs[JSON_KEY_CONTENT_CONSUMPTION.value] = ccJson.toString().encodeBase64()
+
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, _ -> continuation.resumeWith(Result.success(Unit)) },
+            )
+
+            megaApiGateway.setUserAttribute(
+                type = MegaApiJava.USER_ATTR_CC_PREFS,
+                value = newPrefs,
+                listener = listener,
+            )
+
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    private suspend fun getCCPreferences() = withContext(ioDispatcher) {
+        val request = suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    when (error.errorCode) {
+                        MegaError.API_OK -> {
+                            continuation.resumeWith(Result.success(request))
+                        }
+
+                        MegaError.API_ENOENT -> {
+                            continuation.resumeWith(Result.success(null))
+                        }
+
+                        else -> {
+                            continuation.failWithError(error, "getCCPreferences")
+                        }
+                    }
+                }
+            )
+
+            megaApiGateway.getUserAttribute(
+                attributeIdentifier = MegaApiJava.USER_ATTR_CC_PREFS,
+                listener = listener,
+            )
+
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+
+        request?.megaStringMap
     }
 }

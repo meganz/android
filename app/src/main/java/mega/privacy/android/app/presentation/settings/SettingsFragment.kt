@@ -58,6 +58,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CAMERA_
 import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CHAT
 import mega.privacy.android.app.constants.SettingsConstants.KEY_HELP_CENTRE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_HELP_SEND_FEEDBACK
+import mega.privacy.android.app.constants.SettingsConstants.KEY_HIDDEN_ITEMS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_HIDE_RECENT_ACTIVITY
 import mega.privacy.android.app.constants.SettingsConstants.KEY_MEDIA_DISCOVERY_VIEW
 import mega.privacy.android.app.constants.SettingsConstants.KEY_PASSCODE_LOCK
@@ -83,6 +84,7 @@ import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAu
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsComposeActivity
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 
@@ -211,6 +213,16 @@ class SettingsFragment :
                     findPreference<Preference>(KEY_FEATURES_CALLS)?.isEnabled = state.callsEnabled
                     updatePasscodeLockSummary(state.passcodeLock)
                     updateSubFolderMediaDiscovery(state.subFolderMediaDiscoveryChecked)
+                    findPreference<SwitchPreferenceCompat>(KEY_HIDDEN_ITEMS)?.apply {
+                        val accountType = state.accountDetail?.levelDetail?.accountType
+
+                        isVisible = state.isHiddenNodesEnabled == true && accountType !in listOf(
+                            null,
+                            AccountType.FREE,
+                            AccountType.UNKNOWN,
+                        )
+                        isChecked = state.showHiddenItems
+                    }
                     cookiePolicyLink = state.cookiePolicyLink
                 }
             }
@@ -486,6 +498,12 @@ class SettingsFragment :
                 checked?.let {
                     viewModel.setSubFolderMediaDiscoveryEnabled(checked)
                 }
+            }
+
+            KEY_HIDDEN_ITEMS -> {
+                val checked =
+                    findPreference<SwitchPreferenceCompat>(KEY_HIDDEN_ITEMS)?.isChecked
+                viewModel.setShowHiddenItemsEnabled(checked ?: false)
             }
         }
         resetCounters(key)

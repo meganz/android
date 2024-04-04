@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.settings.model
 
+import mega.privacy.android.domain.entity.account.AccountDetail
+
 /**
  * Settings ui state
  *
@@ -24,6 +26,9 @@ package mega.privacy.android.app.presentation.settings.model
  * @property cookiePolicyLink
  * @property enableSettingsCameraUploadsCompose true if the Compose version of Settings Camera
  * Uploads should be shown
+ * @property isHiddenNodesEnabled
+ * @property showHiddenItems
+ * @property accountDetail
  */
 data class SettingsState(
     val autoAcceptEnabled: Boolean,
@@ -46,4 +51,7 @@ data class SettingsState(
     val subFolderMediaDiscoveryChecked: Boolean,
     val cookiePolicyLink: String?,
     val enableSettingsCameraUploadsCompose: Boolean = false,
+    val isHiddenNodesEnabled: Boolean?,
+    val showHiddenItems: Boolean,
+    val accountDetail: AccountDetail?,
 )

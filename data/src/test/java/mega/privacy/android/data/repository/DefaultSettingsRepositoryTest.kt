@@ -3,6 +3,8 @@ package mega.privacy.android.data.repository
 import android.content.Context
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -59,6 +61,7 @@ internal class DefaultSettingsRepositoryTest {
     private val uiPreferencesGateway: UIPreferencesGateway = mock()
     private val startScreenMapper: StartScreenMapper = mock()
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway = mock()
+    private val appScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
     @BeforeAll
     fun setUp() {
@@ -75,6 +78,7 @@ internal class DefaultSettingsRepositoryTest {
             uiPreferencesGateway = uiPreferencesGateway,
             startScreenMapper = startScreenMapper,
             fileManagementPreferencesGateway = fileManagementPreferencesGateway,
+            appScope = appScope,
         )
     }
 

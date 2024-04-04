@@ -94,6 +94,16 @@ interface SettingsRepository {
     suspend fun setSubfolderMediaDiscoveryEnabled(enabled: Boolean)
 
     /**
+     * Monitor show hidden items
+     */
+    fun monitorShowHiddenItems(): Flow<Boolean>
+
+    /**
+     * Set show hidden items
+     */
+    suspend fun setShowHiddenItems(enabled: Boolean)
+
+    /**
      * Set the default storage download location
      */
     suspend fun setDefaultStorageDownloadLocation()

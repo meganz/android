@@ -34,4 +34,6 @@ enum class TimelinePreferencesJSON(val value: String) {
     JSON_SENSITIVES("sensitives"),
 
     JSON_SENSITIVES_ONBOARDED("onboarded"),
+
+    JSON_VAL_SHOW_HIDDEN_NODES("showHiddenNodes"),
 }

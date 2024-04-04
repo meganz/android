@@ -34,11 +34,13 @@ import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.SetSubFolderMediaDiscoveryEnabledUseCase
@@ -90,6 +92,8 @@ class SettingsViewModelTest {
     private val monitorSubFolderMediaDiscoverySettingsUseCase =
         mock<MonitorSubFolderMediaDiscoverySettingsUseCase>()
     private val getSessionTransferURLUseCase = mock<GetSessionTransferURLUseCase>()
+    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -146,6 +150,10 @@ class SettingsViewModelTest {
 
         getSessionTransferURLUseCase.stub { onBlocking { invoke(any()) }.thenReturn(null) }
 
+        monitorShowHiddenItemsUseCase.stub { onBlocking { invoke() }.thenReturn(emptyFlow()) }
+
+        monitorAccountDetailUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
+
         initViewModel()
     }
 
@@ -178,6 +186,9 @@ class SettingsViewModelTest {
             setSubFolderMediaDiscoveryEnabledUseCase = setSubFolderMediaDiscoveryEnabledUseCase,
             monitorSubFolderMediaDiscoverySettingsUseCase = monitorSubFolderMediaDiscoverySettingsUseCase,
             getSessionTransferURLUseCase = getSessionTransferURLUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            setShowHiddenItemsUseCase = mock(),
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
         )
     }
 
