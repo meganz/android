@@ -35,7 +35,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.messages.UiChatM
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.ChatUnreadHeaderMessage
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.header.HeaderMessage
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.room.update.MessageReceived
 import mega.privacy.android.domain.usecase.MonitorContactCacheUpdates
 import mega.privacy.android.domain.usecase.chat.message.GetLastMessageSeenIdUseCase
@@ -242,14 +242,18 @@ class MessageListViewModel @Inject constructor(
     /**
      * Update latest message
      *
-     * @param message Message
+     * @param messages list of messages reversed order, latest message is the first
      */
-    fun updateLatestMessage(message: TypedMessage?) {
-        if (latestMessageId.longValue == -1L && message != null) {
-            setMessageSeen(message.msgId)
+    fun updateLatestMessage(messages: List<UiChatMessage?>) {
+        if (latestMessageId.longValue == -1L && messages.isNotEmpty()) {
+            // mark first time user enter chat room as seen
+            messages.find { it?.message?.status == ChatMessageStatus.NOT_SEEN }?.let {
+                setMessageSeen(it.id)
+            }
         }
-        latestMessageId.longValue = message?.msgId ?: -1L
-        if (message?.isMine == true) {
+        val lastMessage = messages.firstOrNull()?.message
+        latestMessageId.longValue = lastMessage?.msgId ?: -1L
+        if (lastMessage?.isMine == true) {
             // if user sent a message, reset the extraUnreadCount and remove unread header
             _state.update { state -> state.copy(extraUnreadCount = 0, lastSeenMessageId = -1) }
         }

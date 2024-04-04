@@ -13,8 +13,10 @@ import mega.privacy.android.app.presentation.meeting.chat.mapper.ChatMessageDate
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ChatMessageTimeSeparatorMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.UiChatMessageMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewModel
+    import mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.TextUiMessage
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
@@ -144,11 +146,16 @@ internal class MessageListViewModelTest {
         val typedMessage = mock<TextMessage> {
             on { msgId } doReturn messageId
             on { isMine } doReturn true
+            on { status } doReturn ChatMessageStatus.NOT_SEEN
+        }
+        val uiMessage = mock<TextUiMessage> {
+            on { message } doReturn typedMessage
+            on { id } doReturn messageId
         }
         assertThat(underTest.latestMessageId.longValue).isEqualTo(-1L)
-        underTest.updateLatestMessage(typedMessage)
+        underTest.updateLatestMessage(listOf(uiMessage))
         assertThat(underTest.latestMessageId.longValue).isEqualTo(messageId)
-        underTest.updateLatestMessage(typedMessage)
+        underTest.updateLatestMessage(listOf(uiMessage))
         // verify call only once
         verify(setMessageSeenUseCase).invoke(chatId, messageId)
         underTest.state.test {

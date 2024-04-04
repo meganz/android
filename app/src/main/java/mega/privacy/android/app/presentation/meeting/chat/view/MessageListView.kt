@@ -153,7 +153,7 @@ internal fun MessageListView(
         ) {
             scrollState.scrollToItem(0, 0)
         }
-        viewModel.updateLatestMessage(latestMessage)
+        viewModel.updateLatestMessage(pagingItems.itemSnapshotList)
     }
 
     LaunchedEffect(state.userUpdate) {
