@@ -1,6 +1,8 @@
 package mega.privacy.android.app.activities
 
-import android.Manifest.permission.*
+import android.Manifest.permission.CAMERA
+import android.Manifest.permission.RECORD_AUDIO
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.Intent
@@ -10,7 +12,9 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.view.View.*
+import android.view.View.GONE
+import android.view.View.LAYER_TYPE_HARDWARE
+import android.view.View.VISIBLE
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW
@@ -23,7 +27,12 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivityWebViewBinding
 import mega.privacy.android.app.utils.CacheFolderManager
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
+import mega.privacy.android.app.utils.Constants.EMAIL_VERIFY_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
+import mega.privacy.android.app.utils.Constants.REQUEST_CAMERA
+import mega.privacy.android.app.utils.Constants.REQUEST_RECORD_AUDIO
+import mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.copyFileToDCIM
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
@@ -36,7 +45,7 @@ import timber.log.Timber
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
 
 /**
  * WebViewActivity
@@ -57,6 +66,19 @@ class WebViewActivity : BaseActivity() {
     private var mFileChooserParams: WebChromeClient.FileChooserParams? = null
     private var pickedImage: String? = null
     private var pickedVideo: String? = null
+
+
+    private val chooserLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.data == null) {
+                mFilePathCallback?.onReceiveValue(null)
+            } else if (mFilePathCallback != null) {
+                manageResult(result.data)
+            }
+
+            pickedImage = null
+            pickedVideo = null
+        }
 
     /**
      * onCreate
@@ -297,18 +319,6 @@ class WebViewActivity : BaseActivity() {
         val chooserIntent = Intent(Intent.ACTION_CHOOSER)
         chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent)
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, chooserArray)
-
-        val chooserLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                if (result.data == null) {
-                    mFilePathCallback?.onReceiveValue(null)
-                } else if (mFilePathCallback != null) {
-                    manageResult(result.data)
-                }
-
-                pickedImage = null
-                pickedVideo = null
-            }
 
         chooserLauncher.launch(chooserIntent)
 
