@@ -10,6 +10,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.SubmitIssueRequest
 import mega.privacy.android.domain.entity.SupportTicket
+import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.repository.SupportRepository
 import mega.privacy.android.domain.usecase.logging.GetZippedLogsUseCase
 import org.junit.jupiter.api.AfterEach
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -46,11 +48,13 @@ class SubmitIssueUseCaseTest {
     private val compressedLogs = File("path/to/${supportTicket.logFileName}")
     private val percentage = 1F
     private val formattedSupportTicket = "formattedSupportTicket"
+    private val userAccount = mock<UserAccount>()
 
     private val supportRepository = mock<SupportRepository>()
     private val createSupportTicketUseCase = mock<CreateSupportTicketUseCase>()
     private val formatSupportTicketUseCase = mock<FormatSupportTicketUseCase>()
     private val getZippedLogsUseCase = mock<GetZippedLogsUseCase>()
+    private val getAccountDetailsUseCase = mock<GetAccountDetailsUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -62,9 +66,19 @@ class SubmitIssueUseCaseTest {
             on { uploadFile(compressedLogs) }.thenReturn(flowOf(percentage))
         }
 
+        getAccountDetailsUseCase.stub {
+            onBlocking {
+                invoke(false)
+            }.thenReturn(userAccount)
+        }
+
         createSupportTicketUseCase.stub {
             onBlocking {
-                invoke(supportTicket.description, supportTicket.logFileName)
+                invoke(
+                    eq(supportTicket.description),
+                    eq(supportTicket.logFileName),
+                    any()
+                )
             }.thenReturn(supportTicket)
         }
 
@@ -79,6 +93,7 @@ class SubmitIssueUseCaseTest {
             createSupportTicketUseCase = createSupportTicketUseCase,
             formatSupportTicketUseCase = formatSupportTicketUseCase,
             getZippedLogsUseCase = getZippedLogsUseCase,
+            getAccountDetailsUseCase = getAccountDetailsUseCase,
         )
     }
 
@@ -128,7 +143,11 @@ class SubmitIssueUseCaseTest {
     fun `test that support ticket is created`() = runTest {
         underTest.call(false).test { cancelAndIgnoreRemainingEvents() }
 
-        verify(createSupportTicketUseCase).invoke(supportTicket.description, null)
+        verify(createSupportTicketUseCase).invoke(
+            supportTicket.description,
+            null,
+            getAccountDetailsUseCase(false)
+        )
     }
 
     @Test
@@ -140,7 +159,11 @@ class SubmitIssueUseCaseTest {
 
             underTest.call(true).test { cancelAndIgnoreRemainingEvents() }
 
-            verify(createSupportTicketUseCase).invoke(supportTicket.description, compressedLogs.name)
+            verify(createSupportTicketUseCase).invoke(
+                supportTicket.description,
+                compressedLogs.name,
+                getAccountDetailsUseCase(false)
+            )
         }
 
     @Test

@@ -2,7 +2,6 @@ package mega.privacy.android.domain.usecase
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AppInfo
@@ -16,13 +15,11 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class DefaultCreateSupportTicketUseCaseTest {
     private lateinit var underTest: CreateSupportTicketUseCase
     private val deviceRepository = mock<EnvironmentRepository>()
-    private val getAccountDetailsUseCase = mock<GetAccountDetailsUseCase>()
 
     private val device = "device"
     private val languageCode = "languageCode"
@@ -35,6 +32,15 @@ class DefaultCreateSupportTicketUseCaseTest {
     private val description = "Issue description"
     private val deviceSdkVersionInt = 31
     private val deviceSdkVersionName = "Android 12"
+    val accountDetails = UserAccount(
+        userId = UserId(1L),
+        email = accountEmail,
+        fullName = accountFullName,
+        isBusinessAccount = true,
+        isMasterBusinessAccount = true,
+        accountTypeIdentifier = AccountType.FREE,
+        accountTypeString = accountTypeString
+    )
 
     @Before
     fun setUp() {
@@ -56,50 +62,28 @@ class DefaultCreateSupportTicketUseCaseTest {
             onBlocking { getDeviceSdkVersionName() }.thenReturn(deviceSdkVersionName)
         }
 
-
-        runBlocking {
-            whenever(getAccountDetailsUseCase(false)).thenReturn(
-                UserAccount(
-                    userId = UserId(1L),
-                    email = accountEmail,
-                    fullName = accountFullName,
-                    isBusinessAccount = true,
-                    isMasterBusinessAccount = true,
-                    accountTypeIdentifier = AccountType.FREE,
-                    accountTypeString = accountTypeString
-                )
-            )
-        }
-
         underTest = CreateSupportTicketUseCase(
             environmentRepository = deviceRepository,
-            getAccountDetailsUseCase = getAccountDetailsUseCase
         )
     }
 
     @Test
     fun `test that device and app info is retrieved`() = runTest {
-        underTest(description = description, null)
+        underTest(description = description, null, accountDetails)
 
         verify(deviceRepository).getDeviceInfo()
         verify(deviceRepository).getAppInfo()
     }
 
     @Test
-    fun `test that account information is retrieved`() = runTest {
-        underTest(description = description, null)
-        verify(getAccountDetailsUseCase).invoke(false)
-    }
-
-    @Test
     fun `test that device sdk version int is retrieved`() = runTest {
-        underTest(description = description, null)
+        underTest(description = description, null, accountDetails)
         verify(deviceRepository).getDeviceSdkVersionInt()
     }
 
     @Test
     fun `test that device sdk version name is retrieved`() = runTest {
-        underTest(description = description, null)
+        underTest(description = description, null, accountDetails)
         verify(deviceRepository).getDeviceSdkVersionName()
     }
 
@@ -118,7 +102,7 @@ class DefaultCreateSupportTicketUseCaseTest {
             deviceSdkVersionName = deviceSdkVersionName,
         )
 
-        val actual = underTest(description, fileName)
+        val actual = underTest(description, fileName, accountDetails)
 
         assertThat(actual).isEqualTo(expected)
     }
