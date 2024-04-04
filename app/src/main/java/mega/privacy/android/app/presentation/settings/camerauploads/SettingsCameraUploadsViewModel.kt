@@ -24,6 +24,7 @@ import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
@@ -48,6 +49,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderNodeVa
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
@@ -103,6 +105,8 @@ import javax.inject.Inject
  * @property listenToNewMediaUseCase Listens to new Photos and Videos captured by the Device
  * @property monitorCameraUploadsFolderDestinationUseCase Listens for any destination changes in the Camera
  * / Media Uploads Folder Nodes
+ * @property monitorCameraUploadsSettingsActionsUseCase Monitors any changes to Settings Camera
+ * Uploads
  * @property preparePrimaryFolderPathUseCase Prepares the Primary Folder path
  * @property setCameraUploadsByWifiUseCase Sets whether Camera Uploads can only run through Wi-Fi / Wi-Fi or Mobile Data
  * @property setChargingRequiredForVideoCompressionUseCase Sets whether or not the Device should be
@@ -154,6 +158,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val isSecondaryFolderPathValidUseCase: IsSecondaryFolderPathValidUseCase,
     private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
     private val monitorCameraUploadsFolderDestinationUseCase: MonitorCameraUploadsFolderDestinationUseCase,
+    private val monitorCameraUploadsSettingsActionsUseCase: MonitorCameraUploadsSettingsActionsUseCase,
     private val preparePrimaryFolderPathUseCase: PreparePrimaryFolderPathUseCase,
     private val setCameraUploadsByWifiUseCase: SetCameraUploadsByWifiUseCase,
     private val setChargingRequiredForVideoCompressionUseCase: SetChargingRequiredForVideoCompressionUseCase,
@@ -186,6 +191,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     init {
         initializeSettings()
         monitorCameraUploadsFolderDestination()
+        monitorCameraUploadsSettingsActions()
     }
 
     /**
@@ -261,6 +267,31 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
+     * Observes any behavioral changes to the Settings Camera Uploads
+     */
+    private fun monitorCameraUploadsSettingsActions() {
+        viewModelScope.launch {
+            monitorCameraUploadsSettingsActionsUseCase()
+                .catch { exception ->
+                    Timber.e(
+                        "An exception occurred when listening for Settings Camera Uploads changes",
+                        exception,
+                    )
+                }.collect { cameraUploadsSettingsAction ->
+                    when (cameraUploadsSettingsAction) {
+                        CameraUploadsSettingsAction.DisableCameraUploads -> {
+                            onCameraUploadsStateChanged(enabled = false)
+                        }
+
+                        CameraUploadsSettingsAction.DisableMediaUploads -> {
+                            onMediaUploadsStateChanged(enabled = false)
+                        }
+                    }
+                }
+        }
+    }
+
+    /**
      * When receiving a destination update of the Camera Uploads Primary Folder Node, update the
      * Primary Folder Node name in the UI State
      *
@@ -315,21 +346,20 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     /**
      * Performs specific actions when the Camera Uploads state changes
      *
-     * @param newState The new Camera Uploads state
+     * @param enabled true if Camera Uploads should be enabled
      */
-    fun onCameraUploadsStateChanged(newState: Boolean) {
+    fun onCameraUploadsStateChanged(enabled: Boolean) {
         viewModelScope.launch {
             runCatching {
                 if (isConnectedToInternetUseCase()) {
-                    Timber.d("Is Camera Uploads enabled: $newState")
-                    if (isCameraUploadsEnabledUseCase()) {
-                        // Camera Uploads is currently enabled. Disable the feature
+                    if (enabled) {
+                        // Check if the Media Permissions have been granted before continuing the
+                        // process of enabling Camera Uploads
+                        _uiState.update { it.copy(requestPermissions = triggered) }
+                    } else {
+                        // Disable Camera Uploads
                         setCameraUploadsEnabled(false)
                         stopCameraUploadsUseCase(CameraUploadsRestartMode.StopAndDisable)
-                    } else {
-                        // Camera Uploads is currently disabled. Check if the Media Permissions have
-                        // been granted before continuing the process
-                        _uiState.update { it.copy(requestPermissions = triggered) }
                     }
                 } else {
                     Timber.d("User must be connected to the Internet to update the Camera Uploads state")

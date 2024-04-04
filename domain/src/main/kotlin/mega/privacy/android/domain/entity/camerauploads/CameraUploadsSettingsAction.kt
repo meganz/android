@@ -1,17 +1,17 @@
 package mega.privacy.android.domain.entity.camerauploads
 
 /**
- * Camera Uploads Settings Action
+ * Interface that enumerates different actions to be performed by the Settings Camera Uploads
  */
 sealed interface CameraUploadsSettingsAction {
 
     /**
-     * DisableMediaUpload
+     * An action to disable Media Uploads
      */
-    object DisableMediaUploads : CameraUploadsSettingsAction
+    data object DisableMediaUploads : CameraUploadsSettingsAction
 
     /**
-     * RefreshSettings
+     * An action to disable Camera Uploads
      */
-    object RefreshSettings : CameraUploadsSettingsAction
+    data object DisableCameraUploads : CameraUploadsSettingsAction
 }

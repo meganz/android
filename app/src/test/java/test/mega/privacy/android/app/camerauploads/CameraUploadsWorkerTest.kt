@@ -1083,7 +1083,7 @@ class CameraUploadsWorkerTest {
             )
             assertThat(result).isEqualTo(ListenableWorker.Result.failure())
             verify(setPrimaryFolderLocalPathUseCase).invoke("")
-            verify(broadcastCameraUploadsSettingsActionUseCase).invoke(CameraUploadsSettingsAction.RefreshSettings)
+            verify(broadcastCameraUploadsSettingsActionUseCase).invoke(CameraUploadsSettingsAction.DisableCameraUploads)
             verify(underTest).setProgress(
                 workDataOf(
                     STATUS_INFO to FOLDER_UNAVAILABLE,

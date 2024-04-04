@@ -499,7 +499,7 @@ class LegacySettingsCameraUploadsFragment : SettingsBaseFragment(),
             collectFlow(viewModel.monitorCameraUploadsSettingsActions) {
                 when (it) {
                     CameraUploadsSettingsAction.DisableMediaUploads -> viewModel.toggleMediaUploads()
-                    CameraUploadsSettingsAction.RefreshSettings -> viewModel.toggleCameraUploadsSettings()
+                    CameraUploadsSettingsAction.DisableCameraUploads -> viewModel.toggleCameraUploadsSettings()
                 }
             }
             collectFlow(viewModel.monitorBackupInfoType) {

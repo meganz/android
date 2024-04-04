@@ -6,6 +6,7 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
@@ -49,6 +51,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderNodeVa
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSettingsActionsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
@@ -80,9 +83,9 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
+import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
@@ -124,6 +127,8 @@ internal class SettingsCameraUploadsViewModelTest {
     private val listenToNewMediaUseCase = mock<ListenToNewMediaUseCase>()
     private val monitorCameraUploadsFolderDestinationUseCase =
         mock<MonitorCameraUploadsFolderDestinationUseCase>()
+    private val monitorCameraUploadsSettingsActionsUseCase =
+        mock<MonitorCameraUploadsSettingsActionsUseCase>()
     private val preparePrimaryFolderPathUseCase = mock<PreparePrimaryFolderPathUseCase>()
     private val setCameraUploadsByWifiUseCase = mock<SetCameraUploadsByWifiUseCase>()
     private val setChargingRequiredForVideoCompressionUseCase =
@@ -145,6 +150,9 @@ internal class SettingsCameraUploadsViewModelTest {
     private val stopCameraUploadsUseCase = mock<StopCameraUploadsUseCase>()
     private val uploadOptionUiItemMapper = Mockito.spy(UploadOptionUiItemMapper())
     private val videoQualityUiItemMapper = Mockito.spy(VideoQualityUiItemMapper())
+
+    private val fakeMonitorCameraUploadsSettingsActionsFlow =
+        MutableSharedFlow<CameraUploadsSettingsAction>()
 
     @BeforeEach
     fun resetMocks() {
@@ -173,6 +181,7 @@ internal class SettingsCameraUploadsViewModelTest {
             isSecondaryFolderPathValidUseCase,
             listenToNewMediaUseCase,
             monitorCameraUploadsFolderDestinationUseCase,
+            monitorCameraUploadsSettingsActionsUseCase,
             preparePrimaryFolderPathUseCase,
             setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompressionUseCase,
@@ -235,6 +244,9 @@ internal class SettingsCameraUploadsViewModelTest {
             requireChargingDuringVideoCompression
         )
         whenever(isSecondaryFolderEnabled()).thenReturn(isMediaUploadsEnabled)
+        whenever(monitorCameraUploadsSettingsActionsUseCase()).thenReturn(
+            fakeMonitorCameraUploadsSettingsActionsFlow
+        )
 
         underTest = SettingsCameraUploadsViewModel(
             areLocationTagsEnabledUseCase = areLocationTagsEnabledUseCase,
@@ -261,6 +273,7 @@ internal class SettingsCameraUploadsViewModelTest {
             isSecondaryFolderPathValidUseCase = isSecondaryFolderPathValidUseCase,
             listenToNewMediaUseCase = listenToNewMediaUseCase,
             monitorCameraUploadsFolderDestinationUseCase = monitorCameraUploadsFolderDestinationUseCase,
+            monitorCameraUploadsSettingsActionsUseCase = monitorCameraUploadsSettingsActionsUseCase,
             preparePrimaryFolderPathUseCase = preparePrimaryFolderPathUseCase,
             setCameraUploadsByWifiUseCase = setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompressionUseCase = setChargingRequiredForVideoCompressionUseCase,
@@ -299,7 +312,7 @@ internal class SettingsCameraUploadsViewModelTest {
                 initializeUnderTest()
                 whenever(isConnectedToInternetUseCase()).thenReturn(false)
 
-                underTest.onCameraUploadsStateChanged(newState = false)
+                underTest.onCameraUploadsStateChanged(enabled = false)
 
                 verify(snackBarHandler).postSnackbarMessage(
                     resId = R.string.general_error,
@@ -313,7 +326,7 @@ internal class SettingsCameraUploadsViewModelTest {
                 initializeUnderTest()
                 whenever(isConnectedToInternetUseCase()).thenThrow(RuntimeException())
 
-                assertDoesNotThrow { underTest.onCameraUploadsStateChanged(newState = false) }
+                assertDoesNotThrow { underTest.onCameraUploadsStateChanged(enabled = false) }
                 verify(snackBarHandler).postSnackbarMessage(
                     resId = R.string.general_error,
                     snackbarDuration = MegaSnackbarDuration.Long,
@@ -325,12 +338,8 @@ internal class SettingsCameraUploadsViewModelTest {
             initializeUnderTest()
             whenever(isConnectedToInternetUseCase()).thenReturn(true)
 
-            underTest.onCameraUploadsStateChanged(newState = false)
+            underTest.onCameraUploadsStateChanged(enabled = false)
 
-            // The Use Case is called two times: one during ViewModel initialization and another
-            // when the ViewModel function is called
-            verify(isCameraUploadsEnabledUseCase, times(2)).invoke()
-            verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.StopAndDisable)
             underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.isCameraUploadsEnabled).isFalse()
@@ -339,12 +348,23 @@ internal class SettingsCameraUploadsViewModelTest {
         }
 
         @Test
+        fun `test that disabling camera uploads stops and disables the ongoing camera uploads process`() =
+            runTest {
+                whenever(isConnectedToInternetUseCase()).thenReturn(true)
+                initializeUnderTest()
+
+                underTest.onCameraUploadsStateChanged(enabled = false)
+
+                verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.StopAndDisable)
+            }
+
+        @Test
         fun `test that an error snackbar is shown when the user enables camera uploads and is not connected to the internet`() =
             runTest {
                 initializeUnderTest(isCameraUploadsEnabled = false)
                 whenever(isConnectedToInternetUseCase()).thenReturn(false)
 
-                underTest.onCameraUploadsStateChanged(newState = true)
+                underTest.onCameraUploadsStateChanged(enabled = true)
 
                 verify(snackBarHandler).postSnackbarMessage(
                     resId = R.string.general_error,
@@ -358,7 +378,7 @@ internal class SettingsCameraUploadsViewModelTest {
                 initializeUnderTest(isCameraUploadsEnabled = false)
                 whenever(isConnectedToInternetUseCase()).thenThrow(RuntimeException())
 
-                assertDoesNotThrow { underTest.onCameraUploadsStateChanged(newState = true) }
+                assertDoesNotThrow { underTest.onCameraUploadsStateChanged(enabled = true) }
                 verify(snackBarHandler).postSnackbarMessage(
                     resId = R.string.general_error,
                     snackbarDuration = MegaSnackbarDuration.Long,
@@ -371,12 +391,48 @@ internal class SettingsCameraUploadsViewModelTest {
                 initializeUnderTest(isCameraUploadsEnabled = false)
                 whenever(isConnectedToInternetUseCase()).thenReturn(true)
 
-                underTest.onCameraUploadsStateChanged(newState = true)
+                underTest.onCameraUploadsStateChanged(enabled = true)
 
                 underTest.uiState.test {
                     val state = awaitItem()
                     assertThat(state.requestPermissions).isEqualTo(triggered)
                 }
+            }
+
+        @ParameterizedTest(name = "is camera uploads enabled: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that camera uploads is disabled when it receives a monitor update to disable the feature`(
+            isCameraUploadsEnabled: Boolean,
+        ) =
+            runTest {
+                whenever(isConnectedToInternetUseCase()).thenReturn(true)
+                initializeUnderTest(isCameraUploadsEnabled = isCameraUploadsEnabled)
+
+                // Trigger an update to disable Camera Uploads
+                fakeMonitorCameraUploadsSettingsActionsFlow.emit(CameraUploadsSettingsAction.DisableCameraUploads)
+
+                underTest.uiState.test {
+                    val state = awaitItem()
+                    assertThat(state.isCameraUploadsEnabled).isFalse()
+                    assertThat(state.isMediaUploadsEnabled).isFalse()
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+
+        @Test
+        fun `test that disabling camera uploads through a monitor update stops and disables the ongoing camera uploads process`() =
+            runTest {
+                whenever(isConnectedToInternetUseCase()).thenReturn(true)
+                // Camera Uploads is initially enabled
+                initializeUnderTest()
+
+                // Trigger an update to disable Camera Uploads
+                fakeMonitorCameraUploadsSettingsActionsFlow.emit(CameraUploadsSettingsAction.DisableCameraUploads)
+
+                verify(
+                    stopCameraUploadsUseCase,
+                    atLeast(1)
+                ).invoke(CameraUploadsRestartMode.StopAndDisable)
             }
 
         @ParameterizedTest(name = "new request permissions state event: {0}")
@@ -1145,6 +1201,36 @@ internal class SettingsCameraUploadsViewModelTest {
 
             verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
         }
+
+        @ParameterizedTest(name = "is media uploads enabled: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that media uploads is disabled when it receives a monitor update to disable the feature`(
+            isMediaUploadsEnabled: Boolean,
+        ) = runTest {
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
+            initializeUnderTest(isMediaUploadsEnabled = isMediaUploadsEnabled)
+
+            // Trigger an update to disable Media Uploads
+            fakeMonitorCameraUploadsSettingsActionsFlow.emit(CameraUploadsSettingsAction.DisableMediaUploads)
+
+            verify(disableMediaUploadsSettingsUseCase, atLeast(1)).invoke()
+            underTest.uiState.test {
+                assertThat(awaitItem().isMediaUploadsEnabled).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+        @Test
+        fun `test that disabling media uploads through a monitor update stops the ongoing camera uploads process`() =
+            runTest {
+                whenever(isConnectedToInternetUseCase()).thenReturn(true)
+                initializeUnderTest()
+
+                // Trigger an update to disable Media Uploads
+                fakeMonitorCameraUploadsSettingsActionsFlow.emit(CameraUploadsSettingsAction.DisableMediaUploads)
+
+                verify(stopCameraUploadsUseCase, atLeast(1)).invoke(CameraUploadsRestartMode.Stop)
+            }
     }
 
     /**
