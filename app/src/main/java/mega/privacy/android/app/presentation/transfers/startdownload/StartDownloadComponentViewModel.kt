@@ -205,23 +205,16 @@ internal class StartDownloadComponentViewModel @Inject constructor(
         startDownloadNode: TransferTriggerEvent.StartDownloadNode,
         destination: String?,
     ) {
-        val siblingNodes = startDownloadNode.nodes
-        if (siblingNodes.isEmpty()) return
-        val firstSibling = siblingNodes.first()
-        val parentId = firstSibling.parentId
-        if (!siblingNodes.all { it.parentId == parentId }) {
-            Timber.e("All nodes must have the same parent")
-            _uiState.updateEventAndClearProgress(StartDownloadTransferEvent.Message.TransferCancelled)
-        } else {
-            currentInProgressJob = viewModelScope.launch {
-                startDownloadNodes(
-                    nodes = siblingNodes,
-                    isHighPriority = startDownloadNode.isHighPriority,
-                    getUri = {
-                        destination?.ensureSuffix(File.separator)
-                    },
-                )
-            }
+        val nodes = startDownloadNode.nodes
+        if (nodes.isEmpty()) return
+        currentInProgressJob = viewModelScope.launch {
+            startDownloadNodes(
+                nodes = nodes,
+                isHighPriority = startDownloadNode.isHighPriority,
+                getUri = {
+                    destination?.ensureSuffix(File.separator)
+                },
+            )
         }
     }
 

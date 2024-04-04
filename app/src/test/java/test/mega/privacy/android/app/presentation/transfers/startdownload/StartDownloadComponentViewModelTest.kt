@@ -191,17 +191,6 @@ class StartDownloadComponentViewModelTest {
         }
 
     @Test
-    fun `test that cancel event is emitted when start download nodes is invoked with no sibling nodes`() =
-        runTest {
-            commonStub()
-            whenever(parentNode.parentId).thenReturn(NodeId(55L))
-            underTest.startDownload(
-                TransferTriggerEvent.StartDownloadNode(listOf(node, parentNode))
-            )
-            assertCurrentEventIsEqualTo(StartDownloadTransferEvent.Message.TransferCancelled)
-        }
-
-    @Test
     fun `test that cancel event is emitted when start download nodes is invoked with empty list`() =
         runTest {
             commonStub()
