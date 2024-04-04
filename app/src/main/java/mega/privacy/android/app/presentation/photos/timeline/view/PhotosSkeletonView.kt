@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.photos.timeline.view
 
 import android.content.res.Configuration
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,14 +19,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.utils.shimmerEffect
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable
 internal fun PhotosSkeletonView() {
@@ -61,7 +67,8 @@ internal fun PhotosSkeletonView() {
                         modifier = Modifier
                             .wrapContentSize()
                             .padding(start = 16.dp, top = 14.dp, bottom = 14.dp)
-                            .shimmerEffect(),
+                            .shimmerEffectSquare(),
+                        color = Color.Transparent
                     )
                 }
             } else {
@@ -70,7 +77,7 @@ internal fun PhotosSkeletonView() {
                         .padding(all = 1.5.dp)
                         .fillMaxWidth()
                         .aspectRatio(1f)
-                        .shimmerEffect(),
+                        .shimmerEffectSquare(),
                 )
             }
         }
@@ -107,20 +114,22 @@ internal fun AlbumListSkeletonView() {
                         .padding(all = 1.5.dp)
                         .fillMaxWidth()
                         .aspectRatio(1f)
-                        .shimmerEffect(),
+                        .shimmerEffectSquare(),
                 )
                 Text(
                     text = "Album names",
                     modifier = Modifier
                         .wrapContentSize()
                         .padding(top = 10.dp, bottom = 3.dp)
-                        .shimmerEffect(),
+                        .shimmerEffectSquare(),
+                    color = Color.Transparent
                 )
                 Text(
                     text = "number",
                     modifier = Modifier
                         .wrapContentSize()
-                        .shimmerEffect(),
+                        .shimmerEffectSquare(),
+                    color = Color.Transparent
                 )
             }
         }
@@ -161,7 +170,7 @@ private fun AlbumBig2SmallSkeletonView(
                 .width(smallWidth * 2)
                 .height(smallWidth * 2 + 1.dp)
                 .aspectRatio(1f)
-                .shimmerEffect(),
+                .shimmerEffectSquare(),
         )
         Column(
             verticalArrangement = Arrangement.SpaceBetween,
@@ -171,7 +180,7 @@ private fun AlbumBig2SmallSkeletonView(
                     .width(smallWidth)
                     .height(smallWidth)
                     .aspectRatio(1f)
-                    .shimmerEffect(),
+                    .shimmerEffectSquare(),
             )
             Spacer(
                 modifier = Modifier.height(1.dp)
@@ -181,7 +190,7 @@ private fun AlbumBig2SmallSkeletonView(
                     .width(smallWidth)
                     .height(smallWidth)
                     .aspectRatio(1f)
-                    .shimmerEffect(),
+                    .shimmerEffectSquare(),
             )
         }
     }
@@ -200,21 +209,21 @@ private fun AlbumSmall3ItemSkeletonView(
                 .width(smallWidth)
                 .height(smallWidth)
                 .aspectRatio(1f)
-                .shimmerEffect(),
+                .shimmerEffectSquare(),
         )
         Spacer(
             modifier = Modifier
                 .width(smallWidth)
                 .height(smallWidth)
                 .aspectRatio(1f)
-                .shimmerEffect(),
+                .shimmerEffectSquare(),
         )
         Spacer(
             modifier = Modifier
                 .width(smallWidth)
                 .height(smallWidth)
                 .aspectRatio(1f)
-                .shimmerEffect(),
+                .shimmerEffectSquare(),
         )
     }
 }
@@ -235,7 +244,7 @@ private fun AlbumSmall2BigSkeletonView(
                     .width(smallWidth)
                     .height(smallWidth)
                     .aspectRatio(1f)
-                    .shimmerEffect(),
+                    .shimmerEffectSquare(),
             )
             Spacer(
                 modifier = Modifier.height(1.dp)
@@ -245,7 +254,7 @@ private fun AlbumSmall2BigSkeletonView(
                     .width(smallWidth)
                     .height(smallWidth)
                     .aspectRatio(1f)
-                    .shimmerEffect(),
+                    .shimmerEffectSquare(),
             )
         }
         Spacer(
@@ -253,7 +262,79 @@ private fun AlbumSmall2BigSkeletonView(
                 .width(smallWidth * 2)
                 .height(smallWidth * 2 + 1.dp)
                 .aspectRatio(1f)
-                .shimmerEffect(),
+                .shimmerEffectSquare(),
         )
     }
 }
+
+private fun Modifier.shimmerEffectSquare(): Modifier {
+    return this.shimmerEffect(
+        shape = RoundedCornerShape(4.dp)
+    )
+}
+
+@CombinedThemePreviews
+@Composable
+private fun PhotosSkeletonViewPreview() {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        PhotosSkeletonView()
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun AlbumListSkeletonViewPreview() {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        AlbumListSkeletonView()
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun AlbumContentSkeletonViewPreview() {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        val configuration = LocalConfiguration.current
+        val smallWidth = remember(configuration) {
+            (configuration.screenWidthDp.dp - 1.dp) / 3
+        }
+        AlbumContentSkeletonView(smallWidth)
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun AlbumBig2SmallSkeletonViewPreview() {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        val configuration = LocalConfiguration.current
+        val smallWidth = remember(configuration) {
+            (configuration.screenWidthDp.dp - 1.dp) / 3
+        }
+        AlbumBig2SmallSkeletonView(smallWidth)
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun AlbumSmall3ItemSkeletonViewPreview() {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        val configuration = LocalConfiguration.current
+        val smallWidth = remember(configuration) {
+            (configuration.screenWidthDp.dp - 1.dp) / 3
+        }
+        AlbumSmall3ItemSkeletonView(smallWidth)
+    }
+}
+
+
+@CombinedThemePreviews
+@Composable
+private fun AlbumSmall2BigSkeletonViewPreview() {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        val configuration = LocalConfiguration.current
+        val smallWidth = remember(configuration) {
+            (configuration.screenWidthDp.dp - 1.dp) / 3
+        }
+        AlbumSmall2BigSkeletonView(smallWidth)
+    }
+}
+
