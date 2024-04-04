@@ -18,7 +18,6 @@ import mega.privacy.android.domain.usecase.CreateTraceString
 import mega.privacy.android.domain.usecase.DefaultCreateTraceString
 import mega.privacy.android.domain.usecase.DefaultInitialiseLogging
 import mega.privacy.android.domain.usecase.EnableLogAllToConsole
-import mega.privacy.android.domain.usecase.GetLogFile
 import mega.privacy.android.domain.usecase.InitialiseLogging
 import mega.privacy.android.domain.usecase.ResetSdkLogger
 
@@ -60,10 +59,6 @@ internal abstract class InternalLoggingModule {
             areChatLogsEnabled = areChatLogsEnabled,
             coroutineDispatcher = coroutineDispatcher,
         )
-
-        @Provides
-        fun provideGetLogFile(repository: LoggingRepository): GetLogFile =
-            GetLogFile(repository::compressLogs)
 
         @Provides
         fun provideEnableLogAllToConsole(repository: LoggingRepository): EnableLogAllToConsole =

@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.UpdateApp
-import mega.privacy.android.domain.usecase.GetLogFile
+import mega.privacy.android.domain.usecase.logging.GetZippedLogsUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -15,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class QASettingViewModel @Inject constructor(
     private val updateApp: UpdateApp,
-    private val getLogFile: GetLogFile,
+    private val getLogFile: GetZippedLogsUseCase,
 ) : ViewModel() {
 
     fun checkUpdatePressed() {
@@ -32,8 +32,12 @@ class QASettingViewModel @Inject constructor(
 
     fun exportLogs(onLogCreated: (File) -> Unit) {
         viewModelScope.launch {
-            val logFile = getLogFile()
-            onLogCreated(logFile)
+            try {
+                val logFile = getLogFile()
+                onLogCreated(logFile)
+            } catch (e: Exception) {
+                Timber.e(e, "Error exporting logs")
+            }
         }
     }
 }

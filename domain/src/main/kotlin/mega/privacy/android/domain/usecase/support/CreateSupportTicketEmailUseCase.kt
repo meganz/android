@@ -33,8 +33,8 @@ class CreateSupportTicketEmailUseCase @Inject constructor(
         emailBody: String,
     ): SupportEmailTicket {
         val email = getSupportEmailUseCase()
-        val logs = getZippedLogsUseCase()
-        val formattedTicket = getFormattedTicket(emailBody, logs.name)
+        val logs = runCatching{ getZippedLogsUseCase() }.getOrNull()
+        val formattedTicket = getFormattedTicket(emailBody, logs?.name ?: "No logs found")
 
         return SupportEmailTicket(
             email = email,

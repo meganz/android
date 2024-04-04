@@ -1,7 +1,6 @@
 package mega.privacy.android.data.repository
 
 import android.content.Context
-import android.os.Build
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -31,14 +30,10 @@ import nz.mega.sdk.MegaChatLoggerInterface
 import nz.mega.sdk.MegaLoggerInterface
 import timber.log.Timber
 import java.io.File
-import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import java.util.Date
-import java.util.Locale
-import java.util.TimeZone
 import javax.inject.Inject
 
 /**
@@ -117,9 +112,11 @@ internal class TimberLoggingRepository @Inject constructor(
     override suspend fun compressLogs(): File = withContext(ioDispatcher) {
         val loggingDirectoryPath = loggingConfig.getLoggingDirectoryPath()
         require(loggingDirectoryPath != null) { "Logging configuration file missing or logging directory not configured" }
+        val sourceFolder = File(loggingDirectoryPath).takeIf { it.exists() }
+            ?: throw IllegalStateException("Logging directory not found")
         createEmptyFile().apply {
             fileCompressionGateway.zipFolder(
-                File(loggingDirectoryPath),
+                sourceFolder,
                 this
             )
         }

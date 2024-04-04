@@ -13,6 +13,6 @@ import java.io.File
 data class SupportEmailTicket(
     val email: String,
     val ticket: String,
-    val logs: File,
+    val logs: File?,
     val subject: String,
 )

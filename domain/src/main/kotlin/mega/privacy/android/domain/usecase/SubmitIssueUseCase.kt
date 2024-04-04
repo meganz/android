@@ -40,7 +40,8 @@ class SubmitIssueUseCase @Inject constructor(
             val logFileName = uploadLogs(request.includeLogs)
             if (currentCoroutineContext().isActive) {
                 val account = getAccountDetailsUseCase(false)
-                val formattedTicket = createFormattedSupportTicket(request.description, logFileName, account)
+                val formattedTicket =
+                    createFormattedSupportTicket(request.description, logFileName, account)
                 supportRepository.logTicket(formattedTicket)
             }
         }
@@ -49,7 +50,7 @@ class SubmitIssueUseCase @Inject constructor(
     private suspend fun FlowCollector<Progress>.uploadLogs(
         includeLogs: Boolean,
     ): String? {
-        val logs = if (shouldCompressLogs(includeLogs)) getZippedLogsUseCase() else null
+        val logs = if (shouldCompressLogs(includeLogs)) getZippedLogsOrNull() else null
         logs?.let {
             emitAll(
                 supportRepository.uploadFile(it)
@@ -58,6 +59,9 @@ class SubmitIssueUseCase @Inject constructor(
         }
         return logs?.name
     }
+
+    private suspend fun SubmitIssueUseCase.getZippedLogsOrNull() =
+        runCatching { getZippedLogsUseCase() }.getOrNull()
 
     private suspend fun shouldCompressLogs(includeLogs: Boolean) =
         includeLogs && currentCoroutineContext().isActive
