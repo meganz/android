@@ -27,6 +27,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import de.palm.composestateevents.EventEffect
@@ -89,7 +90,7 @@ fun SearchComposeView(
     val gridState = rememberLazyGridState()
     val scaffoldState = rememberScaffoldState()
     val snackBarHostState = remember { SnackbarHostState() }
-
+    var topBarPadding by remember { mutableStateOf(0.dp) }
     var searchQuery by rememberSaveable {
         mutableStateOf(state.searchQuery)
     }
@@ -104,6 +105,8 @@ fun SearchComposeView(
         listState.scrollToItem(0)
         gridState.scrollToItem(0)
     }
+    topBarPadding =
+        if (state.navigationLevel.isNotEmpty() && state.nodeSourceType != NodeSourceType.CLOUD_DRIVE && state.nodeSourceType != NodeSourceType.HOME) 8.dp else 0.dp
 
     state.errorMessageId?.let {
         val errorMessage = stringResource(id = it)
@@ -132,7 +135,8 @@ fun SearchComposeView(
                 navHostController = navHostController,
                 nodeActionHandler = nodeActionHandler,
                 clearSelection = clearSelection,
-                nodeSourceType = state.nodeSourceType
+                nodeSourceType = state.nodeSourceType,
+                navigationLevel = state.navigationLevel
             )
         },
         snackbarHost = {
@@ -141,7 +145,7 @@ fun SearchComposeView(
             }
         }
     ) { padding ->
-        Column {
+        Column(modifier = Modifier.padding(top = topBarPadding)) {
             if (state.nodeSourceType == NodeSourceType.CLOUD_DRIVE || state.nodeSourceType == NodeSourceType.HOME) {
                 FilterChipsView(state, onFilterClicked, updateFilter, trackAnalytics)
             }
