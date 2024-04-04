@@ -12,6 +12,7 @@ import androidx.navigation.navArgument
  * Video preview screen
  */
 fun NavGraphBuilder.videoPreviewScreen(
+    title: String,
     onBackPressed: () -> Unit,
     onSendVideo: (Uri) -> Unit,
 ) {
@@ -26,6 +27,7 @@ fun NavGraphBuilder.videoPreviewScreen(
         val uri = Uri.parse(it.arguments?.getString(VIDEO_URI_ARG))
         VideoPreviewScreen(
             uri = uri,
+            title = title,
             onBackPressed = onBackPressed,
             onSendVideo = onSendVideo
         )

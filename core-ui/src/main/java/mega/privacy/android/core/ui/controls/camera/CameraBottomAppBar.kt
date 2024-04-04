@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -71,7 +72,7 @@ fun CameraBottomAppBar(
             horizontalArrangement = Arrangement.spacedBy(36.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            InternalAnimatedContent(visible = !isRecording,) {
+            InternalAnimatedContent(visible = !isRecording) {
                 CameraButton(
                     modifier = Modifier.testTag(TEST_TAG_CAMERA_BOTTOM_APP_BAR_GALLERY),
                     iconResId = R.drawable.ic_gallery,
@@ -110,13 +111,13 @@ fun CameraBottomAppBar(
                                 end.linkTo(parent.end)
                                 top.linkTo(parent.top)
                             },
-                        contentDescription = "Video",
+                        contentDescription = stringResource(id = R.string.video_button),
                         selected = true,
                         shape = CircleShape,
                         onClick = onToggleCaptureMode
                     ) {
                         Text(
-                            text = "Video",
+                            text = stringResource(id = R.string.video_button),
                         )
                     }
 
@@ -128,12 +129,12 @@ fun CameraBottomAppBar(
                                 end.linkTo(videoRef.start, 10.dp)
                                 top.linkTo(parent.top)
                             },
-                        contentDescription = "Photo",
+                        contentDescription = stringResource(id = R.string.camera_photo_button),
                         selected = false,
                         shape = CircleShape,
                         onClick = onToggleCaptureMode
                     ) {
-                        Text(text = "Photo")
+                        Text(text = stringResource(id = R.string.camera_photo_button))
                     }
                 } else {
                     Chip(
@@ -145,12 +146,12 @@ fun CameraBottomAppBar(
                                 end.linkTo(parent.end)
                                 top.linkTo(parent.top)
                             },
-                        contentDescription = "Photo",
+                        contentDescription = stringResource(id = R.string.camera_photo_button),
                         selected = true,
                         shape = CircleShape,
                         onClick = onToggleCaptureMode
                     ) {
-                        Text(text = "Photo")
+                        Text(text = stringResource(id = R.string.camera_photo_button))
                     }
 
                     Chip(
@@ -161,12 +162,12 @@ fun CameraBottomAppBar(
                                 start.linkTo(photoRef.end, 10.dp)
                                 top.linkTo(parent.top)
                             },
-                        contentDescription = "Video",
+                        contentDescription = stringResource(id = R.string.video_button),
                         selected = false,
                         shape = CircleShape,
                         onClick = onToggleCaptureMode
                     ) {
-                        Text(text = "Video")
+                        Text(text = stringResource(id = R.string.video_button))
                     }
                 }
             }

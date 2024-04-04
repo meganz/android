@@ -15,6 +15,7 @@ import androidx.navigation.navArgument
  * @param onSendPhoto
  */
 fun NavGraphBuilder.photoPreviewScreen(
+    title: String,
     onBackPressed: () -> Unit,
     onSendPhoto: (Uri) -> Unit,
 ) {
@@ -29,6 +30,7 @@ fun NavGraphBuilder.photoPreviewScreen(
         val uri = Uri.parse(it.arguments?.getString(PHOTO_URI_ARG))
         PhotoPreviewScreen(
             uri = uri,
+            title = title,
             onBackPressed = onBackPressed,
             onSendPhoto = onSendPhoto
         )

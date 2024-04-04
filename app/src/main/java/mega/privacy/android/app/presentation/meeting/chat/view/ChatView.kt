@@ -62,6 +62,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.camera.CameraArg
+import mega.privacy.android.app.camera.InAppCameraLauncher
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.InviteContactActivity
@@ -445,6 +447,28 @@ internal fun ChatView(
 
             selectedMessages = emptySet()
         }
+    val takePictureLauncher =
+        rememberLauncherForActivityResult(
+            contract = InAppCameraLauncher()
+        ) { uri ->
+            uri?.let {
+                onAttachFiles(listOf(it))
+            }
+        }
+    val capturePhotoOrVideoPermissionsLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissionsResult ->
+        if (permissionsResult[Manifest.permission.CAMERA] == true) {
+            takePictureLauncher.launch(CameraArg(uiState.title.orEmpty()))
+        } else {
+            showPermissionNotAllowedSnackbar(
+                context,
+                coroutineScope,
+                scaffoldState.snackbarHostState,
+                R.string.chat_attach_pick_from_camera_deny_permission
+            )
+        }
+    }
     var pendingAction: (@Composable () -> Unit)? by remember {
         mutableStateOf(null)
     }
@@ -475,17 +499,6 @@ internal fun ChatView(
                     ?.let { contactList ->
                         onAttachContacts(contactList.toList())
                     }
-            }
-        var takePictureUri by remember { mutableStateOf(Uri.EMPTY) }
-
-        val takePictureLauncher =
-            rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.TakePicture()
-            ) { resultOk ->
-                if (resultOk) {
-                    onAttachFiles(listOf(takePictureUri))
-                }
-                takePictureUri = Uri.EMPTY
             }
 
         val isFileModalShown by derivedStateOf {
@@ -646,12 +659,14 @@ internal fun ChatView(
                             onSendGiphyMessage = onSendGiphyMessage,
                             onTakePicture = {
                                 coroutineScope.launch {
-                                    createNewImage()?.let {
-                                        takePictureUri = it
-                                        takePictureLauncher.launch(it)
-                                    }
                                     toolbarModalSheetState.hide()
                                 }
+                                capturePhotoOrVideoPermissionsLauncher.launch(
+                                    arrayOf(
+                                        PermissionUtils.getCameraPermission(),
+                                        PermissionUtils.getRecordAudioPermission()
+                                    )
+                                )
                             },
                             sheetState = toolbarModalSheetState,
                             onCameraPermissionDenied = {

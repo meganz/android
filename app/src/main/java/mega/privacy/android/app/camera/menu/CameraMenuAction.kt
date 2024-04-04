@@ -2,13 +2,14 @@ package mega.privacy.android.app.camera.menu
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 
 internal sealed interface CameraMenuAction : MenuActionWithIcon {
     class FlashOff : CameraMenuAction {
         @Composable
-        override fun getDescription(): String = "Flash Off"
+        override fun getDescription(): String = stringResource(id = R.string.camera_flash_mode_off)
 
         @Composable
         override fun getIconPainter() = painterResource(R.drawable.ic_flash_off)
@@ -18,7 +19,7 @@ internal sealed interface CameraMenuAction : MenuActionWithIcon {
 
     class FlashOn : CameraMenuAction {
         @Composable
-        override fun getDescription(): String = "Flash On"
+        override fun getDescription(): String = stringResource(id = R.string.camera_flash_mode_on)
 
         @Composable
         override fun getIconPainter() = painterResource(R.drawable.ic_flash)
@@ -28,7 +29,7 @@ internal sealed interface CameraMenuAction : MenuActionWithIcon {
 
     class FlashAuto : CameraMenuAction {
         @Composable
-        override fun getDescription(): String = "Flash Auto"
+        override fun getDescription(): String = stringResource(id = R.string.camera_flash_mode_auto)
 
         @Composable
         override fun getIconPainter() = painterResource(R.drawable.ic_flash_auto)

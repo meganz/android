@@ -16,6 +16,7 @@ import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
 @Composable
 internal fun CameraPreviewScreen(
     uri: Uri,
+    title: String,
     onBackPressed: () -> Unit,
     onSend: (Uri) -> Unit,
     viewModel: PreviewViewModel = hiltViewModel(),
@@ -29,7 +30,7 @@ internal fun CameraPreviewScreen(
         topBar = {
             MegaAppBar(
                 appBarType = AppBarType.CLOSE,
-                title = stringResource(id = R.string.context_send_file_to_chat),
+                title = stringResource(id = R.string.camera_send_to, title),
                 onNavigationPressed = {
                     viewModel.deleteVideo(uri)
                     onBackPressed()

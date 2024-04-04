@@ -13,12 +13,14 @@ import mega.privacy.android.app.camera.PreviewViewModel
 @Composable
 internal fun PhotoPreviewScreen(
     uri: Uri,
+    title: String,
     onBackPressed: () -> Unit,
     onSendPhoto: (Uri) -> Unit,
     viewModel: PreviewViewModel = hiltViewModel(),
 ) {
     CameraPreviewScreen(
         uri = uri,
+        title = title,
         onBackPressed = onBackPressed,
         onSend = onSendPhoto,
         viewModel = viewModel,

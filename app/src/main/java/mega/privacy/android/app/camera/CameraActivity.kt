@@ -12,6 +12,7 @@ import mega.privacy.android.app.camera.preview.navigateToPhotoPreview
 import mega.privacy.android.app.camera.preview.navigateToVideoPreview
 import mega.privacy.android.app.camera.preview.photoPreviewScreen
 import mega.privacy.android.app.camera.preview.videoPreviewScreen
+import mega.privacy.android.app.presentation.extensions.parcelable
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @AndroidEntryPoint
@@ -21,6 +22,7 @@ internal class CameraActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
+            val args = intent.parcelable<CameraArg>(EXTRA_ARGS) as CameraArg
 
             // force dark theme for camera
             MegaAppTheme(isDark = true) {
@@ -31,10 +33,12 @@ internal class CameraActivity : ComponentActivity() {
                         onOpenPhotoPreview = navController::navigateToPhotoPreview
                     )
                     videoPreviewScreen(
+                        title = args.title,
                         onBackPressed = navController::popBackStack,
                         onSendVideo = ::setResult
                     )
                     photoPreviewScreen(
+                        title = args.title,
                         onBackPressed = navController::popBackStack,
                         onSendPhoto = ::setResult
                     )
@@ -52,5 +56,6 @@ internal class CameraActivity : ComponentActivity() {
 
     companion object {
         const val EXTRA_URI = "extra_uri"
+        const val EXTRA_ARGS = "extra_args"
     }
 }

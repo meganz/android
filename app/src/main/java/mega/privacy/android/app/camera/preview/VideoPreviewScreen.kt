@@ -35,12 +35,14 @@ import mega.privacy.android.app.databinding.SimpleVideoPlayerBinding
 @Composable
 internal fun VideoPreviewScreen(
     uri: Uri,
+    title: String,
     onBackPressed: () -> Unit,
     onSendVideo: (Uri) -> Unit,
     viewModel: PreviewViewModel = hiltViewModel(),
 ) {
     CameraPreviewScreen(
         uri = uri,
+        title = title,
         onBackPressed = onBackPressed,
         onSend = onSendVideo,
         viewModel = viewModel,
