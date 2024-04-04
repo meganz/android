@@ -44,13 +44,18 @@ import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
+import androidx.compose.foundation.background
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -1253,43 +1258,52 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     upgradeToProPlanBottomSheetState.currentValue != ModalBottomSheetValue.Hidden
                 }
 
-                val noBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
                 MegaAppTheme(isDark = isDark) {
+
+                    var showUpgradeDialog by rememberSaveable() {
+                        mutableStateOf(false)
+                    }
                     LaunchedEffect(state.shouldUpgradeToProPlan) {
+                        Timber.d("shouldUpgradeToProPlan ${state.shouldUpgradeToProPlan}")
                         if (state.shouldUpgradeToProPlan) {
+                            showUpgradeDialog = true
                             upgradeToProPlanBottomSheetState.show()
                             viewModel.onConsumeShouldUpgradeToProPlan()
                         }
                     }
+                    LaunchedEffect(upgradeToProPlanBottomSheetState.currentValue) {
+                        if (upgradeToProPlanBottomSheetState.currentValue == ModalBottomSheetValue.Hidden) {
+                            showUpgradeDialog = false
+                        }
+                    }
 
-                    BottomSheet(
-                        modifier = Modifier.semantics {
-                            testTagsAsResourceId = true
-                        },
-                        modalSheetState = when {
-                            isUpgradeToProPlanShown -> upgradeToProPlanBottomSheetState
-                            else -> noBottomSheetState
-                        },
-                        sheetBody = {
-                            when {
-                                isUpgradeToProPlanShown -> {
-                                    UpgradeProPlanBottomSheet {
-                                        coroutineScope.launch {
-                                            upgradeToProPlanBottomSheetState.hide()
+                    if (state.callEndedDueToFreePlanLimits && state.isCallUnlimitedProPlanFeatureFlagEnabled &&
+                        state.usersCallLimitReminders == UsersCallLimitReminders.Enabled
+                    ) {
+                        FreePlanLimitParticipantsDialog(
+                            onConfirm = {
+                                viewModel.onConsumeShowFreePlanParticipantsLimitDialogEvent()
+                            },
+                        )
+                    }
+                    if (showUpgradeDialog) {
+                        BottomSheet(
+                            modifier = Modifier
+                                .semantics {
+                                    testTagsAsResourceId = true
+                                },
+                            modalSheetState = upgradeToProPlanBottomSheetState,
+                            sheetBody = {
+                                when {
+                                    isUpgradeToProPlanShown -> {
+                                        UpgradeProPlanBottomSheet {
+                                            coroutineScope.launch {
+                                                upgradeToProPlanBottomSheetState.hide()
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        }) {
-                        if (state.callEndedDueToFreePlanLimits && state.isCallUnlimitedProPlanFeatureFlagEnabled &&
-                            state.usersCallLimitReminders == UsersCallLimitReminders.Enabled
-                        ) {
-                            FreePlanLimitParticipantsDialog(
-                                onConfirm = {
-                                    viewModel.onConsumeShowFreePlanParticipantsLimitDialogEvent()
-                                },
-                            )
-                        }
+                            })
                     }
                 }
             }
