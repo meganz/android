@@ -531,10 +531,6 @@ class MeetingActivityViewModel @Inject constructor(
             runCatching {
                 getChatCallUseCase(_state.value.chatId)
             }.onSuccess { call ->
-                if (call == null) {
-                    finishMeetingActivity()
-                }
-
                 call?.let {
                     when (call.status) {
                         ChatCallStatus.UserNoPresent -> {
