@@ -261,7 +261,6 @@ class SearchActivityViewModel @Inject constructor(
         _state.update {
             it.copy(
                 selectedFilter = selectedChip.takeIf { selectedChip?.filter != state.value.selectedFilter?.filter },
-                resetScroll = triggered
             )
         }
         viewModelScope.launch { performSearch() }
@@ -368,7 +367,6 @@ class SearchActivityViewModel @Inject constructor(
         _state.update {
             it.copy(
                 typeSelectedFilterOption = typeFilterOption,
-                resetScroll = triggered
             )
         }
         viewModelScope.launch { performSearch() }
@@ -381,7 +379,6 @@ class SearchActivityViewModel @Inject constructor(
         _state.update {
             it.copy(
                 dateModifiedSelectedFilterOption = dateFilterOption,
-                resetScroll = triggered
             )
         }
         viewModelScope.launch { performSearch() }
@@ -394,7 +391,6 @@ class SearchActivityViewModel @Inject constructor(
         _state.update {
             it.copy(
                 dateAddedSelectedFilterOption = dateFilterOption,
-                resetScroll = triggered
             )
         }
         viewModelScope.launch { performSearch() }
@@ -501,15 +497,6 @@ class SearchActivityViewModel @Inject constructor(
 
                 setDateAddedSelectedFilterOption(dateAddedOption)
             }
-        }
-    }
-
-    /**
-     * Clear reset scroll
-     */
-    fun clearResetScroll() {
-        _state.update {
-            it.copy(resetScroll = consumed)
         }
     }
 

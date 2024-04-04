@@ -36,7 +36,6 @@ import mega.privacy.android.domain.entity.search.TypeFilterOption
  * @property selectedNodes selected nodes
  * @property nodeNameCollisionResult result of node name collision
  * @property moveRequestResult result of move request
- * @property resetScroll to reset scroll position
  * @property navigationLevel list of parent handles
  */
 data class SearchActivityState(
@@ -59,6 +58,5 @@ data class SearchActivityState(
     val nodeSourceType: NodeSourceType = NodeSourceType.OTHER,
     val nodeNameCollisionResult: NodeNameCollisionResult? = null,
     val moveRequestResult: Result<MoveRequestResult>? = null,
-    val resetScroll: StateEvent = consumed,
     val navigationLevel: List<Pair<Long, String>> = emptyList(),
 )
