@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemp
 import mega.privacy.android.domain.usecase.camerauploads.DisableMediaUploadsSettingsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
@@ -44,6 +45,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderNodeValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderNodeValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
@@ -61,6 +63,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSetti
 import mega.privacy.android.domain.usecase.camerauploads.SetupDefaultSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupMediaUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
@@ -103,6 +106,7 @@ internal class SettingsCameraUploadsViewModelTest {
     private val disableMediaUploadsSettingsUseCase = mock<DisableMediaUploadsSettingsUseCase>()
     private val getPrimaryFolderNodeUseCase = mock<GetPrimaryFolderNodeUseCase>()
     private val getPrimaryFolderPathUseCase = mock<GetPrimaryFolderPathUseCase>()
+    private val getSecondaryFolderNodeUseCase = mock<GetSecondaryFolderNodeUseCase>()
     private val getSecondaryFolderPathUseCase = mock<GetSecondaryFolderPathUseCase>()
     private val getUploadOptionUseCase = mock<GetUploadOptionUseCase>()
     private val getUploadVideoQualityUseCase = mock<GetUploadVideoQualityUseCase>()
@@ -115,6 +119,7 @@ internal class SettingsCameraUploadsViewModelTest {
     private val isPrimaryFolderNodeValidUseCase = mock<IsPrimaryFolderNodeValidUseCase>()
     private val isPrimaryFolderPathValidUseCase = mock<IsPrimaryFolderPathValidUseCase>()
     private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
+    private val isSecondaryFolderNodeValidUseCase = mock<IsSecondaryFolderNodeValidUseCase>()
     private val isSecondaryFolderPathValidUseCase = mock<IsSecondaryFolderPathValidUseCase>()
     private val listenToNewMediaUseCase = mock<ListenToNewMediaUseCase>()
     private val monitorCameraUploadsFolderDestinationUseCase =
@@ -134,6 +139,7 @@ internal class SettingsCameraUploadsViewModelTest {
     private val setupDefaultSecondaryFolderUseCase = mock<SetupDefaultSecondaryFolderUseCase>()
     private val setupMediaUploadsSettingUseCase = mock<SetupMediaUploadsSettingUseCase>()
     private val setupPrimaryFolderUseCase = mock<SetupPrimaryFolderUseCase>()
+    private val setupSecondaryFolderUseCase = mock<SetupSecondaryFolderUseCase>()
     private val snackBarHandler = mock<SnackBarHandler>()
     private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
     private val stopCameraUploadsUseCase = mock<StopCameraUploadsUseCase>()
@@ -151,6 +157,7 @@ internal class SettingsCameraUploadsViewModelTest {
             disableMediaUploadsSettingsUseCase,
             getPrimaryFolderNodeUseCase,
             getPrimaryFolderPathUseCase,
+            getSecondaryFolderNodeUseCase,
             getSecondaryFolderPathUseCase,
             getUploadOptionUseCase,
             getUploadVideoQualityUseCase,
@@ -162,6 +169,7 @@ internal class SettingsCameraUploadsViewModelTest {
             isPrimaryFolderNodeValidUseCase,
             isPrimaryFolderPathValidUseCase,
             isSecondaryFolderEnabled,
+            isSecondaryFolderNodeValidUseCase,
             isSecondaryFolderPathValidUseCase,
             listenToNewMediaUseCase,
             monitorCameraUploadsFolderDestinationUseCase,
@@ -179,6 +187,7 @@ internal class SettingsCameraUploadsViewModelTest {
             setupDefaultSecondaryFolderUseCase,
             setupMediaUploadsSettingUseCase,
             setupPrimaryFolderUseCase,
+            setupSecondaryFolderUseCase,
             snackBarHandler,
             startCameraUploadUseCase,
             stopCameraUploadsUseCase,
@@ -205,10 +214,15 @@ internal class SettingsCameraUploadsViewModelTest {
             on { id }.thenReturn(NodeId(123456L))
             on { name }.thenReturn("Camera Uploads")
         }
+        val mediaUploadsFolderNode = mock<TypedFolderNode> {
+            on { id }.thenReturn(NodeId(789012L))
+            on { name }.thenReturn("Media Uploads")
+        }
         whenever(areLocationTagsEnabledUseCase()).thenReturn(shouldIncludeLocationTags)
         whenever(areUploadFileNamesKeptUseCase()).thenReturn(shouldKeepUploadFileNames)
         whenever(getPrimaryFolderNodeUseCase()).thenReturn(cameraUploadsFolderNode)
         whenever(getPrimaryFolderPathUseCase()).thenReturn(primaryFolderPath)
+        whenever(getSecondaryFolderNodeUseCase()).thenReturn(mediaUploadsFolderNode)
         whenever(getSecondaryFolderPathUseCase()).thenReturn(secondaryFolderPath)
         whenever(getUploadOptionUseCase()).thenReturn(uploadOption)
         whenever(getUploadVideoQualityUseCase()).thenReturn(videoQuality)
@@ -231,6 +245,7 @@ internal class SettingsCameraUploadsViewModelTest {
             disableMediaUploadsSettingsUseCase = disableMediaUploadsSettingsUseCase,
             getPrimaryFolderNodeUseCase = getPrimaryFolderNodeUseCase,
             getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
+            getSecondaryFolderNodeUseCase = getSecondaryFolderNodeUseCase,
             getSecondaryFolderPathUseCase = getSecondaryFolderPathUseCase,
             getUploadOptionUseCase = getUploadOptionUseCase,
             getUploadVideoQualityUseCase = getUploadVideoQualityUseCase,
@@ -242,6 +257,7 @@ internal class SettingsCameraUploadsViewModelTest {
             isPrimaryFolderNodeValidUseCase = isPrimaryFolderNodeValidUseCase,
             isPrimaryFolderPathValidUseCase = isPrimaryFolderPathValidUseCase,
             isSecondaryFolderEnabled = isSecondaryFolderEnabled,
+            isSecondaryFolderNodeValidUseCase = isSecondaryFolderNodeValidUseCase,
             isSecondaryFolderPathValidUseCase = isSecondaryFolderPathValidUseCase,
             listenToNewMediaUseCase = listenToNewMediaUseCase,
             monitorCameraUploadsFolderDestinationUseCase = monitorCameraUploadsFolderDestinationUseCase,
@@ -250,6 +266,7 @@ internal class SettingsCameraUploadsViewModelTest {
             setChargingRequiredForVideoCompressionUseCase = setChargingRequiredForVideoCompressionUseCase,
             setLocationTagsEnabledUseCase = setLocationTagsEnabledUseCase,
             setPrimaryFolderPathUseCase = setPrimaryFolderPathUseCase,
+            setupSecondaryFolderUseCase = setupSecondaryFolderUseCase,
             setSecondaryFolderLocalPathUseCase = setSecondaryFolderLocalPathUseCase,
             setUploadFileNamesKeptUseCase = setUploadFileNamesKeptUseCase,
             setUploadOptionUseCase = setUploadOptionUseCase,
@@ -1210,6 +1227,115 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.onLocalSecondaryFolderSelected("new/secondary/folder/path")
 
                 verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
+            }
+    }
+
+    /**
+     * The Test Group that verifies behaviors when changing the Media Uploads Secondary Folder Node
+     */
+    @Nested
+    @DisplayName("Media Uploads - Folder Node Selection")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    internal inner class MediaUploadsFolderNodeSelectionTestGroup {
+        @Test
+        fun `test that an error snackbar is shown when changing the secondary folder node throws an exception`() =
+            runTest {
+                whenever(isSecondaryFolderNodeValidUseCase(any())).thenThrow(RuntimeException())
+                initializeUnderTest()
+
+                assertDoesNotThrow { underTest.onSecondaryFolderNodeSelected(NodeId(789012L)) }
+
+                verify(snackBarHandler).postSnackbarMessage(
+                    resId = R.string.general_error,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
+
+        @Test
+        fun `test that an error snackbar is shown when the new secondary folder node is invalid`() =
+            runTest {
+                whenever(isSecondaryFolderNodeValidUseCase(any())).thenReturn(false)
+                initializeUnderTest()
+
+                underTest.onSecondaryFolderNodeSelected(NodeId(789012L))
+
+                verify(snackBarHandler).postSnackbarMessage(
+                    resId = R.string.error_invalid_folder_selected,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
+
+        @Test
+        fun `test that the new secondary folder node is set`() = runTest {
+            val secondaryFolderNodeId = NodeId(789012L)
+            whenever(isSecondaryFolderNodeValidUseCase(any())).thenReturn(true)
+            initializeUnderTest()
+
+            underTest.onSecondaryFolderNodeSelected(secondaryFolderNodeId)
+
+            verify(setupSecondaryFolderUseCase).invoke(secondaryFolderNodeId.longValue)
+        }
+
+        @Test
+        fun `test that setting the new secondary folder node also stops the ongoing camera uploads process`() =
+            runTest {
+                whenever(isSecondaryFolderNodeValidUseCase(any())).thenReturn(true)
+                initializeUnderTest()
+
+                underTest.onSecondaryFolderNodeSelected(NodeId(789012L))
+
+                verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.Stop)
+            }
+
+        @Test
+        fun `test that the exception is caught when setting the secondary folder name`() = runTest {
+            val folderNodeId = NodeId(789012L)
+            val folderDestinationUpdate = CameraUploadsFolderDestinationUpdate(
+                nodeHandle = folderNodeId.longValue,
+                cameraUploadFolderType = CameraUploadFolderType.Secondary,
+            )
+            whenever(isSecondaryFolderNodeValidUseCase(any())).thenReturn(true)
+            whenever(getSecondaryFolderNodeUseCase(any())).thenThrow(RuntimeException())
+            whenever(monitorCameraUploadsFolderDestinationUseCase()).thenReturn(
+                flow {
+                    emit(folderDestinationUpdate)
+                    awaitCancellation()
+                }
+            )
+            initializeUnderTest()
+
+            assertDoesNotThrow { underTest.onSecondaryFolderNodeSelected(folderNodeId) }
+        }
+
+        @Test
+        fun `test that the secondary folder name is set`() =
+            runTest {
+                val folderName = "Media Uploads"
+                val folderNodeId = NodeId(789012L)
+                val mediaUploadsNode = mock<TypedFolderNode> {
+                    on { id }.thenReturn(folderNodeId)
+                    on { name }.thenReturn(folderName)
+                }
+                val folderDestinationUpdate = CameraUploadsFolderDestinationUpdate(
+                    nodeHandle = folderNodeId.longValue,
+                    cameraUploadFolderType = CameraUploadFolderType.Secondary,
+                )
+
+                whenever(isSecondaryFolderNodeValidUseCase(any())).thenReturn(true)
+                whenever(getSecondaryFolderNodeUseCase(any())).thenReturn(mediaUploadsNode)
+                whenever(monitorCameraUploadsFolderDestinationUseCase()).thenReturn(
+                    flow {
+                        emit(folderDestinationUpdate)
+                        awaitCancellation()
+                    }
+                )
+                initializeUnderTest()
+
+                underTest.onSecondaryFolderNodeSelected(folderNodeId)
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().secondaryFolderName).isEqualTo(folderName)
+                }
             }
     }
 }

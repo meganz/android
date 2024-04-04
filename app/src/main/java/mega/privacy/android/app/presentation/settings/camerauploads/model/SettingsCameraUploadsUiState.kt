@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
  * permissions
  * @property requireChargingDuringVideoCompression, If true, the Device needs to be charged when
  * compressing Videos
+ * @property secondaryFolderName The Media Uploads Cloud Drive Folder name, which can be null
  * @property secondaryFolderPath The Media Uploads Local Secondary Folder Path
  * @property shouldIncludeLocationTags If true, Location Tags are added when uploading Photos through
  * Camera Uploads
@@ -36,6 +37,7 @@ internal data class SettingsCameraUploadsUiState(
     val primaryFolderPath: String = "",
     val requestPermissions: StateEvent = consumed,
     val requireChargingDuringVideoCompression: Boolean = true,
+    val secondaryFolderName: String? = null,
     val secondaryFolderPath: String = "",
     val shouldIncludeLocationTags: Boolean = false,
     val shouldKeepUploadFileNames: Boolean = false,

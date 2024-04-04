@@ -34,6 +34,7 @@ internal fun SettingsCameraUploadsRoute(
         onPrimaryFolderNodeSelected = viewModel::onPrimaryFolderNodeSelected,
         onRegularBusinessAccountSubUserPromptAcknowledged = viewModel::onRegularBusinessAccountSubUserPromptAcknowledged,
         onRequestPermissionsStateChanged = viewModel::onRequestPermissionsStateChanged,
+        onSecondaryFolderNodeSelected = viewModel::onSecondaryFolderNodeSelected,
         onUploadOptionUiItemSelected = viewModel::onUploadOptionUiItemSelected,
         onVideoQualityUiItemSelected = viewModel::onVideoQualityUiItemSelected,
     )

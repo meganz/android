@@ -34,6 +34,7 @@ import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemp
 import mega.privacy.android.domain.usecase.camerauploads.DisableMediaUploadsSettingsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
@@ -43,6 +44,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderNodeValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderNodeValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
@@ -60,6 +62,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupCameraUploadsSetti
 import mega.privacy.android.domain.usecase.camerauploads.SetupDefaultSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupMediaUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
@@ -80,6 +83,7 @@ import javax.inject.Inject
  * @property disableMediaUploadsSettingsUseCase Disables Media Uploads
  * @property getPrimaryFolderNodeUseCase Gets the Camera Uploads Primary Folder Node
  * @property getPrimaryFolderPathUseCase Gets the Camera Uploads Primary Folder Path
+ * @property getSecondaryFolderNodeUseCase Gets the Media Uploads Secondary Folder Node
  * @property getSecondaryFolderPathUseCase Gets the Media Uploads Secondary Folder Path
  * @property getUploadOptionUseCase Gets the type of content being uploaded by Camera Uploads
  * @property getUploadVideoQualityUseCase Gets the Video Quality of Videos being uploaded by Camera Uploads
@@ -94,6 +98,7 @@ import javax.inject.Inject
  * @property isPrimaryFolderNodeValidUseCase Checks if the Camera Uploads Folder Node is valid or not
  * @property isPrimaryFolderPathValidUseCase Checks if the Camera Uploads Primary Folder Path is valid or not
  * @property isSecondaryFolderEnabled Checks if Media Uploads (the Secondary Folder) is enabled or not
+ * @property isSecondaryFolderNodeValidUseCase Checks if the Media Uploads Folder Node is valid or not
  * @property isSecondaryFolderPathValidUseCase Checks if the Media Uploads Secondary Folder Path is valid or not
  * @property listenToNewMediaUseCase Listens to new Photos and Videos captured by the Device
  * @property monitorCameraUploadsFolderDestinationUseCase Listens for any destination changes in the Camera
@@ -116,6 +121,7 @@ import javax.inject.Inject
  * @property setupDefaultSecondaryFolderUseCase Establishes a default Media Uploads Secondary Folder
  * @property setupMediaUploadsSettingUseCase Sets up Media Uploads and its Backup Folder
  * @property setupPrimaryFolderUseCase Sets the new Camera Uploads Folder Node
+ * @property setupSecondaryFolderUseCase Sets the new Media Uploads Folder Node
  * @property snackBarHandler Handler to display a Snackbar
  * @property startCameraUploadUseCase Starts the Camera Uploads operation
  * @property stopCameraUploadsUseCase Stops the Camera Uploads operation
@@ -132,6 +138,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val disableMediaUploadsSettingsUseCase: DisableMediaUploadsSettingsUseCase,
     private val getPrimaryFolderNodeUseCase: GetPrimaryFolderNodeUseCase,
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
+    private val getSecondaryFolderNodeUseCase: GetSecondaryFolderNodeUseCase,
     private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase,
     private val getUploadOptionUseCase: GetUploadOptionUseCase,
     private val getUploadVideoQualityUseCase: GetUploadVideoQualityUseCase,
@@ -143,6 +150,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val isPrimaryFolderNodeValidUseCase: IsPrimaryFolderNodeValidUseCase,
     private val isPrimaryFolderPathValidUseCase: IsPrimaryFolderPathValidUseCase,
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
+    private val isSecondaryFolderNodeValidUseCase: IsSecondaryFolderNodeValidUseCase,
     private val isSecondaryFolderPathValidUseCase: IsSecondaryFolderPathValidUseCase,
     private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
     private val monitorCameraUploadsFolderDestinationUseCase: MonitorCameraUploadsFolderDestinationUseCase,
@@ -160,6 +168,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val setupDefaultSecondaryFolderUseCase: SetupDefaultSecondaryFolderUseCase,
     private val setupMediaUploadsSettingUseCase: SetupMediaUploadsSettingUseCase,
     private val setupPrimaryFolderUseCase: SetupPrimaryFolderUseCase,
+    private val setupSecondaryFolderUseCase: SetupSecondaryFolderUseCase,
     private val snackBarHandler: SnackBarHandler,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
@@ -191,10 +200,11 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 val isMediaUploadsEnabled = async { isSecondaryFolderEnabled() }
                 val maximumNonChargingVideoCompressionSize =
                     async { getVideoCompressionSizeLimitUseCase() }
+                val primaryFolderNode = async { getPrimaryFolderNodeUseCase() }
                 val primaryFolderPath = async { getPrimaryFolderPathUseCase() }
-                val primaryUploadNode = async { getPrimaryFolderNodeUseCase() }
                 val requireChargingDuringVideoCompression =
                     async { isChargingRequiredForVideoCompressionUseCase() }
+                val secondaryFolderNode = async { getSecondaryFolderNodeUseCase() }
                 val secondaryFolderPath = async { getSecondaryFolderPathUseCase() }
                 val shouldIncludeLocationTags = async { areLocationTagsEnabledUseCase() }
                 val shouldKeepUploadFileNames = async { areUploadFileNamesKeptUseCase() }
@@ -207,9 +217,10 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                         isCameraUploadsEnabled = isCameraUploadsEnabled.await(),
                         isMediaUploadsEnabled = isMediaUploadsEnabled.await(),
                         maximumNonChargingVideoCompressionSize = maximumNonChargingVideoCompressionSize.await(),
-                        primaryFolderName = primaryUploadNode.await()?.name,
+                        primaryFolderName = primaryFolderNode.await()?.name,
                         primaryFolderPath = primaryFolderPath.await(),
                         requireChargingDuringVideoCompression = requireChargingDuringVideoCompression.await(),
+                        secondaryFolderName = secondaryFolderNode.await()?.name,
                         secondaryFolderPath = secondaryFolderPath.await(),
                         shouldIncludeLocationTags = shouldIncludeLocationTags.await(),
                         shouldKeepUploadFileNames = shouldKeepUploadFileNames.await(),
@@ -241,8 +252,9 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                             primaryFolderNodeId = NodeId(cameraUploadsFolderDestinationUpdate.nodeHandle),
                         )
 
-                        // To be implemented in succeeding Merge Requests
-                        CameraUploadFolderType.Secondary -> Unit
+                        CameraUploadFolderType.Secondary -> setSecondaryFolderName(
+                            secondaryFolderNodeId = NodeId(cameraUploadsFolderDestinationUpdate.nodeHandle),
+                        )
                     }
                 }
         }
@@ -263,6 +275,27 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             }.onFailure { exception ->
                 Timber.e(
                     "An exception occurred when updating the Camera Uploads Folder Node Name",
+                    exception,
+                )
+            }
+        }
+    }
+
+    /**
+     * When receiving a destination update of the Media Uploads Secondary Folder Node, update the
+     * Secondary Folder Node name in the UI State
+     *
+     * @param secondaryFolderNodeId The Media Uploads Secondary Folder [NodeId]
+     */
+    private fun setSecondaryFolderName(secondaryFolderNodeId: NodeId) {
+        viewModelScope.launch {
+            runCatching {
+                getSecondaryFolderNodeUseCase(secondaryFolderNodeId)
+            }.onSuccess { secondaryFolderNode ->
+                _uiState.update { it.copy(secondaryFolderName = secondaryFolderNode?.name) }
+            }.onFailure { exception ->
+                Timber.e(
+                    "An exception occurred when updating the Media Uploads Folder Node Name",
                     exception,
                 )
             }
@@ -680,6 +713,32 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             }.onFailure { exception ->
                 Timber.e(
                     "An error occurred when changing the Media Uploads Local Folder",
+                    exception,
+                )
+                showGenericErrorSnackbar()
+            }
+        }
+    }
+
+    /**
+     * Sets the new Media Uploads Folder Node after selecting from Cloud Drive. Doing this stops the
+     * ongoing Camera Uploads process
+     *
+     * @param newSecondaryFolderNodeId The new Primary Folder [NodeId]
+     */
+    fun onSecondaryFolderNodeSelected(newSecondaryFolderNodeId: NodeId) {
+        viewModelScope.launch {
+            runCatching {
+                if (isSecondaryFolderNodeValidUseCase(newSecondaryFolderNodeId.longValue)) {
+                    setupSecondaryFolderUseCase(newSecondaryFolderNodeId.longValue)
+                    stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
+                } else {
+                    Timber.d("The new Media Uploads Folder Node is invalid")
+                    showInvalidFolderSnackbar()
+                }
+            }.onFailure { exception ->
+                Timber.e(
+                    "An error occurred when changing the Media Uploads Folder Node",
                     exception,
                 )
                 showGenericErrorSnackbar()

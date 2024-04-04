@@ -30,13 +30,13 @@ internal fun openLocalFolderPicker(
 }
 
 /**
- * Selects a new Camera Uploads Folder Node by starting [FileExplorerActivity] and retrieving the
+ * Selects a new Folder Node by starting an [Intent] to [FileExplorerActivity] and retrieving the
  * new Folder Node handle afterwards
  *
  * @param context The [Context] to create a [FileExplorerActivity] [Intent]
  * @param launcher The Launcher to start [FileExplorerActivity]
  */
-internal fun openCameraUploadsFolderNodePicker(
+internal fun openFolderNodePicker(
     context: Context,
     launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
 ) {
