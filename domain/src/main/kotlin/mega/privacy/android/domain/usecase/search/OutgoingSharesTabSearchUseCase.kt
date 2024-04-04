@@ -31,7 +31,7 @@ class OutgoingSharesTabSearchUseCase @Inject constructor(
         )
         return list.sortedWith(
             if (getCloudSortOrder() == SortOrder.ORDER_DEFAULT_DESC) {
-                compareByDescending<UnTypedNode> { it is FolderNode }
+                compareByDescending<UnTypedNode> { it is FolderNode }.reversed()
                     .thenBy(String.CASE_INSENSITIVE_ORDER) { it.name }.reversed()
             } else {
                 compareBy<UnTypedNode> { it is FolderNode }.thenBy(
