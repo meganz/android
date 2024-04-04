@@ -42,9 +42,11 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
@@ -115,14 +117,15 @@ fun LegacySearchAppBar(
 @Composable
 fun CollapsedSearchAppBar(
     onBackPressed: () -> Unit,
-    onSearchClicked: () -> Unit,
     elevation: Boolean,
     title: String,
     modifier: Modifier = Modifier,
+    onSearchClicked: (() -> Unit)? = null,
     actions: List<MenuAction>? = null,
     onActionPressed: ((MenuAction) -> Unit)? = null,
     maxActionsToShow: Int = 3,
     enabled: Boolean = true,
+    showSearchButton: Boolean = true,
 ) {
     val iconColor = if (MaterialTheme.colors.isLight) Color.Black else Color.White
 
@@ -132,7 +135,7 @@ fun CollapsedSearchAppBar(
                 modifier = Modifier.testTag(SEARCH_TOOLBAR_TITLE_VIEW_TEST_TAG),
                 text = title,
                 style = MaterialTheme.typography.subtitle1,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
             )
         },
         navigationIcon = {
@@ -148,15 +151,17 @@ fun CollapsedSearchAppBar(
             }
         },
         actions = {
-            IconButton(
-                modifier = Modifier.testTag(SEARCH_TOOLBAR_SEARCH_BUTTON_TEST_TAG),
-                onClick = { onSearchClicked() },
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_search),
-                    contentDescription = "Search Icon",
-                    tint = iconColor
-                )
+            if (showSearchButton) {
+                IconButton(
+                    modifier = Modifier.testTag(SEARCH_TOOLBAR_SEARCH_BUTTON_TEST_TAG),
+                    onClick = { onSearchClicked?.invoke() },
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_search),
+                        contentDescription = "Search Icon",
+                        tint = iconColor
+                    )
+                }
             }
             actions?.let {
                 MenuActions(
@@ -205,8 +210,8 @@ fun ExpandedSearchAppBar(
                 .padding(start = 5.dp, end = 5.dp)
                 .focusRequester(focusRequester)
                 .testTag(SEARCH_TOOLBAR_TEXT_VIEW_TEST_TAG),
-            value = text,
-            onValueChange = { onSearchTextChange(it) },
+            value = TextFieldValue(text, TextRange(text.length)),
+            onValueChange = { onSearchTextChange(it.text) },
             placeholder = {
                 Text(
                     modifier = Modifier.alpha(ContentAlpha.medium),
@@ -296,7 +301,7 @@ fun AppBarPreview() {
         onBackPressed = {},
         onSearchClicked = {},
         elevation = false,
-        "Screen Title"
+        title = "Screen Title"
     )
 }
 

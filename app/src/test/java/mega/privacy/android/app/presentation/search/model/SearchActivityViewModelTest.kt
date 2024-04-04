@@ -430,6 +430,30 @@ class SearchActivityViewModelTest {
         )
     }
 
+    @Test
+    fun `test that navigation level is updated when open folder and navigate back is clicked`() =
+        runTest {
+            val typedFolderNode = mock<TypedFolderNode> {
+                on { id }.thenReturn(NodeId(345L))
+                on { name }.thenReturn("folder node")
+            }
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+            whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
+            underTest.onSortOrderChanged()
+            underTest.openFolder(typedFolderNode.id.longValue, typedFolderNode.name)
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.navigationLevel.size).isEqualTo(1)
+            }
+
+            underTest.navigateBack()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.navigationLevel.size).isEqualTo(0)
+            }
+
+        }
+
     @AfterEach
     fun tearDown() {
         nodeList.clear()

@@ -61,7 +61,8 @@ class SearchNodesUseCase @Inject constructor(
             parentNodeId = NodeId(longValue = parentHandle),
             order = getCloudSortOrder()
         )
-        return when (nodeSourceType) {
+
+        return if (parentHandle == invalidNodeHandle) return when (nodeSourceType) {
             NodeSourceType.INCOMING_SHARES -> incomingSharesTabSearchUseCase(query = query)
             NodeSourceType.OUTGOING_SHARES -> outgoingSharesTabSearchUseCase(query = query)
             NodeSourceType.LINKS -> linkSharesTabSearchUseCase(
@@ -69,17 +70,43 @@ class SearchNodesUseCase @Inject constructor(
                 isFirstLevel = isFirstLevel
             )
 
-            else -> {
-                val node = getSearchParentNode(nodeSourceType, parentHandle, invalidNodeHandle)
-                searchInNodesUseCase(
-                    nodeId = node?.id,
-                    query = query,
-                    searchCategory = searchCategory,
-                    modificationDate = modificationDate,
-                    creationDate = creationDate,
-                )
-            }
-        }
+            else -> searchInNodes(
+                nodeSourceType = nodeSourceType,
+                parentHandle = parentHandle,
+                invalidNodeHandle = invalidNodeHandle,
+                query = query,
+                searchCategory = searchCategory,
+                modificationDate = modificationDate,
+                creationDate = creationDate
+            )
+        } else searchInNodes(
+            nodeSourceType = nodeSourceType,
+            parentHandle = parentHandle,
+            invalidNodeHandle = invalidNodeHandle,
+            query = query,
+            searchCategory = searchCategory,
+            modificationDate = modificationDate,
+            creationDate = creationDate
+        )
+    }
+
+    private suspend fun searchInNodes(
+        nodeSourceType: NodeSourceType,
+        parentHandle: Long,
+        invalidNodeHandle: Long,
+        query: String,
+        searchCategory: SearchCategory,
+        modificationDate: DateFilterOption?,
+        creationDate: DateFilterOption?,
+    ): List<TypedNode> {
+        val node = getSearchParentNode(nodeSourceType, parentHandle, invalidNodeHandle)
+        return searchInNodesUseCase(
+            nodeId = node?.id,
+            query = query,
+            searchCategory = searchCategory,
+            modificationDate = modificationDate,
+            creationDate = creationDate,
+        )
     }
 
     /**

@@ -292,7 +292,11 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                     coroutineScope.launch {
                                         when (it) {
                                             is TypedFileNode -> openFileClicked(it)
-                                            is TypedFolderNode -> openFolderClicked(it.id.longValue)
+                                            is TypedFolderNode -> viewModel.openFolder(
+                                                folderHandle = it.id.longValue,
+                                                name = it.name
+                                            )
+
                                             else -> Timber.e("Unsupported click")
                                         }
                                     }
@@ -300,6 +304,8 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                 onBackPressed = {
                                     if (viewModel.state.value.selectedNodes.isNotEmpty()) {
                                         viewModel.clearSelection()
+                                    } else if (viewModel.state.value.navigationLevel.isNotEmpty()) {
+                                        viewModel.navigateBack()
                                     } else {
                                         onBackPressedDispatcher.onBackPressed()
                                     }
@@ -374,21 +380,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             .setData(uriUrl)
         startActivity(launchBrowser)
-    }
-
-    /**
-     * On Item click event received from [FileBrowserViewModel]
-     *
-     * @param folderHandle FolderHandle of current selected Folder
-     */
-    private fun openFolderClicked(folderHandle: Long?) {
-        folderHandle?.let {
-            val intent = Intent().apply {
-                putExtra(SEARCH_NODE_HANDLE, it)
-            }
-            setResult(RESULT_OK, intent)
-            finish()
-        }
     }
 
     /**

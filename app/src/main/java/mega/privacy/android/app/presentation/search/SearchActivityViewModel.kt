@@ -165,8 +165,8 @@ class SearchActivityViewModel @Inject constructor(
                 cancelCancelTokenUseCase()
                 if (state.value.dropdownChipsEnabled == true) {
                     searchNodesUseCase(
-                        query = state.value.searchQuery,
-                        parentHandle = parentHandle,
+                        query = getCurrentSearchQuery(),
+                        parentHandle = getCurrentParentHandle(),
                         nodeSourceType = nodeSourceType,
                         isFirstLevel = isFirstLevel,
                         searchCategory = typeFilterToSearchMapper(state.value.typeSelectedFilterOption),
@@ -175,8 +175,8 @@ class SearchActivityViewModel @Inject constructor(
                     )
                 } else {
                     searchNodesUseCase(
-                        query = state.value.searchQuery,
-                        parentHandle = parentHandle,
+                        query = getCurrentSearchQuery(),
+                        parentHandle = getCurrentParentHandle(),
                         nodeSourceType = nodeSourceType,
                         isFirstLevel = isFirstLevel,
                         searchCategory = state.value.selectedFilter?.filter ?: SearchCategory.ALL
@@ -189,6 +189,13 @@ class SearchActivityViewModel @Inject constructor(
             }
         }
     }
+
+    //If folder is opened from search screen we are setting query as empty
+    private fun getCurrentSearchQuery() =
+        state.value.searchQuery.takeIf { state.value.navigationLevel.isEmpty() }.orEmpty()
+
+    private fun getCurrentParentHandle() =
+        state.value.navigationLevel.lastOrNull()?.first ?: parentHandle
 
     private fun onSearchFailure(ex: Throwable) {
         if (ex is CancellationException) {
@@ -504,5 +511,34 @@ class SearchActivityViewModel @Inject constructor(
         _state.update {
             it.copy(resetScroll = consumed)
         }
+    }
+
+    /**
+     * Open folder from search screen
+     *
+     * @param folderHandle folder handle
+     * @param name folder name
+     */
+    fun openFolder(folderHandle: Long, name: String) {
+        val list = _state.value.navigationLevel.toMutableList()
+        list.add(Pair(folderHandle, name))
+        _state.update { state ->
+            state.copy(navigationLevel = list)
+        }
+        performSearch()
+    }
+
+    /**
+     * Handle back press
+     *
+     * navigates back to previous folder
+     */
+    fun navigateBack() {
+        val list = _state.value.navigationLevel.toMutableList()
+        list.remove(list.last())
+        _state.update { state ->
+            state.copy(navigationLevel = list)
+        }
+        performSearch()
     }
 }
