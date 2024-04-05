@@ -1,5 +1,5 @@
-import groovy.lang.Closure
 import mega.privacy.android.build.preBuiltSdkDependency
+import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
     id("com.android.library")
@@ -8,7 +8,6 @@ plugins {
     id("de.mannodermaus.android-junit5")
 }
 
-apply(from = "${project.rootDir}/tools/util.gradle")
 
 android {
     val compileSdkVersion: Int by rootProject.extra
@@ -101,8 +100,7 @@ dependencies {
     implementation(androidx.lifecycle.service)
     implementation(google.hilt.android)
 
-    val shouldApplyDefaultConfiguration: Closure<Boolean> by rootProject.extra
-    if (shouldApplyDefaultConfiguration()) {
+    if (shouldApplyDefaultConfiguration(project)) {
         apply(plugin = "dagger.hilt.android.plugin")
 
         kapt(google.hilt.android.compiler)

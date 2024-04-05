@@ -1,4 +1,5 @@
 import groovy.lang.Closure
+import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
     id("kotlin")
@@ -54,8 +55,7 @@ dependencies {
 
     implementation(lib.kotlin.serialisation)
 
-    val shouldApplyDefaultConfiguration: Closure<Boolean> by rootProject.extra
-    if (shouldApplyDefaultConfiguration()) {
+    if (shouldApplyDefaultConfiguration(project)) {
         kapt(google.hilt.android.compiler)
     }
 

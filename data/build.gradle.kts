@@ -1,5 +1,6 @@
 import groovy.lang.Closure
 import mega.privacy.android.build.preBuiltSdkDependency
+import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
     id("com.android.library")
@@ -12,7 +13,6 @@ plugins {
 
 apply(plugin = "jacoco")
 apply(from = "${project.rootDir}/tools/jacoco.gradle")
-apply(from = "${project.rootDir}/tools/util.gradle")
 
 android {
     val compileSdkVersion: Int by rootProject.extra
@@ -115,8 +115,7 @@ dependencies {
     implementation(androidx.documentfile)
     ksp(androidx.room.compiler)
 
-    val shouldApplyDefaultConfiguration: Closure<Boolean> by rootProject.extra
-    if (shouldApplyDefaultConfiguration()) {
+    if (shouldApplyDefaultConfiguration(project)) {
         apply(plugin = "dagger.hilt.android.plugin")
 
         kapt(google.hilt.android.compiler)

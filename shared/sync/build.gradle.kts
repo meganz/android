@@ -1,4 +1,5 @@
 import groovy.lang.Closure
+import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
     id("com.android.library")
@@ -69,8 +70,7 @@ dependencies {
     implementation(project(":shared:resources"))
     implementation(google.hilt.android)
 
-    val shouldApplyDefaultConfiguration: Closure<Boolean> by rootProject.extra
-    if (shouldApplyDefaultConfiguration()) {
+    if (shouldApplyDefaultConfiguration(project)) {
         apply(plugin = "dagger.hilt.android.plugin")
 
         kapt(google.hilt.android.compiler)

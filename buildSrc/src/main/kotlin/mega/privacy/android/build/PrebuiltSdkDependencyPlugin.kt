@@ -19,11 +19,3 @@ fun DependencyHandlerScope.preBuiltSdkDependency(extra: ExtraPropertiesExtension
         "implementation"(project(":sdk"))
     }
 }
-
-/**
- * Check whether we should use prebuilt SDK or local sdk module
- *
- * @return false if environment variable "USE_PREBUILT_SDK" is false. Otherwise return true.
- */
-fun shouldUsePrebuiltSdk(): Boolean =
-    System.getenv("USE_PREBUILT_SDK")?.let { it != "false" } ?: true

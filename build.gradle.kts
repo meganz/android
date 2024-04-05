@@ -1,4 +1,6 @@
-apply(from = "tools/util.gradle")
+import mega.privacy.android.build.shouldUsePrebuiltSdk
+import mega.privacy.android.build.isServerBuild
+
 plugins {
     // change it following kotlin version, see here https://github.com/google/ksp/releases
     id("com.google.devtools.ksp") version "1.9.22-1.0.17" apply false
@@ -87,16 +89,6 @@ extra["megaSdkVersion"] = "20240403.083758-rel"
 //JDK and Java Version
 extra["jdk"] = "17"
 extra["javaVersion"] = JavaVersion.VERSION_17
-
-/**
- * Checks if it is CI Build
- */
-val isServerBuild: groovy.lang.Closure<Boolean> by ext
-
-/**
- * Checks whether to use Prebuilt Sdk
- */
-val shouldUsePrebuiltSdk: groovy.lang.Closure<Boolean> by ext
 
 /**
  * Checks whether to Suppress Warnings

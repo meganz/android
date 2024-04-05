@@ -1,5 +1,6 @@
 import groovy.lang.Closure
 import mega.privacy.android.build.preBuiltSdkDependency
+import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
     id("com.android.library")
@@ -8,8 +9,6 @@ plugins {
     id("de.mannodermaus.android-junit5")
     id("com.google.devtools.ksp")
 }
-
-apply(from = "${project.rootDir}/tools/util.gradle")
 
 android {
     namespace = "mega.privacy.android.feature.sync"
@@ -100,8 +99,7 @@ dependencies {
     implementation(androidx.datastore.preferences)
     implementation(androidx.hilt.navigation)
 
-    val shouldApplyDefaultConfiguration: Closure<Boolean> by rootProject.extra
-    if (shouldApplyDefaultConfiguration()) {
+    if (shouldApplyDefaultConfiguration(project)) {
         apply(plugin = "dagger.hilt.android.plugin")
 
         kapt(google.hilt.android.compiler)

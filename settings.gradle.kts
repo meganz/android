@@ -1,5 +1,3 @@
-apply(from = "tools/util.gradle")
-
 dependencyResolutionManagement {
     versionCatalogs {
         for (file in fileTree("./gradle/catalogs").matching { include("**/*.toml") }) {
@@ -11,11 +9,6 @@ dependencyResolutionManagement {
     }
 }
 
-
-/**
- * Checks if it is CI Build
- */
-val isServerBuild: groovy.lang.Closure<Boolean> by extra
 
 if (!shouldUsePrebuiltSdk() || isServerBuild()) {
     include(":sdk")
@@ -62,3 +55,5 @@ buildCache {
 
 fun shouldUsePrebuiltSdk(): Boolean =
     System.getenv("USE_PREBUILT_SDK")?.let { it != "false" } ?: true
+
+fun isServerBuild(): Boolean = System.getenv("BUILD_NUMBER") != null
