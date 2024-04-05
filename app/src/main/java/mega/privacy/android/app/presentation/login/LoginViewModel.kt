@@ -22,6 +22,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
 import mega.privacy.android.app.presentation.extensions.error
@@ -129,6 +130,7 @@ class LoginViewModel @Inject constructor(
     private val clearLastRegisteredEmailUseCase: ClearLastRegisteredEmailUseCase,
     private val installReferrerHandler: InstallReferrerHandler,
     @LoginMutex private val loginMutex: Mutex,
+    private val transfersManagement: TransfersManagement,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -748,6 +750,8 @@ class LoginViewModel @Inject constructor(
                     if (getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)) {
                         startChatUploadsWorkerUseCase()
                     }
+                    //Login check resumed pending transfers
+                    transfersManagement.checkResumedPendingTransfers()
                 } else {
                     Timber.d("fetch nodes update")
                     _state.update { it.copy(fetchNodesUpdate = update) }

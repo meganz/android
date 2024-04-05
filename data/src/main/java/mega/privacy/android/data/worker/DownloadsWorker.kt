@@ -46,6 +46,7 @@ class DownloadsWorker @AssistedInject constructor(
     private val downloadNotificationMapper: DownloadNotificationMapper,
     private val transfersFinishedNotificationMapper: TransfersFinishedNotificationMapper,
     private val scanMediaFileUseCase: ScanMediaFileUseCase,
+    foregroundSetter: ForegroundSetter? = null,
 ) : AbstractTransfersWorker(
     context,
     workerParams,
@@ -61,12 +62,13 @@ class DownloadsWorker @AssistedInject constructor(
     areNotificationsEnabledUseCase,
     correctActiveTransfersUseCase,
     clearActiveTransfersIfFinishedUseCase,
+    foregroundSetter,
 ) {
 
     override val finalNotificationId = DOWNLOAD_NOTIFICATION_ID
     override val updateNotificationId = NOTIFICATION_DOWNLOAD_FINAL
 
-    override suspend fun createUpdateNotification(
+    override fun createUpdateNotification(
         activeTransferTotals: ActiveTransferTotals,
         paused: Boolean,
     ) = downloadNotificationMapper(activeTransferTotals, paused)

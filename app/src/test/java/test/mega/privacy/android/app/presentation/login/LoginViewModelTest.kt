@@ -2,7 +2,6 @@ package test.mega.privacy.android.app.presentation.login
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -14,6 +13,7 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerDetails
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
@@ -107,6 +107,7 @@ internal class LoginViewModelTest {
     private val saveLastRegisteredEmailUseCase = mock<SaveLastRegisteredEmailUseCase>()
     private val clearLastRegisteredEmailUseCase = mock<ClearLastRegisteredEmailUseCase>()
     private val installReferrerHandler = mock<InstallReferrerHandler>()
+    private val transfersManagement = mock<TransfersManagement>()
 
     @BeforeEach
     fun setUp() {
@@ -144,7 +145,8 @@ internal class LoginViewModelTest {
             getLastRegisteredEmailUseCase = getLastRegisteredEmailUseCase,
             saveLastRegisteredEmailUseCase = saveLastRegisteredEmailUseCase,
             clearLastRegisteredEmailUseCase = clearLastRegisteredEmailUseCase,
-            installReferrerHandler = installReferrerHandler
+            installReferrerHandler = installReferrerHandler,
+            transfersManagement = transfersManagement,
         )
     }
 

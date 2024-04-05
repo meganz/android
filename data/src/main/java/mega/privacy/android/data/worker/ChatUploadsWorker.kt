@@ -21,10 +21,10 @@ import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMes
 import mega.privacy.android.domain.usecase.chat.message.CheckFinishedChatUploadsUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
+import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
@@ -52,6 +52,7 @@ class ChatUploadsWorker @AssistedInject constructor(
     private val attachNodeWithPendingMessageUseCase: AttachNodeWithPendingMessageUseCase,
     private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
     private val checkFinishedChatUploadsUseCase: CheckFinishedChatUploadsUseCase,
+    foregroundSetter: ForegroundSetter? = null,
 ) : AbstractTransfersWorker(
     context,
     workerParams,
@@ -67,10 +68,11 @@ class ChatUploadsWorker @AssistedInject constructor(
     areNotificationsEnabledUseCase,
     correctActiveTransfersUseCase,
     clearActiveTransfersIfFinishedUseCase,
+    foregroundSetter,
 ) {
     override val updateNotificationId = NOTIFICATION_CHAT_UPLOAD
 
-    override suspend fun createUpdateNotification(
+    override fun createUpdateNotification(
         activeTransferTotals: ActiveTransferTotals,
         paused: Boolean,
     ) = chatUploadNotificationMapper(activeTransferTotals, null, paused)

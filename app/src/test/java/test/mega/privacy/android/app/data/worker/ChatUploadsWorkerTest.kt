@@ -15,6 +15,7 @@ import androidx.work.impl.utils.taskexecutor.WorkManagerTaskExecutor
 import androidx.work.workDataOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -23,6 +24,7 @@ import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.worker.AreNotificationsEnabledUseCase
 import mega.privacy.android.data.worker.ChatUploadsWorker
+import mega.privacy.android.data.worker.ForegroundSetter
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
@@ -86,6 +88,7 @@ class ChatUploadsWorkerTest {
     private val chatMessageRepository = mock<ChatMessageRepository>()
     private val updatePendingMessageUseCase = mock<UpdatePendingMessageUseCase>()
     private val checkFinishedChatUploadsUseCase = mock<CheckFinishedChatUploadsUseCase>()
+    private val setForeground = mock<ForegroundSetter>()
 
     @Before
     fun init() {
@@ -129,6 +132,7 @@ class ChatUploadsWorkerTest {
             attachNodeWithPendingMessageUseCase,
             updatePendingMessageUseCase,
             checkFinishedChatUploadsUseCase,
+            setForeground,
         )
     }
 
@@ -216,9 +220,11 @@ class ChatUploadsWorkerTest {
         whenever(monitorOngoingActiveTransfersUseCase(TransferType.CHAT_UPLOAD)) doReturn (flowOf(
             MonitorOngoingActiveTransfersResult(totals, paused = false, overQuota = false)
         ))
+        whenever(monitorTransferEventsUseCase()) doReturn (emptyFlow())
         whenever(workProgressUpdater.updateProgress(any(), any(), any()))
             .thenReturn(SettableFuture.create<Void?>().also { it.set(null) })
         whenever(areNotificationsEnabledUseCase()).thenReturn(false)
+        whenever(getActiveTransferTotalsUseCase(TransferType.CHAT_UPLOAD)).thenReturn(totals)
         return finishEvent
     }
 }

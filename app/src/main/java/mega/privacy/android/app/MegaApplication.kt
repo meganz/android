@@ -228,11 +228,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         setupMegaChatApi()
         getMiscFlagsIfNeeded()
 
-        //Logout check resumed pending transfers
-        transfersManagement.apply {
-            checkResumedPendingTransfers()
-        }
-
         applicationScope.launch {
             runCatching { updateApiServerUseCase() }
             dbH.resetExtendedAccountDetailsTimestamp()

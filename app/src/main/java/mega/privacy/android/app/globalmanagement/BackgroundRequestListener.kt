@@ -51,7 +51,6 @@ class BackgroundRequestListener @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     private val dbH: DatabaseHandler,
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val transfersManagement: TransfersManagement,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val getFullAccountInfoUseCase: GetFullAccountInfoUseCase,
     private val broadcastFetchNodesFinishUseCase: BroadcastFetchNodesFinishUseCase,
@@ -167,8 +166,6 @@ class BackgroundRequestListener @Inject constructor(
             if (dbH.myChatFilesFolderHandle == INVALID_HANDLE) {
                 megaApi.getMyChatFilesFolder(listener)
             }
-            //Login check resumed pending transfers
-            transfersManagement.checkResumedPendingTransfers()
             applicationScope.launch {
                 // Init CU sync data after login successfully
                 runCatching {
