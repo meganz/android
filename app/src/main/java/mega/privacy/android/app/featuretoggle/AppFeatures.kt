@@ -20,7 +20,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     LoginReportIssueButton(
         "Enables the report issue button on the login screen feature",
-        false,
+        true,
     ),
 
     /**
