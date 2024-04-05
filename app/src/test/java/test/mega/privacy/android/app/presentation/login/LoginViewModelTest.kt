@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerDetails
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
@@ -106,6 +107,7 @@ internal class LoginViewModelTest {
     private val saveLastRegisteredEmailUseCase = mock<SaveLastRegisteredEmailUseCase>()
     private val clearLastRegisteredEmailUseCase = mock<ClearLastRegisteredEmailUseCase>()
     private val installReferrerHandler = mock<InstallReferrerHandler>()
+    private val transfersManagement = mock<TransfersManagement>()
 
     @BeforeEach
     fun setUp() {
@@ -144,6 +146,7 @@ internal class LoginViewModelTest {
             saveLastRegisteredEmailUseCase = saveLastRegisteredEmailUseCase,
             clearLastRegisteredEmailUseCase = clearLastRegisteredEmailUseCase,
             installReferrerHandler = installReferrerHandler,
+            transfersManagement = transfersManagement,
             createSupportTicketEmailUseCase = mock(),
         )
     }
