@@ -5212,9 +5212,9 @@
         <item quantity="other">%1$d participantes foram removidos</item>
     </plurals>
     <!-- Message to user when app update is downloaded -->
-    <string name="general_app_update_message_download_success">Foi feito o download de uma atualização</string>
+    <string name="general_app_update_message_download_success">O aplicativo foi atualizado</string>
     <!-- Action allowing user to restart the app after downloading the update -->
-    <string name="general_app_update_action_restart">Reiniciar</string>
+    <string name="general_app_update_action_restart">Reiniciar o aplicativo</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Permitir acesso aos arquivos de áudio</string>
     <!-- Photos action menu zoom in -->
@@ -5629,4 +5629,8 @@
     <string name="general_login_label_trouble_logging_in">Problemas para fazer login?</string>
     <!-- Button text for reporting an issue on the login screen -->
     <string name="general_login_button_report_your_issue">Informar sobre o problema</string>
+    <!-- Hidden nodes show items -->
+    <string name="hidden_nodes_show_items">Mostrar itens ocultos</string>
+    <!-- Hidden nodes show items description -->
+    <string name="hidden_nodes_show_items_description">Todos os itens ocultos ficarão visíveis, mas desfocados para indicar o seu status “oculto”</string>
 </resources>

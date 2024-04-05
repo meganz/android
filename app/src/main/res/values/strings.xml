@@ -4991,9 +4991,9 @@
         <item quantity="other">Removed %1$d participants</item>
     </plurals>
     <!-- Message to user when app update is downloaded -->
-    <string name="general_app_update_message_download_success">An update has just been downloaded</string>
+    <string name="general_app_update_message_download_success">The app has been updated</string>
     <!-- Action allowing user to restart the app after downloading the update -->
-    <string name="general_app_update_action_restart">Restart</string>
+    <string name="general_app_update_action_restart">Relaunch the app</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Allow access to audio files</string>
     <!-- Photos action menu zoom in -->
@@ -5359,10 +5359,6 @@
         <item quantity="one">%1$d item hidden</item>
         <item quantity="other">%1$d items hidden</item>
     </plurals>
-    <!-- Hidden nodes show items -->
-    <string name="hidden_nodes_show_items">Show hidden items</string>
-    <!-- Hidden nodes show items description -->
-    <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status.</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_priority_support">&#8226;&#160;Priority support</string>
     <!-- The title of the Upgrade bottom sheet dialog  -->
@@ -5411,4 +5407,8 @@
     <string name="camera_flash_mode_auto">Flash mode auto</string>
     <!-- Toolbar title for preview media in camera screen -->
     <string name="camera_send_to">Send to %1$s</string>
+    <!-- Hidden nodes show items -->
+    <string name="hidden_nodes_show_items">Show hidden items</string>
+    <!-- Hidden nodes show items description -->
+    <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
 </resources>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
-    <string name="general_sync_no_error">Não há erros de sincronização</string>
+    <string name="general_sync_no_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
     <string name="general_sync_unsupported_file_system">O MEGA não pode sincronizar ou fazer backup desta pasta porque o sistema de arquivos do seu dispositivo não é suportado.</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
@@ -13,7 +13,7 @@
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
     <string name="general_sync_remote_node_not_found">Não foi possível localizar a pasta no MEGA porque ela foi movida ou deletada, ou pode ser que você não tenha acesso a ela.</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
-    <string name="general_sync_storage_overquota">Unable to sync or back up this folder as your storage is full</string>
+    <string name="general_sync_storage_overquota">Não foi possível sincronizar ou fazer backup dessa pasta porque a sua conta está cheia</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
     <string name="general_sync_account_expired">Não foi possível sincronizar ou fazer backup dessa pasta porque o seu plano expirou.</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
@@ -29,7 +29,7 @@
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
     <string name="general_sync_vboxsharedfolder_unsupported">O MEGA não pode sincronizar ou fazer backup das pastas do VirtualBox.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
-    <string name="general_sync_account_blocked">Unable to sync or back up this folder as the account has been blocked</string>
+    <string name="general_sync_account_blocked">Não foi possível sincronizar ou fazer backup dessa pasta porque a conta foi bloqueada</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
     <string name="general_sync_unknown_temporary_error">Não foi possível sincronizar ou fazer o backup desta pasta. Tente novamente mais tarde. Se o problema persistir, entre em contato com a nossa equipe de Suporte.</string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->

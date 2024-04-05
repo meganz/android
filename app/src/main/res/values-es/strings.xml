@@ -5212,9 +5212,9 @@
         <item quantity="other">Se han eliminado %1$d participantes</item>
     </plurals>
     <!-- Message to user when app update is downloaded -->
-    <string name="general_app_update_message_download_success">Se acaba de descargar una actualización</string>
+    <string name="general_app_update_message_download_success">La aplicación se ha actualizado</string>
     <!-- Action allowing user to restart the app after downloading the update -->
-    <string name="general_app_update_action_restart">Reiniciar</string>
+    <string name="general_app_update_action_restart">Relaunch the app</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Permitir el acceso a archivos de audio</string>
     <!-- Photos action menu zoom in -->
@@ -5592,11 +5592,11 @@
         <item quantity="other">%1$d elementos ocultos</item>
     </plurals>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_priority_support">&#8226;&#160;Priority support</string>
+    <string name="account_upgrade_account_description_priority_support">&#8226;&#160;Soporte prioritario</string>
     <!-- The title of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_title">Amplía a Pro para recibir llamadas ilimitadas</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->
-    <string name="meetings_upgrade_pro_plan_body">Your call reached the 60 minute limit and has ended. Pro users have unlimited calls and up to 1000 participants.</string>
+    <string name="meetings_upgrade_pro_plan_body">La llamada ha alcanzado el límite de 60 minutos y ha finalizado. Los usuarios Pro tienen llamadas ilimitadas y hasta 1000 participantes.</string>
     <!-- The button text of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_button">Ampliar cuenta</string>
     <!-- Search drop down chips filter type file type -->
@@ -5626,7 +5626,11 @@
     <!-- Search drop down chips filter type date modified older -->
     <string name="search_dropdown_chip_filter_type_date_older">Anterior</string>
     <!-- String below login button next to button for reporting a login issue -->
-    <string name="general_login_label_trouble_logging_in">Trouble logging in?</string>
+    <string name="general_login_label_trouble_logging_in">¿Problemas para iniciar sesión?</string>
     <!-- Button text for reporting an issue on the login screen -->
-    <string name="general_login_button_report_your_issue">Report your issue</string>
+    <string name="general_login_button_report_your_issue">Reporta tu problema</string>
+    <!-- Hidden nodes show items -->
+    <string name="hidden_nodes_show_items">Show hidden items</string>
+    <!-- Hidden nodes show items description -->
+    <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
 </resources>

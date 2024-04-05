@@ -4758,9 +4758,9 @@
         <item quantity="other">%1$d명의 참여자를 제거하였습니다</item>
     </plurals>
     <!-- Message to user when app update is downloaded -->
-    <string name="general_app_update_message_download_success">업데이트가 다운로드 되었습니다</string>
+    <string name="general_app_update_message_download_success">앱이 업데이트 되었습니다</string>
     <!-- Action allowing user to restart the app after downloading the update -->
-    <string name="general_app_update_action_restart">재시작</string>
+    <string name="general_app_update_action_restart">Relaunch the app</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">오디오 파일에 접근 허용</string>
     <!-- Photos action menu zoom in -->
@@ -5153,4 +5153,8 @@
     <string name="general_login_label_trouble_logging_in">로그인에 문제가 있나요?</string>
     <!-- Button text for reporting an issue on the login screen -->
     <string name="general_login_button_report_your_issue">문제 신고</string>
+    <!-- Hidden nodes show items -->
+    <string name="hidden_nodes_show_items">Show hidden items</string>
+    <!-- Hidden nodes show items description -->
+    <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
 </resources>

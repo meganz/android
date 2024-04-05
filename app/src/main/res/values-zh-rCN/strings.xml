@@ -4758,9 +4758,9 @@
         <item quantity="other">已移除%1$d位参与者</item>
     </plurals>
     <!-- Message to user when app update is downloaded -->
-    <string name="general_app_update_message_download_success">刚刚下载了更新</string>
+    <string name="general_app_update_message_download_success">应用程序已更新</string>
     <!-- Action allowing user to restart the app after downloading the update -->
-    <string name="general_app_update_action_restart">重启</string>
+    <string name="general_app_update_action_restart">Relaunch the app</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">允许访问音频文件</string>
     <!-- Photos action menu zoom in -->
@@ -5154,4 +5154,8 @@
     <string name="general_login_label_trouble_logging_in">Trouble logging in?</string>
     <!-- Button text for reporting an issue on the login screen -->
     <string name="general_login_button_report_your_issue">Report your issue</string>
+    <!-- Hidden nodes show items -->
+    <string name="hidden_nodes_show_items">Show hidden items</string>
+    <!-- Hidden nodes show items description -->
+    <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
 </resources>

@@ -71,7 +71,7 @@
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
     <string name="device_center_list_view_item_sub_state_storage_overquota">Der belegte Speicherplatz hat das Limit erreicht.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
-    <string name="device_center_list_view_item_sub_state_account_expired">Ihr Abonnement ist abgelaufen.</string>
+    <string name="device_center_list_view_item_sub_state_account_expired">Dieser Ordner kann nicht synchronisiert oder gesichert werden, da Ihr Paket abgelaufen ist.</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
     <string name="device_center_list_view_item_sub_state_foreign_target_overshare">Der Ordner kann nicht synchronisiert werden, da der freigebende Benutzer sein Speicherplatzlimit erreicht hat.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->

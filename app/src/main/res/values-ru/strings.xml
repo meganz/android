@@ -5439,7 +5439,7 @@
         <item quantity="other">Удалено %1$d участника</item>
     </plurals>
     <!-- Message to user when app update is downloaded -->
-    <string name="general_app_update_message_download_success">Только что было скачано обновление</string>
+    <string name="general_app_update_message_download_success">Приложение было обновлено</string>
     <!-- Action allowing user to restart the app after downloading the update -->
     <string name="general_app_update_action_restart">Перезапустить</string>
     <!-- Title of the screen asking permissions for Audio files -->
@@ -5867,4 +5867,8 @@
     <string name="general_login_label_trouble_logging_in">Trouble logging in?</string>
     <!-- Button text for reporting an issue on the login screen -->
     <string name="general_login_button_report_your_issue">Report your issue</string>
+    <!-- Hidden nodes show items -->
+    <string name="hidden_nodes_show_items">Show hidden items</string>
+    <!-- Hidden nodes show items description -->
+    <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
 </resources>

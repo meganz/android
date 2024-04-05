@@ -4758,9 +4758,9 @@
         <item quantity="other">ลบผู้เข้าร่วม %1$d คนออกแล้ว</item>
     </plurals>
     <!-- Message to user when app update is downloaded -->
-    <string name="general_app_update_message_download_success">เพิ่งดาวน์โหลดการอัปเดตล่าสุดเสร็จเมื่อสักครู่นี้</string>
+    <string name="general_app_update_message_download_success">แอปได้รับการอัปเดตแล้ว</string>
     <!-- Action allowing user to restart the app after downloading the update -->
-    <string name="general_app_update_action_restart">เริ่มใหม่ตั้งแต่ต้น</string>
+    <string name="general_app_update_action_restart">Relaunch the app</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">อนุญาตให้เข้าถึงไฟล์เสียง</string>
     <!-- Photos action menu zoom in -->
@@ -5153,4 +5153,8 @@
     <string name="general_login_label_trouble_logging_in">Trouble logging in?</string>
     <!-- Button text for reporting an issue on the login screen -->
     <string name="general_login_button_report_your_issue">Report your issue</string>
+    <!-- Hidden nodes show items -->
+    <string name="hidden_nodes_show_items">Show hidden items</string>
+    <!-- Hidden nodes show items description -->
+    <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
 </resources>

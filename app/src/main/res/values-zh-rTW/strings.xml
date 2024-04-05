@@ -4758,9 +4758,9 @@
         <item quantity="other">已移除%1$d個與會者</item>
     </plurals>
     <!-- Message to user when app update is downloaded -->
-    <string name="general_app_update_message_download_success">剛剛下載了更新</string>
+    <string name="general_app_update_message_download_success">應用程式已更新</string>
     <!-- Action allowing user to restart the app after downloading the update -->
-    <string name="general_app_update_action_restart">重頭播放</string>
+    <string name="general_app_update_action_restart">重新啟動應用程式</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">允許存取音訊檔案</string>
     <!-- Photos action menu zoom in -->
@@ -5150,7 +5150,11 @@
     <!-- Search drop down chips filter type date modified older -->
     <string name="search_dropdown_chip_filter_type_date_older">較舊的</string>
     <!-- String below login button next to button for reporting a login issue -->
-    <string name="general_login_label_trouble_logging_in">Trouble logging in?</string>
+    <string name="general_login_label_trouble_logging_in">登入時遇到問題？</string>
     <!-- Button text for reporting an issue on the login screen -->
-    <string name="general_login_button_report_your_issue">Report your issue</string>
+    <string name="general_login_button_report_your_issue">報告您的問題</string>
+    <!-- Hidden nodes show items -->
+    <string name="hidden_nodes_show_items">顯示隱藏的項目</string>
+    <!-- Hidden nodes show items description -->
+    <string name="hidden_nodes_show_items_description">可看到所有隱藏的項目，但會模糊顯示以表示其「隱藏」狀態</string>
 </resources>
