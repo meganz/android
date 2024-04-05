@@ -4985,9 +4985,9 @@
         <item quantity="other">%1$d deelnemers verwijderd</item>
     </plurals>
     <!-- Message to user when app update is downloaded -->
-    <string name="general_app_update_message_download_success">Er is zojuist een update gedownload</string>
+    <string name="general_app_update_message_download_success">De applicatie is bijgewerkt</string>
     <!-- Action allowing user to restart the app after downloading the update -->
-    <string name="general_app_update_action_restart">Herstarten</string>
+    <string name="general_app_update_action_restart">Start de applicatie opnieuw</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Toegang tot audio bestanden toestaan</string>
     <!-- Photos action menu zoom in -->
@@ -5388,7 +5388,11 @@
     <!-- Search drop down chips filter type date modified older -->
     <string name="search_dropdown_chip_filter_type_date_older">Ouder</string>
     <!-- String below login button next to button for reporting a login issue -->
-    <string name="general_login_label_trouble_logging_in">Trouble logging in?</string>
+    <string name="general_login_label_trouble_logging_in">Problemen met inloggen?</string>
     <!-- Button text for reporting an issue on the login screen -->
-    <string name="general_login_button_report_your_issue">Report your issue</string>
+    <string name="general_login_button_report_your_issue">Meld uw probleem</string>
+    <!-- Hidden nodes show items -->
+    <string name="hidden_nodes_show_items">Verborgen items weergeven</string>
+    <!-- Hidden nodes show items description -->
+    <string name="hidden_nodes_show_items_description">Alle verborgen items zijn zichtbaar, maar wazig om hun “verborgen” status aan te geven</string>
 </resources>

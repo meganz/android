@@ -4758,9 +4758,9 @@
         <item quantity="other">%1$d人の参加者を削除しました</item>
     </plurals>
     <!-- Message to user when app update is downloaded -->
-    <string name="general_app_update_message_download_success">アップデートがダウンロードされました</string>
+    <string name="general_app_update_message_download_success">アプリが更新されました</string>
     <!-- Action allowing user to restart the app after downloading the update -->
-    <string name="general_app_update_action_restart">再起動</string>
+    <string name="general_app_update_action_restart">アプリを再起動</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">音声ファイルへのアクセスを許可する</string>
     <!-- Photos action menu zoom in -->
@@ -5153,4 +5153,8 @@
     <string name="general_login_label_trouble_logging_in">ログインできませんか？</string>
     <!-- Button text for reporting an issue on the login screen -->
     <string name="general_login_button_report_your_issue">問題を報告</string>
+    <!-- Hidden nodes show items -->
+    <string name="hidden_nodes_show_items">非表示項目を表示する</string>
+    <!-- Hidden nodes show items description -->
+    <string name="hidden_nodes_show_items_description">非表示の項目はすべて表示されますが、「非表示」ステータスを示すためにぼかされます</string>
 </resources>

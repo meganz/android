@@ -69,13 +69,13 @@
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
-    <string name="general_sync_message_node_in_rubbish_bin">Folder can’t be synced or backed up as the MEGA folder is in the Rubbish bin.</string>
+    <string name="general_sync_message_node_in_rubbish_bin">ไม่สามารถซิงค์หรือสำรองข้อมูลโฟลเดอร์ได้ เนื่องจากโฟลเดอร์ MEGA อยู่ในถังขยะ</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
     <string name="general_sync_message_cannot_locate_local_drive_now">Folder in your device can’t be located right now. Try again later.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
     <string name="general_sync_message_cannot_locate_local_drive">ไม่สามารถหาโฟลเดอร์ในอุปกรณ์ของคุณได้</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
-    <string name="general_sync_message_folder_backup_issue_due_to_recent_changes">Problem syncing or backing up this folder because of changes to the MEGA folder. Stop the sync or backup and try setting it up again in the Desktop app, or contact Support.</string>
+    <string name="general_sync_message_folder_backup_issue_due_to_recent_changes">มีปัญหาในการซิงค์หรือสำรองข้อมูลในโฟลเดอร์นี้เนื่องจากมีการเปลี่ยนแปลงในโฟลเดอร์ MEGA คุณสามารถหยุดการซิงค์หรือสำรองข้อมูลและลองตั้งค่าใหม่ในแอปเดสก์ท็อป หรือติดต่อฝ่ายสนับสนุน</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
     <string name="general_sync_message_folder_backup_issue">พบปัญหาในการซิงค์หรือสำรองข้อมูลโฟลเดอร์นี้ ให้หยุดการซิงค์หรือสำรองข้อมูล แล้วลองตั้งค่าอีกครั้งในแอปเดสก์ท็อป หรือติดต่อฝ่ายสนับสนุน</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
