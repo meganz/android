@@ -129,17 +129,6 @@ internal fun SettingsCameraUploadsView(
     var showVideoCompressionSizeInputPrompt by rememberSaveable { mutableStateOf(false) }
     var showVideoQualityPrompt by rememberSaveable { mutableStateOf(false) }
 
-    /**
-     * Flag that controls the start of Camera Uploads when the onPause() Lifecycle Event is triggered
-     * (e.g. User leaves the Screen)
-     *
-     * This is false when the User attempts to change the Camera / Media Uploads Folder, be it a
-     * Local Folder or Folder Node
-     */
-    var canStartCameraUploads by rememberSaveable {
-        mutableStateOf(true)
-    }
-
     val cameraUploadsLocalFolderLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
     ) {
@@ -167,14 +156,9 @@ internal fun SettingsCameraUploadsView(
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_PAUSE) {
-                // Check if Camera Uploads can be started
-                if (canStartCameraUploads) {
-                    onCameraUploadsProcessStarted.invoke()
-                }
-            } else if (event == Lifecycle.Event.ON_RESUME) {
-                // Re-enable the flag that starts the Camera Uploads process when leaving the screen
-                canStartCameraUploads = true
+            if (event == Lifecycle.Event.ON_DESTROY) {
+                // Only start the Camera Uploads process upon leaving Settings Camera Uploads
+                onCameraUploadsProcessStarted.invoke()
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -292,7 +276,6 @@ internal fun SettingsCameraUploadsView(
                     CameraUploadsLocalFolderTile(
                         primaryFolderPath = uiState.primaryFolderPath,
                         onItemClicked = {
-                            canStartCameraUploads = false
                             openLocalFolderPicker(
                                 context = context,
                                 launcher = cameraUploadsLocalFolderLauncher,
@@ -303,7 +286,6 @@ internal fun SettingsCameraUploadsView(
                         primaryFolderName = uiState.primaryFolderName.takeIf { !it.isNullOrBlank() }
                             ?: stringResource(R.string.section_photo_sync),
                         onItemClicked = {
-                            canStartCameraUploads = false
                             openFolderNodePicker(
                                 context = context,
                                 launcher = cameraUploadsFolderNodeLauncher,
@@ -319,7 +301,6 @@ internal fun SettingsCameraUploadsView(
                             secondaryFolderPath = uiState.secondaryFolderPath.takeIf { it.isNotBlank() }
                                 ?: stringResource(R.string.settings_empty_folder),
                             onItemClicked = {
-                                canStartCameraUploads = false
                                 openLocalFolderPicker(
                                     context = context,
                                     launcher = mediaUploadsLocalFolderLauncher,
@@ -330,7 +311,6 @@ internal fun SettingsCameraUploadsView(
                             secondaryFolderName = uiState.secondaryFolderName.takeIf { !it.isNullOrBlank() }
                                 ?: stringResource(R.string.section_secondary_media_uploads),
                             onItemClicked = {
-                                canStartCameraUploads = false
                                 openFolderNodePicker(
                                     context = context,
                                     launcher = mediaUploadsFolderNodeLauncher,

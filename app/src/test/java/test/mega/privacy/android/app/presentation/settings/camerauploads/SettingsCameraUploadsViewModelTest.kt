@@ -5,9 +5,12 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
@@ -94,6 +97,7 @@ import java.util.stream.Stream
  * Test class for [SettingsCameraUploadsViewModel]
  */
 @ExtendWith(CoroutineMainDispatcherExtension::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class SettingsCameraUploadsViewModelTest {
 
@@ -153,6 +157,7 @@ internal class SettingsCameraUploadsViewModelTest {
 
     private val fakeMonitorCameraUploadsSettingsActionsFlow =
         MutableSharedFlow<CameraUploadsSettingsAction>()
+    private val applicationScope = TestScope(UnconfinedTestDispatcher())
 
     @BeforeEach
     fun resetMocks() {
@@ -249,6 +254,7 @@ internal class SettingsCameraUploadsViewModelTest {
         )
 
         underTest = SettingsCameraUploadsViewModel(
+            applicationScope = applicationScope,
             areLocationTagsEnabledUseCase = areLocationTagsEnabledUseCase,
             areUploadFileNamesKeptUseCase = areUploadFileNamesKeptUseCase,
             checkEnableCameraUploadsStatusUseCase = checkEnableCameraUploadsStatusUseCase,

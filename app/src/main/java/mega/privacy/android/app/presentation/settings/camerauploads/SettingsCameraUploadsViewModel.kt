@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,6 +27,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
@@ -74,6 +76,8 @@ import javax.inject.Inject
 /**
  * The [ViewModel] for Settings Camera Uploads
  *
+ * @property applicationScope Coroutine Scope used to run operations that should outlive the
+ * ViewModel
  * @property areLocationTagsEnabledUseCase Checks if Location Tags are included for Photo uploads
  * @property areUploadFileNamesKeptUseCase Checks if the existing filenames should be used when
  * uploading content
@@ -134,6 +138,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 internal class SettingsCameraUploadsViewModel @Inject constructor(
+    @ApplicationScope private val applicationScope: CoroutineScope,
     private val areLocationTagsEnabledUseCase: AreLocationTagsEnabledUseCase,
     private val areUploadFileNamesKeptUseCase: AreUploadFileNamesKeptUseCase,
     private val checkEnableCameraUploadsStatusUseCase: CheckEnableCameraUploadsStatusUseCase,
@@ -441,10 +446,11 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Starts the Camera Uploads process
+     * Starts the Camera Uploads process. The [ApplicationScope] is used to ensure that the process
+     * is started when leaving the Settings Camera Uploads screen
      */
     fun onCameraUploadsProcessStarted() {
-        viewModelScope.launch {
+        applicationScope.launch {
             runCatching {
                 startCameraUploadUseCase()
                 listenToNewMediaUseCase(forceEnqueue = false)
