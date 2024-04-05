@@ -29,6 +29,7 @@ import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMa
 import mega.privacy.android.data.worker.AbstractTransfersWorker
 import mega.privacy.android.data.worker.AreNotificationsEnabledUseCase
 import mega.privacy.android.data.worker.DownloadsWorker
+import mega.privacy.android.data.worker.ForegroundSetter
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
@@ -89,6 +90,7 @@ class DownloadsWorkerTest {
     private val transfersFinishedNotificationMapper = mock<TransfersFinishedNotificationMapper>()
     private val workProgressUpdater = mock<ProgressUpdater>()
     private val scanMediaFileUseCase = mock<ScanMediaFileUseCase>()
+    private val setForeground = mock<ForegroundSetter>()
 
     @Before
     fun setup() {
@@ -133,6 +135,7 @@ class DownloadsWorkerTest {
             handleSDCardEventUseCase = handleSDCardEventUseCase,
             scanMediaFileUseCase = scanMediaFileUseCase,
             handleAvailableOfflineEventUseCase = handleAvailableOfflineEventUseCase,
+            foregroundSetter = setForeground
         )
     }
 
@@ -252,6 +255,37 @@ class DownloadsWorkerTest {
             verifyNoInteractions(overQuotaNotificationBuilder)
         }
 
+    fun `test that setForeground is not invoked when worker starts with no transfers`() =
+        runTest {
+            val initial: ActiveTransferTotals = mockActiveTransferTotals(
+                hasCompleted = false,
+            )
+            whenever(initial.totalTransfers).thenReturn(0)
+            commonStub(initialTransferTotals = initial)
+            underTest.doWork()
+            verifyNoInteractions(setForeground)
+        }
+
+    @Test
+    fun `test that transfersFinishedNotificationMapper is invoked when worker starts with completed transfers`() =
+        runTest {
+            val initial: ActiveTransferTotals = mockActiveTransferTotals(true)
+            whenever(initial.totalTransfers).thenReturn(1)
+            commonStub(initialTransferTotals = initial)
+            underTest.doWork()
+            verify(transfersFinishedNotificationMapper).invoke(initial)
+        }
+
+    @Test
+    fun `test that setForeground is not invoked when worker starts with completed transfers`() =
+        runTest {
+            val initial: ActiveTransferTotals = mockActiveTransferTotals(true)
+            commonStub(initialTransferTotals = initial)
+            whenever(initial.totalTransfers).thenReturn(1)
+            underTest.doWork()
+            verifyNoInteractions(setForeground)
+        }
+
     @Test
     fun `test that transfersFinishedNotificationMapper is not invoked when transfer finishes with no transfers`() =
         runTest {
@@ -342,6 +376,7 @@ class DownloadsWorkerTest {
         whenever(areNotificationsEnabledUseCase()).thenReturn(true)
         whenever(workProgressUpdater.updateProgress(any(), any(), any()))
             .thenReturn(SettableFuture.create<Void?>().also { it.set(null) })
+        whenever(downloadNotificationMapper(any(), any())).thenReturn(mock())
     }
 
     private fun mockActiveTransferTotals(

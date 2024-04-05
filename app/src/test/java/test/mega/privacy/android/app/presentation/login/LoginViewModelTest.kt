@@ -2,7 +2,6 @@ package test.mega.privacy.android.app.presentation.login
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -14,6 +13,7 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.model.LoginError
@@ -96,6 +96,7 @@ internal class LoginViewModelTest {
     private val getTimelinePhotosUseCase = mock<GetTimelinePhotosUseCase>()
     private val startDownloadWorkerUseCase = mock<StartDownloadWorkerUseCase>()
     private val startChatUploadsWorkerUseCase = mock<StartChatUploadsWorkerUseCase>()
+    private val transfersManagement = mock<TransfersManagement>()
 
     @BeforeEach
     fun setUp() {
@@ -129,7 +130,8 @@ internal class LoginViewModelTest {
             getTimelinePhotosUseCase = getTimelinePhotosUseCase,
             startDownloadWorkerUseCase = startDownloadWorkerUseCase,
             startChatUploadsWorkerUseCase = startChatUploadsWorkerUseCase,
-            loginMutex = mock()
+            loginMutex = mock(),
+            transfersManagement = transfersManagement,
         )
     }
 

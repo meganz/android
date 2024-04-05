@@ -21,6 +21,7 @@ import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.getState
@@ -118,7 +119,8 @@ class LoginViewModel @Inject constructor(
     private val getTimelinePhotosUseCase: GetTimelinePhotosUseCase,
     private val startDownloadWorkerUseCase: StartDownloadWorkerUseCase,
     private val startChatUploadsWorkerUseCase: StartChatUploadsWorkerUseCase,
-    @LoginMutex private val loginMutex: Mutex
+    @LoginMutex private val loginMutex: Mutex,
+    private val transfersManagement: TransfersManagement,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -728,6 +730,8 @@ class LoginViewModel @Inject constructor(
                     if (getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)) {
                         startChatUploadsWorkerUseCase()
                     }
+                    //Login check resumed pending transfers
+                    transfersManagement.checkResumedPendingTransfers()
                 } else {
                     Timber.d("fetch nodes update")
                     _state.update { it.copy(fetchNodesUpdate = update) }

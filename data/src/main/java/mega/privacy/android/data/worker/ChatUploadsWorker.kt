@@ -52,6 +52,7 @@ class ChatUploadsWorker @AssistedInject constructor(
     private val attachNodeWithPendingMessageUseCase: AttachNodeWithPendingMessageUseCase,
     private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
     private val checkFinishedChatUploadsUseCase: CheckFinishedChatUploadsUseCase,
+    foregroundSetter: ForegroundSetter? = null,
 ) : AbstractTransfersWorker(
     context,
     workerParams,
@@ -67,10 +68,11 @@ class ChatUploadsWorker @AssistedInject constructor(
     areNotificationsEnabledUseCase,
     correctActiveTransfersUseCase,
     clearActiveTransfersIfFinishedUseCase,
+    foregroundSetter,
 ) {
     override val updateNotificationId = NOTIFICATION_CHAT_UPLOAD
 
-    override suspend fun createUpdateNotification(
+    override fun createUpdateNotification(
         activeTransferTotals: ActiveTransferTotals,
         paused: Boolean,
     ) = chatUploadNotificationMapper(activeTransferTotals, null, paused)
