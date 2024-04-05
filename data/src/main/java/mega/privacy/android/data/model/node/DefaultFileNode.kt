@@ -21,6 +21,7 @@ internal data class DefaultFileNode(
     override val fullSizePath: String? = null,
     override val isFavourite: Boolean,
     override val isMarkedSensitive: Boolean,
+    override val isSensitiveInherited: Boolean,
     override val exportedData: ExportedData?,
     override val isTakenDown: Boolean,
     override val isIncomingShare: Boolean,

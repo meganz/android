@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "a050df366ffc8c60038436d8284c4aab",
+    "identityHash": "3ab98f55df4d0ee3d7fbc11a4684ce7f",
     "entities": [
       {
         "tableName": "typed_messages",
@@ -386,7 +386,7 @@
       },
       {
         "tableName": "chat_node",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `parentId` INTEGER NOT NULL, `base64Id` TEXT NOT NULL, `restoreId` INTEGER, `label` INTEGER NOT NULL, `isFavourite` INTEGER NOT NULL, `isMarkedSensitive` INTEGER NOT NULL, `isTakenDown` INTEGER NOT NULL, `isIncomingShare` INTEGER NOT NULL, `isNodeKeyDecrypted` INTEGER NOT NULL, `creationTime` INTEGER NOT NULL, `serializedData` TEXT, `isAvailableOffline` INTEGER NOT NULL, `versionCount` INTEGER NOT NULL, `size` INTEGER NOT NULL, `modificationTime` INTEGER NOT NULL, `type` TEXT NOT NULL, `thumbnailPath` TEXT, `previewPath` TEXT, `fullSizePath` TEXT, `fingerprint` TEXT, `originalFingerprint` TEXT, `hasThumbnail` INTEGER NOT NULL, `hasPreview` INTEGER NOT NULL, `publicLink` TEXT, `publicLinkCreationTime` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `parentId` INTEGER NOT NULL, `base64Id` TEXT NOT NULL, `restoreId` INTEGER, `label` INTEGER NOT NULL, `isFavourite` INTEGER NOT NULL, `isMarkedSensitive` INTEGER NOT NULL, `isSensitiveInherited` INTEGER NOT NULL, `isTakenDown` INTEGER NOT NULL, `isIncomingShare` INTEGER NOT NULL, `isNodeKeyDecrypted` INTEGER NOT NULL, `creationTime` INTEGER NOT NULL, `serializedData` TEXT, `isAvailableOffline` INTEGER NOT NULL, `versionCount` INTEGER NOT NULL, `size` INTEGER NOT NULL, `modificationTime` INTEGER NOT NULL, `type` TEXT NOT NULL, `thumbnailPath` TEXT, `previewPath` TEXT, `fullSizePath` TEXT, `fingerprint` TEXT, `originalFingerprint` TEXT, `hasThumbnail` INTEGER NOT NULL, `hasPreview` INTEGER NOT NULL, `publicLink` TEXT, `publicLinkCreationTime` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -433,6 +433,12 @@
           {
             "fieldPath": "isMarkedSensitive",
             "columnName": "isMarkedSensitive",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isSensitiveInherited",
+            "columnName": "isSensitiveInherited",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -677,7 +683,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a050df366ffc8c60038436d8284c4aab')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3ab98f55df4d0ee3d7fbc11a4684ce7f')"
     ]
   }
 }

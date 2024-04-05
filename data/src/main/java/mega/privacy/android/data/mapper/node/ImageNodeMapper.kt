@@ -1,5 +1,6 @@
 package mega.privacy.android.data.mapper.node
 
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.node.ExportedData
@@ -17,18 +18,20 @@ internal class ImageNodeMapper @Inject constructor(
     private val thumbnailFromServerMapper: ThumbnailFromServerMapper,
     private val previewFromServerMapper: PreviewFromServerMapper,
     private val fullImageFromServerMapper: FullImageFromServerMapper,
-    private val offlineAvailabilityMapper: OfflineAvailabilityMapper
+    private val offlineAvailabilityMapper: OfflineAvailabilityMapper,
+    private val megaApiGateway: MegaApiGateway,
 ) {
     suspend operator fun invoke(
         megaNode: MegaNode,
         numVersion: suspend (MegaNode) -> Int,
         requireSerializedData: Boolean = false,
-        offline: Offline?
+        offline: Offline?,
     ) = if (megaNode.isFolder) {
         throw IllegalStateException("Node is a folder")
     } else {
         val version = (numVersion(megaNode) - 1).coerceAtLeast(0)
         val isAvailableOffline = offline?.let { offlineAvailabilityMapper(megaNode, it) } ?: false
+        val isSensitiveInherited = megaApiGateway.isSensitiveInherited(megaNode)
         object : ImageNode {
             override val id = NodeId(megaNode.handle)
             override val name = megaNode.name
@@ -47,6 +50,7 @@ internal class ImageNodeMapper @Inject constructor(
             override val type = fileTypeInfoMapper(megaNode)
             override val isFavourite = megaNode.isFavourite
             override val isMarkedSensitive = megaNode.isMarkedSensitive
+            override val isSensitiveInherited = isSensitiveInherited
             override val exportedData = megaNode.takeIf { megaNode.isExported }?.let {
                 ExportedData(it.publicLink, it.publicLinkCreationTime)
             }

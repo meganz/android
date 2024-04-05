@@ -17,6 +17,7 @@ internal data class DefaultFolderNode(
     override val childFileCount: Int,
     override val isFavourite: Boolean,
     override val isMarkedSensitive: Boolean,
+    override val isSensitiveInherited: Boolean,
     override val exportedData: ExportedData?,
     override val isTakenDown: Boolean,
     override val isInRubbishBin: Boolean,

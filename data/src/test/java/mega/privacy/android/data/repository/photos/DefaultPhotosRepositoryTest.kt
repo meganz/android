@@ -52,7 +52,9 @@ class DefaultPhotosRepositoryTest {
     private lateinit var underTest: PhotosRepository
 
     private val nodeRepository = mock<NodeRepository>()
-    private val megaApiGateway = mock<MegaApiGateway>()
+    private val megaApiGateway = mock<MegaApiGateway> {
+        onBlocking { isSensitiveInherited(any()) }.thenReturn(false)
+    }
     private val megaApiFolder = mock<MegaApiFolderGateway>()
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
     private val cacheGateway = mock<CacheGateway> {
@@ -322,6 +324,8 @@ class DefaultPhotosRepositoryTest {
         fileTypeInfo: FileTypeInfo,
         size: Long,
         isTakenDown: Boolean,
+        isSensitive: Boolean,
+        isSensitiveInherited: Boolean,
     ): Photo.Image = Photo.Image(
         id,
         albumPhotoId,
@@ -335,6 +339,8 @@ class DefaultPhotosRepositoryTest {
         fileTypeInfo,
         size,
         isTakenDown,
+        isSensitive,
+        isSensitiveInherited,
     )
 
     private fun createVideo(
@@ -350,6 +356,8 @@ class DefaultPhotosRepositoryTest {
         fileTypeInfo: FileTypeInfo,
         size: Long,
         isTakenDown: Boolean,
+        isSensitive: Boolean,
+        isSensitiveInherited: Boolean,
     ): Photo.Video = Photo.Video(
         id,
         albumPhotoId,
@@ -363,6 +371,8 @@ class DefaultPhotosRepositoryTest {
         fileTypeInfo as VideoFileTypeInfo,
         size,
         isTakenDown,
+        isSensitive,
+        isSensitiveInherited,
     )
 
     private fun mapFileTypeInfo(megaNode: MegaNode): FileTypeInfo {

@@ -504,6 +504,15 @@ interface MegaApiGateway {
     )
 
     /**
+     * Ascertain if the node is marked as sensitive or a descendent of such
+     * <p>
+     * see MegaNode::isMarkedSensitive to see if the node is sensitive
+     *
+     * @param node node to inspect
+     */
+    suspend fun isSensitiveInherited(node: MegaNode): Boolean
+
+    /**
      * Add logger
      *
      * @param logger

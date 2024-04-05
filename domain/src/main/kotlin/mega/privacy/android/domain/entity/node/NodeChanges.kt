@@ -18,5 +18,6 @@ enum class NodeChanges {
     Public_link,
     New,
     Name,
-    Favourite
+    Favourite,
+    Sensitive,
 }

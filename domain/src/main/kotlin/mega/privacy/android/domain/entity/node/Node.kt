@@ -50,6 +50,11 @@ interface Node {
     val isMarkedSensitive: Boolean
 
     /**
+     * Is sensitive inherited from parent node
+     */
+    val isSensitiveInherited: Boolean
+
+    /**
      * Exported data if the node is exported (shared with public link), null otherwise
      */
     val exportedData: ExportedData?

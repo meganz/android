@@ -38,6 +38,7 @@ class NodeMapperTest {
         onBlocking { isInRubbish(any()) }.thenReturn(false)
         onBlocking { isPendingShare(any()) }.thenReturn(false)
         onBlocking { getNumVersions(any()) }.thenReturn(2)
+        onBlocking { isSensitiveInherited(any()) }.thenReturn(false)
     }
     private val megaApiFolderGateway = mock<MegaApiFolderGateway> {
         onBlocking { getNumChildFolders(any()) }.thenReturn(0)

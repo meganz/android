@@ -31,6 +31,7 @@ internal class SampleFolderNodeDataProvider :
             override val label = 1
             override val isFavourite = false
             override val isMarkedSensitive = false
+            override val isSensitiveInherited: Boolean = false
             override val exportedData = null
             override val isTakenDown = false
             override val isIncomingShare = false
@@ -61,6 +62,7 @@ internal class SampleFolderNodeDataProvider :
             override val label = 1
             override val isFavourite = true
             override val isMarkedSensitive = false
+            override val isSensitiveInherited: Boolean = false
             override val exportedData = null
             override val isTakenDown = false
             override val isIncomingShare = false
@@ -91,6 +93,7 @@ internal class SampleFolderNodeDataProvider :
             override val label = 1
             override val isFavourite = false
             override val isMarkedSensitive = false
+            override val isSensitiveInherited: Boolean = false
             override val exportedData = null
             override val isTakenDown = false
             override val isIncomingShare = false

@@ -32,7 +32,8 @@ private val nodeChangesMap = mapOf(
     MegaNode.CHANGE_TYPE_PUBLIC_LINK to NodeChanges.Public_link,
     MegaNode.CHANGE_TYPE_NEW to NodeChanges.New,
     MegaNode.CHANGE_TYPE_NAME to NodeChanges.Name,
-    MegaNode.CHANGE_TYPE_FAVOURITE to NodeChanges.Favourite
+    MegaNode.CHANGE_TYPE_FAVOURITE to NodeChanges.Favourite,
+    MegaNode.CHANGE_TYPE_SENSITIVE to NodeChanges.Sensitive,
 )
 
 

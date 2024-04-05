@@ -729,6 +729,7 @@ class NodeRepositoryImplTest {
         whenever(megaApiGateway.isPendingShare(megaNode)).thenReturn(true)
         whenever(megaApiGateway.isInRubbish(megaNode)).thenReturn(true)
         whenever(fileTypeInfoMapper.invoke(megaNode)).thenReturn(PdfFileTypeInfo)
+        whenever(megaApiGateway.isSensitiveInherited(megaNode)).thenReturn(false)
         return megaNode
     }
 

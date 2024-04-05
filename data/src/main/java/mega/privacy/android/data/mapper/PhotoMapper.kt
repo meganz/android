@@ -2,6 +2,7 @@ package mega.privacy.android.data.mapper
 
 import mega.privacy.android.data.extensions.getPreviewFileName
 import mega.privacy.android.data.extensions.getThumbnailFileName
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -30,6 +31,8 @@ typealias ImageMapper = (
     @JvmSuppressWildcards FileTypeInfo,
     @JvmSuppressWildcards Long,
     @JvmSuppressWildcards Boolean,
+    @JvmSuppressWildcards Boolean,
+    @JvmSuppressWildcards Boolean,
 ) -> @JvmSuppressWildcards Photo.Image
 
 internal fun toImage(
@@ -45,6 +48,8 @@ internal fun toImage(
     fileTypeInfo: FileTypeInfo,
     size: Long,
     isTakenDown: Boolean,
+    isSensitive: Boolean,
+    isSensitiveInherited: Boolean,
 ) = Photo.Image(
     id = id,
     albumPhotoId = albumPhotoId,
@@ -58,6 +63,8 @@ internal fun toImage(
     fileTypeInfo = fileTypeInfo,
     size = size,
     isTakenDown = isTakenDown,
+    isSensitive = isSensitive,
+    isSensitiveInherited = isSensitiveInherited,
 )
 
 /**
@@ -76,6 +83,8 @@ typealias VideoMapper = (
     @JvmSuppressWildcards FileTypeInfo,
     @JvmSuppressWildcards Long,
     @JvmSuppressWildcards Boolean,
+    @JvmSuppressWildcards Boolean,
+    @JvmSuppressWildcards Boolean,
 ) -> @JvmSuppressWildcards Photo.Video
 
 internal fun toVideo(
@@ -91,6 +100,8 @@ internal fun toVideo(
     fileTypeInfo: FileTypeInfo,
     size: Long,
     isTakenDown: Boolean,
+    isSensitive: Boolean,
+    isSensitiveInherited: Boolean,
 ) = Photo.Video(
     id = id,
     albumPhotoId = albumPhotoId,
@@ -104,6 +115,8 @@ internal fun toVideo(
     fileTypeInfo = fileTypeInfo as VideoFileTypeInfo,
     size = size,
     isTakenDown = isTakenDown,
+    isSensitive = isSensitive,
+    isSensitiveInherited = isSensitiveInherited,
 )
 
 class PhotoMapper @Inject constructor(
@@ -112,6 +125,7 @@ class PhotoMapper @Inject constructor(
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val dateUtilFacade: DateUtilWrapper,
     private val thumbnailPreviewRepository: ThumbnailPreviewRepository,
+    private val megaApiGateway: MegaApiGateway,
 ) {
     suspend operator fun invoke(node: MegaNode, albumPhotoId: AlbumPhotoId?): Photo? {
         return when (val fileType = fileTypeInfoMapper(node)) {
@@ -129,6 +143,8 @@ class PhotoMapper @Inject constructor(
                     fileType,
                     node.size,
                     node.isTakenDown,
+                    node.isMarkedSensitive,
+                    megaApiGateway.isSensitiveInherited(node),
                 )
             }
 
@@ -146,6 +162,8 @@ class PhotoMapper @Inject constructor(
                     fileType,
                     node.size,
                     node.isTakenDown,
+                    node.isMarkedSensitive,
+                    megaApiGateway.isSensitiveInherited(node),
                 )
             }
 

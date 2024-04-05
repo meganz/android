@@ -20,6 +20,8 @@ sealed interface Photo {
     val fileTypeInfo: FileTypeInfo
     val size: Long
     val isTakenDown: Boolean
+    val isSensitive: Boolean
+    val isSensitiveInherited: Boolean
 
     data class Video(
         override val id: Long,
@@ -34,6 +36,8 @@ sealed interface Photo {
         override val fileTypeInfo: VideoFileTypeInfo,
         override val size: Long = 0L,
         override val isTakenDown: Boolean = false,
+        override val isSensitive: Boolean = false,
+        override val isSensitiveInherited: Boolean = false,
     ) : Photo
 
     data class Image(
@@ -49,5 +53,7 @@ sealed interface Photo {
         override val fileTypeInfo: FileTypeInfo,
         override val size: Long = 0L,
         override val isTakenDown: Boolean = false,
+        override val isSensitive: Boolean = false,
+        override val isSensitiveInherited: Boolean = false,
     ) : Photo
 }

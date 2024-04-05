@@ -70,6 +70,7 @@ internal class FileNodeMapper @Inject constructor(
         type = fileTypeInfoMapper(megaNode),
         isFavourite = megaNode.isFavourite,
         isMarkedSensitive = megaNode.isMarkedSensitive,
+        isSensitiveInherited = megaApiGateway.isSensitiveInherited(megaNode),
         exportedData = megaNode.takeIf { megaNode.isExported }?.let {
             ExportedData(it.publicLink, it.publicLinkCreationTime)
         },
