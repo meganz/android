@@ -1,6 +1,7 @@
 package mega.privacy.android.data.database.chat
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -38,7 +39,10 @@ const val CHAT_DATABASE_NAME = "chat_database"
         PendingMessageEntity::class,
         NodeMessageCrossRef::class,
     ],
-    version = 1,
+    version = 2,
+    autoMigrations = [
+        AutoMigration(1, 2),
+    ],
 )
 abstract class ChatDatabase : RoomDatabase() {
 
