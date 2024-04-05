@@ -33,7 +33,7 @@ fun MegaDivider(
     Divider(
         modifier = finalModifier,
         thickness = 1.dp,
-        color = MegaTheme.colors.border.disabled
+        color = MegaTheme.colors.border.subtle
     )
 }
 
