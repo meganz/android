@@ -2,7 +2,6 @@ package test.mega.privacy.android.app.presentation.login
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -144,7 +143,8 @@ internal class LoginViewModelTest {
             getLastRegisteredEmailUseCase = getLastRegisteredEmailUseCase,
             saveLastRegisteredEmailUseCase = saveLastRegisteredEmailUseCase,
             clearLastRegisteredEmailUseCase = clearLastRegisteredEmailUseCase,
-            installReferrerHandler = installReferrerHandler
+            installReferrerHandler = installReferrerHandler,
+            createSupportTicketEmailUseCase = mock(),
         )
     }
 

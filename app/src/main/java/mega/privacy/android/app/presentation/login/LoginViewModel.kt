@@ -42,6 +42,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
+import mega.privacy.android.domain.entity.support.SupportEmailTicket
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.LoginBlockedAccount
 import mega.privacy.android.domain.exception.LoginException
@@ -79,6 +80,7 @@ import mega.privacy.android.domain.usecase.login.SaveLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
+import mega.privacy.android.domain.usecase.support.CreateSupportTicketEmailUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWorkerUseCase
@@ -128,6 +130,7 @@ class LoginViewModel @Inject constructor(
     private val getLastRegisteredEmailUseCase: GetLastRegisteredEmailUseCase,
     private val clearLastRegisteredEmailUseCase: ClearLastRegisteredEmailUseCase,
     private val installReferrerHandler: InstallReferrerHandler,
+    private val createSupportTicketEmailUseCase: CreateSupportTicketEmailUseCase,
     @LoginMutex private val loginMutex: Mutex,
 ) : ViewModel() {
 
@@ -930,6 +933,17 @@ class LoginViewModel @Inject constructor(
                     Timber.e(it)
                 }
             }
+        }
+    }
+
+    /**
+     * On report issue
+     */
+    fun onReportIssue(title: String, sendEmail: (SupportEmailTicket) -> Unit) {
+        viewModelScope.launch {
+            val ticket =
+                createSupportTicketEmailUseCase(title)
+            sendEmail(ticket)
         }
     }
 

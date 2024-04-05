@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,6 +37,7 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
+import mega.privacy.android.app.presentation.extensions.canBeHandled
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.parcelable
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
@@ -59,6 +61,7 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.support.SupportEmailTicket
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.theme.MegaAppTheme
@@ -99,7 +102,7 @@ class LoginFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View = ComposeView(requireContext()).apply {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-        setContent { LoginView() }
+        setContent { LoginScreen() }
     }
 
     override fun onDestroy() {
@@ -108,7 +111,7 @@ class LoginFragment : Fragment() {
     }
 
     @Composable
-    private fun LoginView() {
+    private fun LoginScreen() {
         val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val uiState by viewModel.state.collectAsStateWithLifecycle()
 
@@ -145,7 +148,13 @@ class LoginFragment : Fragment() {
                 onBackPressed = { onBackPressed(uiState) },
                 onUpdateKarereLogs = { viewModel.checkAndUpdateKarereLogs(requireActivity()) },
                 onUpdateSdkLogs = { viewModel.checkAndUpdateSDKLogs(requireActivity()) },
-                onFirstTime2FAConsumed = viewModel::onFirstTime2FAConsumed
+                onFirstTime2FAConsumed = viewModel::onFirstTime2FAConsumed,
+                onReportIssue = {
+                    viewModel.onReportIssue(
+                        getString(R.string.setting_feedback_body),
+                        ::sendSupportEmail
+                    )
+                },
             )
         }
     }
@@ -869,6 +878,40 @@ class LoginFragment : Fragment() {
             } catch (e: Exception) {
                 Timber.w("Exception trying to open installed browser apps", e)
             }
+        }
+    }
+
+    private fun sendSupportEmail(ticket: SupportEmailTicket) {
+        val fileUri = getLogFileUri(ticket)
+        val emailIntent = getEmailIntent(ticket, fileUri)
+        if (emailIntent.canBeHandled(requireContext())) {
+            startActivity(emailIntent)
+        }
+    }
+
+    private fun getLogFileUri(
+        ticket: SupportEmailTicket,
+    ) = ticket.logs?.let { file ->
+        context?.let {
+            FileProvider.getUriForFile(
+                it,
+                Constants.AUTHORITY_STRING_FILE_PROVIDER,
+                file
+            )
+        }
+    }
+
+    private fun getEmailIntent(
+        ticket: SupportEmailTicket,
+        fileUri: Uri?,
+    ) = Intent(Intent.ACTION_SEND).apply {
+        type = "message/rfc822"
+        putExtra(Intent.EXTRA_EMAIL, arrayOf(ticket.email))
+        putExtra(Intent.EXTRA_SUBJECT, ticket.subject)
+        putExtra(Intent.EXTRA_TEXT, ticket.ticket)
+        fileUri?.let<Uri, Unit> {
+            putExtra(Intent.EXTRA_STREAM, it)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
     }
 }

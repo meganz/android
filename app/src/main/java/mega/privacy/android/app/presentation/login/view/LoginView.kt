@@ -117,6 +117,7 @@ fun LoginView(
     onUpdateKarereLogs: () -> Unit,
     onUpdateSdkLogs: () -> Unit,
     onFirstTime2FAConsumed: () -> Unit,
+    onReportIssue: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -155,6 +156,7 @@ fun LoginView(
                     onUpdateKarereLogs = onUpdateKarereLogs,
                     onUpdateSdkLogs = onUpdateSdkLogs,
                     onChangeApiServer = { showChangeApiServerDialog = true },
+                    onReportIssue = onReportIssue,
                     modifier = modifier,
                 )
 
@@ -203,6 +205,7 @@ private fun RequireLogin(
     onUpdateKarereLogs: () -> Unit,
     onUpdateSdkLogs: () -> Unit,
     onChangeApiServer: () -> Unit,
+    onReportIssue: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -324,7 +327,7 @@ private fun RequireLogin(
             Row(
                 modifier = Modifier
                     .clickable {
-                        TODO()
+                        onReportIssue()
                     }
                     .padding(start = 22.dp, top = 18.dp, end = 22.dp),
             ) {
@@ -535,6 +538,7 @@ private fun PreviewEmptyLoginView() {
             onUpdateKarereLogs = {},
             onUpdateSdkLogs = {},
             onChangeApiServer = {},
+            onReportIssue = {},
         )
     }
 }
@@ -560,7 +564,8 @@ private fun PreviewLoginView(
             onBackPressed = {},
             onUpdateKarereLogs = {},
             onUpdateSdkLogs = {},
-            onFirstTime2FAConsumed = {}
+            onFirstTime2FAConsumed = {},
+            onReportIssue = {},
         )
     }
 }
