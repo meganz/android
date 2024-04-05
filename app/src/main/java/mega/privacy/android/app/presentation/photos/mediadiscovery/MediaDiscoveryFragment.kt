@@ -129,7 +129,7 @@ class MediaDiscoveryFragment : Fragment() {
         if (isVisible) {
             managerActivity?.hideAdsView()
         } else {
-            managerActivity?.showAdsView()
+            managerActivity?.handleShowingAds(TAB_CLOUD_SLOT_ID)
         }
     }
 
