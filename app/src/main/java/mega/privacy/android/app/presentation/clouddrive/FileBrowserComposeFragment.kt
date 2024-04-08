@@ -10,20 +10,23 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.crashlytics.ktx.crashlytics
@@ -37,7 +40,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -55,21 +57,23 @@ import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetD
 import mega.privacy.android.app.presentation.clouddrive.ui.FileBrowserComposeView
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
+import mega.privacy.android.app.presentation.node.NodeActionsViewModel
+import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
@@ -108,10 +112,10 @@ class FileBrowserComposeFragment : Fragment() {
     lateinit var getThemeMode: GetThemeMode
 
     /**
-     * Mapper to open file
+     * File type icon mapper
      */
     @Inject
-    lateinit var getIntentToOpenFileMapper: GetIntentToOpenFileMapper
+    lateinit var fileTypeIconMapper: FileTypeIconMapper
 
     /**
      * Mapper to get options for Action Bar
@@ -119,12 +123,7 @@ class FileBrowserComposeFragment : Fragment() {
     @Inject
     lateinit var getOptionsForToolbarMapper: GetOptionsForToolbarMapper
 
-    /**
-     * Mapper to get icon for file type
-     */
-    @Inject
-    lateinit var fileTypeIconMapper: FileTypeIconMapper
-
+    private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val fileBrowserViewModel: FileBrowserViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
 
@@ -165,77 +164,108 @@ class FileBrowserComposeFragment : Fragment() {
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by fileBrowserViewModel.state.collectAsStateWithLifecycle()
+                val nodeActionState by nodeActionsViewModel.state.collectAsStateWithLifecycle()
                 val snackbarHostState = remember { SnackbarHostState() }
+                val scaffoldState = rememberScaffoldState()
                 val coroutineScope = rememberCoroutineScope()
-                MegaAppTheme(isDark = themeMode.isDarkMode()) {
-                    FileBrowserComposeView(
-                        uiState = uiState,
-                        emptyState = getEmptyFolderDrawable(uiState.isFileBrowserEmpty),
-                        onItemClick = fileBrowserViewModel::onItemClicked,
-                        onLongClick = {
-                            fileBrowserViewModel.onLongItemClicked(it)
-                            if (actionMode == null) {
-                                actionMode =
-                                    (activity as? AppCompatActivity)?.startSupportActionMode(
-                                        ActionBarCallBack()
-                                    )
-                            }
-                        },
-                        onMenuClick = {
-                            if (uiState.isConnected) {
-                                showOptionsMenuForItem(it)
-                            } else {
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar(
-                                        message = getString(R.string.error_server_connection_problem),
-                                    )
-                                }
-                            }
-                        },
-                        sortOrder = getString(
-                            SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
-                                ?: R.string.sortby_name
-                        ),
-                        onSortOrderClick = { showSortByPanel() },
-                        onChangeViewTypeClick = fileBrowserViewModel::onChangeViewTypeClicked,
-                        onLinkClicked = ::navigateToLink,
-                        onDisputeTakeDownClicked = ::navigateToLink,
-                        onDismissClicked = fileBrowserViewModel::onBannerDismissClicked,
-                        onUpgradeClicked = {
-                            fileBrowserViewModel::onBannerDismissClicked
-                            (activity as? ManagerActivity)?.navigateToUpgradeAccount()
-                        },
-                        onEnterMediaDiscoveryClick = {
-                            disableSelectMode()
-                            fileBrowserViewModel.setMediaDiscoveryVisibility(
-                                isMediaDiscoveryOpen = true,
-                                isMediaDiscoveryOpenedByIconClick = true,
-                            )
-                        },
-                        fileTypeIconMapper = fileTypeIconMapper,
-                    )
+                var clickedFile: TypedFileNode? by remember {
+                    mutableStateOf(null)
+                }
 
-                    // Snackbar host state should be attached to snackbar host in the scaffold, but we don't have a scaffold yet
-                    LaunchedEffect(snackbarHostState.currentSnackbarData) {
-                        snackbarHostState.currentSnackbarData?.message?.let {
-                            Util.showSnackbar(activity, it)
+                MegaAppTheme(isDark = themeMode.isDarkMode()) {
+                    MegaScaffold(
+                        scaffoldState = scaffoldState,
+                    ) {
+                        FileBrowserComposeView(
+                            uiState = uiState,
+                            emptyState = getEmptyFolderDrawable(uiState.isFileBrowserEmpty),
+                            onItemClick = {
+                                coroutineScope.launch {
+                                    if (uiState.selectedNodeHandles.isEmpty()) {
+                                        when (it.node) {
+                                            is TypedFileNode -> clickedFile = it.node
+
+                                            is TypedFolderNode -> {
+                                                fileBrowserViewModel.onFolderItemClicked(it.id.longValue)
+                                            }
+
+                                            else -> Timber.e("Unsupported click")
+                                        }
+                                    } else {
+                                        fileBrowserViewModel.onItemClicked(it)
+                                    }
+                                }
+                            },
+                            onLongClick = {
+                                fileBrowserViewModel.onLongItemClicked(it)
+                                if (actionMode == null) {
+                                    actionMode =
+                                        (activity as? AppCompatActivity)?.startSupportActionMode(
+                                            ActionBarCallBack()
+                                        )
+                                }
+                            },
+                            onMenuClick = {
+                                if (uiState.isConnected) {
+                                    showOptionsMenuForItem(it)
+                                } else {
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = getString(R.string.error_server_connection_problem),
+                                        )
+                                    }
+                                }
+                            },
+                            sortOrder = getString(
+                                SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
+                                    ?: R.string.sortby_name
+                            ),
+                            onSortOrderClick = { showSortByPanel() },
+                            onChangeViewTypeClick = fileBrowserViewModel::onChangeViewTypeClicked,
+                            onLinkClicked = ::navigateToLink,
+                            onDisputeTakeDownClicked = ::navigateToLink,
+                            onDismissClicked = fileBrowserViewModel::onBannerDismissClicked,
+                            onUpgradeClicked = {
+                                fileBrowserViewModel::onBannerDismissClicked
+                                (activity as? ManagerActivity)?.navigateToUpgradeAccount()
+                            },
+                            onEnterMediaDiscoveryClick = {
+                                disableSelectMode()
+                                fileBrowserViewModel.setMediaDiscoveryVisibility(
+                                    isMediaDiscoveryOpen = true,
+                                    isMediaDiscoveryOpenedByIconClick = true,
+                                )
+                            },
+                            fileTypeIconMapper = fileTypeIconMapper
+                        )
+
+                        // Snackbar host state should be attached to snackbar host in the scaffold, but we don't have a scaffold yet
+                        LaunchedEffect(snackbarHostState.currentSnackbarData) {
+                            snackbarHostState.currentSnackbarData?.message?.let {
+                                Util.showSnackbar(activity, it)
+                            }
+                            snackbarHostState.currentSnackbarData?.dismiss()
                         }
+                        StartDownloadComponent(
+                            uiState.downloadEvent,
+                            {
+                                fileBrowserViewModel.consumeDownloadEvent()
+                                disableSelectMode()
+                            },
+                            snackBarHostState = snackbarHostState,
+                        )
+                        StartDownloadComponent(
+                            event = nodeActionState.downloadEvent,
+                            onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
+                            snackBarHostState = snackbarHostState,
+                        )
                     }
-                    StartDownloadComponent(
-                        uiState.downloadEvent,
-                        {
-                            fileBrowserViewModel.consumeDownloadEvent()
-                            disableSelectMode()
-                        },
-                        snackBarHostState = snackbarHostState,
-                    )
                 }
                 performItemOptionsClick(uiState.optionsItemInfo)
                 updateActionModeTitle(
                     fileCount = uiState.selectedFileNodes,
                     folderCount = uiState.selectedFolderNodes
                 )
-                onItemClick(uiState.currentFileNode)
                 HandleMediaDiscoveryVisibility(
                     isMediaDiscoveryOpen = uiState.isMediaDiscoveryOpen,
                     isMediaDiscoveryOpenedByIconClick = uiState.isMediaDiscoveryOpenedByIconClick,
@@ -247,6 +277,18 @@ class FileBrowserComposeFragment : Fragment() {
                 }
                 ExitFileBrowser(uiState.exitFileBrowserEvent) {
                     fileBrowserViewModel.consumeExitFileBrowserEvent()
+                }
+                clickedFile?.let {
+                    HandleNodeAction(
+                        typedFileNode = it,
+                        nodeSourceType = Constants.RUBBISH_BIN_ADAPTER,
+                        sortOrder = uiState.sortOrder,
+                        snackBarHostState = snackbarHostState,
+                        onActionHandled = {
+                            clickedFile = null
+                        },
+                        nodeActionsViewModel = nodeActionsViewModel
+                    )
                 }
             }
         }
@@ -290,7 +332,6 @@ class FileBrowserComposeFragment : Fragment() {
                     replaceFragment = fileBrowserViewModel.state().hasNoOpenedFolders,
                     errorMessage = errorMessage,
                 )
-                fileBrowserViewModel.onItemPerformedClicked()
             }
         }
     }
@@ -331,20 +372,6 @@ class FileBrowserComposeFragment : Fragment() {
             onConsumed = onConsumeEvent,
             action = { fileBrowserActionListener?.exitCloudDrive() },
         )
-    }
-
-    /**
-     * On Item click event received from [FileBrowserViewModel]
-     *
-     * @param currentFileNode [FileNode]
-     */
-    private fun onItemClick(currentFileNode: FileNode?) {
-        currentFileNode?.let {
-            openFile(fileNode = it)
-            fileBrowserViewModel.onItemPerformedClicked()
-        } ?: run {
-            fileBrowserActionListener?.updateCloudDriveToolbarTitle(invalidateOptionsMenu = false)
-        }
     }
 
     /**
@@ -615,40 +642,6 @@ class FileBrowserComposeFragment : Fragment() {
                     )
                     disableSelectMode()
                 }
-            }
-        }
-    }
-
-    /**
-     * Open File
-     * @param fileNode [FileNode]
-     */
-    private fun openFile(fileNode: FileNode) {
-        lifecycleScope.launch {
-            runCatching {
-                val intent = getIntentToOpenFileMapper(
-                    activity = requireActivity(),
-                    fileNode = fileNode,
-                    viewType = Constants.FILE_BROWSER_ADAPTER
-                )
-                intent?.let {
-                    if (MegaApiUtils.isIntentAvailable(context, it)) {
-                        startActivity(it)
-                    } else {
-                        Toast.makeText(
-                            context,
-                            getString(R.string.intent_not_available),
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
-            }.onFailure {
-                Timber.e("itemClick:ERROR:httpServerGetLocalLink")
-                (activity as? BaseActivity)?.showSnackbar(
-                    type = Constants.SNACKBAR_TYPE,
-                    content = getString(R.string.general_text_error),
-                    chatId = -1,
-                )
             }
         }
     }

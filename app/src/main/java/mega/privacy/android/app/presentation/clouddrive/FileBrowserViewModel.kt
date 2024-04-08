@@ -495,7 +495,7 @@ class FileBrowserViewModel @Inject constructor(
      *
      * @param folderHandle The Folder Handle
      */
-    private fun onFolderItemClicked(folderHandle: Long) {
+    fun onFolderItemClicked(folderHandle: Long) {
         viewModelScope.launch {
             _state.update {
                 it.copy(
@@ -610,18 +610,6 @@ class FileBrowserViewModel @Inject constructor(
             _state.value.nodesList.indexOfFirst { it.node.id.longValue == nodeUIItem.id.longValue }
         if (_state.value.isInSelection) {
             updateNodeInSelectionState(nodeUIItem = nodeUIItem, index = index)
-        } else {
-            if (nodeUIItem.node is FileNode) {
-                _state.update {
-                    it.copy(
-                        itemIndex = index,
-                        currentFileNode = nodeUIItem.node
-                    )
-                }
-
-            } else {
-                onFolderItemClicked(nodeUIItem.id.longValue)
-            }
         }
     }
 
@@ -733,18 +721,6 @@ class FileBrowserViewModel @Inject constructor(
                     )
                 }
             }
-        }
-    }
-
-    /**
-     * When item is clicked on activity
-     */
-    fun onItemPerformedClicked() {
-        _state.update {
-            it.copy(
-                currentFileNode = null,
-                itemIndex = -1,
-            )
         }
     }
 

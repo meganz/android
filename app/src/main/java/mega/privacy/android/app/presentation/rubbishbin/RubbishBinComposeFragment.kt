@@ -160,6 +160,11 @@ class RubbishBinComposeFragment : Fragment() {
                             fileTypeIconMapper = fileTypeIconMapper
                         )
                     }
+                    StartDownloadComponent(
+                        event = nodeActionState.downloadEvent,
+                        onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
+                        snackBarHostState = snackbarHostState,
+                    )
                 }
                 updateActionModeTitle(
                     fileCount = uiState.selectedFileNodes,
@@ -183,12 +188,6 @@ class RubbishBinComposeFragment : Fragment() {
                         nodeActionsViewModel = nodeActionsViewModel
                     )
                 }
-
-                StartDownloadComponent(
-                    event = nodeActionState.downloadEvent,
-                    onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
-                    snackBarHostState = snackbarHostState,
-                )
             }
         }
     }

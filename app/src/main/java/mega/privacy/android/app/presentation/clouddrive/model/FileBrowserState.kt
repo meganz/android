@@ -59,8 +59,6 @@ data class FileBrowserState(
     val isPendingRefresh: Boolean = false,
     val nodesList: List<NodeUIItem<TypedNode>> = emptyList(),
     val isInSelection: Boolean = false,
-    val itemIndex: Int = -1,
-    val currentFileNode: FileNode? = null,
     val selectedNodeHandles: List<Long> = emptyList(),
     val selectedFileNodes: Int = 0,
     val selectedFolderNodes: Int = 0,

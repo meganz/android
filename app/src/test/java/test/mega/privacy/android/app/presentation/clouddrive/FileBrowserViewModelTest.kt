@@ -2,6 +2,7 @@ package test.mega.privacy.android.app.presentation.clouddrive
 
 import android.view.MenuItem
 import app.cash.turbine.test
+import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
@@ -462,6 +463,15 @@ class FileBrowserViewModelTest {
         whenever(handleOptionClickMapper(eq(menuItem), any())).thenReturn(optionsItemInfo)
         whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
         underTest.onOptionItemClicked(menuItem)
+    }
+
+    @Test
+    fun `test that when folder is selected it calls update handle`() = runTest {
+        val handle = 123456L
+        underTest.onFolderItemClicked(handle)
+        underTest.state.test {
+            assertThat(awaitItem().isLoading).isFalse()
+        }
     }
 
     private suspend fun stubCommon() {
