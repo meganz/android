@@ -1,5 +1,6 @@
 package mega.privacy.android.data.facade
 
+import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
@@ -9,7 +10,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -123,5 +124,16 @@ internal class FileFacadeTest {
 
         val actualSize = underTest.getTotalSize(dir)
         assertThat(actualSize).isEqualTo(5000L)
+    }
+
+    @Test
+    fun `test that delete file by uri returns correct result`() = runTest {
+        val contentUriMock: Uri = mock()
+        val contentResolver = mock<ContentResolver>()
+        whenever(context.contentResolver).thenReturn(contentResolver)
+        whenever(contentResolver.delete(contentUriMock, null, null)).thenReturn(1)
+        val result = underTest.deleteFileByUri(contentUriMock)
+
+        assertThat(result).isTrue()
     }
 }

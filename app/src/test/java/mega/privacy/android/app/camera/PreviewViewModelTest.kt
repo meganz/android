@@ -1,7 +1,5 @@
 package mega.privacy.android.app.camera
 
-import android.app.Application
-import android.content.ContentResolver
 import android.net.Uri
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -11,21 +9,22 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.domain.usecase.file.DeleteFileByUriUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class PreviewViewModelTest {
     private lateinit var underTest: PreviewViewModel
-    private val application: Application = mock()
+    private val deleteFileByUriUseCase = mock<DeleteFileByUriUseCase>()
     private val testDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     private val applicationScope: CoroutineScope = CoroutineScope(testDispatcher)
 
@@ -42,19 +41,22 @@ internal class PreviewViewModelTest {
 
     @BeforeEach
     fun resetMocks() {
-        reset(application)
+        reset(deleteFileByUriUseCase)
     }
 
     @Test
     fun `test that deleting video invokes contentResolver delete`() = runTest {
-        val uri = mock<Uri>()
-        val contentResolver = mock<ContentResolver>()
-        whenever(application.contentResolver).thenReturn(contentResolver)
+        val uri = mock<Uri> {
+            on { toString() } doReturn "content://mega.privacy.android.app.provider/cache/123456"
+        }
         underTest.deleteVideo(uri)
-        verify(contentResolver).delete(uri, null, null)
+        verify(deleteFileByUriUseCase).invoke(uri.toString())
     }
 
     private fun initTestClass() {
-        underTest = PreviewViewModel(application, applicationScope)
+        underTest = PreviewViewModel(
+            applicationScope = applicationScope,
+            deleteFileByUriUseCase = deleteFileByUriUseCase
+        )
     }
 }

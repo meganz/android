@@ -54,6 +54,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.NullAndEmptySource
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.clearInvocations
@@ -567,4 +568,20 @@ internal class FileSystemRepositoryImplTest {
 
             assertThat(actual).isEqualTo(expected)
         }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that deleteFileByUri deletes the file correctly`(expected: Boolean) = runTest {
+        Mockito.mockStatic(Uri::class.java).use { _ ->
+            val testUri = "file://test/file/path"
+            val uri = mock<Uri>()
+            whenever(Uri.parse(testUri)).thenReturn(uri)
+            whenever(fileGateway.deleteFileByUri(uri)).thenReturn(expected)
+
+            val actual = underTest.deleteFileByUri(testUri)
+
+            verify(fileGateway).deleteFileByUri(uri)
+            assertThat(actual).isEqualTo(expected)
+        }
+    }
 }

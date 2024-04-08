@@ -379,4 +379,12 @@ interface FileSystemRepository {
      * Get file type info for a given file
      */
     suspend fun getFileTypeInfo(file: File): FileTypeInfo
+
+    /**
+     * Delete file by uri
+     *
+     * @param uri
+     * @return true if the file is deleted successfully
+     */
+    suspend fun deleteFileByUri(uri: String): Boolean
 }

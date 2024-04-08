@@ -584,4 +584,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             )
         }
 
+    override suspend fun deleteFileByUri(uri: String): Boolean = withContext(ioDispatcher) {
+        fileGateway.deleteFileByUri(Uri.parse(uri))
+    }
 }

@@ -297,4 +297,12 @@ interface FileGateway {
      * Creates a new image from [file] to [destination] with [maxPixels] pixels if the image has more than [maxPixels] pixels
      */
     fun downscaleImage(file: File, destination: File, maxPixels: Long)
+
+    /**
+     * Delete file by uri
+     *
+     * @param uri
+     * @return
+     */
+    suspend fun deleteFileByUri(uri: Uri): Boolean
 }

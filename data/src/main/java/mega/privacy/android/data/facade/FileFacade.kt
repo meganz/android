@@ -438,6 +438,9 @@ class FileFacade @Inject constructor(
         fileBitmap.recycle()
     }
 
+    override suspend fun deleteFileByUri(uri: Uri): Boolean =
+        context.contentResolver.delete(uri, null, null) > 0
+
     private fun File.getCompressFormat(): CompressFormat = when (extension) {
         "jpeg", "jpg" -> CompressFormat.JPEG
         "png" -> CompressFormat.PNG
