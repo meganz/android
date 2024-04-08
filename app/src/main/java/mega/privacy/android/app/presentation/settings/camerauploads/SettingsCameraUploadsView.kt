@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.settings.camerauploads
 
+import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -271,7 +272,14 @@ internal fun SettingsCameraUploadsView(
                     }
                     KeepFileNamesTile(
                         isChecked = uiState.shouldKeepUploadFileNames,
-                        onCheckedChange = onKeepFileNamesStateChanged,
+                        onCheckedChange = { shouldKeepFileNames ->
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.message_keep_device_name),
+                                Toast.LENGTH_SHORT,
+                            ).show()
+                            onKeepFileNamesStateChanged.invoke(shouldKeepFileNames)
+                        },
                     )
                     CameraUploadsLocalFolderTile(
                         primaryFolderPath = uiState.primaryFolderPath,
