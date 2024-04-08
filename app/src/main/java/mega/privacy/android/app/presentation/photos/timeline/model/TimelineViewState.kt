@@ -5,6 +5,7 @@ import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.photos.Photo
 
@@ -95,4 +96,5 @@ data class TimelineViewState(
     val isCameraUploadsLimitedAccess: Boolean = false,
     val showCameraUploadsChangePermissionsMessage: Boolean = false,
     val showCameraUploadsCompletedMessage: Boolean = false,
+    val accountType: AccountType? = null,
 )

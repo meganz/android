@@ -25,6 +25,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -38,11 +40,13 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.DateCardCount
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
+import mega.privacy.android.domain.entity.AccountType
 
 @Composable
 fun CardListView(
     state: LazyGridState = LazyGridState(),
     dateCards: List<DateCard>,
+    accountType: AccountType? = null,
     photoDownload: PhotoDownload,
     onCardClick: (DateCard) -> Unit,
     cardListViewHeaderView: @Composable () -> Unit = {},
@@ -72,7 +76,7 @@ fun CardListView(
                 item.key
             }
         ) { _, dateCard ->
-
+            val photo = dateCard.photo
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -109,6 +113,12 @@ fun CardListView(
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(1f)
+                            .alpha(0.5f.takeIf {
+                                accountType?.isPaid == true && (photo.isSensitive || photo.isSensitiveInherited)
+                            } ?: 1f)
+                            .blur(16.dp.takeIf {
+                                accountType?.isPaid == true && (photo.isSensitive || photo.isSensitiveInherited)
+                            } ?: 0.dp)
                     )
                     Box(
                         modifier = Modifier

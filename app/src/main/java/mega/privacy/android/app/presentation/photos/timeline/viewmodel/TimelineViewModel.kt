@@ -4,13 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -53,6 +54,7 @@ import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
@@ -62,6 +64,7 @@ import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUse
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import nz.mega.sdk.MegaNode
@@ -111,7 +114,9 @@ class TimelineViewModel @Inject constructor(
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase,
     private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
-    monitorCameraUploadsStatusInfoUseCase: MonitorCameraUploadsStatusInfoUseCase,
+    private val monitorCameraUploadsStatusInfoUseCase: MonitorCameraUploadsStatusInfoUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
 ) : ViewModel() {
 
     internal val _state = MutableStateFlow(TimelineViewState(loadPhotosDone = false))
@@ -119,38 +124,73 @@ class TimelineViewModel @Inject constructor(
 
     internal val selectedPhotosIds = mutableSetOf<Long>()
 
-    private var job: Job? = null
     private var isCameraUploadsFirstSyncTriggered = false
     private var isCameraUploadsUploading = false
+    private var showHiddenItems: Boolean? = null
 
     init {
-        job = viewModelScope.launch {
-            getTimelinePhotosUseCase()
-                .catch { throwable ->
-                    Timber.e(throwable)
-                }.collectLatest(::handlePhotos)
-        }
+        monitorPhotos()
+        monitorCameraUploadsStatus()
+
         viewModelScope.launch {
-            monitorCameraUploadsStatusInfoUseCase()
-                .collect {
-                    when (it) {
-                        is CameraUploadsStatusInfo.CheckFilesForUpload -> {
-                            handleCameraUploadsCheckStatus(it)
-                        }
-
-                        is CameraUploadsStatusInfo.UploadProgress -> {
-                            handleCameraUploadsProgressStatus(it)
-                        }
-
-                        is CameraUploadsStatusInfo.Finished -> {
-                            handleCameraUploadsFinishedStatus(it)
-                        }
-
-                        else -> Unit
-                    }
-                }
+            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+                monitorShowHiddenItems()
+                monitorAccountDetail()
+            }
         }
     }
+
+    private fun monitorPhotos() = viewModelScope.launch {
+        getTimelinePhotosUseCase()
+            .catch { throwable ->
+                Timber.e(throwable)
+            }.collectLatest(::handlePhotos)
+    }
+
+    private fun monitorCameraUploadsStatus() = viewModelScope.launch {
+        monitorCameraUploadsStatusInfoUseCase()
+            .collect {
+                when (it) {
+                    is CameraUploadsStatusInfo.CheckFilesForUpload -> {
+                        handleCameraUploadsCheckStatus(it)
+                    }
+
+                    is CameraUploadsStatusInfo.UploadProgress -> {
+                        handleCameraUploadsProgressStatus(it)
+                    }
+
+                    is CameraUploadsStatusInfo.Finished -> {
+                        handleCameraUploadsFinishedStatus(it)
+                    }
+
+                    else -> Unit
+                }
+            }
+    }
+
+    private fun monitorShowHiddenItems() = monitorShowHiddenItemsUseCase()
+        .onEach {
+            showHiddenItems = it
+            if (!_state.value.loadPhotosDone) return@onEach
+
+            handleAndUpdatePhotosUIState(
+                sourcePhotos = _state.value.photos,
+                showingPhotos = filterMedias(_state.value.photos),
+            )
+        }.launchIn(viewModelScope)
+
+    private fun monitorAccountDetail() = monitorAccountDetailUseCase()
+        .onEach { accountDetail ->
+            _state.update {
+                it.copy(accountType = accountDetail.levelDetail?.accountType)
+            }
+            if (!_state.value.loadPhotosDone) return@onEach
+
+            handleAndUpdatePhotosUIState(
+                sourcePhotos = _state.value.photos,
+                showingPhotos = filterMedias(_state.value.photos),
+            )
+        }.launchIn(viewModelScope)
 
     private fun handleCameraUploadsCheckStatus(info: CameraUploadsStatusInfo.CheckFilesForUpload) {
         setCameraUploadsSyncFab(isVisible = true)
@@ -337,7 +377,8 @@ class TimelineViewModel @Inject constructor(
         sourcePhotos: List<Photo>,
         showingPhotos: List<Photo>,
     ) = viewModelScope.launch(defaultDispatcher) {
-        val sortedPhotos = sortPhotos(showingPhotos)
+        val nonSensitivePhotos = filterNonSensitivePhotos(showingPhotos)
+        val sortedPhotos = sortPhotos(nonSensitivePhotos)
 
         async {
             val items = handleAllPhotoItems(showingPhotos = sortedPhotos)
@@ -432,6 +473,17 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
+    private fun filterNonSensitivePhotos(photos: List<Photo>): List<Photo> {
+        val showHiddenItems = showHiddenItems ?: return photos
+        val isPaid = _state.value.accountType?.isPaid ?: return photos
+
+        return if (showHiddenItems || !isPaid) {
+            photos
+        } else {
+            photos.filter { !it.isSensitive && !it.isSensitiveInherited }
+        }
+    }
+
     fun sortByOrder() {
         viewModelScope.launch {
             handleAndUpdatePhotosUIState(
@@ -476,11 +528,6 @@ class TimelineViewModel @Inject constructor(
     }
 
     fun isInAllView(): Boolean = _state.value.selectedTimeBarTab == TimeBarTab.All
-
-    override fun onCleared() {
-        job?.cancel()
-        super.onCleared()
-    }
 
     internal fun resetCUButtonAndProgress() {
         viewModelScope.launch(ioDispatcher) {

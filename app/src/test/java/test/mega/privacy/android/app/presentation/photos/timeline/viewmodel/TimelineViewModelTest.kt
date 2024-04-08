@@ -42,6 +42,7 @@ import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
@@ -51,6 +52,7 @@ import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUse
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.jupiter.api.AfterEach
@@ -121,6 +123,10 @@ class TimelineViewModelTest {
 
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
 
+    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
+
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
+
     @BeforeEach
     fun setUp() {
         getTimelinePhotosUseCase.stub {
@@ -132,6 +138,9 @@ class TimelineViewModelTest {
         reset(
             enableCameraUploadsInPhotosUseCase
         )
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(AppFeatures.HiddenNodes) }.thenReturn(false)
+        }
         initViewModel()
     }
 
@@ -163,6 +172,8 @@ class TimelineViewModelTest {
             timelinePreferencesMapper = timelinePreferencesMapper,
             broadcastBusinessAccountExpiredUseCase = broadcastBusinessAccountExpiredUseCase,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
         )
     }
 

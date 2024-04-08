@@ -527,19 +527,24 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     private suspend fun setShowHiddenNodesPreference(enabled: Boolean) = withContext(ioDispatcher) {
         val prefs = getCCPreferences()
-        val ccJson = prefs?.getValueFor(JSON_KEY_CONTENT_CONSUMPTION.value)
-            ?.decodeBase64()
-            ?.let { JSONObject(it) }
+        val ccJson = try {
+            prefs?.getValueFor(JSON_KEY_CONTENT_CONSUMPTION.value)
+                ?.decodeBase64()
+                ?.let { JSONObject(it) }
+                ?: JSONObject()
+        } catch (e: Exception) {
+            JSONObject()
+        }
 
         val androidJson = try {
-            ccJson?.getJSONObject(JSON_KEY_ANDROID.value)
+            ccJson.getJSONObject(JSON_KEY_ANDROID.value) ?: JSONObject()
         } catch (e: Exception) {
             JSONObject()
         }
         val sensitivesJson = JSONObject(mapOf(JSON_VAL_SHOW_HIDDEN_NODES.value to enabled))
 
-        androidJson?.put(JSON_SENSITIVES.value, sensitivesJson)
-        ccJson?.put(JSON_KEY_ANDROID.value, androidJson)
+        androidJson.put(JSON_SENSITIVES.value, sensitivesJson)
+        ccJson.put(JSON_KEY_ANDROID.value, androidJson)
 
         val newPrefs = prefs ?: MegaStringMap.createInstance()
         newPrefs[JSON_KEY_CONTENT_CONSUMPTION.value] = ccJson.toString().encodeBase64()

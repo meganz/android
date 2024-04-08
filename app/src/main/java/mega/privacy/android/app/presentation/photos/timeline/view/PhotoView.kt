@@ -23,6 +23,8 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -40,6 +42,7 @@ import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.view.isDownloadPreview
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Photo
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -48,6 +51,7 @@ fun PhotoView(
     photo: Photo,
     isSelected: Boolean,
     currentZoomLevel: ZoomLevel,
+    accountType: AccountType?,
     onClick: (Photo) -> Unit,
     onLongPress: (Photo) -> Unit,
     downloadPhoto: PhotoDownload,
@@ -84,6 +88,7 @@ fun PhotoView(
     Box(modifier = photoBoxModifier) {
         PhotoCoverView(
             photo = photo,
+            accountType = accountType,
             currentZoomLevel = currentZoomLevel,
             downloadPhoto = downloadPhoto,
             modifier = Modifier
@@ -132,6 +137,7 @@ fun SelectedIconView(
 @Composable
 fun PhotoCoverView(
     photo: Photo,
+    accountType: AccountType?,
     currentZoomLevel: ZoomLevel,
     modifier: Modifier,
     downloadPhoto: PhotoDownload,
@@ -146,6 +152,7 @@ fun PhotoCoverView(
             is Photo.Image -> {
                 PhotoImageView(
                     photo = photo,
+                    accountType = accountType,
                     isPreview = isDownloadPreview,
                     downloadPhoto = downloadPhoto
                 )
@@ -163,6 +170,7 @@ fun PhotoCoverView(
             is Photo.Video -> {
                 PhotoImageView(
                     photo = photo,
+                    accountType = accountType,
                     isPreview = isDownloadPreview,
                     downloadPhoto = downloadPhoto
                 )
@@ -200,6 +208,7 @@ fun PhotoCoverView(
 @Composable
 fun PhotoImageView(
     photo: Photo,
+    accountType: AccountType?,
     isPreview: Boolean,
     downloadPhoto: PhotoDownload,
 ) {
@@ -227,5 +236,11 @@ fun PhotoImageView(
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1f)
+            .alpha(0.5f.takeIf {
+                accountType?.isPaid == true && (photo.isSensitive || photo.isSensitiveInherited)
+            } ?: 1f)
+            .blur(16.dp.takeIf {
+                accountType?.isPaid == true && (photo.isSensitive || photo.isSensitiveInherited)
+            } ?: 0.dp)
     )
 }

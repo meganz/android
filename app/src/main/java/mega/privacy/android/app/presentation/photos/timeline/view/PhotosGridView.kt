@@ -112,6 +112,7 @@ fun PhotosGridView(
                     photo = item.photo,
                     isSelected = item.isSelected,
                     currentZoomLevel = timelineViewState.currentZoomLevel,
+                    accountType = timelineViewState.accountType,
                     onClick = onClick,
                     onLongPress = onLongPress,
                     downloadPhoto = downloadPhoto,

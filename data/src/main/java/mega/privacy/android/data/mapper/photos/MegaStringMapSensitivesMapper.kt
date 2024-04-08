@@ -10,10 +10,15 @@ import javax.inject.Inject
 
 internal class MegaStringMapSensitivesMapper @Inject constructor() {
     operator fun invoke(prefs: MegaStringMap?, data: Map<String, Any>): MegaStringMap {
-        val json =
+        val json = try {
             prefs?.getValueFor(TimelinePreferencesJSON.JSON_KEY_CONTENT_CONSUMPTION.value)
-                ?.decodeBase64()?.let { JSONObject(it) }
-        json?.put(TimelinePreferencesJSON.JSON_SENSITIVES.value, JSONObject(data))
+                ?.decodeBase64()
+                ?.let { JSONObject(it) }
+                ?: JSONObject()
+        } catch (e: Exception) {
+            JSONObject()
+        }
+        json.put(TimelinePreferencesJSON.JSON_SENSITIVES.value, JSONObject(data))
 
         val newPrefs = prefs ?: MegaStringMap.createInstance()
         newPrefs[TimelinePreferencesJSON.JSON_KEY_CONTENT_CONSUMPTION.value] =

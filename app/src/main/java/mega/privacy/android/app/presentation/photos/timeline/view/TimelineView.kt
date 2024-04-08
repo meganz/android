@@ -309,6 +309,7 @@ private fun HandlePhotosGridView(
                 CardListView(
                     state = lazyGridState,
                     dateCards = dateCards,
+                    accountType = timelineViewState.accountType,
                     photoDownload = photoDownload,
                     onCardClick = onCardClick,
                     cardListViewHeaderView = {

@@ -50,8 +50,10 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -256,11 +258,16 @@ internal class DefaultPhotosRepository @Inject constructor(
     }
 
     private suspend fun handleNodeUpdate(nodeUpdate: NodeUpdate) {
-        for (node in nodeUpdate.changes.keys) {
-            val isPotentialNode = constraints.all { it(node) }
+        for ((node, changes) in nodeUpdate.changes) {
+            if (node is FolderNode && changes.contains(NodeChanges.Sensitive)) {
+                refreshSensitivePhotos()
+                refreshSensitiveImageNodes()
+            } else {
+                val isPotentialNode = constraints.all { it(node) }
 
-            refreshPhotos(node, isPotentialNode)
-            refreshImageNodes(node, isPotentialNode)
+                refreshPhotos(node, isPotentialNode)
+                refreshImageNodes(node, isPotentialNode)
+            }
         }
 
         withContext(photosDispatcher) {
@@ -300,6 +307,23 @@ internal class DefaultPhotosRepository @Inject constructor(
         }
     }
 
+    private suspend fun refreshSensitivePhotos() = withContext(photosDispatcher) {
+        val photos = photosCache.mapNotNull { (nodeId, _) ->
+            getMegaNode(nodeId)?.let { megaNode ->
+                if (isImageNodeValid(megaNode)) {
+                    mapMegaNodeToImage(megaNode)
+                } else if (isVideoNodeValid(megaNode)) {
+                    mapMegaNodeToVideo(megaNode)
+                } else {
+                    null
+                }
+            }
+        }
+
+        photosCache.clear()
+        photosCache.putAll(photos.associateBy { NodeId(it.id) })
+    }
+
     private suspend fun refreshImageNodes(
         node: Node,
         isPotentialNode: Boolean,
@@ -315,6 +339,15 @@ internal class DefaultPhotosRepository @Inject constructor(
         } else {
             imageNodesCache[imageNode.id] = imageNode
         }
+    }
+
+    private suspend fun refreshSensitiveImageNodes() = withContext(imageNodesDispatcher) {
+        val imageNodes = imageNodesCache.mapNotNull { (nodeId, _) ->
+            fetchImageNode(nodeId)
+        }
+
+        imageNodesCache.clear()
+        imageNodesCache.putAll(imageNodes.associateBy { it.id })
     }
 
     override fun monitorImageNodes(): Flow<List<ImageNode>> = imageNodesFlow
