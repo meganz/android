@@ -1,9 +1,7 @@
 package mega.privacy.android.app.presentation.settings
 
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
@@ -12,8 +10,9 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.canBeHandled
 import mega.privacy.android.app.presentation.featureflag.FeatureFlagActivity
-import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
+import mega.privacy.android.app.utils.Constants
 import java.io.File
 
 @AndroidEntryPoint
@@ -57,42 +56,43 @@ class QASettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun sendShareLogFileIntent(logFile: File) = Intent(Intent.ACTION_SEND).apply {
-        type = MimeTypeMap.getSingleton()
-            .getMimeTypeFromExtension(logFile.extension)
-        flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-        putExtra(Intent.EXTRA_STREAM, Uri.fromFile(logFile))
+        val uri = getLogFileUri(logFile)
         putExtra(Intent.EXTRA_TITLE, "Send log file")
         putExtra(Intent.EXTRA_SUBJECT, "Mega Log")
+        uri?.let<Uri, Unit> {
+            type = getMimeType(logFile)
+            putExtra(Intent.EXTRA_STREAM, it)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
     }.let {
-        startActivity(Intent.createChooser(it, null))
+        if (it.canBeHandled(requireContext())) {
+            startActivity(it)
+        }
     }
 
-    private fun sendViewLogFileIntent(logFile: File) {
-        val data = FileProvider.getUriForFile(
-            requireContext(),
-            AUTHORITY_STRING_FILE_PROVIDER, logFile
-        )
-        val type = MimeTypeMap.getSingleton()
-            .getMimeTypeFromExtension(logFile.extension)
-        requireContext().grantUriPermission(
-            requireContext().packageName,
-            data,
-            Intent.FLAG_GRANT_READ_URI_PERMISSION
-        )
+    private fun sendViewLogFileIntent(logFile: File) = Intent(Intent.ACTION_VIEW).apply {
+        val uri = getLogFileUri(logFile)
+        uri?.let {
+            type = getMimeType(logFile)
+            putExtra(Intent.EXTRA_STREAM, it)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+    }.let {
+        if (it.canBeHandled(requireContext())) {
+            startActivity(it)
+        }
+    }
 
-        Intent(Intent.ACTION_VIEW)
-            .setDataAndType(data, type)
-            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            .let {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                    it.addCategory(Intent.CATEGORY_LAUNCHER)
-                }
-                try {
-                    startActivity(it)
-                } catch (e: ActivityNotFoundException) {
-                    sendShareLogFileIntent(logFile)
-                }
-            }
+    private fun getMimeType(logFile: File) = MimeTypeMap.getSingleton()
+        .getMimeTypeFromExtension(logFile.extension)
 
+    private fun getLogFileUri(
+        file: File,
+    ) = context?.let {
+        FileProvider.getUriForFile(
+            it,
+            Constants.AUTHORITY_STRING_FILE_PROVIDER,
+            file
+        )
     }
 }
