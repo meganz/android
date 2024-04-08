@@ -6,9 +6,10 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.media.RingtoneManager
+import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
@@ -394,8 +395,9 @@ class GlobalListener @Inject constructor(
             )
             channel.setShowBadge(true)
             notificationManager.createNotificationChannel(channel)
-            val d: Drawable = appContext.resources
-                .getDrawable(IconPackR.drawable.ic_folder_incoming_medium_solid, appContext.theme)
+            val icon: Bitmap? = getBitmapFromVectorDrawable(
+                IconPackR.drawable.ic_folder_incoming_medium_solid
+            )
             val notificationBuilder: NotificationCompat.Builder =
                 NotificationCompat.Builder(appContext, notificationChannelId)
                     .setSmallIcon(IconPackR.drawable.ic_stat_notify)
@@ -406,7 +408,7 @@ class GlobalListener @Inject constructor(
                     .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                     .setContentIntent(pendingIntent)
                     .setColor(ContextCompat.getColor(appContext, R.color.red_600_red_300))
-                    .setLargeIcon((d as BitmapDrawable).bitmap)
+                    .setLargeIcon(icon)
                     .setPriority(NotificationManager.IMPORTANCE_HIGH)
             notificationManager.notify(
                 Constants.NOTIFICATION_PUSH_CLOUD_DRIVE,
@@ -415,6 +417,20 @@ class GlobalListener @Inject constructor(
         } catch (e: Exception) {
             Timber.e(e)
         }
+    }
+
+    private fun getBitmapFromVectorDrawable(
+        @DrawableRes drawableId: Int,
+    ): Bitmap? {
+        val drawable = ContextCompat.getDrawable(appContext, drawableId) ?: return null
+        val bitmap = Bitmap.createBitmap(
+            drawable.intrinsicWidth,
+            drawable.intrinsicHeight, Bitmap.Config.ARGB_8888
+        )
+        val canvas = Canvas(bitmap)
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
+        return bitmap
     }
 
     /**
