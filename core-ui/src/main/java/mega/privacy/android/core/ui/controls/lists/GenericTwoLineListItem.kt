@@ -29,6 +29,7 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
 import mega.privacy.android.core.ui.theme.extensions.conditional
+import mega.privacy.android.core.ui.theme.tokens.TextColor
 
 /**
  * Generic two line list item
@@ -36,6 +37,8 @@ import mega.privacy.android.core.ui.theme.extensions.conditional
  * @param title Title
  * @param modifier The [Modifier]
  * @param subtitle Subtitle
+ * @param titleTextColor [TextColor] to apply to the title. If no color set, this will be [TextColor.Primary].
+ * @param subtitleTextColor [TextColor] to apply to the subtitle. If no color set, this will be [TextColor.Secondary].
  * @param showEntireSubtitle If true, the entire [subtitle] is displayed. Otherwise, only one line
  * is provided for the [subtitle]
  * @param icon Icon
@@ -51,6 +54,8 @@ fun GenericTwoLineListItem(
     title: String,
     modifier: Modifier = Modifier,
     subtitle: String? = null,
+    titleTextColor: TextColor = TextColor.Primary,
+    subtitleTextColor: TextColor = TextColor.Secondary,
     showEntireSubtitle: Boolean = false,
     icon: @Composable (() -> Unit)? = null,
     subTitlePrefixIcons: @Composable (RowScope.() -> Unit)? = null,
@@ -65,7 +70,7 @@ fun GenericTwoLineListItem(
                 modifier = Modifier,
                 text = title,
                 style = MaterialTheme.typography.subtitle1,
-                color = MegaTheme.colors.text.primary,
+                color = MegaTheme.textColor(textColor = titleTextColor),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -76,7 +81,7 @@ fun GenericTwoLineListItem(
                     modifier = Modifier,
                     text = subtitle,
                     style = MaterialTheme.typography.subtitle2,
-                    color = MegaTheme.colors.text.secondary,
+                    color = MegaTheme.textColor(textColor = subtitleTextColor),
                     maxLines = if (showEntireSubtitle) {
                         Int.MAX_VALUE
                     } else {

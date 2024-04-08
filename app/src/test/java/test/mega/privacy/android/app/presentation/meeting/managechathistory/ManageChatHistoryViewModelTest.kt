@@ -16,9 +16,6 @@ import mega.privacy.android.app.utils.Constants.SECONDS_IN_DAY
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_MONTH_30
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_WEEK
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.ChatRoomPermission
-import mega.privacy.android.domain.entity.chat.ChatRoom
-import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
@@ -46,6 +43,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
+import test.mega.privacy.android.app.presentation.meeting.model.newChatRoom
 import java.util.stream.Stream
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -104,7 +102,7 @@ class ManageChatHistoryViewModelTest {
             whenever(monitorChatRetentionTimeUpdateUseCase(chatRoomId)) doReturn flowOf(
                 retentionTime
             )
-            val chatRoom = newChatRoom()
+            val chatRoom = newChatRoom(withChatId = chatRoomId)
             whenever(getChatRoomUseCase(chatRoomId)) doReturn chatRoom
 
             underTest.initializeChatRoom(chatId = chatRoomId, email = email)
@@ -191,7 +189,7 @@ class ManageChatHistoryViewModelTest {
             whenever(monitorChatRetentionTimeUpdateUseCase(newChatRoomId)) doReturn flowOf(
                 retentionTime
             )
-            val chatRoom = newChatRoom()
+            val chatRoom = newChatRoom(withChatId = newChatRoomId)
             whenever(getChatRoomUseCase(newChatRoomId)) doReturn chatRoom
 
             underTest.initializeChatRoom(chatId = chatRoomId, email = null)
@@ -207,7 +205,7 @@ class ManageChatHistoryViewModelTest {
             whenever(monitorChatRetentionTimeUpdateUseCase(chatRoomId)) doReturn flowOf(
                 retentionTime
             )
-            val chatRoom = newChatRoom()
+            val chatRoom = newChatRoom(withChatId = chatRoomId)
             whenever(getChatRoomUseCase(chatRoomId)) doReturn chatRoom
 
             underTest.initializeChatRoom(chatId = chatRoomId, email = null)
@@ -251,7 +249,7 @@ class ManageChatHistoryViewModelTest {
             )
             val contactHandle = 321L
             whenever(getContactHandleUseCase(email)) doReturn contactHandle
-            val chatRoom = newChatRoom()
+            val chatRoom = newChatRoom(withChatId = chatRoomId)
             whenever(getChatRoomByUserUseCase(contactHandle)) doReturn chatRoom
 
             underTest.initializeChatRoom(chatId = null, email = email)
@@ -279,7 +277,7 @@ class ManageChatHistoryViewModelTest {
             whenever(monitorChatRetentionTimeUpdateUseCase(chatRoomId)) doReturn flowOf(
                 retentionTime
             )
-            val chatRoom = newChatRoom(withRetentionTime = retentionTime)
+            val chatRoom = newChatRoom(withChatId = chatRoomId, withRetentionTime = retentionTime)
             whenever(getChatRoomUseCase(chatRoomId)) doReturn chatRoom
 
             savedStateHandle = SavedStateHandle(mapOf("CHAT_ROOM_ID_KEY" to chatRoomId))
@@ -428,7 +426,7 @@ class ManageChatHistoryViewModelTest {
         whenever(monitorChatRetentionTimeUpdateUseCase(chatRoomId)) doReturn flowOf(
             retentionTime
         )
-        val chatRoom = newChatRoom(withRetentionTime = retentionTime)
+        val chatRoom = newChatRoom(withChatId = chatRoomId, withRetentionTime = retentionTime)
         whenever(getChatRoomUseCase(chatRoomId)) doReturn chatRoom
 
         underTest.initializeChatRoom(chatId = chatRoomId, email = null)
@@ -465,7 +463,7 @@ class ManageChatHistoryViewModelTest {
         whenever(monitorChatRetentionTimeUpdateUseCase(chatRoomId)) doReturn flowOf(
             retentionTime
         )
-        val chatRoom = newChatRoom(withRetentionTime = retentionTime)
+        val chatRoom = newChatRoom(withChatId = chatRoomId, withRetentionTime = retentionTime)
         whenever(getChatRoomUseCase(chatRoomId)) doReturn chatRoom
 
         underTest.initializeChatRoom(chatId = chatRoomId, email = null)
@@ -489,7 +487,7 @@ class ManageChatHistoryViewModelTest {
         whenever(monitorChatRetentionTimeUpdateUseCase(chatRoomId)) doReturn flowOf(
             retentionTime
         )
-        val chatRoom = newChatRoom(withRetentionTime = retentionTime)
+        val chatRoom = newChatRoom(withChatId = chatRoomId, withRetentionTime = retentionTime)
         whenever(getChatRoomUseCase(chatRoomId)) doReturn chatRoom
 
         underTest.initializeChatRoom(chatId = chatRoomId, email = null)
@@ -503,58 +501,4 @@ class ManageChatHistoryViewModelTest {
             )
         }
     }
-
-    private fun newChatRoom(
-        withChatId: Long = chatRoomId,
-        withOwnPrivilege: ChatRoomPermission = ChatRoomPermission.Standard,
-        withNumPreviewers: Long = 0L,
-        withPeerPrivilegesByHandles: Map<Long, ChatRoomPermission> = mapOf(),
-        withPeerCount: Long = 0L,
-        withPeerHandlesList: List<Long> = listOf(),
-        withPeerPrivilegesList: List<ChatRoomPermission> = listOf(),
-        withIsGroup: Boolean = false,
-        withIsPublic: Boolean = false,
-        withIsPreview: Boolean = false,
-        withAuthorizationToken: String? = null,
-        withTitle: String = "",
-        withHasCustomTitle: Boolean = false,
-        withUnreadCount: Int = 0,
-        withUserTyping: Long = 0L,
-        withUserHandle: Long = 0L,
-        withIsActive: Boolean = false,
-        withIsArchived: Boolean = false,
-        withRetentionTime: Long = 0L,
-        withCreationTime: Long = 0L,
-        withIsMeeting: Boolean = false,
-        withIsWaitingRoom: Boolean = false,
-        withIsOpenInvite: Boolean = false,
-        withIsSpeakRequest: Boolean = false,
-        withChanges: List<ChatRoomChange>? = null,
-    ) = ChatRoom(
-        chatId = withChatId,
-        ownPrivilege = withOwnPrivilege,
-        numPreviewers = withNumPreviewers,
-        peerPrivilegesByHandles = withPeerPrivilegesByHandles,
-        peerCount = withPeerCount,
-        peerHandlesList = withPeerHandlesList,
-        peerPrivilegesList = withPeerPrivilegesList,
-        isGroup = withIsGroup,
-        isPublic = withIsPublic,
-        isPreview = withIsPreview,
-        authorizationToken = withAuthorizationToken,
-        title = withTitle,
-        hasCustomTitle = withHasCustomTitle,
-        unreadCount = withUnreadCount,
-        userTyping = withUserTyping,
-        userHandle = withUserHandle,
-        isActive = withIsActive,
-        isArchived = withIsArchived,
-        retentionTime = withRetentionTime,
-        creationTime = withCreationTime,
-        isMeeting = withIsMeeting,
-        isWaitingRoom = withIsWaitingRoom,
-        isOpenInvite = withIsOpenInvite,
-        isSpeakRequest = withIsSpeakRequest,
-        changes = withChanges
-    )
 }
