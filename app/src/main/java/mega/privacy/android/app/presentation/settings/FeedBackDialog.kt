@@ -104,12 +104,10 @@ class FeedBackDialog : DialogFragment() {
 
     private fun sendEmail(subject: String, body: String) {
         val emailIntent = Intent(
-            Intent.ACTION_SENDTO, Uri.fromParts(
-                "mailto", Constants.MAIL_ANDROID, null
+            Intent.ACTION_SENDTO, Uri.parse(
+                "mailto:${Constants.MAIL_ANDROID}?subject=$subject&body=$body"
             )
         )
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
-        emailIntent.putExtra(Intent.EXTRA_TEXT, body)
 
         if (emailIntent.canBeHandled(requireContext())) {
             startActivity(emailIntent)
