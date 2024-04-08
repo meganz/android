@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.favourite.FavouriteSortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.favourites.GetFavouriteSortOrderUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
@@ -98,6 +99,8 @@ class FavouritesViewModelTest {
         on { invoke() }.thenReturn(connectedFlow)
     }
 
+    private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
+
     @BeforeEach
     fun setUp() {
         Mockito.reset(
@@ -123,7 +126,8 @@ class FavouritesViewModelTest {
             mapFavouriteSortOrderUseCase = mapFavouriteSortOrderUseCase,
             headerMapper = headerMapper,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            isAvailableOfflineUseCase = isAvailableOfflineUseCase
+            isAvailableOfflineUseCase = isAvailableOfflineUseCase,
+            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
         )
     }
 

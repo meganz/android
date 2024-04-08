@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.favourites
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -24,6 +25,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.favourites.GetFavouriteSortOrderUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
@@ -59,6 +61,7 @@ class FavouritesViewModel @Inject constructor(
     private val headerMapper: HeaderMapper,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
+    private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
 ) : ViewModel() {
 
     private val query = MutableStateFlow<String?>(null)
@@ -280,4 +283,13 @@ class FavouritesViewModel @Inject constructor(
         if (this::order.isInitialized) order.update { mapFavouriteSortOrderUseCase(sortOrder) }
     }
 
+    fun hideOrUnhideNodes(nodeIds: List<NodeId>, hide: Boolean) = viewModelScope.launch {
+        for (nodeId in nodeIds) {
+            async {
+                runCatching {
+                    updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = hide)
+                }.onFailure { Timber.e("Update sensitivity failed: ", it) }
+            }
+        }
+    }
 }

@@ -6,8 +6,11 @@ import android.net.Uri
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
@@ -15,6 +18,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
+import mega.privacy.android.domain.entity.node.NodeId
 import timber.log.Timber
 
 /**
@@ -36,7 +40,18 @@ class FavouriteActionModeCallback(
     }
 
     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        return false
+        mainActivity.lifecycleScope.launch {
+            val isHiddenNodesEnabled = mainActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+            val hasNonSensitiveNode =
+                viewModel.getItemsSelected().any { !it.value.node.isMarkedSensitive }
+
+            menu?.findItem(R.id.cab_menu_hide)?.isVisible =
+                isHiddenNodesEnabled && hasNonSensitiveNode
+
+            menu?.findItem(R.id.cab_menu_unhide)?.isVisible =
+                isHiddenNodesEnabled && !hasNonSensitiveNode
+        }
+        return true
     }
 
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
@@ -78,7 +93,7 @@ class FavouriteActionModeCallback(
                         } else {
                             LinksUtil.showGetLinkActivity(mainActivity, nodeHandles[0])
                         }
-                    }
+                    } else {}
                 }
 
                 R.id.cab_menu_send_to_chat -> {
@@ -93,10 +108,21 @@ class FavouriteActionModeCallback(
                                 mainActivity.supportFragmentManager,
                                 ConfirmMoveToRubbishBinDialogFragment.TAG
                             )
-                    }
+                    } else {}
                 }
 
                 R.id.cab_menu_select_all -> viewModel.selectAll()
+
+                R.id.cab_menu_hide -> viewModel.hideOrUnhideNodes(
+                    nodeIds = nodeHandles.map { NodeId(longValue = it) },
+                    hide = true,
+                )
+
+                R.id.cab_menu_unhide -> viewModel.hideOrUnhideNodes(
+                    nodeIds = nodeHandles.map { NodeId(longValue = it) },
+                    hide = false,
+                )
+
                 R.id.cab_menu_remove_favourites -> {
                     viewModel.favouritesRemoved(nodeHandles)
                 }
@@ -116,6 +142,8 @@ class FavouriteActionModeCallback(
                             .setData(Uri.parse(Constants.DISPUTE_URL))
                     )
                 }
+
+                else -> {}
             }
         }
         return true
