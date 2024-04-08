@@ -27,7 +27,10 @@ class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase
                 shouldShowAvatar = shouldShowAvatar,
                 reactions = reactions,
                 content = content.orEmpty(),
-                isEdited = isEdited,
+                // Rich preview messages are always edited because are sent as normal messages,
+                // but then edited after getting the preview info from API.
+                // So we cannot manage any real edited status.
+                isEdited = false,
                 status = status,
                 rowId = rowId,
             )
