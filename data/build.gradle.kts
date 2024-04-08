@@ -3,7 +3,7 @@ import mega.privacy.android.build.preBuiltSdkDependency
 import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
-    id("com.android.library")
+    alias(convention.plugins.mega.android.library)
     id("kotlin-android")
     id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")
@@ -15,29 +15,13 @@ apply(plugin = "jacoco")
 apply(from = "${project.rootDir}/tools/jacoco.gradle")
 
 android {
-    val compileSdkVersion: Int by rootProject.extra
-    compileSdk = compileSdkVersion
-    val buildTools: String by rootProject.extra
-    buildToolsVersion = buildTools
 
     defaultConfig {
-        val minSdkVersion: Int by rootProject.extra
-        minSdk = minSdkVersion
-
-        val targetSdkVersion: Int by rootProject.extra
-        targetSdk = targetSdkVersion
 
         val appVersion: String by rootProject.extra
         resValue("string", "app_version", "\"${appVersion}\"")
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
-    }
-
-    compileOptions {
-        val javaVersion: JavaVersion by rootProject.extra
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
     }
 
     kotlin {

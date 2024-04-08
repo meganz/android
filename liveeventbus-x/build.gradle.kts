@@ -1,24 +1,9 @@
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+    alias(convention.plugins.mega.android.library)
 }
 
 android {
     namespace = "com.jeremyliao.liveeventbus"
-    val compileSdkVersion: Int by rootProject.extra
-    compileSdk = compileSdkVersion
-
-    defaultConfig {
-        val minSdkVersion: Int by rootProject.extra
-        minSdk = minSdkVersion
-        val targetSdkVersion: Int by rootProject.extra
-        targetSdk = targetSdkVersion
-    }
-    compileOptions {
-        val javaVersion: JavaVersion by rootProject.extra
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
-    }
     kotlin {
         val jdk: String by rootProject.extra
         jvmToolchain(jdk.toInt())

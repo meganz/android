@@ -2,7 +2,7 @@ import groovy.lang.Closure
 import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
-    id("com.android.library")
+    alias(convention.plugins.mega.android.library)
     id("kotlin-android")
     id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")
@@ -10,10 +10,6 @@ plugins {
 
 android {
     namespace = "mega.privacy.android.shared.sync"
-    val compileSdkVersion: Int by rootProject.extra
-    compileSdk = compileSdkVersion
-    val buildTools: String by rootProject.extra
-    buildToolsVersion = buildTools
 
     buildFeatures {
         compose = true
@@ -21,17 +17,6 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion = androidx.versions.compose.compiler.get()
-    }
-
-    defaultConfig {
-        val minSdkVersion: Int by rootProject.extra
-        minSdk = minSdkVersion
-    }
-
-    compileOptions {
-        val javaVersion: JavaVersion by rootProject.extra
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
     }
 
     testOptions {

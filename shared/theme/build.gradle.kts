@@ -1,15 +1,11 @@
 plugins {
-    id("com.android.library")
+    alias(convention.plugins.mega.android.library)
     id("kotlin-android")
     id("kotlin-kapt")
 }
 
 android {
     namespace = "mega.privacy.android.shared.theme"
-    val compileSdkVersion: Int by rootProject.extra
-    compileSdk = compileSdkVersion
-    val buildTools: String by rootProject.extra
-    buildToolsVersion = buildTools
 
     buildFeatures {
         compose = true
@@ -21,16 +17,8 @@ android {
     }
 
     defaultConfig {
-        val minSdkVersion: Int by rootProject.extra
-        minSdk = minSdkVersion
 
         consumerProguardFiles("consumer-rules.pro")
-    }
-
-    compileOptions {
-        val javaVersion: JavaVersion by rootProject.extra
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
     }
 
     testOptions {

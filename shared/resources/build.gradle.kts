@@ -1,25 +1,10 @@
 plugins {
-    id("com.android.library")
+    alias(convention.plugins.mega.android.library)
     id("kotlin-android")
 }
 
 android {
     namespace = "mega.privacy.android.shared.resources"
-    val compileSdkVersion: Int by rootProject.extra
-    compileSdk = compileSdkVersion
-    val buildTools: String by rootProject.extra
-    buildToolsVersion = buildTools
-
-    defaultConfig {
-        val minSdkVersion: Int by rootProject.extra
-        minSdk = minSdkVersion
-    }
-
-    compileOptions {
-        val javaVersion: JavaVersion by rootProject.extra
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
-    }
 
     kotlin {
         val jdk: String by rootProject.extra
