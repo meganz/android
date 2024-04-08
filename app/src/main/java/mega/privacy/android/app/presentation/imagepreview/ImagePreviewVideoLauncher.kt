@@ -19,6 +19,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -117,43 +118,27 @@ class ImagePreviewVideoLauncher @Inject constructor(
         intent: Intent,
         source: ImagePreviewFetcherSource,
     ): Intent {
-        if (megaApiHttpServerIsRunningUseCase() == 0) {
-            megaApiHttpServerStartUseCase()
-            intent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
-        }
-
-        when (source) {
-            ImagePreviewFetcherSource.CHAT -> {
-                getFileUrlByImageNodeUseCase(imageNode as ChatImageFile).let { url ->
-                    Uri.parse(url)?.let { uri ->
-                        intent.setDataAndType(uri, MimeTypeList.typeForName(imageNode.name).type)
-                    }
-                }
+        runCatching {
+            if (megaApiHttpServerIsRunningUseCase() == 0) {
+                megaApiHttpServerStartUseCase()
+                intent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
             }
 
-            ImagePreviewFetcherSource.FOLDER_LINK,
-            ImagePreviewFetcherSource.FOLDER_LINK_MEDIA_DISCOVERY,
-            -> {
-                getFileUrlByImageNodeUseCase(
-                    PublicLinkFile(
-                        node = addImageTypeUseCase(imageNode),
-                        parent = null
-                    )
-                ).let { url ->
-                    Uri.parse(url)?.let { uri ->
-                        intent.setDataAndType(uri, MimeTypeList.typeForName(imageNode.name).type)
-                    }
-                }
+            val url = when (source) {
+                ImagePreviewFetcherSource.CHAT -> getFileUrlByImageNodeUseCase(imageNode as ChatImageFile)
+                ImagePreviewFetcherSource.FOLDER_LINK, ImagePreviewFetcherSource.FOLDER_LINK_MEDIA_DISCOVERY -> getFileUrlByImageNodeUseCase(
+                    PublicLinkFile(node = addImageTypeUseCase(imageNode), parent = null)
+                )
+
+                else -> getFileUrlByImageNodeUseCase(addImageTypeUseCase(imageNode))
             }
 
-            else -> {
-                getFileUrlByImageNodeUseCase(addImageTypeUseCase(imageNode)).let { url ->
-                    Uri.parse(url)?.let { uri ->
-                        intent.setDataAndType(uri, MimeTypeList.typeForName(imageNode.name).type)
-                    }
-                }
+            url?.takeIf { it.isNotEmpty() }?.let { urlString ->
+                Uri.parse(urlString)?.let { uri ->
+                    intent.setDataAndType(uri, MimeTypeList.typeForName(imageNode.name).type)
+                } ?: throw IllegalArgumentException("Invalid URL: $urlString")
             }
-        }
+        }.onFailure { e -> Timber.e("updateIntent", "Error updating intent: ${e.message}", e) }
 
         return intent
     }
