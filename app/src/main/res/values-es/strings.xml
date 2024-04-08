@@ -5214,7 +5214,7 @@
     <!-- Message to user when app update is downloaded -->
     <string name="general_app_update_message_download_success">La aplicación se ha actualizado</string>
     <!-- Action allowing user to restart the app after downloading the update -->
-    <string name="general_app_update_action_restart">Relaunch the app</string>
+    <string name="general_app_update_action_restart">Reiniciar app</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Permitir el acceso a archivos de audio</string>
     <!-- Photos action menu zoom in -->
@@ -5455,9 +5455,9 @@
     <string name="account_upgrade_account_description_subscription_title">Información sobre la suscripción</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_subscription_details">La suscripción se renueva automáticamente con la misma duración y precio elegidos inicialmente. Puedes desactivar la renovación automática de la suscripción a MEGA&#160;Pro en la página de suscripciones de [A]Google Play[/A] hasta 24 horas antes de la renovación programada.</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Permitir acceso a la galería</string>
-    <!--  -->
+    <!-- Button text to grant permission in the chat bottom sheet -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Conceder acceso</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">Actualización requerida</string>
@@ -5596,7 +5596,7 @@
     <!-- The title of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_title">Amplía a Pro para recibir llamadas ilimitadas</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->
-    <string name="meetings_upgrade_pro_plan_body">La llamada ha alcanzado el límite de 60 minutos y ha finalizado. Los usuarios Pro tienen llamadas ilimitadas y hasta 1000 participantes.</string>
+    <string name="meetings_upgrade_pro_plan_body">La llamada ha alcanzado el límite de 60 minutos y ha finalizado. Los usuarios Pro tienen llamadas de duración ilimitada y pueden invitar hasta 1000 participantes.</string>
     <!-- The button text of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_button">Ampliar cuenta</string>
     <!-- Search drop down chips filter type file type -->
@@ -5630,7 +5630,13 @@
     <!-- Button text for reporting an issue on the login screen -->
     <string name="general_login_button_report_your_issue">Reporta tu problema</string>
     <!-- Hidden nodes show items -->
-    <string name="hidden_nodes_show_items">Show hidden items</string>
+    <string name="hidden_nodes_show_items">Mostrar elementos ocultos</string>
     <!-- Hidden nodes show items description -->
-    <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
+    <string name="hidden_nodes_show_items_description">Todos los elementos ocultos estarán visibles, pero desenfocados para indicar su estado “oculto”</string>
+    <!-- Button text for photo option in camera screen -->
+    <string name="camera_photo_button">Photo</string>
+    <string name="camera_flash_mode_on">Flash mode on</string>
+    <string name="camera_flash_mode_off">Flash mode off</string>
+    <string name="camera_flash_mode_auto">Flash mode auto</string>
+    <string name="camera_send_to">Send to %1$s</string>
 </resources>

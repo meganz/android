@@ -4760,7 +4760,7 @@
     <!-- Message to user when app update is downloaded -->
     <string name="general_app_update_message_download_success">Ứng dụng đã được cập nhật</string>
     <!-- Action allowing user to restart the app after downloading the update -->
-    <string name="general_app_update_action_restart">Relaunch the app</string>
+    <string name="general_app_update_action_restart">Khởi chạy lại ứng&#160;dụng</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Cho phép truy&#160;cập vào các tệp&#160;tin âm&#160;thanh</string>
     <!-- Photos action menu zoom in -->
@@ -4987,9 +4987,9 @@
     <string name="account_upgrade_account_description_subscription_title">Chi&#160;tiết gói đăng&#160;ký</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_subscription_details">Các gói đăng&#160;ký được tự&#160;động gia&#160;hạn cho khoảng thời&#160;gian đăng&#160;ký kế tiếp có cùng thời&#160;lượng và ở cùng mức giá như khoảng thời&#160;gian ban&#160;đầu đã chọn. Bạn có thể tắt tự&#160;động gia&#160;hạn gói đăng&#160;ký MEGA&#160;Pro của mình không&#160;được ít hơn 24 giờ trước khi đến kỳ&#160;hạn thanh&#160;toán cho gói đăng&#160;ký tiếp&#160;theo thông qua trang Gói thuê&#160;bao trong  [A]Google Play[/A].</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Cho phép truy&#160;cập vào thư&#160;viện hình&#160;ảnh của bạn</string>
-    <!--  -->
+    <!-- Button text to grant permission in the chat bottom sheet -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Cấp quyền</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">Cần phải cập&#160;nhật</string>
@@ -5154,7 +5154,13 @@
     <!-- Button text for reporting an issue on the login screen -->
     <string name="general_login_button_report_your_issue">Báo cáo vấn đề của bạn</string>
     <!-- Hidden nodes show items -->
-    <string name="hidden_nodes_show_items">Show hidden items</string>
+    <string name="hidden_nodes_show_items">Hiện các mục đã ẩn</string>
     <!-- Hidden nodes show items description -->
-    <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
+    <string name="hidden_nodes_show_items_description">Tất cả các mục ẩn sẽ hiển&#160;thị, nhưng bị làm mờ để cho biết trạng&#160;thái là bị “ẩn”</string>
+    <!-- Button text for photo option in camera screen -->
+    <string name="camera_photo_button">Ảnh</string>
+    <string name="camera_flash_mode_on">Flash mode on</string>
+    <string name="camera_flash_mode_off">Flash mode off</string>
+    <string name="camera_flash_mode_auto">Flash mode auto</string>
+    <string name="camera_send_to">Gửi đến %1$s</string>
 </resources>

@@ -3,7 +3,7 @@
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="general_sync_no_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="general_sync_unsupported_file_system">MEGA kan geen synchronisatie of back-up van deze map maken omdat het bestandsysteem op uw apparaat niet ondersteund is.</string>
+    <string name="general_sync_unsupported_file_system">MEGA can’t sync or backup this folder because the file system on your device is not supported</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
     <string name="general_sync_invalid_remote_type">De map die u heeft gekozen, kan niet worden gesynchroniseerd</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
@@ -23,7 +23,7 @@
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="general_sync_share_non_full_access">De map kan niet worden gesynchroniseerd omdat het een gedeelde map is waar u geen volledige toegang tot heeft</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
-    <string name="general_sync_put_nodes_error">Bestanden in deze map kunnen niet worden gesynchroniseerd of er kan geen back-up van worden gemaakt. U moet het synchroniseren of backuppen opnieuw inschakelen via de Desktop-applicatie.</string>
+    <string name="general_sync_put_nodes_error">Files in this folder can’t be synced or backed up. You’ll need to re-enable the sync or backup from the desktop app.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
     <string name="general_sync_active_sync_below_path">De map kan niet worden gesynchroniseerd omdat deze al gesynchroniseerde mappen bevat</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
@@ -35,7 +35,7 @@
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
     <string name="general_sync_too_many_action_packets">Account opnieuw geladen. Eventuele gemiste updates voor uw back-ups of synchronisaties zijn niet toegepast.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
-    <string name="general_sync_logged_out">Synchronisatie of back-up is gestopt omdat het lijkt alsof u bent afgemeld bij de Desktop-applicatie. Meld u opnieuw aan via de Desktop-applicatie en hervat de synchronisatie of back-up.</string>
+    <string name="general_sync_logged_out">Sync or backup has been stopped as you appear to have logged out of the desktop app. Log back in via the desktop app, and resume the sync or backup.</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
     <string name="general_sync_missing_parent_node">N/A</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
@@ -69,17 +69,19 @@
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="general_sync_message_something_went_wrong">Er is iets misgegaan.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
-    <string name="general_sync_message_node_in_rubbish_bin">De map kan niet worden gesynchroniseerd of er kan geen back-up van worden gemaakt omdat de MEGA-map zich in de Prullenbak bevindt.</string>
+    <string name="general_sync_message_node_in_rubbish_bin">Folder can’t be synced or backed up as the MEGA folder is in the Rubbish bin</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
     <string name="general_sync_message_cannot_locate_local_drive_now">De map op uw apparaat kan op dit moment niet worden gevonden. Probeer het later nog eens.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
     <string name="general_sync_message_cannot_locate_local_drive">De map op uw apparaat kan niet worden gevonden</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
-    <string name="general_sync_message_folder_backup_issue_due_to_recent_changes">Probleem bij het synchroniseren of maken van een reservekopie van deze map vanwege wijzigingen in de MEGA-map. Stop het synchroniseren of de backup en probeer het opnieuw in te stellen in de Desktop-applicatie, of neem contact op met de klantenservice.</string>
+    <string name="general_sync_message_folder_backup_issue_due_to_recent_changes">Probleem bij het synchroniseren of maken van een reservekopie van deze map vanwege wijzigingen in de MEGA-map. Stop het synchroniseren of de backup en probeer het opnieuw in te stellen in de desktop applicatie, of neem contact op met de Ondersteuning.</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
     <string name="general_sync_message_folder_backup_issue">Probleem bij het synchroniseren of back-uppen van deze map. Stop de synchronisatie of back-up en probeer deze opnieuw in te stellen in de Desktop-applicatie, of neem contact op met de ondersteuning.</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
-    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Map kan niet gesynchroniseert worden omdat het al binnen een gesynchroniseerde map is.</string>
+    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Folder can’t be synced as it’s already inside a synced folder</string>
     <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
-    <string name="general_sync_local_filesystem_mismatch">Bestanden in deze map kunnen niet worden gesynchroniseerd of er kan geen back-up van worden gemaakt. U moet de synchronisatie of back-up opnieuw inschakelen via de desktop-applicatie.</string>
+    <string name="general_sync_local_filesystem_mismatch">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the desktop app.</string>
+    <!-- Warning message to display when sync has been paused due a low battery level -->
+    <string name="general_message_sync_paused_low_battery_level">Syncing paused, battery level too low. Charge battery to resume syncing.</string>
 </resources>

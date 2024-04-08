@@ -5455,9 +5455,9 @@
     <string name="account_upgrade_account_description_subscription_title">Detaliile abonamentului</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_subscription_details">Abonamentele sunt reînnoite automat pentru perioade succesive de abonament cu aceeași durată și la același preț ca perioada inițială aleasă. Puteți dezactiva reînnoirea automată a abonamentului MEGA&#160;Pro cu cel mult 24 de ore înainte de scadența următoarei plăți a abonamentului prin Abonamente în [A]Google Play[/A].</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Permiteți accesul la galeria dvs.</string>
-    <!--  -->
+    <!-- Button text to grant permission in the chat bottom sheet -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Acordă acces</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">Actualizarea necesară</string>
@@ -5595,7 +5595,7 @@
     <!-- The title of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_title">Upgradați la Pro pentru a primi apeluri nelimitate</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->
-    <string name="meetings_upgrade_pro_plan_body">Your call reached the 60 minute limit and has ended. Pro users have unlimited calls and up to 1000 participants.</string>
+    <string name="meetings_upgrade_pro_plan_body">Apelul dvs. a atins limita de 60 de minute și s-a încheiat. Utilizatorii Pro au o durată nelimitată a apelului și pot invita până la 1000 de participanți.</string>
     <!-- The button text of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_button">Upgradați acum</string>
     <!-- Search drop down chips filter type file type -->
@@ -5632,4 +5632,10 @@
     <string name="hidden_nodes_show_items">Show hidden items</string>
     <!-- Hidden nodes show items description -->
     <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
+    <!-- Button text for photo option in camera screen -->
+    <string name="camera_photo_button">Photo</string>
+    <string name="camera_flash_mode_on">Flash mode on</string>
+    <string name="camera_flash_mode_off">Flash mode off</string>
+    <string name="camera_flash_mode_auto">Flash mode auto</string>
+    <string name="camera_send_to">Send to %1$s</string>
 </resources>

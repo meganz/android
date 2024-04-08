@@ -5221,9 +5221,9 @@
     <string name="account_upgrade_account_description_subscription_title">Abonnement details</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_subscription_details">Abonnementen worden automatisch verlengd voor opeenvolgende abonnementsperioden van dezelfde duur en tegen dezelfde prijs als de gekozen initiële periode. U kunt de automatische verlenging van uw MEGA &#160; Pro-abonnement uiterlijk 24 uur voordat uw volgende abonnementsbetaling verschuldigd is, uitschakelen via Abonnementen in [A]Google Play[/A].</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Geef toegang tot uw gallerij</string>
-    <!--  -->
+    <!-- Button text to grant permission in the chat bottom sheet -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Toegang verlenen</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">Update vereist</string>
@@ -5358,7 +5358,7 @@
     <!-- The title of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_title">Upgrade naar Pro om ongelimiteerd te kunnen bellen</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->
-    <string name="meetings_upgrade_pro_plan_body">Uw gesprek heeft de limiet van 60 minuten bereikt en is beëindigd. Pro-gebruikers kunnen ongelimiteerd bellen en tot 1000 deelnemers.</string>
+    <string name="meetings_upgrade_pro_plan_body">Uw gesprek heeft de limiet van 60 minuten bereikt en is beëindigd. Pro-gebruikers hebben een onbeperkte gespreksduur en kunnen tot 1000 deelnemers uitnodigen.</string>
     <!-- The button text of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_button">Nu upgraden</string>
     <!-- Search drop down chips filter type file type -->
@@ -5395,4 +5395,10 @@
     <string name="hidden_nodes_show_items">Verborgen items weergeven</string>
     <!-- Hidden nodes show items description -->
     <string name="hidden_nodes_show_items_description">Alle verborgen items zijn zichtbaar, maar wazig om hun “verborgen” status aan te geven</string>
+    <!-- Button text for photo option in camera screen -->
+    <string name="camera_photo_button">Foto</string>
+    <string name="camera_flash_mode_on">Flash mode on</string>
+    <string name="camera_flash_mode_off">Flash mode off</string>
+    <string name="camera_flash_mode_auto">Flash mode auto</string>
+    <string name="camera_send_to">Verzenden naar %1$s</string>
 </resources>

@@ -187,7 +187,7 @@
     <!-- Sync stalled issue reason is Name clash detailed description-->
     <string name="sync_stalled_issue_name_clash_detail">Há vários itens com o mesmo nome em um lado da sincronização que se tornariam todos o mesmo item no outro lado da sincronização.</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_mega">Uma movimentação ou renomeação foi detectada no MEGA, mas não foi possível replicá-la no dispositivo local.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_mega">Foi detectada no MEGA uma ação para mover ou renomear, mas não foi possível replicá-la no dispositivo local.</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_local">Foi detectado que uma mudança ou renomeação foi feita localmente, mas não foi possível replicá-la no MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->

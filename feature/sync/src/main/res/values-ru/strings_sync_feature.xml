@@ -191,7 +191,7 @@
     <!-- Sync stalled issue reason is Name clash detailed description-->
     <string name="sync_stalled_issue_name_clash_detail">На одной стороне синхронизации есть несколько элементов с одинаковым названием, которые на другой стороне синхронизации станут одним и тем же элементом</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_mega">В MEGA обнаружено перемещение или переименование, но его не удалось воспроизвести локально.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename action was detected in MEGA, but couldn’t be replicated locally.</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_local">Обнаружено локальное перемещение или переименование, но его не удалось воспроизвести в MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->

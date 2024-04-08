@@ -187,7 +187,7 @@
     <!-- Sync stalled issue reason is Name clash detailed description-->
     <string name="sync_stalled_issue_name_clash_detail">Există mai multe elemente cu același nume pe o parte a sincronizării dvs. care ar deveni toate același element unic pe cealaltă parte a sincronizării</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_mega">O mutare sau redenumire a fost detectată în MEGA, dar nu a putut fi replicată local.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename action was detected in MEGA, but couldn’t be replicated locally.</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_local">O mutare sau redenumire a fost detectată la nivel local, dar nu a putut fi reprodusă în MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->

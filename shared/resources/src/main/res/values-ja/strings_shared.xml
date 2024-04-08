@@ -3,7 +3,7 @@
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="general_sync_no_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="general_sync_unsupported_file_system">デバイスのファイルシステムがサポートされていないため、MEGAはこのフォルダを同期またはバックアップできません。</string>
+    <string name="general_sync_unsupported_file_system">デバイスのファイルシステムがサポートされていないため、MEGAはこのフォルダを同期またはバックアップできません</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
     <string name="general_sync_invalid_remote_type">選択したフォルダは同期できません</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
@@ -13,7 +13,7 @@
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
     <string name="general_sync_remote_node_not_found">MEGA内のフォルダは、移動または削除されたため見つからないか、アクセス権がない可能性があります</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
-    <string name="general_sync_storage_overquota">Unable to sync or back up this folder as your storage is full</string>
+    <string name="general_sync_storage_overquota">ストレージがいっぱいのため、このフォルダを同期またはバックアップできません</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
     <string name="general_sync_account_expired">お客様のプランの有効期限が切れているため、このフォルダを同期またはバックアップできません</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
@@ -29,7 +29,7 @@
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
     <string name="general_sync_vboxsharedfolder_unsupported">MEGAはVirtualBoxフォルダを同期またはバックアップできません</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
-    <string name="general_sync_account_blocked">Unable to sync or back up this folder as the account has been blocked</string>
+    <string name="general_sync_account_blocked">アカウントがブロックされているため、このフォルダを同期またはバックアップできません。</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
     <string name="general_sync_unknown_temporary_error">このフォルダの同期またはバックアップ中に問題が発生しました。あとでもう一度お試しください。問題が解決しない場合は、サポートにお問い合わせください。</string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
@@ -69,17 +69,19 @@
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="general_sync_message_something_went_wrong">何か問題が発生しました。</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
-    <string name="general_sync_message_node_in_rubbish_bin">MEGAフォルダはごみ箱にあるため、フォルダを同期またはバックアップできません。</string>
+    <string name="general_sync_message_node_in_rubbish_bin">MEGAフォルダはごみ箱にあるため、フォルダを同期またはバックアップできません</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
     <string name="general_sync_message_cannot_locate_local_drive_now">現在、デバイス内のフォルダが見つかりません。あとでもう一度お試しください。</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
     <string name="general_sync_message_cannot_locate_local_drive">デバイス内のフォルダが見つかりません</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
-    <string name="general_sync_message_folder_backup_issue_due_to_recent_changes">MEGAフォルダへの変更により、このフォルダの同期またはバックアップ中に問題が発生しました。バックアップを停止し、デスクトップアプリでもう一度セットアップしてみるか、サポートにお問い合わせください。</string>
+    <string name="general_sync_message_folder_backup_issue_due_to_recent_changes">MEGAフォルダへの変更により、このフォルダの同期またはバックアップ中に問題が発生しました。バックアップを停止し、デスクトップアプリでもう一度セットアップしてみるか、サポートにご連絡ください。</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
     <string name="general_sync_message_folder_backup_issue">このフォルダの同期またはバックアップ中に問題が発生しました。同期またはバックアップを停止し、デスクトップアプリでもう一度設定してみるか、サポートにお問い合わせください。</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
-    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">パスの上にアクティブな同期。</string>
+    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">パスの上にアクティブな同期</string>
     <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
     <string name="general_sync_local_filesystem_mismatch">このフォルダ内のファイルは同期またはバックアップできません。デスクトップアプリから同期またはバックアップを再度有効にする必要があります。</string>
+    <!-- Warning message to display when sync has been paused due a low battery level -->
+    <string name="general_message_sync_paused_low_battery_level">同期が一時停止されました。バッテリー残量が少なすぎます。同期を再開するにはバッテリーを充電してください。</string>
 </resources>

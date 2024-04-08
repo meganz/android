@@ -111,7 +111,7 @@
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
     <string name="device_center_list_view_item_sub_state_notification_system_unavailable">No se ha podido comunicar con la ubicación de la carpeta. Comprueba que se pueda acceder a la ubicación y que se hayan concedido los permisos para la ubicación de la carpeta.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
-    <string name="device_center_list_view_item_sub_state_unable_to_add_watch">Unable to add a filesystem watch. Ensure there is sufficient free space and memory, and that you have granted permissions for the folder location.</string>
+    <string name="device_center_list_view_item_sub_state_unable_to_add_watch">Unable to add a file system watch. Ensure there is sufficient free space and memory, and that you have granted permissions for the folder location.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
     <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid">No se ha podido leer la ubicación de la sincronización. Comprueba que se pueda acceder a la ubicación y que se hayan concedido los permisos para la ubicación de la carpeta.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->

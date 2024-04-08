@@ -111,7 +111,7 @@
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
     <string name="device_center_list_view_item_sub_state_notification_system_unavailable">Tidak dapat berkomunikasi dengan lokasi folder. Periksa lokasi dapat diakses dan izin untuk lokasi folder diberikan.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
-    <string name="device_center_list_view_item_sub_state_unable_to_add_watch">Unable to add a filesystem watch. Ensure there is sufficient free space and memory, and that you have granted permissions for the folder location.</string>
+    <string name="device_center_list_view_item_sub_state_unable_to_add_watch">Unable to add a file system watch. Ensure there is sufficient free space and memory, and that you have granted permissions for the folder location.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
     <string name="device_center_list_view_item_sub_state_unable_to_retrieve_root_fsid">Tidak dapat membaca lokasi sinkronisasi. Periksa lokasi dapat diakses dan izin untuk lokasi folder diberikan.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->

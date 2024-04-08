@@ -183,7 +183,7 @@
     <!-- Sync stalled issue reason is Name clash detailed description-->
     <string name="sync_stalled_issue_name_clash_detail">Er zijn meerdere items met dezelfde naam aan één kant van uw synchronisatie die allemaal één dezelfde bestand worden aan de andere kant van uw synchronisatie</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_mega">Er is een verplaatsing of hernoeming gedetecteerd in MEGA, maar deze kon niet lokaal worden gerepliceerd.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename action was detected in MEGA, but couldn’t be replicated locally.</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_local">Verplaatsen of hernoemen werd lokaal gedetecteerd, maar kon niet worden gerepliceerd in MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->

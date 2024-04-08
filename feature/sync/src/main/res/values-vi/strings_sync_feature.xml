@@ -179,7 +179,7 @@
     <!-- Sync stalled issue reason is Name clash detailed description-->
     <string name="sync_stalled_issue_name_clash_detail">Có nhiều mục có cùng tên tại một bên của quá&#160;trình đồng&#160;bộ hóa của bạn và tất cả sẽ trở thành cùng một mục duy&#160;nhất ở phía bên kia của quá&#160;trình đồng&#160;bộ hóa của bạn</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_mega">Một việc di chuyển hoặc đổi tên đã được phát&#160;hiện trên MEGA, nhưng không thể phỏng&#160;y&#160;theo trong cục&#160;bộ.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename action was detected in MEGA, but couldn’t be replicated locally.</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_local">Một việc di chuyển hoặc đổi tên đã được phát&#160;hiện trong cục&#160;bộ, nhưng không thể phỏng&#160;y&#160;theo trên MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
