@@ -227,9 +227,7 @@ class FileBrowserComposeFragment : Fragment() {
                     fileCount = uiState.selectedFileNodes,
                     folderCount = uiState.selectedFolderNodes
                 )
-                LaunchedEffect(uiState.currentFileNode) {
-                    onItemClick(uiState.currentFileNode)
-                }
+                onItemClick(uiState.currentFileNode)
                 HandleMediaDiscoveryVisibility(
                     isMediaDiscoveryOpen = uiState.isMediaDiscoveryOpen,
                     isMediaDiscoveryOpenedByIconClick = uiState.isMediaDiscoveryOpenedByIconClick,
