@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.recentactions.mapper.RecentActionBucketUiEntityMapper
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsUiState
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -26,6 +27,7 @@ import javax.inject.Inject
 class RecentActionsComposeViewModel @Inject constructor(
     private val getRecentActionsUseCase: GetRecentActionsUseCase,
     private val setHideRecentActivityUseCase: SetHideRecentActivityUseCase,
+    private val recentActionBucketUiEntityMapper: RecentActionBucketUiEntityMapper,
     monitorHideRecentActivityUseCase: MonitorHideRecentActivityUseCase,
     monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
 ) : ViewModel() {
@@ -75,10 +77,13 @@ class RecentActionsComposeViewModel @Inject constructor(
         runCatching {
             getRecentActionsUseCase()
         }.onSuccess { list ->
+            val groupedRecentActions = list
+                .map { recentActionBucketUiEntityMapper(it) }
+                .groupBy { it.date }
             _uiState.update {
                 it.copy(
                     isLoading = false,
-                    groupedRecentActionItems = list.groupBy { it.timestamp },
+                    groupedRecentActionItems = groupedRecentActions,
                 )
             }
         }.onFailure {
@@ -112,5 +117,9 @@ class RecentActionsComposeViewModel @Inject constructor(
     /**
      * Get all recent action buckets
      */
-    fun getAllRecentBuckets() = uiState.value.groupedRecentActionItems.values.flatten()
+    fun getAllRecentBuckets() = uiState.value
+        .groupedRecentActionItems
+        .values
+        .flatten()
+        .map { it.bucket }
 }
