@@ -35,6 +35,7 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.feature.devicecenter.R
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterInfoUiState
 import mega.privacy.android.shared.theme.MegaAppTheme
 
@@ -206,7 +207,7 @@ private fun DeviceCenterInfoScreenDevicePreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterInfoScreen(
             uiState = DeviceCenterInfoUiState(
-                icon = R.drawable.ic_device_pc,
+                icon = IconPackR.drawable.ic_pc_medium_solid,
                 applySecondaryColorIconTint = true,
                 name = "Device name",
                 numberOfFiles = 6,
@@ -224,7 +225,7 @@ private fun DeviceCenterInfoScreenFolderPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         DeviceCenterInfoScreen(
             uiState = DeviceCenterInfoUiState(
-                icon = R.drawable.ic_device_folder,
+                icon = IconPackR.drawable.ic_folder_medium_solid,
                 name = "Folder name",
                 numberOfFiles = 6,
                 numberOfFolders = 5,

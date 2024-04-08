@@ -11,9 +11,10 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.app.presentation.view.NodesView
-import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 
 /**
  * View for RubbishBinComposeFragment
@@ -25,7 +26,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @param onChangeViewTypeClick
  * @param sortOrder
  * @param emptyState
- * @param thumbnailViewModel
  */
 @Composable
 fun RubbishBinComposeView(
@@ -39,6 +39,7 @@ fun RubbishBinComposeView(
     emptyState: Pair<Int, Int>,
     onLinkClicked: (String) -> Unit,
     onDisputeTakeDownClicked: (String) -> Unit,
+    fileTypeIconMapper: FileTypeIconMapper,
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
@@ -55,7 +56,8 @@ fun RubbishBinComposeView(
             listState = listState,
             gridState = gridState,
             onLinkClicked = onLinkClicked,
-            onDisputeTakeDownClicked = onDisputeTakeDownClicked
+            onDisputeTakeDownClicked = onDisputeTakeDownClicked,
+            fileTypeIconMapper = fileTypeIconMapper
         )
     } else {
         LegacyMegaEmptyView(

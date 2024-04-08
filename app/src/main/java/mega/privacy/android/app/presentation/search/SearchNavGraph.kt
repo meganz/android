@@ -23,6 +23,7 @@ import mega.privacy.android.app.presentation.search.navigation.shareFolderAccess
 import mega.privacy.android.app.presentation.search.navigation.shareFolderDialogNavigation
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 
 
 /**
@@ -49,6 +50,7 @@ internal fun NavGraphBuilder.searchNavGraph(
     onBackPressed: () -> Unit,
     nodeActionsViewModel: NodeActionsViewModel,
     handleClick: (TypedNode?) -> Unit,
+    fileTypeIconMapper: FileTypeIconMapper,
     listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
 ) {
     composable(searchRoute) {
@@ -60,6 +62,7 @@ internal fun NavGraphBuilder.searchNavGraph(
             searchActivityViewModel = searchActivityViewModel,
             onBackPressed = onBackPressed,
             nodeActionHandler = nodeActionHandler,
+            fileTypeIconMapper = fileTypeIconMapper,
             handleClick = handleClick
         )
     }

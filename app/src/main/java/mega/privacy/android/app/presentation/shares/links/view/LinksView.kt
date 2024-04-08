@@ -24,6 +24,7 @@ import mega.privacy.android.core.ui.utils.ListStateMap
 import mega.privacy.android.core.ui.utils.getState
 import mega.privacy.android.core.ui.utils.sync
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 
 /**
@@ -47,6 +48,7 @@ fun LinksView(
     onMenuClick: (NodeUIItem<PublicLinkNode>) -> Unit,
     sortOrder: String,
     onSortOrderClick: () -> Unit,
+    fileTypeIconMapper: FileTypeIconMapper,
 ) {
     var listStateMap by rememberSaveable(saver = ListStateMap.Saver) {
         mutableStateOf(emptyMap())
@@ -99,7 +101,8 @@ fun LinksView(
                 onDisputeTakeDownClicked = { },
                 showMediaDiscoveryButton = false,
                 onEnterMediaDiscoveryClick = { },
-                showPublicLinkCreationTime = uiState.isInRootLevel
+                showPublicLinkCreationTime = uiState.isInRootLevel,
+                fileTypeIconMapper = fileTypeIconMapper
             )
         } else {
             LegacyMegaEmptyView(

@@ -9,6 +9,7 @@ import androidx.compose.ui.res.stringResource
 import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.feature.devicecenter.R
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
@@ -30,7 +31,7 @@ internal fun RenameDeviceBottomSheetTile(
         modifier = Modifier.testTag(BOTTOM_SHEET_TILE_RENAME_DEVICE),
         dividerType = null,
         text = stringResource(R.string.device_center_bottom_sheet_item_rename),
-        icon = painterResource(id = R.drawable.ic_bottom_sheet_rename),
+        icon = painterResource(id = IconPackR.drawable.ic_edit_medium_regular_outline),
         onActionClicked = onActionClicked,
     )
 }

@@ -70,6 +70,7 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -82,8 +83,17 @@ import javax.inject.Inject
 class FolderLinkComposeActivity : TransfersManagementActivity(),
     DecryptAlertDialog.DecryptDialogListener {
 
+    /**
+     * Use case to get the value of a feature flag
+     */
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
+    /**
+     * Mapper to get the icon of a file type
+     */
+    @Inject
+    lateinit var fileTypeIconMapper: FileTypeIconMapper
 
     private lateinit var binding: ActivityFolderLinkComposeBinding
 
@@ -253,7 +263,8 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                     }
                     adsViewModel.fetchNewAd(AdsSlotIDs.SHARED_LINK_SLOT_ID)
                 },
-                onAdDismissed = adsViewModel::onAdConsumed
+                onAdDismissed = adsViewModel::onAdConsumed,
+                fileTypeIconMapper = fileTypeIconMapper
             )
             StartDownloadComponent(
                 event = uiState.downloadEvent,

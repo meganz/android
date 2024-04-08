@@ -46,6 +46,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -69,6 +70,12 @@ class RubbishBinComposeFragment : Fragment() {
      */
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    /**
+     * FileTypeIconMapper
+     */
+    @Inject
+    lateinit var fileTypeIconMapper: FileTypeIconMapper
 
     private val viewModel: RubbishBinViewModel by activityViewModels()
     private val managerViewModel: ManagerViewModel by activityViewModels()
@@ -111,7 +118,8 @@ class RubbishBinComposeFragment : Fragment() {
                         ),
                         emptyState = getEmptyFolderDrawable(uiState.isRubbishBinEmpty),
                         onLinkClicked = ::navigateToLink,
-                        onDisputeTakeDownClicked = ::navigateToLink
+                        onDisputeTakeDownClicked = ::navigateToLink,
+                        fileTypeIconMapper = fileTypeIconMapper
                     )
                 }
                 updateActionModeTitle(

@@ -1,16 +1,19 @@
 package mega.privacy.android.app.presentation.shares.incoming.ui
 
 import android.os.Build
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 import org.robolectric.annotation.Config
 
 @Config(sdk = [Build.VERSION_CODES.Q])
@@ -19,6 +22,8 @@ class IncomingSharesViewTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
+
+    private val fileTypeIconMapper: FileTypeIconMapper = mock()
 
     @Test
     fun `test that empty state is shown when there are no incoming shares`() {
@@ -43,6 +48,7 @@ class IncomingSharesViewTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = {},
                 onLinkClicked = {},
+                fileTypeIconMapper = fileTypeIconMapper
             )
         }
 
@@ -77,6 +83,7 @@ class IncomingSharesViewTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = {},
                 onLinkClicked = {},
+                fileTypeIconMapper = fileTypeIconMapper
             )
         }
 

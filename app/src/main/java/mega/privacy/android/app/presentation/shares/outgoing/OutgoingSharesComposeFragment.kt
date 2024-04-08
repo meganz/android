@@ -70,6 +70,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
 import javax.inject.Inject
@@ -114,6 +115,12 @@ class OutgoingSharesComposeFragment : Fragment() {
      */
     @Inject
     lateinit var getOptionsForToolbarMapper: GetOptionsForToolbarMapper
+
+    /**
+     * Mapper to get file type icon
+     */
+    @Inject
+    lateinit var fileTypeIconMapper: FileTypeIconMapper
 
     private val viewModel: OutgoingSharesComposeViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
@@ -197,6 +204,7 @@ class OutgoingSharesComposeFragment : Fragment() {
                         onLinkClicked = ::navigateToLink,
                         onVerifyContactDialogDismissed = viewModel::dismissVerifyContactDialog,
                         onToggleAppBarElevation = ::toggleAppBarElevation,
+                        fileTypeIconMapper = fileTypeIconMapper,
                     )
 
                     // Snackbar host state should be attached to snackbar host in the scaffold, but we don't have a scaffold yet

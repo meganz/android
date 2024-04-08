@@ -23,6 +23,7 @@ import mega.privacy.android.app.presentation.folderlink.view.Constants.SAVE_BUTT
 import mega.privacy.android.app.presentation.folderlink.view.Constants.SNACKBAR_TAG
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.controls.lists.MEDIA_DISCOVERY_TAG
 import org.junit.Rule
 import org.junit.Test
@@ -74,7 +75,8 @@ class FolderLinkViewTest {
                 onEnterMediaDiscoveryClick = { },
                 adsUiState = adsUiState,
                 onAdClicked = { },
-                onAdDismissed = { }
+                onAdDismissed = { },
+                fileTypeIconMapper = FileTypeIconMapper()
             )
         }
     }

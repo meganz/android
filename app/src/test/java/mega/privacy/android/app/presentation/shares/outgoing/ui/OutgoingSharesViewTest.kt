@@ -8,9 +8,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 import org.robolectric.annotation.Config
 import test.mega.privacy.android.app.onNodeWithText
 
@@ -20,6 +22,7 @@ class OutgoingSharesViewTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
+    private val fileTypeIconMapper: FileTypeIconMapper = mock()
 
     @Test
     fun outgoingSharesViewRendersEmptyView() {
@@ -44,7 +47,8 @@ class OutgoingSharesViewTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = {},
                 onLinkClicked = {},
-                onVerifyContactDialogDismissed = {}
+                onVerifyContactDialogDismissed = {},
+                fileTypeIconMapper = fileTypeIconMapper,
             )
         }
 
@@ -76,7 +80,8 @@ class OutgoingSharesViewTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = {},
                 onLinkClicked = {},
-                onVerifyContactDialogDismissed = {}
+                onVerifyContactDialogDismissed = {},
+                fileTypeIconMapper = fileTypeIconMapper,
             )
         }
         composeTestRule.onNodeWithText(R.string.shared_items_contact_not_in_contact_list_dialog_title)

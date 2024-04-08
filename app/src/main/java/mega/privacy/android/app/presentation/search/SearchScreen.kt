@@ -28,6 +28,7 @@ import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetRo
 import mega.privacy.android.app.presentation.search.navigation.searchFilterBottomSheetRoute
 import mega.privacy.android.app.presentation.search.view.SearchComposeView
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 
 /**
  * Search activity to search Nodes and display
@@ -43,6 +44,7 @@ fun SearchScreen(
     searchActivityViewModel: SearchActivityViewModel,
     nodeActionHandler: NodeActionHandler,
     handleClick: (TypedNode?) -> Unit,
+    fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
 ) {
     val uiState by searchActivityViewModel.state.collectAsStateWithLifecycle()
@@ -101,5 +103,6 @@ fun SearchScreen(
         onBackPressed = onBackPressed,
         navHostController = navHostController,
         nodeActionHandler = nodeActionHandler,
+        fileTypeIconMapper = fileTypeIconMapper,
     )
 }

@@ -76,6 +76,7 @@ import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaNode
 
@@ -152,6 +153,7 @@ internal fun FolderLinkView(
     adsUiState: AdsUIState,
     onAdClicked: (uri: Uri?) -> Unit,
     onAdDismissed: () -> Unit,
+    fileTypeIconMapper: FileTypeIconMapper,
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
@@ -273,7 +275,8 @@ internal fun FolderLinkView(
                     onDisputeTakeDownClicked = onDisputeTakeDownClicked,
                     showMediaDiscoveryButton = state.hasMediaItem,
                     onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
-                    isPublicNode = true
+                    isPublicNode = true,
+                    fileTypeIconMapper = fileTypeIconMapper
                 )
                 ImportDownloadView(
                     Modifier
