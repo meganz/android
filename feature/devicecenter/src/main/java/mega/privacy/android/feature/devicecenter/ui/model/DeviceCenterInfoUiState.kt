@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.devicecenter.ui.model
 
 import androidx.annotation.DrawableRes
-import mega.privacy.android.feature.devicecenter.R
+import mega.privacy.android.icon.pack.R
 
 /**
  * Data class representing the state of the Device Center Info View
@@ -15,7 +15,7 @@ import mega.privacy.android.feature.devicecenter.R
  * @property creationTime The creation time
  */
 data class DeviceCenterInfoUiState(
-    @DrawableRes val icon: Int = R.drawable.ic_device_folder,
+    @DrawableRes val icon: Int = R.drawable.ic_folder_medium_solid,
     @Deprecated(
         "Temporary used in order to fix icon color until we change to the new icon set. Will be removed soon."
     ) val applySecondaryColorIconTint: Boolean = false,

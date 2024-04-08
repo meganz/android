@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 
 /**
@@ -55,6 +56,7 @@ fun <T : TypedNode> NodeGridView(
     showChangeViewType: Boolean = true,
     isPublicNode: Boolean = false,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
+    fileTypeIconMapper: FileTypeIconMapper,
 ) {
     LazyVerticalGrid(
         state = gridState,
@@ -99,6 +101,7 @@ fun <T : TypedNode> NodeGridView(
                 onItemClicked = onItemClicked,
                 onLongClick = onLongClick,
                 thumbnailData = ThumbnailRequest(nodeUIItems[it].node.id, isPublicNode),
+                fileTypeIconMapper = fileTypeIconMapper,
             )
         }
     }

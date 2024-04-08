@@ -48,6 +48,7 @@ import mega.privacy.android.core.ui.utils.sync
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.shared.theme.MegaAppTheme
 
@@ -64,6 +65,7 @@ internal fun VideoSelectedView(
     onVideoSelected: (List<Long>) -> Unit,
     onBackPressed: () -> Unit,
     onMenuActionClick: (FileInfoMenuAction) -> Unit,
+    fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
 ) {
     var listStateMap by rememberSaveable(saver = ListGridStateMap.Saver) {
@@ -191,7 +193,8 @@ internal fun VideoSelectedView(
                         showChangeViewType = showChangeViewType,
                         gridState = currentListState.lazyGridState,
                         showMediaDiscoveryButton = showMediaDiscoveryButton,
-                        isPublicNode = false
+                        isPublicNode = false,
+                        fileTypeIconMapper = fileTypeIconMapper,
                     )
                 }
             }
@@ -246,7 +249,8 @@ private fun VideoSelectedViewWithProgressBarPreview() {
             onChangeViewTypeClick = {},
             onSortOrderClick = {},
             onItemClicked = {},
-            onMenuActionClick = {}
+            onMenuActionClick = {},
+            fileTypeIconMapper = FileTypeIconMapper()
         )
     }
 }
@@ -269,7 +273,8 @@ private fun VideoSelectedViewWithEmptyViewPreview() {
             onChangeViewTypeClick = {},
             onSortOrderClick = {},
             onItemClicked = {},
-            onMenuActionClick = {}
+            onMenuActionClick = {},
+            fileTypeIconMapper = FileTypeIconMapper()
         )
     }
 }

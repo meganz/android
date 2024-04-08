@@ -16,7 +16,6 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -54,6 +53,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -77,6 +77,12 @@ class RubbishBinComposeFragment : Fragment() {
      */
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    /**
+     * FileTypeIconMapper
+     */
+    @Inject
+    lateinit var fileTypeIconMapper: FileTypeIconMapper
 
     private val viewModel: RubbishBinViewModel by activityViewModels()
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
@@ -150,7 +156,8 @@ class RubbishBinComposeFragment : Fragment() {
                             ),
                             emptyState = getEmptyFolderDrawable(uiState.isRubbishBinEmpty),
                             onLinkClicked = ::navigateToLink,
-                            onDisputeTakeDownClicked = ::navigateToLink
+                            onDisputeTakeDownClicked = ::navigateToLink,
+                            fileTypeIconMapper = fileTypeIconMapper
                         )
                     }
                 }

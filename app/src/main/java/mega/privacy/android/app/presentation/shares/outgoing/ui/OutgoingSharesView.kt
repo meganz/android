@@ -26,6 +26,7 @@ import mega.privacy.android.core.ui.utils.getState
 import mega.privacy.android.core.ui.utils.sync
 import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 
 /**
@@ -54,6 +55,7 @@ fun OutgoingSharesView(
     onChangeViewTypeClick: () -> Unit,
     onLinkClicked: (String) -> Unit,
     onVerifyContactDialogDismissed: () -> Unit,
+    fileTypeIconMapper: FileTypeIconMapper
 ) {
 
     var listStateMap by rememberSaveable(saver = ListGridStateMap.Saver) {
@@ -103,7 +105,8 @@ fun OutgoingSharesView(
                 onDisputeTakeDownClicked = { },
                 showMediaDiscoveryButton = false,
                 onEnterMediaDiscoveryClick = { },
-                listContentPadding = PaddingValues(top = 18.dp)
+                listContentPadding = PaddingValues(top = 18.dp),
+                fileTypeIconMapper = fileTypeIconMapper
             )
         } else {
             LegacyMegaEmptyView(

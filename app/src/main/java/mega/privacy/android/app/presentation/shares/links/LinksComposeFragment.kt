@@ -69,6 +69,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
 import javax.inject.Inject
@@ -99,6 +100,12 @@ class LinksComposeFragment : Fragment() {
      */
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    /**
+     * Mapper to get file type icon
+     */
+    @Inject
+    lateinit var fileTypeIconMapper: FileTypeIconMapper
 
     /**
      * Interface that notifies the attached Activity to execute specific functions
@@ -159,6 +166,7 @@ class LinksComposeFragment : Fragment() {
                         ),
                         onSortOrderClick = ::showSortByPanel,
                         onToggleAppBarElevation = ::toggleAppBarElevation,
+                        fileTypeIconMapper = fileTypeIconMapper,
                     )
                     LaunchedEffect(snackbarHostState.currentSnackbarData) {
                         snackbarHostState.currentSnackbarData?.message?.let {

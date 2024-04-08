@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.videosection.VideoSelectedViewModel
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 
 @Composable
 internal fun VideoSelectedScreen(
@@ -16,6 +17,7 @@ internal fun VideoSelectedScreen(
     onVideoSelected: (List<Long>) -> Unit,
     onBackPressed: () -> Unit,
     onSortOrderClick: () -> Unit,
+    fileTypeIconMapper: FileTypeIconMapper,
 ) {
     val navHostController = rememberNavController()
 
@@ -25,7 +27,8 @@ internal fun VideoSelectedScreen(
         modifier = Modifier,
         onBackPressed = onBackPressed,
         onSortOrderClick = onSortOrderClick,
-        onVideoSelected = onVideoSelected
+        onVideoSelected = onVideoSelected,
+        fileTypeIconMapper = fileTypeIconMapper,
     )
 }
 
@@ -38,9 +41,11 @@ internal fun VideoSelectedNavHost(
     onSortOrderClick: () -> Unit,
     onVideoSelected: (List<Long>) -> Unit,
     startDestination: String = videoSelectedRoute,
+    fileTypeIconMapper: FileTypeIconMapper,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
     NavHost(
+        modifier = modifier,
         navController = navHostController,
         startDestination = startDestination
     ) {
@@ -67,7 +72,8 @@ internal fun VideoSelectedNavHost(
 
                         else -> {}
                     }
-                }
+                },
+                fileTypeIconMapper = fileTypeIconMapper,
             )
         }
     }

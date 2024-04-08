@@ -72,6 +72,7 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.CloudDriveScreenEvent
 import timber.log.Timber
@@ -117,6 +118,12 @@ class FileBrowserComposeFragment : Fragment() {
      */
     @Inject
     lateinit var getOptionsForToolbarMapper: GetOptionsForToolbarMapper
+
+    /**
+     * Mapper to get icon for file type
+     */
+    @Inject
+    lateinit var fileTypeIconMapper: FileTypeIconMapper
 
     private val fileBrowserViewModel: FileBrowserViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
@@ -205,6 +212,7 @@ class FileBrowserComposeFragment : Fragment() {
                                 isMediaDiscoveryOpenedByIconClick = true,
                             )
                         },
+                        fileTypeIconMapper = fileTypeIconMapper,
                     )
 
                     // Snackbar host state should be attached to snackbar host in the scaffold, but we don't have a scaffold yet

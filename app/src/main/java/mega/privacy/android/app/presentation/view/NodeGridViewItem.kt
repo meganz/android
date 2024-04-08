@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.Visibility
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.getPainter
@@ -50,6 +49,7 @@ import mega.privacy.android.core.ui.theme.transparent
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 
 /**
  * Grid view item for file/folder info
@@ -69,6 +69,7 @@ internal fun <T : TypedNode> NodeGridViewItem(
     onItemClicked: (NodeUIItem<T>) -> Unit,
     onLongClick: (NodeUIItem<T>) -> Unit,
     thumbnailData: Any?,
+    fileTypeIconMapper: FileTypeIconMapper,
 ) {
     if (nodeUIItem.node is FolderNode) {
         ConstraintLayout(
@@ -171,7 +172,7 @@ internal fun <T : TypedNode> NodeGridViewItem(
                         .testTag(THUMBNAIL_FILE_TEST_TAG),
                     contentDescription = "File",
                     data = thumbnailData,
-                    defaultImage = MimeTypeList.typeForName(nodeUIItem.name).iconResourceId,
+                    defaultImage = fileTypeIconMapper(nodeUIItem.node.type.extension),
                     contentScale = ContentScale.Crop,
                 )
                 nodeUIItem.fileDuration?.let {

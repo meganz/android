@@ -100,6 +100,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.SearchAudioFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchDocsFilterPressedEvent
@@ -159,6 +160,12 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
      */
     @Inject
     lateinit var moveRequestMessageMapper: MoveRequestMessageMapper
+
+    /**
+     * File type icon mapper
+     */
+    @Inject
+    lateinit var fileTypeIconMapper: FileTypeIconMapper
 
     private val snackbarHostState = SnackbarHostState()
 
@@ -301,6 +308,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                         }
                                     }
                                 },
+                                fileTypeIconMapper = fileTypeIconMapper,
                                 onBackPressed = {
                                     if (viewModel.state.value.selectedNodes.isNotEmpty()) {
                                         viewModel.clearSelection()

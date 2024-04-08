@@ -30,6 +30,7 @@ import mega.privacy.android.core.ui.utils.getState
 import mega.privacy.android.core.ui.utils.sync
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 
 /**
@@ -61,6 +62,7 @@ fun FileBrowserComposeView(
     onUpgradeClicked: () -> Unit,
     onDismissClicked: () -> Unit,
     onEnterMediaDiscoveryClick: () -> Unit,
+    fileTypeIconMapper: FileTypeIconMapper,
 ) {
 
     var listStateMap by rememberSaveable(saver = ListGridStateMap.Saver) {
@@ -109,7 +111,8 @@ fun FileBrowserComposeView(
                         onDisputeTakeDownClicked = onDisputeTakeDownClicked,
                         showMediaDiscoveryButton = uiState.showMediaDiscoveryIcon,
                         onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
-                        listContentPadding = PaddingValues(top = 18.dp)
+                        listContentPadding = PaddingValues(top = 18.dp),
+                        fileTypeIconMapper = fileTypeIconMapper
                     )
                 }
             } else {

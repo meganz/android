@@ -11,6 +11,7 @@ import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.controls.lists.EXPORTED_TEST_TAG
 import mega.privacy.android.legacy.core.ui.controls.lists.FAVORITE_TEST_TAG
 import mega.privacy.android.legacy.core.ui.controls.lists.INFO_TEXT_TEST_TAG
@@ -27,6 +28,7 @@ import org.mockito.kotlin.whenever
 class NodesViewTest {
     @get:Rule
     val composeTestRule = createComposeRule()
+    private val fileTypeIconMapper: FileTypeIconMapper = mock()
 
     private val exportedData = ExportedData("link", 123L)
 
@@ -55,7 +57,8 @@ class NodesViewTest {
                 isListView = false,
                 sortOrder = "Any Name",
                 onLinkClicked = {},
-                onDisputeTakeDownClicked = {}
+                onDisputeTakeDownClicked = {},
+                fileTypeIconMapper = fileTypeIconMapper,
             )
         }
         composeTestRule.run {
@@ -90,7 +93,8 @@ class NodesViewTest {
                 isListView = false,
                 sortOrder = "Any Name",
                 onLinkClicked = {},
-                onDisputeTakeDownClicked = {}
+                onDisputeTakeDownClicked = {},
+                fileTypeIconMapper = fileTypeIconMapper,
             )
         }
         composeTestRule.run {
@@ -126,7 +130,8 @@ class NodesViewTest {
                 isListView = false,
                 sortOrder = "Any Name",
                 onLinkClicked = {},
-                onDisputeTakeDownClicked = {}
+                onDisputeTakeDownClicked = {},
+                fileTypeIconMapper = fileTypeIconMapper,
             )
         }
         composeTestRule.run {
@@ -165,7 +170,8 @@ class NodesViewTest {
                     isListView = false,
                     sortOrder = "Any Name",
                     onLinkClicked = {},
-                    onDisputeTakeDownClicked = {}
+                    onDisputeTakeDownClicked = {},
+                    fileTypeIconMapper = fileTypeIconMapper,
                 )
             }
             composeTestRule.run {
@@ -200,7 +206,8 @@ class NodesViewTest {
                 isListView = true,
                 sortOrder = "Any Name",
                 onLinkClicked = {},
-                onDisputeTakeDownClicked = {}
+                onDisputeTakeDownClicked = {},
+                fileTypeIconMapper = fileTypeIconMapper,
             )
         }
         composeTestRule.run {

@@ -10,6 +10,7 @@ import mega.privacy.android.core.ui.controls.dividers.DividerType
 import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.feature.devicecenter.R
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
@@ -32,7 +33,7 @@ internal fun InfoBottomSheetTile(
     MenuActionListTile(
         modifier = Modifier.testTag(BOTTOM_SHEET_TILE_INFO),
         text = stringResource(R.string.device_center_bottom_sheet_item_info),
-        icon = painterResource(id = R.drawable.ic_bottom_sheet_info),
+        icon = painterResource(id = IconPackR.drawable.ic_info_medium_regular_outline),
         dividerType = dividerType,
         onActionClicked = onActionClicked,
     )

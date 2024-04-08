@@ -14,6 +14,7 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 
 
 /**
@@ -64,6 +65,7 @@ fun <T : TypedNode> NodesView(
     isPublicNode: Boolean = false,
     onEnterMediaDiscoveryClick: () -> Unit = {},
     listContentPadding: PaddingValues = PaddingValues(0.dp),
+    fileTypeIconMapper: FileTypeIconMapper,
 ) {
     val takenDownDialog = remember { mutableStateOf(Pair(false, false)) }
     val orientation = LocalConfiguration.current.orientation
@@ -93,6 +95,7 @@ fun <T : TypedNode> NodesView(
             showMediaDiscoveryButton = showMediaDiscoveryButton,
             isPublicNode = isPublicNode,
             showPublicLinkCreationTime = showPublicLinkCreationTime,
+            fileTypeIconMapper = fileTypeIconMapper
         )
     } else {
         val newList = rememberNodeListForGrid(nodeUIItems = nodeUIItems, spanCount = span)
@@ -118,7 +121,8 @@ fun <T : TypedNode> NodesView(
             showChangeViewType = showChangeViewType,
             gridState = gridState,
             showMediaDiscoveryButton = showMediaDiscoveryButton,
-            isPublicNode = isPublicNode
+            isPublicNode = isPublicNode,
+            fileTypeIconMapper = fileTypeIconMapper
         )
     }
     if (takenDownDialog.value.first) {

@@ -23,6 +23,7 @@ import mega.privacy.android.app.presentation.videosection.view.videoselected.VID
 import mega.privacy.android.app.presentation.videosection.view.videoselected.VideoSelectedView
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -36,6 +37,7 @@ import org.mockito.kotlin.verify
 class VideoSelectedViewTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    private val fileTypeIconMapper: FileTypeIconMapper = mock()
 
     @Before
     fun setUp() {
@@ -69,7 +71,8 @@ class VideoSelectedViewTest {
                 onChangeViewTypeClick = onChangeViewTypeClick,
                 onVideoSelected = onVideoSelected,
                 onBackPressed = onBackPressed,
-                onMenuActionClick = onMenuActionClick
+                onMenuActionClick = onMenuActionClick,
+                fileTypeIconMapper = fileTypeIconMapper
             )
         }
     }

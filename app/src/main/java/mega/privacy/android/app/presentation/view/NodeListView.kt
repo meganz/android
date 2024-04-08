@@ -20,8 +20,8 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.folderInfo
 import mega.privacy.android.app.presentation.view.extension.getIcon
@@ -33,11 +33,13 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.shared.theme.MegaAppTheme
@@ -82,6 +84,7 @@ fun <T : TypedNode> NodeListView(
     isPublicNode: Boolean = false,
     showPublicLinkCreationTime: Boolean = false,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
+    fileTypeIconMapper: FileTypeIconMapper,
 ) {
     LazyColumn(
         state = listState,
@@ -159,10 +162,17 @@ fun <T : TypedNode> NodeListView(
                 folderInfo = nodeEntity
                     .let { node -> node as? FolderNode }
                     ?.folderInfo(),
-                icon = nodeEntity
-                    .let { node -> node as? TypedFolderNode }
-                    ?.getIcon()
-                    ?: MimeTypeList.typeForName(nodeUIItemList[it].node.name).iconResourceId,
+                icon = when (nodeEntity) {
+                    is TypedFolderNode -> {
+                        nodeEntity.getIcon()
+                    }
+
+                    is TypedFileNode -> {
+                        fileTypeIconMapper(nodeEntity.type.extension)
+                    }
+
+                    else -> IconPackR.drawable.ic_generic_medium_solid
+                },
                 fileSize = nodeEntity
                     .let { node -> node as? FileNode }
                     ?.let { file -> formatFileSize(file.size, LocalContext.current) },
@@ -232,7 +242,8 @@ private fun NodeListViewPreview(
             listState = LazyListState(),
             showMediaDiscoveryButton = false,
             modifier = Modifier,
-            showChangeViewType = true
+            showChangeViewType = true,
+            fileTypeIconMapper = FileTypeIconMapper()
         )
     }
 }
