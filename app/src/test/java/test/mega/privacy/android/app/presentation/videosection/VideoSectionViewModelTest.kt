@@ -26,6 +26,7 @@ import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
@@ -85,6 +86,7 @@ class VideoSectionViewModelTest {
     private val monitorVideoPlaylistSetsUpdateUseCase =
         mock<MonitorVideoPlaylistSetsUpdateUseCase>()
     private val fakeMonitorVideoPlaylistSetsUpdateFlow = MutableSharedFlow<List<Long>>()
+    private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
 
     private val expectedVideo = mock<VideoUIEntity> {
         on { name }.thenReturn("video name")
@@ -131,6 +133,7 @@ class VideoSectionViewModelTest {
             getSyncUploadsFolderIdsUseCase = getSyncUploadsFolderIdsUseCase,
             removeVideosFromPlaylistUseCase = removeVideosFromPlaylistUseCase,
             monitorVideoPlaylistSetsUpdateUseCase = monitorVideoPlaylistSetsUpdateUseCase,
+            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
         )
     }
 

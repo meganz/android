@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.documentsection.GetAllDocumentsUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -64,6 +65,7 @@ class DocumentSectionViewModelTest {
     private val megaApiHttpServerStartUseCase = mock<MegaApiHttpServerStartUseCase>()
     private val getFileUrlByNodeHandleUseCase = mock<GetFileUrlByNodeHandleUseCase>()
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
+    private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
 
 
     private val expectedDocument =
@@ -95,7 +97,8 @@ class DocumentSectionViewModelTest {
             megaApiHttpServerIsRunningUseCase = megaApiHttpServerIsRunningUseCase,
             megaApiHttpServerStartUseCase = megaApiHttpServerStartUseCase,
             getFileUrlByNodeHandleUseCase = getFileUrlByNodeHandleUseCase,
-            isConnectedToInternetUseCase = isConnectedToInternetUseCase
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase,
+            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
         )
     }
 

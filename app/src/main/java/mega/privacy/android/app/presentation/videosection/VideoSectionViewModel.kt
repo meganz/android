@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,6 +35,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
@@ -80,6 +82,7 @@ class VideoSectionViewModel @Inject constructor(
     private val getSyncUploadsFolderIdsUseCase: GetSyncUploadsFolderIdsUseCase,
     private val removeVideosFromPlaylistUseCase: RemoveVideosFromPlaylistUseCase,
     private val monitorVideoPlaylistSetsUpdateUseCase: MonitorVideoPlaylistSetsUpdateUseCase,
+    private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(VideoSectionState())
 
@@ -875,6 +878,16 @@ class VideoSectionViewModel @Inject constructor(
     internal fun clearNumberOfAddedVideos() = _state.update { it.copy(numberOfAddedVideos = 0) }
 
     internal fun clearNumberOfRemovedItems() = _state.update { it.copy(numberOfRemovedItems = 0) }
+
+    internal fun hideOrUnhideNodes(nodeIds: List<NodeId>, hide: Boolean) = viewModelScope.launch {
+        for (nodeId in nodeIds) {
+            async {
+                runCatching {
+                    updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = hide)
+                }.onFailure { Timber.e("Update sensitivity failed: $it") }
+            }
+        }
+    }
 
     companion object {
         private const val ERROR_MESSAGE_REPEATED_TITLE = 0

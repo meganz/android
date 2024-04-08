@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.audiosection.GetAllAudioUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -62,6 +63,7 @@ class AudioSectionViewModelTest {
     private val setViewType = mock<SetViewType>()
     private val fakeMonitorViewTypeFlow = MutableSharedFlow<ViewType>()
     private val monitorViewType = mock<MonitorViewType>()
+    private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
 
     private val expectedAudio: AudioUiEntity = mock { on { name }.thenReturn("audio name") }
 
@@ -83,7 +85,8 @@ class AudioSectionViewModelTest {
             getFileUrlByNodeHandleUseCase = getFileUrlByNodeHandleUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             setViewType = setViewType,
-            monitorViewType = monitorViewType
+            monitorViewType = monitorViewType,
+            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
         )
     }
 

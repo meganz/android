@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFragment
@@ -42,6 +43,18 @@ internal class VideoSectionActionModeCallback(
                 totalNodes = videoSectionViewModel.state.value.allVideos.size
             )
             CloudStorageOptionControlUtil.applyControl(menu, control)
+        }
+
+        managerActivity.lifecycleScope.launch {
+            val isHiddenNodesEnabled = managerActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+            val hasNonSensitiveNode =
+                videoSectionViewModel.getSelectedNodes().any { !it.isMarkedSensitive }
+
+            menu?.findItem(R.id.cab_menu_hide)?.isVisible =
+                isHiddenNodesEnabled && hasNonSensitiveNode
+
+            menu?.findItem(R.id.cab_menu_unhide)?.isVisible =
+                isHiddenNodesEnabled && !hasNonSensitiveNode
         }
         return true
     }
@@ -108,7 +121,16 @@ internal class VideoSectionActionModeCallback(
                         videoSectionViewModel.getSelectedNodes().map { node -> node.id.longValue })
                         .show(childFragmentManager, RemoveAllSharingContactDialogFragment.TAG)
 
-                R.id.cab_menu_select_all -> videoSectionViewModel.selectAllNodes()
+
+                R.id.cab_menu_hide -> videoSectionViewModel.hideOrUnhideNodes(
+                    nodeIds = videoSectionViewModel.getSelectedNodes().map { it.id },
+                    hide = true,
+                )
+
+                R.id.cab_menu_unhide -> videoSectionViewModel.hideOrUnhideNodes(
+                    nodeIds = videoSectionViewModel.getSelectedNodes().map { it.id },
+                    hide = false,
+                )
 
                 R.id.cab_menu_copy ->
                     NodeController(managerActivity).chooseLocationToCopyNodes(selectedVideos)
