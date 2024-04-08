@@ -71,7 +71,6 @@ import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.getRetentionTimeString
-import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoUiState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
@@ -129,9 +128,8 @@ fun ScheduledMeetingInfoView(
     onScrollChange: (Boolean) -> Unit,
 ) {
     val shouldShowParticipantsLimitWarning =
-        managementState.isCallUnlimitedProPlanFeatureFlagEnabled &&
-                managementState.hasFreePlan() && state.numOfParticipants >= (state.callUsersLimit
-            ?: MeetingState.FREE_PLAN_PARTICIPANTS_LIMIT)
+        managementState.isCallUnlimitedProPlanFeatureFlagEnabled && managementState.hasFreePlan() &&
+                state.shouldShowParticipantsLimitWarning
     val listState = rememberLazyListState()
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
     val snackbarHostState = remember { SnackbarHostState() }

@@ -19,7 +19,9 @@ import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
@@ -33,7 +35,9 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 import org.robolectric.RobolectricTestRunner
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -58,6 +62,8 @@ class GroupChatInfoViewModelTest {
     private val broadcastLeaveChatUseCase: BroadcastLeaveChatUseCase = mock()
     private val monitorSFUServerUpgradeUseCase: MonitorSFUServerUpgradeUseCase = mock()
     private val getChatCallUseCase: GetChatCallUseCase = mock()
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     private val connectivityFlow = MutableSharedFlow<Boolean>()
     private val updatePushNotificationSettings = MutableSharedFlow<Boolean>()
@@ -69,11 +75,12 @@ class GroupChatInfoViewModelTest {
         initializeViewModel()
     }
 
-    private fun initializeStubbing() {
+    private  fun initializeStubbing() {
         whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
         whenever(monitorUpdatePushNotificationSettingsUseCase()).thenReturn(
             updatePushNotificationSettings
         )
+        wheneverBlocking { getFeatureFlagValueUseCase.invoke(any()) }.thenReturn(false)
     }
 
     private fun initializeViewModel() {
@@ -92,7 +99,9 @@ class GroupChatInfoViewModelTest {
             broadcastChatArchivedUseCase = broadcastChatArchivedUseCase,
             broadcastLeaveChatUseCase = broadcastLeaveChatUseCase,
             monitorSFUServerUpgradeUseCase = monitorSFUServerUpgradeUseCase,
-            getChatCallUseCase = getChatCallUseCase
+            getChatCallUseCase = getChatCallUseCase,
+            monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }
 
@@ -130,7 +139,7 @@ class GroupChatInfoViewModelTest {
             underTest.state.test {
                 val item = awaitItem()
                 assertThat(item.chatId).isEqualTo(newChatId)
-                assertThat(item.call).isEqualTo(call)
+                verify(monitorChatCallUpdatesUseCase).invoke()
             }
         }
 
@@ -143,7 +152,7 @@ class GroupChatInfoViewModelTest {
             underTest.state.test {
                 val item = awaitItem()
                 assertThat(item.chatId).isEqualTo(newChatId)
-                assertThat(item.call).isNull()
+                verifyNoInteractions(monitorChatCallUpdatesUseCase)
             }
         }
 
@@ -164,7 +173,8 @@ class GroupChatInfoViewModelTest {
             monitorUpdatePushNotificationSettingsUseCase,
             broadcastChatArchivedUseCase,
             broadcastLeaveChatUseCase,
-            getChatCallUseCase
+            getChatCallUseCase,
+            monitorChatCallUpdatesUseCase,
         )
     }
 }

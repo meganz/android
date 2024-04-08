@@ -33,7 +33,6 @@ import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
-import mega.privacy.android.app.presentation.meeting.model.MeetingState.Companion.FREE_PLAN_PARTICIPANTS_LIMIT
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsBottomPanelView
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
@@ -448,9 +447,7 @@ class BottomFloatingPanelViewHolder(
                 val meetingState by meetingViewModel.state.collectAsStateWithLifecycle()
                 val inMeetingState by inMeetingViewModel.state.collectAsStateWithLifecycle()
                 val shouldShowParticipantsLimitWarning =
-                    meetingState.isCallUnlimitedProPlanFeatureFlagEnabled &&
-                            meetingState.hasFreePlan() && meetingState.chatParticipantsInCall.size >= (inMeetingState.call?.callUsersLimit
-                        ?: FREE_PLAN_PARTICIPANTS_LIMIT)
+                    meetingState.isCallUnlimitedProPlanFeatureFlagEnabled && meetingState.isModerator && inMeetingState.isUserLimitsReached
                 MegaAppTheme(isDark = isSystemInDarkTheme()) {
                     ParticipantsBottomPanelView(
                         state = meetingState,

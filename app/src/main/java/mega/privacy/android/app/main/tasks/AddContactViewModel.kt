@@ -3,14 +3,23 @@ package mega.privacy.android.app.main.tasks
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.model.AddContactState
+import mega.privacy.android.app.presentation.meeting.model.MeetingState
+import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.meeting.ChatCallChanges
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -22,11 +31,19 @@ import javax.inject.Inject
 class AddContactViewModel @Inject constructor(
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getChatCallUseCase: GetChatCallUseCase,
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddContactState())
 
+    /**
+     * Ui State
+     */
     val state = _state.asStateFlow()
+
+
+    private var monitorChatCallJob: Job? = null
 
     init {
         getEnabledFeatures()
@@ -48,7 +65,7 @@ class AddContactViewModel @Inject constructor(
     /**
      * Gets contact enabled Value from [GetContactVerificationWarningUseCase]
      */
-    fun getContactFeatureEnabled() {
+    private fun getContactFeatureEnabled() {
         viewModelScope.launch {
             val contactVerificationWarningEnabled = getContactVerificationWarningUseCase()
             _state.update {
@@ -58,20 +75,71 @@ class AddContactViewModel @Inject constructor(
     }
 
     /**
-     * Check if Call Unlimited Pro Plan feature flag is enabled or not
+     * Set chat id
      */
-    fun shouldShowParticipantsLimitWarning(shouldShow: Boolean) {
-        viewModelScope.launch {
-            runCatching {
-                val shouldShowParticipantsLimitWarning =
-                    getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan) && shouldShow
+    fun setChatId(chatId: Long) {
+        val id = chatId.takeIf { it != -1L } ?: return
+        _state.update { it.copy(chatId = id) }
+        getChatCall()
+    }
 
-                _state.update {
-                    it.copy(shouldShowParticipantsLimitWarning = shouldShowParticipantsLimitWarning)
+    /**
+     * Get chat call updates
+     */
+    private fun getChatCall() {
+        _state.value.chatId?.let { chatId ->
+            viewModelScope.launch {
+                runCatching {
+                    getChatCallUseCase(chatId)?.let { call ->
+                        setShouldShowUserLimitsWarning(call)
+                        monitorChatCall(call.callId)
+                    }
+                }.onFailure {
+                    Timber.e(it)
                 }
-            }.onFailure {
-                Timber.e(it)
             }
+        }
+
+    }
+
+    private fun monitorChatCall(callId: Long) {
+        monitorChatCallJob?.cancel()
+        monitorChatCallJob = viewModelScope.launch {
+            monitorChatCallUpdatesUseCase()
+                .filter { it.callId == callId }
+                .catch {
+                    Timber.e(it)
+                }
+                .collect { call ->
+                    setShouldShowUserLimitsWarning(call)
+                    call.changes?.apply {
+                        if (contains(ChatCallChanges.Status)) {
+                            Timber.d("Chat call status: ${call.status}")
+                            when (call.status) {
+                                ChatCallStatus.Destroyed -> {
+                                    // Call has ended
+                                    _state.update { it.copy(shouldShowParticipantsLimitWarning = false) }
+                                    monitorChatCallJob?.cancel()
+                                }
+
+                                else -> {}
+                            }
+                        }
+                    }
+
+                }
+        }
+    }
+
+    private fun setShouldShowUserLimitsWarning(call: ChatCall) {
+        if (call.callUsersLimit != -1) {
+            val limit = call.callUsersLimit
+                ?: MeetingState.FREE_PLAN_PARTICIPANTS_LIMIT
+            val shouldShowWarning =
+                (call.peerIdParticipants?.size ?: 0) >= limit
+            _state.update { it.copy(shouldShowParticipantsLimitWarning = shouldShowWarning) }
+        } else {
+            _state.update { it.copy(shouldShowParticipantsLimitWarning = false) }
         }
     }
 

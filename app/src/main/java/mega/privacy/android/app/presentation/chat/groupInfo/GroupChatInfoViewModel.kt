@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -17,20 +18,27 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.constants.EventConstants
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.groupInfo.model.GroupInfoState
+import mega.privacy.android.app.presentation.meeting.model.MeetingState.Companion.FREE_PLAN_PARTICIPANTS_LIMIT
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.CallUtil.openMeetingWithAudioOrVideo
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
+import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.meeting.ChatCallChanges
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
@@ -74,6 +82,8 @@ class GroupChatInfoViewModel @Inject constructor(
     private val monitorSFUServerUpgradeUseCase: MonitorSFUServerUpgradeUseCase,
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val getChatCallUseCase: GetChatCallUseCase,
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : BaseRxViewModel() {
 
     /**
@@ -82,6 +92,7 @@ class GroupChatInfoViewModel @Inject constructor(
     private val _state = MutableStateFlow(GroupInfoState())
 
     private var monitorSFUServerUpgradeJob: Job? = null
+    private var monitorChatCallJob: Job? = null
 
     /**
      * UI State GroupChatInfo
@@ -108,6 +119,15 @@ class GroupChatInfoViewModel @Inject constructor(
             }
         }
         monitorSFUServerUpgrade()
+        viewModelScope.launch {
+            getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan).let { flag ->
+                _state.update { state ->
+                    state.copy(
+                        isCallUnlimitedProPlanFeatureFlagEnabled = flag,
+                    )
+                }
+            }
+        }
     }
 
     override fun onCleared() {
@@ -298,7 +318,8 @@ class GroupChatInfoViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 getChatCallUseCase(_state.value.chatId)?.let { call ->
-                    _state.update { it.copy(call = call) }
+                    setShouldShowUserLimitsWarning(call)
+                    monitorChatCall(call.callId)
                 }
             }.onFailure {
                 Timber.e(it)
@@ -306,10 +327,45 @@ class GroupChatInfoViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Set the number of participants in the chat
-     */
-    fun setParticipantsCount(participantsCount: Long) {
-        _state.update { it.copy(participantsCount = participantsCount) }
+    private fun monitorChatCall(callId:Long) {
+        monitorChatCallJob?.cancel()
+        monitorChatCallJob = viewModelScope.launch {
+            monitorChatCallUpdatesUseCase()
+                .filter { it.callId == callId }
+                .catch {
+                    Timber.e(it)
+                }
+                .collect { call ->
+                    setShouldShowUserLimitsWarning(call)
+                    call.changes?.apply {
+                        if (contains(ChatCallChanges.Status)) {
+                            Timber.d("Chat call status: ${call.status}")
+                            when (call.status) {
+                                ChatCallStatus.Destroyed -> {
+                                    // Call has ended
+                                    _state.update { it.copy(shouldShowUserLimitsWarning = false) }
+                                    monitorChatCallJob?.cancel()
+                                }
+
+                                else -> {}
+                            }
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun setShouldShowUserLimitsWarning(call: ChatCall) {
+        Timber.d("Call user limit ${call.callUsersLimit} and users in call ${call.peerIdParticipants?.size}")
+        if (call.callUsersLimit != -1) {
+            val limit = call.callUsersLimit
+                ?: FREE_PLAN_PARTICIPANTS_LIMIT
+            val shouldShowWarning =
+                (call.peerIdParticipants?.size
+                    ?: 0) >= limit && _state.value.isCallUnlimitedProPlanFeatureFlagEnabled
+            _state.update { it.copy(shouldShowUserLimitsWarning = shouldShowWarning) }
+        } else {
+            _state.update { it.copy(shouldShowUserLimitsWarning = false) }
+        }
     }
 }

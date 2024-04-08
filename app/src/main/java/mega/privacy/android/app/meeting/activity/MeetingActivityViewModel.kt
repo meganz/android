@@ -357,19 +357,20 @@ class MeetingActivityViewModel @Inject constructor(
             getChatAndCall()
         }
 
+        getCurrentSubscriptionPlan()
         viewModelScope.launch {
-            getCurrentSubscriptionPlanUseCase()?.let { currentSubscriptionPlan ->
-                _state.update { it.copy(subscriptionPlan = currentSubscriptionPlan) }
-            }
-        }
-        viewModelScope.launch {
-            getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan).let { flag ->
-                _state.update { state ->
-                    state.copy(
-                        isCallUnlimitedProPlanFeatureFlagEnabled = flag,
-                    )
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan).let { flag ->
+                    _state.update { state ->
+                        state.copy(
+                            isCallUnlimitedProPlanFeatureFlagEnabled = flag,
+                        )
+                    }
                 }
+            }.onFailure {
+                Timber.e(it)
             }
+
         }
 
         LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AppRTCAudioManager.AudioDevice::class.java)
@@ -421,6 +422,21 @@ class MeetingActivityViewModel @Inject constructor(
                     UserChanges.Firstname, UserChanges.Lastname -> getMyFullName()
                     else -> Unit
                 }
+            }
+        }
+    }
+
+    private fun getCurrentSubscriptionPlan() {
+        viewModelScope.launch {
+            runCatching {
+                val subscriptionPlan = getCurrentSubscriptionPlanUseCase()
+                subscriptionPlan?.let {
+                    _state.update {
+                        it.copy(subscriptionPlan = subscriptionPlan)
+                    }
+                }
+            }.onFailure {
+                Timber.e(it)
             }
         }
     }

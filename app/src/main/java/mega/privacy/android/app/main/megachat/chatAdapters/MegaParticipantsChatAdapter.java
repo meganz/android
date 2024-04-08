@@ -719,9 +719,10 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
     public void updateParticipantWarning(Boolean shouldShowWarning) {
         ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
         Timber.d("Holder Header: %s", holderHeader);
+        Boolean isModerator = getChat().getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR;
         if (holderHeader != null) {
-            if (shouldShowWarning) {
-                holderHeader.participantsLimitWarningView.setModerator(getChat().getOwnPrivilege() == MegaChatRoom.PRIV_MODERATOR);
+            if (shouldShowWarning && isModerator) {
+                holderHeader.participantsLimitWarningView.setModerator(true);
                 holderHeader.participantsLimitWarningView.setVisibility(View.VISIBLE);
             } else {
                 holderHeader.participantsLimitWarningView.setVisibility(View.GONE);

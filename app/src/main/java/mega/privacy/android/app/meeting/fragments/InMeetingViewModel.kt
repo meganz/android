@@ -397,6 +397,7 @@ class InMeetingViewModel @Inject constructor(
                 chatCall?.let { call ->
                     Timber.d("Call id ${call.callId} and chat id ${call.chatId} and call users limit ${call.callUsersLimit}")
                     Timber.d("Call limit ${call.callDurationLimit} Call Duration ${call.duration} and initial timestamp ${call.initialTimestamp}")
+                    Timber.d("Call user limit ${call.callUsersLimit} and users in call ${call.peerIdParticipants?.size}")
                     _state.update { it.copy(call = call) }
                     call.status?.let { status ->
                         checkSubtitleToolbar()
@@ -405,6 +406,8 @@ class InMeetingViewModel @Inject constructor(
                             _state.update { it.copy(previousState = status) }
                         }
                     }
+                    // add delay to show warning
+                    delay(500)
                     handleFreeCallEndWarning()
                 }
             }.onFailure { exception ->
@@ -442,6 +445,7 @@ class InMeetingViewModel @Inject constructor(
                 .filter { it.chatId == _state.value.currentChatId }
                 .collectLatest { call ->
                     _state.update { it.copy(call = call) }
+                    Timber.d("Call user limit ${call.callUsersLimit} and users in call ${call.peerIdParticipants?.size}")
                     checkSubtitleToolbar()
                     call.changes?.apply {
                         Timber.d("Changes in call $this")

@@ -25,6 +25,7 @@ import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETEN
 import mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
+import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoUiState
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
@@ -33,11 +34,14 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.entity.meeting.ChatCallChanges
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetChatParticipants
@@ -56,6 +60,7 @@ import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCallUseCase
@@ -97,6 +102,7 @@ import javax.inject.Inject
  * @property getMyFullNameUseCase                           [GetMyFullNameUseCase]
  * @property monitorUserUpdates                             [MonitorUserUpdates]
  * @property getChatCallUseCase                             [GetChatCallUseCase]
+ * @property monitorChatCallUpdatesUseCase                  [MonitorChatCallUpdatesUseCase]
  * @property uiState                    Current view state as [ScheduledMeetingInfoUiState]
  */
 @HiltViewModel
@@ -131,6 +137,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val monitorUserUpdates: MonitorUserUpdates,
     private val monitorSFUServerUpgradeUseCase: MonitorSFUServerUpgradeUseCase,
     private val getChatCallUseCase: GetChatCallUseCase,
+    private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ScheduledMeetingInfoUiState())
@@ -141,6 +148,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private var scheduledMeetingId: Long = megaChatApiGateway.getChatInvalidHandle()
 
     private var monitorSFUServerUpgradeJob: Job? = null
+    private var monitorChatCallJob: Job? = null
 
     /**
      * Monitor connectivity event
@@ -239,11 +247,54 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 getChatCallUseCase(_uiState.value.chatId)?.let { call ->
-                    _uiState.update { it.copy(callUsersLimit = call.callUsersLimit) }
+                    setShouldShowUserLimitsWarning(call)
+                    monitorChatCall(call.callId)
                 }
             }.onFailure {
                 Timber.e(it)
             }
+        }
+    }
+
+    private fun monitorChatCall(callId: Long) {
+        monitorChatCallJob?.cancel()
+        monitorChatCallJob = viewModelScope.launch {
+            monitorChatCallUpdatesUseCase()
+                .filter { it.callId == callId }
+                .catch {
+                    Timber.e(it)
+                }
+                .collect { call ->
+                    setShouldShowUserLimitsWarning(call)
+                    call.changes?.apply {
+                        if (contains(ChatCallChanges.Status)) {
+                            Timber.d("Chat call status: ${call.status}")
+                            when (call.status) {
+                                ChatCallStatus.Destroyed -> {
+                                    // Call has ended
+                                    _uiState.update { it.copy(shouldShowParticipantsLimitWarning = false) }
+                                    monitorChatCallJob?.cancel()
+                                }
+
+                                else -> {}
+                            }
+                        }
+                    }
+                }
+        }
+    }
+
+    private fun setShouldShowUserLimitsWarning(call: ChatCall) {
+        Timber.d("Call user limit ${call.callUsersLimit} and users in call ${call.peerIdParticipants?.size}")
+        if (call.callUsersLimit != -1) {
+            val limit = call.callUsersLimit
+                ?: MeetingState.FREE_PLAN_PARTICIPANTS_LIMIT
+            val shouldShowWarning =
+                (call.peerIdParticipants?.size
+                    ?: 0) >= limit
+            _uiState.update { it.copy(shouldShowParticipantsLimitWarning = shouldShowWarning) }
+        } else {
+            _uiState.update { it.copy(shouldShowParticipantsLimitWarning = false) }
         }
     }
 

@@ -346,8 +346,7 @@ class ScheduledMeetingInfoViewTest {
         initComposeRuleContent(
             ScheduledMeetingInfoUiState(
                 myPermission = ChatRoomPermission.Moderator,
-                callUsersLimit = 2,
-                numOfParticipants = 2,
+                shouldShowParticipantsLimitWarning = true,
                 scheduledMeeting = getChatScheduledMeeting()
             ),
             ScheduledMeetingManagementUiState().copy(
@@ -363,8 +362,7 @@ class ScheduledMeetingInfoViewTest {
         initComposeRuleContent(
             ScheduledMeetingInfoUiState(
                 myPermission = ChatRoomPermission.Moderator,
-                callUsersLimit = 10,
-                numOfParticipants = 2,
+                shouldShowParticipantsLimitWarning = false,
                 scheduledMeeting = getChatScheduledMeeting()
             ),
             ScheduledMeetingManagementUiState().copy(

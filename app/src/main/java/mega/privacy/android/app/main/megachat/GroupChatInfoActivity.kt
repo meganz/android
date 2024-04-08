@@ -59,7 +59,6 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.Participan
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
 import mega.privacy.android.app.presentation.chat.groupInfo.GroupChatInfoViewModel
-import mega.privacy.android.app.presentation.meeting.model.MeetingState.Companion.FREE_PLAN_PARTICIPANTS_LIMIT
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.utils.AlertDialogUtil.createForceAppUpdateDialog
@@ -75,7 +74,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MAX_USER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.TextUtil
@@ -369,13 +367,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     private fun updateParticipantsWarning() {
         lifecycleScope.launch {
             delay(100)
-            viewModel.state.value.let { state ->
-                state.call?.let {
-                    val limit = it.callUsersLimit.takeIf { limit -> limit != -1 }
-                        ?: FREE_PLAN_PARTICIPANTS_LIMIT
-                    adapter?.updateParticipantWarning(state.participantsCount >= limit)
-                } ?: adapter?.updateParticipantWarning(false)
-            }
+            adapter?.updateParticipantWarning(viewModel.state.value.shouldShowUserLimitsWarning)
         }
     }
 
@@ -401,7 +393,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         //Set the first element = me
         chat?.let { chatRoom ->
             participantsCount = chatRoom.peerCount
-            viewModel.setParticipantsCount(participantsCount)
             Timber.d("Participants count: %s", participantsCount)
 
             if (!chatRoom.isPreview && chatRoom.isActive) {
@@ -530,10 +521,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 intent.putExtra(
                     INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
                     getString(R.string.add_participants_menu_item)
-                )
-                intent.putExtra(
-                    INTENT_EXTRA_KEY_MAX_USER,
-                    viewModel.state.value.call?.callUsersLimit ?: FREE_PLAN_PARTICIPANTS_LIMIT
                 )
 
                 @Suppress("deprecation")

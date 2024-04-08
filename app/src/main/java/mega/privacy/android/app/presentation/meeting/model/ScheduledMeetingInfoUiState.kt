@@ -37,14 +37,14 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  * @property participantItemList                        List of [ContactItem].
  * @property firstParticipant                           First participant in the chat room.
  * @property secondParticipant                          Second participant in the chat room.
- * @property numOfParticipants                          Number of participants.
- * @property callUsersLimit                             Call users limit.
+ * @property numOfParticipants                          Number of participants in chat
  * @property is24HourFormat                             True, if it's 24 hour format.
  * @property enabledWaitingRoomOption                   True if is enabled waiting room option, false otherwise.
  * @property snackbarMsg                                State to show snackbar message
  * @property myFullName                                 My full name
  * @property showForceUpdateDialog                      True if the force update dialog should be shown, false if not.
  * @property myPermission                               My permission in the chat room.
+ * @property shouldShowParticipantsLimitWarning         True if the participants limit warning should be shown, false if not.
  */
 data class ScheduledMeetingInfoUiState(
     val chatId: Long = -1L,
@@ -68,18 +68,18 @@ data class ScheduledMeetingInfoUiState(
     val leaveGroupDialog: Boolean = false,
     val addParticipantsNoContactsDialog: Boolean = false,
     val addParticipantsNoContactsLeftToAddDialog: Boolean = false,
-    val buttons: List<ScheduledMeetingInfoAction> = ScheduledMeetingInfoAction.values().asList(),
+    val buttons: List<ScheduledMeetingInfoAction> = ScheduledMeetingInfoAction.entries,
     val participantItemList: List<ChatParticipant> = emptyList(),
     val firstParticipant: ChatParticipant? = null,
     val secondParticipant: ChatParticipant? = null,
     val numOfParticipants: Int = 0,
-    val callUsersLimit: Int? = null,
     val is24HourFormat: Boolean = false,
     val enabledWaitingRoomOption: Boolean = true,
     val snackbarMsg: StateEventWithContent<String> = consumed(),
     val myFullName: String = "",
     val showForceUpdateDialog: Boolean = false,
     val myPermission: ChatRoomPermission = ChatRoomPermission.Unknown,
+    val shouldShowParticipantsLimitWarning: Boolean = false,
 ) {
 
     /**
