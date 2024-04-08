@@ -1411,6 +1411,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             if (type == TYPE_LEFT) {
                                 inMeetingViewModel.checkShowOnlyMeBanner()
                             }
+                            inMeetingViewModel.onConsumeParticipantChanges()
                             showWarningTimer()
                         }
                 }

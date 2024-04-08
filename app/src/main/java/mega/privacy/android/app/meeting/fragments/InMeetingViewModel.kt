@@ -600,6 +600,12 @@ class InMeetingViewModel @Inject constructor(
         _getParticipantsChanges.value = Pair(type, action)
     }
 
+    fun onConsumeParticipantChanges(){
+        _getParticipantsChanges.update {
+            it.copy(second = null)
+        }
+    }
+
     /**
      * Method to check the subtitle in the toolbar
      */
