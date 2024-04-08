@@ -1,3 +1,12 @@
+pluginManagement {
+    includeBuild("build-logic")
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
 dependencyResolutionManagement {
     versionCatalogs {
         for (file in fileTree("./gradle/catalogs").matching { include("**/*.toml") }) {

@@ -1,0 +1,4 @@
+
+# Plugins defined by this project
+[plugins]
+mega-android-library = { id = "mega.android.library", version = "unspecified"}

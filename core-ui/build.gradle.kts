@@ -1,15 +1,10 @@
 plugins {
-    id("com.android.library")
+    alias(convention.plugins.mega.android.library)
     id("kotlin-android")
     id("kotlin-kapt")
 }
 
 android {
-    val compileSdkVersion: Int by rootProject.extra
-    compileSdk = compileSdkVersion
-    val buildTools: String by rootProject.extra
-    buildToolsVersion = buildTools
-
     buildFeatures {
         compose = true
         buildConfig = true
@@ -20,20 +15,7 @@ android {
     }
 
     defaultConfig {
-        val minSdkVersion: Int by rootProject.extra
-        minSdk = minSdkVersion
-
-        val targetSdkVersion: Int by rootProject.extra
-        targetSdk = targetSdkVersion
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
-    }
-
-    compileOptions {
-        val javaVersion: JavaVersion by rootProject.extra
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
     }
 
     testOptions {
