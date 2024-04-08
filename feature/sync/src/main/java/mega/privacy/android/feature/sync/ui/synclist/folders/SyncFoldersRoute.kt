@@ -26,5 +26,6 @@ internal fun SyncFoldersRoute(
         },
         addFolderClicked = addFolderClicked,
         issuesInfoClicked = issuesInfoClicked,
+        isLowBatteryLevel = state.isLowBatteryLevel,
     )
 }

@@ -29,6 +29,7 @@ internal fun SyncFoldersScreen(
     removeFolderClicked: (folderPairId: Long) -> Unit,
     addFolderClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,
+    isLowBatteryLevel: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -53,15 +54,16 @@ internal fun SyncFoldersScreen(
                     syncUiItems[it].id
                 }) { itemIndex ->
                     SyncItemView(
-                        Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
-                        syncUiItems,
-                        itemIndex,
+                        modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
+                        syncUiItems = syncUiItems,
+                        itemIndex = itemIndex,
                         cardExpanded = { syncUiItem, expanded ->
                             cardExpanded(CardExpanded(syncUiItem, expanded))
                         },
-                        pauseRunClicked,
-                        removeFolderClicked,
-                        issuesInfoClicked
+                        pauseRunClicked = pauseRunClicked,
+                        removeFolderClicked = removeFolderClicked,
+                        issuesInfoClicked = issuesInfoClicked,
+                        isLowBatteryLevel = isLowBatteryLevel,
                     )
                 }
             }
@@ -98,6 +100,7 @@ private fun SyncFoldersScreenSyncingPreview() {
         removeFolderClicked = {},
         addFolderClicked = {},
         issuesInfoClicked = {},
+        isLowBatteryLevel = false,
     )
 }
 
@@ -122,5 +125,6 @@ private fun SyncFoldersScreenSyncingWithStalledIssuesPreview() {
         removeFolderClicked = {},
         addFolderClicked = {},
         issuesInfoClicked = {},
+        isLowBatteryLevel = false,
     )
 }

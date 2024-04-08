@@ -14,7 +14,8 @@ internal fun SyncItemView(
     cardExpanded: (SyncUiItem, Boolean) -> Unit,
     pauseRunClicked: (SyncUiItem) -> Unit,
     removeFolderClicked: (folderPairId: Long) -> Unit,
-    issuesInfoClicked: () -> Unit
+    issuesInfoClicked: () -> Unit,
+    isLowBatteryLevel: Boolean,
 ) {
     val sync = syncUiItems[itemIndex]
     SyncCard(
@@ -35,7 +36,8 @@ internal fun SyncItemView(
         removeFolderClicked = {
             removeFolderClicked(sync.id)
         },
-        issuesInfoClicked = issuesInfoClicked
+        issuesInfoClicked = issuesInfoClicked,
+        isLowBatteryLevel = isLowBatteryLevel,
     )
 }
 

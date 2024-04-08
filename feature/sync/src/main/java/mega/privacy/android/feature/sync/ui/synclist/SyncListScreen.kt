@@ -37,6 +37,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
+import mega.privacy.android.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -193,6 +194,12 @@ private fun SyncListScreenContent(
         SyncPermissionWarningBanner(
             syncPermissionsManager = syncPermissionsManager
         )
+        if (syncFoldersState.isLowBatteryLevel) {
+            WarningBanner(
+                textString = stringResource(id = mega.privacy.android.shared.resources.R.string.general_message_sync_paused_low_battery_level),
+                onCloseClick = null
+            )
+        }
         HeaderChips(
             selectedChip = checkedChip,
             stalledIssuesCount = stalledIssuesCount,

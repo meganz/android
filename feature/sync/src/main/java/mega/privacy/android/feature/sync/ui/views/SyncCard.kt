@@ -52,6 +52,7 @@ internal fun SyncCard(
     pauseRunClicked: () -> Unit,
     removeFolderClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,
+    isLowBatteryLevel: Boolean,
     modifier: Modifier = Modifier,
 ) {
 
@@ -92,6 +93,7 @@ internal fun SyncCard(
             pauseRunClicked,
             removeFolderClicked,
             issuesInfoClicked,
+            isLowBatteryLevel = isLowBatteryLevel,
         )
     }
 }
@@ -240,6 +242,7 @@ private fun SyncCardFooter(
     pauseRunClicked: () -> Unit,
     removeFolderClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,
+    isLowBatteryLevel: Boolean,
 ) {
     Box(Modifier.fillMaxWidth()) {
         Row(
@@ -271,7 +274,8 @@ private fun SyncCardFooter(
                     stringResource(id = R.string.sync_card_pause_sync)
                 } else {
                     stringResource(id = R.string.sync_card_run_sync)
-                }
+                },
+                enabled = !isLowBatteryLevel
             )
             MegaButtonWithIconAndText(
                 onClick = removeFolderClicked,
@@ -297,7 +301,8 @@ private fun SyncCardExpandedPreview() {
             expanded = true,
             expandClicked = {},
             removeFolderClicked = {},
-            issuesInfoClicked = {}
+            issuesInfoClicked = {},
+            isLowBatteryLevel = false
         )
     }
 }
@@ -317,7 +322,8 @@ private fun SyncCardCollapsedPreview() {
             expanded = false,
             expandClicked = {},
             removeFolderClicked = {},
-            issuesInfoClicked = {}
+            issuesInfoClicked = {},
+            isLowBatteryLevel = false
         )
     }
 }
