@@ -179,7 +179,7 @@
     <!-- Sync stalled issue reason is Name clash detailed description-->
     <string name="sync_stalled_issue_name_clash_detail">同步的一側有多個具有相同名稱的項目，這些項目在同步的另一側都將成為相同的單一項目</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_mega">在MEGA中偵測到移動或重新命名的變動，但無法在本地複製。</string>
+    <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename action was detected in MEGA, but couldn’t be replicated locally.</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_local">偵測到本地發生的移動或重新命名，但無法在MEGA中複製。</string>
     <!-- Sync stalled issue delete or move scanning detail-->

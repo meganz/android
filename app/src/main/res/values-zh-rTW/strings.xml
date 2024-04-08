@@ -4987,9 +4987,9 @@
     <string name="account_upgrade_account_description_subscription_title">訂閱詳情</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_subscription_details">訂閱會自動續訂，續訂的訂閱期間與初始選擇的周期相同，價格也相同。您可以在下次訂閱付款到期前24小時內，透過[A]Google Play[/A]中的訂閱關閉MEGA&#160;Pro訂閱的自動續訂功能。</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">允許存取您的相簿</string>
-    <!--  -->
+    <!-- Button text to grant permission in the chat bottom sheet -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">授予權限</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">需要更新</string>
@@ -5120,7 +5120,7 @@
     <!-- The title of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_title">升級到Pro方案可獲得無限的通話</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->
-    <string name="meetings_upgrade_pro_plan_body">您的通話已達到60分鐘限制並已結束。Pro使用者有無限的通話，而且最多可容納1000位與會者。</string>
+    <string name="meetings_upgrade_pro_plan_body">您的通話時間已達60分鐘的限制並已結束。Pro使用者的通話時間不受限制，最多可邀請1000位與會者。</string>
     <!-- The button text of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_button">立即升級</string>
     <!-- Search drop down chips filter type file type -->
@@ -5157,4 +5157,10 @@
     <string name="hidden_nodes_show_items">顯示隱藏的項目</string>
     <!-- Hidden nodes show items description -->
     <string name="hidden_nodes_show_items_description">可看到所有隱藏的項目，但會模糊顯示以表示其「隱藏」狀態</string>
+    <!-- Button text for photo option in camera screen -->
+    <string name="camera_photo_button">拍照</string>
+    <string name="camera_flash_mode_on">Flash mode on</string>
+    <string name="camera_flash_mode_off">Flash mode off</string>
+    <string name="camera_flash_mode_auto">Flash mode auto</string>
+    <string name="camera_send_to">Send to %1$s</string>
 </resources>

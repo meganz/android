@@ -5689,9 +5689,9 @@
     <string name="account_upgrade_account_description_subscription_title">Подробная информация о подписке</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_subscription_details">Подписки продлеваются автоматически на последующие периоды той же продолжительности и по той же цене, что и первоначально выбранный период. Вы можете отключить автоматическое продление подписки MEGA&#160;Pro не позднее чем за 24 часа до следующего платежа за подписку на странице «Подписки» в [A]Google Play[/A].</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Разрешите доступ к галерее</string>
-    <!--  -->
+    <!-- Button text to grant permission in the chat bottom sheet -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Открыть доступ</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">Требуется обновление</string>
@@ -5834,7 +5834,7 @@
     <!-- The title of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_title">Перейдите на Pro для безлимитных звонков</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->
-    <string name="meetings_upgrade_pro_plan_body">Ваш звонок продлился 60 минут и был завершён. У пользователей Pro звонки неограничены по времени и могут включать до 1000 участников.</string>
+    <string name="meetings_upgrade_pro_plan_body">Ваш звонок продлился 60 минут и был завершён. Пользователи Pro могут организовывать звонки без ограничений по времени и приглашать до 1000 участников.</string>
     <!-- The button text of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_button">Улучшить</string>
     <!-- Search drop down chips filter type file type -->
@@ -5864,11 +5864,17 @@
     <!-- Search drop down chips filter type date modified older -->
     <string name="search_dropdown_chip_filter_type_date_older">Старше</string>
     <!-- String below login button next to button for reporting a login issue -->
-    <string name="general_login_label_trouble_logging_in">Trouble logging in?</string>
+    <string name="general_login_label_trouble_logging_in">Не удаётся войти в систему?</string>
     <!-- Button text for reporting an issue on the login screen -->
-    <string name="general_login_button_report_your_issue">Report your issue</string>
+    <string name="general_login_button_report_your_issue">Сообщите о проблеме</string>
     <!-- Hidden nodes show items -->
-    <string name="hidden_nodes_show_items">Show hidden items</string>
+    <string name="hidden_nodes_show_items">Показывать скрытые элементы</string>
     <!-- Hidden nodes show items description -->
-    <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
+    <string name="hidden_nodes_show_items_description">Все скрытые элементы будут видны, но размыты, чтобы указать на их «скрытый» статус</string>
+    <!-- Button text for photo option in camera screen -->
+    <string name="camera_photo_button">Фото</string>
+    <string name="camera_flash_mode_on">Flash mode on</string>
+    <string name="camera_flash_mode_off">Flash mode off</string>
+    <string name="camera_flash_mode_auto">Flash mode auto</string>
+    <string name="camera_send_to">Отправить в «%1$s»</string>
 </resources>

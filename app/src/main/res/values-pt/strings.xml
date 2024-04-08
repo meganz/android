@@ -5455,9 +5455,9 @@
     <string name="account_upgrade_account_description_subscription_title">Informações da assinatura</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_subscription_details">As assinaturas serão renovadas automaticamente por períodos sucessivos com a mesma duração e pelo mesmo preço do período inicial. Você pode desativar a renovação automática da sua assinatura Pro&#160;do&#160;MEGA até 24 horas antes do vencimento do próximo pagamento nas Assinaturas da [A]Google Play[/A].</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Permitir o acesso à sua galeria</string>
-    <!--  -->
+    <!-- Button text to grant permission in the chat bottom sheet -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Permitir acesso</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">Atualização necessária</string>
@@ -5596,7 +5596,7 @@
     <!-- The title of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_title">Faça o upgrade a um plano Pro para ter chamadas ilimitadas</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->
-    <string name="meetings_upgrade_pro_plan_body">A sua chamada atingiu o limite de 60 minutos e foi finalizada. Os usuários Pro podem fazer chamadas com qualquer duração e convidar até 1000 participantes.</string>
+    <string name="meetings_upgrade_pro_plan_body">A sua chamada atingiu o limite de 60 minutos e foi finalizada. Os usuários Pro podem fazer chamadas com qualquer duração e convidar até 1000&#160;participantes.</string>
     <!-- The button text of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_button">Upgrade</string>
     <!-- Search drop down chips filter type file type -->
@@ -5633,4 +5633,10 @@
     <string name="hidden_nodes_show_items">Mostrar itens ocultos</string>
     <!-- Hidden nodes show items description -->
     <string name="hidden_nodes_show_items_description">Todos os itens ocultos ficarão visíveis, mas desfocados para indicar o seu status “oculto”</string>
+    <!-- Button text for photo option in camera screen -->
+    <string name="camera_photo_button">Foto</string>
+    <string name="camera_flash_mode_on">Flash mode on</string>
+    <string name="camera_flash_mode_off">Flash mode off</string>
+    <string name="camera_flash_mode_auto">Flash mode auto</string>
+    <string name="camera_send_to">Enviar a %1$s</string>
 </resources>

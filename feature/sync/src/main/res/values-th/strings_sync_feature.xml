@@ -179,7 +179,7 @@
     <!-- Sync stalled issue reason is Name clash detailed description-->
     <string name="sync_stalled_issue_name_clash_detail">พบหลายรายการที่มีชื่อซ้ำกันหลายชื่อ แต่จะมีการรวมชื่อที่ซ้ำกันให้เป็นชื่อเดียว</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_mega">มีการย้ายหรือเปลี่ยนชื่อไฟล์ใน MEGA แต่ไม่สามารถซิงค์กับอุปกรณ์ของคุณได้</string>
+    <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename action was detected in MEGA, but couldn’t be replicated locally.</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_local">ระบบตรวจพบว่ามีการย้ายหรือเปลี่ยนชื่อไฟล์ในเครื่องของคุณ แต่ไม่สามารถจำลองการเปลี่ยนแปลงนี้บน MEGA ได้</string>
     <!-- Sync stalled issue delete or move scanning detail-->

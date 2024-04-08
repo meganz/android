@@ -4987,9 +4987,9 @@
     <string name="account_upgrade_account_description_subscription_title">Detail langganan</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_subscription_details">Langganan diperpanjang secara otomatis untuk periode berlangganan berturut-turut dengan durasi yang sama dan dengan harga yang sama dengan periode awal yang dipilih. Anda dapat mematikan perpanjangan otomatis langganan MEGA &#160; Pro anda selambat-lambatnya 24 jam sebelum pembayaran langganan berikutnya jatuh tempo melalui Langganan di [A]Google Play[/A].</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Izinkan akses ke galeri anda</string>
-    <!--  -->
+    <!-- Button text to grant permission in the chat bottom sheet -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Berikan akses</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">Diperlukan pembaruan</string>
@@ -5120,7 +5120,7 @@
     <!-- The title of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_title">Tingkatkan ke Pro untuk mendapatkan panggilan tak terbatas</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->
-    <string name="meetings_upgrade_pro_plan_body">Panggilan anda mencapai batas 60 menit dan telah berakhir. Pengguna pro memiliki panggilan tak terbatas dan hingga 1000 peserta.</string>
+    <string name="meetings_upgrade_pro_plan_body">Panggilan anda mencapai batas 60 menit dan telah berakhir. Pengguna Pro memiliki durasi panggilan tak terbatas dan dapat mengundang hingga 1000 peserta.</string>
     <!-- The button text of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_button">Tingkatkan sekarang</string>
     <!-- Search drop down chips filter type file type -->
@@ -5157,4 +5157,10 @@
     <string name="hidden_nodes_show_items">Show hidden items</string>
     <!-- Hidden nodes show items description -->
     <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
+    <!-- Button text for photo option in camera screen -->
+    <string name="camera_photo_button">Photo</string>
+    <string name="camera_flash_mode_on">Flash mode on</string>
+    <string name="camera_flash_mode_off">Flash mode off</string>
+    <string name="camera_flash_mode_auto">Flash mode auto</string>
+    <string name="camera_send_to">Send to %1$s</string>
 </resources>

@@ -5214,7 +5214,7 @@
     <!-- Message to user when app update is downloaded -->
     <string name="general_app_update_message_download_success">L’appli a été mise à jour</string>
     <!-- Action allowing user to restart the app after downloading the update -->
-    <string name="general_app_update_action_restart">Relaunch the app</string>
+    <string name="general_app_update_action_restart">Relancer l’appli</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Autoriser l’accès aux fichiers son</string>
     <!-- Photos action menu zoom in -->
@@ -5455,9 +5455,9 @@
     <string name="account_upgrade_account_description_subscription_title">Détails de l’abonnement</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_subscription_details">Les abonnements sont renouvelés automatiquement pour des périodes d’abonnement successives de même durée et au même prix que la période initiale choisie. Vous pouvez désactiver le renouvellement automatique de votre abonnement MEGA&#160;Pro au plus tard 24 heures avant la date de paiement de votre prochain abonnement dans Abonnements de [A]Google Play[/A].</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Autoriser l’accès à votre galerie</string>
-    <!--  -->
+    <!-- Button text to grant permission in the chat bottom sheet -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Accorder l’accès</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">Une mise à jour est nécessaire</string>
@@ -5552,7 +5552,7 @@
     <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
     <string name="notifications_screen_notification_promo_expiration_time">Expire le %1$s à %2$s</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
-    <string name="meetings_free_call_organiser_number_of_participants_warning">Seuls 100&#160;participants peuvent participer à l’appel. Tout participant supplémentaire ne pourra qu’envoyer et recevoir des messages. La personne organise l’appel peut souscrire un abonnement Pro pour lever ces restrictions.</string>
+    <string name="meetings_free_call_organiser_number_of_participants_warning">Seuls 100&#160;participants peuvent participer à l’appel. Tout participant supplémentaire ne pourra qu’envoyer et recevoir des messages. La personne qui organise l’appel peut souscrire un abonnement Pro pour lever ces restrictions.</string>
     <!-- Warning Message for non organiser for Free Call -->
     <string name="meetings_free_call_non_organiser_number_of_participants_warning">Seuls 100&#160;participants peuvent participer à l’appel. Tout participant supplémentaire ne pourra qu’envoyer et lire les conversations. Demandez à la personne qui l’organise de lever cette restriction.</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
@@ -5564,7 +5564,7 @@
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos are automatically uploaded by Camera Uploads without any Video Compression -->
     <string name="settings_camera_uploads_video_quality_dialog_option_original">Originale</string>
     <!-- Warning shown when the recording of audio permission is required for sending a voice clip and it has been denied by the user -->
-    <string name="chat_microphone_permissions_denied_for_voice_clip">Si vous souhaitez enregistrer un message vocal, autorisez MEGA à accéder à votre microphone.</string>
+    <string name="chat_microphone_permissions_denied_for_voice_clip">Vous avez refuser à MEGA l’accès à votre microphone. Si vous souhaitez enregistrer un message vocal, accordez à MEGA l’accès à votre microphone.</string>
     <!-- Free plan limitation dialog title for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Impossible de vous joindre</string>
     <!-- Free plan limitation dialogue description for scheduled meeting calls with more than 100 participants -->
@@ -5596,7 +5596,7 @@
     <!-- The title of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_title">Passer à la version Pro pour bénéficier d’appels illimités</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->
-    <string name="meetings_upgrade_pro_plan_body">Votre appel a atteint la limite de 60&#160;minutes et s’est terminé. Les utilisateurs Pro bénéficient d’une durée d’appel illimitée, jusqu’à 1 000&#160;participants.</string>
+    <string name="meetings_upgrade_pro_plan_body">Votre appel a atteint la limite de 60&#160;minutes et s’est terminé. Les utilisateurs Pro bénéficient d’une durée d’appel illimitée et peuvent inviter jusqu’à 1 000&#160;participants.</string>
     <!-- The button text of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_button">Surclasser le compte maintenant</string>
     <!-- Search drop down chips filter type file type -->
@@ -5630,7 +5630,13 @@
     <!-- Button text for reporting an issue on the login screen -->
     <string name="general_login_button_report_your_issue">Signalez votre problème</string>
     <!-- Hidden nodes show items -->
-    <string name="hidden_nodes_show_items">Show hidden items</string>
+    <string name="hidden_nodes_show_items">Afficher les éléments cachés</string>
     <!-- Hidden nodes show items description -->
-    <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
+    <string name="hidden_nodes_show_items_description">Tous les éléments cachés seront visibles, mais flous pour indiquer leur état «&#160;caché&#160;»</string>
+    <!-- Button text for photo option in camera screen -->
+    <string name="camera_photo_button">Photo</string>
+    <string name="camera_flash_mode_on">Flash mode on</string>
+    <string name="camera_flash_mode_off">Flash mode off</string>
+    <string name="camera_flash_mode_auto">Flash mode auto</string>
+    <string name="camera_send_to">Envoyer vers %1$s</string>
 </resources>

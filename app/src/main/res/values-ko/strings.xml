@@ -4987,9 +4987,9 @@
     <string name="account_upgrade_account_description_subscription_title">구독 세부정보</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_subscription_details">구독은 처음 선택한 기간과 같은 기간 그리고 같은 가격으로 연속적으로 자동 갱신 됩니다. MEGA&#160;Pro 구독 자동 갱신을 [A]Google Play[/A]의 구독을 통해 다음 구독의 결제 24시간 전에 취소할 수 있습니다.</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">갤러리에 접근 허용</string>
-    <!--  -->
+    <!-- Button text to grant permission in the chat bottom sheet -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">접근 허가</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">업데이트가 필요합니다</string>
@@ -5120,7 +5120,7 @@
     <!-- The title of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_title">무제한 통화를 하려면 Pro로 업그레이드 하세요</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->
-    <string name="meetings_upgrade_pro_plan_body">당신의 통화가 60분 제한에 도달하여 종료되었습니다. Pro 이용자들은 무제한 통화와 최대 1,000명까지 참여할 수 있습니다.</string>
+    <string name="meetings_upgrade_pro_plan_body">당신의 통화가 60분 제한에 도달하여 종료되었습니다. Pro 이용자들은 무제한 통화 시간과 최대 1000명의 참여자를 초대할 수 있습니다.</string>
     <!-- The button text of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_button">지금 업그레이드</string>
     <!-- Search drop down chips filter type file type -->
@@ -5154,7 +5154,13 @@
     <!-- Button text for reporting an issue on the login screen -->
     <string name="general_login_button_report_your_issue">문제 신고</string>
     <!-- Hidden nodes show items -->
-    <string name="hidden_nodes_show_items">Show hidden items</string>
+    <string name="hidden_nodes_show_items">숨겨진 항목 보기</string>
     <!-- Hidden nodes show items description -->
     <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
+    <!-- Button text for photo option in camera screen -->
+    <string name="camera_photo_button">사진</string>
+    <string name="camera_flash_mode_on">Flash mode on</string>
+    <string name="camera_flash_mode_off">Flash mode off</string>
+    <string name="camera_flash_mode_auto">Flash mode auto</string>
+    <string name="camera_send_to">Send to %1$s</string>
 </resources>

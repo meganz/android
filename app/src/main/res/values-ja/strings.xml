@@ -4987,9 +4987,9 @@
     <string name="account_upgrade_account_description_subscription_title">サブスクリプションの詳細</string>
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_subscription_details">サブスクリプションは、最初に選択した期間と同じ期間および同じ価格で、連続するサブスクリプション期間に対して自動的に更新されます。次のサブスクリプションのお支払い期日の24時間前までに、MEGA&#160;Proサブスクリプションの自動更新をオフに切り替えることができます。これは、[A]Google Play[/A]の「サブスクリプション」から実行できます。</string>
-    <!-- Add new strings to this file (the string code must be unique). Add edits for strings to this file (the string code must match the existing string). -->
+    <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">ギャラリーへのアクセスを許可する</string>
-    <!--  -->
+    <!-- Button text to grant permission in the chat bottom sheet -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">アクセスを許可</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">アップデートが必要です</string>
@@ -5120,7 +5120,7 @@
     <!-- The title of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_title">Proにアップグレードしていただくと無制限に通話できるようになります</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->
-    <string name="meetings_upgrade_pro_plan_body">通話は60分の制限に達したため終了しました。Proユーザー様は、無制限の通話と最大1000人の参加者が利用できます。</string>
+    <string name="meetings_upgrade_pro_plan_body">通話時間が60分の制限に達したため終了しました。Proユーザー様は通話時間が無制限で、最大1000人の参加者を招待できます。</string>
     <!-- The button text of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_button">今すぐアップグレード</string>
     <!-- Search drop down chips filter type file type -->
@@ -5157,4 +5157,10 @@
     <string name="hidden_nodes_show_items">非表示項目を表示する</string>
     <!-- Hidden nodes show items description -->
     <string name="hidden_nodes_show_items_description">非表示の項目はすべて表示されますが、「非表示」ステータスを示すためにぼかされます</string>
+    <!-- Button text for photo option in camera screen -->
+    <string name="camera_photo_button">写真</string>
+    <string name="camera_flash_mode_on">Flash mode on</string>
+    <string name="camera_flash_mode_off">Flash mode off</string>
+    <string name="camera_flash_mode_auto">Flash mode auto</string>
+    <string name="camera_send_to">Send to %1$s</string>
 </resources>
