@@ -103,6 +103,7 @@ import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RemoveShareUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
+import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
 import mega.privacy.android.domain.usecase.notifications.GetNumUnreadPromoNotificationsUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
@@ -132,6 +133,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -313,6 +315,7 @@ class ManagerViewModelTest {
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock {
         onBlocking { invoke() }.thenReturn(fakeCallUpdatesFlow)
     }
+    private val broadcastHomeBadgeCountUseCase = mock<BroadcastHomeBadgeCountUseCase>()
 
 
     private fun initViewModel() {
@@ -391,7 +394,8 @@ class ManagerViewModelTest {
             monitorCallEndedUseCase = monitorCallEndedUseCase,
             monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
             getUsersCallLimitRemindersUseCase = getUsersCallLimitRemindersUseCase,
-            setUsersCallLimitRemindersUseCase = setUsersCallLimitRemindersUseCase
+            setUsersCallLimitRemindersUseCase = setUsersCallLimitRemindersUseCase,
+            broadcastHomeBadgeCountUseCase = broadcastHomeBadgeCountUseCase
         )
     }
 
@@ -438,6 +442,7 @@ class ManagerViewModelTest {
             monitorPushNotificationSettingsUpdate,
             getUsersCallLimitRemindersUseCase,
             setUsersCallLimitRemindersUseCase,
+            broadcastHomeBadgeCountUseCase
         )
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(flowOf(UsersCallLimitReminders.Enabled))
@@ -865,6 +870,7 @@ class ManagerViewModelTest {
             )
             monitorContactRequestUpdates.emit(contactRequests)
             advanceUntilIdle()
+            verify(broadcastHomeBadgeCountUseCase).invoke(expectedTotalCount)
             assertThat(underTest.onGetNumUnreadUserAlerts().test().value().second).isEqualTo(
                 expectedTotalCount
             )
@@ -899,6 +905,7 @@ class ManagerViewModelTest {
 
             monitorContactRequestUpdates.emit(contactRequests)
             advanceUntilIdle()
+            verify(broadcastHomeBadgeCountUseCase).invoke(expectedTotalCount)
             assertThat(underTest.numUnreadUserAlerts.value.second).isEqualTo(expectedTotalCount)
         }
 

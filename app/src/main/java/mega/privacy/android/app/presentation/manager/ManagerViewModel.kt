@@ -96,6 +96,7 @@ import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RemoveShareUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
+import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
 import mega.privacy.android.domain.usecase.notifications.GetNumUnreadPromoNotificationsUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
@@ -244,6 +245,7 @@ class ManagerViewModel @Inject constructor(
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val setUsersCallLimitRemindersUseCase: SetUsersCallLimitRemindersUseCase,
     private val getUsersCallLimitRemindersUseCase: GetUsersCallLimitRemindersUseCase,
+    private val broadcastHomeBadgeCountUseCase: BroadcastHomeBadgeCountUseCase,
 ) : ViewModel() {
 
     /**
@@ -603,6 +605,7 @@ class ManagerViewModel @Inject constructor(
                     getNumUnreadUserAlertsUseCase() + promoNotificationCount
                 _numUnreadUserAlerts.update { Pair(type, totalCount) }
                 legacyNumUnreadUserAlerts.value = Pair(type, totalCount)
+                broadcastHomeBadgeCountUseCase(totalCount)
             }.onFailure {
                 Timber.e("Failed to get the number of unread user alerts or promo notifications with error: $it")
             }

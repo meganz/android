@@ -3410,6 +3410,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 )
             }
         } else {
+            if (drawerItem === DrawerItem.PHOTOS) {
+                setPhotosNavigationToolbarIcon()
+            }
             if (isFirstNavigationLevel) {
                 if (drawerItem === DrawerItem.SEARCH || drawerItem === DrawerItem.BACKUPS || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.RUBBISH_BIN || drawerItem === DrawerItem.TRANSFERS) {
                     badgeDrawable?.progress = 1.0f
@@ -3425,9 +3428,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 badgeDrawable?.text = totalNotifications.toString() + ""
             }
             supportActionBar?.setHomeAsUpIndicator(badgeDrawable)
-        }
-        if (drawerItem === DrawerItem.PHOTOS) {
-            setPhotosNavigationToolbarIcon()
         }
     }
 
