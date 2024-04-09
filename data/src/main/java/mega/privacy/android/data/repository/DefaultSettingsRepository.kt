@@ -6,13 +6,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -99,16 +95,10 @@ internal class DefaultSettingsRepository @Inject constructor(
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway,
     @ApplicationScope private val appScope: CoroutineScope,
 ) : SettingsRepository {
-    private val showHiddenNodesInitialFlow: Flow<Boolean?> = flow<Boolean?> {
-        val isEnabled = getShowHiddenNodesPreference()
-        showHiddenNodesFlow.update { isEnabled }
-    }.stateIn(
-        scope = appScope,
-        started = SharingStarted.Lazily,
-        initialValue = null,
-    )
+    private val showHiddenNodesFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
-    private val showHiddenNodesFlow: MutableStateFlow<Boolean?> = MutableStateFlow(null)
+    @Volatile
+    private var isShowHiddenNodesPopulated: Boolean = false
 
     init {
         runBlocking {
@@ -225,10 +215,18 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setSubfolderMediaDiscoveryEnabled(enabled: Boolean) =
         uiPreferencesGateway.setSubfolderMediaDiscoveryEnabled(enabled)
 
-    override fun monitorShowHiddenItems(): Flow<Boolean> = merge(
-        showHiddenNodesFlow,
-        showHiddenNodesInitialFlow,
-    ).filterNotNull()
+    override fun monitorShowHiddenItems(): Flow<Boolean> = showHiddenNodesFlow
+        .onStart {
+            if (!isShowHiddenNodesPopulated) {
+                isShowHiddenNodesPopulated = true
+                populateShowHiddenNodesPreference()
+            }
+        }
+
+    private suspend fun populateShowHiddenNodesPreference() {
+        val isEnabled = getShowHiddenNodesPreference()
+        showHiddenNodesFlow.update { isEnabled }
+    }
 
     override suspend fun setShowHiddenItems(enabled: Boolean) {
         showHiddenNodesFlow.update { enabled }
@@ -501,6 +499,10 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     override suspend fun resetSetting() {
         setSubfolderMediaDiscoveryEnabled(true)
+
+        // Hidden items setting
+        showHiddenNodesFlow.update { false }
+        isShowHiddenNodesPopulated = false
     }
 
     override suspend fun getIsFirstLaunch() = withContext(ioDispatcher) {
