@@ -291,9 +291,14 @@ fun ParticipantsBottomPanelView(
                     }
                 }
 
-                if (shouldShowParticipantsLimitWarning) {
+                if (shouldShowParticipantsLimitWarning && state.participantsSection == ParticipantsSection.InCallSection) {
                     item(key = "Warning") {
-                        ParticipantsLimitWarningComposeView(state.isModerator)
+                        ParticipantsLimitWarningComposeView(
+                            modifier = Modifier.testTag(
+                                TEST_TAG_PARTICIPANTS_WARNING
+                            ),
+                            isModerator = state.isModerator,
+                        )
                     }
                 }
 
@@ -553,6 +558,7 @@ fun ParticipantsBottomPanelGuestInCallSectionPreview() {
             myPermission = ChatRoomPermission.Standard,
             isGuest = true
         ),
+            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -582,6 +588,7 @@ fun ParticipantsBottomPanelGuestNotInCallSectionPreview() {
             myPermission = ChatRoomPermission.Standard,
             isGuest = true
         ),
+            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -611,6 +618,7 @@ fun ParticipantsBottomPanelGuestNotInCallSectionEmptyStatePreview() {
             myPermission = ChatRoomPermission.Standard,
             isGuest = true
         ),
+            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -640,6 +648,7 @@ fun ParticipantsBottomPanelNonHostInCallSectionPreview() {
             myPermission = ChatRoomPermission.Standard,
             isGuest = false
         ),
+            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -671,6 +680,7 @@ fun ParticipantsBottomPanelNonHostAndOpenInviteInCallSectionPreview() {
             isOpenInvite = true,
             isGuest = false
         ),
+            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -700,6 +710,7 @@ fun ParticipantsBottomPanelNonHostNotInCallSectionPreview() {
             myPermission = ChatRoomPermission.Standard,
             isGuest = false
         ),
+            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -729,6 +740,7 @@ fun ParticipantsBottomPanelNonHostNotInCallSectionEmptyStatePreview() {
             myPermission = ChatRoomPermission.Standard,
             isGuest = false
         ),
+            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -757,6 +769,7 @@ fun ParticipantsBottomPanelInCallView4ParticipantsPreview() {
             hasWaitingRoom = true,
             myPermission = ChatRoomPermission.Moderator,
         ),
+            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -785,6 +798,7 @@ fun ParticipantsBottomPanelInCallView6ParticipantsPreview() {
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
+            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -813,6 +827,7 @@ fun ParticipantsBottomPanelNotInCallViewEmptyStatePreview() {
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
+            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -842,6 +857,7 @@ fun ParticipantsBottomPanelNotInCallView4ParticipantsPreview() {
             isRingingAll = true,
             myPermission = ChatRoomPermission.Moderator,
         ),
+            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -871,6 +887,7 @@ fun ParticipantsBottomPanelNotInCallView6ParticipantsPreview() {
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
+            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -899,6 +916,7 @@ fun ParticipantsBottomPanelNotInCallViewLandEmptyStatePreview() {
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
+            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -957,6 +975,7 @@ fun ParticipantsBottomPanelWaitingRoomView4ParticipantsPreview() {
             hasWaitingRoom = true,
             myPermission = ChatRoomPermission.Moderator,
         ),
+            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -986,6 +1005,7 @@ fun ParticipantsBottomPanelWaitingRoomView4ParticipantsLandPreview() {
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
+            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -1015,6 +1035,7 @@ fun ParticipantsBottomPanelWaitingRoomView6ParticipantsPreview() {
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
+            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -1044,6 +1065,7 @@ fun ParticipantsBottomPanelWaitingRoomView6ParticipantsLandPreview() {
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
+            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -1073,6 +1095,7 @@ fun ParticipantsBottomPanelWaitingRoomViewLandEmptyStatePreview() {
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
+            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -1213,3 +1236,4 @@ private fun getListWith6Participants(): List<ChatParticipant> {
 }
 
 internal const val TEST_TAG_MUTE_ALL_ITEM_VIEW = "sync_mute_all_view"
+internal const val TEST_TAG_PARTICIPANTS_WARNING = "meeting_info:participants_warning"

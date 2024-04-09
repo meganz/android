@@ -8,6 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsBottomPanelView
 import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_MUTE_ALL_ITEM_VIEW
+import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_PARTICIPANTS_WARNING
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import org.junit.Rule
@@ -41,12 +42,38 @@ class ParticipantBottomPanelViewTest {
         composeRule.onNodeWithTag(TEST_TAG_MUTE_ALL_ITEM_VIEW).assertDoesNotExist()
     }
 
+    @Test
+    fun `test that warning banner is shown when in call tab is selected`() {
+        initComposeRuleContent(
+            MeetingState(
+                myPermission = ChatRoomPermission.Moderator,
+                participantsSection = ParticipantsSection.InCallSection
+            ),
+            shouldShowParticipantsLimitWarning = true,
+        )
+        composeRule.onNodeWithTag(TEST_TAG_PARTICIPANTS_WARNING).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that warning banner is not shown when in call tab is not selected`() {
+        initComposeRuleContent(
+            MeetingState(
+                myPermission = ChatRoomPermission.Moderator,
+                participantsSection = ParticipantsSection.NotInCallSection
+            ),
+            shouldShowParticipantsLimitWarning = true,
+        )
+        composeRule.onNodeWithTag(TEST_TAG_PARTICIPANTS_WARNING).assertDoesNotExist()
+    }
+
     private fun initComposeRuleContent(
         uiState: MeetingState,
+        shouldShowParticipantsLimitWarning: Boolean = false,
     ) {
         composeRule.setContent {
             ParticipantsBottomPanelView(
                 state = uiState,
+                shouldShowParticipantsLimitWarning = shouldShowParticipantsLimitWarning,
                 onWaitingRoomClick = { },
                 onInCallClick = { },
                 onNotInCallClick = { },

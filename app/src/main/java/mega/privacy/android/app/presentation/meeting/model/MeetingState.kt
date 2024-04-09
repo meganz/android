@@ -178,13 +178,6 @@ data class MeetingState(
                 (participantsSection == ParticipantsSection.WaitingRoomSection && chatParticipantsInWaitingRoom.isNotEmpty())
 
     /**
-     * Check user free plan
-     *
-     * @return True, if has free plan. False, if has pro plan.
-     */
-    fun hasFreePlan() = subscriptionPlan == AccountType.FREE
-
-    /**
      * Check if user is moderator
      */
     val isModerator = myPermission == ChatRoomPermission.Moderator
