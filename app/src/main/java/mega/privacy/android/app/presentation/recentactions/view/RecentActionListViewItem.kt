@@ -11,7 +11,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -83,7 +82,9 @@ fun RecentActionListViewItem(
             )
 
             Column(
-                modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 3.dp)
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 12.dp, end = 12.dp, top = 3.dp)
             ) {
                 Row {
                     val iconModifier = Modifier
@@ -191,7 +192,6 @@ fun RecentActionListViewItem(
             }
 
             if (showMenuButton) {
-                Spacer(modifier = Modifier.weight(1f))
                 Image(
                     painter = painterResource(id = CoreR.drawable.ic_dots_vertical_grey),
                     contentDescription = "3 dots",

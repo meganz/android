@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.controls.skeleton.ListItemLoadingSkeleton
@@ -28,7 +29,7 @@ fun RecentLoadingView(
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
-        modifier = modifier,
+        modifier = modifier.testTag(RECENT_LOADING_VIEW_TEST_TAG),
     ) {
         item {
             Row(
@@ -51,6 +52,8 @@ fun RecentLoadingView(
         }
     }
 }
+
+internal const val RECENT_LOADING_VIEW_TEST_TAG = "recent_loading_view_test_tag"
 
 
 @CombinedThemePreviews

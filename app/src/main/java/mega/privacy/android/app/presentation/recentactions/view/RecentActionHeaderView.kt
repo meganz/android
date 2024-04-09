@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.recentactions.view
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,6 +27,7 @@ fun RecentActionHeaderView(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .background(MaterialTheme.colors.surface)
             .height(36.dp)
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.CenterStart
