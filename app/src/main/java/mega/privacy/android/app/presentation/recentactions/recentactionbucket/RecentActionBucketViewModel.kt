@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,14 +13,19 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetRecentActionNodes
 import mega.privacy.android.app.fragments.homepage.NodeItem
+import mega.privacy.android.app.presentation.recentactions.model.RecentActionBucketUIState
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
+import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.UpdateRecentAction
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
@@ -36,6 +42,9 @@ class RecentActionBucketViewModel @Inject constructor(
     private val getRecentActionNodes: GetRecentActionNodes,
     private val getParentNodeUseCase: GetParentNodeUseCase,
     monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
+    private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
 ) : ViewModel() {
     private val _actionMode = MutableLiveData<Boolean>()
 
@@ -85,12 +94,32 @@ class RecentActionBucketViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
+    private val _state = MutableStateFlow(RecentActionBucketUIState())
+
+    val state = _state.asStateFlow()
+
     init {
         viewModelScope.launch {
             monitorNodeUpdatesUseCase().collectLatest {
                 Timber.d("Received node update")
                 updateCurrentBucket()
                 clearSelection()
+            }
+        }
+
+        viewModelScope.launch {
+            monitorAccountDetailUseCase()
+                .collect { accountDetail ->
+                    _state.update {
+                        it.copy(accountDetail = accountDetail)
+                    }
+                }
+        }
+
+        viewModelScope.launch {
+            val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
+            _state.update {
+                it.copy(isHiddenNodesOnboarded = isHiddenNodesOnboarded)
             }
         }
     }
@@ -231,5 +260,26 @@ class RecentActionBucketViewModel @Inject constructor(
                 // No nodes contained in the bucket or the action bucket is no loner exists.
                 _shouldCloseFragment.postValue(true)
             }
+    }
+
+    fun hideOrUnhideNodes(hide: Boolean) = viewModelScope.launch {
+        getSelectedNodes().forEach {
+            it.node?.let { node ->
+                async {
+                    runCatching {
+                        updateNodeSensitiveUseCase(nodeId = NodeId(node.handle), isSensitive = hide)
+                    }.onFailure { throwable -> Timber.e("Update sensitivity failed: $throwable") }
+                }
+            }
+        }
+    }
+
+    /**
+     * Mark hidden nodes onboarding has shown
+     */
+    fun setHiddenNodesOnboarded() {
+        _state.update {
+            it.copy(isHiddenNodesOnboarded = true)
+        }
     }
 }

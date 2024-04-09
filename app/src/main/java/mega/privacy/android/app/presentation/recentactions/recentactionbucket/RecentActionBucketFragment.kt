@@ -4,6 +4,7 @@ import mega.privacy.android.core.R as CoreUiR
 import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,6 +12,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -38,6 +42,7 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -101,6 +106,12 @@ class RecentActionBucketFragment : Fragment() {
 
     private var actionMode: ActionMode? = null
 
+    private val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleHiddenNodesOnboardingResult,
+        )
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -142,6 +153,7 @@ class RecentActionBucketFragment : Fragment() {
                     val actionModeCallback =
                         RecentActionBucketActionModeCallback(
                             activity,
+                            this@RecentActionBucketFragment,
                             viewModel,
                             viewModel.isInShare
                         )
@@ -272,18 +284,23 @@ class RecentActionBucketFragment : Fragment() {
             mime.isImage -> {
                 openImage(index, node)
             }
+
             FileUtil.isAudioOrVideo(node) -> {
                 openAudioVideo(index, node, isMedia, localPath)
             }
+
             mime.isURL -> {
                 manageURLNode(requireContext(), megaApi, node)
             }
+
             mime.isPdf -> {
                 openPdf(index, node, localPath)
             }
+
             mime.isOpenableTextFile(node.size) -> {
                 manageTextFileIntent(requireContext(), node, RECENTS_ADAPTER)
             }
+
             else -> {
                 onNodeTapped(
                     requireActivity(),
@@ -425,7 +442,13 @@ class RecentActionBucketFragment : Fragment() {
                 )
             }
         }
-        putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS_BUCKET, adapter ?: return@launch)
+        putThumbnailLocation(
+            intent,
+            listView,
+            index,
+            VIEWER_FROM_RECETS_BUCKET,
+            adapter ?: return@launch
+        )
         startActivity(intent)
         activity?.overridePendingTransition(0, 0)
     }
@@ -528,6 +551,46 @@ class RecentActionBucketFragment : Fragment() {
         } else {
             viewModel.onNodeLongClicked(position, node)
         }
+    }
 
+    fun onHideClicked() {
+        val isHiddenNodesOnboarded = viewModel.state.value.isHiddenNodesOnboarded ?: false
+        val isPaid = viewModel.state.value.accountDetail?.levelDetail?.accountType?.isPaid ?: false
+        if (!isPaid) {
+            val intent = HiddenNodesOnboardingActivity.createScreen(
+                context = requireContext(),
+                isOnboarding = false,
+            )
+            hiddenNodesOnboardingLauncher.launch(intent)
+            activity?.overridePendingTransition(0, 0)
+        } else if (isHiddenNodesOnboarded) {
+            viewModel.hideOrUnhideNodes(true)
+        } else {
+            showHiddenNodesOnboarding()
+        }
+    }
+
+    private fun showHiddenNodesOnboarding() {
+        viewModel.setHiddenNodesOnboarded()
+
+        val intent = HiddenNodesOnboardingActivity.createScreen(
+            context = requireContext(),
+            isOnboarding = true,
+        )
+        hiddenNodesOnboardingLauncher.launch(intent)
+        activity?.overridePendingTransition(0, 0)
+    }
+
+    private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+        val selectedNodesCount = viewModel.getSelectedNodes().size
+        viewModel.hideOrUnhideNodes(true)
+
+        val message = resources.getQuantityString(
+            R.plurals.hidden_nodes_result_message,
+            selectedNodesCount,
+            1
+        )
+        Util.showSnackbar(requireActivity(), message)
     }
 }

@@ -427,9 +427,12 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 }
                 optionLabel.visibility = if (isTakenDown) View.GONE else View.VISIBLE
                 optionFavourite.visibility = if (isTakenDown) View.GONE else View.VISIBLE
-                optionHideLayout.visibility = if (isHiddenNodesEnabled && accountType != null && isHiddenNodesOnboarded != null) View.VISIBLE else View.GONE
-                optionHideProLabel.visibility = if (accountType?.isPaid == false) View.VISIBLE else View.GONE
-                optionHideHelp.visibility = if (accountType?.isPaid == true && !node.isMarkedSensitive) View.VISIBLE else View.GONE
+                optionHideLayout.visibility =
+                    if (isHiddenNodesEnabled && accountType != null && isHiddenNodesOnboarded != null) View.VISIBLE else View.GONE
+                optionHideProLabel.visibility =
+                    if (accountType?.isPaid == false) View.VISIBLE else View.GONE
+                optionHideHelp.visibility =
+                    if (accountType?.isPaid == true && !node.isMarkedSensitive) View.VISIBLE else View.GONE
                 if (accessLevel != MegaShare.ACCESS_OWNER || isTakenDown) {
                     counterShares--
                     optionShare.visibility = View.GONE
@@ -1135,7 +1138,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         decrementModify: () -> Unit,
     ) {
         val optionFavourite = contentView.findViewById<TextView>(R.id.favorite_option)
-        val optionHideLayout = contentView.findViewById<LinearLayout>(R.id.option_hide_layout)
         val optionLabel = contentView.findViewById<LinearLayout>(R.id.option_label_layout)
         val optionRename = contentView.findViewById<TextView>(R.id.rename_option)
         val optionMove = contentView.findViewById<TextView>(R.id.move_option)
@@ -1162,8 +1164,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         optionOpenFolder.visibility = View.GONE
         decrementModify()
         optionRestoreFromRubbish.visibility = View.GONE
-        // We don't want to show hide in Recents and Favourites yet
-        optionHideLayout.visibility = View.GONE
+
         when (accessLevel) {
             MegaShare.ACCESS_READWRITE, MegaShare.ACCESS_READ, MegaShare.ACCESS_UNKNOWN -> {
                 optionLabel.visibility = View.GONE
