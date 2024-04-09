@@ -15,9 +15,11 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
+import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.sync.R
@@ -25,7 +27,7 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCa
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.IsSyncPausedByTheUserUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnWiFiUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
 import timber.log.Timber
@@ -73,7 +75,10 @@ internal class SyncBackgroundService : LifecycleService() {
     internal lateinit var isSyncPausedByTheUserUseCase: IsSyncPausedByTheUserUseCase
 
     @Inject
-    internal lateinit var pauseResumeSyncsBasedOnWiFiUseCase: PauseResumeSyncsBasedOnWiFiUseCase
+    internal lateinit var pauseResumeSyncsBasedOnBatteryAndWiFiUseCase: PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
+
+    @Inject
+    internal lateinit var monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase
 
     override fun onCreate() {
         super.onCreate()
@@ -133,11 +138,12 @@ internal class SyncBackgroundService : LifecycleService() {
             combine(
                 monitorConnectivityUseCase(),
                 monitorSyncByWiFiUseCase(),
-                monitorSyncsUseCase()
-            ) { connectedToInternet: Boolean, syncByWifi: Boolean, _ ->
-                Pair(connectedToInternet, syncByWifi)
-            }.collect { (connectedToInternet, syncByWifi) ->
-                updateSyncState(connectedToInternet, syncByWifi)
+                monitorSyncsUseCase(),
+                monitorBatteryInfoUseCase()
+            ) { connectedToInternet: Boolean, syncByWifi: Boolean, _, batteryInfo: BatteryInfo ->
+                Triple(connectedToInternet, syncByWifi, batteryInfo)
+            }.collect { (connectedToInternet, syncByWifi, batteryInfo) ->
+                updateSyncState(connectedToInternet, syncByWifi, batteryInfo)
             }
         }
         return START_STICKY
@@ -146,10 +152,12 @@ internal class SyncBackgroundService : LifecycleService() {
     private suspend fun updateSyncState(
         connectedToInternet: Boolean,
         syncOnlyByWifi: Boolean,
+        batteryInfo: BatteryInfo,
     ) {
-        pauseResumeSyncsBasedOnWiFiUseCase(
+        pauseResumeSyncsBasedOnBatteryAndWiFiUseCase(
             connectedToInternet = connectedToInternet,
-            syncOnlyByWifi = syncOnlyByWifi
+            syncOnlyByWifi = syncOnlyByWifi,
+            batteryInfo = batteryInfo
         )
     }
 
@@ -181,5 +189,7 @@ internal class SyncBackgroundService : LifecycleService() {
         const val NOTIFICATION_ID = 80
         const val NOTIFICATION_CHANNEL_SYNC_SERVICE_ID = "SyncServiceNotification"
         const val NOTIFICATION_CHANNEL_SYNC_SERVICE_NAME = "Background Syncs"
+
+        const val LOW_BATTERY_LEVEL = 20
     }
 }

@@ -4,9 +4,13 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
@@ -26,6 +30,7 @@ import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -46,6 +51,7 @@ class SyncFoldersViewModelTest {
     private val getSyncStalledIssuesUseCase: GetSyncStalledIssuesUseCase = mock()
     private val setUserPausedSyncsUseCase: SetUserPausedSyncUseCase = mock()
     private val refreshSyncUseCase: RefreshSyncUseCase = mock()
+    private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase = mock()
 
     private lateinit var underTest: SyncFoldersViewModel
 
@@ -77,6 +83,11 @@ class SyncFoldersViewModelTest {
             nodeNames = listOf("Camera"),
         )
     )
+
+    @BeforeEach
+    fun setupMock(): Unit = runBlocking {
+        whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(100, true)))
+    }
 
     @AfterEach
     fun resetAndTearDown() {
@@ -215,7 +226,8 @@ class SyncFoldersViewModelTest {
             pauseSyncUseCase,
             getSyncStalledIssuesUseCase,
             setUserPausedSyncsUseCase,
-            refreshSyncUseCase
+            refreshSyncUseCase,
+            monitorBatteryInfoUseCase
         )
     }
 }

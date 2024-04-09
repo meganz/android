@@ -194,7 +194,7 @@ private fun SyncListScreenContent(
         SyncPermissionWarningBanner(
             syncPermissionsManager = syncPermissionsManager
         )
-        if (syncFoldersState.isLowBatteryLevel) {
+        if (syncFoldersState.syncUiItems.isNotEmpty() && syncFoldersState.isLowBatteryLevel) {
             WarningBanner(
                 textString = stringResource(id = mega.privacy.android.shared.resources.R.string.general_message_sync_paused_low_battery_level),
                 onCloseClick = null

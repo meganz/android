@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
+import mega.privacy.android.feature.sync.data.service.SyncBackgroundService
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.stalledIssue.GetSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
@@ -31,7 +33,8 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val pauseSyncUseCase: PauseSyncUseCase,
     private val getSyncStalledIssuesUseCase: GetSyncStalledIssuesUseCase,
     private val setUserPausedSyncsUseCase: SetUserPausedSyncUseCase,
-    private val refreshSyncUseCase: RefreshSyncUseCase
+    private val refreshSyncUseCase: RefreshSyncUseCase,
+    private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncFoldersState(emptyList()))
@@ -58,6 +61,14 @@ internal class SyncFoldersViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+
+        viewModelScope.launch {
+            monitorBatteryInfoUseCase().collect { batteryInfo ->
+                _state.update { state ->
+                    state.copy(isLowBatteryLevel = batteryInfo.level < SyncBackgroundService.LOW_BATTERY_LEVEL && !batteryInfo.isCharging)
+                }
+            }
         }
     }
 
