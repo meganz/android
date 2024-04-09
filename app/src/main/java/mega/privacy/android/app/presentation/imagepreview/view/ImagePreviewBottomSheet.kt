@@ -88,6 +88,7 @@ internal fun ImagePreviewBottomSheet(
     getImageThumbnailPath: suspend (ImageResult?) -> String?,
     isAvailableOffline: Boolean = false,
     accountDetail: AccountDetail? = null,
+    isHiddenNodesEnabled: Boolean = false,
     isHiddenNodesOnboarded: Boolean? = null,
     onClickInfo: () -> Unit = {},
     onClickFavourite: () -> Unit = {},
@@ -412,7 +413,7 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                if (isHideMenuVisible && accountType != null && isHiddenNodesOnboarded != null) {
+                if (isHiddenNodesEnabled && accountType != null && (!accountType.isPaid || isHideMenuVisible && isHiddenNodesOnboarded != null)) {
                     MenuActionListTile(
                         icon = painterResource(id = Rpack.drawable.ic_eye_off_medium_regular_outline),
                         text = stringResource(id = R.string.general_hide_node),
@@ -420,7 +421,7 @@ internal fun ImagePreviewBottomSheet(
                         dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_HIDE),
                         trailingItem = {
-                            if (accountType == AccountType.FREE) {
+                            if (!accountType.isPaid) {
                                 Text(
                                     text = stringResource(id = R.string.general_pro_only),
                                     color = teal_300.takeIf { isLight } ?: teal_200,
@@ -442,7 +443,7 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                if (isUnhideMenuVisible) {
+                if (isHiddenNodesEnabled && accountType?.isPaid == true && isUnhideMenuVisible) {
                     MenuActionListTile(
                         icon = painterResource(id = Rpack.drawable.ic_eye_medium_regular_outline),
                         text = stringResource(id = R.string.general_unhide_node),

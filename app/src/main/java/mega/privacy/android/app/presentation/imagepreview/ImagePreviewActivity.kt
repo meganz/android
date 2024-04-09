@@ -285,20 +285,21 @@ class ImagePreviewActivity : BaseActivity() {
         accountDetail: AccountDetail?,
         isHiddenNodesOnboarded: Boolean?,
     ) {
-        val accountType = accountDetail?.levelDetail?.accountType
+        val isPaid = accountDetail?.levelDetail?.accountType?.isPaid ?: false
+        val isHiddenNodesOnboarded = isHiddenNodesOnboarded ?: false
 
-        if (accountType == AccountType.FREE || accountType == AccountType.UNKNOWN) {
+        if (!isPaid) {
             val intent = HiddenNodesOnboardingActivity.createScreen(
                 context = this,
                 isOnboarding = false,
             )
             hiddenNodesOnboardingLauncher.launch(intent)
             overridePendingTransition(0, 0)
-        } else if (isHiddenNodesOnboarded == false) {
+        } else if (isHiddenNodesOnboarded) {
+            viewModel.hideNode(nodeId = imageNode.id)
+        } else {
             tempNodeId = imageNode.id
             showHiddenNodesOnboarding()
-        } else {
-            viewModel.hideNode(nodeId = imageNode.id)
         }
     }
 

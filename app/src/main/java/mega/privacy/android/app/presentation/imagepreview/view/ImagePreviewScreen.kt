@@ -126,6 +126,10 @@ internal fun ImagePreviewScreen(
         }
     }
 
+    val isHiddenNodesEnabled by produceState(initialValue = false) {
+        value = viewModel.isHiddenNodesEnabled()
+    }
+
     val currentImageNodeIndex = viewState.currentImageNodeIndex
     val accountDetail = viewState.accountDetail
     val isHiddenNodesOnboarded = viewState.isHiddenNodesOnboarded
@@ -336,6 +340,7 @@ internal fun ImagePreviewScreen(
                     imageNode = currentImageNode,
                     isAvailableOffline = isCurrentImageNodeAvailableOffline,
                     accountDetail = accountDetail,
+                    isHiddenNodesEnabled = isHiddenNodesEnabled,
                     isHiddenNodesOnboarded = isHiddenNodesOnboarded,
                     showInfoMenu = viewModel::isInfoMenuVisible,
                     showFavouriteMenu = viewModel::isFavouriteMenuVisible,

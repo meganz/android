@@ -224,6 +224,10 @@ class ImagePreviewViewModel @Inject constructor(
         return targetImageNodeIndex to imageNodes.getOrNull(targetImageNodeIndex)
     }
 
+    suspend fun isHiddenNodesEnabled(): Boolean {
+        return getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+    }
+
     suspend fun isInfoMenuVisible(imageNode: ImageNode): Boolean {
         return menu?.isInfoMenuVisible(imageNode) ?: false
     }
@@ -277,13 +281,11 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     suspend fun isHideMenuVisible(imageNode: ImageNode): Boolean {
-        return getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
-                && menu?.isHideMenuVisible(imageNode) ?: false
+        return menu?.isHideMenuVisible(imageNode) ?: false
     }
 
     suspend fun isUnhideMenuVisible(imageNode: ImageNode): Boolean {
-        return getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
-                && menu?.isUnhideMenuVisible(imageNode) ?: false
+        return menu?.isUnhideMenuVisible(imageNode) ?: false
     }
 
     suspend fun isMoveMenuVisible(imageNode: ImageNode): Boolean {
