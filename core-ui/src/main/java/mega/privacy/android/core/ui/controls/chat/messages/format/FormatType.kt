@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.format
+package mega.privacy.android.core.ui.controls.chat.messages.format
 
 /**
  * Enum class defining all the possible format types for a text.
@@ -30,7 +30,7 @@ enum class FormatType {
     MultiQuote,
 
     /**
-     * None.
+     * Link.
      */
-    None
+    Link
 }

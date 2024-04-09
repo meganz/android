@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.chat.model.messages.normal.format
+package mega.privacy.android.core.ui.controls.chat.messages.format
 
 /**
  * Data class defining a formatted sentence.

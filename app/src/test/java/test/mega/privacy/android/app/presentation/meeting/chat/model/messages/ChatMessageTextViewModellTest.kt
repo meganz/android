@@ -2,8 +2,11 @@ package test.mega.privacy.android.app.presentation.meeting.chat.model.messages
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.meeting.chat.model.messages.MessageContentViewModel
+import mega.privacy.android.app.presentation.meeting.chat.view.message.normal.ChatMessageTextViewModel
 import mega.privacy.android.domain.usecase.chat.GetLinksFromMessageContentUseCase
+import mega.privacy.android.domain.usecase.chat.link.EnableRichPreviewUseCase
+import mega.privacy.android.domain.usecase.chat.link.MonitorRichLinkPreviewConfigUseCase
+import mega.privacy.android.domain.usecase.chat.link.SetRichLinkWarningCounterUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -13,20 +16,32 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MessageContentViewModelTest {
+class ChatMessageTextViewModellTest {
 
-    private lateinit var underTest: MessageContentViewModel
+    private lateinit var underTest: ChatMessageTextViewModel
 
+    private val monitorRichLinkPreviewConfigUseCase = mock<MonitorRichLinkPreviewConfigUseCase>()
+    private val setRichLinkWarningCounterUseCase = mock<SetRichLinkWarningCounterUseCase>()
+    private val enableRichPreviewUseCase = mock<EnableRichPreviewUseCase>()
     private val getLinksFromMessageContentUseCase = mock<GetLinksFromMessageContentUseCase>()
 
     @BeforeAll
     fun setup() {
-        underTest = MessageContentViewModel(getLinksFromMessageContentUseCase)
+        underTest = ChatMessageTextViewModel(
+            monitorRichLinkPreviewConfigUseCase,
+            setRichLinkWarningCounterUseCase,
+            enableRichPreviewUseCase,
+            getLinksFromMessageContentUseCase,
+        )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(getLinksFromMessageContentUseCase)
+        reset(
+            setRichLinkWarningCounterUseCase,
+            enableRichPreviewUseCase,
+            getLinksFromMessageContentUseCase,
+        )
     }
 
     @Test

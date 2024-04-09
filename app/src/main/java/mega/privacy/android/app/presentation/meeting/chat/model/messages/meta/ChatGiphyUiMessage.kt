@@ -29,6 +29,7 @@ class ChatGiphyUiMessage(
     @Composable
     override fun ContentComposable(
         interactionEnabled: Boolean,
+        onLongClick: () -> Unit,
         initialiseModifier: (onClick: () -> Unit) -> Modifier,
     ) {
         message.chatGifInfo?.let { giphy ->

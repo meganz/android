@@ -20,6 +20,7 @@ data class PendingAttachmentUiMessage(
     @Composable
     override fun ContentComposable(
         interactionEnabled: Boolean,
+        onLongClick: () -> Unit,
         initialiseModifier: (onClick: () -> Unit) -> Modifier,
     ) {
         val modifier = initialiseModifier {

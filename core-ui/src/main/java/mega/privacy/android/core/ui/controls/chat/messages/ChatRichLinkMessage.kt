@@ -8,9 +8,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
@@ -37,25 +36,39 @@ fun ChatRichLinkMessage(
     title: String,
     contentTitle: String,
     contentDescription: String,
-    content: AnnotatedString,
+    content: String,
+    links: List<String>,
+    isEdited: Boolean,
     host: String,
     image: Painter?,
     icon: Painter?,
     modifier: Modifier = Modifier,
+    interactionEnabled: Boolean = true,
+    onLongClick: () -> Unit = {},
 ) {
     ChatBubble(
         modifier = modifier,
         isMe = isMine,
         content = {
+            val uriHandler = LocalUriHandler.current
+
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.subtitle2
                 )
-                Text(
+                MessageText(
+                    message = content,
+                    isEdited = isEdited,
+                    links = links,
+                    onLinkClicked = { link ->
+                        if (interactionEnabled) {
+                            uriHandler.openUri(link.completeURLProtocol())
+                        }
+                    },
+                    onLongClick = onLongClick,
                     modifier = Modifier.padding(top = 4.dp),
-                    text = content,
-                    style = MaterialTheme.typography.caption
+                    style = MaterialTheme.typography.caption,
                 )
             }
         },
@@ -83,10 +96,13 @@ private fun ChatRickLinkMessagePreview(
             title = "Title",
             contentTitle = "Content Title",
             contentDescription = "is a caldera in the Sunda Strait between the islands of Java and Sumatra in the Indonesian province of Lampung. It is located in the most densely populated island of Java. The name is Indonesian for 'Child of Krakatoa'.",
-            content = buildAnnotatedString { append("https://mega.nz") },
+            content = "https://mega.nz",
+            isEdited = false,
+            links = emptyList(),
             host = "mega.nz",
             image = painterResource(R.drawable.ic_select_folder),
             icon = painterResource(R.drawable.ic_select_folder),
+            interactionEnabled = true,
         )
     }
 }

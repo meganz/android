@@ -2,16 +2,21 @@ package mega.privacy.android.app.presentation.meeting.chat.view.message.normal
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewModel
-import mega.privacy.android.app.presentation.meeting.chat.view.message.getMessageText
 import mega.privacy.android.core.ui.controls.chat.messages.ChatBubble
+import mega.privacy.android.core.ui.controls.chat.messages.MessageText
+import mega.privacy.android.core.ui.controls.chat.messages.completeURLProtocol
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 import mega.privacy.android.shared.theme.MegaAppTheme
@@ -25,6 +30,8 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 @Composable
 fun ChatMessageTextView(
     message: TextMessage,
+    interactionEnabled: Boolean,
+    onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ChatMessageTextViewModel = hiltViewModel(),
 ) {
@@ -34,6 +41,11 @@ fun ChatMessageTextView(
     val askedEnableRichLink by parentViewModel.askedEnableRichLink
 
     with(message) {
+        var links by rememberSaveable { mutableStateOf(emptyList<String>()) }
+        LaunchedEffect(Unit) {
+            links = viewModel.getLinks(content)
+        }
+
         ChatMessageTextView(
             text = content,
             isMe = isMine,
@@ -47,7 +59,10 @@ fun ChatMessageTextView(
             onAskedEnableRichLink = parentViewModel::onAskedEnableRichLink,
             enableRichLinkPreview = viewModel::enableRichLinkPreview,
             setRichLinkWarningCounter = viewModel::setRichLinkWarningCounter,
+            interactionEnabled = interactionEnabled,
+            onLongClick = onLongClick,
             isEdited = isEdited,
+            links = links,
         )
     }
 }
@@ -66,8 +81,10 @@ fun ChatMessageTextView(
     onAskedEnableRichLink: () -> Unit = {},
     enableRichLinkPreview: (Boolean) -> Unit = {},
     setRichLinkWarningCounter: (Int) -> Unit = {},
+    interactionEnabled: Boolean = true,
+    onLongClick: () -> Unit = {},
+    links: List<String> = emptyList(),
 ) {
-
     ChatBubble(modifier = modifier, isMe = isMe, subContent = {
         if (shouldShowWarning) {
             EnableRichLinkView(
@@ -99,12 +116,19 @@ fun ChatMessageTextView(
             )
         }
     }) {
-        Text(
+        val uriHandler = LocalUriHandler.current
+
+        MessageText(
+            message = text,
+            isEdited = isEdited,
+            links = links,
+            onLinkClicked = { link ->
+                if (interactionEnabled) {
+                    uriHandler.openUri(link.completeURLProtocol())
+                }
+            },
+            onLongClick = onLongClick,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-            text = getMessageText(
-                message = text,
-                isEdited = isEdited,
-            ),
         )
     }
 }

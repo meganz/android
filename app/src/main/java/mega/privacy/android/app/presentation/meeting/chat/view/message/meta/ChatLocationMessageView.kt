@@ -12,8 +12,8 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.chat.view.message.getMessageText
 import mega.privacy.android.core.ui.controls.chat.messages.LocationMessageView
+import mega.privacy.android.core.ui.controls.chat.messages.getMessageText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.shared.theme.MegaAppTheme
@@ -58,10 +58,7 @@ private fun ChatLocationMessageView(
 ) {
     LocationMessageView(
         isMe = isMine,
-        title = getMessageText(
-            message = stringResource(id = R.string.title_geolocation_message),
-            isEdited = isEdited,
-        ),
+        title = stringResource(id = R.string.title_geolocation_message).getMessageText(isEdited = isEdited),
         geolocation = geolocation,
         map = locationPreview,
         modifier = modifier

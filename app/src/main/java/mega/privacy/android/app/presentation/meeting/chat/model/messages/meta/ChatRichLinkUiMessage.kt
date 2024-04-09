@@ -24,16 +24,17 @@ data class ChatRichLinkUiMessage(
     @Composable
     override fun ContentComposable(
         interactionEnabled: Boolean,
+        onLongClick: () -> Unit,
         initialiseModifier: (onClick: () -> Unit) -> Modifier,
     ) {
         val uriHandler = LocalUriHandler.current
         ChatRichLinkMessageView(
             message = message,
+            interactionEnabled = interactionEnabled,
+            onLongClick = onLongClick,
             modifier = initialiseModifier {
                 message.chatRichPreviewInfo?.url?.let {
-                    uriHandler.openUri(
-                        it
-                    )
+                    uriHandler.openUri(it)
                 }
             },
         )

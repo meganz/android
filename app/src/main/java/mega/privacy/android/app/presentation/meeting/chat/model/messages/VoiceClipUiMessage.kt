@@ -29,6 +29,7 @@ class VoiceClipUiMessage(
     @Composable
     override fun ContentComposable(
         interactionEnabled: Boolean,
+        onLongClick: () -> Unit,
         initialiseModifier: (onClick: () -> Unit) -> Modifier,
     ) {
         val viewModel: VoiceClipMessageViewModel = hiltViewModel()

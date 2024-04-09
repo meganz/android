@@ -19,10 +19,13 @@ data class TextUiMessage(
     @Composable
     override fun ContentComposable(
         interactionEnabled: Boolean,
+        onLongClick: () -> Unit,
         initialiseModifier: (onClick: () -> Unit) -> Modifier,
     ) {
         ChatMessageTextView(
             message = message,
+            interactionEnabled = interactionEnabled,
+            onLongClick = onLongClick,
             modifier = initialiseModifier {},
         )
     }

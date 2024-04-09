@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.chat.RichLinkConfig
+import mega.privacy.android.domain.usecase.chat.GetLinksFromMessageContentUseCase
 import mega.privacy.android.domain.usecase.chat.link.EnableRichPreviewUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorRichLinkPreviewConfigUseCase
 import mega.privacy.android.domain.usecase.chat.link.SetRichLinkWarningCounterUseCase
@@ -19,9 +20,10 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ChatMessageTextViewModel @Inject constructor(
-    private val monitorRichLinkPreviewConfigUseCase: MonitorRichLinkPreviewConfigUseCase,
+    monitorRichLinkPreviewConfigUseCase: MonitorRichLinkPreviewConfigUseCase,
     private val setRichLinkWarningCounterUseCase: SetRichLinkWarningCounterUseCase,
     private val enableRichLinkPreviewUseCase: EnableRichPreviewUseCase,
+    private val getLinksFromMessageContentUseCase: GetLinksFromMessageContentUseCase,
 ) : ViewModel() {
 
     /**
@@ -56,4 +58,12 @@ class ChatMessageTextViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Get links from message content
+     *
+     * @param content Message content.
+     * @return List of links.
+     */
+    fun getLinks(content: String) = getLinksFromMessageContentUseCase(content)
 }

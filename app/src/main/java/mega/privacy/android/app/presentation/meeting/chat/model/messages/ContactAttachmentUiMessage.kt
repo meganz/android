@@ -45,6 +45,7 @@ data class ContactAttachmentUiMessage(
     @Composable
     override fun ContentComposable(
         interactionEnabled: Boolean,
+        onLongClick: () -> Unit,
         initialiseModifier: (onClick: () -> Unit) -> Modifier,
     ) {
         val viewModel: ContactMessageViewModel = hiltViewModel()

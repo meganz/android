@@ -1,7 +1,7 @@
 package test.mega.privacy.android.app.presentation.meeting.chat.view.message
 
 import com.google.common.truth.Truth
-import mega.privacy.android.app.presentation.meeting.chat.view.message.toFormattedText
+import mega.privacy.android.core.ui.controls.chat.messages.toFormattedText
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
@@ -19,7 +19,7 @@ internal class GetMessageTextTest {
         inputText: String,
         expectedText: String,
     ) {
-        Truth.assertThat(inputText.toFormattedText().toString()).isEqualTo(expectedText)
+        Truth.assertThat(inputText.toFormattedText(emptyList()).toString()).isEqualTo(expectedText)
     }
 
     internal class FormatTextArgumentsProvider : ArgumentsProvider {
@@ -176,8 +176,24 @@ internal class GetMessageTextTest {
                     "Text with bold quote format"
                 ),
                 Arguments.of(
-                    "*Text with *bold *bold* `quote` format*",
-                    "Text with *bold bold quote format"
+                    "*Text* www.mega.io text",
+                    "Text www.mega.io text"
+                ),
+                Arguments.of(
+                    "*www.mega.io*",
+                    "www.mega.io"
+                ),
+                Arguments.of(
+                    "`*www.mega.io*`",
+                    "www.mega.io"
+                ),
+                Arguments.of(
+                    "_`*www.mega.io*`_",
+                    "www.mega.io"
+                ),
+                Arguments.of(
+                    "```www.mega.io```",
+                    "www.mega.io"
                 ),
             )
         }

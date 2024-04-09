@@ -36,6 +36,7 @@ data class TextLinkUiMessage(
     @Composable
     override fun ContentComposable(
         interactionEnabled: Boolean,
+        onLongClick: () -> Unit,
         initialiseModifier: (onClick: () -> Unit) -> Modifier,
     ) {
         val viewModel: ChatLinksMessageViewModel = hiltViewModel()
@@ -92,20 +93,24 @@ data class TextLinkUiMessage(
         }
         ChatLinksMessageView(
             message = message,
-            modifier = initialiseModifier { contentLinks.firstOrNull()?.onClick(context) },
-        ) {
-            contentLinks.forEachIndexed { index, linkContent ->
-                key(linkContent.link) {
-                    linkContent.SubContentComposable(
-                        modifier = initialiseModifier { linkContent.onClick(context) },
-                    )
-                }
+            contentLinks = contentLinks,
+            linkViews = {
+                contentLinks.forEachIndexed { index, linkContent ->
+                    key(linkContent.link) {
+                        linkContent.SubContentComposable(
+                            modifier = initialiseModifier { linkContent.onClick(context) },
+                        )
+                    }
 
-                if (index != contentLinks.lastIndex) {
-                    MegaDivider(dividerType = DividerType.FullSize)
+                    if (index != contentLinks.lastIndex) {
+                        MegaDivider(dividerType = DividerType.FullSize)
+                    }
                 }
-            }
-        }
+            },
+            interactionEnabled = interactionEnabled,
+            modifier = initialiseModifier {},
+            onLongClick = onLongClick,
+        )
     }
 
     override val showAvatar = message.shouldShowAvatar
