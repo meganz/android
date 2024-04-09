@@ -46,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -283,6 +284,7 @@ internal fun ChatView(
     onConsumeShouldUpgradeToProPlan: () -> Unit = {},
 ) {
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
     val coroutineScope = rememberCoroutineScope()
     val scaffoldState = rememberScaffoldState()
     var showParticipatingInACallDialog by rememberSaveable { mutableStateOf(false) }
@@ -769,6 +771,7 @@ internal fun ChatView(
                 bottomBar = {
                     if (haveWritePermission) {
                         val onAttachmentClick: () -> Unit = {
+                            focusManager.clearFocus()
                             coroutineScope.launch {
                                 Analytics.tracker.trackEvent(
                                     ChatConversationAddAttachmentButtonPressedEvent
@@ -851,6 +854,7 @@ internal fun ChatView(
                             val onMessageLongClick: (TypedMessage) -> Unit = { message ->
                                 selectedMessages = setOf(message)
                                 // Use message for showing correct available options
+                                focusManager.clearFocus()
                                 coroutineScope.launch {
                                     Analytics.tracker.trackEvent(ChatMessageLongPressedEvent)
                                     messageOptionsModalSheetState.show()
