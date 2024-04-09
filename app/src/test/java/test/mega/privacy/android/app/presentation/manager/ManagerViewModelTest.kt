@@ -91,6 +91,7 @@ import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorUpgradeDialogClosedUseCase
 import mega.privacy.android.domain.usecase.meeting.SetUsersCallLimitRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -317,6 +318,12 @@ class ManagerViewModelTest {
     }
     private val broadcastHomeBadgeCountUseCase = mock<BroadcastHomeBadgeCountUseCase>()
 
+    private val monitorUpgradeDialogClosedFlow = MutableSharedFlow<Unit>()
+
+    private val monitorUpgradeDialogClosedUseCase: MonitorUpgradeDialogClosedUseCase = mock {
+        onBlocking { invoke() }.thenReturn(monitorUpgradeDialogClosedFlow)
+    }
+
 
     private fun initViewModel() {
         underTest = ManagerViewModel(
@@ -395,7 +402,8 @@ class ManagerViewModelTest {
             monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
             getUsersCallLimitRemindersUseCase = getUsersCallLimitRemindersUseCase,
             setUsersCallLimitRemindersUseCase = setUsersCallLimitRemindersUseCase,
-            broadcastHomeBadgeCountUseCase = broadcastHomeBadgeCountUseCase
+            broadcastHomeBadgeCountUseCase = broadcastHomeBadgeCountUseCase,
+            monitorUpgradeDialogClosedUseCase = monitorUpgradeDialogClosedUseCase
         )
     }
 
@@ -442,7 +450,8 @@ class ManagerViewModelTest {
             monitorPushNotificationSettingsUpdate,
             getUsersCallLimitRemindersUseCase,
             setUsersCallLimitRemindersUseCase,
-            broadcastHomeBadgeCountUseCase
+            broadcastHomeBadgeCountUseCase,
+            monitorUpgradeDialogClosedUseCase
         )
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(flowOf(UsersCallLimitReminders.Enabled))

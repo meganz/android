@@ -55,6 +55,7 @@ internal class AppEventFacade @Inject constructor(
     private val _monitorCompletedTransfer = MutableSharedFlow<CompletedTransfer>()
     private val _monitorRefreshSession = MutableSharedFlow<Unit>()
     private val _monitorBackupInfoType = MutableSharedFlow<BackupInfoType>()
+    private val _monitorUpgradeDialogShown = MutableSharedFlow<Unit>()
 
     private val _monitorCameraUploadsSettingsActions =
         MutableSharedFlow<CameraUploadsSettingsAction>()
@@ -230,6 +231,16 @@ internal class AppEventFacade @Inject constructor(
     override fun monitorUpdateUserData(): Flow<Unit> {
         return updateUserData
     }
+
+    override fun monitorUpgradeDialogClosed(): Flow<Unit> {
+        return _monitorUpgradeDialogShown.asSharedFlow()
+    }
+
+    override suspend fun broadcastUpgradeDialogClosed() {
+        _monitorUpgradeDialogShown.emit(Unit)
+    }
+
+
 }
 
 private fun <T> Flow<T>.toSharedFlow(

@@ -374,4 +374,16 @@ internal interface AppEventGateway {
     suspend fun broadcastUpdateUserData()
 
     fun monitorUpdateUserData(): Flow<Unit>
+
+    /**
+     * monitor upgrade dialog closed due to time limit
+     *
+     */
+    fun monitorUpgradeDialogClosed(): Flow<Unit>
+
+    /**
+     * broadcast upgrade dialog is closed
+     *
+     */
+    suspend fun broadcastUpgradeDialogClosed()
 }

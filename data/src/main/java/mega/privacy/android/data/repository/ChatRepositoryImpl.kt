@@ -1390,4 +1390,9 @@ internal class ChatRepositoryImpl @Inject constructor(
                 }
             }
         }
+
+    override fun monitorUpgradeDialogClosed() = appEventGateway.monitorUpgradeDialogClosed()
+
+    override suspend fun broadcastUpgradeDialogClosed() =
+        appEventGateway.broadcastUpgradeDialogClosed()
 }

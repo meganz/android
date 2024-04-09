@@ -126,6 +126,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.CreateNewImageUriUseCase
 import mega.privacy.android.domain.usecase.file.DeleteFileUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.BroadcastUpgradeDialogClosedUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.GetUsersCallLimitRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
@@ -251,7 +252,8 @@ class ChatViewModel @Inject constructor(
     private val monitorLeaveChatUseCase: MonitorLeaveChatUseCase,
     private val leaveChatUseCase: LeaveChatUseCase,
     private val setUsersCallLimitRemindersUseCase: SetUsersCallLimitRemindersUseCase,
-    private val getUsersCallLimitRemindersUseCase: GetUsersCallLimitRemindersUseCase
+    private val getUsersCallLimitRemindersUseCase: GetUsersCallLimitRemindersUseCase,
+    private val broadcastUpgradeDialogClosedUseCase: BroadcastUpgradeDialogClosedUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ChatUiState())
     val state = _state.asStateFlow()
@@ -1666,6 +1668,11 @@ class ChatViewModel @Inject constructor(
      */
     fun onConsumeShouldUpgradeToProPlan() {
         _state.update { state -> state.copy(shouldUpgradeToProPlan = false) }
+        viewModelScope.launch {
+            runCatching {
+                broadcastUpgradeDialogClosedUseCase()
+            }
+        }
     }
 
     companion object {

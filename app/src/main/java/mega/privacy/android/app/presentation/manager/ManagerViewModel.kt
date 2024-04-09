@@ -83,6 +83,7 @@ import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorUpgradeDialogClosedUseCase
 import mega.privacy.android.domain.usecase.meeting.SetUsersCallLimitRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -246,6 +247,7 @@ class ManagerViewModel @Inject constructor(
     private val setUsersCallLimitRemindersUseCase: SetUsersCallLimitRemindersUseCase,
     private val getUsersCallLimitRemindersUseCase: GetUsersCallLimitRemindersUseCase,
     private val broadcastHomeBadgeCountUseCase: BroadcastHomeBadgeCountUseCase,
+    private val monitorUpgradeDialogClosedUseCase: MonitorUpgradeDialogClosedUseCase,
 ) : ViewModel() {
 
     /**
@@ -516,6 +518,14 @@ class ManagerViewModel @Inject constructor(
                 .collect {
                     startCameraUploads()
                 }
+        }
+
+        viewModelScope.launch {
+            monitorUpgradeDialogClosedUseCase().catch {
+                Timber.e(it)
+            }.collect {
+                _state.update { it.copy(shouldUpgradeToProPlan = false) }
+            }
         }
     }
 

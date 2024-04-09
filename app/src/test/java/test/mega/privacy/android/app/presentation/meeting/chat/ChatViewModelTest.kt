@@ -62,8 +62,8 @@ import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
-import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
+import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
@@ -133,6 +133,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.CreateNewImageUriUseCase
 import mega.privacy.android.domain.usecase.file.DeleteFileUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.BroadcastUpgradeDialogClosedUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.GetUsersCallLimitRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
@@ -312,6 +313,7 @@ internal class ChatViewModelTest {
     }
     private val leaveChatUseCase = mock<LeaveChatUseCase>()
     private val broadcastChatArchivedUseCase = mock<BroadcastChatArchivedUseCase>()
+    private val broadcastUpgradeDialogClosedUseCase = mock<BroadcastUpgradeDialogClosedUseCase>()
 
 
     @BeforeEach
@@ -379,7 +381,8 @@ internal class ChatViewModelTest {
             leaveChatUseCase,
             broadcastChatArchivedUseCase,
             setUsersCallLimitRemindersUseCase,
-            getUsersCallLimitRemindersUseCase
+            getUsersCallLimitRemindersUseCase,
+            broadcastUpgradeDialogClosedUseCase
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(flowOf(UsersCallLimitReminders.Enabled))
@@ -491,7 +494,8 @@ internal class ChatViewModelTest {
             monitorLeaveChatUseCase = monitorLeaveChatUseCase,
             broadcastChatArchivedUseCase = broadcastChatArchivedUseCase,
             setUsersCallLimitRemindersUseCase = setUsersCallLimitRemindersUseCase,
-            getUsersCallLimitRemindersUseCase = getUsersCallLimitRemindersUseCase
+            getUsersCallLimitRemindersUseCase = getUsersCallLimitRemindersUseCase,
+            broadcastUpgradeDialogClosedUseCase = broadcastUpgradeDialogClosedUseCase
         )
     }
 
@@ -2987,6 +2991,17 @@ internal class ChatViewModelTest {
             advanceUntilIdle()
             underTest.state.test {
                 assertThat(awaitItem().shouldUpgradeToProPlan).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that when onConsumeShouldUpgradeToProPlan is invoked it updates the state`() =
+        runTest {
+            initTestClass()
+            underTest.onConsumeShouldUpgradeToProPlan()
+            underTest.state.test {
+                assertThat(awaitItem().shouldUpgradeToProPlan).isFalse()
+                verify(broadcastUpgradeDialogClosedUseCase).invoke()
             }
         }
 
