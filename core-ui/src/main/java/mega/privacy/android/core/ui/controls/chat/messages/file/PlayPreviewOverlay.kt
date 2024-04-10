@@ -29,17 +29,16 @@ fun PlayPreviewOverlay(
     duration: String,
     modifier: Modifier = Modifier,
 ) = Box(
-    modifier = modifier
+    modifier = modifier.background(Color.Black.copy(alpha = 0.5f))
 ) {
 
     Image(
         modifier = Modifier
             .align(Alignment.Center)
-            .background(Color.Black.copy(alpha = 0.7f), shape = CircleShape)
             .padding(4.dp)
             .size(32.dp),
         colorFilter = ColorFilter.tint(MegaTheme.colors.icon.onColor),
-        painter = painterResource(id = R.drawable.ic_play_circle_medium_regular_outline),
+        painter = painterResource(id = R.drawable.ic_play_circle_medium_regular_solid),
         contentDescription = "Play"
     )
     VideoDuration(

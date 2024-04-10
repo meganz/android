@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.message.attachment
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.core.net.toUri
@@ -10,12 +9,11 @@ import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 /**
  * View for chat message with node attachment
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NodeAttachmentMessageView(
     message: NodeAttachmentMessage,
-    modifier: Modifier = Modifier,
     uiState: AttachmentMessageUiState,
+    modifier: Modifier = Modifier,
 ) {
     FileMessageView(
         isMe = message.isMine,
