@@ -142,7 +142,9 @@ fun ChatMessageContainer(
                     forward()
                     content(!isSelectMode)
                 } else {
-                    content(!isSelectMode)
+                    Box(modifier = Modifier.weight(1f, false)) {
+                        content(!isSelectMode)
+                    }
                     forward()
                 }
             }
