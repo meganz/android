@@ -281,7 +281,7 @@ class FileBrowserComposeFragment : Fragment() {
                 clickedFile?.let {
                     HandleNodeAction(
                         typedFileNode = it,
-                        nodeSourceType = Constants.RUBBISH_BIN_ADAPTER,
+                        nodeSourceType = Constants.FILE_BROWSER_ADAPTER,
                         sortOrder = uiState.sortOrder,
                         snackBarHostState = snackbarHostState,
                         onActionHandled = {
