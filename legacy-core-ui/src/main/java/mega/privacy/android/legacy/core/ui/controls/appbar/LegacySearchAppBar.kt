@@ -191,6 +191,11 @@ fun ExpandedSearchAppBar(
     modifier: Modifier = Modifier,
     isHideAfterSearch: Boolean = false,
 ) {
+    var textFieldValue by remember {
+        mutableStateOf(
+            TextFieldValue(text, TextRange(text.length))
+        )
+    }
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -200,7 +205,6 @@ fun ExpandedSearchAppBar(
     ) {
         val initialLaunch = rememberSaveable { mutableStateOf(true) }
         val keyboardVisibleInPreviousConfiguration by keyboardAsState()
-
         val focusRequester = remember { FocusRequester() }
         val iconColor = if (MaterialTheme.colors.isLight) Color.Black else Color.White
         val keyboardController = LocalSoftwareKeyboardController.current
@@ -210,8 +214,11 @@ fun ExpandedSearchAppBar(
                 .padding(start = 5.dp, end = 5.dp)
                 .focusRequester(focusRequester)
                 .testTag(SEARCH_TOOLBAR_TEXT_VIEW_TEST_TAG),
-            value = TextFieldValue(text, TextRange(text.length)),
-            onValueChange = { onSearchTextChange(it.text) },
+            value = textFieldValue,
+            onValueChange = {
+                textFieldValue = it
+                onSearchTextChange(it.text)
+            },
             placeholder = {
                 Text(
                     modifier = Modifier.alpha(ContentAlpha.medium),
@@ -237,7 +244,11 @@ fun ExpandedSearchAppBar(
                 if (text.isNotEmpty()) {
                     IconButton(
                         modifier = Modifier.testTag(SEARCH_TOOLBAR_CLOSE_BUTTON_TEST_TAG),
-                        onClick = { onSearchTextChange("") }) {
+                        onClick = {
+                            textFieldValue = TextFieldValue()
+                            onSearchTextChange("")
+                        }
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Close Icon",
