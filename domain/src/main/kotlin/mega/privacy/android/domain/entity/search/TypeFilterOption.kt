@@ -23,4 +23,29 @@ enum class TypeFilterOption {
      * Videos filter option
      */
     Video,
+
+    /**
+     * Pdf filter option
+     */
+    Pdf,
+
+    /**
+     * Presentation filter option
+     */
+    Presentation,
+
+    /**
+     * Spreadsheet filter option
+     */
+    Spreadsheet,
+
+    /**
+     * Folder filter option
+     */
+    Folder,
+
+    /**
+     * Other filter option
+     */
+    Other
 }

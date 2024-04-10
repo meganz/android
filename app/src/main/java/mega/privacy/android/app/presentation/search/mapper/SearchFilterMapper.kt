@@ -46,5 +46,40 @@ class SearchFilterMapper @Inject constructor(
             SearchCategory.VIDEO,
             context.getString(R.string.upload_to_video)
         )
+
+        SearchCategory.PDF -> SearchFilter(
+            SearchCategory.PDF,
+            "Pdf"//            context.getString(R.string.section_pdf)
+        )
+
+        SearchCategory.PRESENTATION -> SearchFilter(
+            SearchCategory.PRESENTATION,
+            "Presentation"//context.getString(R.string.section_presentation)
+        )
+
+        SearchCategory.SPREADSHEET -> SearchFilter(
+            SearchCategory.SPREADSHEET,
+            "Spreadsheet"// context.getString(R.string.section_spreadsheet)
+        )
+
+        SearchCategory.FOLDER -> SearchFilter(
+            SearchCategory.FOLDER,
+            "Folder"//context.getString(R.string.section_folder)
+        )
+
+        SearchCategory.OTHER -> SearchFilter(
+            SearchCategory.OTHER,
+            "Other"//context.getString(R.string.section_other)
+        )
+
+        SearchCategory.DOCUMENTS -> SearchFilter(
+            SearchCategory.DOCUMENTS,
+            context.getString(R.string.section_documents)
+        )
+
+        else -> SearchFilter(
+            SearchCategory.ALL,
+            "All"
+        )
     }
 }

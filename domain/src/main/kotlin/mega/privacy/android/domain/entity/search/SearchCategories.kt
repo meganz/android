@@ -23,6 +23,7 @@ enum class SearchCategory {
      * Documents
      *
      * shows only documents which is matching the search keyword
+     * includes DOCUMENT, PDF, PRESENTATION, SPREADSHEET
      */
     ALL_DOCUMENTS,
 
@@ -39,4 +40,46 @@ enum class SearchCategory {
      * shows only videos which is matching the search keyword
      */
     VIDEO,
+
+    /**
+     * PDF
+     *
+     * shows only pdf files which is matching the search keyword
+     */
+    PDF,
+
+    /**
+     * PRESENTATION
+     *
+     * shows only presentation files which is matching the search keyword
+     */
+    PRESENTATION,
+
+    /**
+     * SPREADSHEET
+     *
+     * shows only spreadsheet files which is matching the search keyword
+     */
+    SPREADSHEET,
+
+    /**
+     * FOLDER
+     *
+     * shows only folders which is matching the search keyword
+     */
+    FOLDER,
+
+    /**
+     * OTHER
+     *
+     * shows only other files which is matching the search keyword
+     */
+    OTHER,
+
+    /**
+     * DOCUMENTS
+     *
+     * shows only documents which is matching the search keyword
+     */
+    DOCUMENTS
 }

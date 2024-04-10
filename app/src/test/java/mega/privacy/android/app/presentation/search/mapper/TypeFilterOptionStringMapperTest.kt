@@ -24,5 +24,15 @@ class TypeFilterOptionStringMapperTest {
             .isEqualTo(context.getString(R.string.search_dropdown_chip_filter_type_file_type_audio))
         assertThat(typeFilterOptionStringMapper(TypeFilterOption.Video))
             .isEqualTo(context.getString(R.string.search_dropdown_chip_filter_type_file_type_video))
+        assertThat(typeFilterOptionStringMapper(TypeFilterOption.Pdf))
+            .isEqualTo("Pdf")
+        assertThat(typeFilterOptionStringMapper(TypeFilterOption.Presentation))
+            .isEqualTo("Presentation")
+        assertThat(typeFilterOptionStringMapper(TypeFilterOption.Spreadsheet))
+            .isEqualTo("Spreadsheet")
+        assertThat(typeFilterOptionStringMapper(TypeFilterOption.Folder))
+            .isEqualTo("Folder")
+        assertThat(typeFilterOptionStringMapper(TypeFilterOption.Other))
+            .isEqualTo("Other")
     }
 }

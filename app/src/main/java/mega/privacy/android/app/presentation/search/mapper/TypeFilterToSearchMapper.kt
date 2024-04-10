@@ -18,7 +18,12 @@ class TypeFilterToSearchMapper @Inject constructor() {
             TypeFilterOption.Audio -> SearchCategory.AUDIO
             TypeFilterOption.Video -> SearchCategory.VIDEO
             TypeFilterOption.Images -> SearchCategory.IMAGES
-            TypeFilterOption.Documents -> SearchCategory.ALL_DOCUMENTS
+            TypeFilterOption.Documents -> SearchCategory.DOCUMENTS
+            TypeFilterOption.Pdf -> SearchCategory.PDF
+            TypeFilterOption.Presentation -> SearchCategory.PRESENTATION
+            TypeFilterOption.Spreadsheet -> SearchCategory.SPREADSHEET
+            TypeFilterOption.Folder -> SearchCategory.FOLDER
+            TypeFilterOption.Other -> SearchCategory.OTHER
             else -> SearchCategory.ALL
         }
 }

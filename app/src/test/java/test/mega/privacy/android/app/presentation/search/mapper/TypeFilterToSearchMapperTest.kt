@@ -36,7 +36,12 @@ internal class TypeFilterToSearchMapperTest {
         Arguments.of(null, SearchCategory.ALL),
         Arguments.of(TypeFilterOption.Audio, SearchCategory.AUDIO),
         Arguments.of(TypeFilterOption.Video, SearchCategory.VIDEO),
-        Arguments.of(TypeFilterOption.Documents, SearchCategory.ALL_DOCUMENTS),
+        Arguments.of(TypeFilterOption.Documents, SearchCategory.DOCUMENTS),
         Arguments.of(TypeFilterOption.Images, SearchCategory.IMAGES),
+        Arguments.of(TypeFilterOption.Pdf, SearchCategory.PDF),
+        Arguments.of(TypeFilterOption.Folder, SearchCategory.FOLDER),
+        Arguments.of(TypeFilterOption.Presentation, SearchCategory.PRESENTATION),
+        Arguments.of(TypeFilterOption.Spreadsheet, SearchCategory.SPREADSHEET),
+        Arguments.of(TypeFilterOption.Other, SearchCategory.OTHER),
     )
 }

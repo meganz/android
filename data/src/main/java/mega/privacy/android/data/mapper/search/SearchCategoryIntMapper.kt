@@ -19,6 +19,11 @@ class SearchCategoryIntMapper @Inject constructor() {
         SearchCategory.VIDEO -> MegaApiAndroid.FILE_TYPE_VIDEO
         SearchCategory.ALL_DOCUMENTS -> MegaApiAndroid.FILE_TYPE_ALL_DOCS
         SearchCategory.IMAGES -> MegaApiAndroid.FILE_TYPE_PHOTO
+        SearchCategory.DOCUMENTS -> MegaApiAndroid.FILE_TYPE_DOCUMENT
+        SearchCategory.PDF -> MegaApiAndroid.FILE_TYPE_PDF
+        SearchCategory.PRESENTATION -> MegaApiAndroid.FILE_TYPE_PRESENTATION
+        SearchCategory.SPREADSHEET -> MegaApiAndroid.FILE_TYPE_SPREADSHEET
+        SearchCategory.OTHER -> MegaApiAndroid.FILE_TYPE_OTHERS
         else -> MegaApiAndroid.FILE_TYPE_DEFAULT
     }
 }

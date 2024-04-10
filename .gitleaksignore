@@ -43,7 +43,7 @@ app/src/gms/google-services.json:gcp-api-key:24
 app/src/gms/google-services.json:gcp-api-key:27
 app/src/gms/google-services.json:gcp-api-key:56
 app/src/gms/google-services.json:gcp-api-key:59
-app/src/main/java/mega/privacy/android/app/MegaApplication.kt:generic-api-key:508
+app/src/main/java/mega/privacy/android/app/MegaApplication.kt:generic-api-key:505
 app/src/main/java/mega/privacy/android/app/SqliteDatabaseHandler.kt:hashicorp-tf-password:2829
 app/src/main/java/mega/privacy/android/app/main/DecryptAlertDialog.kt:hashicorp-tf-password:283
 app/src/main/java/mega/privacy/android/app/presentation/changepassword/view/ChangePasswordComposeView.kt:hashicorp-tf-password:101

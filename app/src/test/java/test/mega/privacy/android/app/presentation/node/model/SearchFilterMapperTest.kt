@@ -50,4 +50,34 @@ class SearchFilterMapperTest {
         val actual = underTest(SearchCategory.ALL_DOCUMENTS)
         Truth.assertThat(actual.name).isEqualTo(context.getString(R.string.section_documents))
     }
+
+    @Test
+    fun `test that when search category is pdf all then filter has the name pdf`() {
+        val actual = underTest(SearchCategory.PDF)
+        Truth.assertThat(actual.name).isEqualTo("Pdf")
+    }
+
+    @Test
+    fun `test that when search category is presentation all then filter has the name presentation`() {
+        val actual = underTest(SearchCategory.PRESENTATION)
+        Truth.assertThat(actual.name).isEqualTo("Presentation")
+    }
+
+    @Test
+    fun `test that when search category is spreadsheet all then filter has the name spreadsheet`() {
+        val actual = underTest(SearchCategory.SPREADSHEET)
+        Truth.assertThat(actual.name).isEqualTo("Spreadsheet")
+    }
+
+    @Test
+    fun `test that when search category is other all then filter has the name other`() {
+        val actual = underTest(SearchCategory.OTHER)
+        Truth.assertThat(actual.name).isEqualTo("Other")
+    }
+
+    @Test
+    fun `test that when search category is folder all then filter has the name folder`() {
+        val actual = underTest(SearchCategory.FOLDER)
+        Truth.assertThat(actual.name).isEqualTo("Folder")
+    }
 }

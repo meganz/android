@@ -21,18 +21,23 @@ class SearchCategoryMapperTest {
         Truth.assertThat(actual).isNotNull()
     }
 
-    @ParameterizedTest(name = "test {0} is mapped correctly")
+    @ParameterizedTest(name = "test {0} is mapped correctly to Search category")
     @MethodSource("provideParameters")
-    fun `test mapped correctly`(expected: SearchCategory, raw: Int) {
-        val actual = underTest(raw)
+    fun `test mapped correctly`(input: Int, expected: SearchCategory) {
+        val actual = underTest(input)
         Truth.assertThat(actual).isEqualTo(expected)
     }
 
     private fun provideParameters(): Stream<Arguments> = Stream.of(
-        Arguments.of(SearchCategory.ALL, MegaApiAndroid.FILE_TYPE_DEFAULT),
-        Arguments.of(SearchCategory.AUDIO, MegaApiAndroid.FILE_TYPE_AUDIO),
-        Arguments.of(SearchCategory.VIDEO, MegaApiAndroid.FILE_TYPE_VIDEO),
-        Arguments.of(SearchCategory.ALL_DOCUMENTS, MegaApiAndroid.FILE_TYPE_ALL_DOCS),
-        Arguments.of(SearchCategory.IMAGES, MegaApiAndroid.FILE_TYPE_PHOTO),
+        Arguments.of(MegaApiAndroid.FILE_TYPE_DEFAULT, SearchCategory.ALL),
+        Arguments.of(MegaApiAndroid.FILE_TYPE_AUDIO, SearchCategory.AUDIO),
+        Arguments.of(MegaApiAndroid.FILE_TYPE_VIDEO, SearchCategory.VIDEO),
+        Arguments.of(MegaApiAndroid.FILE_TYPE_ALL_DOCS, SearchCategory.ALL_DOCUMENTS),
+        Arguments.of(MegaApiAndroid.FILE_TYPE_PHOTO, SearchCategory.IMAGES),
+        Arguments.of(MegaApiAndroid.FILE_TYPE_PDF, SearchCategory.PDF),
+        Arguments.of(MegaApiAndroid.FILE_TYPE_PRESENTATION, SearchCategory.PRESENTATION),
+        Arguments.of(MegaApiAndroid.FILE_TYPE_SPREADSHEET, SearchCategory.SPREADSHEET),
+        Arguments.of(MegaApiAndroid.FILE_TYPE_OTHERS, SearchCategory.OTHER),
+        Arguments.of(MegaApiAndroid.FILE_TYPE_DOCUMENT, SearchCategory.DOCUMENTS)
     )
 }

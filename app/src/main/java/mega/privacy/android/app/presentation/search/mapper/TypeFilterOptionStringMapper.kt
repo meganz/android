@@ -23,5 +23,10 @@ class TypeFilterOptionStringMapper @Inject constructor(
         TypeFilterOption.Video -> context.getString(R.string.search_dropdown_chip_filter_type_file_type_video)
         TypeFilterOption.Images -> context.getString(R.string.search_dropdown_chip_filter_type_file_type_images)
         TypeFilterOption.Documents -> context.getString(R.string.search_dropdown_chip_filter_type_file_type_documents)
+        TypeFilterOption.Folder -> "Folder"
+        TypeFilterOption.Pdf -> "Pdf"
+        TypeFilterOption.Presentation -> "Presentation"
+        TypeFilterOption.Spreadsheet -> "Spreadsheet"
+        TypeFilterOption.Other -> "Other"
     }
 }
