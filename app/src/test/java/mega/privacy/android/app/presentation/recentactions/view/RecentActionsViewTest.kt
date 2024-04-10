@@ -18,7 +18,7 @@ class RecentActionsViewTest {
     fun `test that RecentActionsView displays RecentLoadingView when loading`() {
         val uiState = RecentActionsUiState(isLoading = true)
         composeRule.setContent {
-            RecentActionsView(uiState, {}, {}, {})
+            RecentActionsView(uiState, {}, {}, {}, {})
         }
 
         composeRule.onNodeWithTag(RECENT_LOADING_VIEW_TEST_TAG, true).assertExists()
@@ -28,7 +28,7 @@ class RecentActionsViewTest {
     fun `test that RecentActionsView displays RecentActionsHiddenView when hideRecentActivity is true`() {
         val uiState = RecentActionsUiState(isLoading = false, hideRecentActivity = true)
         composeRule.setContent {
-            RecentActionsView(uiState, {}, {}, {})
+            RecentActionsView(uiState, {}, {}, {}, {})
         }
 
         composeRule.onNodeWithTag(RECENTS_HIDDEN_BUTTON_TEST_TAG, true).assertExists()
@@ -38,7 +38,7 @@ class RecentActionsViewTest {
     fun `test that RecentActionsView displays RecentActionsEmptyView when loaded and list is empty`() {
         val uiState = RecentActionsUiState(isLoading = false, groupedRecentActionItems = emptyMap())
         composeRule.setContent {
-            RecentActionsView(uiState, {}, {}, {})
+            RecentActionsView(uiState, {}, {}, {}, {})
         }
 
         composeRule.onNodeWithTag(RECENT_EMPTY_TEXT_TEST_TAG, true).assertExists()

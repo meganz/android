@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
@@ -17,6 +18,7 @@ import mega.privacy.android.app.presentation.recentactions.model.RecentActionBuc
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
@@ -38,6 +40,7 @@ class RecentActionsComposeViewModelTest {
     private val getRecentActionsUseCase = mock<GetRecentActionsUseCase>()
     private val setHideRecentActivityUseCase = mock<SetHideRecentActivityUseCase>()
     private val monitorHideRecentActivityUseCase = mock<MonitorHideRecentActivityUseCase>()
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val recentActionBucketUiEntityMapper = mock<RecentActionBucketUiEntityMapper>()
@@ -53,7 +56,8 @@ class RecentActionsComposeViewModelTest {
             setHideRecentActivityUseCase,
             monitorHideRecentActivityUseCase,
             monitorNodeUpdatesUseCase,
-            recentActionBucketUiEntityMapper
+            recentActionBucketUiEntityMapper,
+            monitorConnectivityUseCase
         )
         runBlocking {
             stubCommon()
@@ -63,7 +67,8 @@ class RecentActionsComposeViewModelTest {
             setHideRecentActivityUseCase = setHideRecentActivityUseCase,
             monitorHideRecentActivityUseCase = monitorHideRecentActivityUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
-            recentActionBucketUiEntityMapper = recentActionBucketUiEntityMapper
+            recentActionBucketUiEntityMapper = recentActionBucketUiEntityMapper,
+            monitorConnectivityUseCase = monitorConnectivityUseCase
         )
     }
 
@@ -74,6 +79,7 @@ class RecentActionsComposeViewModelTest {
             emit(false)
         })
         whenever(monitorNodeUpdatesUseCase()).thenReturn(monitorNodeUpdatesFakeFlow)
+        whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
 
         val recentActionBucketUiEntity1 = mock<RecentActionBucketUiEntity> {
             on { this.date }.thenReturn("Today")
@@ -102,7 +108,8 @@ class RecentActionsComposeViewModelTest {
     fun `test that initial state is returned`() = runTest {
         underTest.uiState.test {
             val initial = awaitItem()
-            assertThat(initial.hideRecentActivity).isEqualTo(false)
+            assertThat(initial.hideRecentActivity).isFalse()
+            assertThat(initial.isConnected).isFalse()
         }
     }
 

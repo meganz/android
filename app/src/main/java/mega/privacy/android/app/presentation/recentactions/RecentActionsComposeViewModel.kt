@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.recentactions.mapper.RecentActionBucketUiEntityMapper
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsUiState
 import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
@@ -28,6 +29,7 @@ class RecentActionsComposeViewModel @Inject constructor(
     private val getRecentActionsUseCase: GetRecentActionsUseCase,
     private val setHideRecentActivityUseCase: SetHideRecentActivityUseCase,
     private val recentActionBucketUiEntityMapper: RecentActionBucketUiEntityMapper,
+    monitorConnectivityUseCase: MonitorConnectivityUseCase,
     monitorHideRecentActivityUseCase: MonitorHideRecentActivityUseCase,
     monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
 ) : ViewModel() {
@@ -68,6 +70,12 @@ class RecentActionsComposeViewModel @Inject constructor(
                     setUiHideRecentActivity(it)
                 }
         }
+
+        viewModelScope.launch {
+            monitorConnectivityUseCase().collect {
+                _uiState.update { state -> state.copy(isConnected = it) }
+            }
+        }
     }
 
     /**
@@ -94,10 +102,10 @@ class RecentActionsComposeViewModel @Inject constructor(
     /**
      * Set the selected recent actions bucket
      *
-     * @param item
+     * @param bucket
      */
-    fun selectBucket(item: RecentActionBucket) {
-        selectedBucket = item
+    fun selectBucket(bucket: RecentActionBucket) {
+        selectedBucket = bucket
     }
 
     /**

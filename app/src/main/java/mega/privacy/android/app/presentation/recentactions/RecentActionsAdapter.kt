@@ -35,6 +35,7 @@ import javax.inject.Inject
  * Adapter to display a list of recent actions
  *
  */
+@Deprecated("Should be removed when Compose implementation is released")
 class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentActionViewHolder>(),
     SectionTitleProvider, DragThumbnailGetter {
 

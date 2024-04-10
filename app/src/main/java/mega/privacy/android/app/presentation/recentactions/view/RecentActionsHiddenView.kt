@@ -25,7 +25,9 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
  * Composable for when Recent Actions is hidden in settings
+ *
  * @param modifier [Modifier]
+ * @param onShowActivityActionClick Callback when the show activity action button is clicked
  */
 @Composable
 fun RecentActionsHiddenView(
