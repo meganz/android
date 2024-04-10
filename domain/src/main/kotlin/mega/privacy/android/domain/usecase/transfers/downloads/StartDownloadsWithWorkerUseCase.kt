@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.transfers.downloads
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -93,20 +94,22 @@ class StartDownloadsWithWorkerUseCase @Inject constructor(
             if (!doesPathHaveSufficientSpaceForNodesUseCase(destinationPathForSdk, nodes)) {
                 emit(MultiTransferEvent.InsufficientSpace)
             } else {
-                startTransfersAndWorker(
-                    doTransfers = {
-                        downloadNodesUseCase(
-                            nodes,
-                            destinationPathForSdk,
-                            appData = appData,
-                            isHighPriority = isHighPriority
-                        )
-                    },
-                    startWorker = {
-                        startDownloadWorkerUseCase()
-                        //ensure worker has started and is listening to global events so we can finish downloadNodesUseCase
-                        isDownloadsWorkerStartedUseCase()
-                    },
+                emitAll(
+                    startTransfersAndThenWorkerFlow(
+                        doTransfers = {
+                            downloadNodesUseCase(
+                                nodes,
+                                destinationPathForSdk,
+                                appData = appData,
+                                isHighPriority = isHighPriority
+                            )
+                        },
+                        startWorker = {
+                            startDownloadWorkerUseCase()
+                            //ensure worker has started and is listening to global events so we can finish downloadNodesUseCase
+                            isDownloadsWorkerStartedUseCase()
+                        },
+                    )
                 )
             }
         }

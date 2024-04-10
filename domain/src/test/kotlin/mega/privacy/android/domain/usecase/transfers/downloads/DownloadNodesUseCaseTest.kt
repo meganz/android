@@ -336,7 +336,7 @@ class DownloadNodesUseCaseTest {
 
 
     @Test
-    fun `test that scanning folders finished event is emitted when all transfers are scanned`() =
+    fun `test that an event with a true scanningFinished is emitted when all transfers are scanned`() =
         runTest {
             fileAndFolderNodes.forEach { node ->
                 stubFinishScanningEvent(node)
@@ -345,6 +345,20 @@ class DownloadNodesUseCaseTest {
             underTest(fileAndFolderNodes, DESTINATION_PATH_FOLDER, null, false).test {
                 assertThat(cancelAndConsumeRemainingEvents().mapNotNull { event ->
                     (event as? Event.Item)?.value?.takeIf { (it as? MultiTransferEvent.SingleTransferEvent)?.scanningFinished == true }
+                }).hasSize(1)
+            }
+        }
+
+    @Test
+    fun `test that an event with a true allNodesUpdated is emitted when all transfers are updated`() =
+        runTest {
+            fileAndFolderNodes.forEach { node ->
+                stubUpdatedEvent(node)
+            }
+
+            underTest(fileAndFolderNodes, DESTINATION_PATH_FOLDER, null, false).test {
+                assertThat(cancelAndConsumeRemainingEvents().mapNotNull { event ->
+                    (event as? Event.Item)?.value?.takeIf { (it as? MultiTransferEvent.SingleTransferEvent)?.allTransfersUpdated == true }
                 }).hasSize(1)
             }
         }
@@ -476,6 +490,30 @@ class DownloadNodesUseCaseTest {
         }
 
     private fun stubFinishScanningEvent(node: TypedNode) {
+        val handle = node.id.longValue
+        whenever(
+            transferRepository.startDownload(
+                node, DESTINATION_PATH_FOLDER, null, false,
+            )
+        ).thenAnswer {
+            flowOf(
+                if (node is FolderNode) {
+                    TransferEvent.TransferUpdateEvent(mock {
+                        on { isFolderTransfer }.thenReturn(true)
+                        on { stage }.thenReturn(TransferStage.STAGE_TRANSFERRING_FILES)
+                        on { nodeHandle }.thenReturn(handle)
+                    })
+                } else {
+                    TransferEvent.TransferStartEvent(mock {
+                        on { isFolderTransfer }.thenReturn(false)
+                        on { nodeHandle }.thenReturn(handle)
+                    })
+                }
+            )
+        }
+    }
+
+    private fun stubUpdatedEvent(node: TypedNode) {
         val handle = node.id.longValue
         whenever(
             transferRepository.startDownload(

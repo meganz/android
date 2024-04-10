@@ -244,7 +244,7 @@ private fun StartDownloadComponent(
             showPromptSaveDestinationDialog = it
         }
     )
-    MinimumTimeVisibility(visible = uiState.jobInProgressState == StartDownloadTransferJobInProgress.ProcessingFiles) {
+    MinimumTimeVisibility(visible = uiState.jobInProgressState == StartDownloadTransferJobInProgress.ScanningTransfers) {
         TransferInProgressDialog(onCancelConfirmed = onCancelledConfirmed)
     }
     if (showOfflineAlertDialog) {

@@ -5,7 +5,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -215,14 +215,26 @@ class StartDownloadComponentViewModelTest {
         runTest {
             commonStub()
             stubStartDownload(flow {
-                delay(500)
-                emit(mock<MultiTransferEvent.SingleTransferEvent> {
-                    on { scanningFinished } doReturn true
-                })
+                awaitCancellation()
             })
             underTest.startDownload(TransferTriggerEvent.StartDownloadNode(nodes))
             assertThat(underTest.uiState.value.jobInProgressState)
-                .isEqualTo(StartDownloadTransferJobInProgress.ProcessingFiles)
+                .isEqualTo(StartDownloadTransferJobInProgress.ScanningTransfers)
+        }
+
+    @Test
+    fun `test that FinishProcessing event is emitted if start download use case emits an event with scanning finished true`() =
+        runTest {
+            commonStub()
+            stubStartDownload(flow {
+                emit(mock<MultiTransferEvent.SingleTransferEvent> {
+                    on { scanningFinished } doReturn true
+                })
+                awaitCancellation()
+            })
+            underTest.startDownload(TransferTriggerEvent.StartDownloadNode(nodes))
+            assertThat(underTest.uiState.value.jobInProgressState).isNull()
+            assertCurrentEventIsEqualTo(StartDownloadTransferEvent.FinishProcessing(null, 1, 0, 0))
         }
 
     @Test

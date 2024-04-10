@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -246,7 +247,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
         clearActiveTransfersIfFinishedUseCase(TransferType.DOWNLOAD)
         monitorDownloadFinish()
         _uiState.update {
-            it.copy(jobInProgressState = StartDownloadTransferJobInProgress.ProcessingFiles)
+            it.copy(jobInProgressState = StartDownloadTransferJobInProgress.ScanningTransfers)
         }
         var lastError: Throwable? = null
         val terminalEvent = runCatching {
@@ -261,7 +262,15 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                     destinationPathOrUri = uri,
                     nodes = nodes,
                     isHighPriority = isHighPriority,
-                ).catch {
+                ).onEach { event ->
+                    if (_uiState.value.jobInProgressState == StartDownloadTransferJobInProgress.ScanningTransfers &&
+                        (event as? MultiTransferEvent.SingleTransferEvent)?.scanningFinished == true
+                    ) {
+                        _uiState.update {
+                            it.copy(jobInProgressState = null)
+                        }
+                    }
+                }.catch {
                     lastError = it
                     Timber.e(it)
                 }.onCompletion {

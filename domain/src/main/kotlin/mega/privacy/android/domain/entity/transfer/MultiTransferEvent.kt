@@ -26,6 +26,7 @@ sealed interface MultiTransferEvent {
      * @property alreadyTransferred the amount of already transferred files
      * @property alreadyTransferredIds the ids of the nodes already transferred
      * @property scanningFinished All transfers has been scanned by the sdk, starting from this event transfers can be retried by sdk if the app is closed
+     * @property allTransfersUpdated All transfers have been started by the sdk, starting from this event we can know all the transfer that will be skipped by the SDK because they have ben already downloaded.
      */
     data class SingleTransferEvent(
         val transferEvent: TransferEvent,
@@ -35,6 +36,7 @@ sealed interface MultiTransferEvent {
         val alreadyTransferred: Int = 0,
         val alreadyTransferredIds: Set<NodeId> = emptySet(),
         val scanningFinished: Boolean = false,
+        val allTransfersUpdated: Boolean = false,
     ) : MultiTransferEvent {
 
         /**

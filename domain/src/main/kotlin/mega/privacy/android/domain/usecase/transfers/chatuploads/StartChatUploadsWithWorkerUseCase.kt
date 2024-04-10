@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.transfers.chatuploads
 
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageTransferTagRequest
@@ -67,7 +68,7 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
         )
         coroutineContext.ensureActive()
         val appData = TransferAppData.ChatUpload(pendingMessageId)
-        startTransfersAndWorker(
+        emitAll(startTransfersAndThenWorkerFlow(
             doTransfers = {
                 uploadFilesUseCase(
                     filesAndNames, chatFilesFolderId, appData, false
@@ -75,7 +76,10 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
                     //update transfer tag on Start event
                     ((event as? MultiTransferEvent.SingleTransferEvent)?.transferEvent as? TransferEvent.TransferStartEvent)?.transfer?.tag?.let { transferTag ->
                         updatePendingMessageUseCase(
-                            UpdatePendingMessageTransferTagRequest(pendingMessageId, transferTag)
+                            UpdatePendingMessageTransferTagRequest(
+                                pendingMessageId,
+                                transferTag
+                            )
                         )
                     }
                     //attach it if it's already uploaded
@@ -96,6 +100,6 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
                 //ensure worker has started and is listening to global events so we can finish uploadFilesUseCase
                 isChatUploadsWorkerStartedUseCase()
             }
-        )
+        ))
     }
 }

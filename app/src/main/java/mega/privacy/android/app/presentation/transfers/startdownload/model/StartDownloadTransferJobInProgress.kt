@@ -6,7 +6,7 @@ package mega.privacy.android.app.presentation.transfers.startdownload.model
 sealed class StartDownloadTransferJobInProgress {
 
     /**
-     * Sdk is processing the node to prepare the download.
+     * Sdk is scanning the transfers
      */
-    object ProcessingFiles : StartDownloadTransferJobInProgress()
+    data object ScanningTransfers : StartDownloadTransferJobInProgress()
 }

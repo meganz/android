@@ -43,14 +43,17 @@ abstract class AbstractTransferNodesUseCase<T, R>(
         beforeStartTransfer: (suspend () -> Unit)?,
         doTransfer: (T) -> Flow<TransferEvent>,
     ): Flow<MultiTransferEvent> {
-        val alreadyScanned =
-            mutableSetOf<R>() //to check if all [items] have been scanned (childs not needed here)
+        val itemsScanned =
+            mutableSetOf<R>() //to check if all [items] have been scanned (children not needed here)
+        val itemsUpdated =
+            mutableSetOf<R>() // to check if all [items] have been updated (children not needed here)
         val filesStarted =
             mutableSetOf<R>() //to count the number of files that have been started (no folders but including children)
         val alreadyTransferredFiles = mutableSetOf<R>()
         val alreadyTransferredNodeIds = mutableSetOf<NodeId>()
         val allIds = items.map(::generateIdFromItem)
-        var scanningFinishedSend = false
+        var scanningFinished = false
+        var allTransfersUpdated = false
         return channelFlow {
             monitorTransferEvents()
             //start all transfers in parallel
@@ -62,7 +65,8 @@ abstract class AbstractTransferNodesUseCase<T, R>(
                             if (cause is NodeDoesNotExistsException) {
                                 send(MultiTransferEvent.TransferNotStarted(id, cause))
                             }
-                            alreadyScanned.add(id)
+                            itemsScanned.add(id)
+                            itemsUpdated.add(id)
                         }
                         .buffer(capacity = Channel.UNLIMITED)
                         .collect { transferEvent ->
@@ -87,16 +91,29 @@ abstract class AbstractTransferNodesUseCase<T, R>(
                                 }
                             }
                             //check if is a single node scanning finish event
-                            if (!scanningFinishedSend && transferEvent.isFinishScanningEvent) {
+                            if (!scanningFinished && transferEvent.isFinishScanningEvent) {
                                 val id = generateIdFromTransferEvent(transferEvent)
-                                if (!alreadyScanned.contains(id)) {
+                                if (!itemsScanned.contains(id)) {
                                     //this node is already scanned: save it and emit the event
-                                    alreadyScanned.add(id)
+                                    itemsScanned.add(id)
 
                                     //check if all nodes have been scanned
-                                    if (alreadyScanned.containsAll(allIds)) {
-                                        scanningFinishedSend = true
+                                    if (itemsScanned.containsAll(allIds)) {
+                                        scanningFinished = true
                                         invalidateCancelTokenUseCase() //we need to avoid a future cancellation from now on
+                                    }
+                                }
+                            }
+                            //check if is a single node update event, at this point we can know if the transfer will be skipped by the sdk because it has ben already downloaded.
+                            if (!allTransfersUpdated && transferEvent !is TransferEvent.TransferStartEvent) {
+                                val id = generateIdFromTransferEvent(transferEvent)
+                                if (!itemsUpdated.contains(id)) {
+                                    //this node is already scanned: save it and emit the event
+                                    itemsUpdated.add(id)
+
+                                    //check if all nodes have been scanned
+                                    if (itemsUpdated.containsAll(allIds)) {
+                                        allTransfersUpdated = true
                                     }
                                 }
                             }
@@ -109,7 +126,8 @@ abstract class AbstractTransferNodesUseCase<T, R>(
                                     startedFiles = filesStarted.size,
                                     alreadyTransferred = alreadyTransferredFiles.size,
                                     alreadyTransferredIds = alreadyTransferredNodeIds,
-                                    scanningFinished = scanningFinishedSend,
+                                    scanningFinished = scanningFinished,
+                                    allTransfersUpdated = allTransfersUpdated,
                                 )
                             )
                         }
@@ -184,6 +202,7 @@ abstract class AbstractTransferNodesUseCase<T, R>(
             }
 
             this is TransferEvent.TransferFinishEvent -> true
+            this is TransferEvent.TransferStartEvent && !transfer.isFolderTransfer -> true
             this is TransferEvent.TransferUpdateEvent && !transfer.isFolderTransfer -> true
             else -> false
         }
