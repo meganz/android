@@ -2,9 +2,6 @@ package mega.privacy.android.app.presentation.meeting.chat.view.sheet
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -51,11 +48,9 @@ class MessageNotSentBottomSheetTest {
         composeRule.onNodeWithTag(tag2).assertIsDisplayed()
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     private fun initComposeRule(actions: List<@Composable () -> Unit> = emptyList<@Composable () -> Unit>()) {
         composeRule.setContent {
             MessageNotSentBottomSheet(
-                sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
                 actions = actions,
             )
         }

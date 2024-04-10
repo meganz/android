@@ -2,8 +2,6 @@ package test.mega.privacy.android.app.presentation.meeting.chat.view.sheet
 
 import androidx.activity.ComponentActivity
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -138,8 +136,9 @@ class ChatToolbarBottomSheetTest {
                     onAttachContactClicked = onAttachContactClicked,
                     onPickLocation = onPickLocation,
                     onSendGiphyMessage = { },
-                    sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
                     onTakePicture = {},
+                    hideSheet = {},
+                    isVisible = true,
                 )
             }
         }

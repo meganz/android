@@ -404,6 +404,20 @@ internal fun ChatView(
             fileModalSheetState.hide()
         }
     }
+    BackHandler(enabled = messageOptionsModalSheetState.isVisible) {
+        coroutineScope.launch {
+            messageNotSentBottomSheetState.hide()
+        }
+    }
+    BackHandler(enabled = messageNotSentBottomSheetState.isVisible) {
+        coroutineScope.launch {
+            messageNotSentBottomSheetState.hide()
+        }
+    }
+    BackHandler(enabled = reactionInfoBottomSheetState.isVisible) {
+        coroutineScope.launch { reactionInfoBottomSheetState.hide() }
+    }
+
     BackHandler(enabled = WindowInsets.isImeVisible) {
         keyboardController?.hide()
     }
@@ -554,7 +568,7 @@ internal fun ChatView(
                         ChatAttachFileBottomSheet(
                             onAttachFiles = onAttachFiles,
                             onAttachNodes = onAttachNodes,
-                            sheetState = fileModalSheetState,
+                            hideSheet = { coroutineScope.launch { fileModalSheetState.hide() } },
                         )
                     }
 
@@ -586,7 +600,6 @@ internal fun ChatView(
                                     action.group
                                 )
                             },
-                            sheetState = messageOptionsModalSheetState,
                         )
                     }
 
@@ -605,7 +618,6 @@ internal fun ChatView(
                                     setAction = { pendingAction = it }
                                 )
                             },
-                            sheetState = messageNotSentBottomSheetState,
                         )
                     }
 
@@ -613,7 +625,6 @@ internal fun ChatView(
                         ReactionsInfoBottomSheet(
                             selectedReaction = selectedReaction,
                             reactions = reactionList,
-                            sheetState = reactionInfoBottomSheetState,
                             getDetailsInReactionList = getUserInfoIntoReactionList,
                             onUserClick = { userHandle ->
                                 coroutineScope.launch {
@@ -670,7 +681,6 @@ internal fun ChatView(
                                     )
                                 )
                             },
-                            sheetState = toolbarModalSheetState,
                             onCameraPermissionDenied = {
                                 showPermissionNotAllowedSnackbar(
                                     context,
@@ -679,16 +689,16 @@ internal fun ChatView(
                                     R.string.chat_attach_pick_from_camera_deny_permission
                                 )
                             },
-                            onAttachFiles = onAttachFiles
+                            onAttachFiles = onAttachFiles,
+                            hideSheet = { coroutineScope.launch { toolbarModalSheetState.hide() } },
+                            isVisible = toolbarModalSheetState.isVisible,
                         )
                     }
 
                     isUpgradeToProPlanShown -> {
-                        UpgradeProPlanBottomSheet {
-                            coroutineScope.launch {
-                                upgradeToProPlanBottomSheetState.hide()
-                            }
-                        }
+                        UpgradeProPlanBottomSheet(
+                            onUpgrade = { coroutineScope.launch { upgradeToProPlanBottomSheetState.hide() } },
+                        )
                     }
                 }
             },

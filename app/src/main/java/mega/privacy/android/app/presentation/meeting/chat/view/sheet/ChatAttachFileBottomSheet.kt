@@ -13,17 +13,12 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.utils.Constants
@@ -36,16 +31,14 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 /**
  * Bottom sheet to select where to get the file to attach (cloud drive or upload from device) and return the selection.
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChatAttachFileBottomSheet(
     modifier: Modifier = Modifier,
-    sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
+    hideSheet: () -> Unit,
     onAttachFiles: (List<Uri>) -> Unit = {},
     onAttachNodes: (List<NodeId>) -> Unit = {},
 ) {
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
 
     val cloudDriveLauncher =
         rememberLauncherForActivityResult(
@@ -57,7 +50,7 @@ fun ChatAttachFileBottomSheet(
                     ?.takeIf { it.isNotEmpty() }
                     ?.let(onAttachNodes)
             }
-            coroutineScope.launch { sheetState.hide() }
+            hideSheet()
         }
 
     val localLauncher =
@@ -76,7 +69,7 @@ fun ChatAttachFileBottomSheet(
                 attachedFiles?.let(onAttachFiles)
 
             }
-            coroutineScope.launch { sheetState.hide() }
+            hideSheet()
         }
 
     Column(
@@ -131,7 +124,7 @@ private fun openFilePicker(
 private fun ChatAttachFileBottomSheetPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ChatAttachFileBottomSheet(
-            sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+            hideSheet = {},
         )
     }
 }

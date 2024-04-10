@@ -1,21 +1,14 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.sheet
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.meeting.chat.model.messages.actions.MessageBottomSheetAction
 import mega.privacy.android.core.ui.controls.chat.MegaEmojiPickerView
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.AddReactionsSheetItem
@@ -27,7 +20,6 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 /**
  * Bottom sheet for chat message options.
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MessageOptionsBottomSheet(
     showReactionPicker: Boolean,
@@ -35,16 +27,7 @@ fun MessageOptionsBottomSheet(
     onMoreReactionsClicked: () -> Unit,
     actions: List<MessageBottomSheetAction>,
     modifier: Modifier = Modifier,
-    sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
 ) {
-    val coroutineScope = rememberCoroutineScope()
-
-    BackHandler(enabled = sheetState.isVisible) {
-        coroutineScope.launch {
-            sheetState.hide()
-        }
-    }
-
     AnimatedVisibility(visible = !showReactionPicker) {
         Column(
             modifier = modifier
@@ -80,7 +63,6 @@ fun MessageOptionsBottomSheet(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @CombinedThemePreviews
 @Composable
 private fun MessageOptionsBottomSheetPreview() {

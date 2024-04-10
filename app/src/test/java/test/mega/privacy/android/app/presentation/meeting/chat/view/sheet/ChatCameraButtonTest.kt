@@ -1,8 +1,6 @@
 package test.mega.privacy.android.app.presentation.meeting.chat.view.sheet
 
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -28,7 +26,7 @@ class ChatCameraButtonTest {
     private fun initComposeRuleContent() {
         composeTestRule.setContent {
             ChatCameraButton(
-                sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
+                hideSheet = {},
             )
         }
     }

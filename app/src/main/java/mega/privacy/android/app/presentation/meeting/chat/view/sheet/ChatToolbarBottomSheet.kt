@@ -16,11 +16,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -28,7 +24,6 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyPickerActivity
@@ -62,13 +57,13 @@ fun ChatToolbarBottomSheet(
     onTakePicture: () -> Unit,
     onPickLocation: () -> Unit,
     onSendGiphyMessage: (GifData?) -> Unit,
+    hideSheet: () -> Unit,
+    isVisible: Boolean,
     modifier: Modifier = Modifier,
     onCameraPermissionDenied: () -> Unit = {},
-    sheetState: ModalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
     onAttachFiles: (List<Uri>) -> Unit = {},
 ) {
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
 
     val galleryPicker =
         rememberLauncherForActivityResult(
@@ -77,7 +72,7 @@ fun ChatToolbarBottomSheet(
             if (it.isNotEmpty()) {
                 onAttachFiles(it)
             }
-            coroutineScope.launch { sheetState.hide() }
+            hideSheet()
         }
 
     val gifPickerLauncher =
@@ -92,7 +87,7 @@ fun ChatToolbarBottomSheet(
                     it.data?.getParcelableExtra(GIF_DATA)
                 }
             )
-            coroutineScope.launch { sheetState.hide() }
+            hideSheet()
         }
 
     val scanDocumentLauncher =
@@ -102,7 +97,7 @@ fun ChatToolbarBottomSheet(
             it.data?.data?.let { uri ->
                 onAttachFiles(listOf(uri))
             }
-            coroutineScope.launch { sheetState.hide() }
+            hideSheet()
         }
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -110,7 +105,6 @@ fun ChatToolbarBottomSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(4.dp),
-            sheetState = sheetState,
             onTakePicture = {
                 Analytics.tracker.trackEvent(ChatConversationTakePictureMenuItemEvent)
                 onTakePicture()
@@ -124,10 +118,12 @@ fun ChatToolbarBottomSheet(
                 )
                 it.fileUri?.toUri()?.let { uri ->
                     onAttachFiles(listOf(uri))
-                    coroutineScope.launch { sheetState.hide() }
+                    hideSheet()
                 }
             },
             onCameraPermissionDenied = onCameraPermissionDenied,
+            hideSheet = hideSheet,
+            isVisible = isVisible,
         )
         Row(
             modifier = Modifier
@@ -192,7 +188,7 @@ fun ChatToolbarBottomSheet(
                 itemName = stringResource(id = R.string.attachment_upload_panel_contact),
                 onItemClick = {
                     Analytics.tracker.trackEvent(ChatConversationContactMenuItemEvent)
-                    coroutineScope.launch { sheetState.hide() }
+                    hideSheet()
                     onAttachContactClicked()
                 },
                 modifier = Modifier.testTag(TEST_TAG_ATTACH_FROM_CONTACT)
@@ -233,7 +229,8 @@ private fun ChatToolbarBottomSheetPreview() {
             onPickLocation = {},
             onSendGiphyMessage = {},
             onTakePicture = {},
-            sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded)
+            hideSheet = {},
+            isVisible = true,
         )
     }
 }

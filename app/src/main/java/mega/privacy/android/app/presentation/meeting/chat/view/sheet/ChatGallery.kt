@@ -20,8 +20,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,7 +34,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -77,12 +74,13 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 @OptIn(ExperimentalMaterialApi::class, ExperimentalPermissionsApi::class)
 @Composable
 fun ColumnScope.ChatGallery(
-    sheetState: ModalBottomSheetState,
+    hideSheet: () -> Unit,
     modifier: Modifier = Modifier,
     onTakePicture: () -> Unit = {},
     onFileGalleryItemClicked: (FileGalleryItem) -> Unit = {},
     onCameraPermissionDenied: () -> Unit = {},
     viewModel: ChatGalleryViewModel = hiltViewModel(),
+    isVisible: Boolean = false,
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -103,10 +101,10 @@ fun ColumnScope.ChatGallery(
         }
     }
 
-    LaunchedEffect(isMediaPermissionGranted, sheetState.isVisible) {
-        if (isMediaPermissionGranted && sheetState.isVisible) {
+    LaunchedEffect(isMediaPermissionGranted, isVisible) {
+        if (isMediaPermissionGranted && isVisible) {
             viewModel.loadGalleryImages()
-        } else if (!sheetState.isVisible) {
+        } else if (!isVisible) {
             viewModel.removeGalleryImages()
         }
     }
@@ -123,14 +121,15 @@ fun ColumnScope.ChatGallery(
         onTakePicture = onTakePicture,
         onFileGalleryItemClicked = onFileGalleryItemClicked,
         onCameraPermissionDenied = onCameraPermissionDenied,
-        sheetState = sheetState,
         isMediaPermissionGranted = isMediaPermissionGranted,
         onRequestMediaPermission = {
             requestingPermissionTimestamp = System.currentTimeMillis()
             mediaPermissionsLauncher.launch(getMediaPermissions().toTypedArray())
         },
         images = state.items,
-        isLoading = state.isLoading
+        isLoading = state.isLoading,
+        hideSheet = hideSheet,
+        isVisible = isVisible,
     )
 }
 
@@ -139,11 +138,11 @@ fun ColumnScope.ChatGallery(
  *
  * @param modifier
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChatGalleryContent(
-    sheetState: ModalBottomSheetState,
     isMediaPermissionGranted: Boolean,
+    hideSheet: () -> Unit,
+    isVisible: Boolean,
     modifier: Modifier = Modifier,
     isLoading: Boolean = false,
     images: List<FileGalleryItem> = emptyList(),
@@ -165,9 +164,10 @@ fun ChatGalleryContent(
             if (!view.isInEditMode) {
                 ChatCameraButton(
                     modifier = Modifier.size(88.dp),
-                    sheetState = sheetState,
                     onTakePicture = onTakePicture,
                     onCameraPermissionDenied = onCameraPermissionDenied,
+                    isVisible = isVisible,
+                    hideSheet = hideSheet,
                 )
             } else {
                 ChatGalleryItem(modifier = Modifier.size(88.dp)) {}
@@ -284,13 +284,10 @@ private fun ChatGalleryContentPreview(
 ) {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ChatGalleryContent(
-            sheetState = ModalBottomSheetState(
-                initialValue = ModalBottomSheetValue.Expanded,
-                isSkipHalfExpanded = false,
-                density = LocalDensity.current,
-            ),
             isMediaPermissionGranted = isMediaPermissionGranted,
             images = emptyList(),
+            hideSheet = {},
+            isVisible = true,
         )
     }
 }

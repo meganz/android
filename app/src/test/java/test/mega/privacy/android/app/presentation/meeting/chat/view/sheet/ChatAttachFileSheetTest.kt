@@ -1,8 +1,5 @@
 package test.mega.privacy.android.app.presentation.meeting.chat.view.sheet
 
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -39,11 +36,10 @@ class ChatAttachFileSheetTest {
         composeTestRule.onNodeWithTag(TEST_TAG_SEND_FROM_LOCAL).assertIsDisplayed()
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     private fun initComposeRuleContent() {
         composeTestRule.setContent {
             ChatAttachFileBottomSheet(
-                sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden),
+                hideSheet = {},
             )
         }
     }

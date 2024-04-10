@@ -1,10 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.sheet
 
 import androidx.activity.ComponentActivity
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -68,7 +64,6 @@ class ChatGalleryTest {
         verify(onFileGalleryItemClicked).invoke(image)
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     private fun initComposeRuleContent(
         isLoading: Boolean = false,
         isMediaPermissionGranted: Boolean = true,
@@ -77,15 +72,12 @@ class ChatGalleryTest {
     ) {
         composeTestRule.setContent {
             ChatGalleryContent(
-                sheetState = ModalBottomSheetState(
-                    initialValue = ModalBottomSheetValue.Expanded,
-                    isSkipHalfExpanded = false,
-                    density = LocalDensity.current,
-                ),
                 isMediaPermissionGranted = isMediaPermissionGranted,
                 images = images,
                 isLoading = isLoading,
-                onFileGalleryItemClicked = onFileGalleryItemClicked
+                onFileGalleryItemClicked = onFileGalleryItemClicked,
+                hideSheet = {},
+                isVisible = true,
             )
         }
     }
