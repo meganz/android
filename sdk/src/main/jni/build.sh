@@ -152,21 +152,6 @@ ICU_DOWNLOAD_URL=https://github.com/unicode-org/icu/releases/download/release-71
 ICU_SHA1="0b6a02293a81ccfb2a743ce1faa009770ed8a12c"
 ICU_SOURCE_VERSION=icuSource-${ICU_VERSION}
 
-#  When using pre-built SDK, upgrading ExoPlayer must upgrade the ExoPlayer AARs under app/src/main/libs
-EXOPLAYER=ExoPlayer
-EXOPLAYER_VERSION=2.19.1
-EXOPLAYER_SOURCE_FILE=ExoPlayer-r${EXOPLAYER_VERSION}.zip
-EXOPLAYER_SOURCE_FOLDER=ExoPlayer-r${EXOPLAYER_VERSION}
-EXOPLAYER_DOWNLOAD_URL=https://github.com/google/ExoPlayer/archive/r${EXOPLAYER_VERSION}.zip
-EXOPLAYER_SHA1="004effbdeef28c279865ec6eb3674433cc515c32"
-FFMPEG_VERSION=4.2
-FFMPEG_EXT_LIBRARY=exoplayer-extension-ffmpeg-${EXOPLAYER_VERSION}.aar
-FLAC_VERSION=1.3.2
-FLAC_SOURCE_FILE=flac-${FLAC_VERSION}.tar.xz
-FLAC_DOWNLOAD_URL=https://ftp.osuosl.org/pub/xiph/releases/flac/${FLAC_SOURCE_FILE}
-FLAC_SHA1="2bdbb56b128a780a5d998e230f2f4f6eb98f33ee"
-FLAC_EXT_LIBRARY=exoplayer-extension-flac-${EXOPLAYER_VERSION}.aar
-
 WEBRTC_DOWNLOAD_URL=https://mega.nz/file/F0YThaQR#FgoSW-XuxwHVr-9SNmVcP_JWG8B0Q6ogT9By3fEiEDc
 # Expected SHA1 checksum of "megachat/webrtc/libwebrtc_arm64.a" in downloaded WebRTC library
 WEBRTC_SHA1=a82c138885bfbc6e9c2eb08c6b314ae196a7673f
@@ -356,7 +341,6 @@ if [ "$1" == "clean" ]; then
     rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FOLDER}
     rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}
     rm -rf ${PDFVIEWER}/${PDFVIEWER}
-    rm -rf ${EXOPLAYER}/${EXOPLAYER_SOURCE_FOLDER}
     rm -rf ${ICU}/${ICU_SOURCE_VERSION}
     rm -rf ${ICU}/${ICU_SOURCE_FILE}
 
@@ -381,9 +365,6 @@ if [ "$1" == "clean" ]; then
     rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready
     rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}
     rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready
-    rm -rf ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}
-    rm -rf ${EXOPLAYER}/${FLAC_SOURCE_FILE}
-    rm -rf ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready
     rm -rf ${ICU}/${ICU_SOURCE_FILE}.ready
 
     echo "* Deleting object files"
@@ -402,8 +383,6 @@ if [ "$1" == "clean" ]; then
     rm -rf ${TARGET_LIB_DIR}/arm64-v8a
     rm -rf ${TARGET_LIB_DIR}/x86
     rm -rf ${TARGET_LIB_DIR}/x86_64
-    rm -rf ${EXOPLAYER}/${FFMPEG_EXT_LIBRARY}
-    rm -rf ${EXOPLAYER}/${FLAC_EXT_LIBRARY}
 
     echo "* Task finished OK"
     exit 0
