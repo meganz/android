@@ -553,21 +553,9 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             setContent {
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
-                val waitingRoomState by waitingRoomManagementViewModel.state.collectAsStateWithLifecycle()
                 MegaAppTheme(isDark = isDark) {
                     UsersInWaitingRoomDialog()
-                    DenyEntryToCallDialog(
-                        state = waitingRoomState,
-                        onDenyEntryClick = {
-                            waitingRoomManagementViewModel.denyEntryClick()
-                        },
-                        onCancelDenyEntryClick = {
-                            waitingRoomManagementViewModel.cancelDenyEntryClick()
-                        },
-                        onDismiss = {
-                            waitingRoomManagementViewModel.setShowDenyParticipantDialogConsumed()
-                        },
-                    )
+                    DenyEntryToCallDialog( )
                 }
             }
         }

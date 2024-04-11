@@ -2,12 +2,58 @@ package mega.privacy.android.app.presentation.meeting.view.dialog
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.theme.MegaAppTheme
+
+/**
+ * Show the dialog to deny a user entry to the call.
+ */
+@Composable
+fun DenyEntryToCallDialog(
+    viewModel: WaitingRoomManagementViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
+
+    DenyEntryToCallDialog(
+        uiState = uiState,
+        onDenyEntryClick = viewModel::denyEntryClick,
+        onCancelDenyEntryClick = viewModel::cancelDenyEntryClick,
+        onDismiss = viewModel::setShowDenyParticipantDialogConsumed
+    )
+}
+
+/**
+ * Show the dialog to deny a user entry to the call.
+ */
+@Composable
+@Deprecated("Only required for UsersInWaitingRoomDialogFragment. Remove this once it is finally removed.")
+fun DenyEntryToCallDialog(
+    onDismiss: () -> Unit,
+    viewModel: WaitingRoomManagementViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
+
+    DenyEntryToCallDialog(
+        uiState = uiState,
+        onDenyEntryClick = {
+            viewModel.denyEntryClick()
+            onDismiss()
+        },
+        onCancelDenyEntryClick = viewModel::cancelDenyEntryClick,
+        onDismiss = {
+            viewModel.setShowDenyParticipantDialogConsumed()
+            onDismiss()
+        }
+    )
+}
 
 /**
  * Show the dialog to deny a user entry to the call.
@@ -17,15 +63,15 @@ import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
  * @param onDismiss                                 To be triggered when deny participant dialog is hidden
  */
 @Composable
-fun DenyEntryToCallDialog(
-    state: WaitingRoomManagementState,
+private fun DenyEntryToCallDialog(
+    uiState: WaitingRoomManagementState,
     onDenyEntryClick: () -> Unit = {},
     onCancelDenyEntryClick: () -> Unit = {},
     onDismiss: () -> Unit,
-) {
-    if (state.usersInWaitingRoomIDs.isNotEmpty() && !state.showParticipantsInWaitingRoomDialog && state.showDenyParticipantDialog) {
-        var name = state.nameOfTheFirstUserInTheWaitingRoom
-        state.participantToDenyEntry?.apply {
+) = with(uiState) {
+    if (usersInWaitingRoomIDs.isNotEmpty() && !showParticipantsInWaitingRoomDialog && showDenyParticipantDialog) {
+        var name = nameOfTheFirstUserInTheWaitingRoom
+        participantToDenyEntry?.apply {
             data.fullName?.let {
                 name = it
             }

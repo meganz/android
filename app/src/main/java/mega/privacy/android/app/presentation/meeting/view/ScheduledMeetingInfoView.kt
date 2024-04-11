@@ -74,7 +74,6 @@ import mega.privacy.android.app.presentation.meeting.chat.view.message.managemen
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoUiState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
-import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.presentation.meeting.view.dialog.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.UsersInWaitingRoomDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.WaitingRoomWarningDialog
@@ -108,7 +107,6 @@ import java.util.Locale
 fun ScheduledMeetingInfoView(
     state: ScheduledMeetingInfoUiState,
     managementState: ScheduledMeetingManagementUiState,
-    waitingRoomManagementState: WaitingRoomManagementState,
     onEditClicked: () -> Unit,
     onAddParticipantsClicked: () -> Unit,
     onSeeMoreOrLessClicked: () -> Unit,
@@ -118,9 +116,6 @@ fun ScheduledMeetingInfoView(
     onLeaveGroupDialog: () -> Unit,
     onInviteParticipantsDialog: () -> Unit,
     onCloseWarningClicked: () -> Unit,
-    onDenyEntryInWaitingRoomClicked: () -> Unit,
-    onCancelDenyEntryClick: () -> Unit,
-    onDismissDenyEntryDialog: () -> Unit,
     onResetStateSnackbarMessage: () -> Unit = {},
     onButtonClicked: (ScheduledMeetingInfoAction) -> Unit = {},
     onParticipantClicked: (ChatParticipant) -> Unit = {},
@@ -171,11 +166,7 @@ fun ScheduledMeetingInfoView(
 
         UsersInWaitingRoomDialog()
 
-        DenyEntryToCallDialog(
-            state = waitingRoomManagementState,
-            onDenyEntryClick = { onDenyEntryInWaitingRoomClicked() },
-            onCancelDenyEntryClick = { onCancelDenyEntryClick() },
-            onDismiss = { onDismissDenyEntryDialog() })
+        DenyEntryToCallDialog()
 
         Column {
             if (shouldShowWarningDialog) {
@@ -1316,7 +1307,6 @@ fun PreviewScheduledMeetingInfoView() {
                 )
             ),
             managementState = ScheduledMeetingManagementUiState(),
-            waitingRoomManagementState = WaitingRoomManagementState(),
             onButtonClicked = {},
             onEditClicked = {},
             onAddParticipantsClicked = {},
@@ -1330,9 +1320,6 @@ fun PreviewScheduledMeetingInfoView() {
             onInviteParticipantsDialog = {},
             onResetStateSnackbarMessage = {},
             onCloseWarningClicked = {},
-            onDenyEntryInWaitingRoomClicked = {},
-            onCancelDenyEntryClick = {},
-            onDismissDenyEntryDialog = {}
         )
     }
 }

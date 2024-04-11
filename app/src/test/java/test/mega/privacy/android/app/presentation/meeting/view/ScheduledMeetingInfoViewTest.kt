@@ -426,7 +426,6 @@ class ScheduledMeetingInfoViewTest {
                 ScheduledMeetingInfoView(
                     state = state,
                     managementState = managementState,
-                    waitingRoomManagementState = WaitingRoomManagementState(),
                     onButtonClicked = {},
                     onEditClicked = {},
                     onAddParticipantsClicked = {},
@@ -440,9 +439,6 @@ class ScheduledMeetingInfoViewTest {
                     onInviteParticipantsDialog = {},
                     onResetStateSnackbarMessage = {},
                     onCloseWarningClicked = {},
-                    onDenyEntryInWaitingRoomClicked = {},
-                    onCancelDenyEntryClick = {},
-                    onDismissDenyEntryDialog = {}
                 )
             }
         }
@@ -460,7 +456,6 @@ class ScheduledMeetingInfoViewTest {
                 ScheduledMeetingInfoView(
                     state = state,
                     managementState = managementState,
-                    waitingRoomManagementState = WaitingRoomManagementState(),
                     onButtonClicked = onButtonClicked,
                     onEditClicked = {},
                     onAddParticipantsClicked = {},
@@ -474,9 +469,6 @@ class ScheduledMeetingInfoViewTest {
                     onInviteParticipantsDialog = {},
                     onResetStateSnackbarMessage = {},
                     onCloseWarningClicked = {},
-                    onDenyEntryInWaitingRoomClicked = {},
-                    onCancelDenyEntryClick = {},
-                    onDismissDenyEntryDialog = {}
                 )
             }
         }

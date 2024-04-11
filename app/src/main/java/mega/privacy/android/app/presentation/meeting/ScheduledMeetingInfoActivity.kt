@@ -492,13 +492,11 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
         val isDark = themeMode.isDarkMode()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()
-        val waitingRoomManagementState by waitingRoomManagementViewModel.state.collectAsStateWithLifecycle()
 
         MegaAppTheme(isDark = isDark) {
             ScheduledMeetingInfoView(
                 state = uiState,
                 managementState = managementState,
-                waitingRoomManagementState = waitingRoomManagementState,
                 onButtonClicked = ::onActionTap,
                 onEditClicked = { onEditTap() },
                 onAddParticipantsClicked = { viewModel.onInviteParticipantsTap() },
@@ -515,11 +513,6 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                 },
                 onCloseWarningClicked = scheduledMeetingManagementViewModel::closeWaitingRoomWarning,
                 onResetStateSnackbarMessage = viewModel::onSnackbarMessageConsumed,
-                onDenyEntryInWaitingRoomClicked = { waitingRoomManagementViewModel.denyEntryClick() },
-                onCancelDenyEntryClick = {
-                    waitingRoomManagementViewModel.cancelDenyEntryClick()
-                },
-                onDismissDenyEntryDialog = { waitingRoomManagementViewModel.setShowDenyParticipantDialogConsumed() },
             )
         }
     }
