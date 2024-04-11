@@ -1657,16 +1657,17 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
-        if (result.resultCode != Activity.RESULT_OK) return
-        val node = nodeOptionsViewModel.state.value.node ?: return
+        if (result.resultCode == Activity.RESULT_OK) {
+            val node = nodeOptionsViewModel.state.value.node ?: return
 
-        nodeOptionsViewModel.hideOrUnhideNode(
-            handle = node.handle,
-            hidden = !node.isMarkedSensitive,
-        )
+            nodeOptionsViewModel.hideOrUnhideNode(
+                handle = node.handle,
+                hidden = true,
+            )
 
-        val message = resources.getQuantityString(R.plurals.hidden_nodes_result_message, 1, 1)
-        Util.showSnackbar(requireActivity(), message)
+            val message = resources.getQuantityString(R.plurals.hidden_nodes_result_message, 1, 1)
+            Util.showSnackbar(requireActivity(), message)
+        }
 
         setStateBottomSheetBehaviorHidden()
     }
