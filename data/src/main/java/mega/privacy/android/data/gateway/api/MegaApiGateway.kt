@@ -2408,6 +2408,18 @@ interface MegaApiGateway {
     ): List<MegaNode>
 
     /**
+     * Get children of a node
+     * @param filter filter to apply [MegaSearchFilter]
+     * @param order [SortOrder]
+     * @param megaCancelToken [MegaCancelToken]
+     */
+    suspend fun getChildren(
+        filter: MegaSearchFilter,
+        order: Int,
+        megaCancelToken: MegaCancelToken,
+    ): List<MegaNode>
+
+    /**
      * Creates a new share key for the node if there is no share key already created.
      *
      * @param megaNode : [MegaNode] object which needs to be shared

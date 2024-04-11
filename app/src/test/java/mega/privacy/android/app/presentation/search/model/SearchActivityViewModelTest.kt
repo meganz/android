@@ -39,6 +39,7 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.search.GetSearchCategoriesUseCase
 import mega.privacy.android.domain.usecase.search.SearchNodesUseCase
+import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -76,7 +77,9 @@ class SearchActivityViewModelTest {
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase = mock()
     private val typeFilterStringMapper: TypeFilterOptionStringMapper = mock()
     private val dateFilterStringMapper: DateFilterOptionStringMapper = mock()
-    private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
+    private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase = mock()
+    private val searchUseCase: SearchUseCase = mock()
+
 
     private val nodeList = mutableListOf<TypedNode>()
 
@@ -109,6 +112,7 @@ class SearchActivityViewModelTest {
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
             typeFilterOptionStringMapper = typeFilterStringMapper,
             dateFilterOptionStringMapper = dateFilterStringMapper,
+            searchUseCase = searchUseCase,
         )
     }
 

@@ -5,8 +5,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.palm.composestateevents.consumed
-import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,6 +27,7 @@ import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.search.navigation.DATE_ADDED
 import mega.privacy.android.app.presentation.search.navigation.DATE_MODIFIED
 import mega.privacy.android.app.presentation.search.navigation.TYPE
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodeSourceType.OTHER
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -43,6 +42,7 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.search.GetSearchCategoriesUseCase
 import mega.privacy.android.domain.usecase.search.SearchNodesUseCase
+import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
@@ -70,6 +70,7 @@ class SearchActivityViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val searchNodesUseCase: SearchNodesUseCase,
+    private val searchUseCase: SearchUseCase,
     private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase,
     private val searchFilterMapper: SearchFilterMapper,
     private val typeFilterToSearchMapper: TypeFilterToSearchMapper,
@@ -164,14 +165,13 @@ class SearchActivityViewModel @Inject constructor(
             runCatching {
                 cancelCancelTokenUseCase()
                 if (state.value.dropdownChipsEnabled == true) {
-                    searchNodesUseCase(
+                    searchUseCase(
                         query = getCurrentSearchQuery(),
-                        parentHandle = getCurrentParentHandle(),
+                        parentHandle = NodeId(getCurrentParentHandle()),
                         nodeSourceType = nodeSourceType,
-                        isFirstLevel = isFirstLevel,
                         searchCategory = typeFilterToSearchMapper(state.value.typeSelectedFilterOption),
                         modificationDate = state.value.dateModifiedSelectedFilterOption,
-                        creationDate = state.value.dateAddedSelectedFilterOption,
+                        creationDate = state.value.dateAddedSelectedFilterOption
                     )
                 } else {
                     searchNodesUseCase(

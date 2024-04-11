@@ -1214,13 +1214,17 @@ internal class MegaApiFacade @Inject constructor(
         filter: MegaSearchFilter,
         order: Int,
         megaCancelToken: MegaCancelToken,
-    ): List<MegaNode> {
-        return megaApi.search(
-            filter,
-            order,
-            megaCancelToken
-        )
-    }
+    ): List<MegaNode> = megaApi.search(
+        filter,
+        order,
+        megaCancelToken
+    )
+
+    override suspend fun getChildren(
+        filter: MegaSearchFilter,
+        order: Int,
+        megaCancelToken: MegaCancelToken
+    ): List<MegaNode> = megaApi.getChildren(filter, order, megaCancelToken, null)
 
     override fun openShareDialog(
         megaNode: MegaNode,

@@ -50,8 +50,8 @@ fun SearchToolBar(
     nodeActionHandler: NodeActionHandler,
     clearSelection: () -> Unit,
     nodeSourceType: NodeSourceType,
-    toolbarViewModel: NodeToolbarViewModel = hiltViewModel(),
     navigationLevel: List<Pair<Long, String>>,
+    toolbarViewModel: NodeToolbarViewModel = hiltViewModel(),
 ) {
     LaunchedEffect(key1 = selectedNodes.size) {
         toolbarViewModel.updateToolbarState(

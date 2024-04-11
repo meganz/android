@@ -9,12 +9,15 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.search.DateFilterOptionLongMapper
+import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.data.mapper.search.SearchCategoryIntMapper
 import mega.privacy.android.data.mapper.search.SearchCategoryMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.repository.SearchRepository
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
@@ -23,6 +26,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -37,8 +41,17 @@ class SearchRepositoryImplTest {
     private val cancelTokenProvider: CancelTokenProvider = mock()
     private val getLinksSortOrder: GetLinksSortOrder = mock()
     private val sortOrderIntMapper: SortOrderIntMapper = mock()
+    private val getCloudSortOrder: GetCloudSortOrder = mock()
     private val dateFilterOptionLongMapper: DateFilterOptionLongMapper = mock()
     private val megaCancelToken: MegaCancelToken = mock()
+    private val megsSearchFilterMapper: MegaSearchFilterMapper = mock()
+    private val typedNode: TypedFileNode = mock {
+        on { id } doReturn nodeId
+    }
+    private val megaNode: MegaNode = mock {
+        on { handle } doReturn nodeHandle
+    }
+
 
     @BeforeAll
     fun setUp() {
@@ -52,6 +65,8 @@ class SearchRepositoryImplTest {
             getLinksSortOrder = getLinksSortOrder,
             sortOrderIntMapper = sortOrderIntMapper,
             dateFilterOptionLongMapper = dateFilterOptionLongMapper,
+            megaSearchFilterMapper = megsSearchFilterMapper,
+            getCloudSortOrder = getCloudSortOrder
         )
     }
 
@@ -228,6 +243,48 @@ class SearchRepositoryImplTest {
                 order = sortOrderIntMapper(order)
             )
         }
+
+    @Test
+    fun `test that getInShares returns list of untyped nodes`() = runTest {
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+        whenever(megaApiGateway.getInShares(sortOrderIntMapper(SortOrder.ORDER_NONE))).thenReturn(
+            listOf(megaNode)
+        )
+        whenever(nodeMapper(megaNode)).thenReturn(typedNode)
+        val actual = underTest.getInShares()
+        assertThat(actual.first().id).isEqualTo(nodeId)
+    }
+
+    @Test
+    fun `test that getPublicLinks returns list of untyped nodes`() = runTest {
+        whenever(getLinksSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+        whenever(megaApiGateway.getPublicLinks(sortOrderIntMapper(getLinksSortOrder())))
+            .thenReturn(listOf(megaNode))
+        whenever(nodeMapper(megaNode)).thenReturn(typedNode)
+        val actual = underTest.getPublicLinks()
+        assertThat(actual.first().id).isEqualTo(nodeId)
+    }
+
+    @Test
+    fun `test that getBackupNodeId returns node id`() = runTest {
+        whenever(megaApiGateway.getBackupsNode()).thenReturn(megaNode)
+        val actual = underTest.getBackUpNodeId()
+        assertThat(actual).isEqualTo(nodeId)
+    }
+
+    @Test
+    fun `test that getRootNodeId returns node id`() = runTest {
+        whenever(megaApiGateway.getRootNode()).thenReturn(megaNode)
+        val actual = underTest.getRootNodeId()
+        assertThat(actual).isEqualTo(nodeId)
+    }
+
+    @Test
+    fun `test that getRubbishNodeId returns node id`() = runTest {
+        whenever(megaApiGateway.getRubbishBinNode()).thenReturn(megaNode)
+        val actual = underTest.getRubbishNodeId()
+        assertThat(actual).isEqualTo(nodeId)
+    }
 
     companion object {
         private const val nodeHandle = 1L
