@@ -1216,22 +1216,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 val state by viewModel.state.collectAsStateWithLifecycle()
                 if (state.callInProgressChatId != -1L && state.isSessionOnRecording && state.showRecordingConsentDialog && !state.isRecordingConsentAccepted) {
                     MegaAppTheme(isDark = isDark) {
-                        CallRecordingConsentDialog(
-                            onConfirm = {
-                                viewModel.setIsRecordingConsentAccepted(value = true)
-                                viewModel.setShowRecordingConsentDialogConsumed()
-                            },
-                            onDismiss = {
-                                viewModel.setIsRecordingConsentAccepted(value = false)
-                                viewModel.setShowRecordingConsentDialogConsumed()
-                                viewModel.hangChatCall(state.callInProgressChatId)
-                            },
-                            onLearnMore = {
-                                val viewIntent = Intent(Intent.ACTION_VIEW)
-                                viewIntent.data = Uri.parse("https://mega.io/privacy")
-                                startActivity(viewIntent)
-                            }
-                        )
+                        CallRecordingConsentDialog()
                     }
                 }
             }

@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.view.dialog
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,14 +8,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.presentation.chat.ChatViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.theme.MegaAppTheme
 import javax.inject.Inject
 
 /**
@@ -27,7 +23,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 @Deprecated("Use only in case of Java code. Use CallRecordingConsentDialog compose view instead.")
 class CallRecordingConsentDialogFragment : DialogFragment() {
-    private val viewModel: ChatViewModel by viewModels()
 
     /**
      * GetThemeMode
@@ -50,21 +45,7 @@ class CallRecordingConsentDialogFragment : DialogFragment() {
                 val isDark = themeMode.isDarkMode()
                 MegaAppTheme(isDark = isDark) {
                     CallRecordingConsentDialog(
-                        onConfirm = {
-                            viewModel.setIsRecordingConsentAccepted(value = true)
-                            viewModel.setShowRecordingConsentDialogConsumed()
-                            dismissAllowingStateLoss()
-                        },
-                        onDismiss = {
-                            viewModel.setIsRecordingConsentAccepted(value = false)
-                            viewModel.setShowRecordingConsentDialogConsumed()
-                            dismissAllowingStateLoss()
-                        },
-                        onLearnMore = {
-                            val viewIntent = Intent(Intent.ACTION_VIEW)
-                            viewIntent.data = Uri.parse("https://mega.io/privacy")
-                            startActivity(viewIntent)
-                        }
+                        onDismiss = { dismissAllowingStateLoss() }
                     )
                 }
             }
