@@ -211,21 +211,7 @@ class MeetingActivity : PasscodeActivity() {
             setContent {
                 val waitingRoomState by waitingRoomManagementViewModel.state.collectAsStateWithLifecycle()
                 MegaAppTheme(isDark = true) {
-                    UsersInWaitingRoomDialog(
-                        state = waitingRoomState,
-                        onAdmitClick = {
-                            waitingRoomManagementViewModel.admitUsersClick()
-                        },
-                        onDenyClick = {
-                            waitingRoomManagementViewModel.denyUsersClick()
-                        },
-                        onSeeWaitingRoomClick = {
-                            waitingRoomManagementViewModel.seeWaitingRoomClick()
-                        },
-                        onDismiss = {
-                            waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed()
-                        },
-                    )
+                    UsersInWaitingRoomDialog()
                     DenyEntryToCallDialog(
                         state = waitingRoomState,
                         onDenyEntryClick = {

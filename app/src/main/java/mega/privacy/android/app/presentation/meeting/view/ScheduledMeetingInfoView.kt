@@ -118,11 +118,7 @@ fun ScheduledMeetingInfoView(
     onLeaveGroupDialog: () -> Unit,
     onInviteParticipantsDialog: () -> Unit,
     onCloseWarningClicked: () -> Unit,
-    onAdmitUsersInWaitingRoomClicked: () -> Unit,
-    onDenyUsersInWaitingRoomClicked: () -> Unit,
     onDenyEntryInWaitingRoomClicked: () -> Unit,
-    onSeeWaitingRoomClicked: () -> Unit,
-    onDismissWaitingRoomDialog: () -> Unit,
     onCancelDenyEntryClick: () -> Unit,
     onDismissDenyEntryDialog: () -> Unit,
     onResetStateSnackbarMessage: () -> Unit = {},
@@ -173,12 +169,7 @@ fun ScheduledMeetingInfoView(
             onDismiss = { onDismiss() },
             onInvite = { onInviteParticipantsDialog() })
 
-        UsersInWaitingRoomDialog(
-            state = waitingRoomManagementState,
-            onAdmitClick = { onAdmitUsersInWaitingRoomClicked() },
-            onDenyClick = { onDenyUsersInWaitingRoomClicked() },
-            onSeeWaitingRoomClick = { onSeeWaitingRoomClicked() },
-            onDismiss = { onDismissWaitingRoomDialog() })
+        UsersInWaitingRoomDialog()
 
         DenyEntryToCallDialog(
             state = waitingRoomManagementState,
@@ -1339,11 +1330,7 @@ fun PreviewScheduledMeetingInfoView() {
             onInviteParticipantsDialog = {},
             onResetStateSnackbarMessage = {},
             onCloseWarningClicked = {},
-            onAdmitUsersInWaitingRoomClicked = {},
-            onDenyUsersInWaitingRoomClicked = {},
             onDenyEntryInWaitingRoomClicked = {},
-            onSeeWaitingRoomClicked = {},
-            onDismissWaitingRoomDialog = {},
             onCancelDenyEntryClick = {},
             onDismissDenyEntryDialog = {}
         )

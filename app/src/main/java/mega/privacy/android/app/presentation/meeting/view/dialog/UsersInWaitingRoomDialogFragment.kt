@@ -56,13 +56,6 @@ class UsersInWaitingRoomDialogFragment : DialogFragment() {
                 val isDark = themeMode.isDarkMode()
                 MegaAppTheme(isDark = isDark) {
                     UsersInWaitingRoomDialog(
-                        state = state,
-                        onAdmitClick = {
-                            viewModel.admitUsersClick()
-                        },
-                        onDenyClick = {
-                            viewModel.denyUsersClick()
-                        },
                         onSeeWaitingRoomClick = {
                             val chatId = viewModel.state.value.chatId
                             MegaApplication.getInstance().openCallService(chatId)
@@ -78,7 +71,6 @@ class UsersInWaitingRoomDialogFragment : DialogFragment() {
                             dismissAllowingStateLoss()
                         },
                         onDismiss = {
-                            viewModel.setShowParticipantsInWaitingRoomDialogConsumed()
                             dismissAllowingStateLoss()
                         },
                     )

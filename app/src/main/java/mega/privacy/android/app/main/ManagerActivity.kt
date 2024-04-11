@@ -1176,21 +1176,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 val isDark = themeMode.isDarkMode()
                 val waitingRoomState by waitingRoomManagementViewModel.state.collectAsStateWithLifecycle()
                 MegaAppTheme(isDark = isDark) {
-                    UsersInWaitingRoomDialog(
-                        state = waitingRoomState,
-                        onAdmitClick = {
-                            waitingRoomManagementViewModel.admitUsersClick()
-                        },
-                        onDenyClick = {
-                            waitingRoomManagementViewModel.denyUsersClick()
-                        },
-                        onSeeWaitingRoomClick = {
-                            waitingRoomManagementViewModel.seeWaitingRoomClick()
-                        },
-                        onDismiss = {
-                            waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed()
-                        },
-                    )
+                    UsersInWaitingRoomDialog()
                     DenyEntryToCallDialog(
                         state = waitingRoomState,
                         onDenyEntryClick = {

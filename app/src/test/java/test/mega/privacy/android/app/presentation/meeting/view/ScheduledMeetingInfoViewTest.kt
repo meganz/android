@@ -1,12 +1,18 @@
 package test.mega.privacy.android.app.presentation.meeting.view
 
 import androidx.activity.ComponentActivity
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
+import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.getRetentionTimeString
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoUiState
@@ -21,6 +27,8 @@ import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import test.mega.privacy.android.app.onNodeWithText
@@ -357,6 +365,17 @@ class ScheduledMeetingInfoViewTest {
         composeRule.onNodeWithTag(SCHEDULE_MEETING_INFO_PARTICIPANTS_WARNING_TAG).assertExists()
     }
 
+    private val waitingRoomManagementViewModel = mock<WaitingRoomManagementViewModel> {
+        on { state } doReturn MutableStateFlow(WaitingRoomManagementState())
+    }
+
+    private val viewModelStore = mock<ViewModelStore> {
+        on { get(argThat<String> { contains(WaitingRoomManagementViewModel::class.java.canonicalName.orEmpty()) }) } doReturn waitingRoomManagementViewModel
+    }
+    private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
+        on { viewModelStore } doReturn viewModelStore
+    }
+
     @Test
     fun `test that participants warning is not shown when user limit is not reached`() {
         initComposeRuleContent(
@@ -401,31 +420,31 @@ class ScheduledMeetingInfoViewTest {
         managementState: ScheduledMeetingManagementUiState,
     ) {
         composeRule.setContent {
-            ScheduledMeetingInfoView(
-                state = state,
-                managementState = managementState,
-                waitingRoomManagementState = WaitingRoomManagementState(),
-                onButtonClicked = {},
-                onEditClicked = {},
-                onAddParticipantsClicked = {},
-                onSeeMoreOrLessClicked = {},
-                onLeaveGroupClicked = {},
-                onParticipantClicked = {},
-                onScrollChange = {},
-                onBackPressed = {},
-                onDismiss = {},
-                onLeaveGroupDialog = {},
-                onInviteParticipantsDialog = {},
-                onResetStateSnackbarMessage = {},
-                onCloseWarningClicked = {},
-                onAdmitUsersInWaitingRoomClicked = {},
-                onDenyEntryInWaitingRoomClicked = {},
-                onDenyUsersInWaitingRoomClicked = {},
-                onSeeWaitingRoomClicked = {},
-                onDismissWaitingRoomDialog = {},
-                onCancelDenyEntryClick = {},
-                onDismissDenyEntryDialog = {}
-            )
+            CompositionLocalProvider(
+                LocalViewModelStoreOwner provides viewModelStoreOwner
+            ) {
+                ScheduledMeetingInfoView(
+                    state = state,
+                    managementState = managementState,
+                    waitingRoomManagementState = WaitingRoomManagementState(),
+                    onButtonClicked = {},
+                    onEditClicked = {},
+                    onAddParticipantsClicked = {},
+                    onSeeMoreOrLessClicked = {},
+                    onLeaveGroupClicked = {},
+                    onParticipantClicked = {},
+                    onScrollChange = {},
+                    onBackPressed = {},
+                    onDismiss = {},
+                    onLeaveGroupDialog = {},
+                    onInviteParticipantsDialog = {},
+                    onResetStateSnackbarMessage = {},
+                    onCloseWarningClicked = {},
+                    onDenyEntryInWaitingRoomClicked = {},
+                    onCancelDenyEntryClick = {},
+                    onDismissDenyEntryDialog = {}
+                )
+            }
         }
     }
 
@@ -435,31 +454,31 @@ class ScheduledMeetingInfoViewTest {
         onButtonClicked: (ScheduledMeetingInfoAction) -> Unit = {},
     ) {
         composeRule.setContent {
-            ScheduledMeetingInfoView(
-                state = state,
-                managementState = managementState,
-                waitingRoomManagementState = WaitingRoomManagementState(),
-                onButtonClicked = onButtonClicked,
-                onEditClicked = {},
-                onAddParticipantsClicked = {},
-                onSeeMoreOrLessClicked = {},
-                onLeaveGroupClicked = {},
-                onParticipantClicked = {},
-                onScrollChange = {},
-                onBackPressed = {},
-                onDismiss = {},
-                onLeaveGroupDialog = {},
-                onInviteParticipantsDialog = {},
-                onResetStateSnackbarMessage = {},
-                onCloseWarningClicked = {},
-                onAdmitUsersInWaitingRoomClicked = {},
-                onDenyEntryInWaitingRoomClicked = {},
-                onDenyUsersInWaitingRoomClicked = {},
-                onSeeWaitingRoomClicked = {},
-                onDismissWaitingRoomDialog = {},
-                onCancelDenyEntryClick = {},
-                onDismissDenyEntryDialog = {}
-            )
+            CompositionLocalProvider(
+                LocalViewModelStoreOwner provides viewModelStoreOwner
+            ) {
+                ScheduledMeetingInfoView(
+                    state = state,
+                    managementState = managementState,
+                    waitingRoomManagementState = WaitingRoomManagementState(),
+                    onButtonClicked = onButtonClicked,
+                    onEditClicked = {},
+                    onAddParticipantsClicked = {},
+                    onSeeMoreOrLessClicked = {},
+                    onLeaveGroupClicked = {},
+                    onParticipantClicked = {},
+                    onScrollChange = {},
+                    onBackPressed = {},
+                    onDismiss = {},
+                    onLeaveGroupDialog = {},
+                    onInviteParticipantsDialog = {},
+                    onResetStateSnackbarMessage = {},
+                    onCloseWarningClicked = {},
+                    onDenyEntryInWaitingRoomClicked = {},
+                    onCancelDenyEntryClick = {},
+                    onDismissDenyEntryDialog = {}
+                )
+            }
         }
     }
 }
