@@ -11,19 +11,24 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.sync.SyncError
+import mega.privacy.android.domain.exception.MegaSyncException
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetTypedNodesFromFolderUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.domain.usecase.sync.TryNodeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerAction
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerState
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerViewModel
+import mega.privacy.android.shared.sync.DeviceFolderUINodeErrorMessageMapper
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -39,6 +44,8 @@ internal class MegaPickerViewModelTest {
     private val getRootNodeUseCase: GetRootNodeUseCase = mock()
     private val getTypedNodesFromFolder: GetTypedNodesFromFolderUseCase = mock()
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase = mock()
+    private val tryNodeSyncUseCase: TryNodeSyncUseCase = mock()
+    private val deviceFolderUINodeErrorMessageMapper: DeviceFolderUINodeErrorMessageMapper = mock()
 
     private val childrenNodes: List<TypedNode> = mock()
 
@@ -55,7 +62,9 @@ internal class MegaPickerViewModelTest {
             setSelectedMegaFolderUseCase,
             getRootNodeUseCase,
             getTypedNodesFromFolder,
-            getNodeByHandleUseCase
+            getNodeByHandleUseCase,
+            tryNodeSyncUseCase,
+            deviceFolderUINodeErrorMessageMapper
         )
     }
 
@@ -167,6 +176,7 @@ internal class MegaPickerViewModelTest {
 
     @Test
     fun `test that all files access permission is shown when it is not granted`() = runTest {
+        whenever(tryNodeSyncUseCase(NodeId(0))).thenReturn(Unit)
         initViewModel()
 
         underTest.handleAction(
@@ -234,12 +244,63 @@ internal class MegaPickerViewModelTest {
             }
         }
 
+    @Test
+    fun `test that error is shown when selected directory has an error`() =
+        runTest {
+            val currentFolderId = NodeId(2323L)
+            val currentFolderName = "some secret folder"
+            val currentFolder: TypedFolderNode = mock {
+                on { id } doReturn currentFolderId
+                on { name } doReturn currentFolderName
+            }
+            whenever(getRootNodeUseCase()).thenReturn(currentFolder)
+            whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flow {
+                emit(childrenNodes)
+                awaitCancellation()
+            })
+            val errorCode = 18
+            val syncError = SyncError.ACTIVE_SYNC_ABOVE_PATH
+            val errorStringRes = 12345
+            val error = MegaSyncException(
+                errorCode, "error", syncError = syncError
+            )
+            whenever(deviceFolderUINodeErrorMessageMapper(syncError)).thenReturn(errorStringRes)
+            doAnswer { throw error }.whenever(tryNodeSyncUseCase).invoke(currentFolderId)
+            initViewModel()
+
+            underTest.handleAction(
+                MegaPickerAction.CurrentFolderSelected(
+                    allFilesAccessPermissionGranted = true,
+                    disableBatteryOptimizationPermissionGranted = true
+                )
+            )
+
+            val event = underTest.state.value.errorMessageId
+            assertThat(event).isEqualTo(errorStringRes)
+        }
+
+    @Test
+    fun `test that error message event is null when viewmodel handle action is called`() =
+        runTest {
+            initViewModel()
+
+            underTest.handleAction(
+                MegaPickerAction.ErrorMessageShown
+            )
+
+            underTest.state.test {
+                assertThat(awaitItem().errorMessageId).isEqualTo(null)
+            }
+        }
+
     private fun initViewModel() {
         underTest = MegaPickerViewModel(
             setSelectedMegaFolderUseCase,
             getRootNodeUseCase,
             getTypedNodesFromFolder,
-            getNodeByHandleUseCase
+            getNodeByHandleUseCase,
+            tryNodeSyncUseCase,
+            deviceFolderUINodeErrorMessageMapper
         )
     }
 }

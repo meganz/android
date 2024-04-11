@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.megapicker
 
+import mega.privacy.android.shared.resources.R as sharedResR
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,11 +13,15 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.exception.MegaSyncException
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetTypedNodesFromFolderUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.domain.usecase.sync.TryNodeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSelectedMegaFolderUseCase
+import mega.privacy.android.shared.sync.DeviceFolderUINodeErrorMessageMapper
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,6 +30,8 @@ internal class MegaPickerViewModel @Inject constructor(
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val getTypedNodesFromFolder: GetTypedNodesFromFolderUseCase,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
+    private val tryNodeSyncUseCase: TryNodeSyncUseCase,
+    private val deviceFolderUINodeErrorMessageMapper: DeviceFolderUINodeErrorMessageMapper,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MegaPickerState())
@@ -50,8 +57,7 @@ internal class MegaPickerViewModel @Inject constructor(
                 state.value.currentFolder?.let { currentFolder ->
                     viewModelScope.launch {
                         val parentNode = getNodeByHandleUseCase(currentFolder.parentId.longValue)
-                        parentNode
-                            ?.let(::fetchFolders)
+                        parentNode?.let(::fetchFolders)
                     }
                 }
             }
@@ -63,7 +69,23 @@ internal class MegaPickerViewModel @Inject constructor(
                 if (action.disableBatteryOptimizationPermissionGranted) {
                     disableBatteryOptimizationsPermissionShown = true
                 }
-                folderSelected()
+                viewModelScope.launch {
+                    runCatching {
+                        tryNodeSyncUseCase(state.value.currentFolder?.id ?: NodeId(0))
+                    }.onSuccess {
+                        folderSelected()
+                    }.onFailure {
+                        val error = (it as MegaSyncException).syncError
+                        val errorMessage = deviceFolderUINodeErrorMessageMapper(error)
+                            ?: sharedResR.string.general_sync_message_unknown_error
+
+                        _state.update {
+                            it.copy(
+                                errorMessageId = errorMessage
+                            )
+                        }
+                    }
+                }
             }
 
             MegaPickerAction.AllFilesAccessPermissionDialogShown -> {
@@ -91,6 +113,12 @@ internal class MegaPickerViewModel @Inject constructor(
                     it.copy(
                         navigateNextEvent = consumed
                     )
+                }
+            }
+
+            MegaPickerAction.ErrorMessageShown -> {
+                _state.update {
+                    it.copy(errorMessageId = null)
                 }
             }
         }

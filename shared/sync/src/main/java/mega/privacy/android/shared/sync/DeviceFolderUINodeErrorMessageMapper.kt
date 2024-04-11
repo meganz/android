@@ -17,7 +17,7 @@ class DeviceFolderUINodeErrorMessageMapper @Inject constructor() {
      * @param errorSubState The corresponding [SyncError]
      * @return A [StringRes] of the specific Error Message
      */
-    operator fun invoke(errorSubState: SyncError): Int? = when (errorSubState) {
+    operator fun invoke(errorSubState: SyncError?): Int? = when (errorSubState) {
         SyncError.NO_SYNC_ERROR -> null
         SyncError.UNKNOWN_ERROR -> R.string.general_sync_message_unknown_error
         SyncError.UNSUPPORTED_FILE_SYSTEM -> R.string.general_sync_unsupported_file_system

@@ -39,7 +39,11 @@ internal fun MegaPickerRoute(
             currentFolderSelected = {
                 selectCurrentFolder(viewModel, syncPermissionsManager)
             },
-            fileTypeIconMapper = fileTypeIconMapper
+            fileTypeIconMapper = fileTypeIconMapper,
+            errorMessageId = state.value.errorMessageId,
+            errorMessageShown = {
+                viewModel.handleAction(MegaPickerAction.ErrorMessageShown)
+            }
         )
     }
 

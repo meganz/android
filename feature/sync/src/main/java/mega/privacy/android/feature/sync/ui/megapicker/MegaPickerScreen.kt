@@ -8,13 +8,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
@@ -22,6 +27,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacyTopAppBar
+import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaApiJava
 
 @Composable
@@ -30,8 +36,13 @@ internal fun MegaPickerScreen(
     nodes: List<TypedNode>,
     folderClicked: (TypedNode) -> Unit,
     currentFolderSelected: () -> Unit,
-    fileTypeIconMapper: FileTypeIconMapper
+    fileTypeIconMapper: FileTypeIconMapper,
+    errorMessageId: Int?,
+    errorMessageShown: () -> Unit,
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val context = LocalContext.current
 
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -63,8 +74,22 @@ internal fun MegaPickerScreen(
                 fileTypeIconMapper,
                 Modifier.padding(paddingValues)
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                MegaSnackbar(snackbarData = data, modifier = Modifier.padding(bottom = 56.dp))
+            }
         }
     )
+
+    LaunchedEffect(errorMessageId) {
+        if (errorMessageId != null) {
+            snackbarHostState.showSnackbar(
+                message = context.resources.getString(errorMessageId),
+            )
+            errorMessageShown()
+        }
+    }
 }
 
 @Composable
@@ -120,7 +145,9 @@ private fun PreviewSyncNewFolderScreen() {
             SampleNodeDataProvider.values,
             {},
             {},
-            FileTypeIconMapper()
+            FileTypeIconMapper(),
+            errorMessageId = null,
+            errorMessageShown = {}
         )
     }
 }

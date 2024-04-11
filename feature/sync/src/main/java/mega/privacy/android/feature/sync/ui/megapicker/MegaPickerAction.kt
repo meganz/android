@@ -6,16 +6,18 @@ internal sealed interface MegaPickerAction {
 
     data class FolderClicked(val folder: TypedNode) : MegaPickerAction
 
-    object BackClicked : MegaPickerAction
+    data object BackClicked : MegaPickerAction
 
     data class CurrentFolderSelected(
         val allFilesAccessPermissionGranted: Boolean,
         val disableBatteryOptimizationPermissionGranted: Boolean,
     ) : MegaPickerAction
 
-    object AllFilesAccessPermissionDialogShown : MegaPickerAction
+    data object ErrorMessageShown : MegaPickerAction
 
-    object DisableBatteryOptimizationsDialogShown : MegaPickerAction
+    data object AllFilesAccessPermissionDialogShown : MegaPickerAction
 
-    object NextScreenOpened : MegaPickerAction
+    data object DisableBatteryOptimizationsDialogShown : MegaPickerAction
+
+    data object NextScreenOpened : MegaPickerAction
 }
