@@ -764,7 +764,7 @@
     <!-- Title of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_title">Verifica dell\’indirizzo email</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_text">Per favore, controlla la tua e-mail per procedere.</string>
+    <string name="email_verification_text">Controlla la tua casella di posta elettronica per procedere.</string>
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">È stato riscontrato un errore, per favore, riprova.</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
@@ -808,7 +808,7 @@
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
     <string name="mail_same_as_old">Questo è il tuo indirizzo e-mail esistente.</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
-    <string name="change_mail_text_last_step">Questo è l’ultimo passaggio per cambiare la tua e-mail. Per favore, inserisci la tua password qui sotto.</string>
+    <string name="change_mail_text_last_step">Questo è l\’ultimo passaggio per modificare il tuo indirizzo email. Inserisci la tua password qui sotto.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">Cambia e-mail</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
@@ -824,7 +824,7 @@
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Acquisizione delle informazioni in corso&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
-    <string name="email_verification_text_change_mail">La tua nuova e-mail deve essere validata. Per favore, controlla la tua e-mail per procedere.</string>
+    <string name="email_verification_text_change_mail">Your new email address needs to be validated. Check the inbox of the new email address to proceed.</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
     <string name="confirmation_delete_avatar">Cancellare l’immagine del profilo?</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
@@ -854,7 +854,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Troppi tentativi falliti di effettuare il login, per favore aspetta un’ora.</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">Il tuo account non è ancora stato validato. Per favore, controlla la tua e-mail.</string>
+    <string name="account_not_validated_login">Questo account non è stato ancora verificato. Controlla la tua casella di posta elettronica.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Link della cartella non disponibile</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
@@ -868,7 +868,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">In attesa della conferma dell’e-mail</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Per favore, controlla la tua e-mail e poi tocca sul link per confermare il tuo account.</string>
+    <string name="confirm_email_explanation">Controlla la tua casella di posta elettronica e segui il link per confermare il tuo account.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">%1$d oggetto</item>
@@ -2101,9 +2101,8 @@
     <string name="contact_info_button_more">Altro</string>
     <!-- Section title to select a file to perform an action, more files -->
     <plurals name="plural_select_file">
-        <item quantity="one">Scegli file</item>
-        <item quantity="many">Scegli file</item>
-        <item quantity="other">Scegli file</item>
+        <item quantity="one">Choose file</item>
+        <item quantity="other">Choose files</item>
     </plurals>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">Scegli cartella</string>
@@ -2378,7 +2377,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Attiva chiamate</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Garantisci l\’accesso alla tua Rubrica</string>
+    <string name="allow_acces_contact_title">Consenti l\’accesso alla tua rubrica</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Trova facilmente i tuoi contatti che hai in rubrica su MEGA.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3482,7 +3481,7 @@
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">Già hai un abbonamento attivo. Se ne acquisti un altro, ti verranno addebitati entrambi. Per evitare ciò, annulla il tuo abbonamento corrente andando su MEGA da un browser desktop o mobile. Visita il nostro Centro d\’aiuto per maggiori informazioni.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
-    <string name="meeting_bluetooth_connect_required_permissions_warning">Vai nelle Impostazioni per dare a MEGA il permesso di accedere ai tuoi dispositivi vicini utilizzando il Bluetooth.</string>
+    <string name="meeting_bluetooth_connect_required_permissions_warning">Vai nelle Impostazioni per permettere a MEGA di accedere ai tuoi dispositivi vicini utilizzando il Bluetooth.</string>
     <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
     <string name="upgrade_billing_warning">Non riusciamo a portare a termine la fatturazione. Se stai utilizzando un\’app duplicata, per favore considera di effettuare il login su MEGA senza di essa. Altrimenti, prova ad effettuare l\’upgrade tramite un browser web.</string>
     <!-- Title for subscription dialog that shows before delete account -->
@@ -3846,7 +3845,7 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">Questo posto è dove vengono archiviati i backup di file e cartelle. I tuoi backup sono di “sola lettura” per proteggerli da modifiche accidentali nel tuo Cloud drive.\nPuoi effettuare il backup degli oggetti dal tuo computer su MEGA utilizzando la nostra app per desktop.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Il tuo account MEGA è stato sospeso a causa di ripetute accuse di violazione di copyright. Ciò significa che non puoi accedere al tuo account o ai dati che contiene.\nControlla la nostra email per ottenere maggiori informazioni su come puoi inviare una contro-notifica.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Il tuo account MEGA è stato sospeso a causa di ripetute accuse di violazione di copyright. Questo significa che non puoi accedere al tuo account o ai dati al suo interno.\nControlla la tua casella di posta elettronica per maggiori informazioni su come puoi inviare una contro-notifica.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">Il tuo account MEGA è stato chiuso a causa di una violazione dei Termini di Servizio di MEGA.\nNon puoi riottenere accesso ai dati che hai archiviato o registrare un nuovo account.</string>
     <!-- Title of the Meetings tab for the chat section -->
@@ -3982,9 +3981,9 @@
     <!-- Dialog confirmation text for removing photos in an album -->
     <string name="photos_album_remove_from_album_confirmation_text">Rimuovere dall\’album?</string>
     <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
-    <string name="settings_camera_uploads_grant_media_permissions_body">Per attivare i caricamenti da fotocamera, permetti a MEGA l\’accesso alle tue foto e agli altri media sul tuo dispositivo.</string>
+    <string name="settings_camera_uploads_grant_media_permissions_body">Per attivare i Caricamenti da fotocamera, permetti a MEGA l\’accesso alle tue foto e agli altri media sul tuo dispositivo.</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
-    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Garantisci l\’accesso</string>
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Permetti accesso</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">Non permettere</string>
     <!--  -->
@@ -5214,7 +5213,7 @@
     <!-- Message to user when app update is downloaded -->
     <string name="general_app_update_message_download_success">L\’app è stata aggiornata</string>
     <!-- Action allowing user to restart the app after downloading the update -->
-    <string name="general_app_update_action_restart">Relaunch the app</string>
+    <string name="general_app_update_action_restart">Riavvia l\’app</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">Permetti l\’accesso ai file audio</string>
     <!-- Photos action menu zoom in -->
@@ -5337,14 +5336,14 @@
     <string name="chat_chatroom_first_message_header_authenticity_info_text">Il sistema assicura che i dati ricevuti sono arrivati dal mittente mostrato, e i suoi contenuti non sono stati manipolati durante l’invio.</string>
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_get_pro_title">Ottieni di più con un piano Pro</string>
-    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">Effettua l\’upgrade ad un piano Pro per maggiore spazio di archiviazione e molte funzioni extra. I nostri piani partono da %s al mese.</string>
+    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
+    <string name="dialog_onboarding_get_pro_description">Upgrade to a Pro plan and get more storage and access to Pro features. Plans start from as low as %1$s a month</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_some_features_title">Alcune funzioni che puoi trovare sono:</string>
+    <string name="dialog_onboarding_some_features_title">MEGA&#160;Pro plans include:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_storage">Grande archivio</string>
-    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
-    <string name="dialog_onboarding_feature_description_storage">Archivia dati illimitati, a partire da %s.</string>
+    <string name="dialog_onboarding_feature_title_storage">Ultimate storage flexibility</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
+    <string name="dialog_onboarding_feature_description_storage">Starting from %1$s, find the perfect fit for your storage needs.</string>
     <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_transfer">Condivisione della banda di trasferimento</string>
     <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -5354,7 +5353,7 @@
     <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_description_security">Imposta password e date di scadenza per i link di file e cartelle.</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
-    <string name="dialog_onboarding_button_view_pro_plan">Vedi i piani Pro</string>
+    <string name="dialog_onboarding_button_view_pro_plan">Upgrade to Pro today</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s sta presentando</string>
     <!-- Warning indicating that a participant is sharing the screen-->
@@ -5456,9 +5455,9 @@
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_subscription_details">Gli abbonamenti vengono rinnovati automaticamente per periodi di abbonamento successivi della stessa durata e allo stesso prezzo del periodo iniziale scelto. Puoi disattivare il rinnovo automatico del tuo abbonamento MEGA&#160;Pro entro 24 ore prima della scadenza del prossimo pagamento dell\’abbonamento tramite Abbonamenti nel [A]Google Play[/A].</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
-    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Permetti l\’accesso alla tua galleria</string>
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Permetti l\’accesso alla tua Galleria</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
-    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Garantisci l\’accesso</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Permetti accesso</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">Aggiornamento necessario</string>
     <!-- The Body of the Dialog shown to Update the application from playstore -->
@@ -5552,7 +5551,7 @@
     <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
     <string name="notifications_screen_notification_promo_expiration_time">Scade il giorno %1$s alle ore %2$s</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
-    <string name="meetings_free_call_organiser_number_of_participants_warning">Only 100 participants can join the call. Any additional participants will only be able to send and receive messages. The organiser can upgrade to Pro to remove these restrictions.</string>
+    <string name="meetings_free_call_organiser_number_of_participants_warning">Solo 100 partecipanti possono partecipare alla chiamata. Eventuali partecipanti aggiuntivi potranno solo inviare e ricevere messaggi. L\’organizzatore può effettuare l\’upgrade a Pro per rimuovere queste restrizioni.</string>
     <!-- Warning Message for non organiser for Free Call -->
     <string name="meetings_free_call_non_organiser_number_of_participants_warning">Only 100 participants can join the call. Any additional participants will only be able to send and read chats. Ask the organiser to remove this restriction.</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
@@ -5592,7 +5591,7 @@
         <item quantity="other">%1$d oggetti nascosti</item>
     </plurals>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_priority_support">&#8226;&#160;Priority support</string>
+    <string name="account_upgrade_account_description_priority_support">&#8226;&#160;Supporto prioritario</string>
     <!-- The title of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_title">Effettua l\’upgrade a Pro per avere chiamate illimitate</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->
@@ -5626,17 +5625,17 @@
     <!-- Search drop down chips filter type date modified older -->
     <string name="search_dropdown_chip_filter_type_date_older">Vecchio</string>
     <!-- String below login button next to button for reporting a login issue -->
-    <string name="general_login_label_trouble_logging_in">Trouble logging in?</string>
+    <string name="general_login_label_trouble_logging_in">Problemi con il login?</string>
     <!-- Button text for reporting an issue on the login screen -->
-    <string name="general_login_button_report_your_issue">Report your issue</string>
+    <string name="general_login_button_report_your_issue">Segnala il tuo problema</string>
     <!-- Hidden nodes show items -->
-    <string name="hidden_nodes_show_items">Show hidden items</string>
+    <string name="hidden_nodes_show_items">Mostra gli oggetti nascosti</string>
     <!-- Hidden nodes show items description -->
-    <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
+    <string name="hidden_nodes_show_items_description">Tutti gli oggetti nascosti saranno visibili, ma sfocati per indicare il loro status “nascosto”</string>
     <!-- Button text for photo option in camera screen -->
-    <string name="camera_photo_button">Photo</string>
-    <string name="camera_flash_mode_on">Flash mode on</string>
+    <string name="camera_photo_button">Foto</string>
+    <string name="camera_flash_mode_on">Flash attivo</string>
     <string name="camera_flash_mode_off">Flash mode off</string>
     <string name="camera_flash_mode_auto">Flash mode auto</string>
-    <string name="camera_send_to">Send to %1$s</string>
+    <string name="camera_send_to">Invia a %1$s</string>
 </resources>

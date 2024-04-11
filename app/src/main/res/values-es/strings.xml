@@ -764,7 +764,7 @@
     <!-- Title of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_title">Confirma el correo electrónico</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_text">Ve a la bandeja de entrada de tu correo electrónico para continuar.</string>
+    <string name="email_verification_text">Check your email inbox to proceed.</string>
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">Se ha producido un error, por favor inténtalo de nuevo.</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
@@ -808,7 +808,7 @@
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
     <string name="mail_same_as_old">Esta es tu dirección de correo electrónico actual.</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
-    <string name="change_mail_text_last_step">Este es el último paso para cambiar tu correo electrónico. Por favor, introduce tu contraseña.</string>
+    <string name="change_mail_text_last_step">This is the last step to change your email address. Enter your password below.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">Cambiar correo electrónico</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
@@ -824,7 +824,7 @@
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Obteniendo información&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
-    <string name="email_verification_text_change_mail">Tienes que confirmar la nueva dirección de correo electrónico. Ve a tu nueva cuenta de correo electrónico para proceder.</string>
+    <string name="email_verification_text_change_mail">Es necesario validar tu nueva dirección de correo electrónico. Revisa la bandeja de entrada de la nueva dirección de correo electrónico para continuar.</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
     <string name="confirmation_delete_avatar">¿Eliminar imagen del perfil?</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
@@ -854,7 +854,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Demasiados intentos de acceso incorréctos. Vuelve a intentarlo en una hora.</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">Todavía no has confirmado la cuenta. Ve a la bandeja de entrada de tu correo electrónico.</string>
+    <string name="account_not_validated_login">Todavía no has confirmado la cuenta. Ve a la bandeja de entrada de tu correo electrónico para proceder.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Enlace de la carpeta no disponible</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
@@ -868,7 +868,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">Confirma tu cuenta</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Ve a la bandeja de entrada de tu correo electrónico y pulsa en el enlace para confirmar tu cuenta.</string>
+    <string name="confirm_email_explanation">Ve a la bandeja de entrada de tu correo y pulsa en el enlace que te hemos envíado para confirmar tu cuenta.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">%1$d elemento</item>
@@ -2101,9 +2101,8 @@
     <string name="contact_info_button_more">Más</string>
     <!-- Section title to select a file to perform an action, more files -->
     <plurals name="plural_select_file">
-        <item quantity="one">Seleccionar archivo</item>
-        <item quantity="many">Elegir archivos</item>
-        <item quantity="other">Elegir archivos</item>
+        <item quantity="one">Choose file</item>
+        <item quantity="other">Choose files</item>
     </plurals>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">Elige carpeta</string>
@@ -2378,7 +2377,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Activar llamadas</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Permitir el acceso a tus contactos</string>
+    <string name="allow_acces_contact_title">Permite el acceso a tus contactos</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Descubre contactos de tu agenda que tienen MEGA.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3846,7 +3845,7 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">Aquí es donde se almacenan los backups de tus archivos y carpetas. Estos backups son de “solo lectura” para protegerlos de modificaciones accidentales en tu Nube.\nPuedes crear backups en MEGA desde tu pc usando nuestra aplicación de escritorio.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Tu cuenta de MEGA ha sido suspendida debido a repetidas notificaciones de presuntas infracciones de derechos de autor. Como consecuencia, no podrás acceder a tu cuenta ni a tus datos.\nRevisa el correo electrónico que te enviamos para obtener más información sobre cómo presentar una contranotificación.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Tu cuenta de MEGA ha sido suspendida debido a repetidas notificaciones de presuntas infracciones de derechos de autor. Como consecuencia, no podrás acceder a tu cuenta ni a tus datos.\nRevisa el correo electrónico que enviamos a tu dirección de correo para obtener más información sobre cómo presentar una contranotificación.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">Hemos cerrado tu cuenta debido a un incumplimiento de los Términos de servicio de MEGA.\nNo podrás recuperar el acceso a tus datos ni estás autorizado a registrar una nueva cuenta de MEGA.</string>
     <!-- Title of the Meetings tab for the chat section -->
@@ -3982,9 +3981,9 @@
     <!-- Dialog confirmation text for removing photos in an album -->
     <string name="photos_album_remove_from_album_confirmation_text">¿Eliminar del álbum?</string>
     <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
-    <string name="settings_camera_uploads_grant_media_permissions_body">Para activar las subidas desde la cámara, permite a MEGA acceder a tus fotos y vídeos entu dispositivo.</string>
+    <string name="settings_camera_uploads_grant_media_permissions_body">Para activar las subidas desde la cámara, permite a MEGA acceder a tus fotos y vídeos en tu dispositivo.</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
-    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Conceder acceso</string>
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Permitir acceso</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">No conceder</string>
     <!--  -->
@@ -5337,14 +5336,14 @@
     <string name="chat_chatroom_first_message_header_authenticity_info_text">El sistema comprueba que los datos recibidos procedan del remitente original y que su contenido no haya sido manipulado durante la transmisión.</string>
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_get_pro_title">Obtén más con un plan Pro</string>
-    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">Amplía a un plan Pro para obtener más almacenamiento y muchas funciones adicionales. Nuestros planes comienzan desde %s al mes.</string>
+    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
+    <string name="dialog_onboarding_get_pro_description">Upgrade to a Pro plan and get more storage and access to Pro features. Plans start from as low as %1$s a month</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_some_features_title">Algunas de las características que esperamos con ansias son:</string>
+    <string name="dialog_onboarding_some_features_title">MEGA&#160;Pro plans include:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_storage">Almacenamiento generoso</string>
-    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
-    <string name="dialog_onboarding_feature_description_storage">Almacena datos ilimitados, a partir de %s.</string>
+    <string name="dialog_onboarding_feature_title_storage">Ultimate storage flexibility</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
+    <string name="dialog_onboarding_feature_description_storage">Starting from %1$s, find the perfect fit for your storage needs.</string>
     <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_transfer">Transferencia compartida</string>
     <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -5354,7 +5353,7 @@
     <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_description_security">Establece contraseñas y fechas de caducidad para los enlaces a carpetas y archivos.</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
-    <string name="dialog_onboarding_button_view_pro_plan">Descubre los planes Pro</string>
+    <string name="dialog_onboarding_button_view_pro_plan">Upgrade to Pro today</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s está presentando</string>
     <!-- Warning indicating that a participant is sharing the screen-->
@@ -5456,9 +5455,9 @@
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_subscription_details">La suscripción se renueva automáticamente con la misma duración y precio elegidos inicialmente. Puedes desactivar la renovación automática de la suscripción a MEGA&#160;Pro en la página de suscripciones de [A]Google Play[/A] hasta 24 horas antes de la renovación programada.</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
-    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Permitir acceso a la galería</string>
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Permite el acceso a la galería</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
-    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Conceder acceso</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Permitir acceso</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">Actualización requerida</string>
     <!-- The Body of the Dialog shown to Update the application from playstore -->
@@ -5634,9 +5633,9 @@
     <!-- Hidden nodes show items description -->
     <string name="hidden_nodes_show_items_description">Todos los elementos ocultos estarán visibles, pero desenfocados para indicar su estado “oculto”</string>
     <!-- Button text for photo option in camera screen -->
-    <string name="camera_photo_button">Photo</string>
-    <string name="camera_flash_mode_on">Flash mode on</string>
+    <string name="camera_photo_button">Foto</string>
+    <string name="camera_flash_mode_on">Modo flash activado</string>
     <string name="camera_flash_mode_off">Flash mode off</string>
     <string name="camera_flash_mode_auto">Flash mode auto</string>
-    <string name="camera_send_to">Send to %1$s</string>
+    <string name="camera_send_to">Enviar a %1$s</string>
 </resources>

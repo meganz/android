@@ -9,9 +9,9 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Synchronisations [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">Nous devons accéder à la mémoire de votre appareil pour synchroniser votre dossier local. Touchez ici pour accorder l’accès.</string>
+    <string name="sync_storage_permission_banner">Nous devons accéder à la mémoire de votre appareil pour synchroniser votre dossier local. Touchez ici pour autoriser l’accès.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">Afin de synchroniser en permanence vos fichiers et dossiers, autorisez MEGA à fonctionner en arrière-plan.</string>
+    <string name="sync_battery_optimisation_banner">Afin de synchroniser en permanence vos fichiers et dossiers, autorisez MEGA à fonctionner en arrière-plan</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d fichier</item>
@@ -187,7 +187,7 @@
     <!-- Sync stalled issue reason is Name clash detailed description-->
     <string name="sync_stalled_issue_name_clash_detail">Plusieurs éléments du même nom d’un côté de votre synchronisation deviendraient le même élément de l’autre côté de votre synchronisation</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename action was detected in MEGA, but couldn’t be replicated locally.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_mega">Un déplacement ou un renommage a été détecté sur MEGA, mais n’a pas pu être reproduit localement.</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_local">Un déplacement ou un renommage a été détecté localement, mais n’a pas pu être reproduit sur MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->

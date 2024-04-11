@@ -9,9 +9,9 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">同步[A]（%1$d）[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">我們需要存取您的裝置儲存空間，以便同步您的本地資料夾。點選此處以授予存取權限。</string>
+    <string name="sync_storage_permission_banner">We need to access your device storage in order to sync your local folder. Tap here to allow access.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">若要持續同步您的檔案和資料夾，請允許MEGA在背景執行。</string>
+    <string name="sync_battery_optimisation_banner">To continuously sync your files and folders, allow MEGA to run in the background</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="other">%d個檔案</item>
@@ -103,7 +103,7 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">只在WiFi連線</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">您需要在\n裝置上設定一個本地資料夾，該資料夾將與\n您雲端硬碟上選定的資料夾同步。</string>
+    <string name="sync_empty_state_message">You’ll need to set up a local folder on your device that will sync with a chosen folder on your Cloud drive</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_notification_monitoring_description">監控同步</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->

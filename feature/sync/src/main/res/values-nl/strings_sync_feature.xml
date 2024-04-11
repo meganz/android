@@ -9,9 +9,9 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Synchronisaties [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">We hebben toegang tot de opslag van uw apparaat nodig om uw lokale map te kunnen synchroniseren. Tik hier om toegang te verlenen.</string>
+    <string name="sync_storage_permission_banner">We need to access your device storage in order to sync your local folder. Tap here to allow access.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">Om uw bestanden en mappen continu te synchroniseren, kunt u MEGA op de achtergrond laten draaien.</string>
+    <string name="sync_battery_optimisation_banner">To continuously sync your files and folders, allow MEGA to run in the background</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d bestand</item>
@@ -107,7 +107,7 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Alleen Wi-Fi</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">U moet een lokale map op uw \napparaat instellen die wordt gesynchroniseerd met een gekozen map op \nuw clouddrive.</string>
+    <string name="sync_empty_state_message">You’ll need to set up a local folder on your device that will sync with a chosen folder on your Cloud drive</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_notification_monitoring_description">Synchronisaties toezien</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->

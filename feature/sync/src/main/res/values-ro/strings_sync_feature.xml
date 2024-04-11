@@ -9,9 +9,9 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Sincronizări [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">Trebuie să accesăm spațiul de stocare al dispozitivului pentru a vă sincroniza folderul local. Atingeți aici pentru a acorda acces.</string>
+    <string name="sync_storage_permission_banner">Trebuie să accesăm spațiul de stocare al dispozitivului pentru a vă sincroniza folderul local. Atingeți aici pentru a permite accesul.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">Pentru a sincroniza continuu fișierele și folderele, permiteți MEGA să ruleze în fundal.</string>
+    <string name="sync_battery_optimisation_banner">Pentru a sincroniza continuu fișierele și folderele, permiteți MEGA să ruleze în fundal</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d fișier</item>
@@ -111,7 +111,7 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Numai Wi-Fi</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">Va trebui să configurați un folder local pe\ndispozitivul dvs. care se va sincroniza cu un folder ales de pe \nUnitatea dvs. cloud.</string>
+    <string name="sync_empty_state_message">Va trebui să configurați un folder local pe dispozitivul dvs. care se va sincroniza cu un folder ales de pe Unitatea dvs. cloud</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_notification_monitoring_description">Monitorizarea sincronizărilor</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
@@ -187,7 +187,7 @@
     <!-- Sync stalled issue reason is Name clash detailed description-->
     <string name="sync_stalled_issue_name_clash_detail">Există mai multe elemente cu același nume pe o parte a sincronizării dvs. care ar deveni toate același element unic pe cealaltă parte a sincronizării</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename action was detected in MEGA, but couldn’t be replicated locally.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_mega">O mutare sau redenumire a fost detectată în MEGA, dar nu a putut fi replicată local.</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_local">O mutare sau redenumire a fost detectată la nivel local, dar nu a putut fi reprodusă în MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->

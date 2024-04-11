@@ -9,9 +9,9 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">同步[A]（%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">我们需要访问您设备的存储空间，才能同步您的本地文件夹。点按此处以授予访问权限。</string>
+    <string name="sync_storage_permission_banner">我们需要访问您设备的存储空间，才能同步您的本地文件夹。点按此处以允许访问。</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">若要持续同步您的文件和文件夹，请允许MEGA在后台运行。</string>
+    <string name="sync_battery_optimisation_banner">若要持续同步您的文件和文件夹，请允许MEGA在后台运行</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="other">%d个文件</item>
@@ -103,7 +103,7 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">仅限Wi-Fi</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">您需要在您的\n设备上设置一个本地文件夹，它将与\n您云盘的选定文件夹同步。</string>
+    <string name="sync_empty_state_message">您需要在您的设备上设置一个本地文件夹，该文件夹将与您云盘上的选定文件夹同步</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_notification_monitoring_description">监控同步</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
@@ -179,7 +179,7 @@
     <!-- Sync stalled issue reason is Name clash detailed description-->
     <string name="sync_stalled_issue_name_clash_detail">同步的一侧具有多个相同名称的项目，这些项目在同步的另一侧都将成为相同的单一项目</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename action was detected in MEGA, but couldn’t be replicated locally.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_mega">在MEGA中检测到移动或重命名操作，但无法在本地重现。</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_local">检测到本地发生的移动或重命名，但无法在MEGA中复制。</string>
     <!-- Sync stalled issue delete or move scanning detail-->

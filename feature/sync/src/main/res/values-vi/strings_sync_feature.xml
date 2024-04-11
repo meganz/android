@@ -9,9 +9,9 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Đồng bộ [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">Chúng tôi cần truy cập bộ nhớ thiết bị để đồng bộ hóa thư mục cục&#160;bộ của bạn. Chạm vào đây để cấp quyền truy cập.</string>
+    <string name="sync_storage_permission_banner">We need to access your device storage in order to sync your local folder. Tap here to allow access.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">Để liên&#160;tục đồng&#160;bộ hóa các tệp&#160;tin và thư&#160;mục của bạn, cho phép MEGA chạy trong nền.</string>
+    <string name="sync_battery_optimisation_banner">To continuously sync your files and folders, allow MEGA to run in the background</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="other">%d tệp tin</item>
@@ -103,7 +103,7 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Chỉ lúc dùng Wi-Fi</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">Bạn sẽ cần thiết&#160;lập một thư&#160;mục cục&#160;bộ trên thiết&#160;bị của mình sẽ đồng&#160;bộ hóa với một thư&#160;mục chọn ra trên Ổ&#160;Mây của bạn.</string>
+    <string name="sync_empty_state_message">You’ll need to set up a local folder on your device that will sync with a chosen folder on your Cloud drive</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_notification_monitoring_description">Đang giám sát các đồng bộ</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->

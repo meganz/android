@@ -746,7 +746,7 @@
     <!-- Title of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_title">メールアドレスの認証</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_text">メールを確認して続行してください。</string>
+    <string name="email_verification_text">メール受信箱を確認して続行してください。</string>
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">エラーが発生しました。もう一度やり直してください。</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
@@ -806,7 +806,7 @@
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">情報を取得中&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
-    <string name="email_verification_text_change_mail">新しいメールアドレスを検証する必要があります。続行するにはメールを確認してください。</string>
+    <string name="email_verification_text_change_mail">新しいメールアドレスを検証する必要があります。新しいメールアドレスの受信箱を確認して続行してください。</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
     <string name="confirmation_delete_avatar">プロファイル画像を削除しますか？</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
@@ -834,7 +834,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">ログインに失敗した回数が多すぎます。1時間お待ちください</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">このアカウントはまだ検証されていません。メールを確認してください。</string>
+    <string name="account_not_validated_login">このアカウントはまだ検証されていません。メール受信箱をご確認ください。</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">フォルダリンクが使用できません</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
@@ -848,7 +848,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">メールの確認を待っています</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">受信トレイに移動し、アカウントを確認するためにリンクをタップしてください。</string>
+    <string name="confirm_email_explanation">メール受信箱を確認し、リンクをクリックしてアカウントを認証してください。</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="other">%1$d項目</item>
@@ -3298,7 +3298,7 @@
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">すでにサブスクリプションをお持ちです。もう一つご購入されると、二重課金になります。これを避けるには、デスクトップまたはモバイルのウェブブラウザでMEGAにアクセスし、現在のサブスクリプションを解約してください。詳しくは、ヘルプセンターをご覧ください。</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
-    <string name="meeting_bluetooth_connect_required_permissions_warning">設定から、MEGAにBluetoothを使用してお近くの機器にアクセスする権限を与えてください。</string>
+    <string name="meeting_bluetooth_connect_required_permissions_warning">「設定」に移動し、MEGAがBluetoothを使用してお近くのデバイスにアクセスすることを許可してください。</string>
     <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
     <string name="upgrade_billing_warning">ご請求を進めることができません。デュアルアプリをお使いの方は、デュアルアプリなしでのログインをご検討ください。そうでない場合は、ウェブブラウザでアップグレードしてみてください。</string>
     <!-- Title for subscription dialog that shows before delete account -->
@@ -3650,7 +3650,7 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">ここにバックアップしたファイルやフォルダが保存されます。バックアップされたアイテムは、クラウドドライブ内で誤って変更されないように「読み取り専用」になります。\n当社のデスクトップアプリケーションを使用して、パソコンからMEGAにアイテムをバックアップすることができます。</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">度重なる著作権侵害の申し立てにより、あなたのMEGAアカウントは停止されました。これは、アカウントまたはアカウント内のデータにアクセスできないことを意味します。\n異議申し立て通知を提出する方法の詳細については、メールを確認してください。</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">度重なる著作権侵害の申し立てにより、あなたのMEGAアカウントは停止されました。これは、アカウントまたはアカウント内のデータにアクセスできないことを意味します。\n異議申し立て通知を提出する方法の詳細については、メール受信箱を確認してください。</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">MEGAのご利用規約違反により、あなたのアカウントは停止されました。\n保存されたデータへのアクセスを回復したり、MEGAアカウントを新規登録したりすることはできません。</string>
     <!-- Title of the Meetings tab for the chat section -->
@@ -4875,14 +4875,14 @@
     <string name="chat_chatroom_first_message_header_authenticity_info_text">このシステムは、受信したデータが表示された送信者からのものであり、そのコンテンツが転送中に操作されていないことを保証します。</string>
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_get_pro_title">Proプランでさらに充実</string>
-    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">Proプランにアップグレードしていただくと、より多くのストレージと多くの追加機能をご利用いただけます。当社のプランは月額%sから始まります。</string>
+    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
+    <string name="dialog_onboarding_get_pro_description">Proプランにアップグレードしていただくと、ストレージが増え、各種Pro機能をご利用いただけるようになります。プランは月額%1$sからご利用いただけます</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_some_features_title">ご期待いただける機能としては次のようなものがあります。</string>
+    <string name="dialog_onboarding_some_features_title">MEGA&#160;Pro plans include:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_storage">豊富なストレージ</string>
-    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
-    <string name="dialog_onboarding_feature_description_storage">無制限にデータを保管できます（%sから）。</string>
+    <string name="dialog_onboarding_feature_title_storage">究極のストレージの柔軟性</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
+    <string name="dialog_onboarding_feature_description_storage">%1$sから始めて、お客様のストレージのニーズに最適なものを見つけてください。</string>
     <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_transfer">転送共有</string>
     <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -4892,7 +4892,7 @@
     <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_description_security">ファイルとフォルダのリンクのパスワードと有効期限を設定できます。</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
-    <string name="dialog_onboarding_button_view_pro_plan">Proプランを見る</string>
+    <string name="dialog_onboarding_button_view_pro_plan">今すぐProにアップグレード</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$sさんがプレゼン中です</string>
     <!-- Warning indicating that a participant is sharing the screen-->
@@ -5159,8 +5159,8 @@
     <string name="hidden_nodes_show_items_description">非表示の項目はすべて表示されますが、「非表示」ステータスを示すためにぼかされます</string>
     <!-- Button text for photo option in camera screen -->
     <string name="camera_photo_button">写真</string>
-    <string name="camera_flash_mode_on">Flash mode on</string>
-    <string name="camera_flash_mode_off">Flash mode off</string>
-    <string name="camera_flash_mode_auto">Flash mode auto</string>
-    <string name="camera_send_to">Send to %1$s</string>
+    <string name="camera_flash_mode_on">フラッシュモードオン</string>
+    <string name="camera_flash_mode_off">フラッシュモードオフ</string>
+    <string name="camera_flash_mode_auto">フラッシュモード自動</string>
+    <string name="camera_send_to">%1$sに送信</string>
 </resources>
