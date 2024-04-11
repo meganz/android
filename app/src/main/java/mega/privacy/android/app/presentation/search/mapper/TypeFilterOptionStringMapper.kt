@@ -2,8 +2,8 @@ package mega.privacy.android.app.presentation.search.mapper
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.search.TypeFilterOption
+import mega.privacy.android.shared.resources.R
 import javax.inject.Inject
 
 /**
@@ -23,10 +23,10 @@ class TypeFilterOptionStringMapper @Inject constructor(
         TypeFilterOption.Video -> context.getString(R.string.search_dropdown_chip_filter_type_file_type_video)
         TypeFilterOption.Images -> context.getString(R.string.search_dropdown_chip_filter_type_file_type_images)
         TypeFilterOption.Documents -> context.getString(R.string.search_dropdown_chip_filter_type_file_type_documents)
-        TypeFilterOption.Folder -> "Folder"
-        TypeFilterOption.Pdf -> "Pdf"
-        TypeFilterOption.Presentation -> "Presentation"
-        TypeFilterOption.Spreadsheet -> "Spreadsheet"
-        TypeFilterOption.Other -> "Other"
+        TypeFilterOption.Folder -> context.getString(R.string.search_dropdown_chip_filter_type_file_type_folders)
+        TypeFilterOption.Pdf -> context.getString(R.string.search_dropdown_chip_filter_type_file_type_pdf)
+        TypeFilterOption.Presentation -> context.getString(R.string.search_dropdown_chip_filter_type_file_type_presentations)
+        TypeFilterOption.Spreadsheet -> context.getString(R.string.search_dropdown_chip_filter_type_file_type_spreadsheets)
+        TypeFilterOption.Other -> context.getString(R.string.search_dropdown_chip_filter_type_file_type_others)
     }
 }

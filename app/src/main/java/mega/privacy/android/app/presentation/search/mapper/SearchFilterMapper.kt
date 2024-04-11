@@ -2,9 +2,9 @@ package mega.privacy.android.app.presentation.search.mapper
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.shared.resources.R
 import javax.inject.Inject
 
 /**
@@ -22,64 +22,59 @@ class SearchFilterMapper @Inject constructor(
      * @param category search category enum [SearchCategory]
      */
     operator fun invoke(category: SearchCategory) = when (category) {
-        SearchCategory.ALL -> SearchFilter(
-            SearchCategory.ALL,
-            context.getString(R.string.all_view_button)
-        )
-
         SearchCategory.IMAGES -> SearchFilter(
             SearchCategory.IMAGES,
-            context.getString(R.string.section_images)
+            context.getString(R.string.search_dropdown_chip_filter_type_file_type_images)
         )
 
         SearchCategory.ALL_DOCUMENTS -> SearchFilter(
             SearchCategory.ALL_DOCUMENTS,
-            context.getString(R.string.section_documents)
+            context.getString(R.string.search_dropdown_chip_filter_type_file_type_documents)
         )
 
         SearchCategory.AUDIO -> SearchFilter(
             SearchCategory.AUDIO,
-            context.getString(R.string.upload_to_audio)
+            context.getString(R.string.search_dropdown_chip_filter_type_file_type_audio)
         )
 
         SearchCategory.VIDEO -> SearchFilter(
             SearchCategory.VIDEO,
-            context.getString(R.string.upload_to_video)
+            context.getString(R.string.search_dropdown_chip_filter_type_file_type_video)
         )
 
         SearchCategory.PDF -> SearchFilter(
             SearchCategory.PDF,
-            "Pdf"//            context.getString(R.string.section_pdf)
+            context.getString(R.string.search_dropdown_chip_filter_type_file_type_pdf)
         )
 
         SearchCategory.PRESENTATION -> SearchFilter(
             SearchCategory.PRESENTATION,
-            "Presentation"//context.getString(R.string.section_presentation)
+            context.getString(R.string.search_dropdown_chip_filter_type_file_type_presentations)
         )
 
         SearchCategory.SPREADSHEET -> SearchFilter(
             SearchCategory.SPREADSHEET,
-            "Spreadsheet"// context.getString(R.string.section_spreadsheet)
+            context.getString(R.string.search_dropdown_chip_filter_type_file_type_spreadsheets)
         )
 
         SearchCategory.FOLDER -> SearchFilter(
             SearchCategory.FOLDER,
-            "Folder"//context.getString(R.string.section_folder)
+            context.getString(R.string.search_dropdown_chip_filter_type_file_type_folders)
         )
 
         SearchCategory.OTHER -> SearchFilter(
             SearchCategory.OTHER,
-            "Other"//context.getString(R.string.section_other)
+            context.getString(R.string.search_dropdown_chip_filter_type_file_type_others)
         )
 
         SearchCategory.DOCUMENTS -> SearchFilter(
             SearchCategory.DOCUMENTS,
-            context.getString(R.string.section_documents)
+            context.getString(R.string.search_dropdown_chip_filter_type_file_type_documents)
         )
 
         else -> SearchFilter(
             SearchCategory.ALL,
-            "All"
+            ""
         )
     }
 }

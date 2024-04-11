@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R
 import mega.privacy.android.domain.entity.search.TypeFilterOption
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,14 +25,14 @@ class TypeFilterOptionStringMapperTest {
         assertThat(typeFilterOptionStringMapper(TypeFilterOption.Video))
             .isEqualTo(context.getString(R.string.search_dropdown_chip_filter_type_file_type_video))
         assertThat(typeFilterOptionStringMapper(TypeFilterOption.Pdf))
-            .isEqualTo("Pdf")
+            .isEqualTo(context.getString(R.string.search_dropdown_chip_filter_type_file_type_pdf))
         assertThat(typeFilterOptionStringMapper(TypeFilterOption.Presentation))
-            .isEqualTo("Presentation")
+            .isEqualTo(context.getString(R.string.search_dropdown_chip_filter_type_file_type_presentations))
         assertThat(typeFilterOptionStringMapper(TypeFilterOption.Spreadsheet))
-            .isEqualTo("Spreadsheet")
+            .isEqualTo(context.getString(R.string.search_dropdown_chip_filter_type_file_type_spreadsheets))
         assertThat(typeFilterOptionStringMapper(TypeFilterOption.Folder))
-            .isEqualTo("Folder")
+            .isEqualTo(context.getString(R.string.search_dropdown_chip_filter_type_file_type_folders))
         assertThat(typeFilterOptionStringMapper(TypeFilterOption.Other))
-            .isEqualTo("Other")
+            .isEqualTo(context.getString(R.string.search_dropdown_chip_filter_type_file_type_others))
     }
 }
