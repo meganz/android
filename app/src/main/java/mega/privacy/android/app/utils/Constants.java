@@ -221,6 +221,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_FILE_NAME = "FILENAME";
     public static final String INTENT_EXTRA_KEY_SCREEN_POSITION = "screenPosition";
     public static final String INTENT_EXTRA_KEY_ADAPTER_TYPE = "adapterType";
+    public static final String INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE = "mediaQueueTitle";
     public static final String INTENT_EXTRA_KEY_VIEWER_FROM = "viewerFrom";
     public static final String INTENT_EXTRA_KEY_FROM_DOWNLOAD_SERVICE = "fromDownloadService";
     public static final String INTENT_EXTRA_KEY_INSIDE = "inside";

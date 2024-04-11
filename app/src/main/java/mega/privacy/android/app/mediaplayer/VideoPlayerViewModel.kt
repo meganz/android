@@ -82,6 +82,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INVALID_SIZE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
@@ -923,6 +924,9 @@ class VideoPlayerViewModel @Inject constructor(
                     }
 
                     SEARCH_BY_ADAPTER -> {
+                        _playlistTitleState.update {
+                            intent.getStringExtra(INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE) ?: ""
+                        }
                         intent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH)
                             ?.let { handles ->
                                 buildPlaylistFromHandles(

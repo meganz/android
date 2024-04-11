@@ -55,6 +55,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
 import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
@@ -292,6 +293,7 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
 
             videoPlaylistDetailRoute -> {
                 putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, SEARCH_BY_ADAPTER)
+                putExtra(INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE, state.currentVideoPlaylist?.title)
                 state.currentVideoPlaylist?.videos?.map { it.id.longValue }?.let {
                     putExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH, it.toLongArray())
                 }
