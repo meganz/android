@@ -254,11 +254,12 @@ class FileBrowserComposeFragment : Fragment() {
                             },
                             snackBarHostState = snackbarHostState,
                         )
-                        StartDownloadComponent(
+                        EventEffect(
                             event = nodeActionState.downloadEvent,
-                            onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
-                            snackBarHostState = snackbarHostState,
-                        )
+                            onConsumed = nodeActionsViewModel::markDownloadEventConsumed
+                        ) {
+                            fileBrowserViewModel.onDownloadFileTriggered(it)
+                        }
                     }
                 }
                 performItemOptionsClick(uiState.optionsItemInfo)

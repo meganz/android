@@ -734,6 +734,17 @@ class FileBrowserViewModel @Inject constructor(
     }
 
     /**
+     * Download file triggered
+     */
+    fun onDownloadFileTriggered(triggerEvent: TransferTriggerEvent) {
+        _state.update {
+            it.copy(
+                downloadEvent = triggered(triggerEvent)
+            )
+        }
+    }
+
+    /**
      * Consumes the Exit File Browser Event
      */
     fun consumeExitFileBrowserEvent() {

@@ -27,6 +27,7 @@ import mega.privacy.android.app.presentation.transfers.startdownload.model.Trans
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
@@ -440,6 +441,45 @@ class FileBrowserViewModelTest {
                 assertThat(state.downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
                 assertThat((state.downloadEvent as StateEventWithContentTriggered).content)
                     .isInstanceOf(TransferTriggerEvent.StartDownloadNode::class.java)
+            }
+        }
+
+    @Test
+    fun `test that download event is updated when on available offline option click is invoked`() =
+        runTest {
+            val triggered = TransferTriggerEvent.StartDownloadForOffline(node = mock())
+            underTest.onDownloadFileTriggered(triggered)
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat((state.downloadEvent as StateEventWithContentTriggered).content)
+                    .isInstanceOf(TransferTriggerEvent.StartDownloadForOffline::class.java)
+            }
+        }
+
+    @Test
+    fun `test that download event is updated when on download option click is invoked`() =
+        runTest {
+            val triggered = TransferTriggerEvent.StartDownloadNode(nodes = listOf(mock()))
+            underTest.onDownloadFileTriggered(triggered)
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat((state.downloadEvent as StateEventWithContentTriggered).content)
+                    .isInstanceOf(TransferTriggerEvent.StartDownloadNode::class.java)
+            }
+        }
+
+    @Test
+    fun `test that download event is updated when on download for preview option click is invoked`() =
+        runTest {
+            val triggered = TransferTriggerEvent.StartDownloadForPreview(node = mock())
+            underTest.onDownloadFileTriggered(triggered)
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat((state.downloadEvent as StateEventWithContentTriggered).content)
+                    .isInstanceOf(TransferTriggerEvent.StartDownloadForPreview::class.java)
             }
         }
 
