@@ -11,7 +11,7 @@
     <!-- Sync when storage permission is denied we show banner with text to the user-->
     <string name="sync_storage_permission_banner">Nós precisamos acessar o armazenamento do seu dispositivo para sincronizar a sua pasta local. Toque aqui para permitir o acesso</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">Para a sincronização contínua dos seus arquivos e das suas pastas, permita que o MEGA seja executado em segundo plano.</string>
+    <string name="sync_battery_optimisation_banner">Para a sincronização contínua dos seus arquivos e das suas pastas, permita que o MEGA seja executado em segundo plano</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d arquivo</item>
@@ -111,7 +111,7 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Somente Wi-Fi</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">Você precisará configurar uma pasta local no seu\ndispositivo que será sincronizada com uma pasta da\nsua Nuvem de arquivos.</string>
+    <string name="sync_empty_state_message">Você precisará configurar uma pasta local no seu dispositivo que será sincronizada com uma pasta da sua Nuvem de arquivos</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_notification_monitoring_description">Monitorando sincronizações</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->

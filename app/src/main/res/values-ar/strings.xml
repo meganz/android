@@ -791,7 +791,7 @@
     <!-- Title of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_title">توثيق عنوان البريد الإلكتروني</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_text">الرجاء تفقد بريدك الالكتروني للاستمرار.</string>
+    <string name="email_verification_text">تحقق من صندوق البريد الإلكتروني الخاص بك للمتابعة.</string>
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">خطأ حصل. الرجاء المحاولة مرة أخرى.</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
@@ -835,7 +835,7 @@
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
     <string name="mail_same_as_old">هذا هو عنوان بريدك الإلكتروني الحالي.</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
-    <string name="change_mail_text_last_step">هذه هي الخطوة الأخيرة لتغيير البريد الإلكتروني الخاص بك. يرجى إدخال كلمة المرور أدناه.</string>
+    <string name="change_mail_text_last_step">هذه هي الخطوة الأخيرة لتغيير عنوان بريدك الإلكتروني. أدخل كلمة المرور الخاصة بك أدناه.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">تغيير البريد الإلكتروني</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
@@ -851,7 +851,7 @@
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">جاري الحصول على المعلومات&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
-    <string name="email_verification_text_change_mail">عنوان بريدك الإلكتروني الجديد يحتاج إلى التحقق من صحته. يرجى التحقق من البريد الإلكتروني الخاص بك والاستمرار.</string>
+    <string name="email_verification_text_change_mail">يجب التحقق من صحة عنوان بريدك الإلكتروني الجديد. تحقق من البريد الوارد لعنوان البريد الإلكتروني الجديد للمتابعة.</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
     <string name="confirmation_delete_avatar">هل تريد حذف صورة ملفك الشخصي؟</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
@@ -884,7 +884,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">هناك الكثير من المحاولات الفاشلة لتسجيل الدخول، يرجى الانتظار لمدة ساعة.</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">لم يتم التحقق من هذا الحساب بعد. من فضلك تفقد بريدك الالكتروني.</string>
+    <string name="account_not_validated_login">لم يتم التحقق من صحة هذا الحساب حتى الآن. تحقق من صندوق البريد الإلكتروني الخاص بك.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">رابط المجلد غير متوفر</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
@@ -898,7 +898,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">بانتظار تأكيد البريد الإلكتروني</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">يُرجى التحقق من البريد الإلكتروني الخاص بك واضغط على الرابط لتأكيد حسابك.</string>
+    <string name="confirm_email_explanation">تحقق من صندوق البريد الإلكتروني الخاص بك واتبع الرابط لتأكيد حسابك.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="zero">%1$d عنصر</item>
@@ -2238,7 +2238,7 @@
     <plurals name="plural_select_file">
         <item quantity="zero">اختر ملف</item>
         <item quantity="one">اختر ملف</item>
-        <item quantity="two">اختر ملفات</item>
+        <item quantity="two">اختر ملفين</item>
         <item quantity="few">اختر ملفات</item>
         <item quantity="many">اختر ملفات</item>
         <item quantity="other">اختر ملفات</item>
@@ -2540,7 +2540,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">تمكين المكالمات</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">منح حق الوصول إلى دفتر العناوين الخاص بك</string>
+    <string name="allow_acces_contact_title">Allow access to your address book</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">اكتشف جهات الاتصال بسهولة من دفتر العناوين الخاص بك على ميغا MEGA.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3758,7 +3758,7 @@
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">لديك بالفعل اشتراك. إذا اشتريت واحدة أخرى ، فسيتم محاسبتك مرتين. لتجنب ذلك، قم بإلغاء اشتراكك الحالي بالانتقال إلى ميغا MEGA في متصفح الحاسوب المكتبي أو الهاتف المحمول. قم بزيارة مركز المساعدة للحصول على مزيد من المعلومات.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
-    <string name="meeting_bluetooth_connect_required_permissions_warning">انتقل إلى الإعدادات لمنح ميغا MEGA الإذن للوصول إلى أجهزتك القريبة باستخدام البلوتوث.</string>
+    <string name="meeting_bluetooth_connect_required_permissions_warning">Go to Settings to allow MEGA permission to access your nearby devices using Bluetooth.</string>
     <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
     <string name="upgrade_billing_warning">نحن غير قادرين على المضي قدماً في الفواتير. إذا كنت تستخدم تطبيقًا مزدوجًا ، فالرجاء تسجيل الدخول إلى ميغا MEGA بدونه. إذا لم يكن كذلك، فحاول الترقية من خلال متصفح الويب الخاص بك.</string>
     <!-- Title for subscription dialog that shows before delete account -->
@@ -4140,7 +4140,7 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">هذا هو المكان الذي يتم فيه تخزين الملفات والمجلدات التي تم نسخها احتياطيًا. العناصر التي تم نسخها احتياطيًا هي ”للقراءة فقط“ لحمايتها من التعديل العرضي في السواقة السحابية الخاص بك.\nيمكنك نسخ العناصر احتياطيًا من جهاز الكمبيوتر الخاص بك إلى ميغا MEGA باستخدام تطبيق الحاسوب المكتبي الخاص بنا.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">تم تعليق حساب ميغا MEGA الخاص بك بسبب الادعاءات المتكررة بانتهاكات حقوق النشر. هذا يعني أنه لا يمكنك الوصول إلى حسابك أو البيانات الموجودة فيه.\n تحقق من بريدنا الإلكتروني للحصول على مزيد من المعلومات حول كيفية تقديم إشعار مضاد.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck your email inbox for more information on how to file a counter-notice.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">تم إنهاء حسابك بسبب خرق لشروط خدمة ميغا MEGA.\n لن تتمكن من استعادة الوصول إلى بياناتك المخزنة أو لن يُسمح لك بتسجيل حساب ميغا MEGA جديد.</string>
     <!-- Title of the Meetings tab for the chat section -->
@@ -4291,9 +4291,9 @@
     <!-- Dialog confirmation text for removing photos in an album -->
     <string name="photos_album_remove_from_album_confirmation_text">إزالة من الألبوم؟</string>
     <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
-    <string name="settings_camera_uploads_grant_media_permissions_body">لتمكين ترفيعات الكاميرا، امنح ميغا MEGA إمكانية الوصول إلى صورك والوسائط الأخرى على جهازك.</string>
+    <string name="settings_camera_uploads_grant_media_permissions_body">To enable camera uploads, allow MEGA access to your photos and other media on your device.</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
-    <string name="settings_camera_uploads_grant_media_permissions_positive_button">منح اذن الوصول</string>
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">السماح بالوصول</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">لا تمنح</string>
     <!--  -->
@@ -5895,7 +5895,7 @@
     <!-- Message to user when app update is downloaded -->
     <string name="general_app_update_message_download_success">تم تحديث التطبيق</string>
     <!-- Action allowing user to restart the app after downloading the update -->
-    <string name="general_app_update_action_restart">Relaunch the app</string>
+    <string name="general_app_update_action_restart">أعد تشغيل التطبيق</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">السماح بالوصول إلى الملفات الصوتية</string>
     <!-- Photos action menu zoom in -->
@@ -6030,14 +6030,14 @@
     <string name="chat_chatroom_first_message_header_authenticity_info_text">يضمن النظام عرض البيانات الواردة من المرسل، وعدم التلاعب بمحتواها أثناء النقل.</string>
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_get_pro_title">احصل على المزيد مع باقة برو Pro</string>
-    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">قم بالترقية إلى باقة برو Pro لمزيد من مساحة التخزين والكثير من الميزات الإضافية. تبدأ باقاتنا من %s في الشهر الواحد.</string>
+    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
+    <string name="dialog_onboarding_get_pro_description">Upgrade to a Pro plan and get more storage and access to Pro features. Plans start from as low as %1$s a month</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_some_features_title">بعض الميزات التي تتطلع إليها هي:</string>
+    <string name="dialog_onboarding_some_features_title">MEGA&#160;Pro plans include:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_storage">مساحة تخزين سخية</string>
-    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
-    <string name="dialog_onboarding_feature_description_storage">قم بتخزين بيانات غير محدودة، بدءًا من %s</string>
+    <string name="dialog_onboarding_feature_title_storage">Ultimate storage flexibility</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
+    <string name="dialog_onboarding_feature_description_storage">Starting from %1$s, find the perfect fit for your storage needs.</string>
     <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_transfer">مشاركة تراسل المعطيات</string>
     <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -6047,7 +6047,7 @@
     <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_description_security">قم بتعيين كلمات المرور وتواريخ انتهاء الصلاحية لروابط الملفات والمجلدات.</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
-    <string name="dialog_onboarding_button_view_pro_plan">عرض باقات برو Pro</string>
+    <string name="dialog_onboarding_button_view_pro_plan">Upgrade to Pro today</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s يقوم بالتقديم</string>
     <!-- Warning indicating that a participant is sharing the screen-->
@@ -6158,9 +6158,9 @@
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_subscription_details">يتم تجديد الاشتراكات تلقائيًا لفترات اشتراك متتالية من نفس المدة وبنفس سعر الفترة الأولية المختارة. يمكنك إيقاف التجديد التلقائي لاشتراك ميغا برو MEGA&#160;Pro الخاص بك في موعد لا يتجاوز 24 ساعة قبل استحقاق دفعة الاشتراك التالية عبر الاشتراكات في [A]غوغل بلاي Google Play[/A].</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
-    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">السماح بالوصول إلى معرض الصور الخاص بك</string>
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Allow access to your Gallery</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
-    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">منح اذن الوصول</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">السماح بالوصول</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">التحديث مطلوب</string>
     <!-- The Body of the Dialog shown to Update the application from playstore -->
@@ -6283,19 +6283,19 @@
     <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">حسنًا، فهمت ذلك</string>
     <!-- The title of the hidden nodes feature -->
-    <string name="hidden_nodes">Hidden files and folders</string>
+    <string name="hidden_nodes">الملفات والمجلدات المخفية</string>
     <!-- Hidden nodes benefit: hide files and folders -->
-    <string name="hidden_nodes_benefit_title_hide_files_folders">Hide important files and folders</string>
+    <string name="hidden_nodes_benefit_title_hide_files_folders">إخفاء الملفات والمجلدات المهمة</string>
     <!-- Hidden nodes benefit description: hide files and folders -->
-    <string name="hidden_nodes_benefit_description_hide_files_folders">You can conceal sensitive files and folders for privacy. Only you can reveal them, either individually or by temporarily displaying hidden items from the settings.</string>
+    <string name="hidden_nodes_benefit_description_hide_files_folders">يمكنك إخفاء الملفات والمجلدات الحساسة للخصوصية. يمكنك فقط الكشف عنها إما بشكل فردي أو عن طريق عرض العناصر المخفية مؤقتًا من الإعدادات.</string>
     <!-- Hidden nodes benefit: exclude from timeline -->
-    <string name="hidden_nodes_benefit_title_exclude_timeline">Exclude from Timeline</string>
+    <string name="hidden_nodes_benefit_title_exclude_timeline">الاستبعاد من المخطط الزمني</string>
     <!-- Hidden nodes benefit description: exclude from timeline -->
-    <string name="hidden_nodes_benefit_description_exclude_timeline">Hidden items are only accessible through the Cloud drive and will not appear in your Photos, Albums or Recents.</string>
+    <string name="hidden_nodes_benefit_description_exclude_timeline">لا يمكن الوصول إلى العناصر المخفية إلا من خلال السواقة السحابية ولن تظهر في الصور أو الألبومات أو الأحداث الأخيرة.</string>
     <!-- Hidden nodes benefit: out of sight -->
-    <string name="hidden_nodes_benefit_title_out_of_sight">Out of sight</string>
+    <string name="hidden_nodes_benefit_title_out_of_sight">بعيدًا عن الأنظار</string>
     <!-- Hidden nodes benefit description: out of sight -->
-    <string name="hidden_nodes_benefit_description_out_of_sight">You decide when hidden files are visible. There is a new setting to show hidden items temporarily.</string>
+    <string name="hidden_nodes_benefit_description_out_of_sight">عليك أن تقرر متى تكون الملفات المخفية مرئية. هناك إعداد جديد لإظهار العناصر المخفية مؤقتًا.</string>
     <!-- The snackbar message of hidden nodes operation -->
     <plurals name="hidden_nodes_result_message">
         <item quantity="one">%1$d item hidden</item>
@@ -6304,7 +6304,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_priority_support">&#8226;&#160;Priority support</string>
     <!-- The title of the Upgrade bottom sheet dialog  -->
-    <string name="meetings_upgrade_pro_plan_title">Upgrade to Pro to get unlimited calls</string>
+    <string name="meetings_upgrade_pro_plan_title">قم بالترقية إلى برو Pro للحصول على مكالمات غير محدودة</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_body">وصلت مكالمتك إلى حد 60 دقيقة وانتهت. يتمتع مستخدمو برو Pro بمدة مكالمات غير محدودة ويمكنهم دعوة ما يصل إلى 1000 مشارك.</string>
     <!-- The button text of the Upgrade bottom sheet dialog  -->
@@ -6340,7 +6340,7 @@
     <!-- Button text for reporting an issue on the login screen -->
     <string name="general_login_button_report_your_issue">Report your issue</string>
     <!-- Hidden nodes show items -->
-    <string name="hidden_nodes_show_items">Show hidden items</string>
+    <string name="hidden_nodes_show_items">عرض العناصر المخفية</string>
     <!-- Hidden nodes show items description -->
     <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
     <!-- Button text for photo option in camera screen -->

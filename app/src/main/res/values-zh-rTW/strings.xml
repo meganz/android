@@ -746,7 +746,7 @@
     <!-- Title of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_title">電子郵件地址驗證</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_text">請確認您的電子信箱以繼續。</string>
+    <string name="email_verification_text">Check your email inbox to proceed.</string>
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">發生錯誤，請再試一次。</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
@@ -790,7 +790,7 @@
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
     <string name="mail_same_as_old">這是您目前的電子郵件地址。</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
-    <string name="change_mail_text_last_step">這是變更您電子信箱的最後一步了。請於下方輸入您的密碼。</string>
+    <string name="change_mail_text_last_step">This is the last step to change your email address. Enter your password below.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">更改電子信箱</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
@@ -806,7 +806,7 @@
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">正在取得資訊⋯</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
-    <string name="email_verification_text_change_mail">您的新電子郵件地址需要驗證確認。請至您的電子信箱收信並進行驗證。</string>
+    <string name="email_verification_text_change_mail">Your new email address needs to be validated. Check the inbox of the new email address to proceed.</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
     <string name="confirmation_delete_avatar">要刪除您的個人資料相片嗎？</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
@@ -834,7 +834,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">嘗試登入失敗的次數太多，請稍候一個小時後再試。</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">此帳戶尚未驗證啟用。請至你的電子信箱收信確認。</string>
+    <string name="account_not_validated_login">此帳戶尚未通過驗證。請檢查您的電子郵件收件匣。</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">資料夾連結無法使用</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
@@ -848,7 +848,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">等待電子郵件確認中</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">請檢查您的電子郵件，然後點擊信件中的連結來確認您的帳戶。</string>
+    <string name="confirm_email_explanation">檢查您的電子郵件收件匣，並點選連結以確認您的帳戶。</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="other">%1$d個項目</item>
@@ -2011,7 +2011,8 @@
     <string name="contact_info_button_more">更多</string>
     <!-- Section title to select a file to perform an action, more files -->
     <plurals name="plural_select_file">
-        <item quantity="other">選擇檔案</item>
+        <item quantity="one">Choose file</item>
+        <item quantity="other">Choose files</item>
     </plurals>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">選擇資料夾</string>
@@ -2270,7 +2271,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">啟用通話</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">授予對您通訊錄的存取權限</string>
+    <string name="allow_acces_contact_title">允許存取您的通訊錄</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">輕易的在您通訊錄中找到有在使用MEGA的聯絡人。</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3298,7 +3299,7 @@
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">您目前已經有一個訂閱。如果再購買，您將被收取兩次費用。為避免重複訂閱，請在電腦版或手機版網頁瀏覽器中登入MEGA來取消您目前的訂閱。造訪我們的幫助中心瞭解更多訊息。</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
-    <string name="meeting_bluetooth_connect_required_permissions_warning">請至設定授予MEGA使用藍牙連線存取您附近裝置的權限。</string>
+    <string name="meeting_bluetooth_connect_required_permissions_warning">前往設定並授予MEGA使用藍牙存取附近裝置的權限。</string>
     <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
     <string name="upgrade_billing_warning">我們無法處理您的付款。如果您正在使用雙開應用程式，請嘗試不要使用它來登入MEGA。否則請透過網頁瀏覽器進行升級。</string>
     <!-- Title for subscription dialog that shows before delete account -->
@@ -3650,7 +3651,7 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">這是您備份檔案和資料夾存放的地方。您備份的項目是「唯讀」的，以避免它們在您的雲端硬碟中被意外竄改。您可以使用我們桌面應用程式將您電腦中的項目備份到MEGA。</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">由於多次指控侵犯版權，您的MEGA帳戶已被暫停。這意味著您無法存取您的帳戶或其中的資料。\n請查看我們的電子郵件，瞭解有關如何提交反對通知的更多資訊。</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">由於多次侵犯版權的指控，您的MEGA帳戶已被暫停。這意味著您無法存取您的帳戶或當中的資料。\n檢查您的電子郵件收件匣，瞭解有關如何提交反對通知的更多資訊。</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">您的帳戶由於違反MEGA的服務條款而被終止。\n您將無法重新存取您儲存的資料，也無法被授權註冊新的MEGA帳戶。</string>
     <!-- Title of the Meetings tab for the chat section -->
@@ -3776,9 +3777,9 @@
     <!-- Dialog confirmation text for removing photos in an album -->
     <string name="photos_album_remove_from_album_confirmation_text">要從相簿中移除嗎？</string>
     <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
-    <string name="settings_camera_uploads_grant_media_permissions_body">若要啟用相機上傳，請授予MEGA存取您裝置上的相片和其它媒體的權限。</string>
+    <string name="settings_camera_uploads_grant_media_permissions_body">若要啟用相機上傳，請允許予MEGA存取您裝置上的相片和其它媒體。</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
-    <string name="settings_camera_uploads_grant_media_permissions_positive_button">授予權限</string>
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">允許存取</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">不要授予</string>
     <!--  -->
@@ -4875,14 +4876,14 @@
     <string name="chat_chatroom_first_message_header_authenticity_info_text">我們的系統能確保收到的資料是來自所顯示的發送人，且其內容在傳輸過程中不會被篡改。</string>
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_get_pro_title">透過Pro方案獲得更多功能</string>
-    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">升級到Pro方案可獲得更多儲存空間和更多額外的功能。我們的會員方案從每月%s起。</string>
+    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
+    <string name="dialog_onboarding_get_pro_description">Upgrade to a Pro plan and get more storage and access to Pro features. Plans start from as low as %1$s a month</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_some_features_title">一些值得期待的功能：</string>
+    <string name="dialog_onboarding_some_features_title">MEGA&#160;Pro plans include:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_storage">大容量儲存空間</string>
-    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
-    <string name="dialog_onboarding_feature_description_storage">儲存無限資料，從%s起。</string>
+    <string name="dialog_onboarding_feature_title_storage">Ultimate storage flexibility</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
+    <string name="dialog_onboarding_feature_description_storage">Starting from %1$s, find the perfect fit for your storage needs.</string>
     <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_transfer">傳輸流量共享</string>
     <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -4892,7 +4893,7 @@
     <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_description_security">為檔案和資料夾連結設定密碼和到期日期。</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
-    <string name="dialog_onboarding_button_view_pro_plan">查看Pro方案</string>
+    <string name="dialog_onboarding_button_view_pro_plan">Upgrade to Pro today</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s正在展示</string>
     <!-- Warning indicating that a participant is sharing the screen-->
@@ -4990,7 +4991,7 @@
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">允許存取您的相簿</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
-    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">授予權限</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">允許存取</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">需要更新</string>
     <!-- The Body of the Dialog shown to Update the application from playstore -->
@@ -5159,8 +5160,8 @@
     <string name="hidden_nodes_show_items_description">可看到所有隱藏的項目，但會模糊顯示以表示其「隱藏」狀態</string>
     <!-- Button text for photo option in camera screen -->
     <string name="camera_photo_button">拍照</string>
-    <string name="camera_flash_mode_on">Flash mode on</string>
+    <string name="camera_flash_mode_on">閃光模式開啟</string>
     <string name="camera_flash_mode_off">Flash mode off</string>
     <string name="camera_flash_mode_auto">Flash mode auto</string>
-    <string name="camera_send_to">Send to %1$s</string>
+    <string name="camera_send_to">發送至%1$s</string>
 </resources>

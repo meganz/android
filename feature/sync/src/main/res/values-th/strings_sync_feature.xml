@@ -9,9 +9,9 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">ซิงค์ [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">เราจำเป็นต้องเข้าถึงไฟล์ในเครื่องของคุณ เพื่อซิงค์รายการเหล่านั้นกับอุปกรณ์อื่น ๆ แตะที่นี่เพื่ออนุญาตให้เราเข้าถึง</string>
+    <string name="sync_storage_permission_banner">We need to access your device storage in order to sync your local folder. Tap here to allow access.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">เพื่อให้การซิงค์ไฟล์และโฟลเดอร์ของคุณเป็นไปอย่างต่อเนื่อง คุณต้องอนุญาตให้ MEGA ทำงานในเบื้องหลัง</string>
+    <string name="sync_battery_optimisation_banner">To continuously sync your files and folders, allow MEGA to run in the background</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="other">%d ไฟล์</item>
@@ -103,7 +103,7 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Wi-Fi เท่านั้น</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">คุณต้องสร้างโฟลเดอร์ในอุปกรณ์ของคุณ\nที่จะซิงค์กับโฟลเดอร์ที่เลือก\nบนคลาวด์ไดร์ฟของคุณ</string>
+    <string name="sync_empty_state_message">You’ll need to set up a local folder on your device that will sync with a chosen folder on your Cloud drive</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_notification_monitoring_description">กำลังติดตามสถานะการซิงค์</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->

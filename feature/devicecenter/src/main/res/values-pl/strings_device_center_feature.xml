@@ -59,7 +59,7 @@
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="device_center_list_view_item_sub_state_no_sync_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA nie może zsynchronizować ani wykonać kopii zapasowej tego katalogu, ponieważ system plików na urządzeniu nie jest obsługiwany.</string>
+    <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA can’t sync or backup this folder because the file system on your device is not supported</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_remote_type">Nie można zsynchronizować wybranego katalogu</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
@@ -71,33 +71,33 @@
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
     <string name="device_center_list_view_item_sub_state_storage_overquota">Osiągnięto limit przydziału pamięci.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
-    <string name="device_center_list_view_item_sub_state_account_expired">Nie można zsynchronizować lub utworzyć kopii zapasowej tego katalogu, ponieważ plan wygasł.</string>
+    <string name="device_center_list_view_item_sub_state_account_expired">Nie można zsynchronizować ani utworzyć kopii zapasowej tego katalogu, ponieważ plan wygasł</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
-    <string name="device_center_list_view_item_sub_state_foreign_target_overshare">Nie można zsynchronizować katalogu, ponieważ użytkownik, który udostępnił ten katalog, osiągnął swój pojemność.</string>
+    <string name="device_center_list_view_item_sub_state_foreign_target_overshare">Folder can’t be synced as the user who shared this folder has reached their storage quota</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
     <string name="device_center_list_view_item_sub_state_remote_path_has_changed">Katalog w MEGA nie może zostać zlokalizowany, ponieważ został przeniesiony lub usunięty, lub możesz nie mieć do niego dostępu.</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
-    <string name="device_center_list_view_item_sub_state_share_non_full_access">Katalog nie może być zsynchronizowany, ponieważ jest to katalog współdzielony bez pełnego dostępu.</string>
+    <string name="device_center_list_view_item_sub_state_share_non_full_access">Folder can’t be synced as it’s a shared folder without full access</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
-    <string name="device_center_list_view_item_sub_state_put_nodes_error">Plików w tym katalogu nie można synchronizować ani tworzyć ich kopii zapasowych. Konieczne będzie ponowne włączenie synchronizacji lub tworzenia kopii zapasowych w aplikacji Desktop.</string>
+    <string name="device_center_list_view_item_sub_state_put_nodes_error">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the desktop app.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
-    <string name="device_center_list_view_item_sub_state_active_sync_below_path">Katalog nie może być zsynchronizowany, ponieważ zawiera już zsynchronizowane katalogi.</string>
+    <string name="device_center_list_view_item_sub_state_active_sync_below_path">Nie można zsynchronizować katalogu, ponieważ zawiera już zsynchronizowane katalogi</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
-    <string name="device_center_list_view_item_sub_state_vboxsharedfolder_unsupported">MEGA nie może synchronizować ani tworzyć kopii zapasowych katalogów VirtualBox.</string>
+    <string name="device_center_list_view_item_sub_state_vboxsharedfolder_unsupported">MEGA nie może synchronizować ani tworzyć kopii zapasowych katalogu VirtualBox</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
-    <string name="device_center_list_view_item_sub_state_account_blocked">Nie można zsynchronizować lub utworzyć kopii zapasowej tego katalogu, ponieważ konto zostało zablokowane.</string>
+    <string name="device_center_list_view_item_sub_state_account_blocked">Unable to sync or back up this folder as the account has been blocked</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
-    <string name="device_center_list_view_item_sub_state_unknown_temporary_error">Problem z synchronizacją lub kopią zapasową tego katalogu. Spróbuj ponownie później. Jeśli problem będzie się powtarzał, skontaktuj się z pomocą techniczną.</string>
+    <string name="device_center_list_view_item_sub_state_unknown_temporary_error">Problem syncing or backing up this folder. Try again later. If the issue continues, contact support.</string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
     <string name="device_center_list_view_item_sub_state_too_many_action_packets">Konto zostało przeładowane. Wszelkie pominięte aktualizacje kopii zapasowych lub synchronizacji nie zostały zastosowane.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
-    <string name="device_center_list_view_item_sub_state_logged_out">Synchronizacja lub tworzenie kopii zapasowej zostały zatrzymane, ponieważ wygląda na to, że użytkownik wylogował się z aplikacji Desktop. Zaloguj się ponownie za pomocą aplikacji Desktop i wznów synchronizację lub tworzenie kopii zapasowej.</string>
+    <string name="device_center_list_view_item_sub_state_logged_out">Sync or backup has been stopped as you appear to have logged out of the desktop app. Log back in via the desktop app, and resume the sync or backup.</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
     <string name="device_center_list_view_item_sub_state_missing_parent_node">N/A</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="device_center_list_view_item_sub_state_backup_source_not_below_drive">Nie można zlokalizować katalogu na dysku zewnętrznym.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
-    <string name="device_center_list_view_item_sub_state_active_sync_same_path">W tej samej ścieżce znajduje się już zsynchronizowany katalog.</string>
+    <string name="device_center_list_view_item_sub_state_active_sync_same_path">There’s already a synced folder at the same path</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">Zmiana nazwy nie powiodła się.</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
@@ -105,7 +105,7 @@
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
     <string name="device_center_list_view_item_sub_state_sync_config_read_failure">Nie można odczytać konfiguracji synchronizacji. Spróbuj ponownie później lub sprawdź uprawnienia katalogu.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
-    <string name="device_center_list_view_item_sub_state_unknown_drive_path">Ścieżka dysku synchonizacji jest nieznana.</string>
+    <string name="device_center_list_view_item_sub_state_unknown_drive_path">Sync folder location is unknown</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
     <string name="device_center_list_view_item_sub_state_invalid_scan_interval">Nieprawidłowy interwał skanowania. Sprawdź ustawienia interwału skanowania i spróbuj ponownie.</string>
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
@@ -125,17 +125,17 @@
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="device_center_list_view_item_sub_state_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
-    <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">Katalogu nie można zsynchronizować ani wykonać kopii zapasowej, ponieważ MEGA katalog znajduje się w Koszu.</string>
+    <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">Folder can’t be synced or backed up as the MEGA folder is in the Rubbish bin</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
     <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now">Nie można teraz zlokalizować katalogu w urządzeniu, spróbuj ponownie później.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
     <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive">Nie można zlokalizować katalogu w urządzeniu</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">Problem z synchronizacją lub tworzeniem kopii zapasowej tego katalogu z powodu zmian w katalogu MEGA. Zatrzymaj synchronizację lub kopię zapasową i spróbuj ponownie skonfigurować ją w aplikacja desktopowa komputerowej lub kontakt techniczną.</string>
+    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">Problem syncing or backing up this folder because of changes to the MEGA folder. Stop the sync or backup and try setting it up again in the desktop app, or contact support.</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
     <string name="device_center_list_view_item_sub_state_message_folder_backup_issue">Problem z synchronizacją lub kopią zapasową tego katalogu. Zatrzymaj synchronizację lub tworzenie kopii zapasowej i spróbuj skonfigurować je ponownie w aplikacji Desktop lub skontaktuj się z pomocą techniczną.</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Katalog nie może być zsynchronizowany, ponieważ znajduje się już w zsynchronizowanym katalogu.</string>
+    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Folder can’t be synced as it’s already inside a synced folder</string>
     <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
     <string name="device_center_list_view_item_status_camera_uploads_disabled">Przesyłanie z kamery wyłączone</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
@@ -157,7 +157,7 @@
     <!-- Text to show in the Device Center for a No Network State when there is no network connectivity -->
     <string name="device_center_no_network_state">Brak połączenia z internetem</string>
     <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
-    <string name="device_center_list_view_item_sub_state_local_filesystem_mismatch">Plików w tym katalogu nie można synchronizować ani tworzyć ich kopii zapasowych. Konieczne będzie ponowne włączenie synchronizacji lub tworzenia kopii zapasowych w aplikacji Desktop.</string>
+    <string name="device_center_list_view_item_sub_state_local_filesystem_mismatch">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the desktop app.</string>
     <!-- Text to display in Device Center for an empty state when inspecting a device where no sync or backup has been configured -->
     <string name="device_center_nothing_setup_state">Nic nie zostało jeszcze skonfigurowane</string>
     <!-- The hint text for the search bar in the Device Center feature when the User is searching for Devices -->

@@ -11,7 +11,7 @@
     <!-- Sync when storage permission is denied we show banner with text to the user-->
     <string name="sync_storage_permission_banner">ローカルフォルダを同期するには、お使いのデバイスのストレージにアクセスする必要があります。こちらをタップしてアクセスを許可してください。</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">ファイルとフォルダを継続的に同期するには、MEGAをバックグラウンドで実行できるようにします。</string>
+    <string name="sync_battery_optimisation_banner">ファイルとフォルダを継続的に同期するには、MEGAをバックグラウンドで実行できるようにします</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="other">%d 個のファイル</item>
@@ -103,7 +103,7 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Wi-Fiのみ</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">クラウドドライブ上の選択したフォルダと\n同期するローカルフォルダを、デバイス上に\n設定する必要があります。</string>
+    <string name="sync_empty_state_message">クラウドドライブ上の選択されたフォルダと同期するローカルフォルダを、デバイス上に設定する必要があります。</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_notification_monitoring_description">同期の監視</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->

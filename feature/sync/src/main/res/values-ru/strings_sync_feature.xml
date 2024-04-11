@@ -9,9 +9,9 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Синхронизации [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">Нам нужен доступ к памяти устройства, чтобы синхронизировать локальную папку. Нажмите здесь, чтобы предоставить доступ.</string>
+    <string name="sync_storage_permission_banner">We need to access your device storage in order to sync your local folder. Tap here to allow access.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">Чтобы непрерывно синхронизировать файлы и папки, разрешите MEGA работать в фоновом режиме.</string>
+    <string name="sync_battery_optimisation_banner">To continuously sync your files and folders, allow MEGA to run in the background</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d файл</item>
@@ -115,7 +115,7 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Только Wi-Fi</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">Вам нужно будет настроить локальную папку на устройстве, которая будет синхронизироваться с выбранной папкой на Облачном диске.</string>
+    <string name="sync_empty_state_message">You’ll need to set up a local folder on your device that will sync with a chosen folder on your Cloud drive</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_notification_monitoring_description">Отслеживание синхронизаций</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->

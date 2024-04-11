@@ -9,9 +9,9 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">동기화 [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">당신의 로컬 폴더를 동기화하기 위해 장치 저장소에 접근이 필요합니다. 접근을 승인하려면 여기를 탭하세요</string>
+    <string name="sync_storage_permission_banner">We need to access your device storage in order to sync your local folder. Tap here to allow access.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">파일과 폴더를 계속 동기화하려면, MEGA가 백그라운드에서 작동하도록 허용하세요.</string>
+    <string name="sync_battery_optimisation_banner">To continuously sync your files and folders, allow MEGA to run in the background</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="other">%d개의 파일</item>
@@ -103,7 +103,7 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">와이파이 전용</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">당신의 클라우드 드라이브에서\n선택한 폴더와 동기화할 장치의 로컬 폴더를\n설정해야 합니다.</string>
+    <string name="sync_empty_state_message">You’ll need to set up a local folder on your device that will sync with a chosen folder on your Cloud drive</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_notification_monitoring_description">동기화 감시 중</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->

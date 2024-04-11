@@ -764,7 +764,7 @@
     <!-- Title of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_title">Comprovação de email</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_text">Por favor, verifique seu e-mail para continuar.</string>
+    <string name="email_verification_text">Acesse o seu email para continuar.</string>
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">Ocorreu um erro. Por favor, tente novamente.</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
@@ -808,7 +808,7 @@
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
     <string name="mail_same_as_old">Este é o seu e-mail atual.</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
-    <string name="change_mail_text_last_step">Este é o último passo para alterar o seu e-mail. Por favor, digite a sua senha abaixo.</string>
+    <string name="change_mail_text_last_step">Este é o último passo para alterar o seu email: digite a sua senha abaixo.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">Alterar email</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
@@ -824,7 +824,7 @@
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Obtendo informação&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
-    <string name="email_verification_text_change_mail">Seu novo endereço de e-mail precisa ser validada. Por favor, verifique seu e-mail para prosseguir.</string>
+    <string name="email_verification_text_change_mail">O seu novo email precisa ser confirmado. Acesse a conta do seu novo email para continuar.</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
     <string name="confirmation_delete_avatar">Você quer deletar a sua foto de perfil?</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
@@ -854,7 +854,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Muitas tentativas de login incorretas. Por favor, aguarde uma hora.</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">Esta conta ainda não foi confirmada. Por favor, verifique o seu e-mail.</string>
+    <string name="account_not_validated_login">Esta conta ainda não foi confirmada. Acesse o seu email.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">O link da pasta não está disponível</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
@@ -868,7 +868,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">Esperando confirmação por e-mail</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Por favor, verifique o seu e-mail e toque no link para confirmar a sua conta.</string>
+    <string name="confirm_email_explanation">Acesse o seu email e clique no link para confirmar a sua conta.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">%1$d item</item>
@@ -2102,8 +2102,8 @@
     <!-- Section title to select a file to perform an action, more files -->
     <plurals name="plural_select_file">
         <item quantity="one">Escolher arquivo</item>
-        <item quantity="many">Enviar arquivos</item>
-        <item quantity="other">Enviar arquivos</item>
+        <item quantity="many">Escolher arquivos</item>
+        <item quantity="other">Escolher arquivos</item>
     </plurals>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">Escolher pasta</string>
@@ -3846,7 +3846,7 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">É aqui que os seus arquivos e as pastas de backup são armazenados. Os itens de backup são  “somente leitura” para protegê-los de alterações acidentais na sua Nuvem de arquivos. \nVocê pode fazer o backup de itens do seu computador para o MEGA usando o nosso aplicativo para desktop.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">A sua conta no MEGA foi suspensa devido a repetidas alegações de infrações de direitos autorais, o que significa que você não poderá acessar a sua conta, nem os dados armazenados.\nEnviamos um email informações sobre como enviar uma contra-notificação.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">A sua conta no MEGA foi suspensa devido a repetidas alegações de infrações de direitos autorais, e portanto você não poderá acessar a sua conta ou os dados armazenados. \nAcesse o seu email para obter mais informações sobre como enviar uma contranotificação.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">A sua conta foi encerrada devido a uma infração dos Termos de serviço do MEGA.\nVocê não poderá recuperar o acesso aos seus dados armazenados, nem está autorizado a registrar uma nova conta no MEGA.</string>
     <!-- Title of the Meetings tab for the chat section -->
@@ -5337,14 +5337,14 @@
     <string name="chat_chatroom_first_message_header_authenticity_info_text">O sistema garante que os dados recebidos sejam do remetente exibido, e que o conteúdo não tenha sido manipulado durante o trânsito.</string>
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_get_pro_title">Obtenha mais com um plano Pro</string>
-    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">Faça o upgrade a um plano Pro para obter mais armazenamento e muitos recursos adicionais. O nossos planos são a partir de %s por mês.</string>
+    <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
+    <string name="dialog_onboarding_get_pro_description">Faça o upgrade a um plano Pro para obter mais armazenamento e acessar recursos exclusivos. O nossos planos são a partir de %1$s por mês</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_some_features_title">Alguns dos recursos incluídos são:</string>
+    <string name="dialog_onboarding_some_features_title">Os planos Pro&#160;do&#160;MEGA incluem:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_storage">Amplo espaço de armazenamento</string>
-    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
-    <string name="dialog_onboarding_feature_description_storage">Armazene uma quantidade ilimitada de dados, a partir de %s.</string>
+    <string name="dialog_onboarding_feature_title_storage">Flexibilidade de armazenamento máxima</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
+    <string name="dialog_onboarding_feature_description_storage">Encontre o melhor opção para as suas necessidades de armazenamento a partir de %1$s.</string>
     <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_transfer">Compartilhamento de transferência</string>
     <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -5354,7 +5354,7 @@
     <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_description_security">Adicione senhas e datas de validade para links de arquivos e de pastas.</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
-    <string name="dialog_onboarding_button_view_pro_plan">Conheça os planos Pro</string>
+    <string name="dialog_onboarding_button_view_pro_plan">Fazer o upgrade a um plano Pro</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s está apresentando</string>
     <!-- Warning indicating that a participant is sharing the screen-->
@@ -5456,7 +5456,7 @@
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_subscription_details">As assinaturas serão renovadas automaticamente por períodos sucessivos com a mesma duração e pelo mesmo preço do período inicial. Você pode desativar a renovação automática da sua assinatura Pro&#160;do&#160;MEGA até 24 horas antes do vencimento do próximo pagamento nas Assinaturas da [A]Google Play[/A].</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
-    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Permitir o acesso à sua galeria</string>
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Permitir o acesso à sua Galeria</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Permitir acesso</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
@@ -5635,8 +5635,8 @@
     <string name="hidden_nodes_show_items_description">Todos os itens ocultos ficarão visíveis, mas desfocados para indicar o seu status “oculto”</string>
     <!-- Button text for photo option in camera screen -->
     <string name="camera_photo_button">Foto</string>
-    <string name="camera_flash_mode_on">Flash mode on</string>
-    <string name="camera_flash_mode_off">Flash mode off</string>
-    <string name="camera_flash_mode_auto">Flash mode auto</string>
+    <string name="camera_flash_mode_on">Flash ativo</string>
+    <string name="camera_flash_mode_off">Flash desativado</string>
+    <string name="camera_flash_mode_auto">Flash automático</string>
     <string name="camera_send_to">Enviar a %1$s</string>
 </resources>

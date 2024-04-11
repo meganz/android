@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
-    <string name="general_sync_no_error">No sync error</string>
+    <string name="general_sync_no_error">Não há erros de sincronização</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
     <string name="general_sync_unsupported_file_system">O MEGA não pode sincronizar ou fazer backup desta pasta porque o sistema de arquivos do seu dispositivo não é suportado</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
@@ -11,23 +11,23 @@
     <!-- The name of the Device or Folder Sub State when its code is INITIAL_SCAN_FAILED -->
     <string name="general_sync_initial_scan_failed">Falha no escaneio inicial. Você precisa reativar a sua sincronização ou o seu backup no aplicativo para desktop.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
-    <string name="general_sync_remote_node_not_found">Não foi possível localizar a pasta no MEGA porque ela foi movida ou deletada, ou pode ser que você não tenha acesso a ela.</string>
+    <string name="general_sync_remote_node_not_found">Não foi possível localizar a pasta no MEGA porque ela foi movida ou deletada, ou pode ser que você não tenha acesso a ela</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
     <string name="general_sync_storage_overquota">Não foi possível sincronizar ou fazer backup dessa pasta porque a sua conta está cheia</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
-    <string name="general_sync_account_expired">Não foi possível sincronizar ou fazer backup dessa pasta porque o seu plano expirou.</string>
+    <string name="general_sync_account_expired">Não foi possível sincronizar ou fazer backup dessa pasta porque o seu plano expirou</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
     <string name="general_sync_foreign_target_overshare">Não é possível sincronizar esta pasta porque a conta do usuário que a compartilhou alcançou o limite de armazenamento.</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
     <string name="general_sync_remote_path_has_changed">Não foi possível localizar a pasta no MEGA porque ela foi movida ou deletada, ou pode ser que você não tenha acesso a ela.</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
-    <string name="general_sync_share_non_full_access">Não é possível sincronizar esta pasta porque é uma pasta compartilhada à qual você não tem acesso total.</string>
+    <string name="general_sync_share_non_full_access">Não é possível sincronizar esta pasta porque é uma pasta compartilhada à qual você não tem acesso total</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
     <string name="general_sync_put_nodes_error">Não foi possível sincronizar ou fazer backup dos arquivos nesta pasta. Você precisa reativar a sua sincronização ou o seu backup no aplicativo para desktop.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
-    <string name="general_sync_active_sync_below_path">Não é possível sincronizar esta pasta porque ela contém pastas sincronizadas.</string>
+    <string name="general_sync_active_sync_below_path">Não é possível sincronizar esta pasta porque ela contém pastas sincronizadas</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
-    <string name="general_sync_vboxsharedfolder_unsupported">O MEGA não pode sincronizar ou fazer backup das pastas do VirtualBox.</string>
+    <string name="general_sync_vboxsharedfolder_unsupported">O MEGA não pode sincronizar ou fazer backup das pastas do VirtualBox</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
     <string name="general_sync_account_blocked">Não foi possível sincronizar ou fazer backup dessa pasta porque a conta foi bloqueada</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
@@ -41,15 +41,15 @@
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="general_sync_backup_source_not_below_drive">Não é possível localizar a pasta na unidade externa.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
-    <string name="general_sync_active_sync_same_path">Já existe uma pasta sincronizada no mesmo local.</string>
+    <string name="general_sync_active_sync_same_path">Já existe uma pasta sincronizada no mesmo local</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
-    <string name="general_sync_could_not_move_cloud_nodes">Não foi possível renomear.</string>
+    <string name="general_sync_could_not_move_cloud_nodes">Não foi possível renomear</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
-    <string name="general_sync_could_not_create_ignore_file">Não foi possível criar um arquivo .megaignore para essa sincronização.</string>
+    <string name="general_sync_could_not_create_ignore_file">Não foi possível criar um arquivo .megaignore para essa sincronização</string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
     <string name="general_sync_config_read_failure">Não foi possível ler a configuração da sincronização. Tente novamente mais tarde ou verifique as permissões da pasta.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
-    <string name="general_sync_unknown_drive_path">O caminho da unidade de sincronização é desconhecido.</string>
+    <string name="general_sync_unknown_drive_path">A localização da sincronização é desconhecida</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
     <string name="general_sync_invalid_scan_interval">O intervalo de escaneado é inválido. Verifique a configuração do intervalo de escaneado e tente novamente.</string>
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
@@ -61,7 +61,7 @@
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
     <string name="general_sync_unable_to_open_database">Não é possível abrir o banco de dados de cache de estado</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
-    <string name="general_sync_insufficient_disk_space">Não há espaço de armazenamento suficiente no seu dispositivo.</string>
+    <string name="general_sync_insufficient_disk_space">Não há espaço de armazenamento suficiente no seu dispositivo</string>
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
     <string name="general_sync_failure_accessing_persistent_storage">Não foi possível ler a localização da sincronização. Verifique se o local está acessível e se as permissões para a localização da pasta foram concedidas.</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
@@ -84,4 +84,20 @@
     <string name="general_sync_local_filesystem_mismatch">Não foi possível sincronizar ou fazer backup dos arquivos nesta pasta. Você precisa reativar a sua sincronização ou o seu backup no aplicativo para desktop.</string>
     <!-- Warning message to display when sync has been paused due a low battery level -->
     <string name="general_message_sync_paused_low_battery_level">A sincronização foi pausada porque o nível da bateria está muito baixo. Carregue a bateria para retomar a sincronização.</string>
+    <!-- Title for File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_file_sharing">Compartilhamento de arquivos fácil e seguro</string>
+    <!-- Description about File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_file_sharing">Compartilhe arquivos grandes graças a uma ampla cota de transferência e garanta a segurança com links protegidos por senha.</string>
+    <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_backup_rewind">Nunca mais perca dados</string>
+    <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_backup_rewind">Faça backup e sincronize os seus dados para não correr riscos. Além disso, use a função Retroceder para fazer com que as suas pastas voltem ao estado que tinham em qualquer momento dos últimos 180 dias.</string>
+    <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
+    <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_vpn">Mantenha a sua navegação online privada usando a nossa VPN de alta velocidade.</string>
+    <!-- Title for chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_title_chat">Chamadas e reuniões sem restrições</string>
+    <!-- Description about chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
+    <string name="dialog_onboarding_feature_description_chat">Envie mensagens, faça chamadas de vídeo e reuniões com privacidade total e um número ilimitado de participantes.</string>
 </resources>

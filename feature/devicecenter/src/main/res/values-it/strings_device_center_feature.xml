@@ -59,7 +59,7 @@
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="device_center_list_view_item_sub_state_no_sync_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA non può sincronizzare o effettuare il backup di questa cartella perché il filesystem sul tuo dispositivo non è supportato.</string>
+    <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA non può sincronizzare o effettuare il backup di questa cartella perché il filesystem sul tuo dispositivo non è supportato</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_remote_type">La cartella che hai scelto non può essere sincronizzata</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
@@ -71,23 +71,23 @@
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
     <string name="device_center_list_view_item_sub_state_storage_overquota">Limite della banda di trasferimento raggiunto.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
-    <string name="device_center_list_view_item_sub_state_account_expired">Impossibile sincronizzare o effettuare il backup perché il tuo piano è scaduto.</string>
+    <string name="device_center_list_view_item_sub_state_account_expired">Impossibile sincronizzare o effettuare il backup perché il tuo piano è scaduto</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
-    <string name="device_center_list_view_item_sub_state_foreign_target_overshare">La cartella non può essere sincronizzata poiché l\’utente che ha condiviso questa cartella ha esaurito il proprio spazio di archiviazione.</string>
+    <string name="device_center_list_view_item_sub_state_foreign_target_overshare">La cartella non può essere sincronizzata poiché l\’utente che ha condiviso questa cartella ha esaurito il proprio spazio di archiviazione</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
     <string name="device_center_list_view_item_sub_state_remote_path_has_changed">La cartella in MEGA non può essere trovata perché è stata eliminata o spostata, o potresti non avere accesso ad essa.</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
-    <string name="device_center_list_view_item_sub_state_share_non_full_access">La cartella non può essere sincronizzata perché è una cartella condivisa senza pieno accesso.</string>
+    <string name="device_center_list_view_item_sub_state_share_non_full_access">La cartella non può essere sincronizzata perché è una cartella condivisa senza pieno accesso</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
     <string name="device_center_list_view_item_sub_state_put_nodes_error">I file in questa cartella non possono essere sincronizzati o effettuare il backup. Dovrai riattivare la sincronizzazione o il backup dall\’app per desktop.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
-    <string name="device_center_list_view_item_sub_state_active_sync_below_path">La cartella non può essere sincronizzata perché già contiene cartelle sincronizzate.</string>
+    <string name="device_center_list_view_item_sub_state_active_sync_below_path">La cartella non può essere sincronizzata perché già contiene cartelle sincronizzate</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
-    <string name="device_center_list_view_item_sub_state_vboxsharedfolder_unsupported">MEGA non è in grado di sincronizzare o eseguire il backup delle cartelle VirtualBox.</string>
+    <string name="device_center_list_view_item_sub_state_vboxsharedfolder_unsupported">MEGA non è in grado di sincronizzare o eseguire il backup delle cartelle VirtualBox</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
-    <string name="device_center_list_view_item_sub_state_account_blocked">Impossibile sincronizzare o effettuare il backup di questa cartella perché l\’account è stato bloccato.</string>
+    <string name="device_center_list_view_item_sub_state_account_blocked">Impossibile sincronizzare o effettuare il backup di questa cartella perché l\’account è stato bloccato</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
-    <string name="device_center_list_view_item_sub_state_unknown_temporary_error">Problema nella sincronizzazione o nel backup di questa cartella. Riprova più tardi. Se il problema persiste, contatta il Supporto.</string>
+    <string name="device_center_list_view_item_sub_state_unknown_temporary_error">Problema nella sincronizzazione o nel backup di questa cartella. Riprova più tardi. Se il problema persiste, contatta il supporto.</string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
     <string name="device_center_list_view_item_sub_state_too_many_action_packets">Account ricaricato. Qualsiasi aggiornamento mancato ai tuoi backup o alle tue sincronizzazioni non è stato applicato.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
@@ -97,15 +97,15 @@
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="device_center_list_view_item_sub_state_backup_source_not_below_drive">La cartella nel drive esterno non può essere trovata.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
-    <string name="device_center_list_view_item_sub_state_active_sync_same_path">C\’è già una cartella sincronizzata allo stesso percorso.</string>
+    <string name="device_center_list_view_item_sub_state_active_sync_same_path">C\’è già una cartella sincronizzata allo stesso percorso</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">Rinominazione fallita.</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
-    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">Couldn’t create a .megaignore file for this sync</string>
+    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">Impossibile creare un file .megaignore per questa sincronizzazione</string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
     <string name="device_center_list_view_item_sub_state_sync_config_read_failure">Impossibile leggere la configurazione della sincronizzazione. Riprova più tardi o controlla le autorizzazioni della cartella.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
-    <string name="device_center_list_view_item_sub_state_unknown_drive_path">Il percorso della sincronizzazione è sconosciuto.</string>
+    <string name="device_center_list_view_item_sub_state_unknown_drive_path">La posizione della cartella di sincronizzazione è sconosciuta</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
     <string name="device_center_list_view_item_sub_state_invalid_scan_interval">Intervallo della scansione invalido. Controlla l\’impostazione dell\’intervallo della scansione e riprova.</string>
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
@@ -125,17 +125,17 @@
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="device_center_list_view_item_sub_state_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
-    <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">La cartella non può essere sincronizzata o effettuare il backup in quanto la cartella corrispettiva su MEGA è nel Cestino.</string>
+    <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">La cartella non può essere sincronizzata o effettuare il backup in quanto la cartella corrispettiva su MEGA è nel Cestino</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
     <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now">La cartella nel tuo dispositivo non può essere trovata, riprova più tardi.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
     <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive">La cartella nel dispositivo non può essere localizzata</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">Problemi durante la sincronizzazione o il backup di questa cartella a causa di modifiche alla cartella MEGA. Interrompi la sincronizzazione o il backup e prova a configurarli nuovamente nell\’app desktop oppure contatta il Supporto.</string>
+    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">Problemi durante la sincronizzazione o il backup di questa cartella a causa di modifiche alla cartella MEGA. Interrompi la sincronizzazione o il backup e prova a configurarli nuovamente nell\’app desktop oppure contatta il supporto.</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
     <string name="device_center_list_view_item_sub_state_message_folder_backup_issue">Problemi nella sincronizzazione o nel backup di questa cartella. Ferma la sincronizzazione o il backup e prova ad impostarlo nuovamente dall\’app per desktop, o contatta il Supporto.</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">La cartella non può essere sincronizzata in quanto è già dentro una cartella sincronizzata.</string>
+    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">La cartella non può essere sincronizzata in quanto è già dentro una cartella sincronizzata</string>
     <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
     <string name="device_center_list_view_item_status_camera_uploads_disabled">Caricamenti da fotocamera disattivati</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
