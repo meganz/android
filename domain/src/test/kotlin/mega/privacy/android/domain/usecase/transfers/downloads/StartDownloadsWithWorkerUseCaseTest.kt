@@ -160,17 +160,24 @@ class StartDownloadsWithWorkerUseCaseTest {
     fun `test that flow completes immediately when all transfers updated transfers is emitted`() =
         runTest {
             val mockFinish = mock<MultiTransferEvent.SingleTransferEvent> {
+                on { scanningFinished } doReturn true
+            }
+            val mockUpdated = mock<MultiTransferEvent.SingleTransferEvent> {
+                on { scanningFinished } doReturn true
                 on { allTransfersUpdated } doReturn true
             }
             mockFlow(
                 flow {
                     emit(mockFinish)
-                    emit(mockFinish) //should not be received
+                    yield() //to wait for the worker to start
+                    emit(mockUpdated)
+                    emit(mockUpdated) //should not be received
                     awaitCancellation()
                 }
             )
             underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).test {
                 assertThat(awaitItem()).isEqualTo(mockFinish)
+                assertThat(awaitItem()).isEqualTo(mockUpdated)
                 awaitComplete()
             }
         }
@@ -178,11 +185,12 @@ class StartDownloadsWithWorkerUseCaseTest {
     @Test
     fun `test that download worker is started when start download finish correctly`() = runTest {
         mockFlow(
-            flowOf(
-                mock<MultiTransferEvent.SingleTransferEvent> {
+            flow {
+                emit(mock<MultiTransferEvent.SingleTransferEvent> {
                     on { scanningFinished } doReturn true
-                }
-            )
+                })
+                awaitCancellation()
+            }
         )
         underTest(mockNodes(), DESTINATION_PATH_FOLDER, false).collect()
         verify(startDownloadWorkerUseCase).invoke()

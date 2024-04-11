@@ -143,13 +143,14 @@ class StartChatUploadsWithWorkerUseCaseTest {
     }
 
     @Test
-    fun `test that download worker is started when start download finish correctly`() = runTest {
+    fun `test that worker is started when start download finish correctly`() = runTest {
         mockFlow(
-            flowOf(
-                mock<MultiTransferEvent.SingleTransferEvent> {
+            flow {
+                emit(mock<MultiTransferEvent.SingleTransferEvent> {
                     on { scanningFinished } doReturn true
-                },
-            )
+                })
+                awaitCancellation()
+            }
         )
         underTest(mockFile(), 1L, NodeId(11L)).collect()
         verify(startChatUploadsWorkerUseCase).invoke()

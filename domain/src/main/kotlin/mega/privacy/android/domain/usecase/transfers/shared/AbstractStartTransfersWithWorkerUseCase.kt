@@ -36,24 +36,26 @@ abstract class AbstractStartTransfersWithWorkerUseCase(
         startWorker: suspend () -> Unit,
     ) = channelFlow {
         var workerTriggered = false
+        var workerStarted = false
         doTransfers()
             .filter {
                 it !is MultiTransferEvent.SingleTransferEvent
                         || (it.scanningFinished || it.allTransfersUpdated)
             }.transformWhile { event ->
                 val singleTransferEvent = event as? MultiTransferEvent.SingleTransferEvent
-                //emitting a FinishProcessingTransfers can cause a terminal event in the collector (firstOrNull for instance), so we need to start the worker before emitting it
+                emit(event)
                 if (!workerTriggered && singleTransferEvent?.scanningFinished == true) {
-                    startWorker()
                     workerTriggered = true
-                    launch {
-                        //will wait for [allNodesUpdated] to be true or a timeout
+                    launch(NonCancellable) {
+                        startWorker()
+                        workerStarted = true
+                        // Once the Worker has started it will wait for [allNodesUpdated] to be true but with this timeout
                         delay(800.milliseconds)
                         channel.close()
                     }
                 }
-                emit(event)
-                return@transformWhile singleTransferEvent?.allTransfersUpdated != true
+
+                return@transformWhile !workerStarted || singleTransferEvent?.allTransfersUpdated != true
             }.collect {
                 send(it)
             }

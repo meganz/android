@@ -259,6 +259,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
             it.copy(jobInProgressState = StartDownloadTransferJobInProgress.ScanningTransfers)
         }
         var lastError: Throwable? = null
+        var startMessageShown = false
         val terminalEvent = runCatching {
             getUri().also {
                 if (it.isNullOrBlank()) {
@@ -272,12 +273,23 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                     nodes = nodes,
                     isHighPriority = isHighPriority,
                 ).onEach { event ->
+                    val singleTransferEvent = (event as? MultiTransferEvent.SingleTransferEvent)
+                    // clear scanning transfers state
                     if (_uiState.value.jobInProgressState == StartDownloadTransferJobInProgress.ScanningTransfers &&
-                        (event as? MultiTransferEvent.SingleTransferEvent)?.scanningFinished == true
+                        singleTransferEvent?.scanningFinished == true
                     ) {
                         _uiState.update {
                             it.copy(jobInProgressState = null)
                         }
+                    }
+                    //show start message as soon as an event with all transfers updated is received
+                    if (!startMessageShown && singleTransferEvent?.allTransfersUpdated == true) {
+                        startMessageShown = true
+                        updateWithFinishProcessing(
+                            singleTransferEvent,
+                            transferTriggerEvent,
+                            nodes.size,
+                        )
                     }
                 }.catch {
                     lastError = it
@@ -289,20 +301,33 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                 }.last()
             }
         checkRating()
+        when {
+            terminalEvent == MultiTransferEvent.InsufficientSpace ->
+                _uiState.updateEventAndClearProgress(StartDownloadTransferEvent.Message.NotSufficientSpace)
+
+            !startMessageShown -> updateWithFinishProcessing(
+                terminalEvent as? MultiTransferEvent.SingleTransferEvent,
+                transferTriggerEvent,
+                nodes.size,
+                lastError?.takeIf { terminalEvent == null },
+            )
+        }
+    }
+
+    private fun updateWithFinishProcessing(
+        event: MultiTransferEvent.SingleTransferEvent?,
+        transferTriggerEvent: TransferTriggerEvent,
+        totalNodes: Int,
+        error: Throwable? = null,
+    ) {
         _uiState.updateEventAndClearProgress(
-            when (terminalEvent) {
-                MultiTransferEvent.InsufficientSpace -> StartDownloadTransferEvent.Message.NotSufficientSpace
-                else -> {
-                    val finishedEvent = (terminalEvent as? MultiTransferEvent.SingleTransferEvent)
-                    StartDownloadTransferEvent.FinishProcessing(
-                        exception = lastError?.takeIf { terminalEvent == null },
-                        totalNodes = nodes.size,
-                        totalFiles = finishedEvent?.startedFiles ?: 0,
-                        totalAlreadyDownloaded = finishedEvent?.alreadyTransferred ?: 0,
-                        triggerEvent = transferTriggerEvent,
-                    )
-                }
-            }
+            StartDownloadTransferEvent.FinishProcessing(
+                exception = error,
+                totalNodes = totalNodes,
+                totalFiles = event?.startedFiles ?: 0,
+                totalAlreadyDownloaded = event?.alreadyTransferred ?: 0,
+                triggerEvent = transferTriggerEvent,
+            )
         )
     }
 
