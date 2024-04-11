@@ -2,26 +2,22 @@ package mega.privacy.android.app.upgradeAccount.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -34,27 +30,30 @@ import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
+import mega.privacy.android.app.upgradeAccount.view.components.ButtonsRow
 import mega.privacy.android.app.upgradeAccount.view.components.FeatureRow
-import mega.privacy.android.core.ui.controls.buttons.OutlinedMegaButton
-import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.app.upgradeAccount.view.components.GetProPlanColumn
+import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_900
-import mega.privacy.android.core.ui.theme.extensions.h6Medium
 import mega.privacy.android.core.ui.theme.extensions.subtitle1medium
-import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.theme.MegaAppTheme
-import java.util.Locale
 
 internal const val IMAGE_TAG = "onboarding_screen_variant_a:image"
 internal const val PRO_PLAN_TITLE = "onboarding_screen_variant_a:pro_plan_title"
 internal const val PRO_PLAN_TEXT = "onboarding_screen_variant_a:pro_plan_description"
 internal const val FEATURE_TITLE = "onboarding_screen_variant_a:feature_title"
 internal const val STORAGE_DESCRIPTION_ROW = "onboarding_screen_variant_a:storage_description_row"
-internal const val TRANSFER_DESCRIPTION_ROW = "onboarding_screen_variant_a:transfer_description_row"
-internal const val SECURITY_DESCRIPTION_ROW = "onboarding_screen_variant_a:security_description_row"
+internal const val FILE_SHARING_DESCRIPTION_ROW =
+    "onboarding_screen_variant_a:file_sharing_description_row"
+internal const val BACKUP_DESCRIPTION_ROW = "onboarding_screen_variant_a:backup_description_row"
+internal const val VPN_DESCRIPTION_ROW = "onboarding_screen_variant_a:vpn_description_row"
+internal const val CHAT_DESCRIPTION_ROW = "onboarding_screen_variant_a:chat_description_row"
 internal const val SKIP_BUTTON = "onboarding_screen_variant_a:skip_button"
 internal const val VIEW_PRO_PLAN_BUTTON = "onboarding_screen_variant_a:view_pro_plan_button"
 
@@ -83,22 +82,28 @@ fun VariantAOnboardingDialogView(
             modifier = Modifier
                 .width(390.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-        ){
+        ) {
             Spacer(modifier = Modifier.height(32.dp))
             Image(
                 painter = painterResource(id = R.drawable.image_upselling_onboarding_dialog),
                 contentDescription = "",
-                modifier = Modifier.testTag(IMAGE_TAG)
+                modifier = Modifier
+                    .testTag(IMAGE_TAG)
+                    .size(140.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
-            GetProPlanColumn(state = state, isLoading = isLoading)
+            GetProPlanColumn(
+                state = state,
+                isLoading = isLoading,
+                bodyTextStyle = MaterialTheme.typography.subtitle2
+            )
             Spacer(modifier = Modifier.height(16.dp))
-            Text(
+            MegaText(
                 text = stringResource(id = R.string.dialog_onboarding_some_features_title),
+                textColor = TextColor.Primary,
                 style = MaterialTheme.typography.subtitle1medium,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colors.textColorPrimary,
                 modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
                     .testTag(FEATURE_TITLE)
                     .placeholder(
                         color = MaterialTheme.colors.grey_020_grey_900,
@@ -120,108 +125,45 @@ fun VariantAOnboardingDialogView(
                 testTag = STORAGE_DESCRIPTION_ROW,
                 isLoading = isLoading,
             )
-            //Transfer
+            //File sharing
             FeatureRow(
-                drawableID = painterResource(id = R.drawable.ic_transfer_onboarding_dialog),
-                title = stringResource(id = R.string.dialog_onboarding_feature_title_transfer),
-                description = stringResource(id = R.string.dialog_onboarding_feature_description_transfer),
-                testTag = TRANSFER_DESCRIPTION_ROW,
+                drawableID = painterResource(id = R.drawable.ic_file_sharing_onboarding_dialog),
+                title = stringResource(id = sharedR.string.dialog_onboarding_feature_title_file_sharing),
+                description = stringResource(id = sharedR.string.dialog_onboarding_feature_description_file_sharing),
+                testTag = FILE_SHARING_DESCRIPTION_ROW,
                 isLoading = isLoading,
             )
-            //Security
+            //Back-up and rewind
             FeatureRow(
-                drawableID = painterResource(id = R.drawable.ic_security_onboarding_dialog),
-                title = stringResource(id = R.string.dialog_onboarding_feature_title_security),
-                description = stringResource(id = R.string.dialog_onboarding_feature_description_security),
-                testTag = SECURITY_DESCRIPTION_ROW,
+                drawableID = painterResource(id = R.drawable.ic_backup_onboarding_dialog),
+                title = stringResource(id = sharedR.string.dialog_onboarding_feature_title_backup_rewind),
+                description = stringResource(id = sharedR.string.dialog_onboarding_feature_description_backup_rewind),
+                testTag = BACKUP_DESCRIPTION_ROW,
                 isLoading = isLoading,
             )
-            Spacer(modifier = Modifier.height(38.dp))
+            //MEGA VPN
+            FeatureRow(
+                drawableID = painterResource(id = R.drawable.ic_vpn_onboarding_dialog),
+                title = stringResource(id = sharedR.string.dialog_onboarding_feature_title_vpn),
+                description = stringResource(id = sharedR.string.dialog_onboarding_feature_description_vpn),
+                testTag = VPN_DESCRIPTION_ROW,
+                isLoading = isLoading,
+            )
+            //Chat and meetings
+            FeatureRow(
+                drawableID = painterResource(id = R.drawable.ic_chat_onboarding_dialog),
+                title = stringResource(id = sharedR.string.dialog_onboarding_feature_title_chat),
+                description = stringResource(id = sharedR.string.dialog_onboarding_feature_description_chat),
+                testTag = CHAT_DESCRIPTION_ROW,
+                isLoading = isLoading,
+            )
+            Spacer(modifier = Modifier.height(18.dp))
             ButtonsRow(
                 onSkipPressed = onSkipPressed,
                 onViewPlansPressed = onViewPlansPressed,
                 isLoading = isLoading,
             )
         }
-    }
-}
-
-@Composable
-fun GetProPlanColumn(
-    state: ChooseAccountState,
-    isLoading: Boolean,
-) {
-    val cheapestSubscriptionAvailable = state.cheapestSubscriptionAvailable
-    val formattedPrice =
-        cheapestSubscriptionAvailable?.localisePriceCurrencyCode(Locale.getDefault(), true)
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = stringResource(id = R.string.dialog_onboarding_get_pro_title),
-            style = MaterialTheme.typography.h6Medium,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.textColorPrimary,
-            modifier = Modifier.testTag(PRO_PLAN_TITLE),
-        )
-        Text(
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .testTag(PRO_PLAN_TEXT)
-                .placeholder(
-                    color = MaterialTheme.colors.grey_020_grey_900,
-                    shape = RoundedCornerShape(4.dp),
-                    highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
-                    visible = isLoading,
-                ),
-            text = if (formattedPrice != null) stringResource(
-                id = R.string.dialog_onboarding_get_pro_description,
-                formattedPrice.price
-            ) else "",
-            style = MaterialTheme.typography.subtitle2,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.textColorPrimary,
-        )
-    }
-}
-
-@Composable
-fun ButtonsRow(
-    onSkipPressed: () -> Unit,
-    onViewPlansPressed: () -> Unit,
-    isLoading: Boolean,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                vertical = 8.dp,
-                horizontal = 16.dp
-            )
-            .placeholder(
-                color = MaterialTheme.colors.grey_020_grey_900,
-                shape = RoundedCornerShape(4.dp),
-                highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
-                visible = isLoading,
-            ),
-        horizontalArrangement = Arrangement.End,
-    ) {
-        OutlinedMegaButton(
-            textId = R.string.general_skip,
-            onClick = onSkipPressed,
-            modifier = Modifier
-                .padding(end = 8.dp)
-                .testTag(SKIP_BUTTON),
-            rounded = false,
-        )
-        RaisedDefaultMegaButton(
-            textId = R.string.dialog_onboarding_button_view_pro_plan,
-            onClick = onViewPlansPressed,
-            modifier = Modifier.testTag(VIEW_PRO_PLAN_BUTTON)
-        )
     }
 }
 

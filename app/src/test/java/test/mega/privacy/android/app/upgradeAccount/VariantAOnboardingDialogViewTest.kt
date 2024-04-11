@@ -3,39 +3,42 @@ package test.mega.privacy.android.app.upgradeAccount
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
+import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
+import mega.privacy.android.app.upgradeAccount.view.BACKUP_DESCRIPTION_ROW
+import mega.privacy.android.app.upgradeAccount.view.CHAT_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.FEATURE_TITLE
+import mega.privacy.android.app.upgradeAccount.view.FILE_SHARING_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.IMAGE_TAG
 import mega.privacy.android.app.upgradeAccount.view.PRO_PLAN_TEXT
 import mega.privacy.android.app.upgradeAccount.view.PRO_PLAN_TITLE
-import mega.privacy.android.app.upgradeAccount.view.SECURITY_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.SKIP_BUTTON
 import mega.privacy.android.app.upgradeAccount.view.STORAGE_DESCRIPTION_ROW
-import mega.privacy.android.app.upgradeAccount.view.TRANSFER_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.VIEW_PRO_PLAN_BUTTON
+import mega.privacy.android.app.upgradeAccount.view.VPN_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.VariantAOnboardingDialogView
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.shared.resources.R as sharedR
+import androidx.compose.ui.test.printToString
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
+import test.mega.privacy.android.app.fromId
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 @Config(qualifiers = "w720dp-h1280dp-xhdpi")
 class VariantAOnboardingDialogViewTest {
-    private val localisedPriceStringMapper = LocalisedPriceStringMapper()
-    private val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
-    private val formattedSizeMapper = FormattedSizeMapper()
-
     @get:Rule
     var composeRule = createComposeRule()
 
@@ -53,39 +56,88 @@ class VariantAOnboardingDialogViewTest {
     }
 
     @Test
+    fun `test that pro plan row text is shown correctly`() {
+        setContent()
+        composeRule.onNodeWithText(fromId(R.string.dialog_onboarding_get_pro_title))
+            .assertIsDisplayed()
+        composeRule.onNodeWithText(fromId(R.string.dialog_onboarding_get_pro_description, "€4.99"))
+            .assertExists()
+    }
+
+    @Test
     fun `test that title for features is shown correctly`() {
         setContent()
         composeRule.onNodeWithTag(FEATURE_TITLE).assertIsDisplayed()
+        composeRule.onNodeWithText(fromId(R.string.dialog_onboarding_some_features_title))
+            .assertIsDisplayed()
     }
 
     @Test
     fun `test that storage row is displayed`() {
         setContent()
+        composeRule.onNodeWithTag(STORAGE_DESCRIPTION_ROW).printToString()
         composeRule.onNodeWithTag(STORAGE_DESCRIPTION_ROW).assertIsDisplayed()
+        composeRule.onNodeWithText(fromId(R.string.dialog_onboarding_feature_title_storage))
+            .assertIsDisplayed()
+        composeRule.onNodeWithText(
+            fromId(R.string.dialog_onboarding_feature_description_storage, "400 GB")
+        )
+            .assertIsDisplayed()
     }
 
     @Test
-    fun `test that transfer row is displayed`() {
+    fun `test that file sharing row is displayed`() {
         setContent()
-        composeRule.onNodeWithTag(TRANSFER_DESCRIPTION_ROW).assertIsDisplayed()
+        composeRule.onNodeWithTag(FILE_SHARING_DESCRIPTION_ROW).assertIsDisplayed()
+        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_title_file_sharing))
+            .assertIsDisplayed()
+        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_description_file_sharing))
+            .assertIsDisplayed()
     }
 
     @Test
-    fun `test that security row is displayed`() {
+    fun `test that backup row is displayed`() {
         setContent()
-        composeRule.onNodeWithTag(SECURITY_DESCRIPTION_ROW).assertIsDisplayed()
+        composeRule.onNodeWithTag(BACKUP_DESCRIPTION_ROW).assertIsDisplayed()
+        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_title_backup_rewind))
+            .assertIsDisplayed()
+        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_description_backup_rewind))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that vpn row is displayed`() {
+        setContent()
+        composeRule.onNodeWithTag(VPN_DESCRIPTION_ROW).assertIsDisplayed()
+        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_title_vpn))
+            .assertIsDisplayed()
+        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_description_vpn))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that chats row is displayed`() {
+        setContent()
+        composeRule.onNodeWithTag(CHAT_DESCRIPTION_ROW).assertIsDisplayed()
+        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_title_chat))
+            .assertIsDisplayed()
+        composeRule.onNodeWithText(fromId(sharedR.string.dialog_onboarding_feature_description_chat))
+            .assertIsDisplayed()
     }
 
     @Test
     fun `test that skip button is shown correctly`() {
         setContent()
         composeRule.onNodeWithTag(SKIP_BUTTON).assertIsDisplayed()
+        composeRule.onNodeWithText(fromId(R.string.general_skip)).assertIsDisplayed()
     }
 
     @Test
-    fun `test that view pro plan button is shown correctly`() {
+    fun `test that upgrade to pro button is shown correctly`() {
         setContent()
         composeRule.onNodeWithTag(VIEW_PRO_PLAN_BUTTON).assertIsDisplayed()
+        composeRule.onNodeWithText(fromId(R.string.dialog_onboarding_button_view_pro_plan))
+            .assertIsDisplayed()
     }
 
     private fun setContent() = composeRule.setContent {
@@ -101,29 +153,33 @@ class VariantAOnboardingDialogViewTest {
             cheapestSubscriptionAvailable = subscriptionProLite,
         )
 
-    private val subscriptionProLite = LocalisedSubscription(
-        accountType = AccountType.PRO_LITE,
-        storage = PRO_LITE_STORAGE,
-        monthlyTransfer = PRO_LITE_TRANSFER_MONTHLY,
-        yearlyTransfer = PRO_LITE_TRANSFER_YEARLY,
-        monthlyAmount = CurrencyAmount(
-            PRO_LITE_PRICE_MONTHLY,
-            Currency("EUR")
-        ),
-        yearlyAmount = CurrencyAmount(
-            PRO_LITE_PRICE_YEARLY,
-            Currency("EUR")
-        ),
-        localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
-        formattedSize = formattedSizeMapper,
-    )
-
     companion object {
         const val PRO_LITE_STORAGE = 400
         const val PRO_LITE_TRANSFER_MONTHLY = 1024
         const val PRO_LITE_TRANSFER_YEARLY = 12288
         const val PRO_LITE_PRICE_MONTHLY = 4.99F
         const val PRO_LITE_PRICE_YEARLY = 49.99F
+
+        private val localisedPriceStringMapper = LocalisedPriceStringMapper()
+        private val localisedPriceCurrencyCodeStringMapper =
+            LocalisedPriceCurrencyCodeStringMapper()
+        private val formattedSizeMapper = FormattedSizeMapper()
+        val subscriptionProLite = LocalisedSubscription(
+            accountType = AccountType.PRO_LITE,
+            storage = PRO_LITE_STORAGE,
+            monthlyTransfer = PRO_LITE_TRANSFER_MONTHLY,
+            yearlyTransfer = PRO_LITE_TRANSFER_YEARLY,
+            monthlyAmount = CurrencyAmount(
+                PRO_LITE_PRICE_MONTHLY,
+                Currency("EUR")
+            ),
+            yearlyAmount = CurrencyAmount(
+                PRO_LITE_PRICE_YEARLY,
+                Currency("EUR")
+            ),
+            localisedPrice = localisedPriceStringMapper,
+            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+            formattedSize = formattedSizeMapper,
+        )
     }
 }
