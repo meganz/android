@@ -16,6 +16,7 @@ import mega.privacy.android.app.presentation.imagepreview.menu.FavouriteImagePre
 import mega.privacy.android.app.presentation.imagepreview.menu.FileImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.FolderLinkImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
+import mega.privacy.android.app.presentation.imagepreview.menu.LinksImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.MediaDiscoveryImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.OfflineImagePreviewMenu
 import mega.privacy.android.app.presentation.imagepreview.menu.PublicFileImagePreviewMenu
@@ -87,6 +88,11 @@ internal interface ImagePreviewMenuModule {
     @IntoMap
     @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.SHARED_ITEMS)
     fun bindSharedItemsMenu(menu: SharedItemsImagePreviewMenu): ImagePreviewMenu
+
+    @Binds
+    @IntoMap
+    @ImagePreviewMenuFeatureKey(ImagePreviewMenuSource.LINKS)
+    fun bindLinksMenu(menu: LinksImagePreviewMenu): ImagePreviewMenu
 
     @Binds
     @IntoMap

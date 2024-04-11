@@ -35,6 +35,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PLACEHOLDER
+import mega.privacy.android.app.utils.Constants.LINKS_ADAPTER
 import mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -262,6 +263,15 @@ class GetIntentToOpenFileMapper @Inject constructor(
                     context = activity,
                     imageSource = ImagePreviewFetcherSource.SHARED_ITEMS,
                     menuOptionsSource = ImagePreviewMenuSource.SHARED_ITEMS,
+                    anchorImageNodeId = fileNode.id,
+                    params = mapOf(SharedItemsImageNodeFetcher.PARENT_ID to parentNodeHandle),
+                )
+            } else if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview) && viewType == LINKS_ADAPTER) {
+                val parentNodeHandle = fileNode.parentId.longValue
+                ImagePreviewActivity.createIntent(
+                    context = activity,
+                    imageSource = ImagePreviewFetcherSource.SHARED_ITEMS,
+                    menuOptionsSource = ImagePreviewMenuSource.LINKS,
                     anchorImageNodeId = fileNode.id,
                     params = mapOf(SharedItemsImageNodeFetcher.PARENT_ID to parentNodeHandle),
                 )
