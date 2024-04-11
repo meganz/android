@@ -25,6 +25,7 @@ import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
@@ -53,6 +54,7 @@ abstract class AbstractTransfersWorker(
     private val areNotificationsEnabledUseCase: AreNotificationsEnabledUseCase,
     private val correctActiveTransfersUseCase: CorrectActiveTransfersUseCase,
     private val clearActiveTransfersIfFinishedUseCase: ClearActiveTransfersIfFinishedUseCase,
+    private val crashReporter: CrashReporter,
     private val foregroundSetter: ForegroundSetter?,
 ) : CoroutineWorker(context, workerParams) {
 
@@ -92,6 +94,7 @@ abstract class AbstractTransfersWorker(
 
     override suspend fun doWork() = withContext(ioDispatcher) {
         Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Started")
+        crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} Started")
         val monitorJob = monitorTransferEvents(this)
         correctActiveTransfersUseCase(type) //to be sure we haven't missed any event before monitoring them
         val activeTransferTotals = getActiveTransferTotalsUseCase(type)
@@ -106,6 +109,7 @@ abstract class AbstractTransfersWorker(
         // Signal to not kill the worker if the app is killed
         val foregroundInfo = getForegroundInfo(activeTransferTotals, areTransfersPausedUseCase())
         foregroundSetter?.setForeground(foregroundInfo) ?: run {
+            crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} start foreground")
             setForeground(foregroundInfo)
         }
 
@@ -144,6 +148,8 @@ abstract class AbstractTransfersWorker(
                     Timber.d("${this@AbstractTransfersWorker::class.java.simpleName}finished Failure: $lastActiveTransferTotals")
                     Result.failure()//to retry in the future
                 }
+            }.also {
+                crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} Finished")
             }
     }
 

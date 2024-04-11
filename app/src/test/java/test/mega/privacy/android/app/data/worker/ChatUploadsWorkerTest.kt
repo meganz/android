@@ -36,15 +36,16 @@ import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.CheckFinishedChatUploadsUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
+import mega.privacy.android.domain.usecase.transfers.active.HandleTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import org.junit.Before
@@ -53,6 +54,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.UUID
@@ -89,6 +91,7 @@ class ChatUploadsWorkerTest {
     private val updatePendingMessageUseCase = mock<UpdatePendingMessageUseCase>()
     private val checkFinishedChatUploadsUseCase = mock<CheckFinishedChatUploadsUseCase>()
     private val setForeground = mock<ForegroundSetter>()
+    private val crashReporter = mock<CrashReporter>()
 
     @Before
     fun init() {
@@ -132,9 +135,18 @@ class ChatUploadsWorkerTest {
             attachNodeWithPendingMessageUseCase,
             updatePendingMessageUseCase,
             checkFinishedChatUploadsUseCase,
+            crashReporter,
             setForeground,
         )
     }
+
+    @Test
+    fun `test that crashReporter is invoked when the worker starts doing work`() =
+        runTest {
+            commonStub()
+            underTest.doWork()
+            verify(crashReporter, times(2)).log(any())
+        }
 
     @Test
     fun `test that node is attached to chat once upload is finished`() = runTest {

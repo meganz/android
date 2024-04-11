@@ -13,6 +13,7 @@ import mega.privacy.android.data.mapper.transfer.TransfersFinishedNotificationMa
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
@@ -46,23 +47,25 @@ class DownloadsWorker @AssistedInject constructor(
     private val downloadNotificationMapper: DownloadNotificationMapper,
     private val transfersFinishedNotificationMapper: TransfersFinishedNotificationMapper,
     private val scanMediaFileUseCase: ScanMediaFileUseCase,
+    crashReporter: CrashReporter,
     foregroundSetter: ForegroundSetter? = null,
 ) : AbstractTransfersWorker(
-    context,
-    workerParams,
-    TransferType.DOWNLOAD,
-    ioDispatcher,
-    monitorTransferEventsUseCase,
-    handleTransferEventUseCase,
-    monitorOngoingActiveTransfersUseCase,
-    areTransfersPausedUseCase,
-    getActiveTransferTotalsUseCase,
-    overQuotaNotificationBuilder,
-    notificationManager,
-    areNotificationsEnabledUseCase,
-    correctActiveTransfersUseCase,
-    clearActiveTransfersIfFinishedUseCase,
-    foregroundSetter,
+    context = context,
+    workerParams = workerParams,
+    type = TransferType.DOWNLOAD,
+    ioDispatcher = ioDispatcher,
+    monitorTransferEventsUseCase = monitorTransferEventsUseCase,
+    handleTransferEventUseCase = handleTransferEventUseCase,
+    monitorOngoingActiveTransfersUseCase = monitorOngoingActiveTransfersUseCase,
+    areTransfersPausedUseCase = areTransfersPausedUseCase,
+    getActiveTransferTotalsUseCase = getActiveTransferTotalsUseCase,
+    overQuotaNotificationBuilder = overQuotaNotificationBuilder,
+    notificationManager = notificationManager,
+    areNotificationsEnabledUseCase = areNotificationsEnabledUseCase,
+    correctActiveTransfersUseCase = correctActiveTransfersUseCase,
+    clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
+    crashReporter = crashReporter,
+    foregroundSetter = foregroundSetter,
 ) {
 
     override val finalNotificationId = DOWNLOAD_NOTIFICATION_ID
