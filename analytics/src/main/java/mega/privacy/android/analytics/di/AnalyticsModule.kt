@@ -9,6 +9,7 @@ import mega.privacy.android.analytics.EventSenderImpl
 import mega.privacy.android.analytics.ViewIdProviderImpl
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.analytics.tracker.AnalyticsTrackerImpl
+import mega.privacy.mobile.analytics.core.event.identifier.AppIdentifier
 import mega.privacy.mobile.analytics.event.tracking.Tracker
 
 @Module
@@ -22,6 +23,10 @@ internal abstract class AnalyticsModule {
         fun provideTracker(
             viewIdProvider: ViewIdProviderImpl,
             eventSender: EventSenderImpl,
-        ): Tracker = Tracker(viewIdProvider, eventSender)
+        ): Tracker = Tracker(
+            viewIdProvider = viewIdProvider,
+            eventSender = eventSender,
+            appIdentifier = AppIdentifier(0),
+        )
     }
 }
