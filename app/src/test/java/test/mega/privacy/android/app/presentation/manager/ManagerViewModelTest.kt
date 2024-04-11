@@ -879,7 +879,7 @@ class ManagerViewModelTest {
             )
             monitorContactRequestUpdates.emit(contactRequests)
             advanceUntilIdle()
-            verify(broadcastHomeBadgeCountUseCase).invoke(expectedTotalCount)
+            verify(broadcastHomeBadgeCountUseCase).invoke(expectedTotalCount + contactRequests.size)
             assertThat(underTest.onGetNumUnreadUserAlerts().test().value().second).isEqualTo(
                 expectedTotalCount
             )
@@ -914,7 +914,7 @@ class ManagerViewModelTest {
 
             monitorContactRequestUpdates.emit(contactRequests)
             advanceUntilIdle()
-            verify(broadcastHomeBadgeCountUseCase).invoke(expectedTotalCount)
+            verify(broadcastHomeBadgeCountUseCase).invoke(expectedTotalCount + contactRequests.size)
             assertThat(underTest.numUnreadUserAlerts.value.second).isEqualTo(expectedTotalCount)
         }
 

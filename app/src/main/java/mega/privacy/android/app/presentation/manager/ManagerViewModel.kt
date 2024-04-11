@@ -615,7 +615,8 @@ class ManagerViewModel @Inject constructor(
                     getNumUnreadUserAlertsUseCase() + promoNotificationCount
                 _numUnreadUserAlerts.update { Pair(type, totalCount) }
                 legacyNumUnreadUserAlerts.value = Pair(type, totalCount)
-                broadcastHomeBadgeCountUseCase(totalCount)
+                val incomingContactRequests = incomingContactRequests.value.size
+                broadcastHomeBadgeCountUseCase(totalCount + incomingContactRequests)
             }.onFailure {
                 Timber.e("Failed to get the number of unread user alerts or promo notifications with error: $it")
             }
