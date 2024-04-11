@@ -16,10 +16,12 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
@@ -34,6 +36,7 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -95,6 +98,14 @@ internal fun StartDownloadComponent(
         }
     } else {
         null
+    }
+
+    val coroutineScope = rememberCoroutineScope()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            lifecycleOwner.lifecycle.addObserver(viewModel)
+        }
     }
 
     EventEffect(
@@ -209,7 +220,7 @@ private fun StartDownloadComponent(
                         snackBarHostState = snackBarHostState,
                         showQuotaExceededDialog = showQuotaExceededDialog,
                         context = context,
-                        transferTriggerEvent = uiState.transferTriggerEvent
+                        transferTriggerEvent = it.triggerEvent,
                     )
 
                 is StartDownloadTransferEvent.Message ->

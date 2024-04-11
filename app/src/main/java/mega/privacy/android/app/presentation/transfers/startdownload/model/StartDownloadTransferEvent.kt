@@ -15,6 +15,7 @@ sealed interface StartDownloadTransferEvent {
      * @param totalNodes
      * @param totalFiles total files on this nodes
      * @param totalAlreadyDownloaded total files already downloaded, so they won't be downloaded
+     * @param triggerEvent the event that triggered the start of the transfers
      * @property filesToDownload
      */
     data class FinishProcessing(
@@ -22,6 +23,7 @@ sealed interface StartDownloadTransferEvent {
         val totalNodes: Int,
         val totalFiles: Int,
         val totalAlreadyDownloaded: Int,
+        val triggerEvent: TransferTriggerEvent,
     ) : StartDownloadTransferEvent {
         val filesToDownload = totalFiles - totalAlreadyDownloaded
     }

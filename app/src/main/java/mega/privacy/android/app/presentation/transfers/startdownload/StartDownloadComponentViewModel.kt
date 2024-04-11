@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.transfers.startdownload
 
 import android.net.Uri
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +28,6 @@ import mega.privacy.android.app.presentation.transfers.startdownload.model.Start
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferViewState
 import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
-import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -74,7 +75,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
     private val setStorageDownloadAskAlwaysUseCase: SetStorageDownloadAskAlwaysUseCase,
     private val setStorageDownloadLocationUseCase: SetStorageDownloadLocationUseCase,
     private val monitorActiveTransferFinishedUseCase: MonitorActiveTransferFinishedUseCase,
-) : ViewModel() {
+) : ViewModel(), DefaultLifecycleObserver {
 
     private var currentInProgressJob: Job? = null
 
@@ -129,12 +130,10 @@ internal class StartDownloadComponentViewModel @Inject constructor(
             Timber.e("Node in $transferTriggerEvent must exist")
             _uiState.updateEventAndClearProgress(StartDownloadTransferEvent.Message.TransferCancelled)
         } else {
-            _uiState.update {
-                it.copy(transferTriggerEvent = transferTriggerEvent)
-            }
+            lastTriggerEvent = transferTriggerEvent
             when (transferTriggerEvent) {
                 is TransferTriggerEvent.StartDownloadForOffline -> {
-                    startDownloadForOffline(node, transferTriggerEvent.isHighPriority)
+                    startDownloadForOffline(transferTriggerEvent)
                 }
 
                 is TransferTriggerEvent.StartDownloadNode -> {
@@ -155,7 +154,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                 }
 
                 is TransferTriggerEvent.StartDownloadForPreview -> {
-                    startDownloadNodeForPreview(node)
+                    startDownloadNodeForPreview(transferTriggerEvent)
                 }
             }
         }
@@ -183,16 +182,20 @@ internal class StartDownloadComponentViewModel @Inject constructor(
 
     /**
      * It starts downloading the node for preview with the appropriate use case
-     * @param node the [Node] to be downloaded for preview
+     * @param event the [TransferTriggerEvent.StartDownloadForPreview] event that starts this download
      */
-    private fun startDownloadNodeForPreview(node: TypedNode) {
+    private fun startDownloadNodeForPreview(event: TransferTriggerEvent.StartDownloadForPreview) {
+        if (event.node == null) {
+            return
+        }
         currentInProgressJob = viewModelScope.launch {
             startDownloadNodes(
-                nodes = listOf(node),
+                nodes = listOf(event.node),
                 isHighPriority = true,
                 getUri = {
                     getFilePreviewDownloadPathUseCase()
                 },
+                transferTriggerEvent = event
             )
         }
     }
@@ -215,22 +218,27 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                 getUri = {
                     destination?.ensureSuffix(File.separator)
                 },
+                transferTriggerEvent = startDownloadNode
             )
         }
     }
 
     /**
      * It starts downloading the node for offline with the appropriate use case
-     * @param node the [Node] to be saved offline
+     * @param event the [TransferTriggerEvent.StartDownloadForOffline] event that starts this download
      */
-    private fun startDownloadForOffline(node: TypedNode, isHighPriority: Boolean) {
+    private fun startDownloadForOffline(event: TransferTriggerEvent.StartDownloadForOffline) {
+        if (event.node == null) {
+            return
+        }
         currentInProgressJob = viewModelScope.launch {
             startDownloadNodes(
-                nodes = listOf(node),
-                isHighPriority,
+                nodes = listOf(event.node),
+                event.isHighPriority,
                 getUri = {
-                    getOfflinePathForNodeUseCase(node)
+                    getOfflinePathForNodeUseCase(event.node)
                 },
+                transferTriggerEvent = event,
             )
         }
     }
@@ -242,6 +250,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
         nodes: List<TypedNode>,
         isHighPriority: Boolean,
         getUri: suspend () -> String?,
+        transferTriggerEvent: TransferTriggerEvent,
     ) {
         monitorDownloadFinishJob?.cancel()
         clearActiveTransfersIfFinishedUseCase(TransferType.DOWNLOAD)
@@ -290,6 +299,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                         totalNodes = nodes.size,
                         totalFiles = finishedEvent?.startedFiles ?: 0,
                         totalAlreadyDownloaded = finishedEvent?.alreadyTransferred ?: 0,
+                        triggerEvent = transferTriggerEvent,
                     )
                 }
             }
@@ -419,20 +429,23 @@ internal class StartDownloadComponentViewModel @Inject constructor(
         monitorDownloadFinishJob?.cancel()
         monitorDownloadFinishJob = viewModelScope.launch {
             monitorActiveTransferFinishedUseCase(TransferType.DOWNLOAD).collect { totalNodes ->
-                when (_uiState.value.transferTriggerEvent) {
-                    is TransferTriggerEvent.StartDownloadForOffline -> {
-                        StartDownloadTransferEvent.Message.FinishOffline
-                    }
+                if (active) {
+                    when (lastTriggerEvent) {
+                        is TransferTriggerEvent.StartDownloadForOffline -> {
+                            StartDownloadTransferEvent.Message.FinishOffline
+                        }
 
-                    is TransferTriggerEvent.StartDownloadNode, null -> {
-                        StartDownloadTransferEvent.MessagePlural.FinishDownloading(
-                            totalNodes
-                        )
-                    }
+                        is TransferTriggerEvent.StartDownloadNode -> {
+                            StartDownloadTransferEvent.MessagePlural.FinishDownloading(
+                                totalNodes
+                            )
+                        }
 
-                    else -> null
-                }?.let { finishEvent ->
-                    _uiState.updateEventAndClearProgress(finishEvent)
+                        else -> null
+                    }?.let { finishEvent ->
+                        _uiState.updateEventAndClearProgress(finishEvent)
+                    }
+                    lastTriggerEvent = null
                 }
             }
         }
@@ -450,4 +463,22 @@ internal class StartDownloadComponentViewModel @Inject constructor(
 
     private fun String.ensureSuffix(suffix: String) =
         if (this.endsWith(suffix)) this else this.plus(suffix)
+
+    private var active = false
+    override fun onResume(owner: LifecycleOwner) {
+        super.onResume(owner)
+        active = true
+    }
+
+    override fun onPause(owner: LifecycleOwner) {
+        super.onPause(owner)
+        active = false
+    }
+
+    companion object {
+        /**
+         * The last trigger event that started the download, we need to keep it to know what to do when the download finishes even in other screens
+         */
+        private var lastTriggerEvent: TransferTriggerEvent? = null
+    }
 }

@@ -92,6 +92,7 @@ class StartDownloadComponentViewModelTest {
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
     private val parentNode: TypedFolderNode = mock()
+    private val startDownloadEvent = TransferTriggerEvent.StartDownloadNode(nodes)
 
     @BeforeAll
     fun setup() {
@@ -232,17 +233,23 @@ class StartDownloadComponentViewModelTest {
                 })
                 awaitCancellation()
             })
-            underTest.startDownload(TransferTriggerEvent.StartDownloadNode(nodes))
+            val triggerEvent = TransferTriggerEvent.StartDownloadNode(nodes)
+            underTest.startDownload(triggerEvent)
             assertThat(underTest.uiState.value.jobInProgressState).isNull()
-            assertCurrentEventIsEqualTo(StartDownloadTransferEvent.FinishProcessing(null, 1, 0, 0))
+            assertCurrentEventIsEqualTo(
+                StartDownloadTransferEvent.FinishProcessing(null, 1, 0, 0, triggerEvent)
+            )
         }
 
     @Test
     fun `test that FinishProcessing event is emitted if start download use case finishes correctly`() =
         runTest {
             commonStub()
-            underTest.startDownload(TransferTriggerEvent.StartDownloadNode(nodes))
-            assertCurrentEventIsEqualTo(StartDownloadTransferEvent.FinishProcessing(null, 1, 0, 0))
+            val triggerEvent = TransferTriggerEvent.StartDownloadNode(nodes)
+            underTest.startDownload(triggerEvent)
+            assertCurrentEventIsEqualTo(
+                StartDownloadTransferEvent.FinishProcessing(null, 1, 0, 0, triggerEvent)
+            )
         }
 
     @Test
@@ -262,7 +269,7 @@ class StartDownloadComponentViewModelTest {
     ) = runTest {
         commonStub()
         stubStartDownload(flowOf(multiTransferEvent))
-        underTest.startDownload(TransferTriggerEvent.StartDownloadNode(nodes))
+        underTest.startDownload(startDownloadEvent)
         assertCurrentEventIsEqualTo(startDownloadTransferEvent)
     }
 
@@ -355,10 +362,11 @@ class StartDownloadComponentViewModelTest {
         }
 
     @Test
-    fun `test that event is emitted when monitorActiveTransferFinishedUseCase emits a value and transferTriggerEvent is StartDownloadNode`() =
+    fun `test that finish downloading event is emitted when monitorActiveTransferFinishedUseCase emits a value and transferTriggerEvent is StartDownloadNode`() =
         runTest {
             setup()
-            underTest.startDownload(TransferTriggerEvent.StartDownloadNode(listOf(mock()))) //to set transferTriggerEvent to StartDownloadNode
+            underTest.startDownload(TransferTriggerEvent.StartDownloadNode(listOf(mock()))) //to set lastTriggerEvent to StartDownloadNode
+            underTest.onResume(mock())
             underTest.uiState.test {
                 val finished = 2
                 awaitItem() //current value doesn't matter
@@ -377,7 +385,7 @@ class StartDownloadComponentViewModelTest {
             mock<MultiTransferEvent.SingleTransferEvent> {
                 on { scanningFinished } doReturn true
             },
-            StartDownloadTransferEvent.FinishProcessing(null, 1, 0, 0),
+            StartDownloadTransferEvent.FinishProcessing(null, 1, 0, 0, startDownloadEvent),
         ),
         Arguments.of(
             MultiTransferEvent.InsufficientSpace,
