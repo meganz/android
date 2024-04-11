@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfers
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.qrcode.ScanMediaFileUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
@@ -54,6 +55,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -87,6 +89,7 @@ class DownloadsWorkerTest {
     private val workProgressUpdater = mock<ProgressUpdater>()
     private val scanMediaFileUseCase = mock<ScanMediaFileUseCase>()
     private val setForeground = mock<ForegroundSetter>()
+    private val crashReporter = mock<CrashReporter>()
 
     @Before
     fun setup() {
@@ -129,6 +132,7 @@ class DownloadsWorkerTest {
             clearActiveTransfersIfFinishedUseCase = clearActiveTransfersIfFinishedUseCase,
             transfersFinishedNotificationMapper = transfersFinishedNotificationMapper,
             scanMediaFileUseCase = scanMediaFileUseCase,
+            crashReporter = crashReporter,
             foregroundSetter = setForeground
         )
     }
@@ -145,6 +149,14 @@ class DownloadsWorkerTest {
             commonStub()
             underTest.doWork()
             verify(monitorTransferEventsUseCase).invoke()
+        }
+
+    @Test
+    fun `test that crashReporter is invoked when the worker starts doing work`() =
+        runTest {
+            commonStub()
+            underTest.doWork()
+            verify(crashReporter, times(2)).log(any())
         }
 
     @Test

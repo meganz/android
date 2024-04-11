@@ -71,6 +71,7 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.repository.FileSystemRepository
@@ -181,6 +182,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val getFileByPathUseCase: GetFileByPathUseCase,
     private val fileSystemRepository: FileSystemRepository,
     private val timeSystemRepository: TimeSystemRepository,
+    private val crashReporter: CrashReporter,
     @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
 
@@ -290,7 +292,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
         runCatching {
             Timber.d("Start CU Worker")
-
+            crashReporter.log("${CameraUploadsWorker::class.java.simpleName} Started")
             // Signal to not kill the worker if the app is killed
             setForegroundAsync(getForegroundInfo())
 
@@ -304,7 +306,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             canRunCameraUploads()?.let { finishedReason ->
                 when (finishedReason) {
                     CameraUploadsFinishedReason.MEDIA_PERMISSION_NOT_GRANTED,
-                    CameraUploadsFinishedReason.LOCAL_PRIMARY_FOLDER_NOT_VALID
+                    CameraUploadsFinishedReason.LOCAL_PRIMARY_FOLDER_NOT_VALID,
                     ->
                         abortWork(
                             reason = finishedReason,
@@ -368,7 +370,9 @@ class CameraUploadsWorker @AssistedInject constructor(
         return@withContext withContext(NonCancellable) {
             cleanResources()
             sendFinishedStatus(finishedReason ?: CameraUploadsFinishedReason.COMPLETED)
-            endWork(finishedReason ?: CameraUploadsFinishedReason.COMPLETED, restartMode)
+            endWork(finishedReason ?: CameraUploadsFinishedReason.COMPLETED, restartMode).also {
+                crashReporter.log("${CameraUploadsWorker::class.java.simpleName} Finished")
+            }
         }
     }
 
@@ -891,7 +895,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun processProgressEvent(progressEvent: CameraUploadsTransferProgress) {
         when (progressEvent) {
-            is CameraUploadsTransferProgress.ToUpload
+            is CameraUploadsTransferProgress.ToUpload,
             -> processToUploadEvent(progressEvent)
 
             is CameraUploadsTransferProgress.ToCopy,
@@ -934,7 +938,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @param progressEvent
      */
     private suspend fun processToUploadEvent(
-        progressEvent: CameraUploadsTransferProgress.ToUpload
+        progressEvent: CameraUploadsTransferProgress.ToUpload,
     ) {
         updateToUploadCount(
             filePath = progressEvent.record.tempFilePath

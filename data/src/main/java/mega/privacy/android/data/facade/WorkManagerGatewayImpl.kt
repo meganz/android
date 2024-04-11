@@ -170,11 +170,7 @@ class WorkManagerGatewayImpl @Inject constructor(
                     cameraUploadWorkRequest,
                 ).await()
 
-            Timber.d(
-                "CameraUploads Unique Work Status: ${
-                    workManager.getWorkInfosByTag(CAMERA_UPLOAD_TAG).get()
-                }"
-            )
+            Timber.d("CameraUploads Unique Work enqueued")
             // If no CU periodic worker are currently running, cancel the worker
             // It will be rescheduled at the end of the one time request
             cancelPeriodicCameraUploadWorkRequest()
@@ -210,11 +206,7 @@ class WorkManagerGatewayImpl @Inject constructor(
                 ExistingPeriodicWorkPolicy.KEEP,
                 cameraUploadWorkRequest
             ).await()
-        Timber.d(
-            "CameraUploads Periodic Work Status: ${
-                workManager.getWorkInfosByTag(CAMERA_UPLOAD_TAG).get()
-            }"
-        )
+        Timber.d("CameraUploads Periodic Work enqueued")
     }
 
     /**
@@ -239,11 +231,7 @@ class WorkManagerGatewayImpl @Inject constructor(
                 ExistingPeriodicWorkPolicy.KEEP,
                 cuSyncActiveHeartbeatWorkRequest
             ).await()
-        Timber.d(
-            "CameraUpload Schedule Heartbeat Work Status: ${
-                workManager.getWorkInfosByTag(HEART_BEAT_TAG).get()
-            }"
-        )
+        Timber.d("CameraUploads Heartbeat Periodic Work enqueued")
     }
 
     /**

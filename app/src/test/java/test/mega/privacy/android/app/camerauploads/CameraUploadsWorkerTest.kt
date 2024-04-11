@@ -67,6 +67,7 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectoryUseCase
@@ -124,6 +125,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
@@ -209,6 +211,7 @@ class CameraUploadsWorkerTest {
     private val disableCameraUploadsUseCase: DisableCameraUploadsUseCase = mock()
     private val getFileByPathUseCase: GetFileByPathUseCase = mock()
     private val loginMutex: Mutex = mock()
+    private val crashReporter: CrashReporter = mock()
 
     private val foregroundInfo = ForegroundInfo(1, mock())
     private val primaryNodeHandle = 1111L
@@ -298,6 +301,7 @@ class CameraUploadsWorkerTest {
                 getUploadVideoQualityUseCase = getUploadVideoQualityUseCase,
                 disableCameraUploadsUseCase = disableCameraUploadsUseCase,
                 getFileByPathUseCase = getFileByPathUseCase,
+                crashReporter = crashReporter,
             )
         )
         setupDefaultCheckConditionMocks()
@@ -364,6 +368,13 @@ class CameraUploadsWorkerTest {
                 )
             ).thenReturn(list)
             whenever(extractGpsCoordinatesUseCase(list)).thenReturn(list)
+        }
+
+    @Test
+    fun `test that crashReporter is invoked when the worker starts doing work`() =
+        runTest {
+            underTest.doWork()
+            verify(crashReporter, times(2)).log(any())
         }
 
     @Test
