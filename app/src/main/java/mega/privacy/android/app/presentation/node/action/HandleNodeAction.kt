@@ -50,7 +50,7 @@ fun HandleNodeAction(
     nodeActionsViewModel: NodeActionsViewModel = hiltViewModel(),
     sortOrder: SortOrder = SortOrder.ORDER_NONE,
     onActionHandled: () -> Unit,
-    snackBarHostState: SnackbarHostState
+    snackBarHostState: SnackbarHostState,
 ) {
     val context = LocalContext.current
 
@@ -80,6 +80,7 @@ fun HandleNodeAction(
                 is FileNodeContent.TextContent -> openTextEditorActivity(
                     context = context,
                     currentFileNode = typedFileNode,
+                    nodeSourceType = nodeSourceType ?: Constants.FILE_BROWSER_ADAPTER
                 )
 
                 is FileNodeContent.AudioOrVideo -> {
@@ -89,7 +90,8 @@ fun HandleNodeAction(
                         fileNode = typedFileNode,
                         snackBarHostState = snackBarHostState,
                         nodeActionsViewModel = nodeActionsViewModel,
-                        sortOrder = sortOrder
+                        sortOrder = sortOrder,
+                        viewType = nodeSourceType ?: Constants.FILE_BROWSER_ADAPTER
                     )
                 }
 
@@ -135,11 +137,15 @@ fun HandleNodeAction(
     }
 }
 
-private fun openTextEditorActivity(context: Context, currentFileNode: TypedFileNode) {
+private fun openTextEditorActivity(
+    context: Context,
+    currentFileNode: TypedFileNode,
+    nodeSourceType: Int,
+) {
     val textFileIntent = Intent(context, TextEditorActivity::class.java)
     textFileIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, currentFileNode.id.longValue)
         .putExtra(TextEditorViewModel.MODE, TextEditorViewModel.VIEW_MODE)
-        .putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.RUBBISH_BIN_ADAPTER)
+        .putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, nodeSourceType)
     context.startActivity(textFileIntent)
 }
 
@@ -211,6 +217,7 @@ private suspend fun openVideoOrAudioFile(
     snackBarHostState: SnackbarHostState?,
     nodeActionsViewModel: NodeActionsViewModel,
     sortOrder: SortOrder,
+    viewType: Int
 ) {
     val intent = when {
         fileNode.type.isSupported && fileNode.type is VideoFileTypeInfo ->
@@ -234,7 +241,7 @@ private suspend fun openVideoOrAudioFile(
         else -> Intent(Intent.ACTION_VIEW)
     }.apply {
         putExtra(Constants.INTENT_EXTRA_KEY_PLACEHOLDER, 0)
-        putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.RUBBISH_BIN_ADAPTER)
+        putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, viewType)
         putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, fileNode.name)
         putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
         putExtra(Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, fileNode.parentId.longValue)

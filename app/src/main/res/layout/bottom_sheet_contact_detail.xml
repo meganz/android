@@ -45,7 +45,7 @@
                 android:id="@+id/option_call"
                 style="@style/BottomSheetOption"
                 android:text="@string/call_button"
-                app:drawableStartCompat="@drawable/ic_phone_01_medium_regular_solid" />
+                app:drawableStartCompat="@drawable/ic_phone_01_medium_regular_outline" />
 
             <TextView
                 android:id="@+id/option_send_message"
@@ -70,7 +70,7 @@
                 android:id="@+id/option_share_contact"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_send_contact"
-                app:drawableStartCompat="@drawable/ic_share_contact" />
+                app:drawableStartCompat="@drawable/ic_user_right_medium_regular_outline" />
 
             <TextView
                 android:id="@+id/option_share_folder"

@@ -242,13 +242,13 @@
                 android:id="@+id/option_move"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_move"
-                app:drawableStartCompat="@drawable/ic_move" />
+                app:drawableStartCompat="@drawable/ic_move_medium_regular_outline" />
 
             <TextView
                 android:id="@+id/option_copy"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_copy"
-                app:drawableStartCompat="@drawable/ic_menu_copy" />
+                app:drawableStartCompat="@drawable/ic_copy_01_medium_regular_outline" />
 
             <View
                 android:id="@+id/separator_copy"

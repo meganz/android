@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.contactinfo.view
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Divider
@@ -76,7 +77,7 @@ internal fun ContactInfoContent(
     }
     MenuActionListTile(
         text = stringResource(id = R.string.title_properties_chat_share_contact),
-        icon = painterResource(id = R.drawable.ic_share_contact),
+        icon = painterResource(id = iconPackR.drawable.ic_user_right_medium_regular_outline),
     )
     VerifyCredentialsView(isVerified = uiState.areCredentialsVerified)
     if (uiState.chatRoom != null) {
