@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.fileinfo.view
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -44,7 +45,7 @@ internal fun FileVersionsView(
         modifier = Modifier
             .sizeIn(minWidth = textStartPadding)
             .padding(start = 16.dp),
-        painter = painterResource(id = R.drawable.ic_g_version),
+        painter = painterResource(id = iconPackR.drawable.ic_clock_rotate_medium_regular_outline),
         alignment = Alignment.CenterStart,
         contentDescription = "versions icon"
     )

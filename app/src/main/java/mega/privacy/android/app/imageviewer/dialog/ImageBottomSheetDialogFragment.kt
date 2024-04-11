@@ -402,7 +402,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             val copyAction =
                 if (nodeItem?.isExternalNode == true) R.string.general_import else if (imageItem is ImageItem.ChatNode) R.string.add_to_cloud_node_chat else R.string.context_copy
             val copyDrawable =
-                if (nodeItem?.isExternalNode == true || imageItem is ImageItem.ChatNode) R.drawable.ic_cloud_upload_medium_regular_outline else R.drawable.ic_menu_copy
+                if (nodeItem?.isExternalNode == true || imageItem is ImageItem.ChatNode) R.drawable.ic_cloud_upload_medium_regular_outline else R.drawable.ic_icon_copy_medium_regular_outline
             optionCopy.setCompoundDrawablesWithIntrinsicBounds(copyDrawable, 0, 0, 0)
             optionCopy.text = getString(copyAction)
 

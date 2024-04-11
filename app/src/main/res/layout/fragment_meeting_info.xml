@@ -18,7 +18,7 @@
         android:id="@+id/edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_edit"
+        android:src="@drawable/ic_edit_medium_regular_outline"
         app:layout_constraintBottom_toTopOf="@id/moderator_name"
         app:layout_constraintLeft_toRightOf="@id/meeting_name"
         app:layout_constraintTop_toTopOf="parent"

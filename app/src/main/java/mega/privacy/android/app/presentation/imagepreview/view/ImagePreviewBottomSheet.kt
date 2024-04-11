@@ -430,7 +430,7 @@ internal fun ImagePreviewBottomSheet(
                                 )
                             } else {
                                 Icon(
-                                    painter = painterResource(id = RCore.drawable.ic_help_circle),
+                                    painter = painterResource(id = IconPackR.drawable.ic_help_circle_medium_regular_outline),
                                     contentDescription = null,
                                     modifier = Modifier
                                         .size(24.dp)
@@ -454,7 +454,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isMoveMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = R.drawable.ic_move),
+                        icon = painterResource(id = IconPackR.drawable.ic_move_medium_regular_outline),
                         text = stringResource(id = R.string.general_move),
                         onActionClicked = onClickMove,
                         dividerType = null,
@@ -466,7 +466,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isCopyMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id = R.drawable.ic_menu_copy),
+                        icon = painterResource(id = IconPackR.drawable.ic_copy_01_medium_regular_outline),
                         text = stringResource(id = R.string.context_copy),
                         onActionClicked = onClickCopy,
                         dividerType = null,

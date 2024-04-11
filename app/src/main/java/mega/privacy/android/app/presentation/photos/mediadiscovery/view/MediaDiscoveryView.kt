@@ -272,7 +272,7 @@ fun MDBottomSheet(
                 )
                 MenuItem(
                     modifier = Modifier,
-                    res = R.drawable.ic_camera_uploads,
+                    res = iconPackR.drawable.ic_camera_medium_regular_outline,
                     text = R.string.menu_take_picture,
                     description = "Capture",
                     onClick = onCapture,

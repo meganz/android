@@ -30,7 +30,7 @@ sealed class DeviceCenterUINodeStatus(
     data object Unknown : DeviceCenterUINodeStatus(
         name = R.string.device_center_list_view_item_status_unknown_status,
         localizedErrorMessage = null,
-        icon = CoreR.drawable.ic_help_circle,
+        icon =iconPackR.drawable.ic_help_circle_medium_regular_outline,
         color = null,
     )
 

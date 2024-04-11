@@ -128,7 +128,7 @@
                 <TextView
                     style="@style/BottomSheetOption"
                     android:text="@string/title_edit_profile_info"
-                    app:drawableStartCompat="@drawable/ic_file_edit"/>
+                    app:drawableStartCompat="@drawable/ic_edit_medium_regular_outline"/>
 
                 <View
                     android:layout_width="match_parent"
@@ -179,7 +179,7 @@
                     style="@style/BottomSheetOptionWithoutBackground"
                     android:layout_weight="1"
                     android:text="@string/title_section_versions"
-                    app:drawableStartCompat="@drawable/ic_g_version" />
+                    app:drawableStartCompat="@drawable/ic_clock_rotate_medium_regular_outline" />
 
                 <TextView
                     android:id="@+id/versions"
@@ -406,7 +406,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_help_circle"
+                    android:src="@drawable/ic_help_circle_medium_regular_outline"
                     android:visibility="gone"
                     app:tint="?android:attr/textColorSecondary" />
 
@@ -416,13 +416,13 @@
                 android:id="@+id/move_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/general_move_to"
-                app:drawableStartCompat="@drawable/ic_move"/>
+                app:drawableStartCompat="@drawable/ic_move_medium_regular_outline"/>
 
             <TextView
                 android:id="@+id/copy_option"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_copy"
-                app:drawableStartCompat="@drawable/ic_menu_copy"/>
+                app:drawableStartCompat="@drawable/ic_copy_01_medium_regular_outline"/>
 
             <TextView
                 android:id="@+id/restore_option"
@@ -442,7 +442,7 @@
                 android:id="@+id/leave_share_option"
                 style="@style/BottomSheetOption.Red"
                 android:text="@string/alert_leave_share"
-                app:drawableStartCompat="@drawable/leave_share_ic"/>
+                app:drawableStartCompat="@drawable/ic_log_out_02_medium_regular_outline"/>
 
             <TextView
                 android:id="@+id/rubbish_bin_option"

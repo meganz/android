@@ -1,5 +1,6 @@
 package mega.privacy.android.legacy.core.ui.controls.lists
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -75,9 +77,10 @@ fun HeaderViewItem(
                 modifier = Modifier
                     .align(CenterVertically)
                     .padding(end = 16.dp)
+                    .size(16.dp)
                     .clickable { onEnterMediaDiscoveryClick() }
                     .testTag(MEDIA_DISCOVERY_TAG),
-                painter = painterResource(id = R.drawable.ic_media_discovery),
+                painter = painterResource(id = iconPackR.drawable.ic_image_01_small_regular_outline),
                 colorFilter = ColorFilter.tint(color = MaterialTheme.colors.textColorSecondary),
                 contentDescription = "Enter media discovery"
             )
@@ -86,13 +89,14 @@ fun HeaderViewItem(
             Image(
                 modifier = Modifier
                     .align(CenterVertically)
+                    .size(16.dp)
                     .clickable {
                         onChangeViewTypeClick()
                     },
                 painter = if (isListView) {
-                    painterResource(id = R.drawable.ic_grid_view_new)
+                    painterResource(id = iconPackR.drawable.ic_grid_4_small_regular_outline)
                 } else {
-                    painterResource(id = R.drawable.ic_list_view_new)
+                    painterResource(id = iconPackR.drawable.ic_list_small_small_regular_outline)
                 },
                 colorFilter = ColorFilter.tint(color = MaterialTheme.colors.textColorSecondary),
                 contentDescription = "Toggle grid list"

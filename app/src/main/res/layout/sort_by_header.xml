@@ -62,7 +62,7 @@
             android:layout_marginEnd="12dp"
             android:onClick="@{() -> sortByHeaderViewModel.switchViewType()}"
             android:padding="10dp"
-            android:src="@{sortByHeaderViewModel.isListView() ? @drawable/ic_grid_view_new : @drawable/ic_list_view_new}"
+            android:src="@{sortByHeaderViewModel.isListView() ? @drawable/ic_grid_4_small_regular_outline : @drawable/ic_list_small_small_regular_outline}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

@@ -27,7 +27,7 @@ internal fun mapStartScreenOption(screen: StartScreen) = when (screen) {
         StartScreenOption(
             startScreen = screen,
             title = R.string.settings_start_screen_photos_option,
-            icon = R.drawable.ic_camera_uploads,
+            icon = iconPackR.drawable.ic_camera_medium_regular_outline,
         )
     }
 
