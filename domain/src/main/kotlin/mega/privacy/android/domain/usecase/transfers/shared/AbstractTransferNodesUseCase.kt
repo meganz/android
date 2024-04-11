@@ -105,13 +105,10 @@ abstract class AbstractTransferNodesUseCase<T, R>(
                                 }
                             }
                             //check if is a single node update event, at this point we can know if the transfer will be skipped by the sdk because it has ben already downloaded.
-                            if (!allTransfersUpdated && transferEvent !is TransferEvent.TransferStartEvent) {
+                            if (!allTransfersUpdated && transferEvent.isTransferUpdated) {
                                 val id = generateIdFromTransferEvent(transferEvent)
                                 if (!itemsUpdated.contains(id)) {
-                                    //this node is already scanned: save it and emit the event
                                     itemsUpdated.add(id)
-
-                                    //check if all nodes have been scanned
                                     if (itemsUpdated.containsAll(allIds)) {
                                         allTransfersUpdated = true
                                     }
@@ -126,7 +123,7 @@ abstract class AbstractTransferNodesUseCase<T, R>(
                                     startedFiles = filesStarted.size,
                                     alreadyTransferred = alreadyTransferredFiles.size,
                                     alreadyTransferredIds = alreadyTransferredNodeIds,
-                                    scanningFinished = scanningFinished,
+                                    scanningFinished = scanningFinished || allTransfersUpdated,
                                     allTransfersUpdated = allTransfersUpdated,
                                 )
                             )
@@ -191,19 +188,29 @@ abstract class AbstractTransferNodesUseCase<T, R>(
     private val TransferEvent.isFileTransfer: Boolean
         get() = !this.transfer.isFolderTransfer
 
+    private val TransferEvent.isFolderTransfer: Boolean
+        get() = this.transfer.isFolderTransfer
+
     /**
      * return true if this event represents a finish processing event (or already finished)
      */
     private val TransferEvent.isFinishScanningEvent: Boolean
         get() = when {
             this is TransferEvent.TransferUpdateEvent &&
-                    transfer.isFolderTransfer && transfer.stage == mega.privacy.android.domain.entity.transfer.TransferStage.STAGE_TRANSFERRING_FILES -> {
+                    isFolderTransfer && transfer.stage == mega.privacy.android.domain.entity.transfer.TransferStage.STAGE_TRANSFERRING_FILES -> {
                 true
             }
 
             this is TransferEvent.TransferFinishEvent -> true
-            this is TransferEvent.TransferStartEvent && !transfer.isFolderTransfer -> true
-            this is TransferEvent.TransferUpdateEvent && !transfer.isFolderTransfer -> true
+            this is TransferEvent.TransferStartEvent && isFileTransfer -> true
+            this is TransferEvent.TransferUpdateEvent && isFileTransfer -> true
+            else -> false
+        }
+
+    private val TransferEvent.isTransferUpdated: Boolean
+        get() = when {
+            isFileTransfer && this !is TransferEvent.TransferStartEvent -> true
+            isFolderTransfer && isFinishScanningEvent -> true
             else -> false
         }
 }
