@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.presentation.meeting
+package test.mega.privacy.android.app.presentation.meeting.view
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule

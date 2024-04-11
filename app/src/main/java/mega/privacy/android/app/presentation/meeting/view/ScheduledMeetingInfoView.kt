@@ -75,6 +75,9 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoA
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoUiState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
+import mega.privacy.android.app.presentation.meeting.view.dialog.DenyEntryToCallDialog
+import mega.privacy.android.app.presentation.meeting.view.dialog.UsersInWaitingRoomDialog
+import mega.privacy.android.app.presentation.meeting.view.dialog.WaitingRoomWarningDialog
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.grey_alpha_012

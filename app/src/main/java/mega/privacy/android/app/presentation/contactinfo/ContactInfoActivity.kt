@@ -80,8 +80,8 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.isValid
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
-import mega.privacy.android.app.presentation.meeting.view.DenyEntryToCallDialog
-import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
+import mega.privacy.android.app.presentation.meeting.view.dialog.DenyEntryToCallDialog
+import mega.privacy.android.app.presentation.meeting.view.dialog.UsersInWaitingRoomDialog
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel
 import mega.privacy.android.app.utils.AlertDialogUtil

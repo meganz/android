@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.sp
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.dialog.view.CallParticipantBottomSheetView
+import mega.privacy.android.app.presentation.meeting.view.sheet.CallParticipantBottomSheetView
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton

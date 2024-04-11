@@ -206,10 +206,10 @@ import mega.privacy.android.app.presentation.mapper.RestoreNodeResultMapper
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.UpgradeProPlanBottomSheet
-import mega.privacy.android.app.presentation.meeting.view.CallRecordingConsentDialog
-import mega.privacy.android.app.presentation.meeting.view.DenyEntryToCallDialog
-import mega.privacy.android.app.presentation.meeting.view.FreePlanLimitParticipantsDialog
-import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
+import mega.privacy.android.app.presentation.meeting.view.dialog.CallRecordingConsentDialog
+import mega.privacy.android.app.presentation.meeting.view.dialog.DenyEntryToCallDialog
+import mega.privacy.android.app.presentation.meeting.view.dialog.FreePlanLimitParticipantsDialog
+import mega.privacy.android.app.presentation.meeting.view.dialog.UsersInWaitingRoomDialog
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.node.NodeSourceTypeMapper
 import mega.privacy.android.app.presentation.notification.NotificationsFragment

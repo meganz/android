@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting
+package mega.privacy.android.app.presentation.meeting.view.dialog
 
 import android.content.Intent
 import android.os.Bundle
@@ -17,8 +17,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.meeting.view.DenyEntryToCallDialog
-import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
+import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
@@ -31,6 +30,7 @@ import javax.inject.Inject
  * Necessary to display the compose dialogue in ChatActivity.java
  */
 @AndroidEntryPoint
+@Deprecated("Use only in case of Java code. . Use UsersInWaitingRoomDialog compose view instead.")
 class UsersInWaitingRoomDialogFragment : DialogFragment() {
     private val viewModel: WaitingRoomManagementViewModel by viewModels()
 

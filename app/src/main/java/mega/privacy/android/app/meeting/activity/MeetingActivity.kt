@@ -43,10 +43,10 @@ import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
-import mega.privacy.android.app.presentation.meeting.view.CallRecordingConsentDialog
-import mega.privacy.android.app.presentation.meeting.view.DenyEntryToCallDialog
+import mega.privacy.android.app.presentation.meeting.view.dialog.CallRecordingConsentDialog
+import mega.privacy.android.app.presentation.meeting.view.dialog.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsFullListView
-import mega.privacy.android.app.presentation.meeting.view.UsersInWaitingRoomDialog
+import mega.privacy.android.app.presentation.meeting.view.dialog.UsersInWaitingRoomDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.app.utils.ScheduledMeetingDateUtil.getAppropriateStringForScheduledMeetingDate

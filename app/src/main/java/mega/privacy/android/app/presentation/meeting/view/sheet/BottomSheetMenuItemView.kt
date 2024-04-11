@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.view
+package mega.privacy.android.app.presentation.meeting.view.sheet
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes

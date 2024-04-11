@@ -380,9 +380,9 @@ import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity;
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity;
 import mega.privacy.android.app.presentation.login.LoginActivity;
-import mega.privacy.android.app.presentation.meeting.CallRecordingConsentDialogFragment;
+import mega.privacy.android.app.presentation.meeting.view.dialog.CallRecordingConsentDialogFragment;
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity;
-import mega.privacy.android.app.presentation.meeting.UsersInWaitingRoomDialogFragment;
+import mega.privacy.android.app.presentation.meeting.view.dialog.UsersInWaitingRoomDialogFragment;
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity;
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;

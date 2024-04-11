@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.dialog.view
+package mega.privacy.android.app.presentation.meeting.view.dialog
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column

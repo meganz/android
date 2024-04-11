@@ -75,7 +75,7 @@ import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
 import mega.privacy.android.app.presentation.avatar.view.Avatar
 import mega.privacy.android.app.presentation.changepassword.view.Constants
-import mega.privacy.android.app.presentation.meeting.dialog.view.ChangeSFUIdDialog
+import mega.privacy.android.app.presentation.meeting.view.dialog.ChangeSFUIdDialog
 import mega.privacy.android.app.presentation.myaccount.MyAccountHomeViewActions
 import mega.privacy.android.app.presentation.myaccount.model.MyAccountHomeUIState
 import mega.privacy.android.app.presentation.myaccount.model.mapper.toAccountAttributes

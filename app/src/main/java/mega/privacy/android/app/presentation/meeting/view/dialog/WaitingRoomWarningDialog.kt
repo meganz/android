@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.view
+package mega.privacy.android.app.presentation.meeting.view.dialog
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background

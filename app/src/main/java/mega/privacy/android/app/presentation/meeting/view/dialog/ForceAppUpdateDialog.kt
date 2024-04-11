@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.view
+package mega.privacy.android.app.presentation.meeting.view.dialog
 
 import android.content.ActivityNotFoundException
 import android.content.Intent

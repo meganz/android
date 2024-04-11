@@ -106,7 +106,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.sheet.MessageNotS
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.MessageOptionsBottomSheet
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ReactionsInfoBottomSheet
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.UpgradeProPlanBottomSheet
-import mega.privacy.android.app.presentation.meeting.view.FreePlanLimitParticipantsDialog
+import mega.privacy.android.app.presentation.meeting.view.dialog.FreePlanLimitParticipantsDialog
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
 import mega.privacy.android.app.utils.CallUtil

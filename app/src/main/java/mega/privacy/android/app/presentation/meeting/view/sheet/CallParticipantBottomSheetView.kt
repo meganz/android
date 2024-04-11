@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.dialog.view
+package mega.privacy.android.app.presentation.meeting.view.sheet
 
 import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.background
@@ -39,7 +39,6 @@ import mega.privacy.android.app.presentation.chat.list.view.ChatDivider
 import mega.privacy.android.app.presentation.chat.list.view.ChatUserStatusView
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
-import mega.privacy.android.app.presentation.meeting.view.BottomSheetMenuItemView
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary

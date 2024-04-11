@@ -65,6 +65,7 @@ import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetingState
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
+import mega.privacy.android.app.presentation.meeting.view.dialog.WaitingRoomWarningDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons

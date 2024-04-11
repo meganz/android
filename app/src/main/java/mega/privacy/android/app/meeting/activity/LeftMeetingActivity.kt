@@ -15,7 +15,7 @@ import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.databinding.ActivityGuestLeaveMeetingBinding
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.meeting.LeftMeetingViewModel
-import mega.privacy.android.app.presentation.meeting.view.FreePlanLimitParticipantsDialog
+import mega.privacy.android.app.presentation.meeting.view.dialog.FreePlanLimitParticipantsDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.shared.theme.MegaAppTheme

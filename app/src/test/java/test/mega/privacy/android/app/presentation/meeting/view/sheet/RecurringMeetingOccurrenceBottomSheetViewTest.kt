@@ -1,18 +1,18 @@
-package test.mega.privacy.android.app.presentation.meeting
+package test.mega.privacy.android.app.presentation.meeting.view.sheet
 
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.test.onNodeWithTag
-import mega.privacy.android.app.presentation.meeting.dialog.view.CANCEL_OCCURRENCE_TAG
-import mega.privacy.android.app.presentation.meeting.dialog.view.RecurringMeetingOccurrenceBottomSheetView
+import mega.privacy.android.app.presentation.meeting.view.sheet.CANCEL_OCCURRENCE_TAG
+import mega.privacy.android.app.presentation.meeting.view.sheet.RecurringMeetingOccurrenceBottomSheetView
 import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingInfoState
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.presentation.meeting.dialog.view.EDIT_OCCURRENCE_TAG
+import mega.privacy.android.app.presentation.meeting.view.sheet.EDIT_OCCURRENCE_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

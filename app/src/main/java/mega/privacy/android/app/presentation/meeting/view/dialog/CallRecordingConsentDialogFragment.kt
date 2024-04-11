@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting
+package mega.privacy.android.app.presentation.meeting.view.dialog
 
 import android.content.Intent
 import android.net.Uri
@@ -15,7 +15,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.presentation.chat.ChatViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.meeting.view.CallRecordingConsentDialog
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -26,6 +25,7 @@ import javax.inject.Inject
  * Necessary to display the compose dialog in ChatActivity.java
  */
 @AndroidEntryPoint
+@Deprecated("Use only in case of Java code. Use CallRecordingConsentDialog compose view instead.")
 class CallRecordingConsentDialogFragment : DialogFragment() {
     private val viewModel: ChatViewModel by viewModels()
 

@@ -59,9 +59,11 @@ import mega.privacy.android.app.presentation.extensions.getEndZoneDateTime
 import mega.privacy.android.app.presentation.extensions.getStartTimeFormatted
 import mega.privacy.android.app.presentation.extensions.getStartZoneDateTime
 import mega.privacy.android.app.presentation.extensions.getTimeFormatted
-import mega.privacy.android.app.presentation.meeting.dialog.view.RecurringMeetingOccurrenceBottomSheetView
+import mega.privacy.android.app.presentation.meeting.view.sheet.RecurringMeetingOccurrenceBottomSheetView
 import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingInfoState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
+import mega.privacy.android.app.presentation.meeting.view.dialog.CancelOccurrenceAndMeetingDialog
+import mega.privacy.android.app.presentation.meeting.view.dialog.CancelScheduledMeetingOccurrenceDialog
 import mega.privacy.android.legacy.core.ui.controls.dialogs.EditOccurrenceDialog
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.grey_alpha_012

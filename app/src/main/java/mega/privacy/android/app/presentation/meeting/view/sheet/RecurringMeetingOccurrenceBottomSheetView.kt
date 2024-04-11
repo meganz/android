@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.dialog.view
+package mega.privacy.android.app.presentation.meeting.view.sheet
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -31,7 +31,6 @@ import mega.privacy.android.app.presentation.chat.list.view.ChatDivider
 import mega.privacy.android.app.presentation.extensions.getDayAndMonth
 import mega.privacy.android.app.presentation.extensions.getTimeFormatted
 import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingInfoState
-import mega.privacy.android.app.presentation.meeting.view.BottomSheetMenuItemView
 import mega.privacy.android.app.presentation.meeting.view.RecurringMeetingAvatarView
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary

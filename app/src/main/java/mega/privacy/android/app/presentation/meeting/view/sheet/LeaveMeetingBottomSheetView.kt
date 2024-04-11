@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.dialog.view
+package mega.privacy.android.app.presentation.meeting.view.sheet
 
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.Column
@@ -21,7 +21,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
