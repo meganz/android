@@ -266,13 +266,12 @@ class NodeActionsViewModelTest {
                 content
             )
             whenever(getNodePreviewFileUseCase(any())).thenReturn(File("path"))
-            whenever(getFeatureFlagValueUseCase(AppFeatures.ImagePreview)).thenReturn(true)
+
             initViewModel()
             val actual = viewModel.handleFileNodeClicked(node)
             when (node.type) {
                 is ImageFileTypeInfo -> {
                     verifyNoMoreInteractions(getNodeContentUriUseCase)
-                    verify(getFeatureFlagValueUseCase).invoke(AppFeatures.ImagePreview)
                 }
 
                 is TextFileTypeInfo -> {

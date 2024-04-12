@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.chat.mapper.ChatRequestMessageMapper
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeContentUriIntentMapper
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
@@ -412,11 +411,7 @@ class NodeActionsViewModel @Inject constructor(
             uri = getNodeContentUriUseCase(fileNode)
         )
 
-        fileNode.type is ImageFileTypeInfo -> FileNodeContent.ImageForNode(
-            getFeatureFlagValueUseCase(
-                AppFeatures.ImagePreview
-            )
-        )
+        fileNode.type is ImageFileTypeInfo -> FileNodeContent.ImageForNode
 
         fileNode.type is TextFileTypeInfo && fileNode.size <= TextFileTypeInfo.MAX_SIZE_OPENABLE_TEXT_FILE -> FileNodeContent.TextContent
 

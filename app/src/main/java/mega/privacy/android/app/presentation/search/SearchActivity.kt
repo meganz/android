@@ -49,7 +49,6 @@ import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.components.transferWidget.TransfersWidgetView
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.globalmanagement.TransfersManagement
-import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
@@ -409,7 +408,6 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
 
                 is FileNodeContent.ImageForNode -> {
                     openImageViewerActivity(
-                        isImagePreview = content.isImagePreview,
                         currentFileNode = currentFileNode
                     )
                 }
@@ -540,37 +538,38 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     }
 
     private fun openImageViewerActivity(
-        isImagePreview: Boolean,
         currentFileNode: TypedFileNode,
     ) {
         val nodeSourceType = viewModel.state.value.nodeSourceType
-        val intent = if (isImagePreview &&
-            (nodeSourceType == NodeSourceType.CLOUD_DRIVE || nodeSourceType == NodeSourceType.HOME)
-        ) {
-            ImagePreviewActivity.createIntent(
-                context = this,
-                imageSource = ImagePreviewFetcherSource.CLOUD_DRIVE,
-                menuOptionsSource = ImagePreviewMenuSource.CLOUD_DRIVE,
-                anchorImageNodeId = currentFileNode.id,
-                params = mapOf(CloudDriveImageNodeFetcher.PARENT_ID to currentFileNode.parentId.longValue),
-            )
-        } else if (isImagePreview && nodeSourceType == NodeSourceType.RUBBISH_BIN) {
-            ImagePreviewActivity.createIntent(
-                context = this,
-                imageSource = ImagePreviewFetcherSource.RUBBISH_BIN,
-                menuOptionsSource = ImagePreviewMenuSource.RUBBISH_BIN,
-                anchorImageNodeId = currentFileNode.id,
-                params = mapOf(RubbishBinImageNodeFetcher.PARENT_ID to currentFileNode.parentId.longValue),
-            )
-        } else {
-            ImageViewerActivity.getIntentForParentNode(
-                this,
-                currentFileNode.parentId.longValue,
-                viewModel.state.value.sortOrder,
-                currentFileNode.id.longValue
-            )
+        when (nodeSourceType) {
+            NodeSourceType.CLOUD_DRIVE, NodeSourceType.HOME -> {
+                val intent = ImagePreviewActivity.createIntent(
+                    context = this,
+                    imageSource = ImagePreviewFetcherSource.CLOUD_DRIVE,
+                    menuOptionsSource = ImagePreviewMenuSource.CLOUD_DRIVE,
+                    anchorImageNodeId = currentFileNode.id,
+                    params = mapOf(CloudDriveImageNodeFetcher.PARENT_ID to currentFileNode.parentId.longValue),
+                    showScreenLabel = false,
+                )
+                startActivity(intent)
+            }
+
+            NodeSourceType.RUBBISH_BIN -> {
+                val intent = ImagePreviewActivity.createIntent(
+                    context = this,
+                    imageSource = ImagePreviewFetcherSource.RUBBISH_BIN,
+                    menuOptionsSource = ImagePreviewMenuSource.RUBBISH_BIN,
+                    anchorImageNodeId = currentFileNode.id,
+                    params = mapOf(RubbishBinImageNodeFetcher.PARENT_ID to currentFileNode.parentId.longValue),
+                    showScreenLabel = false,
+                )
+                startActivity(intent)
+            }
+
+            else -> {
+                Timber.e("Unsupported node source type")
+            }
         }
-        startActivity(intent)
     }
 
     private fun openVideoOrAudioFile(

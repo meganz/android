@@ -9,7 +9,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
-import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
@@ -70,10 +69,8 @@ fun HandleNodeAction(
                 is FileNodeContent.ImageForNode -> {
                     openImageViewerActivity(
                         context = context,
-                        isImagePreview = content.isImagePreview,
                         currentFileNode = typedFileNode,
                         nodeSourceType = nodeSourceType,
-                        sortOrder = sortOrder
                     )
                 }
 
@@ -176,38 +173,34 @@ private fun openPdfActivity(
 
 private fun openImageViewerActivity(
     context: Context,
-    isImagePreview: Boolean,
     currentFileNode: TypedFileNode,
     nodeSourceType: Int?,
-    sortOrder: SortOrder,
 ) {
-    val intent = if (isImagePreview &&
-        (nodeSourceType == Constants.FILE_BROWSER_ADAPTER)
-    ) {
-        ImagePreviewActivity.createIntent(
-            context = context,
-            imageSource = ImagePreviewFetcherSource.CLOUD_DRIVE,
-            menuOptionsSource = ImagePreviewMenuSource.CLOUD_DRIVE,
-            anchorImageNodeId = currentFileNode.id,
-            params = mapOf(CloudDriveImageNodeFetcher.PARENT_ID to currentFileNode.parentId.longValue),
-        )
-    } else if (isImagePreview && nodeSourceType == Constants.RUBBISH_BIN_ADAPTER) {
-        ImagePreviewActivity.createIntent(
-            context = context,
-            imageSource = ImagePreviewFetcherSource.RUBBISH_BIN,
-            menuOptionsSource = ImagePreviewMenuSource.RUBBISH_BIN,
-            anchorImageNodeId = currentFileNode.id,
-            params = mapOf(RubbishBinImageNodeFetcher.PARENT_ID to currentFileNode.parentId.longValue),
-        )
-    } else {
-        ImageViewerActivity.getIntentForParentNode(
-            context,
-            currentFileNode.parentId.longValue,
-            sortOrder,
-            currentFileNode.id.longValue
-        )
+    when (nodeSourceType) {
+        Constants.FILE_BROWSER_ADAPTER -> {
+            val intent = ImagePreviewActivity.createIntent(
+                context = context,
+                imageSource = ImagePreviewFetcherSource.CLOUD_DRIVE,
+                menuOptionsSource = ImagePreviewMenuSource.CLOUD_DRIVE,
+                anchorImageNodeId = currentFileNode.id,
+                params = mapOf(CloudDriveImageNodeFetcher.PARENT_ID to currentFileNode.parentId.longValue),
+                showScreenLabel = false,
+            )
+            context.startActivity(intent)
+        }
+
+        Constants.RUBBISH_BIN_ADAPTER -> {
+            val intent = ImagePreviewActivity.createIntent(
+                context = context,
+                imageSource = ImagePreviewFetcherSource.RUBBISH_BIN,
+                menuOptionsSource = ImagePreviewMenuSource.RUBBISH_BIN,
+                anchorImageNodeId = currentFileNode.id,
+                params = mapOf(RubbishBinImageNodeFetcher.PARENT_ID to currentFileNode.parentId.longValue),
+                showScreenLabel = false,
+            )
+            context.startActivity(intent)
+        }
     }
-    context.startActivity(intent)
 }
 
 private suspend fun openVideoOrAudioFile(
@@ -217,7 +210,7 @@ private suspend fun openVideoOrAudioFile(
     snackBarHostState: SnackbarHostState?,
     nodeActionsViewModel: NodeActionsViewModel,
     sortOrder: SortOrder,
-    viewType: Int
+    viewType: Int,
 ) {
     val intent = when {
         fileNode.type.isSupported && fileNode.type is VideoFileTypeInfo ->

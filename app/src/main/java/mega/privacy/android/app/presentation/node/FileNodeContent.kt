@@ -17,9 +17,9 @@ sealed interface FileNodeContent {
 
     /**
      * Image for node
-     * @param isImagePreview
      */
-    data class ImageForNode(val isImagePreview: Boolean) : FileNodeContent
+    data object ImageForNode : FileNodeContent
+
     /**
      * Text content
      *
