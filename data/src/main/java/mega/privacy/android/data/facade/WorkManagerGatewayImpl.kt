@@ -197,8 +197,8 @@ class WorkManagerGatewayImpl @Inject constructor(
             SCHEDULER_FLEX_INTERVAL,
             TimeUnit.MINUTES
         )
-            .setNextScheduleTimeOverride(TimeUnit.MINUTES.toMillis(CU_SCHEDULER_INTERVAL))
             .addTag(CAMERA_UPLOAD_TAG)
+            .setInitialDelay(CU_SCHEDULER_INTERVAL, TimeUnit.MINUTES)
             .build()
         workManager
             .enqueueUniquePeriodicWork(
