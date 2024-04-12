@@ -103,6 +103,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -2933,17 +2934,21 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    override fun showMediaDiscoveryFromCloudDrive(
+    override suspend fun showMediaDiscoveryFromCloudDrive(
         mediaHandle: Long,
         isAccessedByIconClick: Boolean,
         replaceFragment: Boolean,
         @StringRes errorMessage: Int?,
-    ) = showMediaDiscovery(
-        mediaHandle = mediaHandle,
-        isAccessedByIconClick = isAccessedByIconClick,
-        replaceFragment = replaceFragment,
-        errorMessage = errorMessage,
-    )
+    ) {
+        lifecycle.withStarted {
+            showMediaDiscovery(
+                mediaHandle = mediaHandle,
+                isAccessedByIconClick = isAccessedByIconClick,
+                replaceFragment = replaceFragment,
+                errorMessage = errorMessage,
+            )
+        }
+    }
 
     /**
      * Displays the Media Discovery
@@ -3922,6 +3927,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     } else {
                         supportInvalidateOptionsMenu()
                     }
+                    ensureActive() // the call openFileBrowserWithSpecificNode may take a long time to finish
                     handleCloudDriveNavigation()
                     if (openFolderRefresh) {
                         onNodesCloudDriveUpdate()
@@ -4135,10 +4141,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     /**
      * Checks if the User should navigate to Cloud Drive or Media Discovery
      */
-    private fun handleCloudDriveNavigation() {
+    private suspend fun handleCloudDriveNavigation() {
         if (fileBrowserViewModel.isMediaDiscoveryOpen()) {
             Timber.d("Show Media Discovery Screen")
-            Handler(Looper.getMainLooper()).post {
+            lifecycle.withStarted {
                 showMediaDiscovery(
                     mediaHandle = fileBrowserViewModel.getSafeBrowserParentHandle(),
                     isAccessedByIconClick = false,
@@ -5312,19 +5318,22 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             // UI State first, then remove Media Discovery, and go back to the previous Fragment
             lifecycleScope.launch {
                 fileBrowserViewModel.exitMediaDiscovery(performBackNavigation = performBackNavigation)
-                removeFragment(mediaDiscoveryFragment)
-                if (performBackNavigation) {
-                    checkCloudDriveAccessFromNotification(isNotFromNotificationAction = {
-                        if (fileBrowserViewModel.isAccessedFolderExited()) {
-                            fileBrowserViewModel.resetIsAccessedFolderExited()
-                            // Go back to Device Center
-                            selectDrawerItem(DrawerItem.DEVICE_CENTER)
-                        } else {
-                            goBackToBottomNavigationItem(bottomNavigationCurrentItem)
-                        }
-                    })
-                } else {
-                    goBackToBottomNavigationItem(bottomNavigationCurrentItem)
+                ensureActive()
+                lifecycle.withStarted {
+                    removeFragment(mediaDiscoveryFragment)
+                    if (performBackNavigation) {
+                        checkCloudDriveAccessFromNotification(isNotFromNotificationAction = {
+                            if (fileBrowserViewModel.isAccessedFolderExited()) {
+                                fileBrowserViewModel.resetIsAccessedFolderExited()
+                                // Go back to Device Center
+                                selectDrawerItem(DrawerItem.DEVICE_CENTER)
+                            } else {
+                                goBackToBottomNavigationItem(bottomNavigationCurrentItem)
+                            }
+                        })
+                    } else {
+                        goBackToBottomNavigationItem(bottomNavigationCurrentItem)
+                    }
                 }
             }
         } else {
@@ -5334,11 +5343,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 lifecycleScope.launch {
                     with(fileBrowserViewModel) {
                         performBackNavigation()
-                        if (isAccessedFolderExited()) {
-                            resetIsAccessedFolderExited()
-                            // Remove Cloud Drive and go back to Device Center
-                            removeFragment(fileBrowserComposeFragment)
-                            selectDrawerItem(DrawerItem.DEVICE_CENTER)
+                        ensureActive()
+                        lifecycle.withStarted {
+                            if (isAccessedFolderExited()) {
+                                resetIsAccessedFolderExited()
+                                // Remove Cloud Drive and go back to Device Center
+                                removeFragment(fileBrowserComposeFragment)
+                                selectDrawerItem(DrawerItem.DEVICE_CENTER)
+                            }
                         }
                     }
                 }

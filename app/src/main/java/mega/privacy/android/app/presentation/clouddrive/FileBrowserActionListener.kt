@@ -27,7 +27,7 @@ interface FileBrowserActionListener {
      * Discovery Icon
      * @param errorMessage The [StringRes] of the error message to display
      */
-    fun showMediaDiscoveryFromCloudDrive(
+    suspend fun showMediaDiscoveryFromCloudDrive(
         mediaHandle: Long,
         isAccessedByIconClick: Boolean,
         replaceFragment: Boolean,
