@@ -14,8 +14,8 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.main.controllers.ChatController
-import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel
-import mega.privacy.android.app.presentation.transfers.startdownload.view.createStartDownloadView
+import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
@@ -58,7 +58,7 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
 
     protected fun addStartDownloadTransferView(root: ViewGroup) {
         root.addView(
-            createStartDownloadView(
+            createStartTransferView(
                 this,
                 startDownloadViewModel.state,
                 startDownloadViewModel::consumeDownloadEvent

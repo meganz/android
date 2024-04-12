@@ -79,7 +79,7 @@ import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
-import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
@@ -354,7 +354,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                         )
                     },
                 )
-                StartDownloadComponent(
+                StartTransferComponent(
                     event = nodeActionState.downloadEvent,
                     onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
                     snackBarHostState = snackbarHostState,

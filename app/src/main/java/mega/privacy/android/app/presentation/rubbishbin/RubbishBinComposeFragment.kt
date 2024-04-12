@@ -44,7 +44,7 @@ import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.rubbishbin.view.RubbishBinComposeView
-import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.theme.MegaAppTheme
@@ -160,7 +160,7 @@ class RubbishBinComposeFragment : Fragment() {
                             fileTypeIconMapper = fileTypeIconMapper
                         )
                     }
-                    StartDownloadComponent(
+                    StartTransferComponent(
                         event = nodeActionState.downloadEvent,
                         onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
                         snackBarHostState = snackbarHostState,

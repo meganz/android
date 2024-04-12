@@ -76,7 +76,7 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
 import mega.privacy.android.app.presentation.slideshow.view.PhotoBox
 import mega.privacy.android.app.presentation.slideshow.view.PhotoState
 import mega.privacy.android.app.presentation.slideshow.view.rememberPhotoState
-import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.controls.text.MiddleEllipsisText
 import mega.privacy.android.core.ui.theme.black
@@ -455,7 +455,7 @@ internal fun ImagePreviewScreen(
                 )
             },
         )
-        StartDownloadComponent(
+        StartTransferComponent(
             event = viewState.downloadEvent,
             onConsumeEvent = viewModel::consumeDownloadEvent,
             snackBarHostState = scaffoldState.snackbarHostState

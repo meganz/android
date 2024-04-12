@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.transfers.startdownload
+package mega.privacy.android.app.presentation.transfers.starttransfer
 
 import android.net.Uri
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -23,10 +23,10 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.middlelayer.iar.OnCompleteListener
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
-import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferEvent
-import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferJobInProgress
-import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferViewState
-import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferJobInProgress
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
@@ -54,10 +54,10 @@ import java.io.File
 import javax.inject.Inject
 
 /**
- * View model to handle start downloading
+ * View model to handle start transfers component
  */
 @HiltViewModel
-internal class StartDownloadComponentViewModel @Inject constructor(
+internal class StartTransfersComponentViewModel @Inject constructor(
     private val getOfflinePathForNodeUseCase: GetOfflinePathForNodeUseCase,
     private val getOrCreateStorageDownloadLocationUseCase: GetOrCreateStorageDownloadLocationUseCase,
     private val getFilePreviewDownloadPathUseCase: GetFilePreviewDownloadPathUseCase,
@@ -81,7 +81,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
 
     private var currentInProgressJob: Job? = null
 
-    private val _uiState = MutableStateFlow(StartDownloadTransferViewState())
+    private val _uiState = MutableStateFlow(StartTransferViewState())
 
     /**
      * the state of the view
@@ -95,7 +95,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
 
     /**
      * It starts the triggered transfer, asking for confirmation in case of large transfers if corresponds
-     * @param transferTriggerEvent the event that triggered this download
+     * @param transferTriggerEvent the event that triggered this transfer
      */
     fun startTransfer(
         transferTriggerEvent: TransferTriggerEvent,
@@ -108,7 +108,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                     }
                     if (transferTriggerEvent.nodes.isEmpty()) {
                         Timber.e("Node in $transferTriggerEvent must exist")
-                        _uiState.updateEventAndClearProgress(StartDownloadTransferEvent.Message.TransferCancelled)
+                        _uiState.updateEventAndClearProgress(StartTransferEvent.Message.TransferCancelled)
                     } else if (!checkAndHandleNeedConfirmationForLargeDownload(transferTriggerEvent)) {
                         startDownloadWithoutConfirmation(transferTriggerEvent)
                     }
@@ -142,7 +142,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
         val node = transferTriggerEvent.nodes.firstOrNull()
         if (node == null) {
             Timber.e("Node in $transferTriggerEvent must exist")
-            _uiState.updateEventAndClearProgress(StartDownloadTransferEvent.Message.TransferCancelled)
+            _uiState.updateEventAndClearProgress(StartTransferEvent.Message.TransferCancelled)
         } else {
             lastTriggerEvent = transferTriggerEvent
             when (transferTriggerEvent) {
@@ -154,7 +154,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                     viewModelScope.launch {
                         if (shouldAskDownloadDestinationUseCase()) {
                             _uiState.updateEventAndClearProgress(
-                                StartDownloadTransferEvent.AskDestination(
+                                StartTransferEvent.AskDestination(
                                     transferTriggerEvent
                                 )
                             )
@@ -270,7 +270,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
         clearActiveTransfersIfFinishedUseCase(TransferType.DOWNLOAD)
         monitorDownloadFinish()
         _uiState.update {
-            it.copy(jobInProgressState = StartDownloadTransferJobInProgress.ScanningTransfers)
+            it.copy(jobInProgressState = StartTransferJobInProgress.ScanningTransfers)
         }
         var lastError: Throwable? = null
         var startMessageShown = false
@@ -289,7 +289,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                 ).onEach { event ->
                     val singleTransferEvent = (event as? MultiTransferEvent.SingleTransferEvent)
                     // clear scanning transfers state
-                    if (_uiState.value.jobInProgressState == StartDownloadTransferJobInProgress.ScanningTransfers &&
+                    if (_uiState.value.jobInProgressState == StartTransferJobInProgress.ScanningTransfers &&
                         singleTransferEvent?.scanningFinished == true
                     ) {
                         _uiState.update {
@@ -310,14 +310,14 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                     Timber.e(it)
                 }.onCompletion {
                     if (it is CancellationException) {
-                        _uiState.updateEventAndClearProgress(StartDownloadTransferEvent.Message.TransferCancelled)
+                        _uiState.updateEventAndClearProgress(StartTransferEvent.Message.TransferCancelled)
                     }
                 }.last()
             }
         checkRating()
         when {
             terminalEvent == MultiTransferEvent.InsufficientSpace ->
-                _uiState.updateEventAndClearProgress(StartDownloadTransferEvent.Message.NotSufficientSpace)
+                _uiState.updateEventAndClearProgress(StartTransferEvent.Message.NotSufficientSpace)
 
             !startMessageShown -> updateWithFinishProcessing(
                 terminalEvent as? MultiTransferEvent.SingleTransferEvent,
@@ -335,7 +335,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
         error: Throwable? = null,
     ) {
         _uiState.updateEventAndClearProgress(
-            StartDownloadTransferEvent.FinishProcessing(
+            StartTransferEvent.FinishProcessing(
                 exception = error,
                 totalNodes = totalNodes,
                 totalFiles = event?.startedFiles ?: 0,
@@ -357,10 +357,10 @@ internal class StartDownloadComponentViewModel @Inject constructor(
             when (it) {
                 is MultiTransferEvent.TransferNotStarted<*> -> {
                     Timber.e(it.exception, "Error starting chat upload")
-                    StartDownloadTransferEvent.Message.TransferCancelled
+                    StartTransferEvent.Message.TransferCancelled
                 }
 
-                MultiTransferEvent.InsufficientSpace -> StartDownloadTransferEvent.Message.NotSufficientSpace
+                MultiTransferEvent.InsufficientSpace -> StartTransferEvent.Message.NotSufficientSpace
                 is MultiTransferEvent.SingleTransferEvent -> null
             }?.let {
                 _uiState.updateEventAndClearProgress(it)
@@ -426,7 +426,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
 
     private fun checkAndHandleDeviceIsNotConnected() =
         if (!isConnectedToInternetUseCase()) {
-            _uiState.updateEventAndClearProgress(StartDownloadTransferEvent.NotConnected)
+            _uiState.updateEventAndClearProgress(StartTransferEvent.NotConnected)
             true
         } else {
             false
@@ -442,7 +442,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
             val size = totalFileSizeOfNodesUseCase(transferTriggerEvent.nodes)
             if (size > TransfersConstants.CONFIRM_SIZE_MIN_BYTES) {
                 _uiState.updateEventAndClearProgress(
-                    StartDownloadTransferEvent.ConfirmLargeDownload(
+                    StartTransferEvent.ConfirmLargeDownload(
                         fileSizeStringMapper(size), transferTriggerEvent
                     )
                 )
@@ -494,11 +494,11 @@ internal class StartDownloadComponentViewModel @Inject constructor(
                 if (active) {
                     when (lastTriggerEvent) {
                         is TransferTriggerEvent.StartDownloadForOffline -> {
-                            StartDownloadTransferEvent.Message.FinishOffline
+                            StartTransferEvent.Message.FinishOffline
                         }
 
                         is TransferTriggerEvent.StartDownloadNode -> {
-                            StartDownloadTransferEvent.MessagePlural.FinishDownloading(
+                            StartTransferEvent.MessagePlural.FinishDownloading(
                                 totalNodes
                             )
                         }
@@ -513,8 +513,8 @@ internal class StartDownloadComponentViewModel @Inject constructor(
         }
     }
 
-    private fun MutableStateFlow<StartDownloadTransferViewState>.updateEventAndClearProgress(
-        event: StartDownloadTransferEvent?,
+    private fun MutableStateFlow<StartTransferViewState>.updateEventAndClearProgress(
+        event: StartTransferEvent?,
     ) =
         this.update {
             it.copy(
@@ -541,6 +541,6 @@ internal class StartDownloadComponentViewModel @Inject constructor(
         /**
          * The last trigger event that started the download, we need to keep it to know what to do when the download finishes even in other screens
          */
-        private var lastTriggerEvent: TransferTriggerEvent? = null
+        private var lastTriggerEvent: TransferTriggerEvent.DownloadTriggerEvent? = null
     }
 }

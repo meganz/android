@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.transfers.startdownload.view
+package mega.privacy.android.app.presentation.transfers.starttransfer.view
 
 import android.Manifest
 import android.app.Activity
@@ -45,11 +45,11 @@ import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.permissions.NotificationsPermissionActivity
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.model.TargetPreference
-import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadComponentViewModel
-import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferEvent
-import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferJobInProgress
-import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferViewState
-import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
+import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferJobInProgress
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.presentation.transfers.view.TransferInProgressDialog
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
@@ -71,11 +71,11 @@ import timber.log.Timber
  */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-internal fun StartDownloadComponent(
+internal fun StartTransferComponent(
     event: StateEventWithContent<TransferTriggerEvent>,
     onConsumeEvent: () -> Unit,
     snackBarHostState: SnackbarHostState,
-    viewModel: StartDownloadComponentViewModel = viewModel(),
+    viewModel: StartTransfersComponentViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -128,7 +128,7 @@ internal fun StartDownloadComponent(
                 viewModel.startTransfer(it)
             }
         })
-    StartDownloadComponent(
+    StartTransferComponent(
         uiState = uiState,
         onOneOffEventConsumed = viewModel::consumeOneOffEvent,
         onCancelledConfirmed = viewModel::cancelCurrentJob,
@@ -147,20 +147,20 @@ internal fun StartDownloadComponent(
 }
 
 /**
- * Helper function to wrap [StartDownloadComponent] into a [ComposeView] so it can be used in screens using View system
+ * Helper function to wrap [StartTransferComponent] into a [ComposeView] so it can be used in screens using View system
  * @param activity the parent activity where this view will be added, it should implement [SnackbarShower] to show the generated Snackbars
- * @param downloadEventState flow that usually comes from the view model and triggers the download Transfer events
+ * @param transferEventState flow that usually comes from the view model and triggers the download Transfer events
  * @param onConsumeEvent lambda to consume the download event, typically it will launch the corresponding consume event in the view model
  */
-fun createStartDownloadView(
+fun createStartTransferView(
     activity: Activity,
-    downloadEventState: Flow<StateEventWithContent<TransferTriggerEvent>>,
+    transferEventState: Flow<StateEventWithContent<TransferTriggerEvent>>,
     onConsumeEvent: () -> Unit,
 ): View = ComposeView(activity).apply {
     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
     setContent {
-        val downloadEvent by downloadEventState.collectAsStateWithLifecycle(
-            (downloadEventState as? StateFlow)?.value ?: consumed()
+        val downloadEvent by transferEventState.collectAsStateWithLifecycle(
+            (transferEventState as? StateFlow)?.value ?: consumed()
         )
         MegaAppTheme(isDark = isSystemInDarkTheme()) {
             val snackbarHostState = remember { SnackbarHostState() }
@@ -171,7 +171,7 @@ fun createStartDownloadView(
                 }
                 snackbarHostState.currentSnackbarData?.dismiss()
             }
-            StartDownloadComponent(
+            StartTransferComponent(
                 downloadEvent,
                 onConsumeEvent,
                 snackBarHostState = snackbarHostState,
@@ -182,8 +182,8 @@ fun createStartDownloadView(
 
 
 @Composable
-private fun StartDownloadComponent(
-    uiState: StartDownloadTransferViewState,
+private fun StartTransferComponent(
+    uiState: StartTransferViewState,
     onOneOffEventConsumed: () -> Unit,
     onCancelledConfirmed: () -> Unit,
     onDownloadConfirmed: (TransferTriggerEvent.DownloadTriggerEvent, saveDoNotAskAgain: Boolean) -> Unit,
@@ -197,7 +197,7 @@ private fun StartDownloadComponent(
     var showOfflineAlertDialog by rememberSaveable { mutableStateOf(false) }
     val showQuotaExceededDialog = remember { mutableStateOf<StorageState?>(null) }
     var showConfirmLargeTransfer by remember {
-        mutableStateOf<StartDownloadTransferEvent.ConfirmLargeDownload?>(null)
+        mutableStateOf<StartTransferEvent.ConfirmLargeDownload?>(null)
     }
     var showAskDestinationDialog by remember {
         mutableStateOf<TransferTriggerEvent.StartDownloadNode?>(null)
@@ -214,7 +214,7 @@ private fun StartDownloadComponent(
         onConsumed = onOneOffEventConsumed,
         action = {
             when (it) {
-                is StartDownloadTransferEvent.FinishProcessing ->
+                is StartTransferEvent.FinishProcessing ->
                     consumeFinishProcessing(
                         event = it,
                         snackBarHostState = snackBarHostState,
@@ -223,21 +223,21 @@ private fun StartDownloadComponent(
                         transferTriggerEvent = it.triggerEvent,
                     )
 
-                is StartDownloadTransferEvent.Message ->
+                is StartTransferEvent.Message ->
                     consumeMessage(it, snackBarHostState, context)
 
-                is StartDownloadTransferEvent.MessagePlural ->
+                is StartTransferEvent.MessagePlural ->
                     consumeMessage(it, snackBarHostState, context)
 
-                StartDownloadTransferEvent.NotConnected -> {
+                StartTransferEvent.NotConnected -> {
                     showOfflineAlertDialog = true
                 }
 
-                is StartDownloadTransferEvent.ConfirmLargeDownload -> {
+                is StartTransferEvent.ConfirmLargeDownload -> {
                     showConfirmLargeTransfer = it
                 }
 
-                is StartDownloadTransferEvent.AskDestination -> {
+                is StartTransferEvent.AskDestination -> {
                     showAskDestinationDialog = it.originalEvent
                 }
             }
@@ -255,7 +255,7 @@ private fun StartDownloadComponent(
             showPromptSaveDestinationDialog = it
         }
     )
-    MinimumTimeVisibility(visible = uiState.jobInProgressState == StartDownloadTransferJobInProgress.ScanningTransfers) {
+    MinimumTimeVisibility(visible = uiState.jobInProgressState == StartTransferJobInProgress.ScanningTransfers) {
         TransferInProgressDialog(onCancelConfirmed = onCancelledConfirmed)
     }
     if (showOfflineAlertDialog) {
@@ -335,7 +335,7 @@ private fun StartDownloadComponent(
 }
 
 private suspend fun consumeFinishProcessing(
-    event: StartDownloadTransferEvent.FinishProcessing,
+    event: StartTransferEvent.FinishProcessing,
     snackBarHostState: SnackbarHostState,
     showQuotaExceededDialog: MutableState<StorageState?>,
     context: Context,
@@ -415,7 +415,7 @@ private suspend fun consumeFinishProcessing(
 }
 
 private suspend fun consumeMessage(
-    event: StartDownloadTransferEvent.Message,
+    event: StartTransferEvent.Message,
     snackBarHostState: SnackbarHostState,
     context: Context,
 ) {
@@ -433,7 +433,7 @@ private suspend fun consumeMessage(
 }
 
 private suspend fun consumeMessage(
-    event: StartDownloadTransferEvent.MessagePlural,
+    event: StartTransferEvent.MessagePlural,
     snackBarHostState: SnackbarHostState,
     context: Context,
 ) {
@@ -444,10 +444,10 @@ private suspend fun consumeMessage(
 }
 
 private fun consumeMessageAction(
-    actionEvent: StartDownloadTransferEvent.Message.ActionEvent,
+    actionEvent: StartTransferEvent.Message.ActionEvent,
     context: Context,
 ) = when (actionEvent) {
-    StartDownloadTransferEvent.Message.ActionEvent.GoToFileManagement -> {
+    StartTransferEvent.Message.ActionEvent.GoToFileManagement -> {
         ContextCompat.startActivity(
             context,
             SettingsActivity.getIntent(context, TargetPreference.Storage),

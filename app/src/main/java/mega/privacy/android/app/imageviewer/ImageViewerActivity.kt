@@ -45,8 +45,8 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.interfaces.showTransfersSnackBar
 import mega.privacy.android.app.presentation.security.PasscodeCheck
-import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel
-import mega.privacy.android.app.presentation.transfers.startdownload.view.createStartDownloadView
+import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EXTRA_LINK
@@ -442,7 +442,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     private fun addStartDownloadTransferView() {
         binding.root.addView(
-            createStartDownloadView(
+            createStartTransferView(
                 this,
                 startDownloadViewModel.state,
                 startDownloadViewModel::consumeDownloadEvent

@@ -56,7 +56,7 @@ import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.incoming.ui.IncomingSharesView
-import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
@@ -212,7 +212,7 @@ class IncomingSharesComposeFragment : Fragment() {
                             Util.showSnackbar(activity, it)
                         }
                     }
-                    StartDownloadComponent(
+                    StartTransferComponent(
                         uiState.downloadEvent,
                         {
                             viewModel.consumeDownloadEvent()

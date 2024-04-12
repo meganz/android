@@ -61,7 +61,7 @@ import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
-import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
@@ -246,7 +246,7 @@ class FileBrowserComposeFragment : Fragment() {
                             }
                             snackbarHostState.currentSnackbarData?.dismiss()
                         }
-                        StartDownloadComponent(
+                        StartTransferComponent(
                             uiState.downloadEvent,
                             {
                                 fileBrowserViewModel.consumeDownloadEvent()

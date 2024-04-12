@@ -51,7 +51,7 @@ import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
-import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_050_white_alpha_050
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
@@ -189,7 +189,7 @@ fun MediaDiscoveryScreen(
             } else {
                 PhotosSkeletonView()
             }
-            StartDownloadComponent(
+            StartTransferComponent(
                 event = uiState.downloadEvent,
                 onConsumeEvent = viewModel::consumeDownloadEvent,
                 snackBarHostState = scaffoldState.snackbarHostState

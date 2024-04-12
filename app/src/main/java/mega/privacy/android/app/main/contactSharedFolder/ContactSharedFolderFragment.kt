@@ -25,8 +25,8 @@ import mega.privacy.android.app.main.ContactFileListActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoViewModel
-import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel
-import mega.privacy.android.app.presentation.transfers.startdownload.view.createStartDownloadView
+import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -109,7 +109,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
     private fun addStartDownloadView(rootView: ViewGroup) {
         activity?.let { activity ->
             rootView.addView(
-                createStartDownloadView(
+                createStartTransferView(
                     activity,
                     startDownloadViewModel.state,
                     startDownloadViewModel::consumeDownloadEvent

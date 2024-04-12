@@ -108,7 +108,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ReactionsIn
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.UpgradeProPlanBottomSheet
 import mega.privacy.android.app.presentation.meeting.view.dialog.FreePlanLimitParticipantsDialog
 import mega.privacy.android.app.presentation.qrcode.findActivity
-import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils
@@ -1101,7 +1101,7 @@ internal fun ChatView(
             }
         }
 
-        StartDownloadComponent(
+        StartTransferComponent(
             event = uiState.downloadEvent,
             onConsumeEvent = consumeDownloadEvent,
             snackBarHostState = scaffoldState.snackbarHostState,

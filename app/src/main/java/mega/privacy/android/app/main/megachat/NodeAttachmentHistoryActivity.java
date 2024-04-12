@@ -3,7 +3,7 @@ package mega.privacy.android.app.main.megachat;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_ERROR_COPYING_NODES;
 import static mega.privacy.android.app.constants.BroadcastConstants.ERROR_MESSAGE_TEXT;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
-import static mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponentKt.createStartDownloadView;
+import static mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponentKt.createStartTransferView;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.manageTextFileIntent;
@@ -108,7 +108,7 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.ChatImageNodeF
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource;
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
-import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel;
+import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel;
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -389,7 +389,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     private void addStartDownloadTransferView() {
         ViewGroup root = findViewById(R.id.node_history_main_layout);
         root.addView(
-                createStartDownloadView(
+                createStartTransferView(
                         this,
                         startDownloadViewModel.getState(),
                         () -> {

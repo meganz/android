@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.transfers.startdownload.model
+package mega.privacy.android.app.presentation.transfers.starttransfer.model
 
 import android.net.Uri
 import androidx.core.net.toUri

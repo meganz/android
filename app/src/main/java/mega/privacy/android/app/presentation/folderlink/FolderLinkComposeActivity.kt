@@ -54,7 +54,7 @@ import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
-import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
@@ -266,7 +266,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                 onAdDismissed = adsViewModel::onAdConsumed,
                 fileTypeIconMapper = fileTypeIconMapper
             )
-            StartDownloadComponent(
+            StartTransferComponent(
                 event = uiState.downloadEvent,
                 onConsumeEvent = viewModel::resetDownloadNode,
                 snackBarHostState = snackBarHostState

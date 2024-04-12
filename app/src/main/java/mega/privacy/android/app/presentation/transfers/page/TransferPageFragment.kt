@@ -33,7 +33,7 @@ import mega.privacy.android.app.main.managerSections.TransfersFragment
 import mega.privacy.android.app.main.managerSections.TransfersViewModel
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.TransfersManagementViewModel
-import mega.privacy.android.app.presentation.transfers.startdownload.view.createStartDownloadView
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.usecase.DownloadNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.Constants
@@ -112,7 +112,7 @@ internal class TransferPageFragment : Fragment() {
 
     private fun addStartDownloadTransferView(root: ViewGroup) {
         root.addView(
-            createStartDownloadView(
+            createStartTransferView(
                 requireActivity(),
                 emptyFlow(), //This view is just to show messages, as transfers can not be started in this screen, that's why it has no events
             ) {}

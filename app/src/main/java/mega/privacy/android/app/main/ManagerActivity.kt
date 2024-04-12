@@ -262,8 +262,8 @@ import mega.privacy.android.app.presentation.startconversation.StartConversation
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.presentation.transfers.page.TransferPageFragment
 import mega.privacy.android.app.presentation.transfers.page.TransferPageViewModel
-import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel
-import mega.privacy.android.app.presentation.transfers.startdownload.view.createStartDownloadView
+import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.psa.PsaViewHolder
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.service.push.MegaMessageService
@@ -1148,7 +1148,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun addStartDownloadTransferView() {
         findViewById<ViewGroup>(R.id.root_content_layout).addView(
-            createStartDownloadView(
+            createStartTransferView(
                 this,
                 startDownloadViewModel.state,
                 startDownloadViewModel::consumeDownloadEvent

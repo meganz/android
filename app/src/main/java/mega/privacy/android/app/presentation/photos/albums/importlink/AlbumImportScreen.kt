@@ -65,7 +65,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
-import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
@@ -323,7 +323,7 @@ internal fun AlbumImportScreen(
                     Analytics.tracker.trackEvent(ImportAlbumContentLoadedEvent)
                 }
             )
-            StartDownloadComponent(
+            StartTransferComponent(
                 event = state.downloadEvent,
                 onConsumeEvent = albumImportViewModel::consumeDownloadEvent,
                 snackBarHostState = scaffoldState.snackbarHostState

@@ -19,7 +19,7 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.ui.utils.pop
 import mega.privacy.android.core.ui.utils.push
 import mega.privacy.android.core.ui.utils.toMutableArrayDeque

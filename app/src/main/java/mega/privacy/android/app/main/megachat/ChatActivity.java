@@ -36,7 +36,7 @@ import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_CHAT_ID;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith;
-import static mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponentKt.createStartDownloadView;
+import static mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponentKt.createStartTransferView;
 import static mega.privacy.android.app.providers.FileProviderActivity.FROM_MEGA_APP;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
@@ -386,7 +386,7 @@ import mega.privacy.android.app.presentation.meeting.view.dialog.UsersInWaitingR
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity;
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
-import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel;
+import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel;
 import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
@@ -2028,7 +2028,7 @@ public class ChatActivity extends PasscodeActivity
     private void addStartDownloadTransferView() {
         ViewGroup root = findViewById(R.id.fragment_container_chat);
         root.addView(
-                createStartDownloadView(
+                createStartTransferView(
                         this,
                         startDownloadViewModel.getState(),
                         () -> {

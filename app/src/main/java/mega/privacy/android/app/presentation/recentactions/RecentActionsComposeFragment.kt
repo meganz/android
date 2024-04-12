@@ -35,7 +35,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.recentactions.view.RecentActionsView
-import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponent
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.ThemeMode
@@ -115,7 +115,7 @@ class RecentActionsComposeFragment : Fragment() {
                         )
                     }
                 }
-                StartDownloadComponent(
+                StartTransferComponent(
                     event = nodeActionState.downloadEvent,
                     onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
                     snackBarHostState = snackbarHostState,

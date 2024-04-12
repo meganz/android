@@ -2,7 +2,7 @@ package mega.privacy.android.app.main;
 
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
-import static mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadComponentKt.createStartDownloadView;
+import static mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponentKt.createStartTransferView;
 import static mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_EMAIL;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
@@ -80,7 +80,7 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.ContactFileLis
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource;
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
-import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadViewModel;
+import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaNodeUtil;
@@ -403,7 +403,7 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
         if (root instanceof ViewGroup && getActivity() != null) {
             startDownloadViewModel = new ViewModelProvider(requireActivity()).get(StartDownloadViewModel.class);
             ((ViewGroup) root).addView(
-                    createStartDownloadView(
+                    createStartTransferView(
                             requireActivity(),
                             startDownloadViewModel.getState(),
                             () -> {

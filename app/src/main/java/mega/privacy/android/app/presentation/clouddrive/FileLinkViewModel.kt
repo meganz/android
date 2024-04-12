@@ -21,7 +21,7 @@ import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
 import mega.privacy.android.app.presentation.mapper.UrlDownloadException
-import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.StorageState

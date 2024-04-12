@@ -1,13 +1,13 @@
-package mega.privacy.android.app.presentation.transfers.startdownload.model
+package mega.privacy.android.app.presentation.transfers.starttransfer.model
 
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import mega.privacy.android.app.R
 
 /**
- * One off events related to start download transfers
+ * One off events related to start transfers
  */
-sealed interface StartDownloadTransferEvent {
+sealed interface StartTransferEvent {
 
     /**
      * Transfers scanning has finished
@@ -24,14 +24,14 @@ sealed interface StartDownloadTransferEvent {
         val totalFiles: Int,
         val totalAlreadyDownloaded: Int,
         val triggerEvent: TransferTriggerEvent,
-    ) : StartDownloadTransferEvent {
+    ) : StartTransferEvent {
         val filesToDownload = totalFiles - totalAlreadyDownloaded
     }
 
     /**
      * we can't do work because there's no Internet connection
      */
-    data object NotConnected : StartDownloadTransferEvent
+    data object NotConnected : StartTransferEvent
 
     /**
      * User needs to confirm large download
@@ -41,14 +41,14 @@ sealed interface StartDownloadTransferEvent {
     data class ConfirmLargeDownload(
         val sizeString: String,
         val transferTriggerEvent: TransferTriggerEvent.DownloadTriggerEvent,
-    ) : StartDownloadTransferEvent
+    ) : StartTransferEvent
 
     /**
      * Depending on Android version and user settings, download destination should be asked for each new download
      * @param originalEvent original [TransferTriggerEvent.StartDownloadNode] event that triggered this event
      */
     data class AskDestination(val originalEvent: TransferTriggerEvent.StartDownloadNode) :
-        StartDownloadTransferEvent
+        StartTransferEvent
 
     /**
      * A message should be shown
@@ -60,7 +60,7 @@ sealed interface StartDownloadTransferEvent {
         @StringRes val message: Int,
         @StringRes val action: Int? = null,
         val actionEvent: ActionEvent? = null,
-    ) : StartDownloadTransferEvent {
+    ) : StartTransferEvent {
         /**
          * The one off event to be triggered with the [action], if [action] is null this parameter will be ignored
          */
@@ -99,7 +99,7 @@ sealed interface StartDownloadTransferEvent {
     sealed class MessagePlural(
         @PluralsRes val message: Int,
         val quantity: Int,
-    ) : StartDownloadTransferEvent {
+    ) : StartTransferEvent {
         /**
          * Save to device has finished
          * @param totalNodes

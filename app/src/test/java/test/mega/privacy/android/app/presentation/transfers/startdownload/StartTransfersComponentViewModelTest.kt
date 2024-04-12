@@ -14,10 +14,10 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersConstants
-import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadComponentViewModel
-import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferEvent
-import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferJobInProgress
-import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
+import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferJobInProgress
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -60,9 +60,9 @@ import org.mockito.kotlin.whenever
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class StartDownloadComponentViewModelTest {
+class StartTransfersComponentViewModelTest {
 
-    private lateinit var underTest: StartDownloadComponentViewModel
+    private lateinit var underTest: StartTransfersComponentViewModel
 
     private val getOfflinePathForNodeUseCase: GetOfflinePathForNodeUseCase = mock()
     private val startDownloadsWithWorkerUseCase: StartDownloadsWithWorkerUseCase = mock()
@@ -98,7 +98,7 @@ class StartDownloadComponentViewModelTest {
     @BeforeAll
     fun setup() {
         initialStub()
-        underTest = StartDownloadComponentViewModel(
+        underTest = StartTransfersComponentViewModel(
             getOfflinePathForNodeUseCase,
             getOrCreateStorageDownloadLocationUseCase,
             getFilePreviewDownloadPathUseCase,
@@ -203,7 +203,7 @@ class StartDownloadComponentViewModelTest {
             commonStub()
             whenever(isConnectedToInternetUseCase()).thenReturn(false)
             underTest.startTransfer(TransferTriggerEvent.StartDownloadNode(nodes))
-            assertCurrentEventIsEqualTo(StartDownloadTransferEvent.NotConnected)
+            assertCurrentEventIsEqualTo(StartTransferEvent.NotConnected)
         }
 
     @Test
@@ -213,7 +213,7 @@ class StartDownloadComponentViewModelTest {
             underTest.startTransfer(
                 TransferTriggerEvent.StartDownloadNode(listOf())
             )
-            assertCurrentEventIsEqualTo(StartDownloadTransferEvent.Message.TransferCancelled)
+            assertCurrentEventIsEqualTo(StartTransferEvent.Message.TransferCancelled)
         }
 
     @Test
@@ -223,7 +223,7 @@ class StartDownloadComponentViewModelTest {
             underTest.startTransfer(
                 TransferTriggerEvent.StartDownloadForOffline(null)
             )
-            assertCurrentEventIsEqualTo(StartDownloadTransferEvent.Message.TransferCancelled)
+            assertCurrentEventIsEqualTo(StartTransferEvent.Message.TransferCancelled)
         }
 
     @Test
@@ -235,7 +235,7 @@ class StartDownloadComponentViewModelTest {
             })
             underTest.startTransfer(TransferTriggerEvent.StartDownloadNode(nodes))
             assertThat(underTest.uiState.value.jobInProgressState)
-                .isEqualTo(StartDownloadTransferJobInProgress.ScanningTransfers)
+                .isEqualTo(StartTransferJobInProgress.ScanningTransfers)
         }
 
     @Test
@@ -252,7 +252,7 @@ class StartDownloadComponentViewModelTest {
             underTest.startTransfer(triggerEvent)
             assertThat(underTest.uiState.value.jobInProgressState).isNull()
             assertCurrentEventIsEqualTo(
-                StartDownloadTransferEvent.FinishProcessing(null, 1, 0, 0, triggerEvent)
+                StartTransferEvent.FinishProcessing(null, 1, 0, 0, triggerEvent)
             )
         }
 
@@ -263,7 +263,7 @@ class StartDownloadComponentViewModelTest {
             val triggerEvent = TransferTriggerEvent.StartDownloadNode(nodes)
             underTest.startTransfer(triggerEvent)
             assertCurrentEventIsEqualTo(
-                StartDownloadTransferEvent.FinishProcessing(null, 1, 0, 0, triggerEvent)
+                StartTransferEvent.FinishProcessing(null, 1, 0, 0, triggerEvent)
             )
         }
 
@@ -273,19 +273,19 @@ class StartDownloadComponentViewModelTest {
             commonStub()
             stubStartTransfers(flowOf(MultiTransferEvent.InsufficientSpace))
             underTest.startTransfer(TransferTriggerEvent.StartDownloadNode(nodes))
-            assertCurrentEventIsEqualTo(StartDownloadTransferEvent.Message.NotSufficientSpace)
+            assertCurrentEventIsEqualTo(StartTransferEvent.Message.NotSufficientSpace)
         }
 
     @ParameterizedTest(name = "when StartDownloadUseCase finishes with {0}, then {1} is emitted")
     @MethodSource("provideDownloadNodeParameters")
     fun `test that a specific StartDownloadTransferEvent is emitted`(
         multiTransferEvent: MultiTransferEvent,
-        startDownloadTransferEvent: StartDownloadTransferEvent,
+        startTransferEvent: StartTransferEvent,
     ) = runTest {
         commonStub()
         stubStartTransfers(flowOf(multiTransferEvent))
         underTest.startTransfer(startDownloadEvent)
-        assertCurrentEventIsEqualTo(startDownloadTransferEvent)
+        assertCurrentEventIsEqualTo(startTransferEvent)
     }
 
     @ParameterizedTest
@@ -300,7 +300,7 @@ class StartDownloadComponentViewModelTest {
         whenever(fileSizeStringMapper(any())).thenReturn(size)
         underTest.startTransfer(startEvent)
         assertCurrentEventIsEqualTo(
-            StartDownloadTransferEvent.ConfirmLargeDownload(size, startEvent)
+            StartTransferEvent.ConfirmLargeDownload(size, startEvent)
         )
     }
 
@@ -331,7 +331,7 @@ class StartDownloadComponentViewModelTest {
             whenever(shouldAskDownloadDestinationUseCase()).thenReturn(true)
             val event = TransferTriggerEvent.StartDownloadNode(nodes)
             underTest.startDownloadWithoutConfirmation(event)
-            assertCurrentEventIsEqualTo(StartDownloadTransferEvent.AskDestination(event))
+            assertCurrentEventIsEqualTo(StartTransferEvent.AskDestination(event))
         }
 
     @Test
@@ -387,7 +387,7 @@ class StartDownloadComponentViewModelTest {
                 awaitItem() //current value doesn't matter
                 monitorActiveTransferFinishedFlow.emit(finished)
                 val expected =
-                    triggered(StartDownloadTransferEvent.MessagePlural.FinishDownloading(finished))
+                    triggered(StartTransferEvent.MessagePlural.FinishDownloading(finished))
 
                 val actual = awaitItem().oneOffViewEvent
 
@@ -400,11 +400,11 @@ class StartDownloadComponentViewModelTest {
             mock<MultiTransferEvent.SingleTransferEvent> {
                 on { scanningFinished } doReturn true
             },
-            StartDownloadTransferEvent.FinishProcessing(null, 1, 0, 0, startDownloadEvent),
+            StartTransferEvent.FinishProcessing(null, 1, 0, 0, startDownloadEvent),
         ),
         Arguments.of(
             MultiTransferEvent.InsufficientSpace,
-            StartDownloadTransferEvent.Message.NotSufficientSpace,
+            StartTransferEvent.Message.NotSufficientSpace,
         ),
     )
 
@@ -422,7 +422,7 @@ class StartDownloadComponentViewModelTest {
     private fun provideStartEvents() = provideStartDownloadEvents() +
             provideStartChatUploadEvents()
 
-    private fun assertCurrentEventIsEqualTo(event: StartDownloadTransferEvent) {
+    private fun assertCurrentEventIsEqualTo(event: StartTransferEvent) {
         assertThat(underTest.uiState.value.oneOffViewEvent)
             .isInstanceOf(StateEventWithContentTriggered::class.java)
         assertThat((underTest.uiState.value.oneOffViewEvent as StateEventWithContentTriggered).content)
