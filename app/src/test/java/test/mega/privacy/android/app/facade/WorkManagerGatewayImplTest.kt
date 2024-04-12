@@ -207,8 +207,10 @@ class WorkManagerGatewayImplTest {
                 val info = awaitItem()
                 assertThat(info[0].state).isEqualTo(WorkInfo.State.ENQUEUED)
                 WorkManagerTestInitHelper.getTestDriver(context)?.apply {
+                    setInitialDelayMet(info[0].id)
                     setPeriodDelayMet(info[0].id)
                 }
+                assertThat(awaitItem()[0].state).isEqualTo(WorkInfo.State.ENQUEUED)
                 assertThat(awaitItem()[0].state).isEqualTo(WorkInfo.State.RUNNING)
             }
         }
