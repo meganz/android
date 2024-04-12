@@ -36,7 +36,8 @@ internal fun BaseMegaAlertDialog(
             text = text,
             fontWeight = FontWeight.Medium,
             style = MaterialTheme.typography.subtitle1,
-            color = MegaTheme.colors.text.secondary
+            color = MegaTheme.colors.text.secondary,
+            modifier = Modifier.testTag(CONTENT_TAG),
         )
     },
     confirmButtonText = confirmButtonText,
@@ -102,7 +103,8 @@ internal fun BaseMegaAlertDialog(
             text = text,
             fontWeight = FontWeight.Medium,
             style = MaterialTheme.typography.subtitle1,
-            color = MegaTheme.colors.text.secondary
+            color = MegaTheme.colors.text.secondary,
+            modifier = Modifier.testTag(CONTENT_TAG),
         )
     },
     buttons = buttons,
@@ -152,6 +154,7 @@ private fun BaseMegaAlertDialog(
 }
 
 internal const val TITLE_TAG = "mega_alert_dialog:text_title"
+internal const val CONTENT_TAG = "mega_alert_dialog:text_content"
 internal const val CANCEL_TAG = "mega_alert_dialog:button_cancel"
 internal const val CONFIRM_TAG = "mega_alert_dialog:button_confirm"
 internal const val OPTION1_TAG = "mega_alert_dialog:button_option1"
