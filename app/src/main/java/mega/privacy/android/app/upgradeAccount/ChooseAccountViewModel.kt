@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.domain.entity.billing.Pricing
@@ -72,7 +72,8 @@ internal class ChooseAccountViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            val getFeatureFlag = getFeatureFlagValueUseCase(AppFeatures.ChooseAccountScreenVariantA)
+            val getFeatureFlag =
+                getFeatureFlagValueUseCase(ABTestFeatures.ChooseAccountScreenVariantA)
             _state.update {
                 it.copy(enableVariantAUI = getFeatureFlag)
             }

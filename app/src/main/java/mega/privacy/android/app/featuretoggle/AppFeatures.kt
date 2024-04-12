@@ -218,14 +218,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     CallUnlimitedProPlan("Call to stay unlimited when host with pro plan leaves", false),
 
     /**
-     * Enable new design Variant A for ChooseAccount screen
-     */
-    ChooseAccountScreenVariantA(
-        "Enable new design (Variant A) for ChooseAccount screen (Onboarding Upselling dialog)",
-        false
-    ),
-
-    /**
      * To show strings for new features (meetings and VPN), strings should be hidden until the features are released
      */
     ShowStringsForNewFeatures(
