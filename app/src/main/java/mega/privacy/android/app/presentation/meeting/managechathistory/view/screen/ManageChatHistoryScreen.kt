@@ -83,13 +83,7 @@ internal fun ManageChatHistoryRoute(
         modifier = modifier.semantics { testTagsAsResourceId = true },
         uiState = uiState,
         onNavigateUp = onNavigateUp,
-        onConfirmClearChatClick = {
-            viewModel.apply {
-                dismissClearChatConfirmation()
-                clearChatHistory(it)
-            }
-        },
-        onClearChatConfirmationDismiss = viewModel::dismissClearChatConfirmation,
+        onConfirmClearChatClick = viewModel::clearChatHistory,
         onSetChatRetentionTime = viewModel::setChatRetentionTime
     )
 }
@@ -99,11 +93,11 @@ internal fun ManageChatHistoryScreen(
     uiState: ManageChatHistoryUIState,
     onNavigateUp: () -> Unit,
     onConfirmClearChatClick: (chatRoomId: Long) -> Unit,
-    onClearChatConfirmationDismiss: () -> Unit,
     onSetChatRetentionTime: (period: Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var shouldShowCustomTimePicker by rememberSaveable { mutableStateOf(false) }
+    var shouldShowClearChatConfirmation by rememberSaveable { mutableStateOf(false) }
     var shouldShowHistoryRetentionConfirmation by rememberSaveable { mutableStateOf(false) }
     val timePickerState = rememberCustomRetentionTimePickerState()
 
@@ -166,7 +160,13 @@ internal fun ManageChatHistoryScreen(
                 )
             }
 
-            ClearMeetingHistoryOption(
+            ClearHistoryOption(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        shouldShowClearChatConfirmation = true
+                    }
+                    .testTag(CLEAR_HISTORY_OPTION_TAG),
                 title = if (uiState.chatRoom?.isMeeting == true) {
                     stringResource(id = R.string.meetings_manage_history_clear)
                 } else {
@@ -176,12 +176,17 @@ internal fun ManageChatHistoryScreen(
         }
     }
 
-    if (uiState.shouldShowClearChatConfirmation) {
+    if (shouldShowClearChatConfirmation) {
         uiState.chatRoom?.apply {
             ClearChatConfirmationDialog(
                 isMeeting = isMeeting,
-                onConfirm = { onConfirmClearChatClick(chatId) },
-                onDismiss = onClearChatConfirmationDismiss
+                onConfirm = {
+                    onConfirmClearChatClick(chatId)
+                    shouldShowClearChatConfirmation = false
+                },
+                onDismiss = {
+                    shouldShowClearChatConfirmation = false
+                }
             )
         }
     }
@@ -353,19 +358,21 @@ private fun List<DisplayValueState>.inStrings(): List<String> = map {
 }
 
 @Composable
-private fun ClearMeetingHistoryOption(title: String) {
-    GenericTwoLineListItem(
-        modifier = Modifier.padding(vertical = 4.dp),
-        title = title,
-        titleTextColor = TextColor.Error,
-        subtitle = stringResource(id = R.string.subtitle_properties_chat_clear),
-        showEntireSubtitle = true
-    )
+private fun ClearHistoryOption(title: String, modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        GenericTwoLineListItem(
+            modifier = Modifier.padding(vertical = 4.dp),
+            title = title,
+            titleTextColor = TextColor.Error,
+            subtitle = stringResource(id = R.string.subtitle_properties_chat_clear),
+            showEntireSubtitle = true
+        )
 
-    MegaDivider(
-        modifier = Modifier.padding(horizontal = 16.dp),
-        dividerType = DividerType.FullSize
-    )
+        MegaDivider(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            dividerType = DividerType.FullSize
+        )
+    }
 }
 
 @CombinedThemePreviews
@@ -376,8 +383,7 @@ private fun ManageChatHistoryScreenWithRetentionTimePreview() {
             uiState = ManageChatHistoryUIState(retentionTime = 3600L),
             onNavigateUp = {},
             onConfirmClearChatClick = {},
-            onClearChatConfirmationDismiss = {},
-            onSetChatRetentionTime = {}
+            onSetChatRetentionTime = {},
         )
     }
 }
@@ -390,8 +396,7 @@ private fun ManageChatHistoryScreenWithoutRetentionTimePreview() {
             uiState = ManageChatHistoryUIState(),
             onNavigateUp = {},
             onConfirmClearChatClick = {},
-            onClearChatConfirmationDismiss = {},
-            onSetChatRetentionTime = {}
+            onSetChatRetentionTime = {},
         )
     }
 }
@@ -402,3 +407,5 @@ internal const val HISTORY_CLEARING_OPTION_SUBTITLE_TAG =
     "history_clearing_option:history_clearing_option_subtitle_display_the_clearing_option_subtitle"
 internal const val HISTORY_CLEARING_OPTION_SWITCH_TAG =
     "history_clearing_option:switch_enablement_toggle"
+internal const val CLEAR_HISTORY_OPTION_TAG =
+    "manage_chat_history_screen:clear_history_option_the_clear_all_chat_or_meeting_history_option"

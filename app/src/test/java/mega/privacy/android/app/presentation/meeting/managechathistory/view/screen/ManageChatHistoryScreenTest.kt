@@ -28,6 +28,7 @@ import mega.privacy.android.app.utils.Constants.SECONDS_IN_MONTH_30
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_WEEK
 import mega.privacy.android.core.ui.controls.dialogs.CONFIRMATION_DIALOG_CANCEL_BUTTON_TAG
 import mega.privacy.android.core.ui.controls.dialogs.CONFIRMATION_DIALOG_CONFIRM_BUTTON_TAG
+import mega.privacy.android.core.ui.controls.dialogs.internal.CONFIRM_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -131,23 +132,27 @@ class ManageChatHistoryScreenTest {
         with(composeRule) {
             setScreen(
                 uiState = ManageChatHistoryUIState(
-                    chatRoom = ChatRoomUiState(),
-                    shouldShowClearChatConfirmation = true
+                    chatRoom = ChatRoomUiState()
                 )
             )
+
+            onNodeWithTag(CLEAR_HISTORY_OPTION_TAG).performClick()
 
             onNodeWithTag(TEST_TAG_CLEAR_CHAT_CONFIRMATION_DIALOG).assertIsDisplayed()
         }
     }
 
     @Test
-    fun `test that the clear chat confirmation is not shown`() {
+    fun `test that the clear chat confirmation is dismissed after the user confirms it`() {
         with(composeRule) {
             setScreen(
                 uiState = ManageChatHistoryUIState(
                     chatRoom = ChatRoomUiState()
                 )
             )
+
+            onNodeWithTag(CLEAR_HISTORY_OPTION_TAG).performClick()
+            onNodeWithTag(CONFIRM_TAG).performClick()
 
             onNodeWithTag(TEST_TAG_CLEAR_CHAT_CONFIRMATION_DIALOG).assertIsNotDisplayed()
         }
@@ -330,7 +335,6 @@ class ManageChatHistoryScreenTest {
         uiState: ManageChatHistoryUIState = ManageChatHistoryUIState(),
         onNavigateUp: () -> Unit = {},
         onConfirmClearChatClick: (chatRoomId: Long) -> Unit = {},
-        onClearChatConfirmationDismiss: () -> Unit = {},
         onSetChatRetentionTime: (period: Long) -> Unit = {},
     ) {
         setContent {
@@ -338,8 +342,7 @@ class ManageChatHistoryScreenTest {
                 uiState = uiState,
                 onNavigateUp = onNavigateUp,
                 onConfirmClearChatClick = onConfirmClearChatClick,
-                onClearChatConfirmationDismiss = onClearChatConfirmationDismiss,
-                onSetChatRetentionTime = onSetChatRetentionTime
+                onSetChatRetentionTime = onSetChatRetentionTime,
             )
         }
     }

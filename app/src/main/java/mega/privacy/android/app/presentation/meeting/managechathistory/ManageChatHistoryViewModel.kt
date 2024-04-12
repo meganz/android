@@ -185,18 +185,4 @@ class ManageChatHistoryViewModel @Inject constructor(
                 .onFailure { Timber.e("Error setting retention time", it) }
         }
     }
-
-    /**
-     * Show clear chat confirmation
-     */
-    internal fun showClearChatConfirmation() {
-        _uiState.update { it.copy(shouldShowClearChatConfirmation = true) }
-    }
-
-    /**
-     * Dismiss the clear chat confirmation
-     */
-    internal fun dismissClearChatConfirmation() {
-        _uiState.update { it.copy(shouldShowClearChatConfirmation = false) }
-    }
 }

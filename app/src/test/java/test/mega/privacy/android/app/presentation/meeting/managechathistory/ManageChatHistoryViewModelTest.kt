@@ -123,25 +123,6 @@ class ManageChatHistoryViewModelTest {
     }
 
     @Test
-    fun `test that the clear chat history visibility state is true`() = runTest {
-        underTest.showClearChatConfirmation()
-
-        underTest.uiState.test {
-            assertThat(expectMostRecentItem().shouldShowClearChatConfirmation).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that the clear chat history visibility state is false when dismissed`() = runTest {
-        underTest.showClearChatConfirmation()
-        underTest.dismissClearChatConfirmation()
-
-        underTest.uiState.test {
-            assertThat(expectMostRecentItem().shouldShowClearChatConfirmation).isFalse()
-        }
-    }
-
-    @Test
     fun `test that the correct snack bar message is shown after successfully clearing the chat history`() =
         runTest {
             underTest.clearChatHistory(chatRoomId)

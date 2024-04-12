@@ -64,6 +64,8 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
 
         private const val IS_HISTORY_RETENTION_CONFIRMATION_SHOWN =
             "IS_HISTORY_RETENTION_CONFIRMATION_SHOWN"
+        private const val IS_CLEAR_CHAT_CONFIRMATION_SHOWN =
+            "IS_CLEAR_CHAT_CONFIRMATION_SHOWN"
     }
 
     /**
@@ -97,6 +99,7 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
     }
 
     private var shouldShowHistoryRetentionConfirmation by mutableStateOf(false)
+    private var shouldShowClearChatConfirmation by mutableStateOf(false)
 
     /**
      * Called to retrieve per-instance state from an activity before being killed
@@ -109,6 +112,10 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
             IS_HISTORY_RETENTION_CONFIRMATION_SHOWN,
             shouldShowHistoryRetentionConfirmation
         )
+        outState.putBoolean(
+            IS_CLEAR_CHAT_CONFIRMATION_SHOWN,
+            shouldShowClearChatConfirmation
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -117,6 +124,7 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
         savedInstanceState?.let {
             shouldShowHistoryRetentionConfirmation =
                 it.getBoolean(IS_HISTORY_RETENTION_CONFIRMATION_SHOWN)
+            shouldShowClearChatConfirmation = it.getBoolean(IS_CLEAR_CHAT_CONFIRMATION_SHOWN)
         }
 
         if (intent == null || intent.extras == null) {
@@ -141,17 +149,17 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             MegaAppTheme(isDark = themeMode.isDarkMode()) {
-                if (uiState.shouldShowClearChatConfirmation) {
+                if (shouldShowClearChatConfirmation) {
                     uiState.chatRoom?.apply {
                         ClearChatConfirmationDialog(
                             isMeeting = isMeeting,
                             onConfirm = {
-                                viewModel.apply {
-                                    dismissClearChatConfirmation()
-                                    clearChatHistory(chatId)
-                                }
+                                shouldShowClearChatConfirmation = false
+                                viewModel.clearChatHistory(chatId)
                             },
-                            onDismiss = viewModel::dismissClearChatConfirmation
+                            onDismiss = {
+                                shouldShowClearChatConfirmation = false
+                            }
                         )
                     }
                 }
@@ -557,7 +565,7 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
     override fun onClick(v: View) {
         when (v.id) {
             R.id.clear_chat_history_layout -> {
-                viewModel.showClearChatConfirmation()
+                shouldShowClearChatConfirmation = true
             }
 
             R.id.history_retention_switch_layout -> {
