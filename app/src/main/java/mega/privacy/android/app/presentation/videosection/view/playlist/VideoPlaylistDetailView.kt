@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.videosection.view.playlist
 
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -42,6 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -139,26 +141,29 @@ fun VideoPlaylistDetailView(
         }
     }
 
+    val context = LocalContext.current
     LaunchedEffect(numberOfAddedVideos) {
         if (numberOfAddedVideos > 0) {
-            val message = if (numberOfAddedVideos == 1) {
-                "1 item"
-            } else {
-                "$numberOfAddedVideos items"
-            }
-            snackBarHostState.showSnackbar("Added $message to \'${playlist?.title}\'")
+            val message = context.resources.getQuantityString(
+                sharedR.plurals.video_section_playlist_detail_add_videos_message,
+                numberOfAddedVideos,
+                numberOfAddedVideos,
+                playlist?.title
+            )
+            snackBarHostState.showSnackbar(message)
             addedMessageShown()
         }
     }
 
     LaunchedEffect(numberOfRemovedItems) {
         if (numberOfRemovedItems > 0) {
-            val message = if (numberOfRemovedItems == 1) {
-                "1 item"
-            } else {
-                "$numberOfRemovedItems items"
-            }
-            snackBarHostState.showSnackbar("Removed $message from \'${playlist?.title}\'")
+            val message = context.resources.getQuantityString(
+                sharedR.plurals.video_section_playlist_detail_remove_videos_message,
+                numberOfRemovedItems,
+                numberOfRemovedItems,
+                playlist?.title
+            )
+            snackBarHostState.showSnackbar(message)
             removedMessageShown()
         }
     }
@@ -194,8 +199,8 @@ fun VideoPlaylistDetailView(
             if (shouldRenameVideoPlaylistDialog) {
                 CreateVideoPlaylistDialog(
                     modifier = Modifier.testTag(DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
-                    title = "Rename",
-                    positiveButtonText = "Rename",
+                    title = stringResource(id = sharedR.string.video_section_playlists_rename_playlist_dialog_title),
+                    positiveButtonText = stringResource(id = sharedR.string.video_section_playlists_rename_playlist_dialog_title),
                     inputPlaceHolderText = { inputPlaceHolderText },
                     errorMessage = errorMessage,
                     onDialogInputChange = setInputValidity,
@@ -216,9 +221,9 @@ fun VideoPlaylistDetailView(
             if (shouldDeleteVideoPlaylistDialog) {
                 DeleteItemsDialog(
                     modifier = Modifier.testTag(DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
-                    title = "Delete playlist?",
-                    text = "Do we need additional explanation to delete playlists?",
-                    confirmButtonText = "Delete",
+                    title = stringResource(id = sharedR.string.video_section_playlists_delete_playlist_dialog_title),
+                    text = null,
+                    confirmButtonText = stringResource(id = sharedR.string.video_section_playlists_delete_playlist_dialog_delete_button),
                     onDeleteButtonClicked = {
                         onDeleteDialogPositiveButtonClicked(listOf(playlist))
                     },
@@ -232,9 +237,9 @@ fun VideoPlaylistDetailView(
             if (shouldDeleteVideosDialog) {
                 DeleteItemsDialog(
                     modifier = Modifier.testTag(DETAIL_DELETE_VIDEOS_DIALOG_TEST_TAG),
-                    title = "Remove from playlist?",
+                    title = stringResource(id = sharedR.string.video_section_playlist_detail_remove_videos_dialog_title),
                     text = null,
-                    confirmButtonText = "Remove",
+                    confirmButtonText = stringResource(id = sharedR.string.video_section_playlist_detail_remove_videos_dialog_remove_button),
                     onDeleteButtonClicked = {
                         onDeleteVideosDialogPositiveButtonClicked(playlist)
                     },
@@ -351,7 +356,7 @@ internal fun VideoPlaylistEmptyView(
         LegacyMegaEmptyView(
             modifier = Modifier
                 .fillMaxSize(),
-            text = stringResource(id = R.string.homepage_empty_hint_video),
+            text = stringResource(id = sharedR.string.video_section_playlist_detail_empty_hint_videos),
             imagePainter = painterResource(id = R.drawable.ic_homepage_empty_video)
         )
     }
@@ -439,14 +444,14 @@ internal fun VideoPlaylistInfoView(
                 .fillMaxWidth()
                 .weight(1f)
                 .testTag(PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG),
-            text = if (numberOfVideos != 0) {
-                if (numberOfVideos == 1) {
-                    "1 Video"
-                } else {
-                    "$numberOfVideos Videos"
-                }
+            text = if (numberOfVideos == 0) {
+                stringResource(id = sharedR.string.video_section_playlist_detail_empty_hint_videos).lowercase()
             } else {
-                "no videos"
+                pluralStringResource(
+                    id = sharedR.plurals.video_section_playlist_detail_video_number,
+                    count = numberOfVideos,
+                    numberOfVideos
+                )
             },
             textColor = TextColor.Secondary,
             style = MaterialTheme.typography.caption
@@ -480,7 +485,7 @@ internal fun PlayAllButtonView(
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .padding(end = 20.dp),
-            text = "Play all",
+            text = stringResource(id = sharedR.string.video_section_playlist_detail_play_all_button),
             textColor = TextColor.Accent,
             style = MaterialTheme.typography.caption
         )

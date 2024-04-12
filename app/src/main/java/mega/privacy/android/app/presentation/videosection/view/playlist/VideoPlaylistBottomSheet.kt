@@ -7,11 +7,13 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.resources.R
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -55,7 +57,7 @@ internal fun RenameVideoPlaylistBottomSheetTile(
 ) {
     MenuActionListTile(
         dividerType = null,
-        text = "Rename",
+        text = stringResource(id = R.string.video_section_playlists_rename_playlist_dialog_title),
         icon = painterResource(id = iconPackR.drawable.ic_pen_02_medium_regular_outline),
         onActionClicked = onActionClicked,
     )
@@ -67,7 +69,7 @@ internal fun DeleteVideoPlaylistBottomSheetTile(
 ) {
     MenuActionListTile(
         dividerType = null,
-        text = "Delete playlist",
+        text = stringResource(id = R.string.video_section_playlist_bottom_sheet_option_title_delete),
         icon = painterResource(id = iconPackR.drawable.ic_trash_medium_regular_outline),
         onActionClicked = onActionClicked,
     )

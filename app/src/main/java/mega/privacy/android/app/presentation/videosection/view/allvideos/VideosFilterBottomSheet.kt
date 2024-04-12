@@ -10,6 +10,7 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
@@ -72,7 +73,7 @@ private fun VideosLocationFilterBottomSheetPreview() {
             options = LocationFilterOption.entries.map { option ->
                 VideosFilterOptionEntity(
                     id = option.ordinal,
-                    title = option.title,
+                    title = stringResource(id = option.titleResId),
                     isSelected = false
                 )
             },
@@ -97,7 +98,7 @@ private fun VideosDurationFilterBottomSheetPreview() {
             options = DurationFilterOption.entries.map { option ->
                 VideosFilterOptionEntity(
                     id = option.ordinal,
-                    title = option.title,
+                    title = stringResource(id = option.titleResId),
                     isSelected = option == DurationFilterOption.MoreThan20
                 )
             },

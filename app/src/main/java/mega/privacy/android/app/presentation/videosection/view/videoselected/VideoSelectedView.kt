@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.videosection.view.videoselected
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
@@ -89,7 +90,8 @@ internal fun VideoSelectedView(
         scaffoldState = rememberScaffoldState(),
         topBar = {
             VideoSelectedTopBar(
-                title = uiState.topBarTitle ?: "Choose files",
+                title = uiState.topBarTitle
+                    ?: stringResource(id = sharedR.string.video_section_video_selected_top_bar_title),
                 searchState = uiState.searchState,
                 query = uiState.query,
                 isEmpty = uiState.nodesList.isEmpty(),

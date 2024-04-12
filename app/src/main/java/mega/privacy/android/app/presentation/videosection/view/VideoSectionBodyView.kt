@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.videosection.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -28,6 +29,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.font.FontWeight
@@ -63,7 +65,9 @@ internal fun VideoSectionBodyView(
     val isScrollingDownPlaylists by playlistsLazyListState.isScrollingDown()
     val isScrollingToEndPlaylists by playlistsLazyListState.isScrolledToEnd()
 
-    Column(modifier = Modifier.fillMaxSize().semantics { testTagsAsResourceId = true }) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .semantics { testTagsAsResourceId = true }) {
         VideoSectionTabs(tabs = tabs, selectedTab = selectedTab, onTabSelected = onTabSelected) {
             when (selectedTab) {
                 VideoSectionTab.All ->
@@ -141,8 +145,11 @@ internal fun VideoSectionTabs(
                     text = {
                         Text(
                             text = when (tab) {
-                                VideoSectionTab.All -> "Videos"
-                                VideoSectionTab.Playlists -> "Playlists"
+                                VideoSectionTab.All ->
+                                    stringResource(id = sharedR.string.video_section_tab_title_all_videos)
+
+                                VideoSectionTab.Playlists ->
+                                    stringResource(id = sharedR.string.video_section_tab_title_playlists)
                             },
                             fontWeight = FontWeight.Medium
                         )

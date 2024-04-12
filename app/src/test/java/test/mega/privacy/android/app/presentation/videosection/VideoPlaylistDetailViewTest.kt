@@ -146,7 +146,7 @@ class VideoPlaylistDetailViewTest {
         composeTestRule.onNodeWithTag(PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG)
             .assertIsDisplayed()
         composeTestRule.onNodeWithTag(PLAYLIST_NUMBER_OF_VIDEOS_TEST_TAG)
-            .assertTextEquals("2 Videos")
+            .assertTextEquals("2 videos")
     }
 
     @Test

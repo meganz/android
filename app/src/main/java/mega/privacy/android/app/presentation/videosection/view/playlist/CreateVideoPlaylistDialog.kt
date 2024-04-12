@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.videosection.view.playlist
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -187,7 +188,7 @@ internal fun CreateVideoPlaylistDialog(
 
                                     R.string.invalid_string -> stringResource(id = it)
 
-                                    else -> "A playlist with this name already exists. Enter a different name."
+                                    else -> stringResource(id = sharedR.string.video_section_playlists_error_message_playlist_name_exists)
                                 },
                                 textColor = TextColor.Error,
                                 style = caption
@@ -203,7 +204,9 @@ internal fun CreateVideoPlaylistDialog(
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.Transparent,
                 ),
-                modifier = Modifier.padding(all = 0.dp).testTag(POSITIVE_BUTTON_TEST_TAG),
+                modifier = Modifier
+                    .padding(all = 0.dp)
+                    .testTag(POSITIVE_BUTTON_TEST_TAG),
                 elevation = ButtonDefaults.elevation(
                     defaultElevation = 0.dp,
                     pressedElevation = 0.dp,

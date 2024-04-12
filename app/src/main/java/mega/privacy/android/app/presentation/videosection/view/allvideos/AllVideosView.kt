@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.videosection.view.allvideos
 
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -94,10 +95,11 @@ internal fun AllVideosView(
         modifier = modifier,
         scaffoldState = rememberScaffoldState(),
     ) { paddingValue ->
+        val locationTitle =
+            stringResource(id = sharedR.string.video_section_videos_location_filter_title)
+        val durationTitle =
+            stringResource(id = sharedR.string.video_section_videos_duration_filter_title)
         Column {
-            val locationText = "Location"
-            val durationText = "Duration"
-
             val isAllLocations = selectedLocationFilterOption == LocationFilterOption.AllLocations
             val isAllDurations = selectedDurationFilterOption == DurationFilterOption.AllDurations
 
@@ -115,17 +117,17 @@ internal fun AllVideosView(
                         locationModalSheetState.show()
                     }
                 },
-                locationDefaultText = locationText,
-                durationDefaultText = durationText,
+                locationDefaultText = locationTitle,
+                durationDefaultText = durationTitle,
                 locationFilterSelectText = if (isAllLocations) {
-                    locationText
+                    locationTitle
                 } else {
-                    selectedLocationFilterOption.title
+                    stringResource(id = selectedLocationFilterOption.titleResId)
                 },
                 durationFilterSelectText = if (isAllDurations) {
-                    durationText
+                    durationTitle
                 } else {
-                    selectedDurationFilterOption.title
+                    stringResource(id = selectedDurationFilterOption.titleResId)
                 }
             )
 
@@ -216,12 +218,12 @@ internal fun AllVideosView(
             modifier = Modifier,
             modalSheetState = locationModalSheetState,
             coroutineScope = coroutineScope,
-            title = "Location",
+            title = locationTitle,
             options = LocationFilterOption.entries.map { option ->
                 VideosFilterOptionEntity(
-                    option.ordinal,
-                    option.title,
-                    option == selectedLocationFilterOption
+                    id = option.ordinal,
+                    title = stringResource(id = option.titleResId),
+                    isSelected = option == selectedLocationFilterOption
                 )
             },
             onItemSelected = { item ->
@@ -243,12 +245,12 @@ internal fun AllVideosView(
             modifier = Modifier,
             modalSheetState = durationModalSheetState,
             coroutineScope = coroutineScope,
-            title = "Duration",
+            title = durationTitle,
             options = DurationFilterOption.entries.map { option ->
                 VideosFilterOptionEntity(
-                    option.ordinal,
-                    option.title,
-                    option == selectedDurationFilterOption
+                    id = option.ordinal,
+                    title = stringResource(id = option.titleResId),
+                    isSelected = option == selectedDurationFilterOption
                 )
             },
             onItemSelected = { item ->

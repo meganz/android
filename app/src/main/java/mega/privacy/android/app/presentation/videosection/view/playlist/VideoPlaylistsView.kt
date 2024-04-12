@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.videosection.view.playlist
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
@@ -35,6 +36,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -100,13 +102,19 @@ internal fun VideoPlaylistsView(
     )
     var clickedItem: Int by rememberSaveable { mutableIntStateOf(-1) }
 
+    val context = LocalContext.current
+
     LaunchedEffect(deletedVideoPlaylistTitles) {
         if (deletedVideoPlaylistTitles.isNotEmpty()) {
-            val deletedMessage = if (deletedVideoPlaylistTitles.size == 1) {
-                "\"${deletedVideoPlaylistTitles[0]}\" deleted"
-            } else {
-                "Deleted ${deletedVideoPlaylistTitles.size} playlists"
-            }
+            val deletedMessage = context.resources.getQuantityString(
+                sharedR.plurals.video_section_playlists_delete_playlists_message,
+                deletedVideoPlaylistTitles.size,
+                if (deletedVideoPlaylistTitles.size == 1) {
+                    deletedVideoPlaylistTitles[0]
+                } else {
+                    deletedVideoPlaylistTitles.size
+                }
+            )
             snackBarHostState.showSnackbar(deletedMessage)
             onDeletedMessageShown()
         }
@@ -147,12 +155,14 @@ internal fun VideoPlaylistsView(
         }
     ) { paddingValue ->
         Box(
-            modifier = Modifier.fillMaxSize().padding(paddingValue)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValue)
         ) {
             if (shouldCreateVideoPlaylistDialog) {
                 CreateVideoPlaylistDialog(
                     modifier = Modifier.testTag(CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
-                    title = "Enter playlist name",
+                    title = stringResource(id = sharedR.string.video_section_playlists_create_playlist_dialog_title),
                     positiveButtonText = stringResource(id = R.string.general_create),
                     inputPlaceHolderText = { inputPlaceHolderText },
                     errorMessage = errorMessage,
@@ -172,8 +182,8 @@ internal fun VideoPlaylistsView(
             if (shouldRenameVideoPlaylistDialog) {
                 CreateVideoPlaylistDialog(
                     modifier = Modifier.testTag(RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
-                    title = "Rename",
-                    positiveButtonText = "Rename",
+                    title = stringResource(id = sharedR.string.video_section_playlists_rename_playlist_dialog_title),
+                    positiveButtonText = stringResource(id = sharedR.string.video_section_playlists_rename_playlist_dialog_title),
                     inputPlaceHolderText = { inputPlaceHolderText },
                     errorMessage = errorMessage,
                     onDialogInputChange = setInputValidity,
@@ -201,9 +211,9 @@ internal fun VideoPlaylistsView(
             if (shouldDeleteVideoPlaylistDialog) {
                 DeleteItemsDialog(
                     modifier = Modifier.testTag(DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
-                    title = "Delete playlist?",
-                    text = "Do we need additional explanation to delete playlists?",
-                    confirmButtonText = "Delete",
+                    title = stringResource(id = sharedR.string.video_section_playlists_delete_playlist_dialog_title),
+                    text = null,
+                    confirmButtonText = stringResource(id = sharedR.string.video_section_playlists_delete_playlist_dialog_delete_button),
                     onDeleteButtonClicked = {
                         if (clickedItem != -1) {
                             onDeleteDialogPositiveButtonClicked(items[clickedItem])
@@ -239,7 +249,7 @@ internal fun VideoPlaylistsView(
 
                 items.isEmpty() -> LegacyMegaEmptyView(
                     modifier = Modifier.testTag(VIDEO_PLAYLISTS_EMPTY_VIEW_TEST_TAG),
-                    text = "[B]No[/B] [A]playlists[/A] [B]found[/B]",
+                    text = stringResource(id = sharedR.string.video_section_playlists_empty_hint_playlist),
                     imagePainter = painterResource(id = R.drawable.ic_homepage_empty_playlists)
                 )
 
