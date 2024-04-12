@@ -447,9 +447,21 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         optionShareFolder.visibility = View.VISIBLE
                         if (isOutShare(node)) {
                             optionShareFolder.setText(R.string.manage_share)
+                            optionShareFolder.setCompoundDrawablesWithIntrinsicBounds(
+                                RPack.drawable.ic_gear_six_medium_regular_outline,
+                                0,
+                                0,
+                                0
+                            )
                             optionClearShares.visibility = View.VISIBLE
                         } else {
                             optionShareFolder.setText(R.string.context_share_folder)
+                            optionShareFolder.setCompoundDrawablesWithIntrinsicBounds(
+                                RPack.drawable.ic_folder_users_medium_regular_outline,
+                                0,
+                                0,
+                                0
+                            )
                             counterShares--
                             optionClearShares.visibility = View.GONE
                         }
