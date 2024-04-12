@@ -23,9 +23,9 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
-import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
@@ -87,6 +87,7 @@ class StartDownloadComponentViewModelTest {
     private val setStorageDownloadAskAlwaysUseCase = mock<SetStorageDownloadAskAlwaysUseCase>()
     private val setStorageDownloadLocationUseCase = mock<SetStorageDownloadLocationUseCase>()
     private val monitorActiveTransferFinishedUseCase = mock<MonitorActiveTransferFinishedUseCase>()
+    private val sendChatAttachmentsUseCase = mock<SendChatAttachmentsUseCase>()
 
 
     private val node: TypedFileNode = mock()
@@ -116,6 +117,7 @@ class StartDownloadComponentViewModelTest {
             setStorageDownloadAskAlwaysUseCase,
             setStorageDownloadLocationUseCase,
             monitorActiveTransferFinishedUseCase,
+            sendChatAttachmentsUseCase,
         )
     }
 
@@ -155,18 +157,18 @@ class StartDownloadComponentViewModelTest {
 
     @ParameterizedTest
     @MethodSource("provideStartEvents")
-    fun `test that clearActiveTransfersIfFinishedUseCase is invoked when startDownloadNode is invoked`(
+    fun `test that clearActiveTransfersIfFinishedUseCase is invoked when startTransfer is invoked`(
         startEvent: TransferTriggerEvent,
     ) = runTest {
         commonStub()
-        underTest.startDownload(startEvent)
-        verify(clearActiveTransfersIfFinishedUseCase).invoke(TransferType.DOWNLOAD)
+        underTest.startTransfer(startEvent)
+        verify(clearActiveTransfersIfFinishedUseCase).invoke(startEvent.type)
     }
 
     @ParameterizedTest
-    @MethodSource("provideStartEvents")
-    fun `test that start download use case is invoked with correct parameters when startDownloadNode is invoked`(
-        startEvent: TransferTriggerEvent,
+    @MethodSource("provideStartDownloadEvents")
+    fun `test that start download use case is invoked with correct parameters when download is started`(
+        startEvent: TransferTriggerEvent.DownloadTriggerEvent,
     ) = runTest {
         commonStub()
         if (startEvent is TransferTriggerEvent.StartDownloadForOffline) {
@@ -174,7 +176,7 @@ class StartDownloadComponentViewModelTest {
         } else if (startEvent is TransferTriggerEvent.StartDownloadForPreview) {
             whenever(getFilePreviewDownloadPathUseCase()).thenReturn(destination)
         }
-        underTest.startDownload(startEvent)
+        underTest.startTransfer(startEvent)
         verify(startDownloadsWithWorkerUseCase).invoke(
             nodes,
             destination,
@@ -182,12 +184,25 @@ class StartDownloadComponentViewModelTest {
         )
     }
 
+    @ParameterizedTest
+    @MethodSource("provideStartChatUploadEvents")
+    fun `test that send chat attachments use case is invoked with correct parameters when chat upload is started`(
+        startEvent: TransferTriggerEvent.StartChatUpload,
+    ) = runTest {
+        commonStub()
+        underTest.startTransfer(startEvent)
+        verify(sendChatAttachmentsUseCase).invoke(
+            CHAT_ID,
+            listOf(chatUri.toString()).associateWith { null },
+        )
+    }
+
     @Test
-    fun `test that no connection event is emitted when monitorConnectivityUseCase is false`() =
+    fun `test that no connection event is emitted when monitorConnectivityUseCase is false and start a download`() =
         runTest {
             commonStub()
             whenever(isConnectedToInternetUseCase()).thenReturn(false)
-            underTest.startDownload(TransferTriggerEvent.StartDownloadNode(nodes))
+            underTest.startTransfer(TransferTriggerEvent.StartDownloadNode(nodes))
             assertCurrentEventIsEqualTo(StartDownloadTransferEvent.NotConnected)
         }
 
@@ -195,7 +210,7 @@ class StartDownloadComponentViewModelTest {
     fun `test that cancel event is emitted when start download nodes is invoked with empty list`() =
         runTest {
             commonStub()
-            underTest.startDownload(
+            underTest.startTransfer(
                 TransferTriggerEvent.StartDownloadNode(listOf())
             )
             assertCurrentEventIsEqualTo(StartDownloadTransferEvent.Message.TransferCancelled)
@@ -205,7 +220,7 @@ class StartDownloadComponentViewModelTest {
     fun `test that cancel event is emitted when start download nodes is invoked with null node`() =
         runTest {
             commonStub()
-            underTest.startDownload(
+            underTest.startTransfer(
                 TransferTriggerEvent.StartDownloadForOffline(null)
             )
             assertCurrentEventIsEqualTo(StartDownloadTransferEvent.Message.TransferCancelled)
@@ -215,10 +230,10 @@ class StartDownloadComponentViewModelTest {
     fun `test that job in progress is set to ProcessingFiles when start download use case starts`() =
         runTest {
             commonStub()
-            stubStartDownload(flow {
+            stubStartTransfers(flow {
                 awaitCancellation()
             })
-            underTest.startDownload(TransferTriggerEvent.StartDownloadNode(nodes))
+            underTest.startTransfer(TransferTriggerEvent.StartDownloadNode(nodes))
             assertThat(underTest.uiState.value.jobInProgressState)
                 .isEqualTo(StartDownloadTransferJobInProgress.ScanningTransfers)
         }
@@ -234,7 +249,7 @@ class StartDownloadComponentViewModelTest {
                 awaitCancellation()
             })
             val triggerEvent = TransferTriggerEvent.StartDownloadNode(nodes)
-            underTest.startDownload(triggerEvent)
+            underTest.startTransfer(triggerEvent)
             assertThat(underTest.uiState.value.jobInProgressState).isNull()
             assertCurrentEventIsEqualTo(
                 StartDownloadTransferEvent.FinishProcessing(null, 1, 0, 0, triggerEvent)
@@ -246,7 +261,7 @@ class StartDownloadComponentViewModelTest {
         runTest {
             commonStub()
             val triggerEvent = TransferTriggerEvent.StartDownloadNode(nodes)
-            underTest.startDownload(triggerEvent)
+            underTest.startTransfer(triggerEvent)
             assertCurrentEventIsEqualTo(
                 StartDownloadTransferEvent.FinishProcessing(null, 1, 0, 0, triggerEvent)
             )
@@ -256,8 +271,8 @@ class StartDownloadComponentViewModelTest {
     fun `test that NotSufficientSpace event is emitted if start download use case returns NotSufficientSpace`() =
         runTest {
             commonStub()
-            stubStartDownload(flowOf(MultiTransferEvent.InsufficientSpace))
-            underTest.startDownload(TransferTriggerEvent.StartDownloadNode(nodes))
+            stubStartTransfers(flowOf(MultiTransferEvent.InsufficientSpace))
+            underTest.startTransfer(TransferTriggerEvent.StartDownloadNode(nodes))
             assertCurrentEventIsEqualTo(StartDownloadTransferEvent.Message.NotSufficientSpace)
         }
 
@@ -268,31 +283,31 @@ class StartDownloadComponentViewModelTest {
         startDownloadTransferEvent: StartDownloadTransferEvent,
     ) = runTest {
         commonStub()
-        stubStartDownload(flowOf(multiTransferEvent))
-        underTest.startDownload(startDownloadEvent)
+        stubStartTransfers(flowOf(multiTransferEvent))
+        underTest.startTransfer(startDownloadEvent)
         assertCurrentEventIsEqualTo(startDownloadTransferEvent)
     }
 
     @ParameterizedTest
-    @MethodSource("provideStartEvents")
+    @MethodSource("provideStartDownloadEvents")
     fun `test that ConfirmLargeDownload is emitted when a large download is started`(
-        startEvent: TransferTriggerEvent,
+        startEvent: TransferTriggerEvent.DownloadTriggerEvent,
     ) = runTest {
         commonStub()
         whenever(isAskBeforeLargeDownloadsSettingUseCase()).thenReturn(true)
         whenever(totalFileSizeOfNodesUseCase(any())).thenReturn(TransfersConstants.CONFIRM_SIZE_MIN_BYTES + 1)
         val size = "x MB"
         whenever(fileSizeStringMapper(any())).thenReturn(size)
-        underTest.startDownload(startEvent)
+        underTest.startTransfer(startEvent)
         assertCurrentEventIsEqualTo(
             StartDownloadTransferEvent.ConfirmLargeDownload(size, startEvent)
         )
     }
 
     @ParameterizedTest
-    @MethodSource("provideStartEvents")
+    @MethodSource("provideStartDownloadEvents")
     fun `test that setAskBeforeLargeDownloadsSettingUseCase is invoked when specified in start download`(
-        startEvent: TransferTriggerEvent,
+        startEvent: TransferTriggerEvent.DownloadTriggerEvent,
     ) = runTest {
         commonStub()
         underTest.startDownloadWithoutConfirmation(startEvent, true)
@@ -300,9 +315,9 @@ class StartDownloadComponentViewModelTest {
     }
 
     @ParameterizedTest
-    @MethodSource("provideStartEvents")
+    @MethodSource("provideStartDownloadEvents")
     fun `test that setAskBeforeLargeDownloadsSettingUseCase is not invoked when not specified in start download`(
-        startEvent: TransferTriggerEvent,
+        startEvent: TransferTriggerEvent.DownloadTriggerEvent,
     ) = runTest {
         commonStub()
         underTest.startDownloadWithoutConfirmation(startEvent, false)
@@ -365,7 +380,7 @@ class StartDownloadComponentViewModelTest {
     fun `test that finish downloading event is emitted when monitorActiveTransferFinishedUseCase emits a value and transferTriggerEvent is StartDownloadNode`() =
         runTest {
             setup()
-            underTest.startDownload(TransferTriggerEvent.StartDownloadNode(listOf(mock()))) //to set lastTriggerEvent to StartDownloadNode
+            underTest.startTransfer(TransferTriggerEvent.StartDownloadNode(listOf(mock()))) //to set lastTriggerEvent to StartDownloadNode
             underTest.onResume(mock())
             underTest.uiState.test {
                 val finished = 2
@@ -393,11 +408,19 @@ class StartDownloadComponentViewModelTest {
         ),
     )
 
-    private fun provideStartEvents() = listOf(
+    private fun provideStartDownloadEvents() = listOf(
         TransferTriggerEvent.StartDownloadNode(nodes),
         TransferTriggerEvent.StartDownloadForOffline(node),
         TransferTriggerEvent.StartDownloadForPreview(node),
+
+        )
+
+    private fun provideStartChatUploadEvents() = listOf(
+        TransferTriggerEvent.StartChatUpload.Files(CHAT_ID, listOf(chatUri)),
     )
+
+    private fun provideStartEvents() = provideStartDownloadEvents() +
+            provideStartChatUploadEvents()
 
     private fun assertCurrentEventIsEqualTo(event: StartDownloadTransferEvent) {
         assertThat(underTest.uiState.value.oneOffViewEvent)
@@ -417,12 +440,17 @@ class StartDownloadComponentViewModelTest {
         whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(totalFileSizeOfNodesUseCase(any())).thenReturn(1)
         whenever(shouldAskDownloadDestinationUseCase()).thenReturn(false)
-        stubStartDownload(
+        stubStartTransfers(
             flowOf(
                 mock<MultiTransferEvent.SingleTransferEvent> {
                     on { scanningFinished } doReturn true
                 })
         )
+    }
+
+    private fun stubStartTransfers(flow: Flow<MultiTransferEvent>) {
+        stubStartDownload(flow)
+        stubStartChatUpload(flow)
     }
 
     private fun stubStartDownload(flow: Flow<MultiTransferEvent>) {
@@ -435,9 +463,15 @@ class StartDownloadComponentViewModelTest {
         ).thenReturn(flow)
     }
 
+    private fun stubStartChatUpload(flow: Flow<MultiTransferEvent>) {
+        whenever(sendChatAttachmentsUseCase(any(), any(), anyOrNull())).thenReturn(flow)
+    }
+
     companion object {
         private const val NODE_HANDLE = 10L
         private const val PARENT_NODE_HANDLE = 12L
+        private const val CHAT_ID = 20L
+        private val chatUri = mock<Uri>()
         private val nodeId = NodeId(NODE_HANDLE)
         private val parentId = NodeId(PARENT_NODE_HANDLE)
         private const val destination = "/destination/"

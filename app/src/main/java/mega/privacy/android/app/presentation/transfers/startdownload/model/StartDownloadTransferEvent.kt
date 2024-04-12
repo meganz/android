@@ -40,7 +40,7 @@ sealed interface StartDownloadTransferEvent {
      */
     data class ConfirmLargeDownload(
         val sizeString: String,
-        val transferTriggerEvent: TransferTriggerEvent,
+        val transferTriggerEvent: TransferTriggerEvent.DownloadTriggerEvent,
     ) : StartDownloadTransferEvent
 
     /**

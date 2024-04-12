@@ -110,7 +110,6 @@ import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachContactsUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetChatFromContactMessagesUseCase
-import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendGiphyMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
@@ -280,7 +279,6 @@ internal class ChatViewModelTest {
     private val monitorJoiningChatUseCase = mock<MonitorJoiningChatUseCase>()
     private val monitorLeavingChatUseCase = mock<MonitorLeavingChatUseCase>()
     private val sendLocationMessageUseCase = mock<SendLocationMessageUseCase>()
-    private val sendChatAttachmentsUseCase = mock<SendChatAttachmentsUseCase>()
     private val monitorChatPendingChangesUseCase = mock<MonitorChatPendingChangesUseCase> {
         on { invoke(any()) } doReturn emptyFlow()
     }
@@ -357,7 +355,6 @@ internal class ChatViewModelTest {
             closeChatPreviewUseCase,
             createNewImageUriUseCase,
             sendLocationMessageUseCase,
-            sendChatAttachmentsUseCase,
             addReactionUseCase,
             getChatMessageUseCase,
             deleteReactionUseCase,
@@ -467,7 +464,6 @@ internal class ChatViewModelTest {
             monitorLeavingChatUseCase = monitorLeavingChatUseCase,
             applicationScope = CoroutineScope(testDispatcher),
             sendLocationMessageUseCase = sendLocationMessageUseCase,
-            sendChatAttachmentsUseCase = sendChatAttachmentsUseCase,
             monitorChatPendingChangesUseCase = monitorChatPendingChangesUseCase,
             addReactionUseCase = addReactionUseCase,
             getChatMessageUseCase = getChatMessageUseCase,
@@ -2436,7 +2432,7 @@ internal class ChatViewModelTest {
     }
 
     @Test
-    fun `test that correct files are sent to SendChatAttachmentsUseCase when on attach files is invoked`() =
+    fun `test that correct state event is set when on attach files is invoked`() =
         runTest {
             initTestClass()
             val files = List(5) { index ->
@@ -2444,9 +2440,17 @@ internal class ChatViewModelTest {
                     on { toString() } doReturn "file$index"
                 }
             }
-            val expected = files.associate { it.toString() to null }
-            underTest.onAttachFiles(files)
-            verify(sendChatAttachmentsUseCase).invoke(chatId, expected, false)
+            underTest.state.test {
+                awaitItem() // Initial state doesn't matter
+                underTest.onAttachFiles(files)
+                val actual = awaitItem().downloadEvent
+                assertThat(actual).isInstanceOf(StateEventWithContentTriggered::class.java)
+                val content = (actual as StateEventWithContentTriggered).content
+                assertThat(content)
+                    .isInstanceOf(TransferTriggerEvent.StartChatUpload.Files::class.java)
+                assertThat((content as TransferTriggerEvent.StartChatUpload.Files).uris)
+                    .isEqualTo(files)
+            }
         }
 
     @Test
@@ -3024,6 +3028,7 @@ internal class ChatViewModelTest {
             whenever(recordAudioUseCase(destination)) doReturn flow {
                 awaitCancellation()
             }
+            initTestClass()
         }
 
         @AfterEach
@@ -3047,11 +3052,20 @@ internal class ChatViewModelTest {
             }
 
         @Test
-        fun `test that recorded audio is sent when VoiceClipRecordEvent Finish event is received`() =
+        fun `test that correct state event is set when VoiceClipRecordEvent Finish event is received`() =
             runTest {
                 underTest.onVoiceClipRecordEvent(VoiceClipRecordEvent.Start)
-                underTest.onVoiceClipRecordEvent(VoiceClipRecordEvent.Finish)
-                verify(sendChatAttachmentsUseCase).invoke(chatId, mapOf(path to null), true)
+                underTest.state.test {
+                    awaitItem() // Initial state doesn't matter
+                    underTest.onVoiceClipRecordEvent(VoiceClipRecordEvent.Finish)
+                    val actual = awaitItem().downloadEvent
+                    assertThat(actual).isInstanceOf(StateEventWithContentTriggered::class.java)
+                    val content = (actual as StateEventWithContentTriggered).content
+                    assertThat(content)
+                        .isInstanceOf(TransferTriggerEvent.StartChatUpload.VoiceClip::class.java)
+                    assertThat((content as TransferTriggerEvent.StartChatUpload.VoiceClip).file)
+                        .isEqualTo(destination)
+                }
             }
     }
 

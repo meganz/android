@@ -54,7 +54,7 @@ data class FileLinkState(
     val jobInProgressState: FileLinkJobInProgressState? = FileLinkJobInProgressState.InitialLoading,
     val openFile: StateEventWithContent<Intent> = consumed(),
     val downloadFile: StateEventWithContent<MegaNode> = consumed(),
-    val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
+    val downloadEvent: StateEventWithContent<TransferTriggerEvent.DownloadTriggerEvent> = consumed(),
     val errorMessage: StateEventWithContent<Int> = consumed(),
     val overQuotaError: StateEventWithContent<StorageState> = consumed(),
     val foreignNodeError: StateEvent = consumed,

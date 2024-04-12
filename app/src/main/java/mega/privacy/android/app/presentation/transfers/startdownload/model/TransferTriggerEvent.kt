@@ -1,6 +1,10 @@
 package mega.privacy.android.app.presentation.transfers.startdownload.model
 
+import android.net.Uri
+import androidx.core.net.toUri
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.transfer.TransferType
+import java.io.File
 
 /**
  * Event to trigger the start of a transfer
@@ -8,14 +12,73 @@ import mega.privacy.android.domain.entity.node.TypedNode
 sealed interface TransferTriggerEvent {
 
     /**
-     * nodes to be transferred
+     * Type of the transfer
      */
-    val nodes: List<TypedNode>
+    val type: TransferType
 
     /**
-     * true if this transfer is a high priority transfer, false otherwise
+     * Event to start uploading to the chat
      */
-    val isHighPriority: Boolean
+    sealed interface StartChatUpload : TransferTriggerEvent {
+        override val type: TransferType
+            get() = TransferType.CHAT_UPLOAD
+
+        /**
+         * The id of the chat where these files will be attached
+         */
+        val chatId: Long
+
+        /**
+         * List of files to be uploaded
+         */
+        val uris: List<Uri>
+
+        /**
+         * Whether this upload is a voice clip
+         */
+        val isVoiceClip: Boolean
+
+        /**
+         * Upload files to chat
+         */
+        data class Files(
+            override val chatId: Long,
+            override val uris: List<Uri>,
+        ) : StartChatUpload {
+            override val isVoiceClip = false
+        }
+
+        /**
+         * Upload voice clip to chat
+         * @param file the voice clip to be uploaded
+         *
+         */
+        data class VoiceClip(
+            override val chatId: Long,
+            val file: File,
+        ) : StartChatUpload {
+            override val uris get() = listOf(file.toUri())
+            override val isVoiceClip = true
+        }
+    }
+
+    /**
+     * Event to start downloading a list of nodes
+     */
+    sealed interface DownloadTriggerEvent : TransferTriggerEvent {
+        override val type: TransferType
+            get() = TransferType.DOWNLOAD
+
+        /**
+         * nodes to be transferred
+         */
+        val nodes: List<TypedNode>
+
+        /**
+         * true if this transfer is a high priority transfer, false otherwise
+         */
+        val isHighPriority: Boolean
+    }
 
 
     /**
@@ -25,7 +88,7 @@ sealed interface TransferTriggerEvent {
     data class StartDownloadForOffline(
         val node: TypedNode?,
         override val isHighPriority: Boolean = false,
-    ) : TransferTriggerEvent {
+    ) : DownloadTriggerEvent {
         override val nodes = node?.let { listOf(node) } ?: emptyList()
     }
 
@@ -37,7 +100,7 @@ sealed interface TransferTriggerEvent {
     data class StartDownloadNode(
         override val nodes: List<TypedNode>,
         override val isHighPriority: Boolean = false,
-    ) : TransferTriggerEvent
+    ) : DownloadTriggerEvent
 
     /**
      * Event to start downloading node for preview
@@ -46,7 +109,7 @@ sealed interface TransferTriggerEvent {
      */
     data class StartDownloadForPreview(
         val node: TypedNode?,
-    ) : TransferTriggerEvent {
+    ) : DownloadTriggerEvent {
         override val nodes = node?.let { listOf(node) } ?: emptyList()
         override val isHighPriority: Boolean = true
     }

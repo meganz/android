@@ -60,7 +60,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
-import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.chat.CreateChatException
@@ -103,7 +102,6 @@ import mega.privacy.android.domain.usecase.chat.link.MonitorJoiningChatUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachContactsUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.GetChatFromContactMessagesUseCase
-import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendGiphyMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendLocationMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
@@ -140,6 +138,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.mobile.analytics.event.ChatConversationUnmuteMenuToolbarEvent
 import timber.log.Timber
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Collections
 import java.util.Date
@@ -226,7 +225,6 @@ class ChatViewModel @Inject constructor(
     private val monitorJoiningChatUseCase: MonitorJoiningChatUseCase,
     private val monitorLeavingChatUseCase: MonitorLeavingChatUseCase,
     private val sendLocationMessageUseCase: SendLocationMessageUseCase,
-    private val sendChatAttachmentsUseCase: SendChatAttachmentsUseCase,
     private val monitorChatPendingChangesUseCase: MonitorChatPendingChangesUseCase,
     private val addReactionUseCase: AddReactionUseCase,
     private val getChatMessageUseCase: GetChatMessageUseCase,
@@ -1182,18 +1180,26 @@ class ChatViewModel @Inject constructor(
     /**
      * Attaches files.
      */
-    fun onAttachFiles(files: List<Uri>) =
-        onAttachFiles(files.map { it.toString() }, false)
+    fun onAttachFiles(files: List<Uri>) {
+        _state.update {
+            it.copy(
+                downloadEvent = triggered(
+                    TransferTriggerEvent.StartChatUpload.Files(chatId, files)
+                )
+            )
+        }
+    }
 
-    private fun onAttachFiles(files: List<String>, isVoiceClip: Boolean) {
-        viewModelScope.launch {
-            sendChatAttachmentsUseCase(chatId, files.associateWith { null }, isVoiceClip)
-                .catch { Timber.e(it) }
-                .collect {
-                    if (it is MultiTransferEvent.TransferNotStarted<*>) {
-                        Timber.e(it.exception, "${it.item} not attached")
-                    }
-                }
+    /**
+     * Attaches voice clip.
+     */
+    private fun onAttachVoiceClip(file: File) {
+        _state.update {
+            it.copy(
+                downloadEvent = triggered(
+                    TransferTriggerEvent.StartChatUpload.VoiceClip(chatId, file)
+                )
+            )
         }
     }
 
@@ -1620,7 +1626,7 @@ class ChatViewModel @Inject constructor(
                 }
                 recordAudioJob?.invokeOnCompletion {
                     if (it == StopAndSendVoiceClip) {
-                        onAttachFiles(listOf(voiceClipFile.toString()), true)
+                        onAttachVoiceClip(voiceClipFile)
                     } else {
                         viewModelScope.launch {
                             deleteFileUseCase(voiceClipFile.toString())

@@ -91,7 +91,7 @@ internal fun StartDownloadComponent(
         rememberPermissionState(Manifest.permission.WRITE_EXTERNAL_STORAGE) { granted ->
             if (granted) {
                 eventWithoutWritePermission?.let {
-                    viewModel.startDownload(it)
+                    viewModel.startTransfer(it)
                 }
             }
             eventWithoutWritePermission = null
@@ -125,7 +125,7 @@ internal fun StartDownloadComponent(
                 eventWithoutWritePermission = it
                 mediaReadPermission.launchPermissionRequest()
             } else {
-                viewModel.startDownload(it)
+                viewModel.startTransfer(it)
             }
         })
     StartDownloadComponent(
@@ -186,7 +186,7 @@ private fun StartDownloadComponent(
     uiState: StartDownloadTransferViewState,
     onOneOffEventConsumed: () -> Unit,
     onCancelledConfirmed: () -> Unit,
-    onDownloadConfirmed: (TransferTriggerEvent, saveDoNotAskAgain: Boolean) -> Unit,
+    onDownloadConfirmed: (TransferTriggerEvent.DownloadTriggerEvent, saveDoNotAskAgain: Boolean) -> Unit,
     onDestinationSet: (TransferTriggerEvent.StartDownloadNode, destination: Uri) -> Unit,
     onPromptSaveDestinationConsumed: () -> Unit,
     onSaveDestination: (String) -> Unit,

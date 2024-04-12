@@ -71,7 +71,7 @@ data class FolderLinkState(
     val finishActivity: Boolean = false,
     val openFile: StateEventWithContent<Intent> = consumed(),
     val downloadNodes: StateEventWithContent<List<MegaNode>> = consumed(),
-    val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
+    val downloadEvent: StateEventWithContent<TransferTriggerEvent.DownloadTriggerEvent> = consumed(),
     val importNode: NodeUIItem<TypedNode>? = null,
     val selectImportLocation: StateEvent = consumed,
     val snackbarMessageContent: StateEventWithContent<String> = consumed(),

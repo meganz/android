@@ -33,6 +33,7 @@ import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.usecase.SetStorageDownloadAskAlwaysUseCase
 import mega.privacy.android.domain.usecase.SetStorageDownloadLocationUseCase
+import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
@@ -75,6 +76,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
     private val setStorageDownloadAskAlwaysUseCase: SetStorageDownloadAskAlwaysUseCase,
     private val setStorageDownloadLocationUseCase: SetStorageDownloadLocationUseCase,
     private val monitorActiveTransferFinishedUseCase: MonitorActiveTransferFinishedUseCase,
+    private val sendChatAttachmentsUseCase: SendChatAttachmentsUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private var currentInProgressJob: Job? = null
@@ -92,21 +94,33 @@ internal class StartDownloadComponentViewModel @Inject constructor(
     }
 
     /**
-     * It starts downloading the related nodes, asking for confirmation in case of large transfers if corresponds
+     * It starts the triggered transfer, asking for confirmation in case of large transfers if corresponds
      * @param transferTriggerEvent the event that triggered this download
      */
-    fun startDownload(
+    fun startTransfer(
         transferTriggerEvent: TransferTriggerEvent,
     ) {
-        if (checkAndHandleDeviceIsNotConnected()) {
-            return
-        }
         viewModelScope.launch {
-            if (transferTriggerEvent.nodes.isEmpty()) {
-                Timber.e("Node in $transferTriggerEvent must exist")
-                _uiState.updateEventAndClearProgress(StartDownloadTransferEvent.Message.TransferCancelled)
-            } else if (!checkAndHandleNeedConfirmationForLargeDownload(transferTriggerEvent)) {
-                startDownloadWithoutConfirmation(transferTriggerEvent)
+            when (transferTriggerEvent) {
+                is TransferTriggerEvent.DownloadTriggerEvent -> {
+                    if (checkAndHandleDeviceIsNotConnected()) {
+                        return@launch
+                    }
+                    if (transferTriggerEvent.nodes.isEmpty()) {
+                        Timber.e("Node in $transferTriggerEvent must exist")
+                        _uiState.updateEventAndClearProgress(StartDownloadTransferEvent.Message.TransferCancelled)
+                    } else if (!checkAndHandleNeedConfirmationForLargeDownload(transferTriggerEvent)) {
+                        startDownloadWithoutConfirmation(transferTriggerEvent)
+                    }
+                }
+
+                is TransferTriggerEvent.StartChatUpload -> {
+                    startChatUploads(
+                        chatId = transferTriggerEvent.chatId,
+                        uris = transferTriggerEvent.uris,
+                        isVoiceClip = transferTriggerEvent.isVoiceClip
+                    )
+                }
             }
         }
     }
@@ -117,7 +131,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
      * @param saveDoNotAskAgainForLargeTransfers if true, it will save in settings to don't ask again for confirmation on large files
      */
     fun startDownloadWithoutConfirmation(
-        transferTriggerEvent: TransferTriggerEvent,
+        transferTriggerEvent: TransferTriggerEvent.DownloadTriggerEvent,
         saveDoNotAskAgainForLargeTransfers: Boolean = false,
     ) {
         if (saveDoNotAskAgainForLargeTransfers) {
@@ -331,6 +345,29 @@ internal class StartDownloadComponentViewModel @Inject constructor(
         )
     }
 
+    private suspend fun startChatUploads(
+        chatId: Long,
+        uris: List<Uri>,
+        isVoiceClip: Boolean = false,
+    ) {
+        clearActiveTransfersIfFinishedUseCase(TransferType.CHAT_UPLOAD)
+        sendChatAttachmentsUseCase(
+            chatId, uris.map { it.toString() }.associateWith { null }, isVoiceClip
+        ).collect {
+            when (it) {
+                is MultiTransferEvent.TransferNotStarted<*> -> {
+                    Timber.e(it.exception, "Error starting chat upload")
+                    StartDownloadTransferEvent.Message.TransferCancelled
+                }
+
+                MultiTransferEvent.InsufficientSpace -> StartDownloadTransferEvent.Message.NotSufficientSpace
+                is MultiTransferEvent.SingleTransferEvent -> null
+            }?.let {
+                _uiState.updateEventAndClearProgress(it)
+            }
+        }
+    }
+
     /**
      * Some events need to be consumed to don't be missed or fired more than once
      */
@@ -400,7 +437,7 @@ internal class StartDownloadComponentViewModel @Inject constructor(
      *
      * @return true if the state has been handled to ask for confirmation, so no extra action should be done
      */
-    private suspend fun checkAndHandleNeedConfirmationForLargeDownload(transferTriggerEvent: TransferTriggerEvent): Boolean {
+    private suspend fun checkAndHandleNeedConfirmationForLargeDownload(transferTriggerEvent: TransferTriggerEvent.DownloadTriggerEvent): Boolean {
         if (isAskBeforeLargeDownloadsSettingUseCase()) {
             val size = totalFileSizeOfNodesUseCase(transferTriggerEvent.nodes)
             if (size > TransfersConstants.CONFIRM_SIZE_MIN_BYTES) {
