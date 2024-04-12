@@ -11,10 +11,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
-import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ResetSdkLogger
 import mega.privacy.android.domain.usecase.SetChatLogsEnabled
 import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
+import mega.privacy.android.domain.usecase.logging.AreSdkLogsEnabledUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -27,7 +27,7 @@ import javax.inject.Inject
  * @property coroutineScope
  * @constructor
  *
- * @param areSdkLogsEnabled
+ * @param areSdkLogsEnabledUseCase
  * @param areChatLogsEnabled
  */
 class LegacyLoggingSettingsFacade @Inject constructor(
@@ -35,13 +35,13 @@ class LegacyLoggingSettingsFacade @Inject constructor(
     private val setChatLogsEnabled: SetChatLogsEnabled,
     private val resetSdkLogger: ResetSdkLogger,
     @ApplicationScope private val coroutineScope: CoroutineScope,
-    areSdkLogsEnabled: AreSdkLogsEnabled,
+    areSdkLogsEnabledUseCase: AreSdkLogsEnabledUseCase,
     areChatLogsEnabled: AreChatLogsEnabled,
 ) : LegacyLoggingSettings {
 
     @OptIn(DelicateCoroutinesApi::class)
     private val sdkLogStatus =
-        areSdkLogsEnabled().stateIn(GlobalScope, SharingStarted.Eagerly, false)
+        areSdkLogsEnabledUseCase().stateIn(GlobalScope, SharingStarted.Eagerly, false)
 
     @OptIn(DelicateCoroutinesApi::class)
     private val chatLogStatus =

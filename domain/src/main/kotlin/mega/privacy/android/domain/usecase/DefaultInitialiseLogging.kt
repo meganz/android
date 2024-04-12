@@ -8,19 +8,20 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.repository.LoggingRepository
+import mega.privacy.android.domain.usecase.logging.AreSdkLogsEnabledUseCase
 import javax.inject.Inject
 
 /**
  * Default initialise logging
  *
  * @property loggingRepository
- * @property areSdkLogsEnabled
+ * @property areSdkLogsEnabledUseCase
  * @property areChatLogsEnabled
  * @property coroutineDispatcher
  */
 internal class DefaultInitialiseLogging @Inject constructor(
     private val loggingRepository: LoggingRepository,
-    private val areSdkLogsEnabled: AreSdkLogsEnabled,
+    private val areSdkLogsEnabledUseCase: AreSdkLogsEnabledUseCase,
     private val areChatLogsEnabled: AreChatLogsEnabled,
     private val coroutineDispatcher: CoroutineDispatcher,
 ) : InitialiseLogging {
@@ -34,7 +35,7 @@ internal class DefaultInitialiseLogging @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun monitorSdkLoggingSetting(overrideEnabledSettings: Boolean) {
-        areSdkLogsEnabled()
+        areSdkLogsEnabledUseCase()
             .distinctUntilChanged()
             .flatMapLatest { enabled ->
                 if (enabled || overrideEnabledSettings) loggingRepository.getSdkLoggingFlow() else emptyFlow()

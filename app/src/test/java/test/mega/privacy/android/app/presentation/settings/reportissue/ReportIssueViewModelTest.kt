@@ -23,10 +23,10 @@ import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIs
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
-import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.GetSupportEmailUseCase
 import mega.privacy.android.domain.usecase.SubmitIssueUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.logging.AreSdkLogsEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -53,7 +53,7 @@ class ReportIssueViewModelTest {
     private lateinit var underTest: ReportIssueViewModel
 
     private val submitIssueUseCase = mock<SubmitIssueUseCase>()
-    private val areSdkLogsEnabled = mock<AreSdkLogsEnabled>()
+    private val areSdkLogsEnabledUseCase = mock<AreSdkLogsEnabledUseCase>()
     private val areChatLogsEnabled = mock<AreChatLogsEnabled>()
 
     private var savedStateHandle = SavedStateHandle(mapOf())
@@ -70,7 +70,7 @@ class ReportIssueViewModelTest {
         monitorConnectivityUseCase.stub {
             on { invoke() } doReturn true.asHotFlow()
         }
-        areSdkLogsEnabled.stub {
+        areSdkLogsEnabledUseCase.stub {
             on { invoke() } doReturn false.asHotFlow()
         }
         areChatLogsEnabled.stub {
@@ -85,7 +85,7 @@ class ReportIssueViewModelTest {
     private fun initViewModel() {
         underTest = ReportIssueViewModel(
             submitIssueUseCase = submitIssueUseCase,
-            areSdkLogsEnabled = areSdkLogsEnabled,
+            areSdkLogsEnabledUseCase = areSdkLogsEnabledUseCase,
             areChatLogsEnabled = areChatLogsEnabled,
             savedStateHandle = savedStateHandle,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
@@ -99,7 +99,7 @@ class ReportIssueViewModelTest {
         savedStateHandle = SavedStateHandle(mapOf())
         reset(
             submitIssueUseCase,
-            areSdkLogsEnabled,
+            areSdkLogsEnabledUseCase,
             areChatLogsEnabled,
             monitorConnectivityUseCase,
             getSupportEmail,
@@ -141,7 +141,7 @@ class ReportIssueViewModelTest {
 
     @Test
     fun `test that when logging is enabled include logs toggle is shown`() = runTest {
-        whenever(areSdkLogsEnabled()).thenReturn(flowOf(true))
+        whenever(areSdkLogsEnabledUseCase()).thenReturn(flowOf(true))
         whenever(areChatLogsEnabled()).thenReturn(flowOf(true))
 
         initViewModel()
@@ -154,7 +154,7 @@ class ReportIssueViewModelTest {
 
     @Test
     fun `test that include logs is set to true if logging is enabled`() = runTest {
-        whenever(areSdkLogsEnabled()).thenReturn(flowOf(true))
+        whenever(areSdkLogsEnabledUseCase()).thenReturn(flowOf(true))
         whenever(areChatLogsEnabled()).thenReturn(flowOf(true))
 
         initViewModel()
@@ -179,7 +179,7 @@ class ReportIssueViewModelTest {
 
     @Test
     fun `test that include logs is updated if new boolean is provided`() = runTest {
-        whenever(areSdkLogsEnabled()).thenReturn(flowOf(true))
+        whenever(areSdkLogsEnabledUseCase()).thenReturn(flowOf(true))
         whenever(areChatLogsEnabled()).thenReturn(flowOf(true))
 
         initViewModel()
@@ -379,7 +379,7 @@ class ReportIssueViewModelTest {
                 onBlocking { invoke(AppFeatures.PermanentLogging) } doReturn true
             }
 
-            areSdkLogsEnabled.stub {
+            areSdkLogsEnabledUseCase.stub {
                 on { invoke() } doReturn flowOf(false)
             }
             areChatLogsEnabled.stub {

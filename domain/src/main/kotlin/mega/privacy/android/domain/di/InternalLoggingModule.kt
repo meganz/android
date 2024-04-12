@@ -10,7 +10,6 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.SdkLogger
 import mega.privacy.android.domain.repository.LoggingRepository
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
-import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.CreateChatLogEntry
 import mega.privacy.android.domain.usecase.CreateLogEntry
 import mega.privacy.android.domain.usecase.CreateSdkLogEntry
@@ -20,6 +19,7 @@ import mega.privacy.android.domain.usecase.DefaultInitialiseLogging
 import mega.privacy.android.domain.usecase.EnableLogAllToConsole
 import mega.privacy.android.domain.usecase.InitialiseLogging
 import mega.privacy.android.domain.usecase.ResetSdkLogger
+import mega.privacy.android.domain.usecase.logging.AreSdkLogsEnabledUseCase
 
 /**
  * Logging module
@@ -50,12 +50,12 @@ internal abstract class InternalLoggingModule {
         @Provides
         fun provideInitialiseLogging(
             loggingRepository: LoggingRepository,
-            areSdkLogsEnabled: AreSdkLogsEnabled,
+            areSdkLogsEnabledUseCase: AreSdkLogsEnabledUseCase,
             areChatLogsEnabled: AreChatLogsEnabled,
             @IoDispatcher coroutineDispatcher: CoroutineDispatcher,
         ): InitialiseLogging = DefaultInitialiseLogging(
             loggingRepository = loggingRepository,
-            areSdkLogsEnabled = areSdkLogsEnabled,
+            areSdkLogsEnabledUseCase = areSdkLogsEnabledUseCase,
             areChatLogsEnabled = areChatLogsEnabled,
             coroutineDispatcher = coroutineDispatcher,
         )

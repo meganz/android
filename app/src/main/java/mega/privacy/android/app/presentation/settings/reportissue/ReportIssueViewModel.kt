@@ -26,10 +26,10 @@ import mega.privacy.android.app.presentation.settings.reportissue.model.ReportIs
 import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIssueResult
 import mega.privacy.android.domain.entity.SubmitIssueRequest
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
-import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.GetSupportEmailUseCase
 import mega.privacy.android.domain.usecase.SubmitIssueUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.logging.AreSdkLogsEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -37,7 +37,7 @@ import javax.inject.Inject
 /**
  * Report issue view model
  *
- * @property areSdkLogsEnabled
+ * @property areSdkLogsEnabledUseCase
  * @property areChatLogsEnabled
  * @property submitIssueUseCase
  *
@@ -48,7 +48,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ReportIssueViewModel @Inject constructor(
-    private val areSdkLogsEnabled: AreSdkLogsEnabled,
+    private val areSdkLogsEnabledUseCase: AreSdkLogsEnabledUseCase,
     private val areChatLogsEnabled: AreChatLogsEnabled,
     private val submitIssueUseCase: SubmitIssueUseCase,
     private val getSupportEmailUseCase: GetSupportEmailUseCase,
@@ -116,7 +116,7 @@ class ReportIssueViewModel @Inject constructor(
                 includeLogs.update { _ -> true }
             } else {
                 combine(
-                    areSdkLogsEnabled(),
+                    areSdkLogsEnabledUseCase(),
                     areChatLogsEnabled()
                 ) { sdk, chat -> sdk || chat }
                     .collectLatest {

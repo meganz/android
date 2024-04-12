@@ -13,7 +13,6 @@ import mega.privacy.android.app.di.settings.startscreen.TempStartScreenUseCaseSt
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
-import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.CanDeleteAccount
 import mega.privacy.android.domain.usecase.FetchAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.GetChatImageQuality
@@ -32,6 +31,7 @@ import mega.privacy.android.domain.usecase.SetChatLogsEnabled
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
+import mega.privacy.android.domain.usecase.logging.AreSdkLogsEnabledUseCase
 import mega.privacy.android.domain.usecase.meeting.GetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.meeting.SetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
@@ -75,7 +75,7 @@ object TestSettingsModule {
         mock()
 
     @Provides
-    fun provideIsLoggingEnabled(): AreSdkLogsEnabled =
+    fun provideIsLoggingEnabled(): AreSdkLogsEnabledUseCase =
         mock { on { invoke() }.thenReturn(flowOf(true)) }
 
     @Provides
