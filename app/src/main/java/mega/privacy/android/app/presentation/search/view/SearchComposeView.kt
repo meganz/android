@@ -86,17 +86,13 @@ fun SearchComposeView(
     fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
 ) {
-    var resetScroll by rememberSaveable {
-        mutableStateOf(false)
-    }
-
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
     val scaffoldState = rememberScaffoldState()
     val snackBarHostState = remember { SnackbarHostState() }
     var topBarPadding by remember { mutableStateOf(0.dp) }
 
-    LaunchedEffect(key1 = resetScroll) {
+    LaunchedEffect(key1 = state.resetScroll) {
         listState.scrollToItem(0)
         gridState.scrollToItem(0)
     }
@@ -108,7 +104,6 @@ fun SearchComposeView(
     searchQuery.useDebounce(
         onChange = {
             updateSearchQuery(it)
-            resetScroll = !resetScroll
         },
     )
 
@@ -154,13 +149,12 @@ fun SearchComposeView(
     ) { padding ->
         Column(modifier = Modifier.padding(top = topBarPadding)) {
             if (state.nodeSourceType == NodeSourceType.CLOUD_DRIVE || state.nodeSourceType == NodeSourceType.HOME) {
-                FilterChipsView(state, onFilterClicked = {
-                    resetScroll = !resetScroll
-                    onFilterClicked(it)
-                }, updateFilter = {
-                    resetScroll = !resetScroll
-                    updateFilter(it)
-                }, trackAnalytics)
+                FilterChipsView(
+                    state = state,
+                    onFilterClicked = onFilterClicked,
+                    updateFilter = updateFilter,
+                    trackAnalytics = trackAnalytics
+                )
             }
             if (state.isSearching) {
                 LoadingStateView(
@@ -245,7 +239,7 @@ private fun PreviewSearchComposeView() {
             hiltViewModel()
         ),
         clearSelection = {},
-        fileTypeIconMapper = FileTypeIconMapper()
+        fileTypeIconMapper = FileTypeIconMapper(),
     )
 }
 

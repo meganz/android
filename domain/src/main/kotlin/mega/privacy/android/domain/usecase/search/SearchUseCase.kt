@@ -50,14 +50,12 @@ class SearchUseCase @Inject constructor(
             query.isEmpty() && parentHandle == invalidNodeHandle && searchTarget == SearchTarget.INCOMING_SHARE -> searchRepository.getInShares()
             query.isEmpty() && parentHandle == invalidNodeHandle && searchTarget == SearchTarget.OUTGOING_SHARE -> searchRepository.getOutShares()
             query.isEmpty() && parentHandle == invalidNodeHandle && searchTarget == SearchTarget.LINKS_SHARE -> searchRepository.getPublicLinks()
-            query.isEmpty() -> searchRepository.getChildren(
+            query.isEmpty() && searchCategory == SearchCategory.ALL && modificationDate == null && creationDate == null -> searchRepository.getChildren(
                 nodeId = getSearchParentNode(nodeSourceType, parentHandle, invalidNodeHandle),
                 searchCategory = searchCategory,
                 query = query,
                 searchTarget = searchTarget,
                 order = getCloudSortOrder(),
-                modificationDate = modificationDate,
-                creationDate = creationDate,
             )
 
             else -> searchRepository.search(
