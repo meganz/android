@@ -12,6 +12,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openCh
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFileLinkActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFolderLinkActivity
 import mega.privacy.android.core.ui.controls.chat.messages.ContactMessageContentView
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.FolderInfo
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -127,16 +128,19 @@ data class FolderLinkContent(
  * File link content
  *
  * @property node
+ * @property fileTypeIconMapper [FileTypeIconMapper]
  * @property link
  */
 data class FileLinkContent(
     val node: TypedFileNode,
+    val fileTypeIconMapper: FileTypeIconMapper,
     override val link: String,
 ) : LinkContent {
     @Composable
     override fun SubContentComposable(modifier: Modifier) {
         FileLinkMessageView(
             modifier = modifier,
+            fileTypeIconMapper = fileTypeIconMapper,
             linkContent = this,
         )
     }

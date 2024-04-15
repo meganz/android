@@ -14,9 +14,10 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
-import mega.privacy.android.app.presentation.node.model.mapper.getFileIconOutline
 import mega.privacy.android.core.ui.controls.chat.messages.ChatBubble
 import mega.privacy.android.core.ui.controls.chat.messages.RichLinkContentView
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.mapper.IconType
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.theme.MegaAppTheme
@@ -25,16 +26,24 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  * Folder link message view
  *
  * @param linkContent
+ * @param fileTypeIconMapper [FileTypeIconMapper]
  * @param modifier
  */
 @Composable
 fun FileLinkMessageView(
     linkContent: FileLinkContent,
+    fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
 ) {
     FileLinkMessageView(
         modifier = modifier,
-        fileIcon = painterResource(id = getFileIconOutline(linkContent.node)),
+        fileIcon = painterResource(
+            id =
+            fileTypeIconMapper(
+                fileExtension = linkContent.node.type.extension,
+                iconType = IconType.Outlined
+            )
+        ),
         fileName = linkContent.node.name,
         fileSize = linkContent.node.size,
         link = linkContent.link,

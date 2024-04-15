@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicLinkInformationUseCase
@@ -22,6 +23,7 @@ class ChatLinksMessageViewModel @Inject constructor(
     private val checkChatLinkUseCase: CheckChatLinkUseCase,
     private val getPublicLinkInformationUseCase: GetPublicLinkInformationUseCase,
     private val getPublicNodeUseCase: GetPublicNodeUseCase,
+    private val fileTypeIconMapper: FileTypeIconMapper
 ) : ViewModel() {
     // check link is expensive operation, so we cache it
     private val contactLinks = mutableMapOf<String, LinkContent>()
@@ -117,23 +119,26 @@ class ChatLinksMessageViewModel @Inject constructor(
      * Load file link info
      *
      * @param link Link
+     * @param fileTypeIconMapper [FileTypeIconMapper]
      * @return File link content
      */
-    suspend fun loadFileLinkInfo(link: String) = runCatching {
-        getLinkContentFromCache(link)
-            ?: getPublicNodeUseCase(link).let { node ->
-                FileLinkContent(
-                    node = node,
-                    link = link
-                ).also {
-                    mutex.withLock {
-                        contactLinks[link] = it
+    suspend fun loadFileLinkInfo(link: String) =
+        runCatching {
+            getLinkContentFromCache(link)
+                ?: getPublicNodeUseCase(link).let { node ->
+                    FileLinkContent(
+                        node = node,
+                        link = link,
+                        fileTypeIconMapper = fileTypeIconMapper
+                    ).also {
+                        mutex.withLock {
+                            contactLinks[link] = it
+                        }
                     }
                 }
-            }
-    }.onFailure {
-        Timber.e(it, "Failed to get file link info")
-    }.getOrNull()
+        }.onFailure {
+            Timber.e(it, "Failed to get file link info")
+        }.getOrNull()
 
     private suspend fun getLinkContentFromCache(link: String) = mutex.withLock {
         contactLinks[link]

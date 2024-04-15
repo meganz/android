@@ -8,6 +8,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.message.link.Cont
 import mega.privacy.android.app.presentation.meeting.chat.view.message.link.FileLinkContent
 import mega.privacy.android.app.presentation.meeting.chat.view.message.link.FolderLinkContent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.FolderInfo
 import mega.privacy.android.domain.entity.contacts.ContactLink
@@ -16,7 +17,6 @@ import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicLinkInformationUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -34,6 +34,7 @@ internal class ChatLinksMessageViewModelTest {
     private val checkChatLinkUseCase: CheckChatLinkUseCase = mock()
     private val getPublicLinkInformationUseCase: GetPublicLinkInformationUseCase = mock()
     private val getPublicNodeUseCase: GetPublicNodeUseCase = mock()
+    private val fileTypeIconMapper = FileTypeIconMapper()
 
     @BeforeEach
     fun resetMocks() {
@@ -41,7 +42,8 @@ internal class ChatLinksMessageViewModelTest {
             getContactFromLinkUseCase,
             checkChatLinkUseCase,
             getPublicLinkInformationUseCase,
-            getPublicNodeUseCase
+            getPublicNodeUseCase,
+            fileTypeIconMapper
         )
     }
 
@@ -144,6 +146,7 @@ internal class ChatLinksMessageViewModelTest {
             .isEqualTo(
                 FileLinkContent(
                     fileNode,
+                    fileTypeIconMapper,
                     link
                 )
             )
