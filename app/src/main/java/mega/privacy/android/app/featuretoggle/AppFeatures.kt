@@ -199,7 +199,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * Search implementation with dropdown chips
      */
-    DropdownChips("Search implementation with dropdown chips and bottom sheet", false),
+    DropdownChips("Search implementation with dropdown chips and bottom sheet", true),
 
     /**
      * To enable showing promo notifications in Notifications screen
