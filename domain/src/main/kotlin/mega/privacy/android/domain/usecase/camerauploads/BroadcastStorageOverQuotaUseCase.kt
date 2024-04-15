@@ -12,5 +12,6 @@ class BroadcastStorageOverQuotaUseCase @Inject constructor(
     /**
      * Invoke
      */
-    suspend operator fun invoke() = transferRepository.broadcastStorageOverQuota()
+    suspend operator fun invoke(isCurrentOverQuota: Boolean = true) =
+        transferRepository.broadcastStorageOverQuota(isCurrentOverQuota)
 }

@@ -2,12 +2,14 @@ package mega.privacy.android.domain.usecase.transfers.active
 
 import mega.privacy.android.domain.entity.transfer.DestinationUriAndSubFolders
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
 import mega.privacy.android.domain.entity.transfer.isVoiceClip
 import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
+import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.HandleAvailableOfflineEventUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.GetTransferDestinationUriUseCase
@@ -23,6 +25,7 @@ class HandleTransferEventUseCase @Inject internal constructor(
     private val transferRepository: TransferRepository,
     private val broadcastBusinessAccountExpiredUseCase: BroadcastBusinessAccountExpiredUseCase,
     private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
+    private val broadcastStorageOverQuotaUseCase: BroadcastStorageOverQuotaUseCase,
     private val handleAvailableOfflineEventUseCase: HandleAvailableOfflineEventUseCase,
     private val handleSDCardEventUseCase: HandleSDCardEventUseCase,
     private val getTransferDestinationUriUseCase: GetTransferDestinationUriUseCase,
@@ -35,6 +38,11 @@ class HandleTransferEventUseCase @Inject internal constructor(
     suspend operator fun invoke(event: TransferEvent) {
         if (event.transfer.isVoiceClip() || event.transfer.isBackgroundTransfer() || event.transfer.isStreamingTransfer) {
             return
+        }
+        if (event is TransferEvent.TransferStartEvent) {
+            // this can be a retried transfer after upgrading or deleting some files to make space, so we set the overquota to false and it will be set to true again if corresponds
+            broadcastTransferOverQuotaUseCase(false)
+            broadcastStorageOverQuotaUseCase(false)
         }
         val transferDestination: DestinationUriAndSubFolders? =
             if (event is TransferEvent.TransferStartEvent || event is TransferEvent.TransferFinishEvent) {
@@ -70,8 +78,12 @@ class HandleTransferEventUseCase @Inject internal constructor(
             }
 
             is TransferEvent.TransferTemporaryErrorEvent -> {
-                if (event.error is QuotaExceededMegaException && event.error.value != 0L) {
-                    broadcastTransferOverQuotaUseCase(true)
+                if (event.error is QuotaExceededMegaException) {
+                    if (event.transfer.transferType == TransferType.DOWNLOAD) {
+                        broadcastTransferOverQuotaUseCase(true)
+                    } else if (event.transfer.transferType.isUploadType()) {
+                        broadcastStorageOverQuotaUseCase()
+                    }
                 }
             }
         }

@@ -78,7 +78,7 @@ internal interface AppEventGateway {
      * Broadcast storage over quota
      *
      */
-    suspend fun broadcastStorageOverQuota()
+    suspend fun broadcastStorageOverQuota(isCurrentOverQuota: Boolean)
 
     /**
      * Monitors logout.

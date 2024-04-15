@@ -10,14 +10,17 @@ import mega.privacy.android.domain.exception.BusinessAccountExpiredMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
+import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.HandleAvailableOfflineEventUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.GetTransferDestinationUriUseCase
 import mega.privacy.android.domain.usecase.transfers.sd.HandleSDCardEventUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.KStubbing
 import org.mockito.kotlin.doReturn
@@ -39,6 +42,7 @@ class HandleTransferEventUseCaseTest {
     private val handleAvailableOfflineEventUseCase = mock<HandleAvailableOfflineEventUseCase>()
     private val handleSDCardEventUseCase = mock<HandleSDCardEventUseCase>()
     private val getTransferDestinationUriUseCase = mock<GetTransferDestinationUriUseCase>()
+    private val broadcastStorageOverQuotaUseCase = mock<BroadcastStorageOverQuotaUseCase>()
 
     @BeforeAll
     fun setUp() {
@@ -46,6 +50,7 @@ class HandleTransferEventUseCaseTest {
             transferRepository = transferRepository,
             broadcastBusinessAccountExpiredUseCase = broadcastBusinessAccountExpiredUseCase,
             broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
+            broadcastStorageOverQuotaUseCase = broadcastStorageOverQuotaUseCase,
             handleAvailableOfflineEventUseCase = handleAvailableOfflineEventUseCase,
             handleSDCardEventUseCase = handleSDCardEventUseCase,
             getTransferDestinationUriUseCase = getTransferDestinationUriUseCase,
@@ -91,14 +96,37 @@ class HandleTransferEventUseCaseTest {
         verify(broadcastBusinessAccountExpiredUseCase).invoke()
     }
 
+    @Test
+    fun `test that broadcastTransferOverQuotaUseCase is invoked when a QuotaExceededMegaException is received as a temporal error for download Event`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.transferType }.thenReturn(TransferType.DOWNLOAD)
+            }
+            val transferEvent = mock<TransferEvent.TransferTemporaryErrorEvent> {
+                on { this.transfer }.thenReturn(transfer)
+                on { this.error }.thenReturn(QuotaExceededMegaException(1, value = 1))
+            }
+            underTest.invoke(transferEvent)
+            verify(broadcastTransferOverQuotaUseCase).invoke(true)
+        }
+
     @ParameterizedTest
-    @MethodSource("provideQuotaExceededMegaExceptionTemporaryErrorEvents")
-    fun `test that broadcastTransferOverQuotaUseCase is invoked when a QuotaExceededMegaException is received as a temporal error`(
-        transferEvent: TransferEvent,
-    ) = runTest {
-        underTest.invoke(transferEvent)
-        verify(broadcastTransferOverQuotaUseCase).invoke(true)
-    }
+    @EnumSource(value = TransferType::class, names = ["GENERAL_UPLOAD", "CHAT_UPLOAD", "CU_UPLOAD"])
+    fun `test that broadcastStorageOverQuotaUseCase is invoked when a QuotaExceededMegaException is received as a temporal error for upload Event`(
+        type: TransferType
+    ) =
+        runTest {
+            reset(broadcastStorageOverQuotaUseCase)
+            val transfer = mock<Transfer> {
+                on { this.transferType }.thenReturn(type)
+            }
+            val transferEvent = mock<TransferEvent.TransferTemporaryErrorEvent> {
+                on { this.transfer }.thenReturn(transfer)
+                on { this.error }.thenReturn(QuotaExceededMegaException(1, value = 1))
+            }
+            underTest.invoke(transferEvent)
+            verify(broadcastStorageOverQuotaUseCase).invoke(true)
+        }
 
     @ParameterizedTest
     @MethodSource("provideFinishEvents")
@@ -147,11 +175,6 @@ class HandleTransferEventUseCaseTest {
     private fun provideFinishEventsWithError() =
         provideTransferEvents<TransferEvent.TransferFinishEvent> {
             on { this.error }.thenReturn(BusinessAccountExpiredMegaException(1))
-        }
-
-    private fun provideQuotaExceededMegaExceptionTemporaryErrorEvents() =
-        provideTransferEvents<TransferEvent.TransferTemporaryErrorEvent> {
-            on { this.error }.thenReturn(QuotaExceededMegaException(1, value = 1))
         }
 
     private fun provideStartFinishEvents() =

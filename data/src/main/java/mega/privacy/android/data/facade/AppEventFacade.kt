@@ -29,8 +29,8 @@ internal class AppEventFacade @Inject constructor(
 
     private val cameraUploadsFolderDestinationUpdate =
         MutableSharedFlow<CameraUploadsFolderDestinationUpdate>()
-    private val _transferOverQuota = MutableSharedFlow<Boolean>()
-    private val _storageOverQuota = MutableSharedFlow<Boolean>()
+    private val _transferOverQuota = MutableStateFlow(false)
+    private val _storageOverQuota = MutableStateFlow(false)
     private val _fileAvailableOffline = MutableSharedFlow<Long>()
     private val _cookieSettings = MutableSharedFlow<Set<CookieType>>()
     private val logout = MutableSharedFlow<Boolean>()
@@ -97,7 +97,7 @@ internal class AppEventFacade @Inject constructor(
 
     override fun monitorStorageOverQuota(): Flow<Boolean> = _storageOverQuota.asSharedFlow()
 
-    override suspend fun broadcastStorageOverQuota() {
+    override suspend fun broadcastStorageOverQuota(isCurrentOverQuota: Boolean) {
         _storageOverQuota.emit(true)
     }
 

@@ -154,7 +154,7 @@ interface TransferRepository {
      * Broadcast storage over quota
      *
      */
-    suspend fun broadcastStorageOverQuota()
+    suspend fun broadcastStorageOverQuota(isCurrentOverQuota: Boolean)
 
     /**
      * Cancels all transfers, uploads and downloads.
