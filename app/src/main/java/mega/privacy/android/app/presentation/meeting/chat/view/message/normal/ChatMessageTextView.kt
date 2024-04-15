@@ -122,11 +122,8 @@ fun ChatMessageTextView(
             message = text,
             isEdited = isEdited,
             links = links,
-            onLinkClicked = { link ->
-                if (interactionEnabled) {
-                    uriHandler.openUri(link.completeURLProtocol())
-                }
-            },
+            interactionEnabled = interactionEnabled,
+            onLinkClicked = { link -> uriHandler.openUri(link.completeURLProtocol()) },
             onLongClick = onLongClick,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
         )

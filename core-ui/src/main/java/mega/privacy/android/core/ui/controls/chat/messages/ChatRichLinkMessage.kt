@@ -61,11 +61,8 @@ fun ChatRichLinkMessage(
                     message = content,
                     isEdited = isEdited,
                     links = links,
-                    onLinkClicked = { link ->
-                        if (interactionEnabled) {
-                            uriHandler.openUri(link.completeURLProtocol())
-                        }
-                    },
+                    interactionEnabled = interactionEnabled,
+                    onLinkClicked = { link -> uriHandler.openUri(link.completeURLProtocol()) },
                     onLongClick = onLongClick,
                     modifier = Modifier.padding(top = 4.dp),
                     style = MaterialTheme.typography.caption,

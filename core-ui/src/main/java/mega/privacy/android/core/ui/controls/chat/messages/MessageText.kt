@@ -25,6 +25,7 @@ import mega.privacy.android.core.ui.controls.chat.messages.format.Format
 import mega.privacy.android.core.ui.controls.chat.messages.format.FormatTag
 import mega.privacy.android.core.ui.controls.chat.messages.format.FormatType
 import mega.privacy.android.core.ui.controls.text.megaSpanStyle
+import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.core.ui.theme.robotoMono
 
 /**
@@ -37,6 +38,7 @@ fun MessageText(
     message: String,
     isEdited: Boolean,
     links: List<String>,
+    interactionEnabled: Boolean,
     onLinkClicked: (String) -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -60,7 +62,9 @@ fun MessageText(
 
         Text(
             text = this,
-            modifier = modifier.then(pressIndicator),
+            modifier = modifier.conditional(interactionEnabled) {
+                then(pressIndicator)
+            },
             style = style,
             onTextLayout = { layoutResult.value = it }
         )

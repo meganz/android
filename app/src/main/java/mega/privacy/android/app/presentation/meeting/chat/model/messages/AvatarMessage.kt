@@ -20,6 +20,9 @@ abstract class AvatarMessage : UiChatMessage {
 
     /**
      * Content composable
+     *
+     * @param onLongClick Already established in the Modifier, but required by some type of messages
+     * with text in bubbles and others which has interactions with their content.
      */
     @Composable
     abstract fun ContentComposable(

@@ -53,11 +53,10 @@ fun ChatLinksMessageView(
                     message = content,
                     isEdited = isEdited,
                     links = links,
+                    interactionEnabled = interactionEnabled,
                     onLinkClicked = { link ->
-                        if (interactionEnabled) {
-                            contentLinks.firstOrNull { it.link.contains(link) }?.onClick(context)
-                                ?: uriHandler.openUri(link.completeURLProtocol())
-                        }
+                        contentLinks.firstOrNull { it.link.contains(link) }?.onClick(context)
+                            ?: uriHandler.openUri(link.completeURLProtocol())
                     },
                     onLongClick = onLongClick,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),

@@ -109,6 +109,7 @@ fun CoreVoiceClipMessageView(
                 modifier = Modifier.padding(start = 8.dp),
                 exists = exists,
                 onValueChange = onSeek,
+                interactionEnabled = interactionEnabled,
             )
             TimestampText(isMe = isMe, timestamp = timestamp, exists = exists)
         }
@@ -148,6 +149,7 @@ private fun PlaySlider(
     isMe: Boolean,
     progressByMediaPlayer: Float?,
     exists: Boolean,
+    interactionEnabled: Boolean,
     modifier: Modifier = Modifier,
     onValueChange: (Float) -> Unit = { },
     onValueChangeFinished: () -> Unit = { },
@@ -170,29 +172,31 @@ private fun PlaySlider(
         modifier = modifier
             .size(width = widthInDp.dp, height = heightInDp.dp)
             .testTag(VOICE_CLIP_MESSAGE_VIEW_SLIDER_TEST_TAG)
-            .pointerInput(null) {
-                awaitPointerEventScope {
-                    while (true) {
-                        val event = awaitPointerEvent()
-                        if (event.type == PointerEventType.Press) {
-                            isFingerDown = true
-                        } else if (event.type == PointerEventType.Release) {
-                            isFingerDown = false
-                            onValueChangeFinished()
-                        }
+            .conditional(interactionEnabled) {
+                pointerInput(null) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            val event = awaitPointerEvent()
+                            if (event.type == PointerEventType.Press) {
+                                isFingerDown = true
+                            } else if (event.type == PointerEventType.Release) {
+                                isFingerDown = false
+                                onValueChangeFinished()
+                            }
 
-                        val x = event.changes.first().position.x.coerceIn(0f, widthInPx)
-                        val newProgress = x / widthInPx
-                        if (progressByUser != newProgress) {
-                            progressByUser = newProgress
-                            onValueChange(newProgress)
-                        }
+                            val x = event.changes.first().position.x.coerceIn(0f, widthInPx)
+                            val newProgress = x / widthInPx
+                            if (progressByUser != newProgress) {
+                                progressByUser = newProgress
+                                onValueChange(newProgress)
+                            }
 
-                        // If user is using the slider, consume the event to prevent parent to handle it.
-                        if (isFingerDown) {
-                            event.changes
-                                .first()
-                                .consume()
+                            // If user is using the slider, consume the event to prevent parent to handle it.
+                            if (isFingerDown) {
+                                event.changes
+                                    .first()
+                                    .consume()
+                            }
                         }
                     }
                 }
