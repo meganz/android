@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.ui.extension.getIcon
-import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import javax.inject.Inject
 

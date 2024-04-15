@@ -69,7 +69,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
 import javax.inject.Inject

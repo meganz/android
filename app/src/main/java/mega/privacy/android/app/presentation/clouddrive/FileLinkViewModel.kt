@@ -44,6 +44,7 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
@@ -64,6 +65,7 @@ class FileLinkViewModel @Inject constructor(
     private val getFileUrlByPublicLinkUseCase: GetFileUrlByPublicLinkUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val mapNodeToPublicLinkUseCase: MapNodeToPublicLinkUseCase,
+    private val fileTypeIconMapper: FileTypeIconMapper
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileLinkState())
@@ -106,7 +108,11 @@ class FileLinkViewModel @Inject constructor(
     fun getPublicNode(link: String, decryptionIntroduced: Boolean = false) = viewModelScope.launch {
         runCatching { getPublicNodeUseCase(link) }
             .onSuccess { node ->
-                val iconResource = getNodeIcon(node, false)
+                val iconResource = getNodeIcon(
+                    typedNode = node,
+                    originShares = false,
+                    fileTypeIconMapper = fileTypeIconMapper
+                )
                 _state.update {
                     it.copyWithTypedNode(node, iconResource)
                 }

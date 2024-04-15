@@ -49,7 +49,7 @@ import mega.privacy.android.core.ui.theme.transparent
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 
 /**
  * Grid view item for file/folder info
@@ -103,7 +103,9 @@ internal fun <T : TypedNode> NodeGridViewItem(
                     .testTag(FOLDER_VIEW_MORE_ICON_TEST_TAG),
             )
             Image(
-                painter = if (nodeUIItem.isSelected) painterResource(id = CoreUiR.drawable.ic_select_folder) else nodeUIItem.node.getPainter(),
+                painter = if (nodeUIItem.isSelected) painterResource(id = CoreUiR.drawable.ic_select_folder) else nodeUIItem.node.getPainter(
+                    fileTypeIconMapper
+                ),
                 contentDescription = "Folder",
                 modifier = Modifier
                     .height(24.dp)

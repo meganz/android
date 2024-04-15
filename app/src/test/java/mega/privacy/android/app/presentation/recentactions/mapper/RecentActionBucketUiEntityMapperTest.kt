@@ -8,12 +8,12 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.TimeUtils.formatBucketDate
 import mega.privacy.android.app.utils.TimeUtils.formatTime
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll

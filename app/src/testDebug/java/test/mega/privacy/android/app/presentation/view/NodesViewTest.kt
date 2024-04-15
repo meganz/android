@@ -11,7 +11,7 @@ import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.controls.lists.EXPORTED_TEST_TAG
 import mega.privacy.android.legacy.core.ui.controls.lists.FAVORITE_TEST_TAG
 import mega.privacy.android.legacy.core.ui.controls.lists.INFO_TEXT_TEST_TAG

@@ -14,7 +14,7 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 
 
 /**

@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.ui.SyncEmptyScreen
-import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerRoute
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRoute
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager

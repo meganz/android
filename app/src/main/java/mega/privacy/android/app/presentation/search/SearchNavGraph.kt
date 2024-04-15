@@ -23,7 +23,7 @@ import mega.privacy.android.app.presentation.search.navigation.shareFolderAccess
 import mega.privacy.android.app.presentation.search.navigation.shareFolderDialogNavigation
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
-import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 
 
 /**
@@ -76,6 +76,7 @@ internal fun NavGraphBuilder.searchNavGraph(
     nodeBottomSheetNavigation(
         nodeActionHandler = nodeActionHandler,
         navHostController = navHostController,
+        fileTypeIconMapper = fileTypeIconMapper
     )
     searchFilterBottomSheetNavigation(
         navHostController = navHostController,

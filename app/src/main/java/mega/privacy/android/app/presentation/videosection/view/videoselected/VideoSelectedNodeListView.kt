@@ -27,6 +27,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.icon.pack.R
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
@@ -44,6 +45,7 @@ internal fun <T : TypedNode> VideoSelectedNodeListView(
     modifier: Modifier = Modifier,
     showChangeViewType: Boolean = true,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
+    fileTypeIconMapper: FileTypeIconMapper
 ) {
     LazyColumn(state = listState, modifier = modifier, contentPadding = listContentPadding) {
         if (showSortOrder || showChangeViewType) {
@@ -73,7 +75,7 @@ internal fun <T : TypedNode> VideoSelectedNodeListView(
                     ?.folderInfo(),
                 icon = nodeEntity
                     .let { node -> node as? TypedFolderNode }
-                    ?.getIcon()
+                    ?.getIcon(fileTypeIconMapper)
                     ?: R.drawable.ic_video_medium_solid,
                 fileSize = nodeEntity
                     .let { node -> node as? FileNode }
@@ -122,6 +124,7 @@ private fun VideoSelectedNodeListViewFoldersPreview(
             listState = LazyListState(),
             showChangeViewType = true,
             listContentPadding = PaddingValues(0.dp),
+            fileTypeIconMapper = FileTypeIconMapper()
         )
     }
 }

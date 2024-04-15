@@ -87,7 +87,7 @@ class GetFileIconOutlineTest {
             it[R.drawable.ic_dmg_thumbnail_outline] = arrayOf("dmg")
             it[R.drawable.ic_excel_thumbnail_outline] =
                 arrayOf("xla", "xlam", "xll", "xlm", "xls", "xlsm", "xlsx", "xlt", "xltm", "xltx")
-            it[R.drawable.ic_executabe_thumbnail_outline] =
+            it[R.drawable.ic_executable_thumbnail_outline] =
                 arrayOf("apk", "app", "bat", "com", "exe", "gadget", "msi", "pif", "vb", "wsf")
             it[R.drawable.ic_web_lang_thumbnail_outline] = arrayOf("as", "asc", "ascs")
             it[R.drawable.ic_font_thumbnail_outline] = arrayOf("fnt", "fon", "otf", "ttf")

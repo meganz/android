@@ -13,7 +13,7 @@ import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
-import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 
 /**
  * Search nav host controller

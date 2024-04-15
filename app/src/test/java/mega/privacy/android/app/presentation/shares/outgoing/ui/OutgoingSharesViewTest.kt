@@ -8,7 +8,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

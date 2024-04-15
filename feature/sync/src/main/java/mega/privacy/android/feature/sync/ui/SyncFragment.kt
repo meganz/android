@@ -19,7 +19,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.feature.sync.navigation.syncNavGraph
 import mega.privacy.android.feature.sync.navigation.syncRoute
-import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import javax.inject.Inject
 

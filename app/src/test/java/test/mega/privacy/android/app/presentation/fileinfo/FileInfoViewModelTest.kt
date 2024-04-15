@@ -35,6 +35,8 @@ import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.FolderTreeInfo
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.contacts.ContactPermission
@@ -80,6 +82,7 @@ import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import org.junit.jupiter.api.BeforeEach
@@ -145,6 +148,7 @@ internal class FileInfoViewModelTest {
         mock<MonitorOfflineFileAvailabilityUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
+    private val fileTypeIconMapper = FileTypeIconMapper()
 
     private val typedFileNode: TypedFileNode = mock()
 
@@ -245,7 +249,8 @@ internal class FileInfoViewModelTest {
             isSecondaryFolderEnabled = isSecondaryFolderEnabled,
             monitorOfflineFileAvailabilityUseCase = monitorOfflineFileAvailabilityUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            getContactVerificationWarningUseCase = getContactVerificationWarningUseCase
+            getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
+            fileTypeIconMapper = fileTypeIconMapper
         )
     }
 
@@ -279,6 +284,12 @@ internal class FileInfoViewModelTest {
         whenever(getOutShares(nodeId)).thenReturn(emptyList())
         whenever(getContactVerificationWarningUseCase()).thenReturn(false)
         whenever(monitorOfflineFileAvailabilityUseCase()).thenReturn(emptyFlow())
+        whenever(typedFileNode.type).thenReturn(
+            StaticImageFileTypeInfo(
+                mimeType = "image/jpg",
+                extension = "jpg"
+            )
+        )
     }
 
     @Test

@@ -24,7 +24,7 @@ import mega.privacy.android.core.ui.utils.ListStateMap
 import mega.privacy.android.core.ui.utils.getState
 import mega.privacy.android.core.ui.utils.sync
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
-import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 
 /**

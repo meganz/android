@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.feature.sync.domain.entity.SolvedIssue
 import mega.privacy.android.feature.sync.domain.entity.StalledIssueResolutionActionType
 import mega.privacy.android.feature.sync.ui.extension.getIcon
-import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.feature.sync.ui.mapper.stalledissue.ResolutionActionTypeToResolutionNameMapper
 import mega.privacy.android.feature.sync.ui.model.SolvedIssueUiItem
 import javax.inject.Inject

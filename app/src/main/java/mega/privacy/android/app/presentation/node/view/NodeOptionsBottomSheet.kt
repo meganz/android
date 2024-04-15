@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.node.view
 
+import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
@@ -19,7 +20,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import de.palm.composestateevents.EventEffect
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
@@ -33,9 +33,9 @@ import mega.privacy.android.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
-import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import timber.log.Timber
 
 
@@ -49,6 +49,7 @@ internal fun NodeOptionsBottomSheetContent(
     navHostController: NavHostController,
     onDismiss: () -> Unit,
     nodeId: Long,
+    fileTypeIconMapper: FileTypeIconMapper,
     viewModel: NodeOptionsBottomSheetViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
@@ -101,8 +102,8 @@ internal fun NodeOptionsBottomSheetContent(
                 else -> ""
             },
             showVersion = node?.hasVersion == true,
-            icon = (node as? TypedFolderNode)?.getIcon()
-                ?: MimeTypeList.typeForName(node?.name).iconResourceId,
+            icon = node?.getIcon(fileTypeIconMapper = fileTypeIconMapper)
+                ?: iconPackR.drawable.ic_generic_medium_solid,
             thumbnailData = node?.id?.let { ThumbnailRequest(it) },
             accessPermissionIcon = uiState.accessPermissionIcon,
         )

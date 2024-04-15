@@ -8,6 +8,7 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.navigation.material.bottomSheet
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.view.NodeOptionsBottomSheetContent
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 
 internal const val nodeBottomSheetRoute = "search/node_bottom_sheet"
 internal const val nodeBottomSheetRouteNodeIdArg = "node_id"
@@ -16,6 +17,7 @@ internal const val nodeBottomSheetRouteNodeIdArg = "node_id"
 internal fun NavGraphBuilder.nodeBottomSheetNavigation(
     nodeActionHandler: NodeActionHandler,
     navHostController: NavHostController,
+    fileTypeIconMapper: FileTypeIconMapper
 ) {
     bottomSheet(
         route = nodeBottomSheetRoute.plus("/{${nodeBottomSheetRouteNodeIdArg}}"),
@@ -33,6 +35,7 @@ internal fun NavGraphBuilder.nodeBottomSheetNavigation(
                 onDismiss = {
                     navHostController.navigateUp()
                 },
+                fileTypeIconMapper = fileTypeIconMapper
             )
         }
     }

@@ -23,7 +23,7 @@ private fun getFileIconOutline(extension: String) =
         "bz2", "gz", "rar", "tar", "tbz", "tgz", "zip", "deb", "udeb", "rpm", "air", "7z", "bz", "bzip2", "cab", "lha", "gzip", "ace", "arc", "pkg" -> IconPackR.drawable.ic_compressed_thumbnail_outline
         "dmg" -> IconPackR.drawable.ic_dmg_thumbnail_outline
         "xla", "xlam", "xll", "xlm", "xls", "xlsm", "xlsx", "xlt", "xltm", "xltx" -> IconPackR.drawable.ic_excel_thumbnail_outline
-        "apk", "app", "bat", "com", "exe", "gadget", "msi", "pif", "vb", "wsf" -> IconPackR.drawable.ic_executabe_thumbnail_outline
+        "apk", "app", "bat", "com", "exe", "gadget", "msi", "pif", "vb", "wsf" -> IconPackR.drawable.ic_executable_thumbnail_outline
         "as", "asc", "ascs" -> IconPackR.drawable.ic_web_lang_thumbnail_outline
         "fnt", "fon", "otf", "ttf" -> IconPackR.drawable.ic_font_thumbnail_outline
         "ai", "aia", "aip", "ait", "art", "irs" -> IconPackR.drawable.ic_illustrator_thumbnail_outline

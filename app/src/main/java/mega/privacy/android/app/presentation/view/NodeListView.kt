@@ -39,7 +39,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.shared.theme.MegaAppTheme
@@ -164,7 +164,7 @@ fun <T : TypedNode> NodeListView(
                     ?.folderInfo(),
                 icon = when (nodeEntity) {
                     is TypedFolderNode -> {
-                        nodeEntity.getIcon()
+                        nodeEntity.getIcon(fileTypeIconMapper)
                     }
 
                     is TypedFileNode -> {

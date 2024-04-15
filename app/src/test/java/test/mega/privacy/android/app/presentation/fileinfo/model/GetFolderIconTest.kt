@@ -6,6 +6,7 @@ import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.domain.entity.DeviceType
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -14,6 +15,8 @@ import org.mockito.kotlin.mock
 import java.util.stream.Stream
 
 class GetFolderIconTest {
+    private val fileTypeIconMapper = FileTypeIconMapper()
+
     @ParameterizedTest(name = "test that folder {0} not in shared items has the expected icon")
     @MethodSource("provideParametersForAllDrawers")
     fun `test that folder nodes return expected icon when origin is not shares`(
@@ -26,6 +29,7 @@ class GetFolderIconTest {
             getNodeIcon(
                 typedNode = folderNode,
                 originShares = false,
+                fileTypeIconMapper = fileTypeIconMapper
             )
         ).isEqualTo(expectedResource)
     }
@@ -44,7 +48,13 @@ class GetFolderIconTest {
                     // tested node would be a chat or camera upload icon in another drawer
                     && (expectedResource == IconPackR.drawable.ic_folder_chat_medium_solid || expectedResource == IconPackR.drawable.ic_folder_camera_uploads_medium_solid)
 
-        Truth.assertThat(getNodeIcon(typedNode = folderNode, originShares = false))
+        Truth.assertThat(
+            getNodeIcon(
+                typedNode = folderNode,
+                originShares = false,
+                fileTypeIconMapper = fileTypeIconMapper
+            )
+        )
             .isEqualTo(if (outShareOverride) IconPackR.drawable.ic_folder_outgoing_medium_solid else expectedResource)
     }
 

@@ -28,7 +28,7 @@ import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetRo
 import mega.privacy.android.app.presentation.search.navigation.searchFilterBottomSheetRoute
 import mega.privacy.android.app.presentation.search.view.SearchComposeView
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 
 /**
  * Search activity to search Nodes and display

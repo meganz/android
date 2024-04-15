@@ -19,7 +19,7 @@ import mega.privacy.android.app.presentation.videosection.view.videoselected.Vid
 import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.theme.MegaAppTheme
 import javax.inject.Inject

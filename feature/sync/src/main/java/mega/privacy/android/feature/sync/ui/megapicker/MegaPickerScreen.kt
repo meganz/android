@@ -25,7 +25,7 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.sync.R
-import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.controls.appbar.LegacyTopAppBar
 import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaApiJava

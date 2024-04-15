@@ -12,7 +12,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -30,7 +30,7 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
-import nz.mega.sdk.MegaNode
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -59,7 +59,7 @@ class FileLinkViewModelTest {
     private val getFileUrlByPublicLinkUseCase = mock<GetFileUrlByPublicLinkUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val mapNodeToPublicLinkUseCase = mock<MapNodeToPublicLinkUseCase>()
-
+    private val fileTypeIconMapper: FileTypeIconMapper = mock()
 
     private val url = "https://mega.co.nz/abc"
     private val filePreviewPath = "data/cache/xyz.jpg"
@@ -99,6 +99,7 @@ class FileLinkViewModelTest {
             getFileUrlByPublicLinkUseCase = getFileUrlByPublicLinkUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             mapNodeToPublicLinkUseCase = mapNodeToPublicLinkUseCase,
+            fileTypeIconMapper = fileTypeIconMapper
         )
     }
 
@@ -258,6 +259,12 @@ class FileLinkViewModelTest {
             on { this.name }.thenReturn(title)
             on { this.size }.thenReturn(fileSize)
             on { this.serializedData }.thenReturn(serializedString)
+            on { this.type }.thenReturn(
+                StaticImageFileTypeInfo(
+                    mimeType = "image/jpeg",
+                    extension = "jpg"
+                )
+            )
         }
 
         whenever(getPublicNodeUseCase(any())).thenReturn(publicNode)
@@ -284,6 +291,12 @@ class FileLinkViewModelTest {
             on { this.name }.thenReturn(title)
             on { this.size }.thenReturn(fileSize)
             on { this.serializedData }.thenReturn(serializedString)
+            on { this.type }.thenReturn(
+                StaticImageFileTypeInfo(
+                    mimeType = "image/jpeg",
+                    extension = "jpg"
+                )
+            )
         }
         val publicNodeNameCollisionResult = PublicNodeNameCollisionResult(
             listOf(publicNode), listOf(), NodeNameCollisionType.COPY
@@ -401,5 +414,11 @@ class FileLinkViewModelTest {
             on { this.name }.thenReturn(title)
             on { this.size }.thenReturn(fileSize)
             on { this.serializedData }.thenReturn(serializedString)
+            on { this.type }.thenReturn(
+                StaticImageFileTypeInfo(
+                    mimeType = "image/jpeg",
+                    extension = "jpg"
+                )
+            )
         }
 }

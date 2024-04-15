@@ -1,7 +1,7 @@
 package mega.privacy.android.app.mediaplayer.mapper
 
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
-import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import java.io.File
 import javax.inject.Inject
 import kotlin.time.Duration

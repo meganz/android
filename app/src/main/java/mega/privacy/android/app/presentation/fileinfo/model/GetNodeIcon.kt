@@ -3,17 +3,21 @@ package mega.privacy.android.app.presentation.fileinfo.model
 import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.annotation.DrawableRes
 import mega.privacy.android.app.presentation.node.model.mapper.getDefaultFolderIcon
-import mega.privacy.android.app.presentation.node.model.mapper.getFileIcon
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 
 /**
  * Get the icon resource associated to the [TypedNode]
  */
 @DrawableRes
-fun getNodeIcon(typedNode: TypedNode, originShares: Boolean) = when (typedNode) {
-    is TypedFileNode -> getFileIcon(typedNode)
+fun getNodeIcon(
+    typedNode: TypedNode,
+    originShares: Boolean,
+    fileTypeIconMapper: FileTypeIconMapper,
+) = when (typedNode) {
+    is TypedFileNode -> fileTypeIconMapper(typedNode.type.extension)
     is TypedFolderNode -> {
         //in SHARED_ITEMS drawer, outgoing share icon has priority over Camera uploads and Chat
         if (

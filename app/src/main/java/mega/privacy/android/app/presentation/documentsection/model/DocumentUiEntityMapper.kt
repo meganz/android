@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.documentsection.model
 
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import java.io.File
 import javax.inject.Inject
 

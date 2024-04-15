@@ -10,7 +10,7 @@ import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.triggered
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.feature.sync.R
-import mega.privacy.android.feature.sync.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerAction.FolderClicked
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import nz.mega.sdk.MegaApiJava
