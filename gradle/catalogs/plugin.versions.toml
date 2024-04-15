@@ -12,6 +12,7 @@ kotlin = "1.9.22"
 lint = "30.2.2"
 navigation = "2.7.7"
 paparazzi = "1.3.2"
+ksp = "1.9.22-1.0.17"
 
 [libraries]
 build-tools = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
@@ -26,3 +27,8 @@ junit5 = { module = "de.mannodermaus.gradle.plugins:android-junit5", version.ref
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 navigation-safeargs = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation" }
 paparazzi = { module = "app.cash.paparazzi:paparazzi-gradle-plugin", version.ref = "paparazzi" }
+ksp-gradle-plugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+
+
+[plugins]
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

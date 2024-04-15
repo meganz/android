@@ -2,8 +2,7 @@ import mega.privacy.android.build.shouldUsePrebuiltSdk
 import mega.privacy.android.build.isServerBuild
 
 plugins {
-    // change it following kotlin version, see here https://github.com/google/ksp/releases
-    id("com.google.devtools.ksp") version "1.9.22-1.0.17" apply false
+    alias(plugin.plugins.ksp) apply false
     id("org.jetbrains.kotlin.android") version "1.9.22" apply false
 }
 // Top-level build file where you can add configuration options common to all sub-projects/modules.

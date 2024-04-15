@@ -469,7 +469,6 @@ dependencies {
     }
     testImplementation(google.hilt.android.test)
     testImplementation(androidx.work.test)
-    testImplementation(testlib.room.test)
     testImplementation(testlib.compose.junit)
     testImplementation(androidx.navigation.testing)
 

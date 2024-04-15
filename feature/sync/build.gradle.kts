@@ -4,10 +4,10 @@ import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
     alias(convention.plugins.mega.android.library)
+    alias(convention.plugins.mega.android.room)
     id("kotlin-android")
     id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")
-    id("com.google.devtools.ksp")
 }
 
 android {
@@ -88,8 +88,6 @@ dependencies {
 
     implementation(androidx.appcompat)
     implementation(androidx.fragment)
-    implementation(androidx.room)
-    ksp(androidx.room.compiler)
     implementation(google.material)
     implementation(google.accompanist.permissions)
     implementation(androidx.lifecycle.viewmodel)

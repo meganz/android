@@ -11,6 +11,9 @@ dependencyResolutionManagement {
         create("testlib") {
             from(files("../gradle/catalogs/testlib.versions.toml"))
         }
+        create("androidx") {
+            from(files("../gradle/catalogs/androidx.versions.toml"))
+        }
     }
 }
 

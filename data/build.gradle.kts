@@ -4,10 +4,11 @@ import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
     alias(convention.plugins.mega.android.library)
+    alias(convention.plugins.mega.android.room)
     id("kotlin-android")
     id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")
-    id("com.google.devtools.ksp")
+
     kotlin("plugin.serialization") version "1.9.21"
 }
 
@@ -56,10 +57,6 @@ android {
         }
     }
 
-    ksp {
-        arg("room.schemaLocation", "$projectDir/schemas")
-        arg("room.generateKotlin", "true")
-    }
     sourceSets {
         // Adds exported schema location as test app assets.
         getByName("androidTest").assets.srcDir("$projectDir/schemas")
@@ -90,14 +87,11 @@ dependencies {
     implementation(androidx.preferences)
     implementation(androidx.lifecycle.process)
     implementation(androidx.work.ktx)
-    implementation(androidx.room)
     implementation(androidx.hilt.work)
     implementation(google.hilt.android)
     implementation(androidx.concurrent.futures)
     implementation(androidx.paging)
-    implementation(androidx.room.paging)
     implementation(androidx.documentfile)
-    ksp(androidx.room.compiler)
 
     if (shouldApplyDefaultConfiguration(project)) {
         apply(plugin = "dagger.hilt.android.plugin")
@@ -132,5 +126,4 @@ dependencies {
     androidTestImplementation(lib.bundles.unit.test)
     androidTestImplementation(testlib.junit.test.ktx)
     androidTestImplementation(testlib.runner)
-    androidTestImplementation(testlib.room.test)
 }
