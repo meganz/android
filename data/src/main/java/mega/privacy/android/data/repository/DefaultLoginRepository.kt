@@ -398,6 +398,17 @@ internal class DefaultLoginRepository @Inject constructor(
         }
     }
 
+    override suspend fun resendSignupLink(email: String, fullName: String) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("resendSignupLink") { }
+                megaApiGateway.resendSignupLink(email, fullName, listener)
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
+
     companion object {
         internal const val FETCH_NODES_ERROR_TIMER = 10000L
     }

@@ -148,4 +148,12 @@ interface LoginRepository {
      * Get the link to open on webclient with transferred session
      */
     suspend fun getSessionTransferURL(path: String): String?
+
+    /**
+     * Sends the confirmation email for a new account
+     *
+     * @param email    Email for the account
+     * @param fullName Full name of the user
+     */
+    suspend fun resendSignupLink(email: String, fullName: String)
 }

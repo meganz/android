@@ -3496,4 +3496,19 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun queryChangeEmailLink(link: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Sends the confirmation email for a new account
+     *
+     * This function is useful to send the confirmation link again or to send it to a different
+     * email address, in case the user mistyped the email at the registration form. It can only
+     * be used after a successful call to MegaApi::createAccount or MegaApi::resumeCreateAccount.
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SEND_SIGNUP_LINK.
+     *
+     * @param email    Email for the account
+     * @param name     Full name of the user (firstname + lastname)
+     * @param listener MegaRequestListener to track this request
+     */
+    fun resendSignupLink(email: String, name: String, listener: MegaRequestListenerInterface)
 }

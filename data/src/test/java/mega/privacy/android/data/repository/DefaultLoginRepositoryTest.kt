@@ -49,6 +49,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -699,11 +700,37 @@ class DefaultLoginRepositoryTest {
             assertThat(actual).isEqualTo(url)
         }
 
-        companion object{
-            @JvmStatic
-            fun provideSessionTransferURLParameters() = listOf(
-                Arguments.of("https://mega.nz/test"),
-                Arguments.of(null),
+    @Test
+    fun `test that the sign-up link is sent with the correct email and name`() = runTest {
+        val email = "test@test.com"
+        val fullName = "fullName"
+        val error = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+        whenever(
+            megaApiGateway.resendSignupLink(
+                eq(email),
+                eq(fullName),
+                any()
+            )
+        ).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                error,
             )
         }
+
+        underTest.resendSignupLink(email, fullName)
+
+        verify(megaApiGateway).resendSignupLink(eq(email), eq(fullName), any())
+    }
+
+    companion object {
+        @JvmStatic
+        fun provideSessionTransferURLParameters() = listOf(
+            Arguments.of("https://mega.nz/test"),
+            Arguments.of(null),
+        )
+    }
 }
