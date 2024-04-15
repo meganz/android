@@ -17,9 +17,12 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -31,10 +34,10 @@ import mega.privacy.android.app.presentation.meeting.managechathistory.component
 import mega.privacy.android.app.presentation.meeting.managechathistory.model.ChatHistoryRetentionOption
 import mega.privacy.android.app.presentation.meeting.managechathistory.model.ManageChatHistoryUIState
 import mega.privacy.android.app.presentation.meeting.managechathistory.model.TimePickerItemUiState
-import mega.privacy.android.app.presentation.meeting.managechathistory.view.dialog.ChatHistoryRetentionConfirmationDialog
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.core.ui.controls.dividers.DividerType
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.core.ui.controls.lists.GenericTwoLineListItem
@@ -44,6 +47,7 @@ import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.theme.MegaAppTheme
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun ManageChatHistoryRoute(
     onNavigateUp: () -> Unit,
@@ -57,7 +61,7 @@ internal fun ManageChatHistoryRoute(
     }
 
     ManageChatHistoryScreen(
-        modifier = modifier,
+        modifier = modifier.semantics { testTagsAsResourceId = true },
         uiState = uiState,
         onNavigateUp = onNavigateUp,
         onConfirmClearChatClick = {
@@ -150,14 +154,21 @@ internal fun ManageChatHistoryScreen(
     }
 
     if (uiState.shouldShowHistoryRetentionConfirmation) {
-        ChatHistoryRetentionConfirmationDialog(
+        ConfirmationDialogWithRadioButtons(
             modifier = Modifier.testTag(CHAT_HISTORY_RETENTION_TIME_CONFIRMATION_TAG),
-            selectedOption = uiState.selectedHistoryRetentionTimeOption,
+            titleText = stringResource(id = R.string.title_properties_history_retention),
+            subTitleText = stringResource(id = R.string.subtitle_properties_manage_chat),
+            radioOptions = ChatHistoryRetentionOption.entries,
+            initialSelectedOption = uiState.selectedHistoryRetentionTimeOption,
+            optionDescriptionMapper = @Composable {
+                stringResource(id = it.stringId)
+            },
             onOptionSelected = onRetentionTimeOptionSelected,
             confirmButtonText = stringResource(id = uiState.confirmButtonStringId),
             isConfirmButtonEnable = { uiState.isConfirmButtonEnable },
+            onConfirmRequest = onConfirmRetentionTimeClick,
+            cancelButtonText = stringResource(id = R.string.general_cancel),
             onDismissRequest = onRetentionTimeConfirmationDismiss,
-            onConfirmClick = onConfirmRetentionTimeClick
         )
     }
 }

@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -76,7 +77,8 @@ fun <T> ConfirmationDialogWithRadioButtons(
                 if (titleText.isNotEmpty()) {
                     MegaText(
                         modifier = Modifier
-                            .padding(top = 20.dp, bottom = 16.dp, start = 24.dp, end = 24.dp),
+                            .padding(top = 20.dp, bottom = 16.dp, start = 24.dp, end = 24.dp)
+                            .testTag(CONFIRMATION_DIALOG_TITLE_TAG),
                         text = titleText,
                         textColor = TextColor.Primary,
                         style = MaterialTheme.typography.h6,
@@ -85,7 +87,8 @@ fun <T> ConfirmationDialogWithRadioButtons(
                 if (subTitleText.isNotEmpty()) {
                     MegaText(
                         modifier = Modifier
-                            .padding(bottom = 16.dp, start = 24.dp, end = 24.dp),
+                            .padding(bottom = 16.dp, start = 24.dp, end = 24.dp)
+                            .testTag(CONFIRMATION_DIALOG_SUBTITLE_TAG),
                         text = subTitleText,
                         textColor = TextColor.Secondary,
                         style = MaterialTheme.typography.subtitle1,
@@ -114,7 +117,9 @@ fun <T> ConfirmationDialogWithRadioButtons(
                 ) {
                     radioOptions?.forEach { item ->
                         SettingsItemWithRadioButton(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("${CONFIRMATION_DIALOG_OPTIONS_TAG}_$item"),
                             title = optionDescriptionMapper(item),
                             selected = item == selectedOption,
                             onClick = {
@@ -133,12 +138,14 @@ fun <T> ConfirmationDialogWithRadioButtons(
                     AlertDialogFlowRow {
                         if (!cancelButtonText.isNullOrEmpty()) {
                             TextMegaButton(
+                                modifier = Modifier.testTag(CONFIRMATION_DIALOG_CANCEL_BUTTON_TAG),
                                 text = cancelButtonText,
                                 onClick = onDismissRequest,
                             )
                         }
                         if (!confirmButtonText.isNullOrEmpty()) {
                             TextMegaButton(
+                                modifier = Modifier.testTag(CONFIRMATION_DIALOG_CONFIRM_BUTTON_TAG),
                                 enabled = isConfirmButtonEnable?.invoke()
                                     ?: (selectedOption != null),
                                 text = confirmButtonText,
@@ -232,3 +239,14 @@ private fun ConfirmationDialogWithRadioButtonsWithScrollPreview() {
         )
     }
 }
+
+internal const val CONFIRMATION_DIALOG_TITLE_TAG =
+    "confirmation_dialog_with_radio_buttons:mega_text_title"
+internal const val CONFIRMATION_DIALOG_SUBTITLE_TAG =
+    "confirmation_dialog_with_radio_buttons:mega_text_subtitle"
+internal const val CONFIRMATION_DIALOG_OPTIONS_TAG =
+    "confirmation_dialog_with_radio_buttons:settings_item_with_radio_button_radio_option"
+internal const val CONFIRMATION_DIALOG_CANCEL_BUTTON_TAG =
+    "confirmation_dialog_with_radio_buttons:text_mega_button_cancel_button"
+internal const val CONFIRMATION_DIALOG_CONFIRM_BUTTON_TAG =
+    "confirmation_dialog_with_radio_buttons:text_mega_button_confirm_button"
