@@ -45,7 +45,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
     SettingsCameraUploadsCompose(
         "Enables the Settings Camera Uploads in Jetpack Compose. This requires an app " +
                 "restart for the changes to take effect.",
-        false,
+        true,
     ),
 
 
