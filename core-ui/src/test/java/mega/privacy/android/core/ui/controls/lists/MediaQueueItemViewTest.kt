@@ -16,19 +16,19 @@ import org.mockito.Mockito
 import org.mockito.kotlin.verify
 
 @RunWith(AndroidJUnit4::class)
-class MediaPlaylistItemViewTest {
+class MediaQueueItemViewTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
     private val testIcon = R.drawable.ic_audio_medium_solid
     private val testName = "Media Name"
-    private val testCurrentPlaylistPosition = "00:00"
+    private val testCurrentPlayingPosition = "00:00"
     private val testDuration = "10:00"
 
     private fun setComposeContent(
         @DrawableRes icon: Int = testIcon,
         name: String = testName,
-        currentPlaylistPosition: String = testCurrentPlaylistPosition,
+        currentPlayingPosition: String = testCurrentPlayingPosition,
         duration: String = testDuration,
         thumbnailData: Any? = null,
         onClick: () -> Unit = {},
@@ -39,10 +39,10 @@ class MediaPlaylistItemViewTest {
         isReorderEnabled: Boolean = true,
     ) {
         composeTestRule.setContent {
-            MediaPlaylistItemView(
+            MediaQueueItemView(
                 icon = icon,
                 name = name,
-                currentPlaylistPosition = currentPlaylistPosition,
+                currentPlayingPosition = currentPlayingPosition,
                 duration = duration,
                 thumbnailData = thumbnailData,
                 onClick = onClick,
@@ -60,23 +60,23 @@ class MediaPlaylistItemViewTest {
         setComposeContent()
 
         listOf(
-            MEDIA_PLAYLIST_ITEM_VIEW_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_THUMBNAIL_LAYOUT_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_THUMBNAIL_ICON_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_REORDER_ICON_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_NAME_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_DURATION_TEST_TAG
+            MEDIA_QUEUE_ITEM_VIEW_TEST_TAG,
+            MEDIA_QUEUE_ITEM_THUMBNAIL_LAYOUT_TEST_TAG,
+            MEDIA_QUEUE_ITEM_THUMBNAIL_ICON_TEST_TAG,
+            MEDIA_QUEUE_ITEM_REORDER_ICON_TEST_TAG,
+            MEDIA_QUEUE_ITEM_NAME_TEST_TAG,
+            MEDIA_QUEUE_ITEM_DURATION_TEST_TAG
         ).forEach { viewTag ->
             viewTag.isDisplayed()
         }
 
-        MEDIA_PLAYLIST_ITEM_NAME_TEST_TAG.textEquals(testName)
-        MEDIA_PLAYLIST_ITEM_DURATION_TEST_TAG.textEquals(testDuration)
+        MEDIA_QUEUE_ITEM_NAME_TEST_TAG.textEquals(testName)
+        MEDIA_QUEUE_ITEM_DURATION_TEST_TAG.textEquals(testDuration)
 
         listOf(
-            MEDIA_PLAYLIST_ITEM_SELECT_ICON_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_PAUSED_BACKGROUND_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_PAUSED_ICON_TEST_TAG
+            MEDIA_QUEUE_ITEM_SELECT_ICON_TEST_TAG,
+            MEDIA_QUEUE_ITEM_PAUSED_BACKGROUND_TEST_TAG,
+            MEDIA_QUEUE_ITEM_PAUSED_ICON_TEST_TAG
         ).forEach { viewTag ->
             viewTag.doesNotExist()
         }
@@ -97,23 +97,23 @@ class MediaPlaylistItemViewTest {
         setComposeContent(isSelected = true)
 
         listOf(
-            MEDIA_PLAYLIST_ITEM_VIEW_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_SELECT_ICON_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_REORDER_ICON_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_NAME_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_DURATION_TEST_TAG
+            MEDIA_QUEUE_ITEM_VIEW_TEST_TAG,
+            MEDIA_QUEUE_ITEM_SELECT_ICON_TEST_TAG,
+            MEDIA_QUEUE_ITEM_REORDER_ICON_TEST_TAG,
+            MEDIA_QUEUE_ITEM_NAME_TEST_TAG,
+            MEDIA_QUEUE_ITEM_DURATION_TEST_TAG
         ).forEach { viewTag ->
             viewTag.isDisplayed()
         }
 
-        MEDIA_PLAYLIST_ITEM_NAME_TEST_TAG.textEquals(testName)
-        MEDIA_PLAYLIST_ITEM_DURATION_TEST_TAG.textEquals(testDuration)
+        MEDIA_QUEUE_ITEM_NAME_TEST_TAG.textEquals(testName)
+        MEDIA_QUEUE_ITEM_DURATION_TEST_TAG.textEquals(testDuration)
 
         listOf(
-            MEDIA_PLAYLIST_ITEM_THUMBNAIL_LAYOUT_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_THUMBNAIL_ICON_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_PAUSED_BACKGROUND_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_PAUSED_ICON_TEST_TAG
+            MEDIA_QUEUE_ITEM_THUMBNAIL_LAYOUT_TEST_TAG,
+            MEDIA_QUEUE_ITEM_THUMBNAIL_ICON_TEST_TAG,
+            MEDIA_QUEUE_ITEM_PAUSED_BACKGROUND_TEST_TAG,
+            MEDIA_QUEUE_ITEM_PAUSED_ICON_TEST_TAG
         ).forEach { viewTag ->
             viewTag.doesNotExist()
         }
@@ -124,23 +124,23 @@ class MediaPlaylistItemViewTest {
         setComposeContent(isReorderEnabled = false)
 
         listOf(
-            MEDIA_PLAYLIST_ITEM_VIEW_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_THUMBNAIL_LAYOUT_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_THUMBNAIL_ICON_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_NAME_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_DURATION_TEST_TAG
+            MEDIA_QUEUE_ITEM_VIEW_TEST_TAG,
+            MEDIA_QUEUE_ITEM_THUMBNAIL_LAYOUT_TEST_TAG,
+            MEDIA_QUEUE_ITEM_THUMBNAIL_ICON_TEST_TAG,
+            MEDIA_QUEUE_ITEM_NAME_TEST_TAG,
+            MEDIA_QUEUE_ITEM_DURATION_TEST_TAG
         ).forEach { viewTag ->
             viewTag.isDisplayed()
         }
 
-        MEDIA_PLAYLIST_ITEM_NAME_TEST_TAG.textEquals(testName)
-        MEDIA_PLAYLIST_ITEM_DURATION_TEST_TAG.textEquals(testDuration)
+        MEDIA_QUEUE_ITEM_NAME_TEST_TAG.textEquals(testName)
+        MEDIA_QUEUE_ITEM_DURATION_TEST_TAG.textEquals(testDuration)
 
         listOf(
-            MEDIA_PLAYLIST_ITEM_SELECT_ICON_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_REORDER_ICON_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_PAUSED_BACKGROUND_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_PAUSED_ICON_TEST_TAG
+            MEDIA_QUEUE_ITEM_SELECT_ICON_TEST_TAG,
+            MEDIA_QUEUE_ITEM_REORDER_ICON_TEST_TAG,
+            MEDIA_QUEUE_ITEM_PAUSED_BACKGROUND_TEST_TAG,
+            MEDIA_QUEUE_ITEM_PAUSED_ICON_TEST_TAG
         ).forEach { viewTag ->
             viewTag.doesNotExist()
         }
@@ -151,24 +151,24 @@ class MediaPlaylistItemViewTest {
         setComposeContent(isItemPlaying = true)
 
         listOf(
-            MEDIA_PLAYLIST_ITEM_VIEW_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_NAME_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_DURATION_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_THUMBNAIL_LAYOUT_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_THUMBNAIL_ICON_TEST_TAG,
+            MEDIA_QUEUE_ITEM_VIEW_TEST_TAG,
+            MEDIA_QUEUE_ITEM_NAME_TEST_TAG,
+            MEDIA_QUEUE_ITEM_DURATION_TEST_TAG,
+            MEDIA_QUEUE_ITEM_THUMBNAIL_LAYOUT_TEST_TAG,
+            MEDIA_QUEUE_ITEM_THUMBNAIL_ICON_TEST_TAG,
         ).forEach { viewTag ->
             viewTag.isDisplayed()
         }
 
-        MEDIA_PLAYLIST_ITEM_NAME_TEST_TAG.textEquals(testName)
-        val expectedDuration = "$testCurrentPlaylistPosition / $testDuration"
-        MEDIA_PLAYLIST_ITEM_DURATION_TEST_TAG.textEquals(expectedDuration)
+        MEDIA_QUEUE_ITEM_NAME_TEST_TAG.textEquals(testName)
+        val expectedDuration = "$testCurrentPlayingPosition / $testDuration"
+        MEDIA_QUEUE_ITEM_DURATION_TEST_TAG.textEquals(expectedDuration)
 
         listOf(
-            MEDIA_PLAYLIST_ITEM_PAUSED_BACKGROUND_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_PAUSED_ICON_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_SELECT_ICON_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_REORDER_ICON_TEST_TAG
+            MEDIA_QUEUE_ITEM_PAUSED_BACKGROUND_TEST_TAG,
+            MEDIA_QUEUE_ITEM_PAUSED_ICON_TEST_TAG,
+            MEDIA_QUEUE_ITEM_SELECT_ICON_TEST_TAG,
+            MEDIA_QUEUE_ITEM_REORDER_ICON_TEST_TAG
         ).forEach { viewTag ->
             viewTag.doesNotExist()
         }
@@ -179,23 +179,23 @@ class MediaPlaylistItemViewTest {
         setComposeContent(isPaused = true, isItemPlaying = true)
 
         listOf(
-            MEDIA_PLAYLIST_ITEM_VIEW_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_NAME_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_DURATION_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_THUMBNAIL_LAYOUT_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_THUMBNAIL_ICON_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_PAUSED_BACKGROUND_TEST_TAG,
-            MEDIA_PLAYLIST_ITEM_PAUSED_ICON_TEST_TAG
+            MEDIA_QUEUE_ITEM_VIEW_TEST_TAG,
+            MEDIA_QUEUE_ITEM_NAME_TEST_TAG,
+            MEDIA_QUEUE_ITEM_DURATION_TEST_TAG,
+            MEDIA_QUEUE_ITEM_THUMBNAIL_LAYOUT_TEST_TAG,
+            MEDIA_QUEUE_ITEM_THUMBNAIL_ICON_TEST_TAG,
+            MEDIA_QUEUE_ITEM_PAUSED_BACKGROUND_TEST_TAG,
+            MEDIA_QUEUE_ITEM_PAUSED_ICON_TEST_TAG
         ).forEach { viewTag ->
             viewTag.isDisplayed()
         }
 
-        MEDIA_PLAYLIST_ITEM_NAME_TEST_TAG.textEquals(testName)
-        val expectedDuration = "$testCurrentPlaylistPosition / $testDuration"
-        MEDIA_PLAYLIST_ITEM_DURATION_TEST_TAG.textEquals(expectedDuration)
+        MEDIA_QUEUE_ITEM_NAME_TEST_TAG.textEquals(testName)
+        val expectedDuration = "$testCurrentPlayingPosition / $testDuration"
+        MEDIA_QUEUE_ITEM_DURATION_TEST_TAG.textEquals(expectedDuration)
 
-        MEDIA_PLAYLIST_ITEM_SELECT_ICON_TEST_TAG.doesNotExist()
-        MEDIA_PLAYLIST_ITEM_REORDER_ICON_TEST_TAG.doesNotExist()
+        MEDIA_QUEUE_ITEM_SELECT_ICON_TEST_TAG.doesNotExist()
+        MEDIA_QUEUE_ITEM_REORDER_ICON_TEST_TAG.doesNotExist()
     }
 
     @Test
@@ -203,7 +203,7 @@ class MediaPlaylistItemViewTest {
         val onClick = Mockito.mock<() -> Unit>()
         setComposeContent(onClick = onClick)
 
-        composeTestRule.onNodeWithTag(MEDIA_PLAYLIST_ITEM_VIEW_TEST_TAG, true).performClick()
+        composeTestRule.onNodeWithTag(MEDIA_QUEUE_ITEM_VIEW_TEST_TAG, true).performClick()
         verify(onClick).invoke()
     }
 }

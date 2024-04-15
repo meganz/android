@@ -2,16 +2,11 @@ package mega.privacy.android.core.ui.controls.lists
 
 import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,11 +33,11 @@ import mega.privacy.android.core.ui.theme.tokens.Colors
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 
 /**
- * The media playlist item view
+ * The media queue item view
  *
  * @param icon thumbnail default icon
  * @param name the name of the media item
- * @param currentPlaylistPosition the current playing position
+ * @param currentPlayingPosition the current playing position
  * @param duration the duration of the media item
  * @param thumbnailData the thumbnail data of the media item
  * @param onClick the click callback
@@ -52,12 +47,11 @@ import mega.privacy.android.core.ui.theme.tokens.TextColor
  * @param isReorderEnabled whether the media item can be reordered
  * @param isSelected whether the media item is selected
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MediaPlaylistItemView(
+fun MediaQueueItemView(
     @DrawableRes icon: Int,
     name: String,
-    currentPlaylistPosition: String,
+    currentPlayingPosition: String,
     duration: String,
     thumbnailData: Any?,
     onClick: () -> Unit,
@@ -67,55 +61,58 @@ fun MediaPlaylistItemView(
     isReorderEnabled: Boolean = true,
     isSelected: Boolean = false,
 ) {
-    Row(
-        modifier = modifier
-            .combinedClickable(
-                onClick = onClick
+    GenericTwoLineListItem(
+        title = {
+            MegaText(
+                modifier = Modifier.testTag(MEDIA_QUEUE_ITEM_NAME_TEST_TAG),
+                text = name,
+                textColor = TextColor.Primary
             )
-            .fillMaxWidth()
-            .height(72.dp)
-            .testTag(MEDIA_PLAYLIST_ITEM_VIEW_TEST_TAG),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        val thumbnailModifier = Modifier
-            .padding(start = 12.dp)
-            .size(48.dp)
-            .clip(RoundedCornerShape(5.dp))
-        PlaylistThumbnailView(
-            modifier = thumbnailModifier,
-            icon = icon,
-            isSelected = isSelected,
-            isPaused = isPaused,
-            isItemPlaying = isItemPlaying,
-            thumbnailData = thumbnailData
-        )
-
-        PlaylistInfoView(
-            modifier = Modifier
-                .padding(start = 24.dp)
-                .fillMaxWidth()
-                .weight(1f),
-            name = name,
-            currentPlaylistPosition = currentPlaylistPosition,
-            isItemPlaying = isItemPlaying,
-            duration = duration
-        )
-
-        if (!isItemPlaying && isReorderEnabled) {
-            Image(
+        },
+        modifier = modifier.testTag(MEDIA_QUEUE_ITEM_VIEW_TEST_TAG),
+        subtitle = {
+            MegaText(
+                modifier = Modifier.testTag(MEDIA_QUEUE_ITEM_DURATION_TEST_TAG),
+                text = if (isItemPlaying) {
+                    "$currentPlayingPosition / $duration"
+                } else {
+                    duration
+                },
+                textColor = TextColor.Secondary,
+                style = MaterialTheme.typography.caption
+            )
+        },
+        icon = {
+            QueueThumbnailView(
                 modifier = Modifier
-                    .padding(end = 12.dp)
-                    .testTag(MEDIA_PLAYLIST_ITEM_REORDER_ICON_TEST_TAG),
-                painter = painterResource(R.drawable.ic_reorder),
-                contentDescription = "Reorder",
-                colorFilter = ColorFilter.tint(MegaTheme.colors.icon.secondary)
+                    .padding(start = 12.dp)
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(5.dp)),
+                icon = icon,
+                isSelected = isSelected,
+                isPaused = isPaused,
+                isItemPlaying = isItemPlaying,
+                thumbnailData = thumbnailData
             )
-        }
-    }
+        },
+        trailingIcons = {
+            if (!isItemPlaying && isReorderEnabled) {
+                Image(
+                    modifier = Modifier
+                        .padding(end = 12.dp)
+                        .testTag(MEDIA_QUEUE_ITEM_REORDER_ICON_TEST_TAG),
+                    painter = painterResource(R.drawable.ic_reorder),
+                    contentDescription = "Reorder",
+                    colorFilter = ColorFilter.tint(MegaTheme.colors.icon.secondary)
+                )
+            }
+        },
+        onItemClicked = onClick
+    )
 }
 
 @Composable
-private fun PlaylistThumbnailView(
+private fun QueueThumbnailView(
     modifier: Modifier,
     @DrawableRes icon: Int,
     isSelected: Boolean,
@@ -125,17 +122,17 @@ private fun PlaylistThumbnailView(
 ) {
     if (isSelected) {
         Image(
-            modifier = modifier.testTag(MEDIA_PLAYLIST_ITEM_SELECT_ICON_TEST_TAG),
+            modifier = modifier.testTag(MEDIA_QUEUE_ITEM_SELECT_ICON_TEST_TAG),
             painter = painterResource(R.drawable.ic_select_folder),
             contentDescription = "Selected",
         )
     } else {
         Box(
-            modifier = modifier.testTag(MEDIA_PLAYLIST_ITEM_THUMBNAIL_LAYOUT_TEST_TAG),
+            modifier = modifier.testTag(MEDIA_QUEUE_ITEM_THUMBNAIL_LAYOUT_TEST_TAG),
             contentAlignment = Alignment.Center
         ) {
             AsyncImage(
-                modifier = Modifier.testTag(MEDIA_PLAYLIST_ITEM_THUMBNAIL_ICON_TEST_TAG),
+                modifier = Modifier.testTag(MEDIA_QUEUE_ITEM_THUMBNAIL_ICON_TEST_TAG),
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(thumbnailData)
                     .crossfade(true)
@@ -152,14 +149,14 @@ private fun PlaylistThumbnailView(
                         .size(24.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .background(Colors.Neutral.n800)
-                        .testTag(MEDIA_PLAYLIST_ITEM_PAUSED_BACKGROUND_TEST_TAG),
+                        .testTag(MEDIA_QUEUE_ITEM_PAUSED_BACKGROUND_TEST_TAG),
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
                         modifier = Modifier
                             .size(12.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .testTag(MEDIA_PLAYLIST_ITEM_PAUSED_ICON_TEST_TAG),
+                            .testTag(MEDIA_QUEUE_ITEM_PAUSED_ICON_TEST_TAG),
                         painter = painterResource(R.drawable.ic_pause),
                         contentDescription = "Paused",
                         colorFilter = ColorFilter.tint(Color.White)
@@ -172,9 +169,9 @@ private fun PlaylistThumbnailView(
 }
 
 @Composable
-private fun PlaylistInfoView(
+private fun QueueInfoView(
     name: String,
-    currentPlaylistPosition: String,
+    currentPlayingPosition: String,
     isItemPlaying: Boolean,
     duration: String,
     modifier: Modifier = Modifier,
@@ -183,15 +180,15 @@ private fun PlaylistInfoView(
         modifier = modifier
     ) {
         MegaText(
-            modifier = Modifier.testTag(MEDIA_PLAYLIST_ITEM_NAME_TEST_TAG),
+            modifier = Modifier.testTag(MEDIA_QUEUE_ITEM_NAME_TEST_TAG),
             text = name,
             textColor = TextColor.Primary
         )
 
         MegaText(
-            modifier = Modifier.testTag(MEDIA_PLAYLIST_ITEM_DURATION_TEST_TAG),
+            modifier = Modifier.testTag(MEDIA_QUEUE_ITEM_DURATION_TEST_TAG),
             text = if (isItemPlaying) {
-                "$currentPlaylistPosition / $duration"
+                "$currentPlayingPosition / $duration"
             } else {
                 duration
             },
@@ -203,9 +200,9 @@ private fun PlaylistInfoView(
 
 @CombinedThemePreviews
 @Composable
-private fun MediaPlaylistItemInfoViewWithPausedPreview() {
+private fun MediaQueueItemInfoViewWithPausedPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        MediaPlaylistItemView(
+        MediaQueueItemView(
             icon = iconPackR.drawable.ic_audio_medium_solid,
             onClick = {},
             thumbnailData = null,
@@ -213,7 +210,7 @@ private fun MediaPlaylistItemInfoViewWithPausedPreview() {
             isPaused = true,
             isItemPlaying = true,
             name = "Video name",
-            currentPlaylistPosition = "00:00",
+            currentPlayingPosition = "00:00",
             duration = "14:00"
         )
     }
@@ -221,16 +218,16 @@ private fun MediaPlaylistItemInfoViewWithPausedPreview() {
 
 @CombinedThemePreviews
 @Composable
-private fun MediaPlaylistItemInfoViewWithSelectedPreview() {
+private fun MediaQueueItemInfoViewWithSelectedPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        MediaPlaylistItemView(
+        MediaQueueItemView(
             icon = iconPackR.drawable.ic_video_medium_solid,
             onClick = {},
             thumbnailData = null,
             modifier = Modifier,
             isSelected = true,
             name = "Video name",
-            currentPlaylistPosition = "",
+            currentPlayingPosition = "",
             duration = "14:00"
         )
     }
@@ -238,62 +235,61 @@ private fun MediaPlaylistItemInfoViewWithSelectedPreview() {
 
 @CombinedThemePreviews
 @Composable
-private fun MediaPlaylistItemInfoViewPreview() {
+private fun MediaQueueItemInfoViewPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        MediaPlaylistItemView(
+        MediaQueueItemView(
             icon = iconPackR.drawable.ic_audio_medium_solid,
             onClick = {},
             thumbnailData = null,
             modifier = Modifier,
             name = "Video name",
-            currentPlaylistPosition = "",
+            currentPlayingPosition = "",
             duration = "14:00",
         )
     }
 }
 
 /**
- * Test tag for the media playlist item view
+ * Test tag for the media queue item view
  */
-const val MEDIA_PLAYLIST_ITEM_VIEW_TEST_TAG = "media_playlist_item:row_view"
+const val MEDIA_QUEUE_ITEM_VIEW_TEST_TAG = "media_queue_item:row_view"
 
 /**
- * Test tag for the selected icon of the media playlist item
+ * Test tag for the selected icon of the media queue item
  */
-const val MEDIA_PLAYLIST_ITEM_SELECT_ICON_TEST_TAG = "media_playlist_item:image_selected"
+const val MEDIA_QUEUE_ITEM_SELECT_ICON_TEST_TAG = "media_queue_item:image_selected"
 
 /**
- * Test tag for the thumbnail layout of the media playlist item
+ * Test tag for the thumbnail layout of the media queue item
  */
-const val MEDIA_PLAYLIST_ITEM_THUMBNAIL_LAYOUT_TEST_TAG = "media_playlist_item:box_layout"
+const val MEDIA_QUEUE_ITEM_THUMBNAIL_LAYOUT_TEST_TAG = "media_queue_item:box_layout"
 
 /**
- * Test tag for the thumbnail image of the media playlist item
+ * Test tag for the thumbnail image of the media queue item
  */
-const val MEDIA_PLAYLIST_ITEM_THUMBNAIL_ICON_TEST_TAG = "media_playlist_item:image_thumbnail"
+const val MEDIA_QUEUE_ITEM_THUMBNAIL_ICON_TEST_TAG = "media_queue_item:image_thumbnail"
 
 /**
- * Test tag for the paused background of the media playlist item
+ * Test tag for the paused background of the media queue item
  */
-const val MEDIA_PLAYLIST_ITEM_PAUSED_BACKGROUND_TEST_TAG =
-    "media_playlist_item:box_paused_background"
+const val MEDIA_QUEUE_ITEM_PAUSED_BACKGROUND_TEST_TAG = "media_queue_item:box_paused_background"
 
 /**
- * Test tag for the paused image of the media playlist item
+ * Test tag for the paused image of the media queue item
  */
-const val MEDIA_PLAYLIST_ITEM_PAUSED_ICON_TEST_TAG = "media_playlist_item:image_paused"
+const val MEDIA_QUEUE_ITEM_PAUSED_ICON_TEST_TAG = "media_queue_item:image_paused"
 
 /**
- * Test tag for the name of the media playlist item
+ * Test tag for the name of the media queue item
  */
-const val MEDIA_PLAYLIST_ITEM_NAME_TEST_TAG = "media_playlist_item:text_name"
+const val MEDIA_QUEUE_ITEM_NAME_TEST_TAG = "media_queue_item:text_name"
 
 /**
- * Test tag for the duration of the media playlist item
+ * Test tag for the duration of the media queue item
  */
-const val MEDIA_PLAYLIST_ITEM_DURATION_TEST_TAG = "media_playlist_item:text_duration"
+const val MEDIA_QUEUE_ITEM_DURATION_TEST_TAG = "media_queue_item:text_duration"
 
 /**
- * Test tag for the reorder icon of the media playlist item
+ * Test tag for the reorder icon of the media queue item
  */
-const val MEDIA_PLAYLIST_ITEM_REORDER_ICON_TEST_TAG = "media_playlist_item:image_reorder"
+const val MEDIA_QUEUE_ITEM_REORDER_ICON_TEST_TAG = "media_queue_item:image_reorder"
