@@ -393,14 +393,13 @@ class CameraUploadsWorker @AssistedInject constructor(
     ): Result =
         when (finishedReason) {
             CameraUploadsFinishedReason.COMPLETED -> {
-                Timber.d("Camera Uploads process ended successfully: Process completed")
                 resetTotalUploads()
                 sendTransfersUpToDateInfoToBackupCenter()
+                scheduleCameraUploads()
                 Result.success()
             }
 
             else -> {
-                Timber.d("Camera Uploads process aborted with restart mode: $restartMode")
                 cancelAllTransfers()
                 resetTotalUploads()
                 sendTransfersInterruptedInfoToBackupCenter()
@@ -424,6 +423,8 @@ class CameraUploadsWorker @AssistedInject constructor(
                     }
                 }
             }
+        }.also {
+            Timber.d("Camera Uploads process finished with $finishedReason with restart mode: $restartMode")
         }
 
     override suspend fun getForegroundInfo() =

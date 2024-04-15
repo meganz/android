@@ -7,24 +7,28 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
+import androidx.work.PeriodicWorkRequest.Companion.MIN_PERIODIC_FLEX_MILLIS
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkQuery
+import androidx.work.WorkRequest.Companion.MIN_BACKOFF_MILLIS
 import androidx.work.await
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
-import mega.privacy.android.data.gateway.WorkerClassGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
+import mega.privacy.android.data.gateway.WorkerClassGateway
 import mega.privacy.android.data.worker.ChatUploadsWorker
 import mega.privacy.android.data.worker.DeleteOldestCompletedTransfersWorker
 import mega.privacy.android.data.worker.DownloadsWorker
 import mega.privacy.android.data.worker.NewMediaWorker
 import mega.privacy.android.domain.monitoring.CrashReporter
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.toJavaDuration
 
 /**
  * Tag identifying the Camera Uploads periodic worker when enqueued
@@ -42,24 +46,14 @@ private const val SINGLE_CAMERA_UPLOAD_TAG = "MEGA_SINGLE_CAMERA_UPLOAD_TAG"
 private const val HEART_BEAT_TAG = "HEART_BEAT_TAG"
 
 /**
- * Interval in minutes to run the Heartbeat periodic worker worker
+ * Interval to run the Heartbeat periodic worker worker
  */
-private const val UP_TO_DATE_HEARTBEAT_INTERVAL: Long = 30
+private val UP_TO_DATE_HEARTBEAT_INTERVAL = 30.minutes
 
 /**
- * Interval in minutes to run the Heartbeat periodic worker worker
+ * Interval to run the Camera Uploads periodic worker
  */
-private const val HEARTBEAT_FLEX_INTERVAL: Long = 20
-
-/**
- * Interval in minutes to run the Camera Uploads periodic worker
- */
-private const val CU_SCHEDULER_INTERVAL: Long = 60
-
-/**
- * Flex Interval in minutes to run the Camera Uploads periodic worker
- */
-private const val SCHEDULER_FLEX_INTERVAL: Long = 50
+private val CU_SCHEDULER_INTERVAL = 60.minutes
 
 /**
  * Responsible of managing the queue of workers in the WorkManager
@@ -160,7 +154,10 @@ class WorkManagerGatewayImpl @Inject constructor(
             val cameraUploadWorkRequest =
                 OneTimeWorkRequest.Builder(workerClassGateway.cameraUploadsWorkerClass)
                     .addTag(SINGLE_CAMERA_UPLOAD_TAG)
-                    .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.SECONDS)
+                    .setBackoffCriteria(
+                        backoffPolicy = BackoffPolicy.LINEAR,
+                        duration = MIN_BACKOFF_MILLIS.milliseconds.toJavaDuration(),
+                    )
                     .build()
 
             workManager
@@ -189,16 +186,14 @@ class WorkManagerGatewayImpl @Inject constructor(
 
         workManager.debugWorkInfo(crashReporter)
 
-        // periodic work that runs during the last 10 minutes of every one hour period
+        // periodic work that runs during the last 5 minutes of every one hour period
         val cameraUploadWorkRequest = PeriodicWorkRequest.Builder(
-            workerClassGateway.cameraUploadsWorkerClass,
-            CU_SCHEDULER_INTERVAL,
-            TimeUnit.MINUTES,
-            SCHEDULER_FLEX_INTERVAL,
-            TimeUnit.MINUTES
+            workerClass = workerClassGateway.cameraUploadsWorkerClass,
+            repeatInterval = CU_SCHEDULER_INTERVAL.toJavaDuration(),
+            flexInterval = MIN_PERIODIC_FLEX_MILLIS.milliseconds.toJavaDuration(),
         )
             .addTag(CAMERA_UPLOAD_TAG)
-            .setInitialDelay(CU_SCHEDULER_INTERVAL, TimeUnit.MINUTES)
+            .setInitialDelay(duration = CU_SCHEDULER_INTERVAL.toJavaDuration())
             .build()
         workManager
             .enqueueUniquePeriodicWork(
@@ -215,13 +210,11 @@ class WorkManagerGatewayImpl @Inject constructor(
     private suspend fun scheduleCameraUploadSyncActiveHeartbeat() {
         workManager.debugWorkInfo(crashReporter)
 
-        // periodic work that runs during the last 10 minutes of every half an hour period
+        // periodic work that runs during the last 5 minutes of every half an hour period
         val cuSyncActiveHeartbeatWorkRequest = PeriodicWorkRequest.Builder(
-            workerClassGateway.syncHeartbeatCameraUploadWorkerClass,
-            UP_TO_DATE_HEARTBEAT_INTERVAL,
-            TimeUnit.MINUTES,
-            HEARTBEAT_FLEX_INTERVAL,
-            TimeUnit.MINUTES
+            workerClass = workerClassGateway.syncHeartbeatCameraUploadWorkerClass,
+            repeatInterval = UP_TO_DATE_HEARTBEAT_INTERVAL.toJavaDuration(),
+            flexInterval = MIN_PERIODIC_FLEX_MILLIS.milliseconds.toJavaDuration(),
         )
             .addTag(HEART_BEAT_TAG)
             .build()

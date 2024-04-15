@@ -1395,6 +1395,14 @@ class CameraUploadsWorkerTest {
         }
 
     @Test
+    fun `test that the CU is scheduled when the worker complete with success`() =
+        runTest {
+            val result = underTest.doWork()
+            verify(scheduleCameraUploadUseCase).invoke()
+            assertThat(result).isEqualTo(ListenableWorker.Result.success())
+        }
+
+    @Test
     fun `test that the temporary folder is deleted when the worker complete with success`() =
         runTest {
             val result = underTest.doWork()
