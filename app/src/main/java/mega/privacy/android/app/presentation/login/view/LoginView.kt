@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusManager
@@ -48,6 +49,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -101,6 +104,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  * @param onFirstTime2FAConsumed    Action when the 2FA is shown for the first time.
  * @param modifier                  [Modifier]
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LoginView(
     state: LoginState,
@@ -126,7 +130,9 @@ fun LoginView(
     var showChangeApiServerDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .semantics { testTagsAsResourceId = true },
         scaffoldState = scaffoldState,
         topBar = {
             if (state.is2FARequired || state.multiFactorAuthState != null) {
@@ -240,7 +246,8 @@ private fun RequireLogin(
                             }
                         }
                     })
-                },
+                }
+                .testTag(LOGIN_TO_MEGA_TAG),
             text = stringResource(id = R.string.login_to_mega),
             style = MaterialTheme.typography.subtitle1.copy(
                 fontWeight = FontWeight.Medium,
@@ -258,7 +265,8 @@ private fun RequireLogin(
                 .focusProperties {
                     next = passwordFocusRequester
                     previous = emailFocusRequester
-                },
+                }
+                .testTag(TEXT_FIELD_LABEL_TAG),
             text = state.accountSession?.email ?: "",
             errorText = state.emailError?.let { stringResource(id = it.error) },
             isEmail = true
@@ -282,15 +290,18 @@ private fun RequireLogin(
                 .focusProperties {
                     next = passwordFocusRequester
                     previous = emailFocusRequester
-                },
+                }
+                .testTag(PASSWORD_TEXT_FIELD_TAG),
             text = state.password ?: "",
             errorText = state.passwordError?.let { stringResource(id = it.error) }
         )
         TextMegaButton(
-            modifier = Modifier.padding(
-                start = 14.dp,
-                top = if (state.passwordError != null) 24.dp else 44.dp
-            ),
+            modifier = Modifier
+                .padding(
+                    start = 14.dp,
+                    top = if (state.passwordError != null) 24.dp else 44.dp
+                )
+                .testTag(FORGOT_PASSWORD_TAG),
             textId = R.string.forgot_pass,
             onClick = onForgotPassword
         )
@@ -301,7 +312,8 @@ private fun RequireLogin(
                     top = 44.dp,
                     end = 22.dp
                 )
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .testTag(LOGIN_BUTTON_TAG),
             textId = R.string.login_text,
             onClick = { clickLogin(onLoginClicked, focusManager) },
             enabled = !state.isLocalLogoutInProgress
@@ -314,12 +326,15 @@ private fun RequireLogin(
             MegaCircularProgressIndicator(
                 modifier = Modifier
                     .size(16.dp)
-                    .padding(start = 3.dp),
+                    .padding(start = 3.dp)
+                    .testTag(CANCEL_LOGIN_PROGRESS_TAG),
                 strokeWidth = 1.dp
             )
             Text(
                 text = stringResource(id = R.string.login_in_progress),
-                modifier = Modifier.padding(start = 6.dp),
+                modifier = Modifier
+                    .padding(start = 6.dp)
+                    .testTag(CANCELLING_LOGIN_TAG),
                 style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.secondary)
             )
         }
@@ -332,11 +347,13 @@ private fun RequireLogin(
                     .padding(start = 22.dp, top = 18.dp, end = 22.dp),
             ) {
                 Text(
+                    modifier = Modifier.testTag(TROUBLE_LOGIN_TAG),
                     text = stringResource(id = R.string.general_login_label_trouble_logging_in),
                     style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorPrimary)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
+                    modifier = Modifier.testTag(REPORT_ISSUE_TAG),
                     text = stringResource(id = R.string.general_login_button_report_your_issue),
                     style = MaterialTheme.typography.subtitle2.copy(
                         color = MaterialTheme.colors.textColorPrimary,
@@ -356,12 +373,15 @@ private fun RequireLogin(
                         } else {
                             pendingClicksSDK - 1
                         }
-                    },
+                    }
+                    .testTag(NEW_TO_MEGA_TAG),
                 text = stringResource(id = R.string.new_to_mega),
                 style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorPrimary),
             )
             TextMegaButton(
-                modifier = Modifier.padding(top = 4.dp),
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .testTag(CREATE_ACCOUNT_TAG),
                 textId = R.string.create_account,
                 onClick = onCreateAccount
             )
@@ -403,23 +423,31 @@ private fun LoginInProgress(
             if (isCheckingSignupLink) {
                 LoginInProgressText(
                     stringId = R.string.login_querying_signup_link,
-                    modifier = Modifier.padding(top = 30.dp)
+                    modifier = Modifier
+                        .padding(top = 30.dp)
+                        .testTag(CHECKING_VALIDATION_TAG)
                 )
             }
             LoginInProgressText(
                 stringId = R.string.login_connecting_to_server,
-                modifier = Modifier.padding(top = 5.dp)
+                modifier = Modifier
+                    .padding(top = 5.dp)
+                    .testTag(CONNECTING_TO_SERVER_TAG)
             )
             fetchNodesUpdate?.apply {
                 LoginInProgressText(
                     stringId = R.string.download_updating_filelist,
-                    modifier = Modifier.padding(top = 5.dp)
+                    modifier = Modifier
+                        .padding(top = 5.dp)
+                        .testTag(UPDATING_FILE_LIST_TAG)
                 )
                 progress?.let {
                     if (it.floatValue > 0) {
                         LoginInProgressText(
                             stringId = R.string.login_preparing_filelist,
-                            modifier = Modifier.padding(top = 5.dp)
+                            modifier = Modifier
+                                .padding(top = 5.dp)
+                                .testTag(PREPARING_FILE_LIST_TAG)
                         )
                         MegaLinearProgressIndicator(
                             progress = it.floatValue,
@@ -439,7 +467,9 @@ private fun LoginInProgress(
             fetchNodesUpdate?.temporaryError?.let {
                 LoginInProgressText(
                     stringId = it.messageId,
-                    modifier = Modifier.padding(top = 10.dp)
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .testTag(TEMPORARY_ERROR_TAG)
                 )
             }
         }
@@ -482,7 +512,9 @@ private fun TwoFactorAuthentication(
         val isError = state.multiFactorAuthState == MultiFactorAuthState.Failed
         Text(
             text = stringResource(id = R.string.explain_confirm_2fa),
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 40.dp),
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 40.dp)
+                .testTag(ENTER_AUTHENTICATION_CODE_TAG),
             style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.textColorSecondary),
             textAlign = TextAlign.Center
         )
@@ -497,14 +529,18 @@ private fun TwoFactorAuthentication(
         if (isError) {
             Text(
                 text = stringResource(id = R.string.pin_error_2fa),
-                modifier = Modifier.padding(start = 10.dp, top = 18.dp, end = 10.dp),
+                modifier = Modifier
+                    .padding(start = 10.dp, top = 18.dp, end = 10.dp)
+                    .testTag(INVALID_CODE_TAG),
                 style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.error)
             )
         }
         TextMegaButton(
             textId = R.string.lost_your_authenticator_device,
             onClick = onLostAuthenticatorDevice,
-            modifier = Modifier.padding(top = if (isError) 0.dp else 29.dp, bottom = 40.dp)
+            modifier = Modifier
+                .padding(top = if (isError) 0.dp else 29.dp, bottom = 40.dp)
+                .testTag(LOST_AUTHENTICATION_CODE_TAG)
         )
     }
 
@@ -616,5 +652,36 @@ internal const val MEGA_LOGO_TEST_TAG = "MEGA_LOGO"
 internal const val FETCH_NODES_PROGRESS_TEST_TAG = "FETCH_NODES_PROGRESS"
 internal const val LOGIN_PROGRESS_TEST_TAG = "LOGIN_PROGRESS"
 internal const val TWO_FA_PROGRESS_TEST_TAG = "TWO_FA_PROGRESS"
+internal const val CHECKING_VALIDATION_TAG =
+    "login_in_progress:login_in_progress_text_checking_validation_link"
+internal const val CONNECTING_TO_SERVER_TAG =
+    "login_in_progress:login_in_progress_text_connecting_to_the_server"
+internal const val UPDATING_FILE_LIST_TAG =
+    "login_in_progress:login_in_progress_text_updating_file_list"
+internal const val PREPARING_FILE_LIST_TAG =
+    "login_in_progress:login_in_progress_text_preparing_file_list"
+internal const val TEMPORARY_ERROR_TAG =
+    "login_in_progress:login_in_progress_text_temporary_error"
+internal const val LOGIN_TO_MEGA_TAG = "require_login:text_login_to_mega"
+internal const val TEXT_FIELD_LABEL_TAG =
+    "require_login:label_text_field_displaying_the_email_address_label"
+internal const val PASSWORD_TEXT_FIELD_TAG =
+    "require_login:password_text_field_displaying_the_password"
+internal const val FORGOT_PASSWORD_TAG = "require_login:text_mega_button_forgot_password"
+internal const val LOGIN_BUTTON_TAG = "require_login:raised_default_mega_button_login"
+internal const val CANCEL_LOGIN_PROGRESS_TAG =
+    "require_login:mega_circular_progress_indicator_cancel_login_progress"
+internal const val CANCELLING_LOGIN_TAG = "require_login:text_cancelling_login"
+internal const val TROUBLE_LOGIN_TAG = "require_login:text_trouble_logging_in"
+internal const val REPORT_ISSUE_TAG = "require_login:text_report_issue"
+internal const val NEW_TO_MEGA_TAG = "require_login:text_new_to_mega"
+internal const val CREATE_ACCOUNT_TAG = "require_login:text_mega_button_create_account"
+internal const val ENTER_AUTHENTICATION_CODE_TAG =
+    "two_factor_authentication:text_enter_authentication_code"
+internal const val INVALID_CODE_TAG =
+    "two_factor_authentication:text_invalid_code"
+internal const val LOST_AUTHENTICATION_CODE_TAG =
+    "two_factor_authentication:text_mega_button_lost_authentication_code"
+
 internal const val CLICKS_TO_ENABLE_LOGS = 5
 private const val LONG_PRESS_DELAY = 5000L
