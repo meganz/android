@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.views
 
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -16,6 +17,7 @@ internal fun SyncItemView(
     removeFolderClicked: (folderPairId: Long) -> Unit,
     issuesInfoClicked: () -> Unit,
     isLowBatteryLevel: Boolean,
+    @StringRes errorRes: Int? = null
 ) {
     val sync = syncUiItems[itemIndex]
     SyncCard(
@@ -38,6 +40,7 @@ internal fun SyncItemView(
         },
         issuesInfoClicked = issuesInfoClicked,
         isLowBatteryLevel = isLowBatteryLevel,
+        errorRes = errorRes
     )
 }
 

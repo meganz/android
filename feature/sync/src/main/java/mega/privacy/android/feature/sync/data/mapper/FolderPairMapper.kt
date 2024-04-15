@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.data.mapper
 
+import mega.privacy.android.data.mapper.backup.SyncErrorMapper
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import nz.mega.sdk.MegaSync
@@ -11,6 +12,7 @@ import javax.inject.Inject
  */
 internal class FolderPairMapper @Inject constructor(
     private val mapSyncStatus: SyncStatusMapper,
+    private val syncErrorMapper: SyncErrorMapper
 ) {
 
     operator fun invoke(
@@ -23,6 +25,7 @@ internal class FolderPairMapper @Inject constructor(
             pairName = model.name,
             localFolderPath = model.localFolder,
             remoteFolder = RemoteFolder(model.megaHandle, megaFolderName),
-            syncStatus = mapSyncStatus(syncStats, model.runState)
+            syncStatus = mapSyncStatus(syncStats, model.runState),
+            syncError = syncErrorMapper(model.error)
         )
 }

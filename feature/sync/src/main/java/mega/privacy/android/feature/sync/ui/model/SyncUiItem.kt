@@ -12,4 +12,5 @@ internal data class SyncUiItem(
     val megaStoragePath: String,
     @StringRes val method: Int,
     val expanded: Boolean,
+    @StringRes val error: Int? = null
 )

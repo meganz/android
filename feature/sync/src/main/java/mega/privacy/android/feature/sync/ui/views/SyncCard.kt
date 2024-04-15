@@ -1,6 +1,10 @@
 package mega.privacy.android.feature.sync.ui.views
 
+import mega.privacy.android.core.R as coreR
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,16 +32,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.R as coreR
-import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.core.ui.controls.buttons.MegaButtonWithIconAndText
-import mega.privacy.android.feature.sync.R
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable
 internal fun SyncCard(
@@ -53,6 +56,7 @@ internal fun SyncCard(
     removeFolderClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,
     isLowBatteryLevel: Boolean,
+    @StringRes errorRes: Int?,
     modifier: Modifier = Modifier,
 ) {
 
@@ -75,10 +79,19 @@ internal fun SyncCard(
             status,
             hasStalledIssues = hasStalledIssues,
             expanded = expanded,
-            expandClicked
+            expandClicked,
         )
 
-        Divider(Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp))
+        if (errorRes != null) {
+            WarningBanner(
+                textString = stringResource(errorRes),
+                onCloseClick = null,
+                Modifier.padding(top = 16.dp)
+            )
+            Divider(Modifier.padding(start = 16.dp, end = 16.dp))
+        } else {
+            Divider(Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp))
+        }
 
         AnimatedVisibility(visible = expanded) {
             SyncCardDetailedInfo(deviceStoragePath, megaStoragePath, method)
@@ -89,11 +102,12 @@ internal fun SyncCard(
                 SyncStatus.SYNCING,
                 SyncStatus.SYNCED
             ),
-            isError = hasStalledIssues,
+            hasStalledIssues = hasStalledIssues,
             pauseRunClicked,
             removeFolderClicked,
             issuesInfoClicked,
             isLowBatteryLevel = isLowBatteryLevel,
+            isError = errorRes != null
         )
     }
 }
@@ -238,11 +252,12 @@ private fun SyncCardDetailedInfo(
 @Composable
 private fun SyncCardFooter(
     isSyncRunning: Boolean,
-    isError: Boolean,
+    hasStalledIssues: Boolean,
     pauseRunClicked: () -> Unit,
     removeFolderClicked: () -> Unit,
     issuesInfoClicked: () -> Unit,
     isLowBatteryLevel: Boolean,
+    isError: Boolean,
 ) {
     Box(Modifier.fillMaxWidth()) {
         Row(
@@ -250,7 +265,7 @@ private fun SyncCardFooter(
                 .align(Alignment.CenterEnd)
                 .padding(end = 16.dp, top = 16.dp, bottom = 16.dp)
         ) {
-            if (isError) {
+            if (hasStalledIssues) {
                 MegaButtonWithIconAndText(
                     modifier = Modifier.padding(end = 8.dp),
                     onClick = issuesInfoClicked,
@@ -275,7 +290,7 @@ private fun SyncCardFooter(
                 } else {
                     stringResource(id = R.string.sync_card_run_sync)
                 },
-                enabled = !isLowBatteryLevel
+                enabled = !isLowBatteryLevel && !isError
             )
             MegaButtonWithIconAndText(
                 onClick = removeFolderClicked,
@@ -302,7 +317,30 @@ private fun SyncCardExpandedPreview() {
             expandClicked = {},
             removeFolderClicked = {},
             issuesInfoClicked = {},
-            isLowBatteryLevel = false
+            isLowBatteryLevel = false,
+            errorRes = null,
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun SyncCardExpandedWithBannerPreview() {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        SyncCard(
+            folderPairName = "Competitors documentation",
+            status = SyncStatus.SYNCING,
+            hasStalledIssues = false,
+            deviceStoragePath = "/storage/emulated/0/Download",
+            megaStoragePath = "/Root/Competitors documentation",
+            method = "Two-way",
+            pauseRunClicked = {},
+            expanded = true,
+            expandClicked = {},
+            removeFolderClicked = {},
+            issuesInfoClicked = {},
+            isLowBatteryLevel = false,
+            errorRes = sharedR.string.general_sync_active_sync_below_path,
         )
     }
 }
@@ -323,7 +361,30 @@ private fun SyncCardCollapsedPreview() {
             expandClicked = {},
             removeFolderClicked = {},
             issuesInfoClicked = {},
-            isLowBatteryLevel = false
+            isLowBatteryLevel = false,
+            errorRes = null
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun SyncCardCollapsedWithBannerPreview() {
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        SyncCard(
+            folderPairName = "Competitors documentation",
+            status = SyncStatus.SYNCING,
+            hasStalledIssues = false,
+            deviceStoragePath = "/storage/emulated/0/Download",
+            megaStoragePath = "/Root/Competitors documentation",
+            method = "Two-way",
+            pauseRunClicked = {},
+            expanded = false,
+            expandClicked = {},
+            removeFolderClicked = {},
+            issuesInfoClicked = {},
+            isLowBatteryLevel = false,
+            errorRes = sharedR.string.general_sync_active_sync_below_path,
         )
     }
 }

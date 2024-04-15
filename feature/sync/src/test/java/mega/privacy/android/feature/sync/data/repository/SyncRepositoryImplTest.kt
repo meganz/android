@@ -17,7 +17,6 @@ import mega.privacy.android.domain.exception.MegaSyncException
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGateway
 import mega.privacy.android.feature.sync.data.mapper.FolderPairMapper
-import mega.privacy.android.feature.sync.data.mapper.SyncStatusMapper
 import mega.privacy.android.feature.sync.data.mapper.stalledissue.StalledIssueTypeMapper
 import mega.privacy.android.feature.sync.data.mapper.stalledissue.StalledIssuesMapper
 import mega.privacy.android.feature.sync.data.model.MegaSyncListenerEvent
@@ -43,7 +42,7 @@ class SyncRepositoryImplTest {
     private val syncGateway: SyncGateway = mock()
     private val syncStatsCacheGateway: SyncStatsCacheGateway = mock()
     private val megaApiGateway: MegaApiGateway = mock()
-    private val folderPairMapper: FolderPairMapper = FolderPairMapper(SyncStatusMapper())
+    private val folderPairMapper: FolderPairMapper = FolderPairMapper(mock(), mock())
     private val stalledIssuesMapper: StalledIssuesMapper = StalledIssuesMapper(
         StalledIssueTypeMapper()
     )

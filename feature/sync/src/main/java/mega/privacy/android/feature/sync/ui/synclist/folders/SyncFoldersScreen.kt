@@ -17,8 +17,8 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
-import mega.privacy.android.feature.sync.ui.views.SyncItemView
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.CardExpanded
+import mega.privacy.android.feature.sync.ui.views.SyncItemView
 import mega.privacy.android.feature.sync.ui.views.SyncListNoItemsPlaceHolder
 
 @Composable
@@ -64,6 +64,7 @@ internal fun SyncFoldersScreen(
                         removeFolderClicked = removeFolderClicked,
                         issuesInfoClicked = issuesInfoClicked,
                         isLowBatteryLevel = isLowBatteryLevel,
+                        errorRes = syncUiItems[itemIndex].error
                     )
                 }
             }
