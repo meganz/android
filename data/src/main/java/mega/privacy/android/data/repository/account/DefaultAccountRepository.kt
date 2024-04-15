@@ -1322,6 +1322,16 @@ internal class DefaultAccountRepository @Inject constructor(
             }
         }
 
+    override suspend fun cancelCreateAccount() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("cancelCreateAccount") {}
+            megaApiGateway.cancelCreateAccount(listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
         private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"

@@ -636,4 +636,9 @@ interface AccountRepository {
      * @return The Change Email Link if there are no issues found during the querying process
      */
     suspend fun queryChangeEmailLink(changeEmailLink: String): String
+
+    /**
+     * Cancel a registration process
+     */
+    suspend fun cancelCreateAccount()
 }

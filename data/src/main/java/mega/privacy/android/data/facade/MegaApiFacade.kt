@@ -1579,4 +1579,7 @@ internal class MegaApiFacade @Inject constructor(
         name: String,
         listener: MegaRequestListenerInterface,
     ) = megaApi.resendSignupLink(email, name, listener)
+
+    override fun cancelCreateAccount(listener: MegaRequestListenerInterface) =
+        megaApi.cancelCreateAccount(listener)
 }

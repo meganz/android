@@ -1856,4 +1856,26 @@ class DefaultAccountRepositoryTest {
                 underTest.queryChangeEmailLink("email/link/to/query")
             }
         }
+
+    @Test
+    fun `test that the sdk successfully cancels a registration process`() = runTest {
+        val megaErrorCode = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+        whenever(
+            megaApiGateway.cancelCreateAccount(
+                listener = any()
+            )
+        ).thenAnswer {
+            ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                api = mock(),
+                request = mock(),
+                error = megaErrorCode
+            )
+        }
+
+        underTest.cancelCreateAccount()
+
+        verify(megaApiGateway).cancelCreateAccount(any())
+    }
 }

@@ -3511,4 +3511,18 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun resendSignupLink(email: String, name: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Cancel a registration process
+     *
+     * If a signup link has been generated during registration process, call this function
+     * to invalidate it. The ephemeral session will not be invalidated, only the signup link.
+     *
+     * The associated request type with this request is MegaRequest::TYPE_CREATE_ACCOUNT.
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the value MegaApi::CANCEL_ACCOUNT
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+    fun cancelCreateAccount(listener: MegaRequestListenerInterface)
 }
