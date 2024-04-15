@@ -35,6 +35,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
@@ -440,7 +441,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             }
         }
 
-        collectFlow(monitorTransferOverQuotaUseCase()) { isCurrentOverQuota ->
+        collectFlow(monitorTransferOverQuotaUseCase().filter { it }) { isCurrentOverQuota ->
             if (transfersManagement.shouldShowTransferOverQuotaWarning()) {
                 transfersManagement.isCurrentTransferOverQuota = isCurrentOverQuota
                 transfersManagement.setTransferOverQuotaTimestamp()
