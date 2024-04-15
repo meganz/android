@@ -19,6 +19,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 
 internal class AudioSectionActionModeCallback(
+    private val fragment: AudioSectionFragment,
     private val managerActivity: ManagerActivity,
     private val childFragmentManager: FragmentManager,
     private val audioSectionViewModel: AudioSectionViewModel,
@@ -49,12 +50,15 @@ internal class AudioSectionActionModeCallback(
             val isHiddenNodesEnabled = managerActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
             val hasNonSensitiveNode =
                 audioSectionViewModel.getSelectedNodes().any { !it.isMarkedSensitive }
+            val isPaid =
+            audioSectionViewModel.state.value.accountDetail?.levelDetail?.accountType?.isPaid
+                ?: false
 
             menu?.findItem(R.id.cab_menu_hide)?.isVisible =
-                isHiddenNodesEnabled && hasNonSensitiveNode
+                isHiddenNodesEnabled && (hasNonSensitiveNode || !isPaid)
 
             menu?.findItem(R.id.cab_menu_unhide)?.isVisible =
-                isHiddenNodesEnabled && !hasNonSensitiveNode
+                isHiddenNodesEnabled && !hasNonSensitiveNode && isPaid
         }
         return true
     }
@@ -123,10 +127,7 @@ internal class AudioSectionActionModeCallback(
 
                 R.id.cab_menu_select_all -> audioSectionViewModel.selectAllNodes()
 
-                R.id.cab_menu_hide -> audioSectionViewModel.hideOrUnhideNodes(
-                    nodeIds = audioSectionViewModel.getSelectedNodes().map { it.id },
-                    hide = true,
-                )
+                R.id.cab_menu_hide -> fragment.handleHideNodeClick()
 
                 R.id.cab_menu_unhide -> audioSectionViewModel.hideOrUnhideNodes(
                     nodeIds = audioSectionViewModel.getSelectedNodes().map { it.id },

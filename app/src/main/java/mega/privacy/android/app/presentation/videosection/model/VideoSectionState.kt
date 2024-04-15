@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.videosection.model
 
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.account.AccountDetail
 
 /**
  * The state is for the videos section
@@ -37,6 +38,8 @@ import mega.privacy.android.domain.entity.SortOrder
  * @property areVideoPlaylistsRemovedSuccessfully true if the video playlists are removed successfully
  * @property currentDestinationRoute the current destination route
  * @property updateToolbarTitle true is to update toolbar title
+ * @property accountDetail the account detail
+ * @property isHiddenNodesOnboarded if is hidden nodes onboarded
  */
 data class VideoSectionState(
     val allVideos: List<VideoUIEntity> = emptyList(),
@@ -71,4 +74,6 @@ data class VideoSectionState(
     val areVideoPlaylistsRemovedSuccessfully: Boolean = false,
     val currentDestinationRoute: String? = null,
     val updateToolbarTitle: String? = null,
+    val accountDetail: AccountDetail? = null,
+    val isHiddenNodesOnboarded: Boolean = false,
 )

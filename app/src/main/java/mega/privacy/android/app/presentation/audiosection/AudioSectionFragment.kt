@@ -8,6 +8,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +31,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
@@ -36,6 +40,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.utils.Constants
@@ -47,9 +52,11 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_S
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
@@ -77,6 +84,8 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
     lateinit var getOptionsForToolbarMapper: GetOptionsForToolbarMapper
 
     private var actionMode: ActionMode? = null
+
+    private var tempNodeIds: List<NodeId> = listOf()
 
     /**
      * onCreateView
@@ -238,10 +247,11 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
             actionMode =
                 (requireActivity() as? AppCompatActivity)?.startSupportActionMode(
                     AudioSectionActionModeCallback(
+                        fragment = this,
                         managerActivity = requireActivity() as ManagerActivity,
                         childFragmentManager = childFragmentManager,
                         audioSectionViewModel = audioSectionViewModel,
-                        getOptionsForToolbarMapper = getOptionsForToolbarMapper
+                        getOptionsForToolbarMapper = getOptionsForToolbarMapper,
                     ) {
                         disableSelectMode()
                     }
@@ -300,5 +310,65 @@ class AudioSectionFragment : Fragment(), HomepageSearchable {
      */
     override fun exitSearch() {
         audioSectionViewModel.exitSearch()
+    }
+
+    suspend fun handleHideNodeClick() {
+        var isPaid: Boolean
+        var isHiddenNodesOnboarded: Boolean
+        with(audioSectionViewModel.state.value) {
+            isPaid = this.accountDetail?.levelDetail?.accountType?.isPaid ?: false
+            isHiddenNodesOnboarded = this.isHiddenNodesOnboarded
+        }
+
+        if (!isPaid) {
+            val intent = HiddenNodesOnboardingActivity.createScreen(
+                context = requireContext(),
+                isOnboarding = false,
+            )
+            hiddenNodesOnboardingLauncher.launch(intent)
+            activity?.overridePendingTransition(0, 0)
+        } else if (isHiddenNodesOnboarded) {
+            audioSectionViewModel.hideOrUnhideNodes(
+                nodeIds = audioSectionViewModel.getSelectedNodes().map { it.id },
+                hide = true,
+            )
+        } else {
+            tempNodeIds = audioSectionViewModel.getSelectedNodes().map { it.id }
+            showHiddenNodesOnboarding()
+        }
+    }
+
+    private fun showHiddenNodesOnboarding() {
+        audioSectionViewModel.setHiddenNodesOnboarded()
+
+        val intent = HiddenNodesOnboardingActivity.createScreen(
+            context = requireContext(),
+            isOnboarding = true,
+        )
+        hiddenNodesOnboardingLauncher.launch(intent)
+        activity?.overridePendingTransition(0, 0)
+    }
+
+    private val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleHiddenNodesOnboardingResult,
+        )
+
+    private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+
+        audioSectionViewModel.hideOrUnhideNodes(
+            nodeIds = tempNodeIds,
+            hide = true,
+        )
+
+        val message =
+            resources.getQuantityString(
+                R.plurals.hidden_nodes_result_message,
+                tempNodeIds.size,
+                1
+            )
+        Util.showSnackbar(requireActivity(), message)
     }
 }

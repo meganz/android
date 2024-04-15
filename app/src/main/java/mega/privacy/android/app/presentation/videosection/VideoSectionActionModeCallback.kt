@@ -19,6 +19,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 
 internal class VideoSectionActionModeCallback(
+    private val fragment: VideoSectionFragment,
     private val managerActivity: ManagerActivity,
     private val childFragmentManager: FragmentManager,
     private val videoSectionViewModel: VideoSectionViewModel,
@@ -49,12 +50,15 @@ internal class VideoSectionActionModeCallback(
             val isHiddenNodesEnabled = managerActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
             val hasNonSensitiveNode =
                 videoSectionViewModel.getSelectedNodes().any { !it.isMarkedSensitive }
+            val isPaid =
+                videoSectionViewModel.state.value.accountDetail?.levelDetail?.accountType?.isPaid
+                    ?: false
 
             menu?.findItem(R.id.cab_menu_hide)?.isVisible =
-                isHiddenNodesEnabled && hasNonSensitiveNode
+                isHiddenNodesEnabled && (hasNonSensitiveNode || !isPaid)
 
             menu?.findItem(R.id.cab_menu_unhide)?.isVisible =
-                isHiddenNodesEnabled && !hasNonSensitiveNode
+                isHiddenNodesEnabled && !hasNonSensitiveNode && isPaid
         }
         return true
     }
@@ -122,10 +126,7 @@ internal class VideoSectionActionModeCallback(
                         .show(childFragmentManager, RemoveAllSharingContactDialogFragment.TAG)
 
 
-                R.id.cab_menu_hide -> videoSectionViewModel.hideOrUnhideNodes(
-                    nodeIds = videoSectionViewModel.getSelectedNodes().map { it.id },
-                    hide = true,
-                )
+                R.id.cab_menu_hide -> fragment.handleHideNodeClick()
 
                 R.id.cab_menu_unhide -> videoSectionViewModel.hideOrUnhideNodes(
                     nodeIds = videoSectionViewModel.getSelectedNodes().map { it.id },

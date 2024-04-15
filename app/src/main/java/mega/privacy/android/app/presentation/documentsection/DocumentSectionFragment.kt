@@ -7,6 +7,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,6 +40,7 @@ import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetD
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
 import mega.privacy.android.app.presentation.documentsection.view.DocumentSectionComposeView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
@@ -48,6 +52,7 @@ import mega.privacy.android.app.utils.Constants.DOCUMENTS_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.DOCUMENTS_SEARCH_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
@@ -81,6 +86,9 @@ class DocumentSectionFragment : Fragment(), HomepageSearchable {
     lateinit var getOptionsForToolbarMapper: GetOptionsForToolbarMapper
 
     private var actionMode: ActionMode? = null
+
+    private var tempNodeIds: List<NodeId> = listOf()
+
 
     /**
      * onCreateView
@@ -262,6 +270,7 @@ class DocumentSectionFragment : Fragment(), HomepageSearchable {
             actionMode =
                 (requireActivity() as? AppCompatActivity)?.startSupportActionMode(
                     DocumentSectionActionModeCallback(
+                        fragment = this,
                         managerActivity = requireActivity() as ManagerActivity,
                         childFragmentManager = childFragmentManager,
                         documentSectionViewModel = documentSectionViewModel,
@@ -338,5 +347,65 @@ class DocumentSectionFragment : Fragment(), HomepageSearchable {
      */
     override fun exitSearch() {
         documentSectionViewModel.exitSearch()
+    }
+
+    suspend fun handleHideNodeClick() {
+        var isPaid: Boolean
+        var isHiddenNodesOnboarded: Boolean
+        with(documentSectionViewModel.uiState.value) {
+            isPaid = this.accountDetail?.levelDetail?.accountType?.isPaid ?: false
+            isHiddenNodesOnboarded = this.isHiddenNodesOnboarded
+        }
+
+        if (!isPaid) {
+            val intent = HiddenNodesOnboardingActivity.createScreen(
+                context = requireContext(),
+                isOnboarding = false,
+            )
+            hiddenNodesOnboardingLauncher.launch(intent)
+            activity?.overridePendingTransition(0, 0)
+        } else if (isHiddenNodesOnboarded) {
+            documentSectionViewModel.hideOrUnhideNodes(
+                nodeIds = documentSectionViewModel.getSelectedNodes().map { it.id },
+                hide = true,
+            )
+        } else {
+            tempNodeIds = documentSectionViewModel.getSelectedNodes().map { it.id }
+            showHiddenNodesOnboarding()
+        }
+    }
+
+    private fun showHiddenNodesOnboarding() {
+        documentSectionViewModel.setHiddenNodesOnboarded()
+
+        val intent = HiddenNodesOnboardingActivity.createScreen(
+            context = requireContext(),
+            isOnboarding = true,
+        )
+        hiddenNodesOnboardingLauncher.launch(intent)
+        activity?.overridePendingTransition(0, 0)
+    }
+
+    private val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleHiddenNodesOnboardingResult,
+        )
+
+    private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+
+        documentSectionViewModel.hideOrUnhideNodes(
+            nodeIds = tempNodeIds,
+            hide = true,
+        )
+
+        val message =
+            resources.getQuantityString(
+                R.plurals.hidden_nodes_result_message,
+                tempNodeIds.size,
+                1
+            )
+        Util.showSnackbar(requireActivity(), message)
     }
 }

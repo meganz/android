@@ -10,6 +10,8 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -43,6 +45,7 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
@@ -124,6 +127,8 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
                 }
             }
         }
+
+    private var tempNodeIds: List<NodeId> = listOf()
 
     /**
      * onCreateView
@@ -311,6 +316,7 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
             actionMode =
                 (requireActivity() as? AppCompatActivity)?.startSupportActionMode(
                     VideoSectionActionModeCallback(
+                        fragment = this,
                         managerActivity = requireActivity() as ManagerActivity,
                         childFragmentManager = childFragmentManager,
                         videoSectionViewModel = videoSectionViewModel,
@@ -496,6 +502,67 @@ class VideoSectionFragment : Fragment(), HomepageSearchable {
      */
     override fun exitSearch() {
         videoSectionViewModel.exitSearch()
+    }
+
+
+    suspend fun handleHideNodeClick() {
+        var isPaid: Boolean
+        var isHiddenNodesOnboarded: Boolean
+        with(videoSectionViewModel.state.value) {
+            isPaid = this.accountDetail?.levelDetail?.accountType?.isPaid ?: false
+            isHiddenNodesOnboarded = this.isHiddenNodesOnboarded
+        }
+
+        if (!isPaid) {
+            val intent = HiddenNodesOnboardingActivity.createScreen(
+                context = requireContext(),
+                isOnboarding = false,
+            )
+            hiddenNodesOnboardingLauncher.launch(intent)
+            activity?.overridePendingTransition(0, 0)
+        } else if (isHiddenNodesOnboarded) {
+            videoSectionViewModel.hideOrUnhideNodes(
+                nodeIds = videoSectionViewModel.getSelectedNodes().map { it.id },
+                hide = true,
+            )
+        } else {
+            tempNodeIds = videoSectionViewModel.getSelectedNodes().map { it.id }
+            showHiddenNodesOnboarding()
+        }
+    }
+
+    private fun showHiddenNodesOnboarding() {
+        videoSectionViewModel.setHiddenNodesOnboarded()
+
+        val intent = HiddenNodesOnboardingActivity.createScreen(
+            context = requireContext(),
+            isOnboarding = true,
+        )
+        hiddenNodesOnboardingLauncher.launch(intent)
+        activity?.overridePendingTransition(0, 0)
+    }
+
+    private val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleHiddenNodesOnboardingResult,
+        )
+
+    private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+
+        videoSectionViewModel.hideOrUnhideNodes(
+            nodeIds = tempNodeIds,
+            hide = true,
+        )
+
+        val message =
+            resources.getQuantityString(
+                R.plurals.hidden_nodes_result_message,
+                tempNodeIds.size,
+                1
+            )
+        Util.showSnackbar(requireActivity(), message)
     }
 
     companion object {

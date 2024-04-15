@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.documentsection.model
 
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.preference.ViewType
 
 /**
@@ -14,6 +15,8 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property selectedDocumentHandles the selected document handles
  * @property actionMode if list is in action mode or not
  * @property scrollToTop if need to scroll to top
+ * @property accountDetail the account detail
+ * @property isHiddenNodesOnboarded if is hidden nodes onboarded
  */
 data class DocumentSectionUiState(
     val allDocuments: List<DocumentUiEntity> = emptyList(),
@@ -24,4 +27,6 @@ data class DocumentSectionUiState(
     val selectedDocumentHandles: List<Long> = emptyList(),
     val actionMode: Boolean = false,
     val scrollToTop: Boolean = false,
+    val accountDetail: AccountDetail? = null,
+    val isHiddenNodesOnboarded: Boolean = false,
 )

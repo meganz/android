@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.audiosection.model
 
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.preference.ViewType
 
 /**
@@ -15,6 +16,8 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property scrollToTop the scroll to top state
  * @property selectedAudioHandles the selected audio handles
  * @property isInSelection if list is in selection mode or not
+ * @property accountDetail the account detail
+ * @property isHiddenNodesOnboarded if is hidden nodes onboarded
  */
 data class AudioSectionState(
     val allAudios: List<AudioUiEntity> = emptyList(),
@@ -26,4 +29,6 @@ data class AudioSectionState(
     val scrollToTop: Boolean = false,
     val selectedAudioHandles: List<Long> = emptyList(),
     val isInSelection: Boolean = false,
+    val accountDetail: AccountDetail? = null,
+    val isHiddenNodesOnboarded: Boolean = false,
 )

@@ -1,7 +1,10 @@
 package mega.privacy.android.app.presentation.documentsection
 
+import android.content.Intent
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
@@ -13,12 +16,14 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFragment
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.main.dialog.shares.RemoveAllSharingContactDialogFragment
+import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 
 internal class DocumentSectionActionModeCallback(
+    private val fragment: DocumentSectionFragment,
     private val managerActivity: ManagerActivity,
     private val childFragmentManager: FragmentManager,
     private val documentSectionViewModel: DocumentSectionViewModel,
@@ -48,12 +53,15 @@ internal class DocumentSectionActionModeCallback(
             val isHiddenNodesEnabled = managerActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
             val hasNonSensitiveNode =
                 documentSectionViewModel.getSelectedNodes().any { !it.isMarkedSensitive }
+            val isPaid =
+                documentSectionViewModel.uiState.value.accountDetail?.levelDetail?.accountType?.isPaid
+                    ?: false
 
             menu?.findItem(R.id.cab_menu_hide)?.isVisible =
-                isHiddenNodesEnabled && hasNonSensitiveNode
+                isHiddenNodesEnabled && (hasNonSensitiveNode || !isPaid)
 
             menu?.findItem(R.id.cab_menu_unhide)?.isVisible =
-                isHiddenNodesEnabled && !hasNonSensitiveNode
+                isHiddenNodesEnabled && !hasNonSensitiveNode && isPaid
         }
         return true
     }
@@ -129,10 +137,7 @@ internal class DocumentSectionActionModeCallback(
 
                 R.id.cab_menu_select_all -> documentSectionViewModel.selectAllNodes()
 
-                R.id.cab_menu_hide -> documentSectionViewModel.hideOrUnhideNodes(
-                    nodeIds = documentSectionViewModel.getSelectedNodes().map { it.id },
-                    hide = true,
-                )
+                R.id.cab_menu_hide -> fragment.handleHideNodeClick()
 
                 R.id.cab_menu_unhide -> documentSectionViewModel.hideOrUnhideNodes(
                     nodeIds = documentSectionViewModel.getSelectedNodes().map { it.id },
