@@ -8,7 +8,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -50,8 +49,6 @@ fun ChatRichLinkMessage(
         modifier = modifier,
         isMe = isMine,
         content = {
-            val uriHandler = LocalUriHandler.current
-
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(
                     text = title,
@@ -62,7 +59,7 @@ fun ChatRichLinkMessage(
                     isEdited = isEdited,
                     links = links,
                     interactionEnabled = interactionEnabled,
-                    onLinkClicked = { link -> uriHandler.openUri(link.completeURLProtocol()) },
+                    onLinkClicked = { it },
                     onLongClick = onLongClick,
                     modifier = Modifier.padding(top = 4.dp),
                     style = MaterialTheme.typography.caption,

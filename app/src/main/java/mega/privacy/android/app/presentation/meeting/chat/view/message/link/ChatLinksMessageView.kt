@@ -9,13 +9,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.message.normal.ChatMessageTextViewModel
 import mega.privacy.android.core.ui.controls.chat.messages.ChatBubble
 import mega.privacy.android.core.ui.controls.chat.messages.MessageText
-import mega.privacy.android.core.ui.controls.chat.messages.completeURLProtocol
 import mega.privacy.android.domain.entity.chat.messages.normal.TextLinkMessage
 
 /**
@@ -46,7 +44,6 @@ fun ChatLinksMessageView(
             modifier = modifier,
             subContent = linkViews,
             content = {
-                val uriHandler = LocalUriHandler.current
                 val context = LocalContext.current
 
                 MessageText(
@@ -55,8 +52,14 @@ fun ChatLinksMessageView(
                     links = links,
                     interactionEnabled = interactionEnabled,
                     onLinkClicked = { link ->
-                        contentLinks.firstOrNull { it.link.contains(link) }?.onClick(context)
-                            ?: uriHandler.openUri(link.completeURLProtocol())
+                        contentLinks.firstOrNull { it.link.contains(link) }.let { contentLink ->
+                            if (contentLink == null) {
+                                link
+                            } else {
+                                contentLink.onClick(context)
+                                null
+                            }
+                        }
                     },
                     onLongClick = onLongClick,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),

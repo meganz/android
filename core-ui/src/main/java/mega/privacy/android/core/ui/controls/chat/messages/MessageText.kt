@@ -4,10 +4,16 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -20,10 +26,12 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import kotlinx.coroutines.launch
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.chat.messages.format.Format
 import mega.privacy.android.core.ui.controls.chat.messages.format.FormatTag
 import mega.privacy.android.core.ui.controls.chat.messages.format.FormatType
+import mega.privacy.android.core.ui.controls.layouts.LocalSnackBarHostState
 import mega.privacy.android.core.ui.controls.text.megaSpanStyle
 import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.core.ui.theme.robotoMono
@@ -39,15 +47,22 @@ fun MessageText(
     isEdited: Boolean,
     links: List<String>,
     interactionEnabled: Boolean,
-    onLinkClicked: (String) -> Unit,
+    onLinkClicked: (String) -> String?,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current,
 ) {
+    var clickedLink by rememberSaveable { mutableStateOf<String?>(null) }
+
+    clickedLink?.let {
+        OpenMessageLink(link = it)
+        clickedLink = null
+    }
+
     with(message.getMessageText(isEdited = isEdited, links = links)) {
         val onClick: (Int) -> Unit = {
             getStringAnnotations(URL_TAG, it, it).firstOrNull()
-                ?.let { link -> onLinkClicked(link.item) }
+                ?.let { link -> clickedLink = onLinkClicked(link.item) }
         }
         val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
         val pressIndicator = Modifier.pointerInput(onClick) {
@@ -428,9 +443,29 @@ private fun String.getLinkWithoutFormatTags(): String {
 }
 
 /**
+ * Tries to open a link using the URI handler.
+ * If the link cannot be opened, it will show a warning.
+ */
+@Composable
+fun OpenMessageLink(link: String) {
+    val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackBarHostState.current
+
+    runCatching {
+        uriHandler.openUri(link.completeURLProtocol())
+    }.onFailure {
+        coroutineScope.launch {
+            snackbarHostState?.showSnackbar(context.getString(R.string.chat_click_link_in_message_intent_not_available))
+        }
+    }
+}
+
+/**
  * Adds URL protocol if required
  */
-fun String.completeURLProtocol() =
+private fun String.completeURLProtocol() =
     if (this.toUri().scheme.isNullOrBlank()) "http://$this"
     else this
 

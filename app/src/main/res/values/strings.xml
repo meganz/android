@@ -5113,21 +5113,13 @@
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_get_pro_title">Get more with a Pro plan</string>
     <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">Upgrade to a Pro plan and get more storage and access to Pro features. Plans start from as low as %1$s a month</string>
+    <string name="dialog_onboarding_get_pro_description">Upgrade to a Pro plan and get more storage and access to Pro features. Plans start from as low as %1$s a month.</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_some_features_title">MEGA&#160;Pro plans include:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_storage">Ultimate storage flexibility</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
     <string name="dialog_onboarding_feature_description_storage">Starting from %1$s, find the perfect fit for your storage needs.</string>
-    <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_transfer">Transfer sharing</string>
-    <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_transfer">The people you share data with can use your transfer quota to download and stream the items you shared.</string>
-    <!-- Title for Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_security">Additional security when sharing</string>
-    <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_security">Set passwords and expiry dates for file and folder links.</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
     <string name="dialog_onboarding_button_view_pro_plan">Upgrade to Pro today</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
@@ -5403,8 +5395,12 @@
     <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
     <!-- Button text for photo option in camera screen -->
     <string name="camera_photo_button">Photo</string>
+    <!--  -->
     <string name="camera_flash_mode_on">Flash mode on</string>
+    <!--  -->
     <string name="camera_flash_mode_off">Flash mode off</string>
+    <!--  -->
     <string name="camera_flash_mode_auto">Flash mode auto</string>
+    <!--  -->
     <string name="camera_send_to">Send to %1$s</string>
 </resources>
