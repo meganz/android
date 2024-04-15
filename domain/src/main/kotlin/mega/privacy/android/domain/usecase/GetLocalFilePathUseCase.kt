@@ -15,7 +15,7 @@ class GetLocalFilePathUseCase @Inject constructor(
     /**
      * Get the local folder path
      *
-     * @param typedFileNode [TypedFileNode]
+     * @param typedNode TypedNode
      * @return local file if it exists
      */
     suspend operator fun invoke(typedNode: TypedNode?) =
