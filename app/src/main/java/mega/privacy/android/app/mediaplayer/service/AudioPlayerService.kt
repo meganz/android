@@ -1,9 +1,13 @@
 package mega.privacy.android.app.mediaplayer.service
 
+import mega.privacy.android.icon.pack.R as iconPackR
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
 import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -16,6 +20,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -25,6 +30,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.Player
+import androidx.media3.ui.PlayerView
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
@@ -47,16 +54,10 @@ import mega.privacy.android.app.utils.ChatUtil.STREAM_MUSIC_DEFAULT
 import mega.privacy.android.app.utils.ChatUtil.getAudioFocus
 import mega.privacy.android.app.utils.ChatUtil.getRequest
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
-import mega.privacy.android.icon.pack.R as iconPackR
-import android.annotation.SuppressLint
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import androidx.core.app.NotificationCompat
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID
+import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.monitoring.CrashReporter
-import androidx.media3.common.Player
-import androidx.media3.ui.PlayerView
+import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -77,6 +78,12 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
      */
     @Inject
     lateinit var viewModelGateway: AudioPlayerServiceViewModelGateway
+
+    /**
+     * IsUserLoggedIn
+     */
+    @Inject
+    lateinit var isUserLoggedIn: IsUserLoggedIn
 
     /**
      * CrashReporter
@@ -520,6 +527,14 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
             isAudioPlayer = isAudioPlayer,
             showShuffleButton = showShuffleButton,
         )
+    }
+
+    override fun stopAudioServiceWhenAudioPlayerClosedWithUserNotLogin() {
+        lifecycleScope.launch {
+            if (!isUserLoggedIn()) {
+                stopPlayer()
+            }
+        }
     }
 
     override fun playing() = mediaPlayerGateway.mediaPlayerIsPlaying()

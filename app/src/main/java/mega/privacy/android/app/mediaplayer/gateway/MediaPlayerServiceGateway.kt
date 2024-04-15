@@ -103,4 +103,9 @@ interface MediaPlayerServiceGateway {
         isAudioPlayer: Boolean = true,
         showShuffleButton: Boolean? = null,
     )
+
+    /**
+     * Check the user if logged in when the audio player is closed, if not, stop the audio service
+     */
+    fun stopAudioServiceWhenAudioPlayerClosedWithUserNotLogin()
 }

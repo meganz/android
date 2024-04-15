@@ -600,6 +600,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         if (isFinishing) {
             dragToExit.showPreviousHiddenThumbnail()
         }
+        serviceGateway?.stopAudioServiceWhenAudioPlayerClosedWithUserNotLogin()
 
         serviceGateway = null
         playerServiceGateway = null
