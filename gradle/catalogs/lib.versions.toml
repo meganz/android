@@ -25,6 +25,8 @@ nocturn = "1.0"
 karma = "1.3"
 sqlcipher = "4.5.4"
 kotlin-serialisation = "1.6.3"
+eclipse-jgit = "6.6.0.202305301015-r"
+json = "20230227"
 
 [libraries]
 anko-commons = { module = "org.jetbrains.anko:anko-commons", version.ref = "anko" }
@@ -79,6 +81,9 @@ karma-compiler = { module = "com.mega.karma:compiler", version.ref = "karma" }
 karma-core = { module = "com.mega.karma:core", version.ref = "karma" }
 sqlcipher = { module = "net.zetetic:android-database-sqlcipher", version.ref = "sqlcipher" }
 kotlin-serialisation = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialisation"}
+eclipse-jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "eclipse-jgit"}
+eclipse-jgit-ssh-jsch = { module = "org.eclipse.jgit:org.eclipse.jgit.ssh.jsch", version.ref = "eclipse-jgit"}
+json = { module = "org.json:json", version.ref = "json"}
 
 [bundles]
 fresco = ["fresco", "fresco-gif", "fresco-webp", "fresco-webpsupport"]

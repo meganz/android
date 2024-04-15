@@ -7,7 +7,7 @@ espresso = "3.5.1"
 hamcrest = "2.2"
 junit = "4.13.2"
 junit-test = "1.1.5"
-junit5= '5.10.0'
+junit5 = '5.10.0'
 jraska-livedata-test = "1.2.0"
 mockito = "5.4.0"
 mockito-inline = "5.2.0"
@@ -19,6 +19,7 @@ roboelectric = "4.11.1"
 room-test = "2.6.1"
 runner = "1.5.2"
 coil = "2.5.0"
+system-stubs-jupiter = "2.1.6"
 
 [libraries]
 androidx-compose-ui-test = { group = "androidx.compose.ui", name = "ui-test" }
@@ -55,6 +56,7 @@ roboelectric = { module = "org.robolectric:robolectric", version.ref = "roboelec
 room-test = { module = "androidx.room:room-testing", version.ref = "room-test" }
 runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
 coil-test = { module = "io.coil-kt:coil-test", version.ref = "coil" }
+system-stubs-jupiter = { module = "uk.org.webcompere:system-stubs-jupiter", version.ref = "system-stubs-jupiter" }
 
 [bundles]
 unit-test = ["junit", "truth", "hamcrest", "mockito", "mockito-inline", "mockito-kotlin", "turbine"]

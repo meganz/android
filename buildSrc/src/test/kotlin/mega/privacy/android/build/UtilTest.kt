@@ -11,105 +11,104 @@ import uk.org.webcompere.systemstubs.jupiter.SystemStubsExtension
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(SystemStubsExtension::class)
-class UtilPluginTest {
-
+class UtilTest {
 
     @SystemStub
-    private val variables: EnvironmentVariables = EnvironmentVariables()
+    private val env: EnvironmentVariables = EnvironmentVariables()
 
     @Test
     fun `test that readVersionCode returns properly when it is available in system environment`() {
         val expectedVersionCode = "12345"
-        variables.set("APK_VERSION_CODE_FOR_CD", expectedVersionCode)
+        env.set("APK_VERSION_CODE_FOR_CD", expectedVersionCode)
         assertThat(readVersionCode()).isEqualTo(expectedVersionCode.toInt())
     }
 
     @Test
     fun `test that readVersionNameTag returns versions name when it is available in system environment`() {
         val expectedVersionName = "expected_version_name"
-        variables.set("APK_VERSION_NAME_TAG_FOR_CD", expectedVersionName)
+        env.set("APK_VERSION_NAME_TAG_FOR_CD", expectedVersionName)
         assertThat(readVersionNameTag()).isEqualTo(expectedVersionName)
     }
 
     @Test
     fun `test that readVersionNameTag returns empty when it is not available in system environment`() {
-        variables.set("APK_VERSION_NAME_TAG_FOR_CD", null)
+        env.set("APK_VERSION_NAME_TAG_FOR_CD", null)
         assertThat(readVersionNameTag()).isEmpty()
     }
 
     @Test
     fun `test that readVersionNameTag returns empty when it is available but blank in system environment`() {
-        variables.set("APK_VERSION_NAME_TAG_FOR_CD", "   ")
+        env.set("APK_VERSION_NAME_TAG_FOR_CD", "   ")
         assertThat(readVersionNameTag()).isEmpty()
     }
 
     @Test
     fun `test that readVersionNameChannel returns versions name when it is available in system environment`() {
         val expectedVersionName = "expected_version_name"
-        variables.set("APK_VERSION_NAME_CHANNEL_FOR_CD", expectedVersionName)
+        env.set("APK_VERSION_NAME_CHANNEL_FOR_CD", expectedVersionName)
         assertThat(readVersionNameChannel()).isEqualTo(expectedVersionName)
     }
 
     @Test
     fun `test that readVersionNameChannel returns empty when it is available but blank in system environment`() {
-        variables.set("APK_VERSION_NAME_CHANNEL_FOR_CD", "   ")
+        env.set("APK_VERSION_NAME_CHANNEL_FOR_CD", "   ")
         assertThat(readVersionNameChannel()).isEmpty()
     }
 
     @Test
     fun `test that readVersionNameChannel returns empty when it is not available in system environment`() {
-        variables.set("APK_VERSION_NAME_CHANNEL_FOR_CD", null)
+        env.set("APK_VERSION_NAME_CHANNEL_FOR_CD", null)
         assertThat(readVersionNameChannel()).isEmpty()
     }
 
     @Test
     fun `test that readReleaseNotes returns versions name when it is available in system environment`() {
         val expectedVersionName = "expected_release_notes"
-        variables.set("RELEASE_NOTES_FOR_CD", expectedVersionName)
+        env.set("RELEASE_NOTES_FOR_CD", expectedVersionName)
         assertThat(readReleaseNotes()).isEqualTo(expectedVersionName)
     }
 
     @Test
     fun `test that readReleaseNotes returns default release notes when it is not available in system environment`() {
-        variables.set("RELEASE_NOTES_FOR_CD", null)
+        env.set("RELEASE_NOTES_FOR_CD", null)
         assertThat(readReleaseNotes()).isEqualTo("Release Note not available")
     }
 
     @Test
     fun `test that readReleaseNotes returns default release notes when it is available but blank in system environment`() {
-        variables.set("RELEASE_NOTES_FOR_CD", "   ")
+        env.set("RELEASE_NOTES_FOR_CD", "   ")
         assertThat(readReleaseNotes()).isEqualTo("Release Note not available")
     }
 
     @Test
     fun `test that readTesters returns versions name when it is available in system environment`() {
         val expectedVersionName = "expected_testers"
-        variables.set("TESTERS_FOR_CD", expectedVersionName)
+        env.set("TESTERS_FOR_CD", expectedVersionName)
         assertThat(readTesters()).isEqualTo(expectedVersionName)
     }
 
     @Test
     fun `test that readTesters returns empty when it is not available in system environment`() {
-        variables.set("TESTERS_FOR_CD", null)
+        env.set("TESTERS_FOR_CD", null)
         assertThat(readTesters()).isEmpty()
     }
 
     @Test
     fun `test that readTesters returns empty when it is available but blank in system environment`() {
-        variables.set("TESTERS_FOR_CD", "   ")
+        env.set("TESTERS_FOR_CD", "   ")
         assertThat(readTesters()).isEmpty()
     }
 
     @Test
     fun `test that readTesterGroupList returns versions name when it is available in system environment`() {
         val expectedGroupList = "expected_group_list"
-        variables.set("TESTER_GROUP_FOR_CD", expectedGroupList)
+        env.set("TESTER_GROUP_FOR_CD", expectedGroupList)
         assertThat(readTesterGroupList()).isEqualTo(expectedGroupList)
     }
 
     @Test
     fun `test that readTesterGroupList returns default group list when it is available in system environment`() {
-        variables.set("TESTER_GROUP_FOR_CD", null)
+        env.set("TESTER_GROUP_FOR_CD", null)
         assertThat(readTesterGroupList())
             .isEqualTo(
                 "internal_qa, internal_dev, external_qa, external_dev, internal_design"
@@ -119,51 +118,51 @@ class UtilPluginTest {
     @Test
     fun `test that isServerBuild returns true when it is available in system environment`() {
         val expectedBuildNumber = "expected_build_number"
-        variables.set("BUILD_NUMBER", expectedBuildNumber)
+        env.set("BUILD_NUMBER", expectedBuildNumber)
         assertThat(isServerBuild()).isTrue()
     }
 
     @Test
     fun `test that isServerBuild returns false when it is not available in system environment`() {
-        variables.set("BUILD_NUMBER", null)
+        env.set("BUILD_NUMBER", null)
         assertThat(isServerBuild()).isFalse()
     }
 
     @Test
     fun `test that isCiBuild returns true when it is available in system environment`() {
         val expectedIsCiBuild = "true"
-        variables.set("IS_CI_BUILD", expectedIsCiBuild)
+        env.set("IS_CI_BUILD", expectedIsCiBuild)
         assertThat(isCiBuild()).isTrue()
     }
 
     @Test
     fun `test that isCiBuild returns false when it is not available in system environment`() {
-        variables.set("IS_CI_BUILD", null)
+        env.set("IS_CI_BUILD", null)
         assertThat(isCiBuild()).isFalse()
     }
 
     @Test
     fun `test that isCiBuild returns false when it is available in system environment but value is not true`() {
-        variables.set("IS_CI_BUILD", "other_value")
+        env.set("IS_CI_BUILD", "other_value")
         assertThat(isCiBuild()).isFalse()
     }
 
     @Test
     fun `test that shouldCombineLintReports returns true when it is available in system environment`() {
         val expected = "true"
-        variables.set("COMBINE_LINT_REPORTS", expected)
+        env.set("COMBINE_LINT_REPORTS", expected)
         assertThat(shouldCombineLintReports()).isTrue()
     }
 
     @Test
     fun `test that shouldCombineLintReports returns false when it is not available in system environment`() {
-        variables.set("COMBINE_LINT_REPORTS", null)
+        env.set("COMBINE_LINT_REPORTS", null)
         assertThat(shouldCombineLintReports()).isFalse()
     }
 
     @Test
     fun `test that shouldCombineLintReports returns false when it is available in system environment but value is not true`() {
-        variables.set("COMBINE_LINT_REPORTS", "other_value")
+        env.set("COMBINE_LINT_REPORTS", "other_value")
         assertThat(shouldCombineLintReports()).isFalse()
     }
 
@@ -189,27 +188,27 @@ class UtilPluginTest {
     @Test
     fun `test that shouldUsePrebuiltSdk returns true when it is true in system environment`() {
         val expected = "true"
-        variables.set("USE_PREBUILT_SDK", expected)
+        env.set("USE_PREBUILT_SDK", expected)
         assertThat(shouldUsePrebuiltSdk()).isTrue()
     }
 
     @Test
     fun `test that shouldUsePrebuiltSdk returns true when it is other value in system environment`() {
         val expected = "something else"
-        variables.set("USE_PREBUILT_SDK", expected)
+        env.set("USE_PREBUILT_SDK", expected)
         assertThat(shouldUsePrebuiltSdk()).isTrue()
     }
 
     @Test
     fun `test that shouldUsePrebuiltSdk returns false when it is false in system environment`() {
         val expected = "false"
-        variables.set("USE_PREBUILT_SDK", expected)
+        env.set("USE_PREBUILT_SDK", expected)
         assertThat(shouldUsePrebuiltSdk()).isFalse()
     }
 
     @Test
     fun `test that shouldUsePrebuiltSdk returns true when it is not available in system environment`() {
-        variables.set("USE_PREBUILT_SDK", null)
+        env.set("USE_PREBUILT_SDK", null)
         assertThat(shouldUsePrebuiltSdk()).isTrue()
     }
 }
