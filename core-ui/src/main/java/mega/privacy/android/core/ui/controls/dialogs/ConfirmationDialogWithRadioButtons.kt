@@ -241,12 +241,12 @@ private fun ConfirmationDialogWithRadioButtonsWithScrollPreview() {
 }
 
 internal const val CONFIRMATION_DIALOG_TITLE_TAG =
-    "confirmation_dialog_with_radio_buttons:mega_text_title"
+    "confirmation_dialog_with_radio_buttons:text_title"
 internal const val CONFIRMATION_DIALOG_SUBTITLE_TAG =
-    "confirmation_dialog_with_radio_buttons:mega_text_subtitle"
+    "confirmation_dialog_with_radio_buttons:text_subtitle"
 internal const val CONFIRMATION_DIALOG_OPTIONS_TAG =
-    "confirmation_dialog_with_radio_buttons:settings_item_with_radio_button_radio_option"
+    "confirmation_dialog_with_radio_buttons:text_option"
 internal const val CONFIRMATION_DIALOG_CANCEL_BUTTON_TAG =
-    "confirmation_dialog_with_radio_buttons:text_mega_button_cancel_button"
+    "confirmation_dialog_with_radio_buttons:button_cancel"
 internal const val CONFIRMATION_DIALOG_CONFIRM_BUTTON_TAG =
-    "confirmation_dialog_with_radio_buttons:text_mega_button_confirm_button"
+    "confirmation_dialog_with_radio_buttons:button_confirm"
