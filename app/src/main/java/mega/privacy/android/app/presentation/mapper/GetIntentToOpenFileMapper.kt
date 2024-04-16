@@ -9,7 +9,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
@@ -257,7 +256,7 @@ class GetIntentToOpenFileMapper @Inject constructor(
                     showScreenLabel = false,
                     params = mapOf(CloudDriveImageNodeFetcher.PARENT_ID to parentNodeHandle),
                 )
-            } else if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview) && (viewType == INCOMING_SHARES_ADAPTER || viewType == OUTGOING_SHARES_ADAPTER)) {
+            } else if (viewType == INCOMING_SHARES_ADAPTER || viewType == OUTGOING_SHARES_ADAPTER) {
                 val parentNodeHandle = fileNode.parentId.longValue
                 ImagePreviewActivity.createIntent(
                     context = activity,
@@ -265,8 +264,9 @@ class GetIntentToOpenFileMapper @Inject constructor(
                     menuOptionsSource = ImagePreviewMenuSource.SHARED_ITEMS,
                     anchorImageNodeId = fileNode.id,
                     params = mapOf(SharedItemsImageNodeFetcher.PARENT_ID to parentNodeHandle),
+                    showScreenLabel = false,
                 )
-            } else if (getFeatureFlagValueUseCase(AppFeatures.ImagePreview) && viewType == LINKS_ADAPTER) {
+            } else if (viewType == LINKS_ADAPTER) {
                 val parentNodeHandle = fileNode.parentId.longValue
                 ImagePreviewActivity.createIntent(
                     context = activity,
@@ -274,6 +274,7 @@ class GetIntentToOpenFileMapper @Inject constructor(
                     menuOptionsSource = ImagePreviewMenuSource.LINKS,
                     anchorImageNodeId = fileNode.id,
                     params = mapOf(SharedItemsImageNodeFetcher.PARENT_ID to parentNodeHandle),
+                    showScreenLabel = false,
                 )
             } else if (viewType == RUBBISH_BIN_ADAPTER) {
                 ImagePreviewActivity.createIntent(
