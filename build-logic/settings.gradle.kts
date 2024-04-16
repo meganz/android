@@ -5,14 +5,11 @@ dependencyResolutionManagement {
         mavenCentral()
     }
     versionCatalogs {
-        create("plugin") {
-            from(files("../gradle/catalogs/plugin.versions.toml"))
-        }
-        create("testlib") {
-            from(files("../gradle/catalogs/testlib.versions.toml"))
-        }
-        create("androidx") {
-            from(files("../gradle/catalogs/androidx.versions.toml"))
+        for (file in fileTree("../gradle/catalogs").matching { include("**/*.toml") }) {
+            val name = file.name.split(".")[0]
+            create(name) {
+                from(files(file))
+            }
         }
     }
 }

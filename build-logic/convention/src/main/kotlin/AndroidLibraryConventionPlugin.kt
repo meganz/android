@@ -9,6 +9,11 @@ import org.gradle.kotlin.dsl.configure
  */
 class AndroidLibraryConventionPlugin : Plugin<Project> {
 
+    /**
+     * Apply this plugin to the given target object.
+     *
+     * @param target The target object
+     */
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {

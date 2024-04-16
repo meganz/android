@@ -24,4 +24,10 @@ gradlePlugin {
             implementationClass = "AndroidRoomConventionPlugin"
         }
     }
+    plugins {
+        register("androidTest") {
+            id = "mega.android.test"
+            implementationClass = "AndroidTestConventionPlugin"
+        }
+    }
 }

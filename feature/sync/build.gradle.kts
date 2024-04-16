@@ -1,10 +1,10 @@
-import groovy.lang.Closure
 import mega.privacy.android.build.preBuiltSdkDependency
 import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.room)
+    alias(convention.plugins.mega.android.test)
     id("kotlin-android")
     id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")
@@ -47,10 +47,6 @@ android {
         abortOnError = false
         xmlOutput = file("build/reports/lint-results.xml")
     }
-}
-
-tasks.withType<Test> {
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
 }
 
 dependencies {
@@ -97,20 +93,4 @@ dependencies {
     implementation(platform(androidx.compose.bom))
     implementation(androidx.bundles.compose.bom)
     implementation(lib.compose.state.events)
-
-    testImplementation(testlib.junit)
-    testImplementation(testlib.junit.test.ktx)
-    testImplementation(testlib.espresso)
-    testImplementation(testlib.compose.junit)
-    testImplementation(testlib.bundles.ui.test)
-    testImplementation(testlib.bundles.unit.test)
-    testImplementation(testlib.arch.core.test)
-    testImplementation(testlib.test.core.ktx)
-    testImplementation(testlib.mockito)
-    testImplementation(testlib.mockito.kotlin)
-    testImplementation(testlib.mockito.android)
-
-    testRuntimeOnly(testlib.junit.jupiter.engine)
-    testImplementation(platform(testlib.junit5.bom))
-    testImplementation(testlib.bundles.junit5.api)
 }

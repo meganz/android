@@ -10,3 +10,6 @@ val Project.androidx
 
 val Project.testlib
     get(): VersionCatalog = extensions.getByType<VersionCatalogsExtension>().named("testlib")
+
+val Project.lib
+    get(): VersionCatalog = extensions.getByType<VersionCatalogsExtension>().named("lib")

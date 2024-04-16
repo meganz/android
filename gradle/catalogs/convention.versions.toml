@@ -2,3 +2,5 @@
 [plugins]
 mega-android-library = { id = "mega.android.library", version = "unspecified" }
 mega-android-room = { id = "mega.android.room", version = "unspecified" }
+mega-android-test = { id = "mega.android.test", version = "unspecified" }
+
