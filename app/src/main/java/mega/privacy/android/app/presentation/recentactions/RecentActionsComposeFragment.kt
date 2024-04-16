@@ -123,7 +123,7 @@ class RecentActionsComposeFragment : Fragment() {
                 clickedFile?.let {
                     HandleNodeAction(
                         typedFileNode = it,
-                        nodeSourceType = Constants.RECENTS_ADAPTER,
+                        nodeSourceType = Constants.FILE_BROWSER_ADAPTER,
                         snackBarHostState = snackbarHostState,
                         onActionHandled = {
                             clickedFile = null

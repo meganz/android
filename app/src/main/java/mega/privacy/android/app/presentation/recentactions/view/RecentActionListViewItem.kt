@@ -84,7 +84,7 @@ fun RecentActionListViewItem(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = 12.dp, end = 12.dp, top = 3.dp)
+                    .padding(start = 12.dp, end = 12.dp, top = 5.dp)
             ) {
                 Row {
                     val iconModifier = Modifier

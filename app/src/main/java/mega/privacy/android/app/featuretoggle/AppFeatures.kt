@@ -16,6 +16,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Enables recent actions compose tab
+     */
+    RecentActionsCompose(
+        "Enables new Recent Actions Compose tab (requires app restart)",
+        true,
+    ),
+
+    /**
      * Enables the report issue button on the login screen
      */
     LoginReportIssueButton(

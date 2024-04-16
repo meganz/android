@@ -48,6 +48,7 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNo
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
+import mega.privacy.android.app.presentation.recentactions.RecentActionsComposeViewModel
 import mega.privacy.android.app.presentation.recentactions.RecentActionsViewModel
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
@@ -97,6 +98,7 @@ class RecentActionBucketFragment : Fragment() {
     private val viewModel by viewModels<RecentActionBucketViewModel>()
 
     private val recentActionsViewModel: RecentActionsViewModel by activityViewModels()
+    private val recentActionsComposeViewModel: RecentActionsComposeViewModel by activityViewModels()
 
     private lateinit var binding: FragmentRecentActionBucketBinding
 
@@ -128,14 +130,17 @@ class RecentActionBucketFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
 
-        viewModel.setBucket(recentActionsViewModel.selected)
-        viewModel.setCachedActionList(recentActionsViewModel.snapshotActionList)
-
-        viewModel.shouldCloseFragment.observe(viewLifecycleOwner) {
-            if (it) Navigation.findNavController(view).popBackStack()
-        }
-
         viewLifecycleOwner.lifecycleScope.launch {
+            val enableRecentActionsCompose =
+                getFeatureFlagValueUseCase(AppFeatures.RecentActionsCompose)
+            if (enableRecentActionsCompose) {
+                viewModel.setBucket(recentActionsComposeViewModel.selectedBucket)
+                viewModel.setCachedActionList(recentActionsComposeViewModel.getAllRecentBuckets())
+            } else {
+                viewModel.setBucket(recentActionsViewModel.selected)
+                viewModel.setCachedActionList(recentActionsViewModel.snapshotActionList)
+            }
+
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.items.collectLatest {
                     setupListView(it)
@@ -145,6 +150,10 @@ class RecentActionBucketFragment : Fragment() {
                     checkScroll()
                 }
             }
+        }
+
+        viewModel.shouldCloseFragment.observe(viewLifecycleOwner) {
+            if (it) Navigation.findNavController(view).popBackStack()
         }
 
         viewModel.actionMode.observe(viewLifecycleOwner) { visible ->

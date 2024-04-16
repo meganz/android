@@ -391,14 +391,17 @@ class HomepageFragment : Fragment() {
      */
     private fun setupBottomSheetUI() {
         var enableOfflineCompose: Boolean
+        var enableRecentActionsCompose: Boolean
         runBlocking {
             enableOfflineCompose = getFeatureFlagValueUseCase(AppFeatures.OfflineCompose)
+            enableRecentActionsCompose = getFeatureFlagValueUseCase(AppFeatures.RecentActionsCompose)
         }
         viewPager = viewDataBinding.homepageBottomSheet.viewPager
         val adapter =
             BottomSheetPagerAdapter(
                 fragment = this@HomepageFragment,
-                enableOfflineCompose = enableOfflineCompose
+                enableOfflineCompose = enableOfflineCompose,
+                enableRecentActionsCompose = enableRecentActionsCompose
             )
         // By setting this will make BottomSheetPagerAdapter create all the fragments on initialization.
         viewPager.offscreenPageLimit = adapter.itemCount
