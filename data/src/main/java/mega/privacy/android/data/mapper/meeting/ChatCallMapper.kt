@@ -37,7 +37,7 @@ internal class ChatCallMapper @Inject constructor(
         finalTimestamp = megaChatCall.finalTimeStamp,
         termCode = chatCallTermCodeMapper(megaChatCall.termCode),
         callDurationLimit = megaChatCall.callDurationLimit,
-        callUsersLimit = megaChatCall.callUsersLimit,
+        callUsersLimit = if (megaChatCall.callUsersLimit == -1) null else megaChatCall.callUsersLimit,
         callClientsLimit = megaChatCall.callClientsLimit,
         callClientsPerUserLimit = megaChatCall.callClientsPerUserLimit,
         endCallReason = endCallReasonMapper(megaChatCall.endCallReason),

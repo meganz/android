@@ -11,15 +11,19 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
+import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
+import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.chat.GetMessageSenderNameUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.AllowUsersJoinCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallInProgress
 import mega.privacy.android.domain.usecase.meeting.KickUsersFromCallUseCase
@@ -53,6 +57,7 @@ class WaitingRoomManagementViewModel @Inject constructor(
     private val kickUsersFromCallUseCase: KickUsersFromCallUseCase,
     private val getPluralStringFromStringResMapper: GetPluralStringFromStringResMapper,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(WaitingRoomManagementState())
@@ -63,9 +68,22 @@ class WaitingRoomManagementViewModel @Inject constructor(
     val state: StateFlow<WaitingRoomManagementState> = _state
 
     init {
+        getEnabledFeatures()
         getCall()
         startMonitoringChatCallUpdates()
         startMonitoringScheduledMeetingUpdates()
+    }
+
+    private fun getEnabledFeatures() {
+        viewModelScope.launch {
+            getFeatureFlagValueUseCase(AppFeatures.CallUnlimitedProPlan).let { flag ->
+                _state.update { state ->
+                    state.copy(
+                        isCallUnlimitedProPlanFeatureFlagEnabled = flag,
+                    )
+                }
+            }
+        }
     }
 
     /**
@@ -102,6 +120,13 @@ class WaitingRoomManagementViewModel @Inject constructor(
             Timber.e(exception)
         }.onSuccess { chatCall ->
             chatCall?.let { call ->
+                _state.update { state ->
+                    state.copy(
+                        numUsersInCall = call.numParticipants ?: 0,
+                        callUsersLimit = call.callUsersLimit
+                    )
+                }
+
                 call.waitingRoom?.apply {
                     _state.update { state ->
                         state.copy(
@@ -141,6 +166,13 @@ class WaitingRoomManagementViewModel @Inject constructor(
      */
     private fun startMonitoringChatCallUpdates() = viewModelScope.launch {
         monitorChatCallUpdatesUseCase().collectLatest { call ->
+            _state.update { state ->
+                state.copy(
+                    numUsersInCall = call.numParticipants ?: 0,
+                    callUsersLimit = call.callUsersLimit
+                )
+            }
+
             call.changes?.apply {
                 if (contains(ChatCallChanges.Status)) {
                     if (call.chatId == state.value.chatId && (call.status == ChatCallStatus.UserNoPresent || call.status == ChatCallStatus.Destroyed)) {

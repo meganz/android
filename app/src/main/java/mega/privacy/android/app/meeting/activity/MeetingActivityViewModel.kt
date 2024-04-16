@@ -548,6 +548,12 @@ class MeetingActivityViewModel @Inject constructor(
                 getChatCallUseCase(_state.value.chatId)
             }.onSuccess { call ->
                 call?.let {
+                    _state.update { state ->
+                        state.copy(
+                            currentCall = it
+                        )
+                    }
+
                     when (call.status) {
                         ChatCallStatus.UserNoPresent -> {
                             if (_state.value.action == MeetingActivity.MEETING_ACTION_IN) {
@@ -558,7 +564,6 @@ class MeetingActivityViewModel @Inject constructor(
                         ChatCallStatus.TerminatingUserParticipation,
                         ChatCallStatus.Destroyed,
                         -> finishMeetingActivity()
-
 
                         else -> {
                             checkIfPresenting(it)
@@ -802,6 +807,12 @@ class MeetingActivityViewModel @Inject constructor(
             monitorChatCallUpdatesUseCase()
                 .filter { it.chatId == _state.value.chatId }
                 .collectLatest { call ->
+                    _state.update { state ->
+                        state.copy(
+                            currentCall = call
+                        )
+                    }
+
                     checkIfPresenting(call)
                     call.changes?.apply {
                         if (contains(ChatCallChanges.Status)) {
@@ -1672,7 +1683,6 @@ class MeetingActivityViewModel @Inject constructor(
                             chatParticipantList = list
                         )
                     }
-
                     checkParticipantLists()
                 }
         }.onFailure { exception ->
@@ -1723,6 +1733,7 @@ class MeetingActivityViewModel @Inject constructor(
                 usersInCall = participants
             )
         }
+
         checkParticipantLists()
         if (!_state.value.isSessionOnRecording) {
             checkIfCallIsBeingRecorded()
@@ -1744,9 +1755,12 @@ class MeetingActivityViewModel @Inject constructor(
                 participantAdded = true
                 chatParticipantsInWaitingRoom.add(chatParticipant)
             }
+
             state.value.usersInCall.find { it.peerId == chatParticipant.handle }
                 ?.let { participant ->
+
                     participantAdded = true
+
                     chatParticipantsInCall.add(chatParticipantMapper(participant, chatParticipant))
                 }
 
@@ -1762,6 +1776,7 @@ class MeetingActivityViewModel @Inject constructor(
                             ringIndividualInACall(chatParticipant.handle)
                             chatNewInvitedParticipants.remove(participant)
                         }
+
                     chatParticipantsNotInCall.add(chatParticipant)
                 }
             }

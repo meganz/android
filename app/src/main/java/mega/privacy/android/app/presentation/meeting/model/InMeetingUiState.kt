@@ -74,13 +74,4 @@ data class InMeetingUiState(
     val shouldFinish: Boolean = false,
     val minutesToEndMeeting: Int? = null,
     val showMeetingEndWarningDialog: Boolean = false,
-) {
-    /**
-     * True if the user limits are reached
-     */
-    val isUserLimitsReached: Boolean
-        get() = call?.callUsersLimit != -1 && (call?.peerIdParticipants?.size
-            ?: 0) >= (call?.callUsersLimit
-            ?: MeetingState.FREE_PLAN_PARTICIPANTS_LIMIT)
-
-}
+)

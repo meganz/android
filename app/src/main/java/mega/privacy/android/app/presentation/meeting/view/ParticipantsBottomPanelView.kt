@@ -22,6 +22,10 @@ import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -36,8 +40,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
+import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
@@ -60,365 +67,445 @@ import mega.privacy.mobile.analytics.event.ScheduledMeetingShareMeetingLinkButto
  */
 @Composable
 fun ParticipantsBottomPanelView(
+    viewModel: MeetingActivityViewModel,
+    waitingRoomManagementViewModel: WaitingRoomManagementViewModel,
+    onInviteParticipantsClick: () -> Unit = {},
+    onParticipantMoreOptionsClicked: (ChatParticipant) -> Unit = {},
+) {
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
+
+    BottomPanelView(state = uiState, onWaitingRoomClick = {
+        viewModel.updateParticipantsSection(
+            ParticipantsSection.WaitingRoomSection
+        )
+    },
+        onInCallClick = {
+            viewModel.updateParticipantsSection(
+                ParticipantsSection.InCallSection
+            )
+        },
+        onNotInCallClick = {
+            viewModel.updateParticipantsSection(
+                ParticipantsSection.NotInCallSection
+            )
+        },
+        onAdmitAllClick = { waitingRoomManagementViewModel.admitUsersClick() },
+        onSeeAllClick = {
+            viewModel.onSnackbarMessageConsumed()
+            viewModel.onSeeAllClick()
+            if (viewModel.state.value.participantsSection == ParticipantsSection.WaitingRoomSection) {
+                waitingRoomManagementViewModel.setShowParticipantsInWaitingRoomDialogConsumed()
+            }
+        },
+        onInviteParticipantsClick = onInviteParticipantsClick,
+        onShareMeetingLinkClick = {
+            viewModel.queryMeetingLink(
+                shouldShareMeetingLink = true
+            )
+        },
+        onAllowAddParticipantsClick = {
+            viewModel.allowAddParticipantsClick()
+        },
+        onAdmitParticipantClicked = {
+            waitingRoomManagementViewModel.admitUsersClick(
+                it
+            )
+        },
+        onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked,
+        onDenyParticipantClicked = {
+            waitingRoomManagementViewModel.denyUsersClick(
+                it
+            )
+        },
+        onRingParticipantClicked = { chatParticipant ->
+            viewModel.ringParticipant(chatParticipant.handle)
+        },
+        onMuteAllParticipantsClick = {
+            viewModel.muteAllParticipants()
+        },
+        onRingAllParticipantsClicked = {
+            viewModel.ringAllAbsentsParticipants()
+        })
+}
+
+/**
+ * Bottom panel view
+ */
+@Composable
+fun BottomPanelView(
     state: MeetingState,
     onWaitingRoomClick: () -> Unit,
     onInCallClick: () -> Unit,
     onNotInCallClick: () -> Unit,
     onAdmitAllClick: () -> Unit,
     onSeeAllClick: () -> Unit,
-    onInviteParticipantsClick: () -> Unit,
-    onShareMeetingLinkClick: () -> Unit,
-    onAllowAddParticipantsClick: () -> Unit,
-    shouldShowParticipantsLimitWarning: Boolean = false,
+    onInviteParticipantsClick: () -> Unit = {},
+    onShareMeetingLinkClick: () -> Unit = {},
+    onAllowAddParticipantsClick: () -> Unit = {},
     onAdmitParticipantClicked: (ChatParticipant) -> Unit = {},
     onDenyParticipantClicked: (ChatParticipant) -> Unit = {},
     onParticipantMoreOptionsClicked: (ChatParticipant) -> Unit = {},
     onRingParticipantClicked: (ChatParticipant) -> Unit = {},
     onRingAllParticipantsClicked: () -> Unit = {},
-    onMuteAllParticipantsClick: () -> Unit,
+    onMuteAllParticipantsClick: () -> Unit = {},
 ) {
 
     val listState = rememberLazyListState()
     val maxNumParticipantsNoSeeAllOption = 4
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 10.dp, bottom = 10.dp),
-    ) {
+    var isAdmitAllButtonEnabled by rememberSaveable { mutableStateOf(true) }
+    var isCallUserLimitWarningShown by rememberSaveable { mutableStateOf(false) }
+    var isAllowNonHostAddParticipantEnabled by rememberSaveable { mutableStateOf(true) }
+
+    with(state) {
+        isCallUserLimitWarningShown = showUserLimitWarningDialog
+        isAdmitAllButtonEnabled = !isAdmitAllButtonDisabled
+        isAllowNonHostAddParticipantEnabled = !isAllowNonHostAddParticipantsButtonDisabled
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
+                .padding(top = 10.dp, bottom = 10.dp),
         ) {
-
-            LazyColumn(
-                state = listState,
+            Column(
                 modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
             ) {
-                item(key = "Chips") {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp, end = 20.dp, bottom = 10.dp)
-                    ) {
-                        if (state.shouldWaitingRoomSectionBeShown() && state.usersInWaitingRoomIDs.isNotEmpty()) {
-                            CallTextButtonChip(
-                                modifier = Modifier
-                                    .padding(end = 8.dp)
-                                    .fillParentMaxWidth(0.29F),
-                                text = stringResource(id = R.string.meetings_schedule_meeting_waiting_room_label),
-                                onClick = onWaitingRoomClick,
-                                isChecked = state.participantsSection == ParticipantsSection.WaitingRoomSection
-                            )
-                        }
 
-                        CallTextButtonChip(
-                            modifier = if (state.shouldWaitingRoomSectionBeShown()) {
-                                Modifier
-                                    .padding(end = 8.dp)
-                                    .fillParentMaxWidth(0.29F)
-                            } else {
-                                Modifier.padding(end = 8.dp)
-                            },
-                            text = stringResource(id = R.string.meetings_bottom_panel_participants_in_call_button),
-                            onClick = onInCallClick,
-                            isChecked = state.participantsSection == ParticipantsSection.InCallSection
-                        )
-
-                        CallTextButtonChip(
-                            modifier = if (state.shouldWaitingRoomSectionBeShown()) {
-                                Modifier.fillParentMaxWidth(0.29F)
-                            } else {
-                                Modifier
-                            },
-                            text = stringResource(id = R.string.meetings_bottom_panel_participants_not_in_call_button),
-                            onClick = onNotInCallClick,
-                            isChecked = state.participantsSection == ParticipantsSection.NotInCallSection
-                        )
-
-                        if (state.shouldWaitingRoomSectionBeShown() && state.usersInWaitingRoomIDs.isEmpty()) {
-                            CallTextButtonChip(
-                                modifier = Modifier
-                                    .padding(start = 8.dp)
-                                    .fillParentMaxWidth(0.29F),
-                                text = stringResource(id = R.string.meetings_schedule_meeting_waiting_room_label),
-                                onClick = onWaitingRoomClick,
-                                isChecked = state.participantsSection == ParticipantsSection.WaitingRoomSection
-                            )
-                        }
-                    }
-                }
-                if (state.hasHostPermission() && state.participantsSection == ParticipantsSection.InCallSection) {
-                    item(key = "Allow non-hosts add participants button") {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier
+                ) {
+                    item(key = "Chips") {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 16.dp, end = 20.dp)
-                                .defaultMinSize(minHeight = 48.dp)
-                                .clickable {
-                                    onAllowAddParticipantsClick()
-                                },
-                            verticalAlignment = Alignment.CenterVertically,
-
-                            ) {
-                            Row(
-                                modifier = Modifier.weight(1f),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Text(
-                                    modifier = Modifier.padding(end = 23.dp),
-                                    style = MaterialTheme.typography.subtitle1.copy(
-                                        color = MaterialTheme.colors.black_white, fontSize = 14.sp
-                                    ),
-                                    text = stringResource(id = R.string.chat_group_chat_info_allow_non_host_participants_option),
-                                )
-                            }
-                            Box(
-                                modifier = Modifier.wrapContentSize(Alignment.CenterEnd)
-                            ) {
-                                Switch(
-                                    modifier = Modifier.align(Alignment.Center),
-                                    checked = state.enabledAllowNonHostAddParticipantsOption,
-                                    enabled = true,
-                                    onCheckedChange = null,
-                                    colors = switchColors()
-                                )
-                            }
-                        }
-                    }
-                }
-
-                if (state.shouldNumberOfParticipantsItemBeShown()) {
-                    item(key = "Number of participants") {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .defaultMinSize(minHeight = 56.dp)
-                                .padding(bottom = 10.dp, start = 16.dp, end = 20.dp),
-                            verticalAlignment = Alignment.CenterVertically,
+                                .padding(start = 16.dp, end = 20.dp, bottom = 10.dp)
                         ) {
-                            Row(
-                                modifier = Modifier.weight(1f),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Text(
-                                    text = when (state.participantsSection) {
-                                        ParticipantsSection.WaitingRoomSection -> stringResource(
-                                            id = R.string.meetings_bottom_panel_number_of_participants_in_the_waiting_room_label,
-                                            state.usersInWaitingRoomIDs.size
-                                        )
-
-                                        ParticipantsSection.InCallSection -> stringResource(
-                                            id = R.string.participants_number,
-                                            state.chatParticipantsInCall.size
-                                        )
-
-                                        ParticipantsSection.NotInCallSection -> pluralStringResource(
-                                            id = R.plurals.meetings_bottom_panel_number_of_participants_not_in_call_label,
-                                            count = state.chatParticipantsNotInCall.size,
-                                            state.chatParticipantsNotInCall.size
-                                        )
-
-                                    },
-                                    style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.textColorPrimary),
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+                            if (shouldWaitingRoomSectionBeShown() && usersInWaitingRoomIDs.isNotEmpty()) {
+                                CallTextButtonChip(
+                                    modifier = Modifier
+                                        .padding(end = 8.dp)
+                                        .fillParentMaxWidth(0.29F),
+                                    text = stringResource(id = R.string.meetings_schedule_meeting_waiting_room_label),
+                                    onClick = onWaitingRoomClick,
+                                    isChecked = participantsSection == ParticipantsSection.WaitingRoomSection
                                 )
                             }
 
-                            if (state.shouldAdmitAllItemBeShown()) {
-                                Box(
-                                    modifier = Modifier.wrapContentSize(Alignment.CenterEnd)
-                                ) {
-                                    Row(modifier = Modifier.align(Alignment.Center)) {
-                                        TextMegaButton(
-                                            text = stringResource(
-                                                id = R.string.meetings_waiting_room_admit_users_to_call_dialog_admit_button,
-                                            ),
-                                            onClick = onAdmitAllClick,
-                                        )
-                                    }
-                                }
-                            }
+                            CallTextButtonChip(
+                                modifier = if (shouldWaitingRoomSectionBeShown()) {
+                                    Modifier
+                                        .padding(end = 8.dp)
+                                        .fillParentMaxWidth(0.29F)
+                                } else {
+                                    Modifier.padding(end = 8.dp)
+                                },
+                                text = stringResource(id = R.string.meetings_bottom_panel_participants_in_call_button),
+                                onClick = onInCallClick,
+                                isChecked = participantsSection == ParticipantsSection.InCallSection
+                            )
 
-                            if (state.shouldMuteAllItemBeShown()) {
-                                Box(
+                            CallTextButtonChip(
+                                modifier = if (shouldWaitingRoomSectionBeShown()) {
+                                    Modifier.fillParentMaxWidth(0.29F)
+                                } else {
+                                    Modifier
+                                },
+                                text = stringResource(id = R.string.meetings_bottom_panel_participants_not_in_call_button),
+                                onClick = onNotInCallClick,
+                                isChecked = participantsSection == ParticipantsSection.NotInCallSection
+                            )
+
+                            if (shouldWaitingRoomSectionBeShown() && usersInWaitingRoomIDs.isEmpty()) {
+                                CallTextButtonChip(
                                     modifier = Modifier
-                                        .wrapContentSize(Alignment.CenterEnd)
-                                        .testTag(TEST_TAG_MUTE_ALL_ITEM_VIEW)
-                                        .clickable(enabled = !state.areAllParticipantsMuted()) {
-                                            onMuteAllParticipantsClick()
-                                        },
-                                ) {
-                                    Row(modifier = Modifier.align(Alignment.Center)) {
-                                        Text(
-                                            text = if (state.areAllParticipantsMuted())
-                                                stringResource(id = R.string.meetings_bottom_panel_in_call_participants_all_muted_label)
-                                            else
-                                                stringResource(id = R.string.meetings_bottom_panel_in_call_participants_mute_all_participants_button),
-                                            style = MaterialTheme.typography.subtitle2.copy(
-                                                color = if (state.areAllParticipantsMuted()) MaterialTheme.colors.grey_200_grey_700 else MaterialTheme.colors.teal_300_teal_200
-                                            ),
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                    }
-                                }
+                                        .padding(start = 8.dp)
+                                        .fillParentMaxWidth(0.29F),
+                                    text = stringResource(id = R.string.meetings_schedule_meeting_waiting_room_label),
+                                    onClick = onWaitingRoomClick,
+                                    isChecked = participantsSection == ParticipantsSection.WaitingRoomSection
+                                )
                             }
+                        }
+                    }
+                    if (hasHostPermission() && participantsSection == ParticipantsSection.InCallSection) {
+                        item(key = "Allow non-hosts add participants button") {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 16.dp, end = 20.dp)
+                                    .defaultMinSize(minHeight = 48.dp)
+                                    .clickable {
+                                        if (isAllowNonHostAddParticipantEnabled) {
+                                            onAllowAddParticipantsClick()
+                                        }
+                                    },
+                                verticalAlignment = Alignment.CenterVertically,
 
-                            if (state.shouldCallAllItemBeShown()) {
+                                ) {
+                                Row(
+                                    modifier = Modifier.weight(1f),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Text(
+                                        modifier = Modifier.padding(end = 23.dp),
+                                        style = MaterialTheme.typography.subtitle1.copy(
+                                            color = MaterialTheme.colors.black_white,
+                                            fontSize = 14.sp
+                                        ),
+                                        text = stringResource(id = R.string.chat_group_chat_info_allow_non_host_participants_option),
+                                    )
+                                }
                                 Box(
                                     modifier = Modifier.wrapContentSize(Alignment.CenterEnd)
                                 ) {
-                                    Row(modifier = Modifier.align(Alignment.Center)) {
-                                        if (state.isRingingAll) {
-                                            Icon(
-                                                imageVector = ImageVector.vectorResource(id = R.drawable.ringing_all_icon),
-                                                contentDescription = "Call all icon",
-                                                tint = MaterialTheme.colors.secondary
+                                    Switch(
+                                        modifier = Modifier.align(Alignment.Center),
+                                        checked = enabledAllowNonHostAddParticipantsOption,
+                                        enabled = isAllowNonHostAddParticipantEnabled,
+                                        onCheckedChange = null,
+                                        colors = switchColors()
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    if (shouldNumberOfParticipantsItemBeShown()) {
+                        item(key = "Number of participants") {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .defaultMinSize(minHeight = 56.dp)
+                                    .padding(bottom = 10.dp, start = 16.dp, end = 20.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Row(
+                                    modifier = Modifier.weight(1f),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Text(
+                                        text = when (participantsSection) {
+                                            ParticipantsSection.WaitingRoomSection -> stringResource(
+                                                id = R.string.meetings_bottom_panel_number_of_participants_in_the_waiting_room_label,
+                                                usersInWaitingRoomIDs.size
                                             )
-                                        } else {
+
+                                            ParticipantsSection.InCallSection -> stringResource(
+                                                id = R.string.participants_number,
+                                                chatParticipantsInCall.size
+                                            )
+
+                                            ParticipantsSection.NotInCallSection -> pluralStringResource(
+                                                id = R.plurals.meetings_bottom_panel_number_of_participants_not_in_call_label,
+                                                count = chatParticipantsNotInCall.size,
+                                                chatParticipantsNotInCall.size
+                                            )
+
+                                        },
+                                        style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.textColorPrimary),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+
+                                if (shouldAdmitAllItemBeShown()) {
+                                    Box(
+                                        modifier = Modifier.wrapContentSize(Alignment.CenterEnd)
+                                    ) {
+                                        Row(modifier = Modifier.align(Alignment.Center)) {
                                             TextMegaButton(
-                                                text = stringResource(id = R.string.meetings_bottom_panel_not_in_call_participants_call_all_button),
-                                                onClick = onRingAllParticipantsClicked,
+                                                text = stringResource(
+                                                    id = R.string.meetings_waiting_room_admit_users_to_call_dialog_admit_button,
+                                                ),
+                                                enabled = isAdmitAllButtonEnabled,
+                                                onClick = onAdmitAllClick,
                                             )
+                                        }
+                                    }
+                                }
+
+                                if (shouldMuteAllItemBeShown()) {
+                                    Box(
+                                        modifier = Modifier
+                                            .wrapContentSize(Alignment.CenterEnd)
+                                            .testTag(TEST_TAG_MUTE_ALL_ITEM_VIEW)
+                                            .clickable(enabled = !areAllParticipantsMuted()) {
+                                                onMuteAllParticipantsClick()
+                                            },
+                                    ) {
+                                        Row(modifier = Modifier.align(Alignment.Center)) {
+                                            Text(
+                                                text = if (areAllParticipantsMuted())
+                                                    stringResource(id = R.string.meetings_bottom_panel_in_call_participants_all_muted_label)
+                                                else
+                                                    stringResource(id = R.string.meetings_bottom_panel_in_call_participants_mute_all_participants_button),
+                                                style = MaterialTheme.typography.subtitle2.copy(
+                                                    color = if (areAllParticipantsMuted()) MaterialTheme.colors.grey_200_grey_700 else MaterialTheme.colors.teal_300_teal_200
+                                                ),
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                        }
+                                    }
+                                }
+
+                                if (shouldCallAllItemBeShown()) {
+                                    Box(
+                                        modifier = Modifier.wrapContentSize(Alignment.CenterEnd)
+                                    ) {
+                                        Row(modifier = Modifier.align(Alignment.Center)) {
+                                            if (isRingingAll) {
+                                                Icon(
+                                                    imageVector = ImageVector.vectorResource(id = R.drawable.ringing_all_icon),
+                                                    contentDescription = "Call all icon",
+                                                    tint = MaterialTheme.colors.secondary
+                                                )
+                                            } else {
+                                                TextMegaButton(
+                                                    text = stringResource(id = R.string.meetings_bottom_panel_not_in_call_participants_call_all_button),
+                                                    onClick = onRingAllParticipantsClicked,
+                                                )
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                if (shouldShowParticipantsLimitWarning && state.participantsSection == ParticipantsSection.InCallSection) {
-                    item(key = "Warning") {
-                        ParticipantsLimitWarningComposeView(
-                            modifier = Modifier.testTag(
-                                TEST_TAG_PARTICIPANTS_WARNING
-                            ),
-                            isModerator = state.isModerator,
-                        )
+                    if (isCallUserLimitWarningShown) {
+                        item(key = "Warning") {
+                            ParticipantsLimitWarningComposeView(
+                                modifier = Modifier.testTag(
+                                    TEST_TAG_PARTICIPANTS_WARNING
+                                ),
+                                isModerator = hasHostPermission(),
+                            )
+                        }
                     }
-                }
 
-                if (state.shouldInviteParticipantsItemBeShown()) {
-                    item(key = "Invite participants button") {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 16.dp, end = 20.dp)
-                                .height(56.dp),
-                            verticalAlignment = Alignment.CenterVertically,
+                    if (shouldInviteParticipantsItemBeShown()) {
+                        item(key = "Invite participants button") {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 16.dp, end = 20.dp)
+                                    .height(56.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                InviteParticipantsButton(
+                                    onInviteParticipantsClicked = onInviteParticipantsClick
+                                )
+                            }
+                        }
+                    }
+
+
+                    item(key = "Participants list") {
+                        when (participantsSection) {
+                            ParticipantsSection.WaitingRoomSection -> {
+                                if (shouldWaitingRoomSectionBeShown() && chatParticipantsInWaitingRoom.isNotEmpty()) {
+                                    chatParticipantsInWaitingRoom.indices.forEach { i ->
+                                        if (i < maxNumParticipantsNoSeeAllOption) {
+                                            ParticipantInCallItem(
+                                                section = participantsSection,
+                                                myPermission = myPermission,
+                                                isGuest = isGuest,
+                                                isUsersLimitInCallReached = isUsersLimitInCallReached(),
+                                                participant = chatParticipantsInWaitingRoom[i],
+                                                onAdmitParticipantClicked = onAdmitParticipantClicked,
+                                                onDenyParticipantClicked = onDenyParticipantClicked,
+                                                onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillParentMaxHeight()
+                                            .padding(bottom = if (isScreenOrientationLandscape()) 60.dp else 100.dp)
+                                    ) {
+                                        EmptyState(section = participantsSection)
+                                    }
+                                }
+                            }
+
+                            ParticipantsSection.InCallSection -> chatParticipantsInCall.indices.forEach { i ->
+                                if (i < maxNumParticipantsNoSeeAllOption) {
+                                    ParticipantInCallItem(
+                                        section = participantsSection,
+                                        myPermission = myPermission,
+                                        isGuest = isGuest,
+                                        participant = chatParticipantsInCall[i],
+                                        onAdmitParticipantClicked = onAdmitParticipantClicked,
+                                        onDenyParticipantClicked = onDenyParticipantClicked,
+                                        onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked
+                                    )
+                                }
+                            }
+
+                            ParticipantsSection.NotInCallSection -> {
+                                if (chatParticipantsNotInCall.isNotEmpty()) {
+                                    chatParticipantsNotInCall.indices.forEach { i ->
+                                        if (i < maxNumParticipantsNoSeeAllOption) {
+                                            ParticipantInCallItem(
+                                                section = participantsSection,
+                                                myPermission = myPermission,
+                                                isGuest = isGuest,
+                                                participant = chatParticipantsNotInCall[i],
+                                                isRingingAll = isRingingAll,
+                                                onAdmitParticipantClicked = onAdmitParticipantClicked,
+                                                onDenyParticipantClicked = onDenyParticipantClicked,
+                                                onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked,
+                                                onRingParticipantClicked = onRingParticipantClicked
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillParentMaxHeight()
+                                            .padding(bottom = if (isScreenOrientationLandscape()) 60.dp else 100.dp)
+                                    ) {
+                                        EmptyState(section = participantsSection)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    item(key = "See all") {
+                        if (
+                            (participantsSection == ParticipantsSection.WaitingRoomSection && shouldWaitingRoomSectionBeShown() && chatParticipantsInWaitingRoom.size > maxNumParticipantsNoSeeAllOption) ||
+                            (participantsSection == ParticipantsSection.InCallSection && chatParticipantsInCall.size > maxNumParticipantsNoSeeAllOption) ||
+                            (participantsSection == ParticipantsSection.NotInCallSection && chatParticipantsNotInCall.size > maxNumParticipantsNoSeeAllOption)
                         ) {
-                            InviteParticipantsButton(
-                                onInviteParticipantsClicked = onInviteParticipantsClick
+                            SeeAllParticipantsButton(
+                                onSeeAllClicked = onSeeAllClick
                             )
                         }
                     }
                 }
-
-
-                item(key = "Participants list") {
-                    when (state.participantsSection) {
-                        ParticipantsSection.WaitingRoomSection -> {
-                            if (state.shouldWaitingRoomSectionBeShown() && state.chatParticipantsInWaitingRoom.isNotEmpty()) {
-                                state.chatParticipantsInWaitingRoom.indices.forEach { i ->
-                                    if (i < maxNumParticipantsNoSeeAllOption) {
-                                        ParticipantInCallItem(
-                                            section = state.participantsSection,
-                                            myPermission = state.myPermission,
-                                            isGuest = state.isGuest,
-                                            participant = state.chatParticipantsInWaitingRoom[i],
-                                            onAdmitParticipantClicked = onAdmitParticipantClicked,
-                                            onDenyParticipantClicked = onDenyParticipantClicked,
-                                            onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked
-                                        )
-                                    }
-                                }
-                            } else {
-                                Column(
-                                    modifier = Modifier
-                                        .fillParentMaxHeight()
-                                        .padding(bottom = if (isScreenOrientationLandscape()) 60.dp else 100.dp)
-                                ) {
-                                    EmptyState(section = state.participantsSection)
-                                }
-                            }
-                        }
-
-                        ParticipantsSection.InCallSection -> state.chatParticipantsInCall.indices.forEach { i ->
-                            if (i < maxNumParticipantsNoSeeAllOption) {
-                                ParticipantInCallItem(
-                                    section = state.participantsSection,
-                                    myPermission = state.myPermission,
-                                    isGuest = state.isGuest,
-                                    participant = state.chatParticipantsInCall[i],
-                                    onAdmitParticipantClicked = onAdmitParticipantClicked,
-                                    onDenyParticipantClicked = onDenyParticipantClicked,
-                                    onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked
-                                )
-                            }
-                        }
-
-                        ParticipantsSection.NotInCallSection -> {
-                            if (state.chatParticipantsNotInCall.isNotEmpty()) {
-                                state.chatParticipantsNotInCall.indices.forEach { i ->
-                                    if (i < maxNumParticipantsNoSeeAllOption) {
-                                        ParticipantInCallItem(
-                                            section = state.participantsSection,
-                                            myPermission = state.myPermission,
-                                            isGuest = state.isGuest,
-                                            participant = state.chatParticipantsNotInCall[i],
-                                            isRingingAll = state.isRingingAll,
-                                            onAdmitParticipantClicked = onAdmitParticipantClicked,
-                                            onDenyParticipantClicked = onDenyParticipantClicked,
-                                            onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked,
-                                            onRingParticipantClicked = onRingParticipantClicked
-                                        )
-                                    }
-                                }
-                            } else {
-                                Column(
-                                    modifier = Modifier
-                                        .fillParentMaxHeight()
-                                        .padding(bottom = if (isScreenOrientationLandscape()) 60.dp else 100.dp)
-                                ) {
-                                    EmptyState(section = state.participantsSection)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                item(key = "See all") {
-                    if (
-                        (state.participantsSection == ParticipantsSection.WaitingRoomSection && state.shouldWaitingRoomSectionBeShown() && state.chatParticipantsInWaitingRoom.size > maxNumParticipantsNoSeeAllOption) ||
-                        (state.participantsSection == ParticipantsSection.InCallSection && state.chatParticipantsInCall.size > maxNumParticipantsNoSeeAllOption) ||
-                        (state.participantsSection == ParticipantsSection.NotInCallSection && state.chatParticipantsNotInCall.size > maxNumParticipantsNoSeeAllOption)
-                    ) {
-                        SeeAllParticipantsButton(
-                            onSeeAllClicked = onSeeAllClick
-                        )
-                    }
-                }
             }
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 100.dp),
-        ) {
-            RaisedDefaultMegaButton(
+            Row(
                 modifier = Modifier
-                    .padding(start = 16.dp, end = 16.dp)
-                    .fillMaxWidth(),
-                textId = if (state.callType == CallType.Meeting) R.string.meetings_scheduled_meeting_info_share_meeting_link_label else R.string.meetings_group_call_bottom_panel_share_chat_link_button,
-                onClick = {
-                    Analytics.tracker.trackEvent(ScheduledMeetingShareMeetingLinkButtonEvent)
-                    onShareMeetingLinkClick()
-                }
-            )
+                    .fillMaxWidth()
+                    .padding(bottom = 100.dp),
+            ) {
+                RaisedDefaultMegaButton(
+                    modifier = Modifier
+                        .padding(start = 16.dp, end = 16.dp)
+                        .fillMaxWidth(),
+                    textId = if (callType == CallType.Meeting) R.string.meetings_scheduled_meeting_info_share_meeting_link_label else R.string.meetings_group_call_bottom_panel_share_chat_link_button,
+                    onClick = {
+                        Analytics.tracker.trackEvent(ScheduledMeetingShareMeetingLinkButtonEvent)
+                        onShareMeetingLinkClick()
+                    }
+                )
+            }
         }
     }
 }
@@ -545,20 +632,19 @@ private fun InviteParticipantsButton(
 }
 
 /**
- * [ParticipantsBottomPanelView] preview guest in call section
+ * [BottomPanelView] preview guest in call section
  */
 @Preview
 @Composable
 fun ParticipantsBottomPanelGuestInCallSectionPreview() {
     MegaAppTheme(isDark = true) {
-        ParticipantsBottomPanelView(state = MeetingState(
+        BottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith4Participants(),
             hasWaitingRoom = true,
             myPermission = ChatRoomPermission.Standard,
             isGuest = true
         ),
-            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -575,20 +661,19 @@ fun ParticipantsBottomPanelGuestInCallSectionPreview() {
 }
 
 /**
- * [ParticipantsBottomPanelView] preview guest not in call section
+ * [BottomPanelView] preview guest not in call section
  */
 @Preview
 @Composable
 fun ParticipantsBottomPanelGuestNotInCallSectionPreview() {
     MegaAppTheme(isDark = true) {
-        ParticipantsBottomPanelView(state = MeetingState(
+        BottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = getListWith4Participants(),
             hasWaitingRoom = true,
             myPermission = ChatRoomPermission.Standard,
             isGuest = true
         ),
-            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -611,14 +696,13 @@ fun ParticipantsBottomPanelGuestNotInCallSectionPreview() {
 @Composable
 fun ParticipantsBottomPanelGuestNotInCallSectionEmptyStatePreview() {
     MegaAppTheme(isDark = true) {
-        ParticipantsBottomPanelView(state = MeetingState(
+        BottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = emptyList(),
             hasWaitingRoom = true,
             myPermission = ChatRoomPermission.Standard,
             isGuest = true
         ),
-            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -641,14 +725,13 @@ fun ParticipantsBottomPanelGuestNotInCallSectionEmptyStatePreview() {
 @Composable
 fun ParticipantsBottomPanelNonHostInCallSectionPreview() {
     MegaAppTheme(isDark = true) {
-        ParticipantsBottomPanelView(state = MeetingState(
+        BottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith4Participants(),
             hasWaitingRoom = true,
             myPermission = ChatRoomPermission.Standard,
             isGuest = false
         ),
-            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -671,7 +754,7 @@ fun ParticipantsBottomPanelNonHostInCallSectionPreview() {
 @Composable
 fun ParticipantsBottomPanelNonHostAndOpenInviteInCallSectionPreview() {
     MegaAppTheme(isDark = true) {
-        ParticipantsBottomPanelView(state = MeetingState(
+        BottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith4Participants(),
             hasWaitingRoom = true,
@@ -680,7 +763,6 @@ fun ParticipantsBottomPanelNonHostAndOpenInviteInCallSectionPreview() {
             isOpenInvite = true,
             isGuest = false
         ),
-            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -697,20 +779,19 @@ fun ParticipantsBottomPanelNonHostAndOpenInviteInCallSectionPreview() {
 }
 
 /**
- * [ParticipantsBottomPanelView] preview non host not in call section
+ * [BottomPanelView] preview non host not in call section
  */
 @Preview
 @Composable
 fun ParticipantsBottomPanelNonHostNotInCallSectionPreview() {
     MegaAppTheme(isDark = true) {
-        ParticipantsBottomPanelView(state = MeetingState(
+        BottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = getListWith4Participants(),
             hasWaitingRoom = true,
             myPermission = ChatRoomPermission.Standard,
             isGuest = false
         ),
-            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -727,20 +808,19 @@ fun ParticipantsBottomPanelNonHostNotInCallSectionPreview() {
 }
 
 /**
- * [ParticipantsBottomPanelView] preview non host not in call section empty state
+ * [BottomPanelView] preview non host not in call section empty state
  */
 @Preview
 @Composable
 fun ParticipantsBottomPanelNonHostNotInCallSectionEmptyStatePreview() {
     MegaAppTheme(isDark = true) {
-        ParticipantsBottomPanelView(state = MeetingState(
+        BottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = emptyList(),
             hasWaitingRoom = true,
             myPermission = ChatRoomPermission.Standard,
             isGuest = false
         ),
-            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -757,19 +837,18 @@ fun ParticipantsBottomPanelNonHostNotInCallSectionEmptyStatePreview() {
 }
 
 /**
- * [ParticipantsBottomPanelView] preview in call section with 4 participants in portrait
+ * [BottomPanelView] preview in call section with 4 participants in portrait
  */
 @Preview
 @Composable
 fun ParticipantsBottomPanelInCallView4ParticipantsPreview() {
     MegaAppTheme(isDark = true) {
-        ParticipantsBottomPanelView(state = MeetingState(
+        BottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith4Participants(),
             hasWaitingRoom = true,
             myPermission = ChatRoomPermission.Moderator,
         ),
-            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -786,19 +865,18 @@ fun ParticipantsBottomPanelInCallView4ParticipantsPreview() {
 }
 
 /**
- * [ParticipantsBottomPanelView] preview in call section with 6 participants in portrait
+ * [BottomPanelView] preview in call section with 6 participants in portrait
  */
 @Preview
 @Composable
 fun ParticipantsBottomPanelInCallView6ParticipantsPreview() {
     MegaAppTheme(isDark = true) {
-        ParticipantsBottomPanelView(state = MeetingState(
+        BottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith6Participants(),
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
-            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -815,19 +893,18 @@ fun ParticipantsBottomPanelInCallView6ParticipantsPreview() {
 }
 
 /**
- * [ParticipantsBottomPanelView] preview not in call section empty state
+ * [BottomPanelView] preview not in call section empty state
  */
 @Preview
 @Composable
 fun ParticipantsBottomPanelNotInCallViewEmptyStatePreview() {
     MegaAppTheme(isDark = true) {
-        ParticipantsBottomPanelView(state = MeetingState(
+        BottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = emptyList(),
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
-            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -844,20 +921,19 @@ fun ParticipantsBottomPanelNotInCallViewEmptyStatePreview() {
 }
 
 /**
- * [ParticipantsBottomPanelView] preview not in call section with 4 participants in portrait
+ * [BottomPanelView] preview not in call section with 4 participants in portrait
  */
 @Preview
 @Composable
 fun ParticipantsBottomPanelNotInCallView4ParticipantsPreview() {
     MegaAppTheme(isDark = true) {
-        ParticipantsBottomPanelView(state = MeetingState(
+        BottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = getListWith4Participants(),
             hasWaitingRoom = true,
             isRingingAll = true,
             myPermission = ChatRoomPermission.Moderator,
         ),
-            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -874,20 +950,19 @@ fun ParticipantsBottomPanelNotInCallView4ParticipantsPreview() {
 }
 
 /**
- * [ParticipantsBottomPanelView] preview not in call section with 6 participants in portrait
+ * [BottomPanelView] preview not in call section with 6 participants in portrait
  */
 @Preview
 @Composable
 fun ParticipantsBottomPanelNotInCallView6ParticipantsPreview() {
     MegaAppTheme(isDark = true) {
-        ParticipantsBottomPanelView(state = MeetingState(
+        BottomPanelView(state = MeetingState(
             isRingingAll = true,
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = getListWith6Participants(),
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
-            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -904,19 +979,18 @@ fun ParticipantsBottomPanelNotInCallView6ParticipantsPreview() {
 }
 
 /**
- * [ParticipantsBottomPanelView] preview not in call section empty state
+ * [BottomPanelView] preview not in call section empty state
  */
 @Preview(name = "5-inch Device Landscape", widthDp = 640, heightDp = 360)
 @Composable
 fun ParticipantsBottomPanelNotInCallViewLandEmptyStatePreview() {
     MegaAppTheme(isDark = true) {
-        ParticipantsBottomPanelView(state = MeetingState(
+        BottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = emptyList(),
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
-            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -933,13 +1007,13 @@ fun ParticipantsBottomPanelNotInCallViewLandEmptyStatePreview() {
 }
 
 /**
- * [ParticipantsBottomPanelView] preview waiting room section empty state
+ * [BottomPanelView] preview waiting room section empty state
  */
 @Preview
 @Composable
 fun ParticipantsBottomPanelWaitingRoomViewEmptyStatePreview() {
     MegaAppTheme(isDark = true) {
-        ParticipantsBottomPanelView(state = MeetingState(
+        BottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = emptyList(),
             usersInWaitingRoomIDs = emptyList(),
@@ -962,20 +1036,19 @@ fun ParticipantsBottomPanelWaitingRoomViewEmptyStatePreview() {
 }
 
 /**
- * [ParticipantsBottomPanelView] preview waiting room section with 4 participants in portrait
+ * [BottomPanelView] preview waiting room section with 4 participants in portrait
  */
 @Preview
 @Composable
 fun ParticipantsBottomPanelWaitingRoomView4ParticipantsPreview() {
     MegaAppTheme(isDark = true) {
-        ParticipantsBottomPanelView(state = MeetingState(
+        BottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = getListWith4Participants(),
             usersInWaitingRoomIDs = get4UsersInWaitingRoomIDs(),
             hasWaitingRoom = true,
             myPermission = ChatRoomPermission.Moderator,
         ),
-            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -992,20 +1065,19 @@ fun ParticipantsBottomPanelWaitingRoomView4ParticipantsPreview() {
 }
 
 /**
- * [ParticipantsBottomPanelView] preview waiting room section with 4 participants in landscape
+ * [BottomPanelView] preview waiting room section with 4 participants in landscape
  */
 @Preview(name = "5-inch Device Landscape", widthDp = 640, heightDp = 360)
 @Composable
 fun ParticipantsBottomPanelWaitingRoomView4ParticipantsLandPreview() {
     MegaAppTheme(isDark = true) {
-        ParticipantsBottomPanelView(state = MeetingState(
+        BottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = getListWith4Participants(),
             usersInWaitingRoomIDs = get4UsersInWaitingRoomIDs(),
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
-            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -1022,20 +1094,19 @@ fun ParticipantsBottomPanelWaitingRoomView4ParticipantsLandPreview() {
 }
 
 /**
- * [ParticipantsBottomPanelView] preview waiting room section with 6 participants in portrait
+ * [BottomPanelView] preview waiting room section with 6 participants in portrait
  */
 @Preview
 @Composable
 fun ParticipantsBottomPanelWaitingRoomView6ParticipantsPreview() {
     MegaAppTheme(isDark = true) {
-        ParticipantsBottomPanelView(state = MeetingState(
+        BottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = getListWith6Participants(),
             usersInWaitingRoomIDs = get6UsersInWaitingRoomIDs(),
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
-            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -1052,20 +1123,19 @@ fun ParticipantsBottomPanelWaitingRoomView6ParticipantsPreview() {
 }
 
 /**
- * [ParticipantsBottomPanelView] preview waiting room section with 6 participants in landscape
+ * [BottomPanelView] preview waiting room section with 6 participants in landscape
  */
 @Preview(name = "5-inch Device Landscape", widthDp = 640, heightDp = 360)
 @Composable
 fun ParticipantsBottomPanelWaitingRoomView6ParticipantsLandPreview() {
     MegaAppTheme(isDark = true) {
-        ParticipantsBottomPanelView(state = MeetingState(
+        BottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = getListWith6Participants(),
             usersInWaitingRoomIDs = get6UsersInWaitingRoomIDs(),
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
-            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -1082,20 +1152,19 @@ fun ParticipantsBottomPanelWaitingRoomView6ParticipantsLandPreview() {
 }
 
 /**
- * [ParticipantsBottomPanelView] preview waiting room section empty state in landscape
+ * [BottomPanelView] preview waiting room section empty state in landscape
  */
 @Preview(name = "5-inch Device Landscape", widthDp = 640, heightDp = 360)
 @Composable
 fun ParticipantsBottomPanelWaitingRoomViewLandEmptyStatePreview() {
     MegaAppTheme(isDark = true) {
-        ParticipantsBottomPanelView(state = MeetingState(
+        BottomPanelView(state = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = emptyList(),
             usersInWaitingRoomIDs = emptyList(),
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
-            shouldShowParticipantsLimitWarning= true,
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},

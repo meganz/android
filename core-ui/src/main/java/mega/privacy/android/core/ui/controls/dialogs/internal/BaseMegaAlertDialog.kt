@@ -63,6 +63,8 @@ internal fun BaseMegaAlertDialog(
     onCancel: () -> Unit = onDismiss,
     dismissOnClickOutside: Boolean = true,
     dismissOnBackPress: Boolean = true,
+    cancelEnabled: Boolean = true,
+    confirmEnabled: Boolean = true,
 ) = BaseMegaAlertDialog(
     text = content,
     buttons = {
@@ -72,12 +74,14 @@ internal fun BaseMegaAlertDialog(
                     modifier = Modifier.testTag(CANCEL_TAG),
                     text = cancelButtonText,
                     onClick = onCancel,
+                    enabled = cancelEnabled
                 )
             }
             TextMegaButton(
                 modifier = Modifier.testTag(CONFIRM_TAG),
                 text = confirmButtonText,
                 onClick = onConfirm,
+                enabled = confirmEnabled
             )
         }
     },

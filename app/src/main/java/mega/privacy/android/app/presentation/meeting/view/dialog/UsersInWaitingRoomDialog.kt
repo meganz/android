@@ -103,10 +103,21 @@ private fun UsersInWaitingRoomDialog(
                 )
             }
 
+        val body: String? = when {
+            showUserLimitWarning -> {
+                stringResource(R.string.meetings_free_call_organiser_number_of_participants_warning)
+            }
+
+            else -> null
+        }
+
         MegaAlertDialog(
-            text = message,
-            dismissOnClickOutside = true,
-            dismissOnBackPress = false,
+            title = message,
+            body = body,
+            confirmEnabled = when {
+                isOneParticipantInWaitingRoom -> !showUserLimitWarning
+                else -> true
+            },
             confirmButtonText = stringResource(
                 id = when {
                     isOneParticipantInWaitingRoom -> R.string.meetings_waiting_room_admit_user_to_call_dialog_admit_button
@@ -117,6 +128,11 @@ private fun UsersInWaitingRoomDialog(
                 isOneParticipantInWaitingRoom -> onAdmitClick
                 else -> onSeeWaitingRoomClick
             },
+
+            cancelEnabled = when {
+                isOneParticipantInWaitingRoom -> true
+                else -> !shouldDisableAdmitAllParticipants
+            },
             cancelButtonText = stringResource(
                 id = when {
                     isOneParticipantInWaitingRoom -> R.string.meetings_waiting_room_admit_users_to_call_dialog_deny_button
@@ -124,11 +140,14 @@ private fun UsersInWaitingRoomDialog(
                 }
 
             ),
+
             onCancel = when {
                 isOneParticipantInWaitingRoom -> onDenyClick
                 else -> onAdmitClick
             },
             onDismiss = onDismiss,
+            dismissOnClickOutside = true,
+            dismissOnBackPress = false
         )
     }
 }

@@ -99,6 +99,65 @@ fun MegaAlertDialog(
 )
 
 /**
+ * Alert dialog with title and body text an a confirmation button with optional cancel button
+ * Confirm and cancel button will be placed horizontally if there are enough room, vertically if not.
+ *
+ * @param title Title to be shown
+ * @param body Info/Body text to be shown
+ * @param confirmButtonText text for the confirm button
+ * @param cancelButtonText text for the cancel button, if null there will be no cancel button
+ * @param onConfirm to be triggered when confirm button is pressed
+ * @param onDismiss to be triggered when dialog is hidden, whether with cancel button, confirm button, back or outside press.
+ * @param dismissOnClickOutside if true, the dialog will be dismiss when the user taps outside of the dialog, default to true.
+ * @param dismissOnBackPress if true, the dialog will be dismiss when the user does back action, default to true.
+ */
+@Composable
+fun MegaAlertDialog(
+    title: String,
+    body: String?,
+    confirmButtonText: String,
+    cancelButtonText: String?,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+    onCancel: () -> Unit = onDismiss,
+    dismissOnClickOutside: Boolean = true,
+    dismissOnBackPress: Boolean = true,
+    cancelEnabled: Boolean = true,
+    confirmEnabled: Boolean = true,
+) = BaseMegaAlertDialog(
+    content = {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            MegaText(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                text = title,
+                textColor = TextColor.Primary,
+                style = MaterialTheme.typography.h6
+            )
+            body?.let {
+                MegaText(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = it,
+                    textColor = TextColor.Secondary
+                )
+            }
+        }
+    },
+    confirmButtonText = confirmButtonText,
+    cancelButtonText = cancelButtonText,
+    onConfirm = onConfirm,
+    onDismiss = onDismiss,
+    modifier = modifier,
+    onCancel = onCancel,
+    cancelEnabled = cancelEnabled,
+    confirmEnabled = confirmEnabled,
+    dismissOnClickOutside = dismissOnClickOutside,
+    dismissOnBackPress = dismissOnBackPress,
+)
+
+/**
  * Alert dialog with title, image and body text an a confirmation button with optional cancel button
  * Confirm and cancel button will be placed horizontally if there are enough room, vertically if not.
  *

@@ -33,6 +33,7 @@ import mega.privacy.android.app.presentation.contact.view.ContactStatusView
 import mega.privacy.android.app.presentation.contact.view.DefaultAvatarView
 import mega.privacy.android.app.presentation.contact.view.UriAvatarView
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
+import mega.privacy.android.core.ui.controls.buttons.MegaButtonWithIcon
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
@@ -59,6 +60,7 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @param onDenyParticipantClicked          Detect when deny is clicked
  * @param onParticipantMoreOptionsClicked   Detect when more options button is clicked
  * @param onRingParticipantClicked          Detect when ring (call) participant is clicked
+ * @param isUsersLimitInCallReached         True, users in call limit has been reached. False, if not.
  */
 @Composable
 fun ParticipantInCallItem(
@@ -68,6 +70,7 @@ fun ParticipantInCallItem(
     participant: ChatParticipant,
     modifier: Modifier = Modifier,
     isRingingAll: Boolean = false,
+    isUsersLimitInCallReached: Boolean = false,
     onAdmitParticipantClicked: (ChatParticipant) -> Unit = {},
     onDenyParticipantClicked: (ChatParticipant) -> Unit = {},
     onParticipantMoreOptionsClicked: (ChatParticipant) -> Unit = {},
@@ -183,26 +186,27 @@ fun ParticipantInCallItem(
                         ParticipantsSection.WaitingRoomSection -> {
                             if (myPermission == ChatRoomPermission.Moderator && !isGuest) {
                                 Icon(
-                                    modifier = Modifier.clickable {
-                                        onDenyParticipantClicked(
-                                            participant
-                                        )
-                                    },
+                                    modifier = Modifier
+                                        .padding(end = 10.dp)
+                                        .clickable {
+                                            onDenyParticipantClicked(
+                                                participant
+                                            )
+                                        },
                                     imageVector = ImageVector.vectorResource(id = R.drawable.deny_participant_icon),
                                     contentDescription = "Deny icon",
                                     tint = MaterialTheme.colors.grey_alpha_087_white
                                 )
-                                Icon(
-                                    modifier = Modifier
-                                        .padding(start = 15.dp, end = 10.dp)
-                                        .clickable {
-                                            onAdmitParticipantClicked(
-                                                participant
-                                            )
-                                        },
-                                    imageVector = ImageVector.vectorResource(id = R.drawable.admit_participant_icon),
-                                    contentDescription = "Admit icon",
-                                    tint = MaterialTheme.colors.grey_alpha_087_white
+
+                                MegaButtonWithIcon(
+                                    onClick = {
+                                        onAdmitParticipantClicked(
+                                            participant
+                                        )
+                                    },
+                                    icon = R.drawable.admit_participant_icon,
+                                    iconColor = MaterialTheme.colors.grey_alpha_087_white,
+                                    enabled = !isUsersLimitInCallReached
                                 )
                             }
                         }

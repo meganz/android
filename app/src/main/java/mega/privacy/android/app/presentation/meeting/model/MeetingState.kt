@@ -7,6 +7,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.meeting.CallType
@@ -64,6 +65,7 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property isCallUnlimitedProPlanFeatureFlagEnabled   True, if Call Unlimited Pro Plan feature flag enabled. False, otherwise.
  * @property callEndedDueToFreePlanLimits               State event to show the force free plan limit participants dialog.
  * @property action                                     Meeting action type
+ * @property currentCall                                [ChatCall]
  */
 data class MeetingState(
     val chatId: Long = -1L,
@@ -114,6 +116,7 @@ data class MeetingState(
     val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
     val callEndedDueToFreePlanLimits: Boolean = false,
     val action: String? = null,
+    val currentCall: ChatCall? = null
 ) {
     /**
      * Check if waiting room is opened
@@ -178,9 +181,62 @@ data class MeetingState(
                 (participantsSection == ParticipantsSection.WaitingRoomSection && chatParticipantsInWaitingRoom.isNotEmpty())
 
     /**
-     * Check if user is moderator
+     * Get the users limit
      */
-    val isModerator = myPermission == ChatRoomPermission.Moderator
+    private val callUsersLimit
+        get() = currentCall?.callUsersLimit
+
+    /**
+     * Check if participants in the call is equal o more than the limit
+     */
+    fun isUsersLimitInCallReached(): Boolean {
+        callUsersLimit?.let { limit ->
+            return chatParticipantsInCall.size >= limit
+        }
+
+        return false
+    }
+
+    /**
+     * Check if participants in the call and in the WR is more than the limit
+     */
+    private fun isUsersLimitInCallAndInWRReached(): Boolean {
+        callUsersLimit?.let { limit ->
+            return (chatParticipantsInCall.size + chatParticipantsInWaitingRoom.size) >= limit
+        }
+
+        return false
+    }
+
+    /**
+     * Check if user limit warning dialog should be shown
+     */
+    val showUserLimitWarningDialog
+        get() = isCallUnlimitedProPlanFeatureFlagEnabled &&
+                hasHostPermission() &&
+                chatParticipantsInWaitingRoom.isNotEmpty() &&
+                participantsSection == ParticipantsSection.WaitingRoomSection &&
+                (isUsersLimitInCallReached() || isUsersLimitInCallAndInWRReached())
+
+
+    /**
+     * Check if admit all participants should be disabled
+     */
+    val isAdmitAllButtonDisabled
+        get() = isCallUnlimitedProPlanFeatureFlagEnabled &&
+                hasHostPermission() &&
+                chatParticipantsInWaitingRoom.isNotEmpty() &&
+                participantsSection == ParticipantsSection.WaitingRoomSection &&
+                (isUsersLimitInCallReached() || isUsersLimitInCallAndInWRReached())
+
+    /**
+     * Check if admit all participants should be disabled
+     */
+    val isAllowNonHostAddParticipantsButtonDisabled
+        get() = isCallUnlimitedProPlanFeatureFlagEnabled &&
+                hasHostPermission() &&
+                participantsSection == ParticipantsSection.InCallSection &&
+                isUsersLimitInCallReached()
 
     companion object {
         /**

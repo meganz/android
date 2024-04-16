@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.model
 
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingViewModel
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 
 /**
@@ -21,8 +22,11 @@ import mega.privacy.android.domain.entity.chat.ChatParticipant
  * @property shouldWaitingRoomBeShown                True, it must be shown. False, must be hidden
  * @property isDialogClosed                          True, if waiting room dialog is closed. False if not
  * @property isWaitingRoomSectionOpened              True, if waiting room section is opened. False if not
+ * @property isCallUnlimitedProPlanFeatureFlagEnabled   True, if Call Unlimited Pro Plan feature flag enabled. False, otherwise.
+ * @property callUsersLimit                            Call users limit
+ * @property numUsersInCall                             Users number in the call
  */
-data class WaitingRoomManagementState constructor(
+data class WaitingRoomManagementState(
     val snackbarString: String? = null,
     val showParticipantsInWaitingRoomDialog: Boolean = false,
     val showDenyParticipantDialog: Boolean = false,
@@ -38,7 +42,26 @@ data class WaitingRoomManagementState constructor(
     val shouldWaitingRoomBeShown: Boolean = false,
     val isDialogClosed: Boolean = false,
     val isWaitingRoomSectionOpened: Boolean = false,
+    val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
+    val numUsersInCall: Int = 0,
+    val callUsersLimit: Int? = null,
 ) {
+
+    /**
+     * Show user limit warning dialog
+     */
+    val showUserLimitWarning
+        get() = callUsersLimit != null && isCallUnlimitedProPlanFeatureFlagEnabled &&
+                numUsersInCall >= callUsersLimit
+
+    /**
+     * Check if should be disabled admit all participants button
+     */
+    val shouldDisableAdmitAllParticipants
+        get() = callUsersLimit != null && isCallUnlimitedProPlanFeatureFlagEnabled &&
+                (numUsersInCall >= callUsersLimit ||
+                        ((numUsersInCall + usersInWaitingRoomIDs.size) >= callUsersLimit))
+
     /**
      * Check if the dialog is relative to the open call
      *

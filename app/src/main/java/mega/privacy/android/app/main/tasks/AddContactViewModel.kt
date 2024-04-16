@@ -12,10 +12,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.model.AddContactState
-import mega.privacy.android.app.presentation.meeting.model.MeetingState
-import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
@@ -26,6 +25,10 @@ import javax.inject.Inject
 /**
  * AddContactView Model
  * @param getContactVerificationWarningUseCase [GetFeatureFlagValueUseCase]
+ * @param getFeatureFlagValueUseCase [GetFeatureFlagValueUseCase]
+ * @param getChatCallUseCase [GetChatCallUseCase]
+ * @param monitorChatCallUpdatesUseCase [MonitorChatCallUpdatesUseCase]
+ * @param getCurrentSubscriptionPlanUseCase [GetCurrentSubscriptionPlanUseCase]
  */
 @HiltViewModel
 class AddContactViewModel @Inject constructor(
@@ -33,6 +36,7 @@ class AddContactViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getChatCallUseCase: GetChatCallUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
+    private val getCurrentSubscriptionPlanUseCase: GetCurrentSubscriptionPlanUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddContactState())
@@ -41,7 +45,6 @@ class AddContactViewModel @Inject constructor(
      * Ui State
      */
     val state = _state.asStateFlow()
-
 
     private var monitorChatCallJob: Job? = null
 
@@ -71,6 +74,7 @@ class AddContactViewModel @Inject constructor(
             _state.update {
                 it.copy(isContactVerificationWarningEnabled = contactVerificationWarningEnabled)
             }
+
         }
     }
 
@@ -91,7 +95,7 @@ class AddContactViewModel @Inject constructor(
             viewModelScope.launch {
                 runCatching {
                     getChatCallUseCase(chatId)?.let { call ->
-                        setShouldShowUserLimitsWarning(call)
+                        _state.update { it.copy(currentChatCall = call) }
                         monitorChatCall(call.callId)
                     }
                 }.onFailure {
@@ -111,14 +115,12 @@ class AddContactViewModel @Inject constructor(
                     Timber.e(it)
                 }
                 .collect { call ->
-                    setShouldShowUserLimitsWarning(call)
+                    _state.update { it.copy(currentChatCall = call) }
                     call.changes?.apply {
                         if (contains(ChatCallChanges.Status)) {
                             Timber.d("Chat call status: ${call.status}")
                             when (call.status) {
                                 ChatCallStatus.Destroyed -> {
-                                    // Call has ended
-                                    _state.update { it.copy(shouldShowParticipantsLimitWarning = false) }
                                     monitorChatCallJob?.cancel()
                                 }
 
@@ -126,22 +128,7 @@ class AddContactViewModel @Inject constructor(
                             }
                         }
                     }
-
                 }
         }
     }
-
-    private fun setShouldShowUserLimitsWarning(call: ChatCall) {
-        if (call.callUsersLimit != -1) {
-            val limit = call.callUsersLimit
-                ?: MeetingState.FREE_PLAN_PARTICIPANTS_LIMIT
-            val shouldShowWarning =
-                (call.peerIdParticipants?.size
-                    ?: 0) >= limit && _state.value.isCallUnlimitedProPlanFeatureFlagEnabled
-            _state.update { it.copy(shouldShowParticipantsLimitWarning = shouldShowWarning) }
-        } else {
-            _state.update { it.copy(shouldShowParticipantsLimitWarning = false) }
-        }
-    }
-
 }
