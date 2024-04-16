@@ -106,15 +106,18 @@ internal fun VideoPlaylistsView(
 
     LaunchedEffect(deletedVideoPlaylistTitles) {
         if (deletedVideoPlaylistTitles.isNotEmpty()) {
-            val deletedMessage = context.resources.getQuantityString(
-                sharedR.plurals.video_section_playlists_delete_playlists_message,
-                deletedVideoPlaylistTitles.size,
-                if (deletedVideoPlaylistTitles.size == 1) {
+            val deletedMessage = if (deletedVideoPlaylistTitles.size == 1) {
+                context.resources.getString(
+                    sharedR.string.video_section_playlists_delete_playlists_message_singular,
                     deletedVideoPlaylistTitles[0]
-                } else {
+                )
+            } else {
+                context.resources.getQuantityString(
+                    sharedR.plurals.video_section_playlists_delete_playlists_message,
+                    deletedVideoPlaylistTitles.size,
                     deletedVideoPlaylistTitles.size
-                }
-            )
+                )
+            }
             snackBarHostState.showSnackbar(deletedMessage)
             onDeletedMessageShown()
         }
