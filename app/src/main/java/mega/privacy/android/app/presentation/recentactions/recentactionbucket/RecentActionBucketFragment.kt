@@ -134,8 +134,10 @@ class RecentActionBucketFragment : Fragment() {
             val enableRecentActionsCompose =
                 getFeatureFlagValueUseCase(AppFeatures.RecentActionsCompose)
             if (enableRecentActionsCompose) {
-                viewModel.setBucket(recentActionsComposeViewModel.selectedBucket)
-                viewModel.setCachedActionList(recentActionsComposeViewModel.getAllRecentBuckets())
+                if (!viewModel.isCurrentBucketSet()) {
+                    viewModel.setBucket(recentActionsComposeViewModel.selectedBucket)
+                    viewModel.setCachedActionList(recentActionsComposeViewModel.getAllRecentBuckets())
+                }
             } else {
                 viewModel.setBucket(recentActionsViewModel.selected)
                 viewModel.setCachedActionList(recentActionsViewModel.snapshotActionList)

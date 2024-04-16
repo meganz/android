@@ -23,32 +23,21 @@ class DefaultUpdateRecentAction @Inject constructor(
         val recentActions = getRecentActionsUseCase()
 
         // Update the current bucket
-        recentActions.firstOrNull { currentBucket.isSameBucket(it) }?.let {
+        recentActions.firstOrNull { currentBucket.identifier == it.identifier }?.let {
             return@withContext it
         }
 
+        if (cachedActionList == null) return@withContext null
+
         // Compare the previous list of actions with the new list of recent actions
         // and only keep the actions from the updated list that differs from the previous cached one
-        val filteredActions =
-            cachedActionList?.let { cachedList ->
-                recentActions.filter { it !in cachedList.filter { item -> item.isSameBucket(it) } }
-            } ?: return@withContext null
+        val filteredActions = recentActions.filter { bucket ->
+            cachedActionList.none { it.identifier == bucket.identifier }
+        }
 
-        // The last one is the changed one
-        return@withContext if (filteredActions.size == 1) filteredActions[0] else null
+        // We return if only one bucket is changed, cause if more than one is updated or created,
+        // we can't know which one to return as SDK API doesn't provide any unique id/key for a bucket
+        return@withContext if (filteredActions.size == 1) filteredActions.first() else null
     }
-}
 
-/**
- * Compare two [RecentActionBucket]
- *
- * @param bucket the MegaRecentActionBucket to compare with the current object
- * @return true if the two MegaRecentActionBucket are the same
- */
-fun RecentActionBucket.isSameBucket(bucket: RecentActionBucket): Boolean {
-    return isMedia == bucket.isMedia &&
-            isUpdate == bucket.isUpdate &&
-            timestamp == bucket.timestamp &&
-            parentNodeId.longValue == bucket.parentNodeId.longValue &&
-            userEmail == bucket.userEmail
 }

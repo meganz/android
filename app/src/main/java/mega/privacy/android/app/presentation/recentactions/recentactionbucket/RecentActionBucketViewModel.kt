@@ -125,6 +125,13 @@ class RecentActionBucketViewModel @Inject constructor(
     }
 
     /**
+     * Check if the current bucket is set
+     *
+     * @return true if the current bucket is set
+     */
+    fun isCurrentBucketSet(): Boolean = _bucket.value != null
+
+    /**
      * Set bucket value
      *
      * @param selectedBucket

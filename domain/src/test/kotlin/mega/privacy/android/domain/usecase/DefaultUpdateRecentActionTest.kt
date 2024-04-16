@@ -51,12 +51,12 @@ class DefaultUpdateRecentActionTest {
         val bucket6 = createBucket(isMedia = true, isUpdate = true, 0L, NodeId(0L), "1")
         val bucket7 = createBucket(isMedia = true, isUpdate = true, 0L, NodeId(1L), "2")
 
-        assertThat(bucket1.isSameBucket(bucket2)).isEqualTo(true)
-        assertThat(bucket1.isSameBucket(bucket3)).isEqualTo(false)
-        assertThat(bucket1.isSameBucket(bucket4)).isEqualTo(false)
-        assertThat(bucket1.isSameBucket(bucket5)).isEqualTo(false)
-        assertThat(bucket1.isSameBucket(bucket6)).isEqualTo(false)
-        assertThat(bucket1.isSameBucket(bucket7)).isEqualTo(false)
+        assertThat(bucket1.identifier == bucket2.identifier).isEqualTo(true)
+        assertThat(bucket1.identifier == bucket3.identifier).isEqualTo(false)
+        assertThat(bucket1.identifier == bucket4.identifier).isEqualTo(false)
+        assertThat(bucket1.identifier == bucket5.identifier).isEqualTo(false)
+        assertThat(bucket1.identifier == bucket6.identifier).isEqualTo(false)
+        assertThat(bucket1.identifier == bucket7.identifier).isEqualTo(false)
     }
 
     @Test
