@@ -746,7 +746,7 @@
     <!-- Title of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_title">电子邮件地址验证</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_text">Check your email inbox to proceed.</string>
+    <string name="email_verification_text">检查您的电子邮件收件箱以继续。</string>
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">发生错误，请再试一次。</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
@@ -790,7 +790,7 @@
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
     <string name="mail_same_as_old">这是您当前的电子邮件地址。</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
-    <string name="change_mail_text_last_step">This is the last step to change your email address. Enter your password below.</string>
+    <string name="change_mail_text_last_step">这是更改您的电子邮件地址的最后一步。在下方输入您的密码。</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">更改电子邮件地址</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
@@ -806,7 +806,7 @@
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">正在获取信息&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
-    <string name="email_verification_text_change_mail">Your new email address needs to be validated. Check the inbox of the new email address to proceed.</string>
+    <string name="email_verification_text_change_mail">您的新电子邮件地址需要验证。检查新电子邮件地址的收件箱以继续。</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
     <string name="confirmation_delete_avatar">是否删除您的头像？</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
@@ -834,7 +834,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">尝试登录次数过多，请一小时后再试。</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">This account has not been validated yet. Check your email inbox.</string>
+    <string name="account_not_validated_login">此帐户尚未通过验证。检查您的电子邮件收件箱。</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">文件夹链接不可用</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
@@ -2011,8 +2011,7 @@
     <string name="contact_info_button_more">更多</string>
     <!-- Section title to select a file to perform an action, more files -->
     <plurals name="plural_select_file">
-        <item quantity="one">Choose file</item>
-        <item quantity="other">Choose files</item>
+        <item quantity="other">选择文件</item>
     </plurals>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">选择文件夹</string>
@@ -2271,7 +2270,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">启用通话</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Allow access to your address book</string>
+    <string name="allow_acces_contact_title">允许访问您的通讯录</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">从您的MEGA通讯录中轻松发现联系人。</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3299,7 +3298,7 @@
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">您当前已经有一个订阅。若购买另一个，您将被收取两次费用。为避免重复订阅，请在电脑或手机网页浏览器中登录MEGA以取消您当前的订阅。访问我们的帮助中心了解更多信息。</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
-    <string name="meeting_bluetooth_connect_required_permissions_warning">Go to Settings to allow MEGA permission to access your nearby devices using Bluetooth.</string>
+    <string name="meeting_bluetooth_connect_required_permissions_warning">前往设置以授予MEGA使用蓝牙访问附近设备的权限。</string>
     <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
     <string name="upgrade_billing_warning">我们无法处理您的购买。如果您正在使用双应用程序，请尝试退出一个后登录MEGA。否则，请尝试通过网络浏览器进行升级。</string>
     <!-- Title for subscription dialog that shows before delete account -->
@@ -3651,7 +3650,7 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">这是存储您备份的文件和文件夹的地方。您备份的项目是“只读”以保护它们不会在您的云驱动器中被意外修改。您可以使用我们的桌面应用程序将计算机中的项目备份到MEGA。</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck your email inbox for more information on how to file a counter-notice.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">由于多次被指控侵犯版权，您的MEGA帐户已被停用。这意味着您无法访问您的帐户或其中的数据。\n检查您的电子邮件收件箱，了解有关如何提交抗辩通知的更多信息。</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">由于违反MEGA的服务条款，您的帐户已被终止。\n您将无法重新获得对存储数据的访问权限，也无法被授权注册新的MEGA账户。</string>
     <!-- Title of the Meetings tab for the chat section -->
@@ -3777,7 +3776,7 @@
     <!-- Dialog confirmation text for removing photos in an album -->
     <string name="photos_album_remove_from_album_confirmation_text">要从相册中移除吗？</string>
     <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
-    <string name="settings_camera_uploads_grant_media_permissions_body">To enable camera uploads, allow MEGA access to your photos and other media on your device.</string>
+    <string name="settings_camera_uploads_grant_media_permissions_body">若要启用相机上传，请授予MEGA访问您设备上照片和其它媒体的权限。</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
     <string name="settings_camera_uploads_grant_media_permissions_positive_button">允许访问</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
@@ -4761,7 +4760,7 @@
     <!-- Message to user when app update is downloaded -->
     <string name="general_app_update_message_download_success">应用程序已更新</string>
     <!-- Action allowing user to restart the app after downloading the update -->
-    <string name="general_app_update_action_restart">Relaunch the app</string>
+    <string name="general_app_update_action_restart">重新启动应用程序</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">允许访问音频文件</string>
     <!-- Photos action menu zoom in -->
@@ -4877,23 +4876,15 @@
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_get_pro_title">通过Pro方案获得更多权益</string>
     <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">Upgrade to a Pro plan and get more storage and access to Pro features. Plans start from as low as %1$s a month</string>
+    <string name="dialog_onboarding_get_pro_description">升级到Pro方案，获得更多存储空间和使用Pro功能的权限。方案起价低至%1$s一个月。</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_some_features_title">MEGA&#160;Pro plans include:</string>
+    <string name="dialog_onboarding_some_features_title">MEGA&#160;Pro方案包括：</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_storage">Ultimate storage flexibility</string>
+    <string name="dialog_onboarding_feature_title_storage">极致的存储灵活性</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
-    <string name="dialog_onboarding_feature_description_storage">Starting from %1$s, find the perfect fit for your storage needs.</string>
-    <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_transfer">传输流量共享</string>
-    <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_transfer">与您共享数据的人可以使用您的传输流量来下载和串流播放您共享的项目。</string>
-    <!-- Title for Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_security">共享时的额外安全性</string>
-    <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_security">为文件和文件夹链接设置密码和到期日期。</string>
+    <string name="dialog_onboarding_feature_description_storage">从%1$s起，找到最适合您存储需求的方案。</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
-    <string name="dialog_onboarding_button_view_pro_plan">Upgrade to Pro today</string>
+    <string name="dialog_onboarding_button_view_pro_plan">今天升级到Pro</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s正在展示</string>
     <!-- Warning indicating that a participant is sharing the screen-->
@@ -4989,7 +4980,7 @@
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_subscription_details">订阅将自动续订，续订周期与初始选择的周期相同，并且以相同的价格进行续订。您可以在下一次订阅付款到期前24小时以内，通过[A]Google Play[/A]订阅界面关闭MEGA&#160;Pro订阅的自动续订功能。</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
-    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Allow access to your Gallery</string>
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">允许访问您的图库</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">允许访问</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
@@ -5079,7 +5070,7 @@
     <!-- Expiration date and time for promotional notifications. Shown on Notifications screen under each promotional notification. The placeholder %1$s will be replaced with localised date and the placeholder %2$s will be replaced with localised time.  -->
     <string name="notifications_screen_notification_promo_expiration_time">%1$s%2$s到期</string>
     <!-- Warning Message and upgrade link for organiser for Free Call -->
-    <string name="meetings_free_call_organiser_number_of_participants_warning">Only 100 participants can join the call. Any additional participants will only be able to send and receive messages. The organiser can upgrade to Pro to remove these restrictions.</string>
+    <string name="meetings_free_call_organiser_number_of_participants_warning">只有100位参与者可以加入通话。任何其他参与者只能发送和接收消息。组织者可以升级到Pro版以移除这些限制。</string>
     <!-- Warning Message for non organiser for Free Call -->
     <string name="meetings_free_call_non_organiser_number_of_participants_warning">只有100位&#160;参与者可以加入通话。任何其他参与者将只能发送和阅读聊天记录。请求组织者取消此限制。</string>
     <!-- The Video Quality Option shown in a Dialog in Settings Camera Uploads, indicating that the Videos will be compressed to Low Quality before being uploaded by Camera Uploads -->
@@ -5114,11 +5105,10 @@
     <string name="hidden_nodes_benefit_description_out_of_sight">您可以决定何时显示隐藏的文件。有一个新的设置可以暂时显示隐藏的项目。</string>
     <!-- The snackbar message of hidden nodes operation -->
     <plurals name="hidden_nodes_result_message">
-        <item quantity="one">%1$d item hidden</item>
-        <item quantity="other">%1$d items hidden</item>
+        <item quantity="other">已隐藏%1$d个项目</item>
     </plurals>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be prioritised when customer support is needed. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_priority_support">&#8226;&#160;Priority support</string>
+    <string name="account_upgrade_account_description_priority_support">&#8226; &#160;优先支持</string>
     <!-- The title of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_title">升级到Pro版即可获得无限通话</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->
@@ -5152,17 +5142,21 @@
     <!-- Search drop down chips filter type date modified older -->
     <string name="search_dropdown_chip_filter_type_date_older">较旧的</string>
     <!-- String below login button next to button for reporting a login issue -->
-    <string name="general_login_label_trouble_logging_in">Trouble logging in?</string>
+    <string name="general_login_label_trouble_logging_in">登录时遇到问题？</string>
     <!-- Button text for reporting an issue on the login screen -->
-    <string name="general_login_button_report_your_issue">Report your issue</string>
+    <string name="general_login_button_report_your_issue">报告您的问题</string>
     <!-- Hidden nodes show items -->
     <string name="hidden_nodes_show_items">显示隐藏的项目</string>
     <!-- Hidden nodes show items description -->
-    <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
+    <string name="hidden_nodes_show_items_description">所有隐藏的项目都将可见，但会模糊显示以表示其“隐藏”状态</string>
     <!-- Button text for photo option in camera screen -->
-    <string name="camera_photo_button">Photo</string>
-    <string name="camera_flash_mode_on">Flash mode on</string>
-    <string name="camera_flash_mode_off">Flash mode off</string>
-    <string name="camera_flash_mode_auto">Flash mode auto</string>
-    <string name="camera_send_to">Send to %1$s</string>
+    <string name="camera_photo_button">拍照</string>
+    <!--  -->
+    <string name="camera_flash_mode_on">闪光灯模式开启</string>
+    <!--  -->
+    <string name="camera_flash_mode_off">闪光模式关闭</string>
+    <!--  -->
+    <string name="camera_flash_mode_auto">闪光模式自动</string>
+    <!--  -->
+    <string name="camera_send_to">发送至%1$s</string>
 </resources>

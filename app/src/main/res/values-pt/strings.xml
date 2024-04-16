@@ -5338,21 +5338,13 @@
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_get_pro_title">Obtenha mais com um plano Pro</string>
     <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">Faça o upgrade a um plano Pro para obter mais armazenamento e acessar recursos exclusivos. O nossos planos são a partir de %1$s por mês</string>
+    <string name="dialog_onboarding_get_pro_description">Faça o upgrade a um plano Pro para obter mais armazenamento e acessar recursos exclusivos. O nossos planos são a partir de %1$s por mês.</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_some_features_title">Os planos Pro&#160;do&#160;MEGA incluem:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_storage">Flexibilidade de armazenamento máxima</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
     <string name="dialog_onboarding_feature_description_storage">Encontre o melhor opção para as suas necessidades de armazenamento a partir de %1$s.</string>
-    <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_transfer">Compartilhamento de transferência</string>
-    <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_transfer">As pessoas com as quais você compartilhar dados podem usar a sua cota de transferência para fazer download e streaming dos itens que você compartilhou.</string>
-    <!-- Title for Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_security">Segurança adicional ao compartilhar</string>
-    <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_security">Adicione senhas e datas de validade para links de arquivos e de pastas.</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
     <string name="dialog_onboarding_button_view_pro_plan">Fazer o upgrade a um plano Pro</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
@@ -5635,8 +5627,12 @@
     <string name="hidden_nodes_show_items_description">Todos os itens ocultos ficarão visíveis, mas desfocados para indicar o seu status “oculto”</string>
     <!-- Button text for photo option in camera screen -->
     <string name="camera_photo_button">Foto</string>
+    <!--  -->
     <string name="camera_flash_mode_on">Flash ativo</string>
+    <!--  -->
     <string name="camera_flash_mode_off">Flash desativado</string>
+    <!--  -->
     <string name="camera_flash_mode_auto">Flash automático</string>
+    <!--  -->
     <string name="camera_send_to">Enviar a %1$s</string>
 </resources>

@@ -100,4 +100,115 @@
     <string name="dialog_onboarding_feature_title_chat">Appels et réunions sans restrictions</string>
     <!-- Description about chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_description_chat">Les réunions, les messages et les appels vidéo sont entièrement privés et protégés, avec un nombre illimité de participants.</string>
+    <!-- Search drop down chips filter type file type -->
+    <string name="search_dropdown_chip_filter_type_file_type">Type</string>
+    <!-- Search drop down chips filter type file type images -->
+    <string name="search_dropdown_chip_filter_type_file_type_images">Images</string>
+    <!-- Search drop down chips filter type file type videos -->
+    <string name="search_dropdown_chip_filter_type_file_type_video">Vidéos</string>
+    <!-- Search drop down chips filter type file type audio -->
+    <string name="search_dropdown_chip_filter_type_file_type_audio">Sons</string>
+    <!-- Search drop down chips filter type file type documents -->
+    <string name="search_dropdown_chip_filter_type_file_type_documents">Documents</string>
+    <!-- Search drop down chips filter type file type pdf -->
+    <string name="search_dropdown_chip_filter_type_file_type_pdf">PDF</string>
+    <!-- Search drop down chips filter type file type spreadsheets -->
+    <string name="search_dropdown_chip_filter_type_file_type_spreadsheets">Feuilles de calcul</string>
+    <!-- Search drop down chips filter type file type presentations -->
+    <string name="search_dropdown_chip_filter_type_file_type_presentations">Présentations</string>
+    <!-- Search drop down chips filter type file type folders -->
+    <string name="search_dropdown_chip_filter_type_file_type_folders">Dossiers</string>
+    <!-- Search drop down chips filter type file type others -->
+    <string name="search_dropdown_chip_filter_type_file_type_others">Others</string>
+    <!-- Search drop down chips filter type date added -->
+    <string name="search_dropdown_chip_filter_type_date_added">Date d’ajout</string>
+    <!-- Search drop down chips filter type last modified -->
+    <string name="search_dropdown_chip_filter_type_last_modified">Dernière modification</string>
+    <!-- Search drop down chips filter type date modified today -->
+    <string name="search_dropdown_chip_filter_type_date_today">Aujourd’hui</string>
+    <!-- Search drop down chips filter type date modified last 7 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_seven_days">7&#160;derniers jours</string>
+    <!-- Search drop down chips filter type date modified last 30 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_thirty_days">30&#160;derniers jours</string>
+    <!-- Search drop down chips filter type date modified this year -->
+    <string name="search_dropdown_chip_filter_type_date_this_year">Cette année</string>
+    <!-- Search drop down chips filter type date modified last year -->
+    <string name="search_dropdown_chip_filter_type_date_last_year">L’année dernière</string>
+    <!-- Search drop down chips filter type date modified older -->
+    <string name="search_dropdown_chip_filter_type_date_older">Plus ancien</string>
+    <!-- All videos tab title of the video section  -->
+    <string name="video_section_tab_title_all_videos">Videos</string>
+    <!-- Playlists tab title of the video section  -->
+    <string name="video_section_tab_title_playlists">Playlists</string>
+    <!-- Location filter title of the video section  -->
+    <string name="video_section_videos_location_filter_title">Location</string>
+    <!-- All locations option of the video section location filter  -->
+    <string name="video_section_videos_location_option_all_locations">All locations</string>
+    <!-- Cloud drive option of the video section location filter  -->
+    <string name="video_section_videos_location_option_cloud_drive">Cloud drive</string>
+    <!-- Camera uploads option of the video section location filter  -->
+    <string name="video_section_videos_location_option_camera_uploads">Camera uploads</string>
+    <!-- Shared items option of the video section location filter  -->
+    <string name="video_section_videos_location_option_shared_items">Shared items</string>
+    <!-- Duration filter title of the video section  -->
+    <string name="video_section_videos_duration_filter_title">Duration</string>
+    <!-- All Duration option of the video section duration filter  -->
+    <string name="video_section_videos_duration_option_all_duration">All durations</string>
+    <!-- Less than 10 seconds option of the video section duration filter  -->
+    <string name="video_section_videos_duration_option_less_than_10_seconds">Less than 10 seconds</string>
+    <!-- Between 10 and 60 seconds option of the video section duration filter  -->
+    <string name="video_section_videos_duration_option_between_10_and_60_seconds">Between 10 and 60 seconds</string>
+    <!-- Between 1 and 4 minutes option of the video section duration filter  -->
+    <string name="video_section_videos_duration_option_between_1_and_4_minutes">Between 1 and 4 minutes</string>
+    <!-- Between 4 and 20 minutes option of the video section duration filter  -->
+    <string name="video_section_videos_duration_option_between_4_and_20_minutes">Between 4 and 20 minutes</string>
+    <!-- More than 20 minutes option of the video section duration filter  -->
+    <string name="video_section_videos_duration_option_more_than_20_minutes">More than 20 minutes</string>
+    <!-- Create playlist dialog title of the video section playlists tab -->
+    <string name="video_section_playlists_create_playlist_dialog_title">Enter playlist name</string>
+    <!-- Rename playlist dialog title of the video section playlists tab -->
+    <string name="video_section_playlists_rename_playlist_dialog_title">Rename</string>
+    <!-- Error message when the playlist name already exists -->
+    <string name="video_section_playlists_error_message_playlist_name_exists">A playlist with this name already exists. Enter a different name.</string>
+    <!-- Delete playlist dialog title of the video section playlists tab -->
+    <string name="video_section_playlists_delete_playlist_dialog_title">Delete playlist\?</string>
+    <!-- Delete button title of the video section playlists tab delete playlist dialog -->
+    <string name="video_section_playlists_delete_playlist_dialog_delete_button">Delete</string>
+    <!-- Text that indicates that there’s no playlist to show. -->
+    <string name="video_section_playlists_empty_hint_playlist">No playlists found</string>
+    <!-- Delete option title of the video section playlist bottom sheet -->
+    <string name="video_section_playlist_bottom_sheet_option_title_delete">Delete playlist</string>
+    <!-- Remove videos dialog title of the video section playlist detail -->
+    <string name="video_section_playlist_detail_remove_videos_dialog_title">Remove from playlist\?</string>
+    <!-- Remove button title of the video section playlist detail remove videos dialog -->
+    <string name="video_section_playlist_detail_remove_videos_dialog_remove_button">Remove</string>
+    <!-- Play all button title of the video section playlist detail -->
+    <string name="video_section_playlist_detail_play_all_button">Play all</string>
+    <!-- Text that indicates that there’s no videos in the video playlist detail to show. -->
+    <string name="video_section_playlist_detail_empty_hint_videos">No videos</string>
+    <!-- Top bar title of the video section video selected page -->
+    <string name="video_section_video_selected_top_bar_title">Choose files</string>
+    <!-- Message when deleting the playlists of the video section playlists tab -->
+    <plurals name="video_section_playlists_delete_playlists_message">
+        <item quantity="one"></item>
+        <item quantity="many"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Message when adding the videos to the video section playlist -->
+    <plurals name="video_section_playlist_detail_add_videos_message">
+        <item quantity="one">Added %1$d item to “%2$s”</item>
+        <item quantity="other">Added %1$d items to “%2$s”</item>
+    </plurals>
+    <!-- Message when removing the videos to the video section playlist -->
+    <plurals name="video_section_playlist_detail_remove_videos_message">
+        <item quantity="one">Removed %1$d item from “%2$s”</item>
+        <item quantity="other">Removed %1$d items from “%2$s”</item>
+    </plurals>
+    <!-- Text of the video section playlist detail video number -->
+    <plurals name="video_section_playlist_detail_video_number">
+        <item quantity="one">%1$d video</item>
+        <item quantity="other">%1$d videos</item>
+    </plurals>
+    <!-- Warning shown when the user clicks on a web link and there is no app available at the moment for opening it. -->
+    <string name="chat_click_link_in_message_intent_not_available">You may not have any apps installed which can open this website</string>
 </resources>

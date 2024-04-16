@@ -2011,8 +2011,7 @@
     <string name="contact_info_button_more">Thêm nữa</string>
     <!-- Section title to select a file to perform an action, more files -->
     <plurals name="plural_select_file">
-        <item quantity="one">Choose file</item>
-        <item quantity="other">Choose files</item>
+        <item quantity="other">Chọn tệp tin</item>
     </plurals>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">Chọn thư&#160;mục</string>
@@ -4877,23 +4876,15 @@
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_get_pro_title">Nhận được nhiều hơn với gói Pro</string>
     <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">Upgrade to a Pro plan and get more storage and access to Pro features. Plans start from as low as %1$s a month</string>
+    <string name="dialog_onboarding_get_pro_description">Upgrade to a Pro plan and get more storage and access to Pro features. Plans start from as low as %1$s a month.</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_some_features_title">MEGA&#160;Pro plans include:</string>
+    <string name="dialog_onboarding_some_features_title">Các gói MEGA&#160;Pro có bao&#160;gồm:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_storage">Ultimate storage flexibility</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
     <string name="dialog_onboarding_feature_description_storage">Starting from %1$s, find the perfect fit for your storage needs.</string>
-    <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_transfer">Chia&#160;sẻ lượng truyền&#160;tải</string>
-    <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_transfer">Những người bạn chia&#160;sẻ dữ&#160;liệu có thể sử&#160;dụng băng&#160;thông truyền&#160;tải của bạn để tải&#160;xuống và truyền trực&#160;tuyến các mục bạn đã chia&#160;sẻ.</string>
-    <!-- Title for Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_security">Lớp bảo&#160;mật bổ&#160;sung khi chia&#160;sẻ</string>
-    <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_security">Đặt mật&#160;khẩu và ngày hết hạn cho các đường liên&#160;kết tệp&#160;tin và thư&#160;mục.</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
-    <string name="dialog_onboarding_button_view_pro_plan">Upgrade to Pro today</string>
+    <string name="dialog_onboarding_button_view_pro_plan">Nâng cấp lên Pro ngay hôm nay</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s hiện đang trình&#160;bày</string>
     <!-- Warning indicating that a participant is sharing the screen-->
@@ -4989,7 +4980,7 @@
     <!-- Details body for the subscription details section, which shows to the user to provide details about subscription. -->
     <string name="account_upgrade_subscription_details">Các gói đăng&#160;ký được tự&#160;động gia&#160;hạn cho khoảng thời&#160;gian đăng&#160;ký kế tiếp có cùng thời&#160;lượng và ở cùng mức giá như khoảng thời&#160;gian ban&#160;đầu đã chọn. Bạn có thể tắt tự&#160;động gia&#160;hạn gói đăng&#160;ký MEGA&#160;Pro của mình không&#160;được ít hơn 24 giờ trước khi đến kỳ&#160;hạn thanh&#160;toán cho gói đăng&#160;ký tiếp&#160;theo thông qua trang Gói thuê&#160;bao trong  [A]Google Play[/A].</string>
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
-    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Allow access to your Gallery</string>
+    <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Cho phép truy&#160;cập vào Thư&#160;viện Hình&#160;ảnh của bạn</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
     <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Cho phép quyền truy&#160;cập</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
@@ -5160,8 +5151,12 @@
     <string name="hidden_nodes_show_items_description">Tất cả các mục ẩn sẽ hiển&#160;thị, nhưng bị làm mờ để cho biết trạng&#160;thái là bị “ẩn”</string>
     <!-- Button text for photo option in camera screen -->
     <string name="camera_photo_button">Ảnh</string>
-    <string name="camera_flash_mode_on">Flash mode on</string>
-    <string name="camera_flash_mode_off">Flash mode off</string>
-    <string name="camera_flash_mode_auto">Flash mode auto</string>
+    <!--  -->
+    <string name="camera_flash_mode_on">Bật đèn flash</string>
+    <!--  -->
+    <string name="camera_flash_mode_off">Tắt đèn flash</string>
+    <!--  -->
+    <string name="camera_flash_mode_auto">Đèn flash tự&#160;động</string>
+    <!--  -->
     <string name="camera_send_to">Gửi đến %1$s</string>
 </resources>

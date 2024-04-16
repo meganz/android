@@ -2990,7 +2990,7 @@
     <!-- Message displayed to inform that a link and its password have been sent separately to a chat -->
     <string name="link_and_password_sent">Le lien et le mot de passe ont été envoyés</string>
     <!-- Title of a warning recommending upgrade to Pro -->
-    <string name="upgrade_pro">Passer à un compte&#160;Pro</string>
+    <string name="upgrade_pro">Souscrire un abonnement Pro</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Les utilisateurs de MEGA Pro ont l’accès exclusif à des fonctions supplémentaires de sécurité des liens qui rendent votre compte encore plus sûr.</string>
     <!-- Meaning of links decryption key -->
@@ -5345,14 +5345,6 @@
     <string name="dialog_onboarding_feature_title_storage">La plus grande flexibilité en matière d’espace de stockage</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
     <string name="dialog_onboarding_feature_description_storage">À partir de %1$s, trouvez la réponse idéale à vos besoins de stockage.</string>
-    <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_transfer">Partage des transferts</string>
-    <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_transfer">Les personnes avec qui vous partagez des données peuvent utiliser votre quota de transfert pour télécharger ou diffuser en continu les éléments que vous avez partagés.</string>
-    <!-- Title for Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_security">Sécurité supplémentaire lors de partages</string>
-    <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_security">Définissez des mots de passe et des dates d’expiration pour les liens de fichier et de dossier.</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
     <string name="dialog_onboarding_button_view_pro_plan">Passer à un abonnement&#160;Pro</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
@@ -5635,8 +5627,12 @@
     <string name="hidden_nodes_show_items_description">Tous les éléments cachés seront visibles, mais flous pour indiquer leur état «&#160;caché&#160;»</string>
     <!-- Button text for photo option in camera screen -->
     <string name="camera_photo_button">Photo</string>
+    <!--  -->
     <string name="camera_flash_mode_on">Flash activé</string>
+    <!--  -->
     <string name="camera_flash_mode_off">Flash désactivé</string>
+    <!--  -->
     <string name="camera_flash_mode_auto">Flash automatique</string>
+    <!--  -->
     <string name="camera_send_to">Envoyer vers %1$s</string>
 </resources>
