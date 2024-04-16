@@ -17,6 +17,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityManageChatHistoryBinding
@@ -26,9 +28,7 @@ import mega.privacy.android.app.presentation.meeting.managechathistory.ManageCha
 import mega.privacy.android.app.presentation.meeting.managechathistory.model.ChatHistoryRetentionOption
 import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.CHAT_HISTORY_RETENTION_TIME_CONFIRMATION_TAG
 import mega.privacy.android.app.utils.ChatUtil
-import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.DISABLED_RETENTION_TIME
-import mega.privacy.android.app.utils.Constants.EMAIL
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_DAY
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_HOUR
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_MONTH_30
@@ -89,10 +89,7 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
             finish()
         }
 
-        viewModel.initializeChatRoom(
-            chatId = intent.extras?.getLong(CHAT_ID),
-            email = intent.extras?.getString(EMAIL)
-        )
+        viewModel.initializeChatRoom()
 
         collectFlows()
 
@@ -102,11 +99,10 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
         binding.composeView.setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            val chatRoomUiState by viewModel.chatRoomUiState.collectAsStateWithLifecycle()
 
             MegaAppTheme(isDark = themeMode.isDarkMode()) {
                 if (uiState.shouldShowClearChatConfirmation) {
-                    chatRoomUiState?.apply {
+                    uiState.chatRoom?.apply {
                         ClearChatConfirmationDialog(
                             isMeeting = isMeeting,
                             onConfirm = {
@@ -137,7 +133,7 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
                         isConfirmButtonEnable = { uiState.isConfirmButtonEnable },
                         onConfirmRequest = {
                             viewModel.apply {
-                                onNewRetentionTimeConfirmed(it)
+                                onNewRetentionTimeOptionConfirmed(it)
                                 dismissHistoryRetentionConfirmation()
                             }
                         },
@@ -159,17 +155,17 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
             }
 
             if (uiState.shouldShowCustomTimePicker) {
-                showPickers(viewModel.retentionTimeUiState.value)
-                viewModel.onCustomTimePickerSet()
+                showPickers(uiState.retentionTime)
+                viewModel.hideCustomTimePicker()
             }
         }
 
-        collectFlow(viewModel.retentionTimeUiState) { retentionTime ->
-            updateRetentionTimeUI(retentionTime)
+        collectFlow(viewModel.uiState.map { it.chatRoom }.distinctUntilChanged()) {
+            setupUI(it)
         }
 
-        collectFlow(viewModel.chatRoomUiState) { chatRoom ->
-            setupUI(chatRoom)
+        collectFlow(viewModel.uiState.map { it.retentionTime }.distinctUntilChanged()) {
+            updateRetentionTimeUI(it)
         }
     }
 

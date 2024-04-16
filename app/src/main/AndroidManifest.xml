@@ -465,6 +465,11 @@
             android:label="@string/title_properties_manage_chat"
             android:launchMode="singleTop" />
         <activity
+            android:name=".presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivityV2"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_properties_manage_chat"
+            android:launchMode="singleTop" />
+        <activity
             android:name=".presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity"
             android:label="@string/authenticity_credentials_label"
             android:launchMode="singleTop" />

@@ -8,9 +8,11 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_CLEAR_CHAT_CONFIRMATION_DIALOG
+import mega.privacy.android.app.presentation.meeting.chat.view.message.management.getRetentionTimeString
 import mega.privacy.android.app.presentation.meeting.managechathistory.model.ChatHistoryRetentionOption
 import mega.privacy.android.app.presentation.meeting.managechathistory.model.ManageChatHistoryUIState
 import org.junit.Rule
@@ -174,7 +176,7 @@ class ManageChatHistoryScreenTest {
         composeRule.apply {
             setScreen(
                 uiState = ManageChatHistoryUIState(
-                    formattedRetentionTime = "1 hour"
+                    retentionTime = 3600L
                 )
             )
 
@@ -184,16 +186,18 @@ class ManageChatHistoryScreenTest {
 
     @Test
     fun `test that retention is shown when retention time is not blank`() {
-        val formattedRetentionTime = "1 hour"
+        val retentionTime = 3600L
 
         composeRule.apply {
             setScreen(
                 uiState = ManageChatHistoryUIState(
-                    formattedRetentionTime = formattedRetentionTime
+                    retentionTime = retentionTime
                 )
             )
 
-            onNodeWithText(formattedRetentionTime).assertIsDisplayed()
+            val context = InstrumentationRegistry.getInstrumentation().targetContext
+            val expected = getRetentionTimeString(context, retentionTime)
+            onNodeWithText(expected.orEmpty()).assertIsDisplayed()
         }
     }
 
@@ -264,6 +268,7 @@ class ManageChatHistoryScreenTest {
         onConfirmRetentionTimeClick: (option: ChatHistoryRetentionOption) -> Unit = {},
         onRetentionTimeConfirmationDismiss: () -> Unit = {},
         onHistoryClearingCheckChange: (value: Boolean) -> Unit = {},
+        onCustomTimePickerClick: () -> Unit = {},
     ) {
         setContent {
             ManageChatHistoryScreen(
@@ -274,7 +279,8 @@ class ManageChatHistoryScreenTest {
                 onRetentionTimeOptionSelected = onRetentionTimeOptionSelected,
                 onConfirmRetentionTimeClick = onConfirmRetentionTimeClick,
                 onRetentionTimeConfirmationDismiss = onRetentionTimeConfirmationDismiss,
-                onHistoryClearingCheckChange = onHistoryClearingCheckChange
+                onHistoryClearingCheckChange = onHistoryClearingCheckChange,
+                onCustomTimePickerClick = onCustomTimePickerClick
             )
         }
     }

@@ -15,11 +15,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -28,10 +31,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ClearChatConfirmationDialog
+import mega.privacy.android.app.presentation.meeting.chat.view.message.management.getRetentionTimeString
 import mega.privacy.android.app.presentation.meeting.managechathistory.ManageChatHistoryViewModel
 import mega.privacy.android.app.presentation.meeting.managechathistory.component.NumberPicker
 import mega.privacy.android.app.presentation.meeting.managechathistory.component.NumberPickerScrollState
 import mega.privacy.android.app.presentation.meeting.managechathistory.model.ChatHistoryRetentionOption
+import mega.privacy.android.app.presentation.meeting.managechathistory.model.DisplayValueUiState
 import mega.privacy.android.app.presentation.meeting.managechathistory.model.ManageChatHistoryUIState
 import mega.privacy.android.app.presentation.meeting.managechathistory.model.TimePickerItemUiState
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
@@ -46,10 +51,12 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.legacy.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.theme.MegaAppTheme
+import java.util.Locale
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun ManageChatHistoryRoute(
+    onRetryConnectionsAndSignalPresence: () -> Unit,
     onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ManageChatHistoryViewModel = hiltViewModel(),
@@ -57,7 +64,15 @@ internal fun ManageChatHistoryRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     BackHandler {
+        onRetryConnectionsAndSignalPresence()
         onNavigateUp()
+    }
+
+    LaunchedEffect(uiState.shouldNavigateUp) {
+        if (uiState.shouldNavigateUp) {
+            onNavigateUp()
+            viewModel.onNavigatedUp()
+        }
     }
 
     ManageChatHistoryScreen(
@@ -74,12 +89,13 @@ internal fun ManageChatHistoryRoute(
         onRetentionTimeOptionSelected = viewModel::updateHistoryRetentionTimeConfirmation,
         onConfirmRetentionTimeClick = {
             viewModel.apply {
-                onNewRetentionTimeConfirmed(it)
+                onNewRetentionTimeOptionConfirmed(it)
                 dismissHistoryRetentionConfirmation()
             }
         },
         onRetentionTimeConfirmationDismiss = viewModel::dismissHistoryRetentionConfirmation,
-        onHistoryClearingCheckChange = {}
+        onHistoryClearingCheckChange = {},
+        onCustomTimePickerClick = viewModel::onCustomTimePickerConfirmed
     )
 }
 
@@ -93,6 +109,7 @@ internal fun ManageChatHistoryScreen(
     onConfirmRetentionTimeClick: (option: ChatHistoryRetentionOption) -> Unit,
     onRetentionTimeConfirmationDismiss: () -> Unit,
     onHistoryClearingCheckChange: (value: Boolean) -> Unit,
+    onCustomTimePickerClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -116,7 +133,7 @@ internal fun ManageChatHistoryScreen(
                 .fillMaxSize()
         ) {
             HistoryClearingOption(
-                retentionTime = uiState.formattedRetentionTime,
+                retentionTime = uiState.retentionTime,
                 isChecked = uiState.isHistoryClearingOptionChecked,
                 onCheckChange = onHistoryClearingCheckChange,
             )
@@ -129,7 +146,7 @@ internal fun ManageChatHistoryScreen(
                     onPeriodPickerValueChange = { oldValue, newValue -> },
                     onOrdinalPickerScrollChange = { },
                     onPeriodPickerScrollChange = { },
-                    onOKClick = { _, _ -> }
+                    onOKClick = onCustomTimePickerClick
                 )
             }
 
@@ -175,14 +192,19 @@ internal fun ManageChatHistoryScreen(
 
 @Composable
 private fun ColumnScope.HistoryClearingOption(
-    retentionTime: String,
+    retentionTime: Long,
     isChecked: Boolean,
     onCheckChange: (value: Boolean) -> Unit,
 ) {
+    val context = LocalContext.current
+    val formattedRetentionTime = getRetentionTimeString(
+        context = context,
+        timeInSeconds = retentionTime
+    )
     GenericTwoLineListItem(
         modifier = Modifier.padding(top = 4.dp),
         title = stringResource(id = R.string.title_properties_history_retention),
-        subtitle = if (retentionTime.isNotBlank()) {
+        subtitle = if (!formattedRetentionTime.isNullOrBlank()) {
             stringResource(id = R.string.subtitle_properties_manage_chat)
         } else {
             stringResource(id = R.string.subtitle_properties_history_retention)
@@ -197,17 +219,17 @@ private fun ColumnScope.HistoryClearingOption(
         }
     )
 
-    if (retentionTime.isNotBlank()) {
+    if (!formattedRetentionTime.isNullOrBlank()) {
         MegaText(
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp),
-            text = retentionTime,
+            text = formattedRetentionTime,
             textColor = TextColor.Accent,
             style = MaterialTheme.typography.subtitle2
         )
     }
 
     MegaDivider(
-        modifier = Modifier.padding(top = 4.dp),
+        modifier = Modifier.padding(top = 4.dp, start = 16.dp, end = 16.dp),
         dividerType = DividerType.FullSize
     )
 }
@@ -220,7 +242,7 @@ private fun ColumnScope.CustomRetentionTimePicker(
     onPeriodPickerValueChange: (oldValue: Int, newValue: Int) -> Unit,
     onOrdinalPickerScrollChange: (scrollState: NumberPickerScrollState) -> Unit,
     onPeriodPickerScrollChange: (scrollState: NumberPickerScrollState) -> Unit,
-    onOKClick: (ordinal: Int, period: Int) -> Unit,
+    onOKClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -237,7 +259,7 @@ private fun ColumnScope.CustomRetentionTimePicker(
                 minimumValue = minimumValue,
                 maximumValue = maximumValue,
                 currentValue = currentValue,
-                displayValues = displayValues,
+                displayValues = displayValues?.inStrings(),
                 onValueChange = onOrdinalPickerValueChange,
                 onScrollChange = onOrdinalPickerScrollChange
             )
@@ -251,7 +273,7 @@ private fun ColumnScope.CustomRetentionTimePicker(
                 minimumValue = minimumValue,
                 maximumValue = maximumValue,
                 currentValue = currentValue,
-                displayValues = displayValues,
+                displayValues = displayValues?.inStrings(),
                 onValueChange = onPeriodPickerValueChange,
                 onScrollChange = onPeriodPickerScrollChange
             )
@@ -261,10 +283,28 @@ private fun ColumnScope.CustomRetentionTimePicker(
     TextMegaButton(
         modifier = Modifier.align(Alignment.End),
         text = stringResource(id = R.string.general_ok),
-        onClick = { onOKClick(ordinalPickerUiState.currentValue, periodPickerUiState.currentValue) }
+        onClick = onOKClick
     )
 
-    MegaDivider(dividerType = DividerType.FullSize)
+    MegaDivider(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        dividerType = DividerType.FullSize
+    )
+}
+
+@Composable
+private fun List<DisplayValueUiState>.inStrings(): List<String> = map {
+    when (it) {
+        is DisplayValueUiState.PluralString -> pluralStringResource(
+            it.id,
+            it.quantity,
+            it.quantity
+        ).lowercase(Locale.getDefault())
+
+        is DisplayValueUiState.SingularString -> {
+            stringResource(id = it.id).lowercase(Locale.getDefault())
+        }
+    }
 }
 
 @Composable
@@ -277,7 +317,10 @@ private fun ColumnScope.ClearMeetingHistoryOption(title: String) {
         showEntireSubtitle = true
     )
 
-    MegaDivider(dividerType = DividerType.FullSize)
+    MegaDivider(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        dividerType = DividerType.FullSize
+    )
 }
 
 @CombinedThemePreviews
@@ -285,16 +328,15 @@ private fun ColumnScope.ClearMeetingHistoryOption(title: String) {
 private fun ManageChatHistoryScreenWithRetentionTimePreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ManageChatHistoryScreen(
-            uiState = ManageChatHistoryUIState(
-                formattedRetentionTime = "1 hour"
-            ),
+            uiState = ManageChatHistoryUIState(retentionTime = 3600L),
             onNavigateUp = {},
             onConfirmClearChatClick = {},
             onClearChatConfirmationDismiss = {},
             onRetentionTimeOptionSelected = {},
             onConfirmRetentionTimeClick = {},
             onRetentionTimeConfirmationDismiss = {},
-            onHistoryClearingCheckChange = {}
+            onHistoryClearingCheckChange = {},
+            onCustomTimePickerClick = {}
         )
     }
 }
@@ -311,7 +353,8 @@ private fun ManageChatHistoryScreenWithoutRetentionTimePreview() {
             onRetentionTimeOptionSelected = {},
             onConfirmRetentionTimeClick = {},
             onRetentionTimeConfirmationDismiss = {},
-            onHistoryClearingCheckChange = {}
+            onHistoryClearingCheckChange = {},
+            onCustomTimePickerClick = {}
         )
     }
 }
@@ -330,7 +373,8 @@ private fun ManageChatHistoryScreenWithCustomPickerPreview() {
             onRetentionTimeOptionSelected = {},
             onConfirmRetentionTimeClick = {},
             onRetentionTimeConfirmationDismiss = {},
-            onHistoryClearingCheckChange = {}
+            onHistoryClearingCheckChange = {},
+            onCustomTimePickerClick = {}
         )
     }
 }
