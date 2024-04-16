@@ -136,7 +136,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     ) {
         if (saveDoNotAskAgainForLargeTransfers) {
             viewModelScope.launch {
-                setAskBeforeLargeDownloadsSettingUseCase(askForConfirmation = false)
+                runCatching { setAskBeforeLargeDownloadsSettingUseCase(askForConfirmation = false) }
+                    .onFailure { Timber.e(it) }
             }
         }
         val node = transferTriggerEvent.nodes.firstOrNull()
@@ -152,17 +153,21 @@ internal class StartTransfersComponentViewModel @Inject constructor(
 
                 is TransferTriggerEvent.StartDownloadNode -> {
                     viewModelScope.launch {
-                        if (shouldAskDownloadDestinationUseCase()) {
+                        if (runCatching { shouldAskDownloadDestinationUseCase() }.getOrDefault(false)) {
                             _uiState.updateEventAndClearProgress(
                                 StartTransferEvent.AskDestination(
                                     transferTriggerEvent
                                 )
                             )
                         } else {
-                            startDownloadNodes(
-                                transferTriggerEvent,
-                                getOrCreateStorageDownloadLocationUseCase()
-                            )
+                            runCatching { getOrCreateStorageDownloadLocationUseCase() }
+                                .onFailure { Timber.e(it) }
+                                .getOrNull()?.let { location ->
+                                    startDownloadNodes(
+                                        transferTriggerEvent,
+                                        location
+                                    )
+                                }
                         }
                     }
                 }
@@ -186,7 +191,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         Timber.d("Selected destination $destinationUri")
         viewModelScope.launch {
             startDownloadNodes(startDownloadNode, destinationUri.toString())
-            if (shouldPromptToSaveDestinationUseCase()) {
+            if (runCatching { shouldPromptToSaveDestinationUseCase() }.getOrDefault(false)) {
                 _uiState.update {
                     it.copy(promptSaveDestination = triggered(destinationUri.toString()))
                 }
@@ -207,7 +212,9 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 nodes = listOf(event.node),
                 isHighPriority = true,
                 getUri = {
-                    getFilePreviewDownloadPathUseCase()
+                    runCatching { getFilePreviewDownloadPathUseCase() }
+                        .onFailure { Timber.e(it) }
+                        .getOrNull()
                 },
                 transferTriggerEvent = event
             )
@@ -250,7 +257,9 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 nodes = listOf(event.node),
                 event.isHighPriority,
                 getUri = {
-                    getOfflinePathForNodeUseCase(event.node)
+                    runCatching { getOfflinePathForNodeUseCase(event.node) }
+                        .onFailure { Timber.e(it) }
+                        .getOrNull()
                 },
                 transferTriggerEvent = event,
             )
@@ -267,7 +276,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         transferTriggerEvent: TransferTriggerEvent,
     ) {
         monitorDownloadFinishJob?.cancel()
-        clearActiveTransfersIfFinishedUseCase(TransferType.DOWNLOAD)
+        runCatching { clearActiveTransfersIfFinishedUseCase(TransferType.DOWNLOAD) }
+            .onFailure { Timber.e(it) }
         monitorDownloadFinish()
         _uiState.update {
             it.copy(jobInProgressState = StartTransferJobInProgress.ScanningTransfers)
@@ -350,10 +360,11 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         uris: List<Uri>,
         isVoiceClip: Boolean = false,
     ) {
-        clearActiveTransfersIfFinishedUseCase(TransferType.CHAT_UPLOAD)
+        runCatching { clearActiveTransfersIfFinishedUseCase(TransferType.CHAT_UPLOAD) }
+            .onFailure { Timber.e(it) }
         sendChatAttachmentsUseCase(
             chatId, uris.map { it.toString() }.associateWith { null }, isVoiceClip
-        ).collect {
+        ).catch { Timber.e(it) }.collect {
             when (it) {
                 is MultiTransferEvent.TransferNotStarted<*> -> {
                     Timber.e(it.exception, "Error starting chat upload")
@@ -425,11 +436,11 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     }
 
     private fun checkAndHandleDeviceIsNotConnected() =
-        if (!isConnectedToInternetUseCase()) {
+        if (runCatching { isConnectedToInternetUseCase() }.getOrDefault(true)) {
+            false
+        } else {
             _uiState.updateEventAndClearProgress(StartTransferEvent.NotConnected)
             true
-        } else {
-            false
         }
 
     /**
@@ -438,8 +449,9 @@ internal class StartTransfersComponentViewModel @Inject constructor(
      * @return true if the state has been handled to ask for confirmation, so no extra action should be done
      */
     private suspend fun checkAndHandleNeedConfirmationForLargeDownload(transferTriggerEvent: TransferTriggerEvent.DownloadTriggerEvent): Boolean {
-        if (isAskBeforeLargeDownloadsSettingUseCase()) {
-            val size = totalFileSizeOfNodesUseCase(transferTriggerEvent.nodes)
+        if (runCatching { isAskBeforeLargeDownloadsSettingUseCase() }.getOrDefault(false)) {
+            val size = runCatching { totalFileSizeOfNodesUseCase(transferTriggerEvent.nodes) }
+                .getOrDefault(0L)
             if (size > TransfersConstants.CONFIRM_SIZE_MIN_BYTES) {
                 _uiState.updateEventAndClearProgress(
                     StartTransferEvent.ConfirmLargeDownload(
@@ -459,6 +471,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             viewModelScope.launch {
                 monitorOngoingActiveTransfersUseCase(TransferType.DOWNLOAD).conflate().takeWhile {
                     checkShowRating
+                }.catch {
+                    Timber.e(it)
                 }.collect { (transferTotals, paused) ->
                     if (checkShowRating && !paused && transferTotals.totalFileTransfers > 0) {
                         val currentDownloadSpeed = getCurrentDownloadSpeedUseCase()
@@ -490,26 +504,28 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private fun monitorDownloadFinish() {
         monitorDownloadFinishJob?.cancel()
         monitorDownloadFinishJob = viewModelScope.launch {
-            monitorActiveTransferFinishedUseCase(TransferType.DOWNLOAD).collect { totalNodes ->
-                if (active) {
-                    when (lastTriggerEvent) {
-                        is TransferTriggerEvent.StartDownloadForOffline -> {
-                            StartTransferEvent.Message.FinishOffline
-                        }
+            monitorActiveTransferFinishedUseCase(TransferType.DOWNLOAD)
+                .catch { Timber.e(it) }
+                .collect { totalNodes ->
+                    if (active) {
+                        when (lastTriggerEvent) {
+                            is TransferTriggerEvent.StartDownloadForOffline -> {
+                                StartTransferEvent.Message.FinishOffline
+                            }
 
-                        is TransferTriggerEvent.StartDownloadNode -> {
-                            StartTransferEvent.MessagePlural.FinishDownloading(
-                                totalNodes
-                            )
-                        }
+                            is TransferTriggerEvent.StartDownloadNode -> {
+                                StartTransferEvent.MessagePlural.FinishDownloading(
+                                    totalNodes
+                                )
+                            }
 
-                        else -> null
-                    }?.let { finishEvent ->
-                        _uiState.updateEventAndClearProgress(finishEvent)
+                            else -> null
+                        }?.let { finishEvent ->
+                            _uiState.updateEventAndClearProgress(finishEvent)
+                        }
+                        lastTriggerEvent = null
                     }
-                    lastTriggerEvent = null
                 }
-            }
         }
     }
 
