@@ -972,7 +972,12 @@ internal class DefaultPhotosRepository @Inject constructor(
         }
 
     override suspend fun isHiddenNodesOnboarded(): Boolean = withContext(ioDispatcher) {
-        sensitivesRetriever(prefs = getContentConsumptionPreferences())
+        try {
+            val prefs = getContentConsumptionPreferences()
+            sensitivesRetriever(prefs)
+        } catch (t: Throwable) {
+            false
+        }
     }
 
     override suspend fun setHiddenNodesOnboarded() = withContext(ioDispatcher) {
