@@ -4876,21 +4876,13 @@
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_get_pro_title">Proプランでさらに充実</string>
     <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">Proプランにアップグレードしていただくと、ストレージが増え、各種Pro機能をご利用いただけるようになります。プランは月額%1$sからご利用いただけます</string>
+    <string name="dialog_onboarding_get_pro_description">Proプランにアップグレードしていただくと、ストレージが増え、各種Pro機能をご利用いただけるようになります。プランは月額%1$sからご利用いただけます。</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_some_features_title">MEGA&#160;Pro plans include:</string>
+    <string name="dialog_onboarding_some_features_title">MEGA&#160;Proプランには次のものが含まれます：</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_storage">究極のストレージの柔軟性</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
     <string name="dialog_onboarding_feature_description_storage">%1$sから始めて、お客様のストレージのニーズに最適なものを見つけてください。</string>
-    <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_transfer">転送共有</string>
-    <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_transfer">データを共有する相手は、お客様の転送容量を使用して、お客様が共有した項目をダウンロードしてストリーミングできます。</string>
-    <!-- Title for Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_security">共有時のセキュリティの強化</string>
-    <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_security">ファイルとフォルダのリンクのパスワードと有効期限を設定できます。</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
     <string name="dialog_onboarding_button_view_pro_plan">今すぐProにアップグレード</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
@@ -5159,8 +5151,12 @@
     <string name="hidden_nodes_show_items_description">非表示の項目はすべて表示されますが、「非表示」ステータスを示すためにぼかされます</string>
     <!-- Button text for photo option in camera screen -->
     <string name="camera_photo_button">写真</string>
+    <!--  -->
     <string name="camera_flash_mode_on">フラッシュモードオン</string>
+    <!--  -->
     <string name="camera_flash_mode_off">フラッシュモードオフ</string>
+    <!--  -->
     <string name="camera_flash_mode_auto">フラッシュモード自動</string>
+    <!--  -->
     <string name="camera_send_to">%1$sに送信</string>
 </resources>

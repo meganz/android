@@ -9,9 +9,9 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Synchronisaties [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">We need to access your device storage in order to sync your local folder. Tap here to allow access.</string>
+    <string name="sync_storage_permission_banner">We hebben toegang tot de opslag van uw apparaat nodig om uw lokale map te kunnen synchroniseren. Tik hier om toegang toe te staan.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">To continuously sync your files and folders, allow MEGA to run in the background</string>
+    <string name="sync_battery_optimisation_banner">Als u uw bestanden en mappen continu wilt synchroniseren, moet u MEGA op de achtergrond laten draaien</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d bestand</item>
@@ -107,7 +107,7 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">Alleen Wi-Fi</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">You’ll need to set up a local folder on your device that will sync with a chosen folder on your Cloud drive</string>
+    <string name="sync_empty_state_message">U moet een lokale map op uw apparaat instellen die wordt gesynchroniseerd met een gekozen map op uw Cloud-schijf</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_notification_monitoring_description">Synchronisaties toezien</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
@@ -183,7 +183,7 @@
     <!-- Sync stalled issue reason is Name clash detailed description-->
     <string name="sync_stalled_issue_name_clash_detail">Er zijn meerdere items met dezelfde naam aan één kant van uw synchronisatie die allemaal één dezelfde bestand worden aan de andere kant van uw synchronisatie</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename action was detected in MEGA, but couldn’t be replicated locally.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_mega">Er is een actie voor het verplaatsen of hernoemen van de naam gedetecteerd in MEGA, maar deze kon niet lokaal worden gerepliceerd.</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_local">Verplaatsen of hernoemen werd lokaal gedetecteerd, maar kon niet worden gerepliceerd in MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->

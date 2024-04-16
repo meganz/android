@@ -746,7 +746,7 @@
     <!-- Title of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_title">電子郵件地址驗證</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_text">Check your email inbox to proceed.</string>
+    <string name="email_verification_text">檢查您的電子郵件收件匣以繼續。</string>
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">發生錯誤，請再試一次。</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
@@ -790,7 +790,7 @@
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
     <string name="mail_same_as_old">這是您目前的電子郵件地址。</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
-    <string name="change_mail_text_last_step">This is the last step to change your email address. Enter your password below.</string>
+    <string name="change_mail_text_last_step">這是更改您電子郵件地址的最後一步。在下方輸入您的密碼。</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">更改電子信箱</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
@@ -806,7 +806,7 @@
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">正在取得資訊⋯</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
-    <string name="email_verification_text_change_mail">Your new email address needs to be validated. Check the inbox of the new email address to proceed.</string>
+    <string name="email_verification_text_change_mail">您的新電子郵件地址需要驗證。檢查新電子郵件地址的收件匣以繼續。</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
     <string name="confirmation_delete_avatar">要刪除您的個人資料相片嗎？</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
@@ -2011,8 +2011,7 @@
     <string name="contact_info_button_more">更多</string>
     <!-- Section title to select a file to perform an action, more files -->
     <plurals name="plural_select_file">
-        <item quantity="one">Choose file</item>
-        <item quantity="other">Choose files</item>
+        <item quantity="other">選擇檔案</item>
     </plurals>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">選擇資料夾</string>
@@ -4877,23 +4876,15 @@
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_get_pro_title">透過Pro方案獲得更多功能</string>
     <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">Upgrade to a Pro plan and get more storage and access to Pro features. Plans start from as low as %1$s a month</string>
+    <string name="dialog_onboarding_get_pro_description">升級到Pro方案可獲得更多儲存空間和使用Pro功能的權限。方案一個月%1$s起。</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_some_features_title">MEGA&#160;Pro plans include:</string>
+    <string name="dialog_onboarding_some_features_title">MEGA&#160;Pro方案包括：</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_storage">Ultimate storage flexibility</string>
+    <string name="dialog_onboarding_feature_title_storage">終極的儲存彈性</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
-    <string name="dialog_onboarding_feature_description_storage">Starting from %1$s, find the perfect fit for your storage needs.</string>
-    <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_transfer">傳輸流量共享</string>
-    <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_transfer">與您共享資料的人可以使用您的傳輸配額來下載和串流播放您所共享的項目。</string>
-    <!-- Title for Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_security">共享時的額外安全性</string>
-    <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_security">為檔案和資料夾連結設定密碼和到期日期。</string>
+    <string name="dialog_onboarding_feature_description_storage">從%1$s起，找到最適合您儲存需求的方案。</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
-    <string name="dialog_onboarding_button_view_pro_plan">Upgrade to Pro today</string>
+    <string name="dialog_onboarding_button_view_pro_plan">立即升級到Pro</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s正在展示</string>
     <!-- Warning indicating that a participant is sharing the screen-->
@@ -5160,8 +5151,12 @@
     <string name="hidden_nodes_show_items_description">可看到所有隱藏的項目，但會模糊顯示以表示其「隱藏」狀態</string>
     <!-- Button text for photo option in camera screen -->
     <string name="camera_photo_button">拍照</string>
+    <!--  -->
     <string name="camera_flash_mode_on">閃光模式開啟</string>
-    <string name="camera_flash_mode_off">Flash mode off</string>
-    <string name="camera_flash_mode_auto">Flash mode auto</string>
+    <!--  -->
+    <string name="camera_flash_mode_off">閃光燈模式關閉</string>
+    <!--  -->
+    <string name="camera_flash_mode_auto">閃光燈模式自動</string>
+    <!--  -->
     <string name="camera_send_to">發送至%1$s</string>
 </resources>

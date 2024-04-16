@@ -5338,21 +5338,13 @@
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_get_pro_title">Obțineți mai mult cu un abonament Pro</string>
     <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">Treceți la un abonament Pro și obțineți mai mult spațiu de stocare și acces la funcțiile Pro. Planurile încep de la %1$s o lună</string>
+    <string name="dialog_onboarding_get_pro_description">Treceți la un abonament Pro și obțineți mai mult spațiu de stocare și acces la funcțiile Pro. Planurile încep de la %1$s o lună.</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_some_features_title">MEGA&#160;Pro plans include:</string>
+    <string name="dialog_onboarding_some_features_title">Abonamentele MEGA&#160;Pro includ:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_storage">Flexibilitate maximă în spațiu de stocare</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
     <string name="dialog_onboarding_feature_description_storage">Începând de la %1$s, găsiți potrivirea perfectă pentru nevoile dvs. de stocare.</string>
-    <!-- Title for Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_transfer">Partajarea transferurilor</string>
-    <!-- Description about Transfer feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_transfer">Persoanele cu care partajați date pot folosi cota de transfer pentru a descărca și transmite în flux elementele pe care le-ați partajat.</string>
-    <!-- Title for Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_security">Securitate suplimentară la partajare</string>
-    <!-- Description about Security feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_security">Setați parolele și datele de expirare pentru linkurile de fișiere și folder.</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
     <string name="dialog_onboarding_button_view_pro_plan">Upgradeați la un abonament Pro</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
@@ -5635,8 +5627,12 @@
     <string name="hidden_nodes_show_items_description">Toate elementele ascunse vor fi vizibile, dar încețoșate pentru a indica starea lor „ascunse”</string>
     <!-- Button text for photo option in camera screen -->
     <string name="camera_photo_button">Fotografie</string>
+    <!--  -->
     <string name="camera_flash_mode_on">Flash activat</string>
+    <!--  -->
     <string name="camera_flash_mode_off">Flash dezactivat</string>
+    <!--  -->
     <string name="camera_flash_mode_auto">Flash automat</string>
+    <!--  -->
     <string name="camera_send_to">Trimiteți la %1$s</string>
 </resources>

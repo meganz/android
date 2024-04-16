@@ -3,7 +3,7 @@
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="general_sync_no_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="general_sync_unsupported_file_system">MEGA can’t sync or backup this folder because the file system on your device is not supported</string>
+    <string name="general_sync_unsupported_file_system">MEGA nie może zsynchronizować ani wykonać kopii zapasowej tego katalogu, ponieważ system plików na urządzeniu nie jest obsługiwany</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
     <string name="general_sync_invalid_remote_type">Nie można zsynchronizować wybranego katalogu</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
@@ -13,7 +13,7 @@
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
     <string name="general_sync_remote_node_not_found">Katalog w MEGA nie może być zlokalizowany, ponieważ został przeniesiony lub usunięty, lub możesz nie mieć dostępu</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
-    <string name="general_sync_storage_overquota">Unable to sync or back up this folder as your storage is full</string>
+    <string name="general_sync_storage_overquota">Nie można zsynchronizować ani utworzyć kopii zapasowej tego katalogu, ponieważ pamięć jest pełna</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
     <string name="general_sync_account_expired">Nie można zsynchronizować ani utworzyć kopii zapasowej tego katalogu, ponieważ plan wygasł</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
@@ -23,19 +23,19 @@
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="general_sync_share_non_full_access">Nie można zsynchronizować katalogu, ponieważ jest to katalog udostępniony, do którego nie masz pełny dostęp</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
-    <string name="general_sync_put_nodes_error">Files in this folder can’t be synced or backed up. You’ll need to re-enable the sync or backup from the desktop app.</string>
+    <string name="general_sync_put_nodes_error">Pliki w tym katalogu nie można synchronizować ani tworzyć kopii zapasowych. Będziesz musiał ponownie włączyć synchronizację lub kopię zapasową z aplikacja desktopowej.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
     <string name="general_sync_active_sync_below_path">Nie można zsynchronizować katalogu, ponieważ zawiera już zsynchronizowane katalogi</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
     <string name="general_sync_vboxsharedfolder_unsupported">MEGA nie może synchronizować ani tworzyć kopii zapasowych katalogu VirtualBox</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
-    <string name="general_sync_account_blocked">Unable to sync or back up this folder as the account has been blocked</string>
+    <string name="general_sync_account_blocked">Nie można zsynchronizować ani utworzyć kopii zapasowej tego katalogu, ponieważ konto zostało zablokowane</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
     <string name="general_sync_unknown_temporary_error">Problem z synchronizacją lub kopią zapasową tego katalogu. Spróbuj ponownie później. Jeśli problem będzie się powtarzał, skontaktuj się z pomocą techniczną.</string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
     <string name="general_sync_too_many_action_packets">Konto zostało przeładowane. Wszelkie pominięte aktualizacje kopii zapasowych lub synchronizacji nie zostały zastosowane.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
-    <string name="general_sync_logged_out">Sync or backup has been stopped as you appear to have logged out of the desktop app. Log back in via the desktop app, and resume the sync or backup.</string>
+    <string name="general_sync_logged_out">Synchronizacja lub tworzenie kopii zapasowych zostało zatrzymane, ponieważ wydaje się, że wylogowałeś się z aplikacji desktopowej. Zaloguj się ponownie za pomocą aplikacji desktopowerj aby wznowić synchronizację lub tworzenie kopii zapasowych.</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
     <string name="general_sync_missing_parent_node">N/A</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
@@ -43,13 +43,13 @@
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
     <string name="general_sync_active_sync_same_path">W tej samej lokalizacji znajduje się już zsynchronizowany katalog</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
-    <string name="general_sync_could_not_move_cloud_nodes">Renaming failed</string>
+    <string name="general_sync_could_not_move_cloud_nodes">Zmiana nazwy nie powiodła się</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
     <string name="general_sync_could_not_create_ignore_file">Nie można utworzyć pliku .megaignore dla tej synchronizacji</string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
     <string name="general_sync_config_read_failure">Nie można odczytać konfiguracji synchronizacji. Spróbuj ponownie później lub sprawdź uprawnienia katalogu.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
-    <string name="general_sync_unknown_drive_path">Sync location is unknown</string>
+    <string name="general_sync_unknown_drive_path">Lokalizacja synchronizacji jest nieznana</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
     <string name="general_sync_invalid_scan_interval">Nieprawidłowy interwał skanowania. Sprawdź ustawienia interwału skanowania i spróbuj ponownie.</string>
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
@@ -69,7 +69,7 @@
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
-    <string name="general_sync_message_node_in_rubbish_bin">Folder can’t be synced or backed up as the MEGA folder is in the Rubbish bin</string>
+    <string name="general_sync_message_node_in_rubbish_bin">Nie można synchronizować ani utworzyć kopii zapasowej katalogu, ponieważ katalog MEGA znajduje się w koszu</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
     <string name="general_sync_message_cannot_locate_local_drive_now">Katalog w urządzeniu nie może być teraz zlokalizowany. Spróbuj ponownie później.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
@@ -79,19 +79,19 @@
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
     <string name="general_sync_message_folder_backup_issue">Problem z synchronizacją lub kopią zapasową tego katalogu. Zatrzymaj synchronizację lub tworzenie kopii zapasowej i spróbuj skonfigurować je ponownie w aplikacji Desktop lub skontaktuj się z pomocą techniczną.</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
-    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Folder can’t be synced as it’s already inside a synced folder</string>
+    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Nie można zsynchronizować katalogu, ponieważ znajduje się on już w zsynchronizowanym katalogu</string>
     <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
-    <string name="general_sync_local_filesystem_mismatch">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the desktop app.</string>
+    <string name="general_sync_local_filesystem_mismatch">Pliki w tym katalogu nie można synchronizować ani tworzyć kopii zapasowych. Będziesz musiał ponownie włączyć synchronizację lub kopię zapasową z aplikacji desktopowej.</string>
     <!-- Warning message to display when sync has been paused due a low battery level -->
-    <string name="general_message_sync_paused_low_battery_level">Syncing paused, battery level too low. Charge battery to resume syncing.</string>
+    <string name="general_message_sync_paused_low_battery_level">Synchronizacja wstrzymana, poziom naładowania baterii za niski. Naładuj baterię, aby wznowić synchronizację.</string>
     <!-- Title for File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_file_sharing">Easy, secure file sharing</string>
+    <string name="dialog_onboarding_feature_title_file_sharing">Łatwe i bezpieczne udostępnianie plików</string>
     <!-- Description about File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_file_sharing">Share large files thanks to a generous transfer quota and ensure security with password-protected links.</string>
+    <string name="dialog_onboarding_feature_description_file_sharing">Udostępniaj duże pliki dzięki dużemu limitowi transferu i zapewniaj bezpieczeństwo dzięki linkom chronionym hasłem.</string>
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_backup_rewind">Never lose data again</string>
+    <string name="dialog_onboarding_feature_title_backup_rewind">Nigdy więcej nie utrać danych</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Back up and sync your data for complete confidence. Plus, use Rewind to restore folders to any date up to 180 days.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">Utwórz kopię zapasową i synchronizuj dane, aby uzyskać pełną pewność. Ponadto użyj Przewiń do tyłu, aby przywróć katalog do dowolnej daty do 180 dni.</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -99,5 +99,117 @@
     <!-- Title for chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_chat">Nieograniczone połączenia i spotkania</string>
     <!-- Description about chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_chat">Message, video call, and meet in total privacy with unlimited participants.</string>
+    <string name="dialog_onboarding_feature_description_chat">Wiadomości, połączenie wideo, i spotkania w całkowitej prywatności z nieograniczoną liczbą uczestników.</string>
+    <!-- Search drop down chips filter type file type -->
+    <string name="search_dropdown_chip_filter_type_file_type">Rodzaj</string>
+    <!-- Search drop down chips filter type file type images -->
+    <string name="search_dropdown_chip_filter_type_file_type_images">Obrazy</string>
+    <!-- Search drop down chips filter type file type videos -->
+    <string name="search_dropdown_chip_filter_type_file_type_video">Film</string>
+    <!-- Search drop down chips filter type file type audio -->
+    <string name="search_dropdown_chip_filter_type_file_type_audio">Dzwięk</string>
+    <!-- Search drop down chips filter type file type documents -->
+    <string name="search_dropdown_chip_filter_type_file_type_documents">Dokumenty</string>
+    <!-- Search drop down chips filter type file type pdf -->
+    <string name="search_dropdown_chip_filter_type_file_type_pdf">PDFy</string>
+    <!-- Search drop down chips filter type file type spreadsheets -->
+    <string name="search_dropdown_chip_filter_type_file_type_spreadsheets">Arkusze kalkulacyjne</string>
+    <!-- Search drop down chips filter type file type presentations -->
+    <string name="search_dropdown_chip_filter_type_file_type_presentations">Prezentacje</string>
+    <!-- Search drop down chips filter type file type folders -->
+    <string name="search_dropdown_chip_filter_type_file_type_folders">Katalogi</string>
+    <!-- Search drop down chips filter type file type others -->
+    <string name="search_dropdown_chip_filter_type_file_type_others">Pozostałe</string>
+    <!-- Search drop down chips filter type date added -->
+    <string name="search_dropdown_chip_filter_type_date_added">Data dodania</string>
+    <!-- Search drop down chips filter type last modified -->
+    <string name="search_dropdown_chip_filter_type_last_modified">Ostatnia zmiana</string>
+    <!-- Search drop down chips filter type date modified today -->
+    <string name="search_dropdown_chip_filter_type_date_today">Dzisiaj</string>
+    <!-- Search drop down chips filter type date modified last 7 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_seven_days">Ostatnie 7 dni</string>
+    <!-- Search drop down chips filter type date modified last 30 days -->
+    <string name="search_dropdown_chip_filter_type_date_last_thirty_days">Ostatnie 30 dni</string>
+    <!-- Search drop down chips filter type date modified this year -->
+    <string name="search_dropdown_chip_filter_type_date_this_year">W tym roku</string>
+    <!-- Search drop down chips filter type date modified last year -->
+    <string name="search_dropdown_chip_filter_type_date_last_year">Ostatni rok</string>
+    <!-- Search drop down chips filter type date modified older -->
+    <string name="search_dropdown_chip_filter_type_date_older">Starsze</string>
+    <!-- All videos tab title of the video section  -->
+    <string name="video_section_tab_title_all_videos">Videos</string>
+    <!-- Playlists tab title of the video section  -->
+    <string name="video_section_tab_title_playlists">Playlists</string>
+    <!-- Location filter title of the video section  -->
+    <string name="video_section_videos_location_filter_title">Location</string>
+    <!-- All locations option of the video section location filter  -->
+    <string name="video_section_videos_location_option_all_locations">All locations</string>
+    <!-- Cloud drive option of the video section location filter  -->
+    <string name="video_section_videos_location_option_cloud_drive">Cloud drive</string>
+    <!-- Camera uploads option of the video section location filter  -->
+    <string name="video_section_videos_location_option_camera_uploads">Camera uploads</string>
+    <!-- Shared items option of the video section location filter  -->
+    <string name="video_section_videos_location_option_shared_items">Shared items</string>
+    <!-- Duration filter title of the video section  -->
+    <string name="video_section_videos_duration_filter_title">Duration</string>
+    <!-- All Duration option of the video section duration filter  -->
+    <string name="video_section_videos_duration_option_all_duration">All durations</string>
+    <!-- Less than 10 seconds option of the video section duration filter  -->
+    <string name="video_section_videos_duration_option_less_than_10_seconds">Less than 10 seconds</string>
+    <!-- Between 10 and 60 seconds option of the video section duration filter  -->
+    <string name="video_section_videos_duration_option_between_10_and_60_seconds">Between 10 and 60 seconds</string>
+    <!-- Between 1 and 4 minutes option of the video section duration filter  -->
+    <string name="video_section_videos_duration_option_between_1_and_4_minutes">Between 1 and 4 minutes</string>
+    <!-- Between 4 and 20 minutes option of the video section duration filter  -->
+    <string name="video_section_videos_duration_option_between_4_and_20_minutes">Between 4 and 20 minutes</string>
+    <!-- More than 20 minutes option of the video section duration filter  -->
+    <string name="video_section_videos_duration_option_more_than_20_minutes">More than 20 minutes</string>
+    <!-- Create playlist dialog title of the video section playlists tab -->
+    <string name="video_section_playlists_create_playlist_dialog_title">Enter playlist name</string>
+    <!-- Rename playlist dialog title of the video section playlists tab -->
+    <string name="video_section_playlists_rename_playlist_dialog_title">Rename</string>
+    <!-- Error message when the playlist name already exists -->
+    <string name="video_section_playlists_error_message_playlist_name_exists">A playlist with this name already exists. Enter a different name.</string>
+    <!-- Delete playlist dialog title of the video section playlists tab -->
+    <string name="video_section_playlists_delete_playlist_dialog_title">Delete playlist\?</string>
+    <!-- Delete button title of the video section playlists tab delete playlist dialog -->
+    <string name="video_section_playlists_delete_playlist_dialog_delete_button">Delete</string>
+    <!-- Text that indicates that there’s no playlist to show. -->
+    <string name="video_section_playlists_empty_hint_playlist">No playlists found</string>
+    <!-- Delete option title of the video section playlist bottom sheet -->
+    <string name="video_section_playlist_bottom_sheet_option_title_delete">Delete playlist</string>
+    <!-- Remove videos dialog title of the video section playlist detail -->
+    <string name="video_section_playlist_detail_remove_videos_dialog_title">Remove from playlist\?</string>
+    <!-- Remove button title of the video section playlist detail remove videos dialog -->
+    <string name="video_section_playlist_detail_remove_videos_dialog_remove_button">Remove</string>
+    <!-- Play all button title of the video section playlist detail -->
+    <string name="video_section_playlist_detail_play_all_button">Play all</string>
+    <!-- Text that indicates that there’s no videos in the video playlist detail to show. -->
+    <string name="video_section_playlist_detail_empty_hint_videos">No videos</string>
+    <!-- Top bar title of the video section video selected page -->
+    <string name="video_section_video_selected_top_bar_title">Choose files</string>
+    <!-- Message when deleting the playlists of the video section playlists tab -->
+    <plurals name="video_section_playlists_delete_playlists_message">
+        <item quantity="one"></item>
+        <item quantity="few"></item>
+        <item quantity="many"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Message when adding the videos to the video section playlist -->
+    <plurals name="video_section_playlist_detail_add_videos_message">
+        <item quantity="one">Added %1$d item to “%2$s”</item>
+        <item quantity="other">Added %1$d items to “%2$s”</item>
+    </plurals>
+    <!-- Message when removing the videos to the video section playlist -->
+    <plurals name="video_section_playlist_detail_remove_videos_message">
+        <item quantity="one">Removed %1$d item from “%2$s”</item>
+        <item quantity="other">Removed %1$d items from “%2$s”</item>
+    </plurals>
+    <!-- Text of the video section playlist detail video number -->
+    <plurals name="video_section_playlist_detail_video_number">
+        <item quantity="one">%1$d video</item>
+        <item quantity="other">%1$d videos</item>
+    </plurals>
+    <!-- Warning shown when the user clicks on a web link and there is no app available at the moment for opening it. -->
+    <string name="chat_click_link_in_message_intent_not_available">You may not have any apps installed which can open this website</string>
 </resources>
