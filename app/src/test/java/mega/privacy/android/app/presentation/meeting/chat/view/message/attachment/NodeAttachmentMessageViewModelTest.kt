@@ -11,6 +11,7 @@ import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.GifFileTypeInfo
@@ -82,6 +83,7 @@ class NodeAttachmentMessageViewModelTest {
     private val importTypedNodesUseCase = mock<ImportTypedNodesUseCase>()
     private val copyRequestMessageMapper = mock<CopyRequestMessageMapper>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val fileTypeIconMapper = FileTypeIconMapper()
 
     @BeforeEach
     internal fun initTests() {
@@ -102,6 +104,7 @@ class NodeAttachmentMessageViewModelTest {
             importTypedNodesUseCase = importTypedNodesUseCase,
             copyRequestMessageMapper = copyRequestMessageMapper,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            fileTypeIconMapper = fileTypeIconMapper
         )
     }
 

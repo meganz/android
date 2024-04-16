@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
@@ -37,6 +38,7 @@ class PendingAttachmentMessageViewModelTest {
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val fileSizeStringMapper = mock<FileSizeStringMapper>()
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
+    private val fileTypeIconMapper = FileTypeIconMapper()
 
     @BeforeEach
     internal fun resetMocks() {
@@ -108,6 +110,7 @@ class PendingAttachmentMessageViewModelTest {
             monitorTransferEventsUseCase,
             fileSizeStringMapper,
             durationInSecondsTextMapper,
+            fileTypeIconMapper
         )
     }
 

@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
-import mega.privacy.android.app.presentation.node.model.mapper.getFileIconChat
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.chat.messages.AttachmentMessage
 import java.util.concurrent.ConcurrentHashMap
 
@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap
 abstract class AbstractAttachmentMessageViewModel<T : AttachmentMessage>(
     private val fileSizeStringMapper: FileSizeStringMapper,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+    private val fileTypeIconMapper: FileTypeIconMapper
 ) : ViewModel() {
 
 
@@ -67,7 +68,7 @@ abstract class AbstractAttachmentMessageViewModel<T : AttachmentMessage>(
         fileName = attachmentMessage.fileName,
         fileSize = fileSizeStringMapper(attachmentMessage.fileSize),
         duration = attachmentMessage.duration?.let { durationInSecondsTextMapper(it) },
-        fileTypeResId = getFileIconChat(attachmentMessage.fileType),
+        fileTypeResId = fileTypeIconMapper(attachmentMessage.fileType.extension),
         isError = attachmentMessage.isSendError()
     )
 }

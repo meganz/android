@@ -12,6 +12,7 @@ import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageM
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.node.FileNodeContent
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
@@ -59,10 +60,12 @@ class NodeAttachmentMessageViewModel @Inject constructor(
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     fileSizeStringMapper: FileSizeStringMapper,
+    fileTypeIconMapper: FileTypeIconMapper,
     durationInSecondsTextMapper: DurationInSecondsTextMapper,
 ) : AbstractAttachmentMessageViewModel<NodeAttachmentMessage>(
     fileSizeStringMapper,
     durationInSecondsTextMapper,
+    fileTypeIconMapper
 ) {
     override fun onMessageAdded(
         mutableStateFlow: MutableStateFlow<AttachmentMessageUiState>,

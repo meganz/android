@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.pendingMessageId
@@ -23,9 +24,11 @@ class PendingAttachmentMessageViewModel @Inject constructor(
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     fileSizeStringMapper: FileSizeStringMapper,
     durationInSecondsTextMapper: DurationInSecondsTextMapper,
+    fileTypeIconMapper: FileTypeIconMapper
 ) : AbstractAttachmentMessageViewModel<PendingAttachmentMessage>(
     fileSizeStringMapper,
     durationInSecondsTextMapper,
+    fileTypeIconMapper
 ) {
     init {
         monitorUploads()
