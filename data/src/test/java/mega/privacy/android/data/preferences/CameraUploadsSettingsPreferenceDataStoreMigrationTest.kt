@@ -1,8 +1,7 @@
 package mega.privacy.android.data.preferences
 
 import androidx.datastore.preferences.core.Preferences
-import com.google.common.truth.Truth
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.model.MegaPreferences
@@ -15,8 +14,10 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 
-@OptIn(ExperimentalCoroutinesApi::class)
-class CameraUploadsSettingsPreferenceDataStoreMigrationTest {
+/**
+ * Test class for [CameraUploadsSettingsPreferenceDataStoreMigration]
+ */
+internal class CameraUploadsSettingsPreferenceDataStoreMigrationTest {
 
     private lateinit var underTest: CameraUploadsSettingsPreferenceDataStoreMigration
 
@@ -39,7 +40,7 @@ class CameraUploadsSettingsPreferenceDataStoreMigrationTest {
     internal fun `test that should migrate returns true if no keys exist`() = runTest {
         val currentData = mock<Preferences> { on { asMap() }.thenReturn(emptyMap()) }
         val actual = underTest.shouldMigrate(currentData)
-        Truth.assertThat(actual).isTrue()
+        assertThat(actual).isTrue()
     }
 
     @Test
@@ -58,7 +59,7 @@ class CameraUploadsSettingsPreferenceDataStoreMigrationTest {
         verify(dataStore).setChargingRequiredForVideoCompression(true)
         verify(dataStore).setUploadFileNamesKept(false)
         verify(dataStore).setVideoCompressionSizeLimit(200)
-        verify(dataStore).setFileUploadOption(1001)
+        verify(dataStore).setFileUploadOption(1003)
         verify(dataStore).setUploadsByWifi(true)
     }
 

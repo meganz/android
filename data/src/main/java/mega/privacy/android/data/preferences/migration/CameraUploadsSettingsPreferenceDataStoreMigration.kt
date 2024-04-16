@@ -45,7 +45,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
             areUploadFileNamesKept = false,
             isChargingRequiredForVideoCompression = true,
             videoCompressionSizeLimit = GetVideoCompressionSizeLimitUseCase.DEFAULT_SIZE,
-            fileUploadOption = 1001,
+            fileUploadOption = 1003,
             isUploadsByWifi = true,
         )
     }
@@ -73,7 +73,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
             videoCompressionSizeLimit = oldPreferences.chargingOnSize?.toIntOrNull()
                 ?: GetVideoCompressionSizeLimitUseCase.DEFAULT_SIZE,
             fileUploadOption = oldPreferences.camSyncFileUpload?.toIntOrNull()
-                ?: 1001,
+                ?: 1003,
             isUploadsByWifi = oldPreferences.camSyncWifi?.toBooleanStrictOrNull() ?: true,
         )
     }

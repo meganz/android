@@ -5,7 +5,7 @@ import mega.privacy.android.domain.repository.CameraUploadRepository
 import javax.inject.Inject
 
 /**
- * Use Case to retrieve the upload option for Camera Uploads
+ * Use Case to retrieve the type of content to be uploaded by Camera Uploads
  *
  * @property cameraUploadRepository [CameraUploadRepository]
  */
@@ -16,8 +16,9 @@ class GetUploadOptionUseCase @Inject constructor(
     /**
      * Invocation function
      *
-     * @return [UploadOption]
+     * @return The existing [UploadOption] that was set. [UploadOption.PHOTOS_AND_VIDEOS] is
+     * returned as default if there was no existing [UploadOption] set
      */
     suspend operator fun invoke(): UploadOption =
-        cameraUploadRepository.getUploadOption() ?: UploadOption.PHOTOS
+        cameraUploadRepository.getUploadOption() ?: UploadOption.PHOTOS_AND_VIDEOS
 }
