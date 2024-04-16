@@ -14,21 +14,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.R
 import mega.privacy.android.data.database.DatabaseHandler
@@ -171,7 +166,6 @@ internal class ChatRepositoryImpl @Inject constructor(
 ) : ChatRepository {
     private val richLinkConfig = MutableStateFlow(RichLinkConfig())
     private var chatRoomUpdates: HashMap<Long, Flow<ChatRoomUpdate>> = hashMapOf()
-    private val chatRoomUpdatesMutex = Mutex()
     private val joiningIds = mutableSetOf<Long>()
     private val joiningIdsFlow = MutableSharedFlow<MutableSet<Long>>()
     private val leavingIds = mutableSetOf<Long>()
@@ -672,46 +666,34 @@ internal class ChatRepositoryImpl @Inject constructor(
         }.getOrThrow()
     }
 
-    override fun monitorChatRoomUpdates(chatId: Long) = flow {
-        getChatRoomUpdates(chatId)?.let { updates ->
-            emitAll(updates.filterIsInstance<ChatRoomUpdate.OnChatRoomUpdate>()
-                .mapNotNull { it.chat }
-                .map { chatRoomMapper(it) }
-                .flowOn(ioDispatcher))
-        }
-    }
+    override fun monitorChatRoomUpdates(chatId: Long) =
+        getChatRoomUpdates(chatId).filterIsInstance<ChatRoomUpdate.OnChatRoomUpdate>()
+            .mapNotNull { it.chat }
+            .map { chatRoomMapper(it) }
+            .flowOn(ioDispatcher)
+
 
     override suspend fun loadMessages(chatId: Long, count: Int): ChatHistoryLoadStatus =
         withContext(ioDispatcher) {
             chatHistoryLoadStatusMapper(megaChatApiGateway.loadMessages(chatId, count))
         }
 
-    override fun monitorOnMessageLoaded(chatId: Long) = flow {
-        getChatRoomUpdates(chatId)?.let { updates ->
-            emitAll(updates.filterIsInstance<ChatRoomUpdate.OnMessageLoaded>()
-                .map { it.msg?.let { message -> chatMessageMapper(message) } }
-                .flowOn(ioDispatcher))
-        }
-    }
+    override fun monitorOnMessageLoaded(chatId: Long) =
+        getChatRoomUpdates(chatId).filterIsInstance<ChatRoomUpdate.OnMessageLoaded>()
+            .map { it.msg?.let { message -> chatMessageMapper(message) } }
+            .flowOn(ioDispatcher)
 
-    override fun monitorMessageUpdates(chatId: Long): Flow<ChatRoomMessageUpdate> = flow {
-        getChatRoomUpdates(chatId)?.let { updates: Flow<ChatRoomUpdate> ->
-            emitAll(updates.mapNotNull {
-                chatRoomMessageUpdateMapper(it)
-            }.onEach {
-                Timber.d("Chat message update for chatId: $chatId: $it")
-            }.flowOn(ioDispatcher))
-        }
-    }
+    override fun monitorMessageUpdates(chatId: Long): Flow<ChatRoomMessageUpdate> =
+        getChatRoomUpdates(chatId).mapNotNull {
+            chatRoomMessageUpdateMapper(it)
+        }.onEach {
+            Timber.d("Chat message update for chatId: $chatId: $it")
+        }.flowOn(ioDispatcher)
 
-    override fun monitorReactionUpdates(chatId: Long) = flow {
-        getChatRoomUpdates(chatId)?.let { updates ->
-            emitAll(
-                updates.filterIsInstance<ChatRoomUpdate.OnReactionUpdate>()
-                    .map { reactionUpdateMapper(it) }
-                    .flowOn(ioDispatcher))
-        }
-    }
+    override fun monitorReactionUpdates(chatId: Long) =
+        getChatRoomUpdates(chatId).filterIsInstance<ChatRoomUpdate.OnReactionUpdate>()
+            .map { reactionUpdateMapper(it) }
+            .flowOn(ioDispatcher)
 
     override fun monitorChatListItemUpdates(): Flow<ChatListItem> =
         megaChatApiGateway.chatUpdates
@@ -1133,14 +1115,10 @@ internal class ChatRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun getChatRoomUpdates(chatId: Long) = chatRoomUpdatesMutex.withLock {
-        if (!chatRoomUpdates.containsKey(chatId)) {
-            chatRoomUpdates[chatId] = megaChatApiGateway.openChatRoom(chatId).onCompletion {
-                chatRoomUpdates.remove(chatId)
-            }
+    private fun getChatRoomUpdates(chatId: Long) = synchronized(chatRoomUpdates) {
+        chatRoomUpdates.getOrPut(chatId) {
+            megaChatApiGateway.openChatRoom(chatId)
         }
-
-        chatRoomUpdates[chatId]
     }
 
     override suspend fun getMyFullName(): String? = withContext(ioDispatcher) {
