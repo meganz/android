@@ -53,7 +53,6 @@ public class DefaultScrollHandle extends ConstraintLayout implements ScrollHandl
     @Override
     public void setupLayout(PDFView pdfView) {
         Timber.d("setupLayout");
-        if (getParent() != null) return;
 
         ConstraintLayout.LayoutParams textViewHandleLp = new ConstraintLayout.LayoutParams(dp2px(45), dp2px(45));
         textViewHandleLp.endToEnd = LayoutParams.PARENT_ID;
@@ -63,7 +62,9 @@ public class DefaultScrollHandle extends ConstraintLayout implements ScrollHandl
         textViewHandle.setBackgroundResource(R.drawable.fastscroll_pdf_viewer);
         textViewHandle.setPadding(dp2px(10), dp2px(10), dp2px(10), dp2px(10));
         textViewHandle.setElevation(dp2px(4));
-        addView(textViewHandle, textViewHandleLp);
+        if (textViewHandle.getParent() == null) {
+            addView(textViewHandle, textViewHandleLp);
+        }
 
         ConstraintLayout.LayoutParams textViewBubbleLp = new ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
         textViewBubbleLp.endToEnd = LayoutParams.PARENT_ID;
@@ -75,11 +76,15 @@ public class DefaultScrollHandle extends ConstraintLayout implements ScrollHandl
         textViewBubble.setTextAlignment(TEXT_ALIGNMENT_CENTER);
         textViewBubble.setTextColor(ContextCompat.getColor(context, R.color.scroll_bubble_text_color));
         textViewBubble.setPadding(dp2px(10), dp2px(6), dp2px(10), dp2px(6));
-        addView(textViewBubble, textViewBubbleLp);
+        if (textViewBubble.getParent() == null) {
+            addView(textViewBubble, textViewBubbleLp);
+        }
 
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        pdfView.addView(this, lp);
+        if (getParent() == null) {
+            pdfView.addView(this, lp);
+        }
 
         this.pdfView = pdfView;
     }
