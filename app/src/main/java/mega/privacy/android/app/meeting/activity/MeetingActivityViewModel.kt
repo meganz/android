@@ -1000,7 +1000,7 @@ class MeetingActivityViewModel @Inject constructor(
      * @param chatId chat ID
      */
     fun updateChatRoomId(chatId: Long) {
-        if (_state.value.chatId != chatId) {
+        if (_state.value.chatId != chatId && chatId != -1L) {
             _state.update {
                 it.copy(
                     chatId = chatId

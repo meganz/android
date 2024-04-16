@@ -136,7 +136,8 @@ class AddContactViewModel @Inject constructor(
             val limit = call.callUsersLimit
                 ?: MeetingState.FREE_PLAN_PARTICIPANTS_LIMIT
             val shouldShowWarning =
-                (call.peerIdParticipants?.size ?: 0) >= limit
+                (call.peerIdParticipants?.size
+                    ?: 0) >= limit && _state.value.isCallUnlimitedProPlanFeatureFlagEnabled
             _state.update { it.copy(shouldShowParticipantsLimitWarning = shouldShowWarning) }
         } else {
             _state.update { it.copy(shouldShowParticipantsLimitWarning = false) }

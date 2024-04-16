@@ -406,9 +406,6 @@ class InMeetingViewModel @Inject constructor(
                             _state.update { it.copy(previousState = status) }
                         }
                     }
-                    // add delay to show warning
-                    delay(500)
-                    handleFreeCallEndWarning()
                 }
             }.onFailure { exception ->
                 Timber.e(exception)
@@ -458,6 +455,10 @@ class InMeetingViewModel @Inject constructor(
                                         previousState = status,
                                     )
                                 }
+                            }
+                            if (call.status == ChatCallStatus.InProgress) {
+                                Timber.d("Call in progress")
+                                handleFreeCallEndWarning()
                             }
                         } else if (contains(ChatCallChanges.CallWillEnd)) {
                             handleFreeCallEndWarning()

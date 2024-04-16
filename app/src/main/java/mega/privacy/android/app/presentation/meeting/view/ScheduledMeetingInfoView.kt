@@ -122,8 +122,8 @@ fun ScheduledMeetingInfoView(
     onScrollChange: (Boolean) -> Unit,
 ) {
     val shouldShowParticipantsLimitWarning =
-        managementState.isCallUnlimitedProPlanFeatureFlagEnabled && managementState.hasFreePlan() &&
-                state.shouldShowParticipantsLimitWarning
+        managementState.isCallUnlimitedProPlanFeatureFlagEnabled &&
+                state.shouldShowParticipantsLimitWarning && state.isModerator
     val listState = rememberLazyListState()
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
     val snackbarHostState = remember { SnackbarHostState() }
