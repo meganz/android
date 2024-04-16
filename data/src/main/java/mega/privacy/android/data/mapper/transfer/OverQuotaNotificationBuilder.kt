@@ -9,5 +9,5 @@ interface OverQuotaNotificationBuilder {
     /**
      * Creates a Notification for over quota transfers
      */
-    suspend operator fun invoke(): Notification
+    suspend operator fun invoke(storageOverQuota: Boolean): Notification
 }

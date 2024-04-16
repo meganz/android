@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.facade.AccountInfoFacade
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.notifications.DownloadNotificationIntentService
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils
@@ -34,7 +35,13 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
     private val accountInfoFacade: AccountInfoFacade,
 ) : OverQuotaNotificationBuilder {
 
-    override suspend operator fun invoke(): Notification {
+    override suspend operator fun invoke(storageOverQuota: Boolean) = if (storageOverQuota) {
+        storageOverQuotaNotification()
+    } else {
+        transferOverQuotaNotification()
+    }
+
+    private suspend fun transferOverQuotaNotification(): Notification {
         val isLoggedIn =
             isUserLoggedIn() && areCredentialsNullUseCase()
         var isFreeAccount = false
@@ -102,6 +109,32 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
             setContentIntent(clickPendingIntent)
             setOngoing(false)
             setAutoCancel(true)
+        }
+        return builder.build()
+    }
+
+    private fun storageOverQuotaNotification(): Notification = with(context) {
+        val contentText = getString(R.string.download_show_info)
+        val message = getString(R.string.overquota_alert_title)
+        val intent = Intent(this, ManagerActivity::class.java)
+        intent.action = Constants.ACTION_OVERQUOTA_STORAGE
+        val builder = NotificationCompat.Builder(
+            context,
+            Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID,
+        ).apply {
+            setSmallIcon(iconPackR.drawable.ic_stat_notify)
+            color = ContextCompat.getColor(this@with, R.color.red_600_red_300)
+            setContentIntent(
+                PendingIntent.getActivity(
+                    applicationContext,
+                    0,
+                    intent,
+                    PendingIntent.FLAG_IMMUTABLE
+                )
+            )
+            setAutoCancel(true).setTicker(contentText)
+            setContentTitle(message).setContentText(contentText)
+            setOngoing(false)
         }
         return builder.build()
     }

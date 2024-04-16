@@ -40,7 +40,6 @@ import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -48,6 +47,7 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -155,7 +155,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
                 Timber.w("STORAGE OVER QUOTA ERROR: ${error.errorCode}")
                 //work around - SDK does not return over quota error for folder upload,
                 //so need to be notified from global listener
-                if (transfer.transferType.isUploadType()) {
+                if (transfer.transferType == TransferType.GENERAL_UPLOAD) {
                     if (transfer.isForeignOverQuota) return
                     val uploadServiceIntent = Intent(this, UploadService::class.java).apply {
                         action = Constants.ACTION_OVERQUOTA_STORAGE

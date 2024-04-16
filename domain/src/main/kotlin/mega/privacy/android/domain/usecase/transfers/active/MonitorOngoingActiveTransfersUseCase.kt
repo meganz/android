@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.transformWhile
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.usecase.camerauploads.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.TransfersConstants.ON_TRANSFER_UPDATE_REFRESH_MILLIS
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorDownloadTransfersPausedUseCase
@@ -26,6 +27,7 @@ class MonitorOngoingActiveTransfersUseCase @Inject constructor(
     private val getActiveTransferTotalsUseCase: GetActiveTransferTotalsUseCase,
     private val monitorDownloadTransfersPausedUseCase: MonitorDownloadTransfersPausedUseCase,
     private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
+    private val monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase,
 ) {
 
     /**
@@ -37,17 +39,24 @@ class MonitorOngoingActiveTransfersUseCase @Inject constructor(
             .sample(ON_TRANSFER_UPDATE_REFRESH_MILLIS)
             .onStart { emit(getActiveTransferTotalsUseCase(transferType)) }
         val pausedFlow = monitorDownloadTransfersPausedUseCase()
-        val overQuotaFlow = monitorTransferOverQuotaUseCase().onStart { emit(false) }
+        val transferOverQuotaFlow = monitorTransferOverQuotaUseCase().onStart { emit(false) }
+        val storageOverQuotaFlow = monitorStorageOverQuotaUseCase().onStart { emit(false) }
 
         return combine(
             transfersFlow,
             pausedFlow,
-            overQuotaFlow
-        ) { transferTotals, paused, overQuota ->
-            MonitorOngoingActiveTransfersResult(transferTotals, paused, overQuota)
+            transferOverQuotaFlow,
+            storageOverQuotaFlow,
+        ) { transferTotals, paused, transfersOverQuota, storageOverQuota ->
+            MonitorOngoingActiveTransfersResult(
+                transferTotals,
+                paused,
+                transfersOverQuota,
+                storageOverQuota
+            )
         }.transformWhile {
             emit(it)
-            it.activeTransferTotals.hasOngoingTransfers() && !it.overQuota
+            it.activeTransferTotals.hasOngoingTransfers() && !it.transfersOverQuota && !it.storageOverQuota
         }
     }
 }

@@ -230,7 +230,12 @@ class ChatUploadsWorkerTest {
             on { hasOngoingTransfers() }.thenReturn(true)
         }
         whenever(monitorOngoingActiveTransfersUseCase(TransferType.CHAT_UPLOAD)) doReturn (flowOf(
-            MonitorOngoingActiveTransfersResult(totals, paused = false, overQuota = false)
+            MonitorOngoingActiveTransfersResult(
+                totals,
+                paused = false,
+                transfersOverQuota = false,
+                storageOverQuota = false
+            )
         ))
         whenever(monitorTransferEventsUseCase()) doReturn (emptyFlow())
         whenever(workProgressUpdater.updateProgress(any(), any(), any()))

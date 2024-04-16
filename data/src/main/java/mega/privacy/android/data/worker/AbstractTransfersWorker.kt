@@ -6,8 +6,6 @@ import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Build
 import androidx.core.app.NotificationManagerCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
@@ -116,14 +114,14 @@ abstract class AbstractTransfersWorker(
         onStart()
         monitorOngoingActiveTransfersUseCase(type)
             .catch { Timber.e("${this@AbstractTransfersWorker::class.java.simpleName}error: $it") }
-            .onEach { (transferTotals, paused, _) ->
+            .onEach { (transferTotals, paused, _, _) ->
                 //set progress percent as worker progress
                 setProgress(workDataOf(PROGRESS to transferTotals.transferProgress.floatValue))
                 //update the notification
                 notify(createUpdateNotification(transferTotals, paused))
                 Timber.d("${this@AbstractTransfersWorker::class.java.simpleName}${if (paused) "(paused) " else ""} Notification update (${transferTotals.transferProgress.intValue}):${transferTotals.hasOngoingTransfers()}")
             }
-            .last().let { (lastActiveTransferTotals, _, overQuota) ->
+            .last().let { (lastActiveTransferTotals, _, transferOverQuota, storageOverQuota) ->
                 stopService(monitorJob)
                 if (lastActiveTransferTotals.hasCompleted()) {
                     Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Finished Successful: $lastActiveTransferTotals")
@@ -132,16 +130,8 @@ abstract class AbstractTransfersWorker(
                     }
                     Result.success()
                 } else {
-                    if (overQuota
-                        && !ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(
-                            Lifecycle.State.STARTED
-                        )
-                    ) {
-                        //the over quota notification is shown if the app is in background (if not a full dialog will be shown in the app)
-                        showFinalNotification(
-                            overQuotaNotificationBuilder(),
-                            NOTIFICATION_STORAGE_OVERQUOTA
-                        )
+                    if (storageOverQuota || transferOverQuota) {
+                        showOverQuotaNotification(storageOverQuota = storageOverQuota)
                     } else {
                         showFinishNotification(lastActiveTransferTotals)
                     }
@@ -198,6 +188,12 @@ abstract class AbstractTransfersWorker(
         showFinalNotification(
             createFinishNotification(activeTransferTotals),
             finalNotificationId,
+        )
+
+    private suspend fun showOverQuotaNotification(storageOverQuota: Boolean) =
+        showFinalNotification(
+            overQuotaNotificationBuilder(storageOverQuota = storageOverQuota),
+            NOTIFICATION_STORAGE_OVERQUOTA
         )
 
     @SuppressLint("MissingPermission")

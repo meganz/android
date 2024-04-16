@@ -234,9 +234,9 @@ class DownloadsWorkerTest {
     fun `test that overQuotaNotificationBuilder is invoked when transfers finishes with incomplete transfers and over quota true`() =
         runTest {
             val transferTotal = mockActiveTransferTotals(false)
-            commonStub(transferTotals = listOf(transferTotal), overQuota = true)
+            commonStub(transferTotals = listOf(transferTotal), transferOverQuota = true)
             underTest.doWork()
-            verify(overQuotaNotificationBuilder).invoke()
+            verify(overQuotaNotificationBuilder).invoke(false)
             verifyNoInteractions(transfersFinishedNotificationMapper)
         }
 
@@ -341,7 +341,7 @@ class DownloadsWorkerTest {
     private suspend fun commonStub(
         initialTransferTotals: ActiveTransferTotals = mockActiveTransferTotals(false),
         transferTotals: List<ActiveTransferTotals> = listOf(mockActiveTransferTotals(true)),
-        overQuota: Boolean = false,
+        transferOverQuota: Boolean = false,
     ) = runTest {
         val transfer: Transfer = mock()
         val transferEvent = TransferEvent.TransferFinishEvent(transfer, null)
@@ -355,7 +355,14 @@ class DownloadsWorkerTest {
             .thenReturn(flow {
                 delay(100)//to be sure that other events are received
                 transferTotals.forEach {
-                    emit(MonitorOngoingActiveTransfersResult(it, false, overQuota))
+                    emit(
+                        MonitorOngoingActiveTransfersResult(
+                            activeTransferTotals = it,
+                            paused = false,
+                            transfersOverQuota = transferOverQuota,
+                            storageOverQuota = false
+                        )
+                    )
                 }
             })
         whenever(areNotificationsEnabledUseCase()).thenReturn(true)

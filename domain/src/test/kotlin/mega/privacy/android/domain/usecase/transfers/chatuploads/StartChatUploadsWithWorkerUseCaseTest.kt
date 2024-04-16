@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.PendingMessage
+import mega.privacy.android.domain.entity.chat.PendingMessageState
+import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageTransferTagRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
@@ -253,6 +255,31 @@ class StartChatUploadsWithWorkerUseCaseTest {
                 verify(attachNodeWithPendingMessageUseCase).invoke(
                     pendingMessageId,
                     NodeId(nodeHandle)
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that pending message is updated to error uploading when a temporary error is received`() =
+        runTest {
+            val file = mockFile()
+            val pendingMessageId = 15L
+            val nodeHandle = 12L
+            val event = MultiTransferEvent.SingleTransferEvent(
+                mock<TransferEvent.TransferTemporaryErrorEvent>(),
+                1L, 1L,
+            )
+            whenever(
+                uploadFilesUseCase(any(), NodeId(any()), any(), any(), any())
+            ) doReturn flowOf(event)
+
+            underTest(file, pendingMessageId, NodeId(11L)).test {
+                verify(updatePendingMessageUseCase).invoke(
+                    UpdatePendingMessageStateRequest(
+                        pendingMessageId,
+                        PendingMessageState.ERROR_UPLOADING
+                    )
                 )
                 cancelAndIgnoreRemainingEvents()
             }
