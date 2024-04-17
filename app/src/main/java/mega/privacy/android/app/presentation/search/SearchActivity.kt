@@ -59,8 +59,10 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.filelink.view.animationScale
 import mega.privacy.android.app.presentation.filelink.view.animationSpecs
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
+import mega.privacy.android.app.presentation.imagepreview.fetcher.BackupsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
@@ -85,6 +87,7 @@ import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -99,7 +102,6 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.SearchAudioFilterPressedEvent
 import mega.privacy.mobile.analytics.event.SearchDocsFilterPressedEvent
@@ -537,40 +539,63 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
         startActivity(pdfIntent)
     }
 
-    private fun openImageViewerActivity(
-        currentFileNode: TypedFileNode,
-    ) {
+    private fun openImageViewerActivity(currentFileNode: TypedFileNode) {
         val nodeSourceType = viewModel.state.value.nodeSourceType
-        when (nodeSourceType) {
-            NodeSourceType.CLOUD_DRIVE, NodeSourceType.HOME -> {
-                val intent = ImagePreviewActivity.createIntent(
-                    context = this,
-                    imageSource = ImagePreviewFetcherSource.CLOUD_DRIVE,
-                    menuOptionsSource = ImagePreviewMenuSource.CLOUD_DRIVE,
-                    anchorImageNodeId = currentFileNode.id,
-                    params = mapOf(CloudDriveImageNodeFetcher.PARENT_ID to currentFileNode.parentId.longValue),
-                    showScreenLabel = false,
-                )
-                startActivity(intent)
-            }
+        val currentFileNodeParentId = currentFileNode.parentId.longValue
 
-            NodeSourceType.RUBBISH_BIN -> {
-                val intent = ImagePreviewActivity.createIntent(
-                    context = this,
-                    imageSource = ImagePreviewFetcherSource.RUBBISH_BIN,
-                    menuOptionsSource = ImagePreviewMenuSource.RUBBISH_BIN,
-                    anchorImageNodeId = currentFileNode.id,
-                    params = mapOf(RubbishBinImageNodeFetcher.PARENT_ID to currentFileNode.parentId.longValue),
-                    showScreenLabel = false,
+        val (imageSource, menuOptionsSource, paramKey) = when (nodeSourceType) {
+            NodeSourceType.CLOUD_DRIVE, NodeSourceType.HOME ->
+                Triple(
+                    ImagePreviewFetcherSource.CLOUD_DRIVE,
+                    ImagePreviewMenuSource.CLOUD_DRIVE,
+                    CloudDriveImageNodeFetcher.PARENT_ID
                 )
-                startActivity(intent)
-            }
+
+            NodeSourceType.RUBBISH_BIN ->
+                Triple(
+                    ImagePreviewFetcherSource.RUBBISH_BIN,
+                    ImagePreviewMenuSource.RUBBISH_BIN,
+                    RubbishBinImageNodeFetcher.PARENT_ID
+                )
+
+            NodeSourceType.INCOMING_SHARES, NodeSourceType.OUTGOING_SHARES ->
+                Triple(
+                    ImagePreviewFetcherSource.SHARED_ITEMS,
+                    ImagePreviewMenuSource.SHARED_ITEMS,
+                    SharedItemsImageNodeFetcher.PARENT_ID
+                )
+
+            NodeSourceType.LINKS ->
+                Triple(
+                    ImagePreviewFetcherSource.SHARED_ITEMS,
+                    ImagePreviewMenuSource.LINKS,
+                    SharedItemsImageNodeFetcher.PARENT_ID
+                )
+
+            NodeSourceType.BACKUPS ->
+                Triple(
+                    ImagePreviewFetcherSource.BACKUPS,
+                    ImagePreviewMenuSource.BACKUPS,
+                    BackupsImageNodeFetcher.PARENT_ID
+                )
 
             else -> {
                 Timber.e("Unsupported node source type")
+                return
             }
         }
+
+        val intent = ImagePreviewActivity.createIntent(
+            context = this,
+            imageSource = imageSource,
+            menuOptionsSource = menuOptionsSource,
+            anchorImageNodeId = currentFileNode.id,
+            params = mapOf(paramKey to currentFileNodeParentId),
+            showScreenLabel = false
+        )
+        startActivity(intent)
     }
+
 
     private fun openVideoOrAudioFile(
         fileNode: TypedFileNode,
