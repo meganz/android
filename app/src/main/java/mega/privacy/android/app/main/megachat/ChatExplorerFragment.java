@@ -818,6 +818,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
     }
 
     private void setListVisibility() {
+        if (adapterList == null) return;
         if (adapterList.getItemCount() == 0) {
             Timber.d("adapterList.getItemCount() == 0");
             listView.setVisibility(View.GONE);
@@ -856,17 +857,21 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                 }
             }
 
-            adapterList.setSearchSelectedItems(searchSelectedItems);
+            if (adapterList != null) {
+                adapterList.setSearchSelectedItems(searchSelectedItems);
+            }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (!adapterList.isSearchEnabled()) {
-                return;
+            if (adapterList != null) {
+                if (!adapterList.isSearchEnabled()) {
+                    return;
+                }
+                adapterList.setItems(searchItems);
+                setListVisibility();
             }
-            adapterList.setItems(searchItems);
-            setListVisibility();
         }
     }
 
