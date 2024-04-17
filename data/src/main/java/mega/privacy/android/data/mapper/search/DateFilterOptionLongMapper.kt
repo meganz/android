@@ -55,6 +55,12 @@ class DateFilterOptionLongMapper @Inject constructor() {
                 startOfLastYearInstant.epochSecond to endOfLastYearInstant.epochSecond
             }
 
+            DateFilterOption.Older -> {
+                val endOfLastLastYear = LocalDate.of(today.year - 2, 12, 31)
+                val endOfLastLastYearInstant = endOfLastLastYear.atStartOfDay(zone).toInstant()
+                Long.MIN_VALUE to endOfLastLastYearInstant.epochSecond
+            }
+
             else -> {
                 Long.MIN_VALUE to now.epochSecond
             }

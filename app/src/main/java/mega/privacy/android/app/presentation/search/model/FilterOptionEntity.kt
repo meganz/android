@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.search.model
 
+import androidx.annotation.StringRes
+
 /**
  * Entity class to represent the filter option
  *
@@ -9,6 +11,6 @@ package mega.privacy.android.app.presentation.search.model
  */
 data class FilterOptionEntity(
     val id: Int,
-    val title: String,
+    @StringRes val title: Int,
     val isSelected: Boolean,
 )

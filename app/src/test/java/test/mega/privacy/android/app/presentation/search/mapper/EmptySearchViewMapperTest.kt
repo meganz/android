@@ -3,7 +3,7 @@ package test.mega.privacy.android.app.presentation.search.mapper
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
 import mega.privacy.android.domain.entity.search.SearchCategory
@@ -29,18 +29,27 @@ class EmptySearchViewMapperTest {
                 category = SearchCategory.ALL,
                 searchQuery = "query"
             )
-        Truth.assertThat(actual.second)
-            .isEqualTo(context.getString(R.string.search_empty_screen_no_results))
+        assertThat(actual.second).isEqualTo(context.getString(R.string.search_empty_screen_no_results))
+    }
+
+    @Test
+    fun `test that when search query is null and user has date filter chips then no results message is shown to the user`() {
+        val actual = underTest(
+            isSearchChipEnabled = true,
+            category = SearchCategory.ALL,
+            isDateFilterApplied = true,
+        )
+        assertThat(actual.second).isEqualTo(context.getString(R.string.search_empty_screen_no_results))
     }
 
     @Test
     fun `test that when search query is null and user has not any chips then Cloud drive is empty message is shown to the user`() {
         val actual = underTest(
             isSearchChipEnabled = true,
-            category = SearchCategory.ALL
+            category = SearchCategory.ALL,
+            isDateFilterApplied = false,
         )
-        Truth.assertThat(actual.second)
-            .isEqualTo(context.getString(R.string.cloud_drive_empty_screen_message))
+        assertThat(actual.second).isEqualTo(context.getString(R.string.cloud_drive_empty_screen_message))
     }
 
     @Test
@@ -49,8 +58,7 @@ class EmptySearchViewMapperTest {
             isSearchChipEnabled = true,
             category = SearchCategory.IMAGES
         )
-        Truth.assertThat(actual.second)
-            .isEqualTo(context.getString(R.string.search_empty_screen_no_images))
+        assertThat(actual.second).isEqualTo(context.getString(R.string.search_empty_screen_no_images))
     }
 
     @Test
@@ -59,8 +67,7 @@ class EmptySearchViewMapperTest {
             isSearchChipEnabled = true,
             category = SearchCategory.ALL_DOCUMENTS
         )
-        Truth.assertThat(actual.second)
-            .isEqualTo(context.getString(R.string.search_empty_screen_no_documents))
+        assertThat(actual.second).isEqualTo(context.getString(R.string.search_empty_screen_no_documents))
     }
 
     @Test
@@ -69,8 +76,7 @@ class EmptySearchViewMapperTest {
             isSearchChipEnabled = true,
             category = SearchCategory.AUDIO
         )
-        Truth.assertThat(actual.second)
-            .isEqualTo(context.getString(R.string.search_empty_screen_no_audio))
+        assertThat(actual.second).isEqualTo(context.getString(R.string.search_empty_screen_no_audio))
     }
 
     @Test
@@ -79,7 +85,6 @@ class EmptySearchViewMapperTest {
             isSearchChipEnabled = true,
             category = SearchCategory.VIDEO
         )
-        Truth.assertThat(actual.second)
-            .isEqualTo(context.getString(R.string.search_empty_screen_no_video))
+        assertThat(actual.second).isEqualTo(context.getString(R.string.search_empty_screen_no_video))
     }
 }

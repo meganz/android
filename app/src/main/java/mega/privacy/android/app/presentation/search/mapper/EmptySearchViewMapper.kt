@@ -5,9 +5,16 @@ import android.content.res.Configuration
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SearchCategory.ALL
 import mega.privacy.android.domain.entity.search.SearchCategory.ALL_DOCUMENTS
 import mega.privacy.android.domain.entity.search.SearchCategory.AUDIO
+import mega.privacy.android.domain.entity.search.SearchCategory.DOCUMENTS
+import mega.privacy.android.domain.entity.search.SearchCategory.FOLDER
 import mega.privacy.android.domain.entity.search.SearchCategory.IMAGES
+import mega.privacy.android.domain.entity.search.SearchCategory.OTHER
+import mega.privacy.android.domain.entity.search.SearchCategory.PDF
+import mega.privacy.android.domain.entity.search.SearchCategory.PRESENTATION
+import mega.privacy.android.domain.entity.search.SearchCategory.SPREADSHEET
 import mega.privacy.android.domain.entity.search.SearchCategory.VIDEO
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import javax.inject.Inject
@@ -25,6 +32,7 @@ class EmptySearchViewMapper @Inject constructor(
      * @param category search category enum [SearchCategory]
      * @param searchParentHandle searchParentHandle
      * @param rootNodeHandle root Node handle
+     * @param isDateFilterApplied if there is a date filter applied
      * If user searches for some text then always "No results" are shown to the user
      * If search query is empty then empty screen is shown based on the filter selected [SearchCategory]
      * If no filter is selected and screen is empty then we show "Cloud drive is empty"
@@ -35,6 +43,7 @@ class EmptySearchViewMapper @Inject constructor(
         searchQuery: String? = "",
         searchParentHandle: Long = -1,
         rootNodeHandle: Long = -1,
+        isDateFilterApplied: Boolean = false,
     ): Pair<Int, String> {
         return if (isSearchChipEnabled.not()) {
             if (searchParentHandle == INVALID_HANDLE) {
@@ -89,6 +98,21 @@ class EmptySearchViewMapper @Inject constructor(
                 category == VIDEO -> Pair(
                     R.drawable.ic_homepage_empty_video,
                     context.getString(R.string.search_empty_screen_no_video)
+                )
+
+                category == PDF
+                        || category == PRESENTATION
+                        || category == SPREADSHEET
+                        || category == FOLDER
+                        || category == OTHER
+                        || category == DOCUMENTS -> Pair(
+                    R.drawable.ic_empty_search,
+                    context.getString(R.string.search_empty_screen_no_results)
+                )
+
+                category == ALL && isDateFilterApplied -> Pair(
+                    R.drawable.ic_empty_search,
+                    context.getString(R.string.search_empty_screen_no_results)
                 )
 
                 else -> Pair(

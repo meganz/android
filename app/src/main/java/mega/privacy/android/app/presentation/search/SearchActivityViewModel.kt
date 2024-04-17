@@ -16,14 +16,16 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.search.mapper.DateFilterOptionStringMapper
+import mega.privacy.android.app.presentation.search.mapper.DateFilterOptionStringResMapper
 import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
 import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
-import mega.privacy.android.app.presentation.search.mapper.TypeFilterOptionStringMapper
+import mega.privacy.android.app.presentation.search.mapper.TypeFilterOptionStringResMapper
 import mega.privacy.android.app.presentation.search.mapper.TypeFilterToSearchMapper
+import mega.privacy.android.app.presentation.search.model.DateFilterWithName
 import mega.privacy.android.app.presentation.search.model.FilterOptionEntity
 import mega.privacy.android.app.presentation.search.model.SearchActivityState
 import mega.privacy.android.app.presentation.search.model.SearchFilter
+import mega.privacy.android.app.presentation.search.model.TypeFilterWithName
 import mega.privacy.android.app.presentation.search.navigation.DATE_ADDED
 import mega.privacy.android.app.presentation.search.navigation.DATE_MODIFIED
 import mega.privacy.android.app.presentation.search.navigation.TYPE
@@ -74,8 +76,8 @@ class SearchActivityViewModel @Inject constructor(
     private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase,
     private val searchFilterMapper: SearchFilterMapper,
     private val typeFilterToSearchMapper: TypeFilterToSearchMapper,
-    private val typeFilterOptionStringMapper: TypeFilterOptionStringMapper,
-    private val dateFilterOptionStringMapper: DateFilterOptionStringMapper,
+    private val typeFilterOptionStringResMapper: TypeFilterOptionStringResMapper,
+    private val dateFilterOptionStringResMapper: DateFilterOptionStringResMapper,
     private val emptySearchViewMapper: EmptySearchViewMapper,
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
     private val setViewType: SetViewType,
@@ -169,9 +171,9 @@ class SearchActivityViewModel @Inject constructor(
                         query = getCurrentSearchQuery(),
                         parentHandle = NodeId(getCurrentParentHandle()),
                         nodeSourceType = nodeSourceType,
-                        searchCategory = typeFilterToSearchMapper(state.value.typeSelectedFilterOption),
-                        modificationDate = state.value.dateModifiedSelectedFilterOption,
-                        creationDate = state.value.dateAddedSelectedFilterOption
+                        searchCategory = typeFilterToSearchMapper(state.value.typeSelectedFilterOption?.type),
+                        modificationDate = state.value.dateModifiedSelectedFilterOption?.date,
+                        creationDate = state.value.dateAddedSelectedFilterOption?.date
                     )
                 } else {
                     searchNodesUseCase(
@@ -241,8 +243,9 @@ class SearchActivityViewModel @Inject constructor(
         if (state.value.dropdownChipsEnabled == true) {
             emptySearchViewMapper(
                 isSearchChipEnabled = true,
-                category = typeFilterToSearchMapper(state.value.typeSelectedFilterOption),
-                searchQuery = state.value.searchQuery
+                category = typeFilterToSearchMapper(state.value.typeSelectedFilterOption?.type),
+                searchQuery = state.value.searchQuery,
+                isDateFilterApplied = state.value.dateAddedSelectedFilterOption != null || state.value.dateModifiedSelectedFilterOption != null
             )
         } else {
             emptySearchViewMapper(
@@ -364,7 +367,7 @@ class SearchActivityViewModel @Inject constructor(
     /**
      * Updates the type filter with the selected option
      */
-    fun setTypeSelectedFilterOption(typeFilterOption: TypeFilterOption?) {
+    fun setTypeSelectedFilterOption(typeFilterOption: TypeFilterWithName?) {
         _state.update {
             it.copy(
                 typeSelectedFilterOption = typeFilterOption,
@@ -377,7 +380,7 @@ class SearchActivityViewModel @Inject constructor(
     /**
      * Updates the date modified filter with the selected option
      */
-    fun setDateModifiedSelectedFilterOption(dateFilterOption: DateFilterOption?) {
+    fun setDateModifiedSelectedFilterOption(dateFilterOption: DateFilterWithName?) {
         _state.update {
             it.copy(
                 dateModifiedSelectedFilterOption = dateFilterOption,
@@ -390,7 +393,7 @@ class SearchActivityViewModel @Inject constructor(
     /**
      * Updates the date added filter with the selected option
      */
-    fun setDateAddedSelectedFilterOption(dateFilterOption: DateFilterOption?) {
+    fun setDateAddedSelectedFilterOption(dateFilterOption: DateFilterWithName?) {
         _state.update {
             it.copy(
                 dateAddedSelectedFilterOption = dateFilterOption,
@@ -452,8 +455,8 @@ class SearchActivityViewModel @Inject constructor(
             TypeFilterOption.entries.map { option ->
                 FilterOptionEntity(
                     option.ordinal,
-                    typeFilterOptionStringMapper(option),
-                    option == state.value.typeSelectedFilterOption
+                    typeFilterOptionStringResMapper(option),
+                    option == state.value.typeSelectedFilterOption?.type
                 )
             }
 
@@ -461,16 +464,16 @@ class SearchActivityViewModel @Inject constructor(
             DateFilterOption.entries.map { option ->
                 FilterOptionEntity(
                     option.ordinal,
-                    dateFilterOptionStringMapper(option),
-                    option == state.value.dateModifiedSelectedFilterOption
+                    dateFilterOptionStringResMapper(option),
+                    option == state.value.dateModifiedSelectedFilterOption?.date
                 )
             }
 
         DATE_ADDED -> DateFilterOption.entries.map { option ->
             FilterOptionEntity(
                 option.ordinal,
-                dateFilterOptionStringMapper(option),
-                option == state.value.dateAddedSelectedFilterOption
+                dateFilterOptionStringResMapper(option),
+                option == state.value.dateAddedSelectedFilterOption?.date
             )
         }
 
@@ -484,22 +487,43 @@ class SearchActivityViewModel @Inject constructor(
         when (filter) {
             TYPE -> {
                 val typeOption = TypeFilterOption.entries.getOrNull(filterOption.id)
-                    ?.takeIf { it.ordinal != state.value.typeSelectedFilterOption?.ordinal }
-                setTypeSelectedFilterOption(typeOption)
+                    ?.takeIf { it.ordinal != state.value.typeSelectedFilterOption?.type?.ordinal }
+                setTypeSelectedFilterOption(
+                    typeOption?.let {
+                        TypeFilterWithName(
+                            it,
+                            typeFilterOptionStringResMapper(it)
+                        )
+                    }
+                )
             }
 
             DATE_MODIFIED -> {
                 val dateModifiedOption = DateFilterOption.entries.getOrNull(filterOption.id)
-                    ?.takeIf { it.ordinal != state.value.dateModifiedSelectedFilterOption?.ordinal }
+                    ?.takeIf { it.ordinal != state.value.dateModifiedSelectedFilterOption?.date?.ordinal }
 
-                setDateModifiedSelectedFilterOption(dateModifiedOption)
+                setDateModifiedSelectedFilterOption(
+                    dateModifiedOption?.let {
+                        DateFilterWithName(
+                            it,
+                            dateFilterOptionStringResMapper(it)
+                        )
+                    }
+                )
             }
 
             DATE_ADDED -> {
                 val dateAddedOption = DateFilterOption.entries.getOrNull(filterOption.id)
-                    ?.takeIf { it.ordinal != state.value.dateAddedSelectedFilterOption?.ordinal }
+                    ?.takeIf { it.ordinal != state.value.dateAddedSelectedFilterOption?.date?.ordinal }
 
-                setDateAddedSelectedFilterOption(dateAddedOption)
+                setDateAddedSelectedFilterOption(
+                    dateAddedOption?.let {
+                        DateFilterWithName(
+                            it,
+                            dateFilterOptionStringResMapper(it)
+                        )
+                    }
+                )
             }
         }
     }

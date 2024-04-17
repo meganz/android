@@ -8,13 +8,14 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.search.SearchActivityViewModel
-import mega.privacy.android.app.presentation.search.mapper.DateFilterOptionStringMapper
+import mega.privacy.android.app.presentation.search.mapper.DateFilterOptionStringResMapper
 import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
 import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
-import mega.privacy.android.app.presentation.search.mapper.TypeFilterOptionStringMapper
+import mega.privacy.android.app.presentation.search.mapper.TypeFilterOptionStringResMapper
 import mega.privacy.android.app.presentation.search.mapper.TypeFilterToSearchMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
@@ -75,8 +76,8 @@ class SearchActivityViewModelTest {
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
     private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode = mock()
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase = mock()
-    private val typeFilterStringMapper: TypeFilterOptionStringMapper = mock()
-    private val dateFilterStringMapper: DateFilterOptionStringMapper = mock()
+    private val typeFilterStringMapper: TypeFilterOptionStringResMapper = mock()
+    private val dateFilterStringMapper: DateFilterOptionStringResMapper = mock()
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase = mock()
     private val searchUseCase: SearchUseCase = mock()
 
@@ -110,8 +111,8 @@ class SearchActivityViewModelTest {
             typeFilterToSearchMapper = typeFilterToSearchMapper,
             emptySearchViewMapper = emptySearchViewMapper,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
-            typeFilterOptionStringMapper = typeFilterStringMapper,
-            dateFilterOptionStringMapper = dateFilterStringMapper,
+            typeFilterOptionStringResMapper = typeFilterStringMapper,
+            dateFilterOptionStringResMapper = dateFilterStringMapper,
             searchUseCase = searchUseCase,
         )
     }
@@ -222,7 +223,10 @@ class SearchActivityViewModelTest {
     @Test
     fun `test that setting a type filter will change the filter state`() =
         runTest {
-            val type = TypeFilterOption.Images
+            val type = TypeFilterWithName(
+                TypeFilterOption.Images,
+                R.string.search_dropdown_chip_filter_type_file_type_images
+            )
             underTest.setTypeSelectedFilterOption(type)
             underTest.state.test {
                 val state = awaitItem()
@@ -235,7 +239,10 @@ class SearchActivityViewModelTest {
     @Test
     fun `test that setting a date modified filter will change the filter state`() =
         runTest {
-            val date = DateFilterOption.Today
+            val date = DateFilterWithName(
+                DateFilterOption.Today,
+                R.string.search_dropdown_chip_filter_type_date_today
+            )
             underTest.setDateModifiedSelectedFilterOption(date)
             underTest.state.test {
                 val state = awaitItem()
@@ -248,7 +255,10 @@ class SearchActivityViewModelTest {
     @Test
     fun `test that setting a date added filter will change the filter state`() =
         runTest {
-            val date = DateFilterOption.Older
+            val date = DateFilterWithName(
+                DateFilterOption.Older,
+                R.string.search_dropdown_chip_filter_type_date_older
+            )
             underTest.setDateAddedSelectedFilterOption(date)
             underTest.state.test {
                 val state = awaitItem()

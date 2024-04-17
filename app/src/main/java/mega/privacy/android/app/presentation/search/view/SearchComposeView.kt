@@ -41,12 +41,12 @@ import mega.privacy.android.app.presentation.search.model.SearchActivityState
 import mega.privacy.android.app.presentation.search.model.SearchFilter
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewForSearch
 
 /**

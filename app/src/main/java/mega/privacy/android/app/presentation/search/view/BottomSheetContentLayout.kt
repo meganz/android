@@ -17,13 +17,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.search.model.FilterOptionEntity
-import mega.privacy.android.domain.entity.search.TypeFilterOption
 import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.tokens.TextColor
+import mega.privacy.android.domain.entity.search.TypeFilterOption
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable
@@ -53,7 +54,7 @@ internal fun BottomSheetContentLayout(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 MegaText(
-                    text = option.title,
+                    text = stringResource(id = option.title),
                     textColor = TextColor.Primary,
                     style = MaterialTheme.typography.subtitle2,
                 )
@@ -81,7 +82,7 @@ private fun SearchFilterBottomSheetPreview() {
             options = TypeFilterOption.entries.map { option ->
                 FilterOptionEntity(
                     id = option.ordinal,
-                    title = "Type",
+                    title = R.string.search_dropdown_chip_filter_type_file_type,
                     isSelected = true
                 )
             },
