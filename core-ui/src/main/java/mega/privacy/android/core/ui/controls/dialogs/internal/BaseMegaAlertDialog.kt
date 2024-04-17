@@ -8,8 +8,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
@@ -119,6 +122,7 @@ internal fun BaseMegaAlertDialog(
     dismissOnBackPress = dismissOnBackPress
 )
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun BaseMegaAlertDialog(
     buttons: @Composable (() -> Unit),
@@ -130,7 +134,7 @@ private fun BaseMegaAlertDialog(
     dismissOnBackPress: Boolean = true,
 ) = CompositionLocalProvider(LocalAbsoluteElevation provides 24.dp) {
     AlertDialog(
-        modifier = modifier,
+        modifier = modifier.semantics { testTagsAsResourceId = true },
         backgroundColor = MegaTheme.colors.background.surface1,
         title = title?.composeLet {
             Text(

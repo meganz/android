@@ -19,8 +19,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -40,6 +43,7 @@ import mega.privacy.android.core.ui.theme.tokens.TextColor
  * @param optionDescriptionMapper can be used to map each option to the text that represents it, toString() will be used by default
  *
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun <T> ConfirmationDialogWithRadioButtons(
     radioOptions: List<T>?,
@@ -67,6 +71,7 @@ fun <T> ConfirmationDialogWithRadioButtons(
         properties = properties,
     ) {
         Surface(
+            modifier = Modifier.semantics { testTagsAsResourceId = true },
             elevation = 24.dp,
             shape = RoundedCornerShape(4.dp)
         ) {

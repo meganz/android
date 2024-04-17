@@ -16,11 +16,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.lifecycle.Lifecycle
@@ -99,6 +102,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  * @param onVideoQualityUiItemSelected Lambda to execute when the User selects a new
  * [VideoQualityUiItem] from the Video Quality prompt
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun SettingsCameraUploadsView(
     uiState: SettingsCameraUploadsUiState,
@@ -167,6 +171,7 @@ internal fun SettingsCameraUploadsView(
     }
 
     MegaScaffold(
+        modifier = Modifier.semantics { testTagsAsResourceId = true },
         topBar = {
             MegaAppBar(
                 modifier = Modifier.testTag(SETTINGS_CAMERA_UPLOADS_TOOLBAR),

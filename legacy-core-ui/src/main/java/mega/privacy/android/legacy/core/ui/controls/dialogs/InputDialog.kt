@@ -19,11 +19,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -48,7 +51,7 @@ import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
  * @param keyboardActions Specifies Keyboard Actions to be performed
  * @param keyboardType Specifies the type of keys available for the Keyboard (e.g. Text, Number)
  */
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun InputDialog(
     title: String,
@@ -79,7 +82,7 @@ fun InputDialog(
     CompositionLocalProvider(LocalAbsoluteElevation provides 24.dp) {
         val focusRequester = remember { FocusRequester() }
         AlertDialog(
-            modifier = modifier,
+            modifier = modifier.semantics { testTagsAsResourceId = true },
             title = {
                 Text(
                     modifier = Modifier
