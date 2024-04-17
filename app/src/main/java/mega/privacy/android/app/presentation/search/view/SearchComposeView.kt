@@ -94,6 +94,8 @@ fun SearchComposeView(
 
     LaunchedEffect(key1 = state.resetScroll) {
         listState.scrollToItem(0)
+    }
+    LaunchedEffect(key1 = state.resetScroll) {
         gridState.scrollToItem(0)
     }
 
