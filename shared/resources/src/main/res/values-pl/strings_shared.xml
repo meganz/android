@@ -188,7 +188,7 @@
     <string name="video_section_playlist_detail_empty_hint_videos">No videos</string>
     <!-- Top bar title of the video section video selected page -->
     <string name="video_section_video_selected_top_bar_title">Choose files</string>
-    <!-- Message when deleting the playlists of the video section playlists tab -->
+    <!-- Message when deleting the playlists of the video section playlists tab. %1$d will be replaced the number of deleted playlists -->
     <plurals name="video_section_playlists_delete_playlists_message">
         <item quantity="one"></item>
         <item quantity="few"></item>
@@ -212,4 +212,6 @@
     </plurals>
     <!-- Warning shown when the user clicks on a web link and there is no app available at the moment for opening it. -->
     <string name="chat_click_link_in_message_intent_not_available">You may not have any apps installed which can open this website</string>
+    <!-- Message when deleting a singular playlist of the video section playlists tab. %1$s will be replaced the name of deleted playlist -->
+    <string name="video_section_playlists_delete_playlists_message_singular">“%1$s” deleted</string>
 </resources>
