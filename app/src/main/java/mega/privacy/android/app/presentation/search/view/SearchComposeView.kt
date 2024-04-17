@@ -109,8 +109,7 @@ fun SearchComposeView(
         },
     )
 
-    topBarPadding =
-        if (state.navigationLevel.isNotEmpty() && state.nodeSourceType != NodeSourceType.CLOUD_DRIVE && state.nodeSourceType != NodeSourceType.HOME) 8.dp else 0.dp
+    topBarPadding = if (state.navigationLevel.isNotEmpty()) 8.dp else 0.dp
 
     state.errorMessageId?.let {
         val errorMessage = stringResource(id = it)
@@ -150,7 +149,7 @@ fun SearchComposeView(
         }
     ) { padding ->
         Column(modifier = Modifier.padding(top = topBarPadding)) {
-            if (state.nodeSourceType == NodeSourceType.CLOUD_DRIVE || state.nodeSourceType == NodeSourceType.HOME) {
+            if ((state.nodeSourceType == NodeSourceType.CLOUD_DRIVE || state.nodeSourceType == NodeSourceType.HOME) && state.navigationLevel.isEmpty()) {
                 FilterChipsView(
                     state = state,
                     onFilterClicked = onFilterClicked,

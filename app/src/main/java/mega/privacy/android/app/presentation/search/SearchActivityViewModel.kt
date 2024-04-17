@@ -538,7 +538,12 @@ class SearchActivityViewModel @Inject constructor(
         val list = _state.value.navigationLevel.toMutableList()
         list.add(Pair(folderHandle, name))
         _state.update { state ->
-            state.copy(navigationLevel = list)
+            state.copy(
+                navigationLevel = list,
+                typeSelectedFilterOption = null,
+                dateModifiedSelectedFilterOption = null,
+                dateAddedSelectedFilterOption = null
+            )
         }
         performSearch()
     }

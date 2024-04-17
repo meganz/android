@@ -119,7 +119,7 @@
     <!-- Search drop down chips filter type file type folders -->
     <string name="search_dropdown_chip_filter_type_file_type_folders">Folders</string>
     <!-- Search drop down chips filter type file type others -->
-    <string name="search_dropdown_chip_filter_type_file_type_others">Others</string>
+    <string name="search_dropdown_chip_filter_type_file_type_others">Other</string>
     <!-- Search drop down chips filter type date added -->
     <string name="search_dropdown_chip_filter_type_date_added">Date added</string>
     <!-- Search drop down chips filter type last modified -->
