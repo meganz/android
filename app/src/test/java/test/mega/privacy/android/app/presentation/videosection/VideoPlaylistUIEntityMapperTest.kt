@@ -30,7 +30,8 @@ class VideoPlaylistUIEntityMapperTest {
     private val cover: Long? = null
     private val creationTime = 100L
     private val modificationTime = 200L
-    private val thumbnailList: List<String>? = null
+    private val testNodeId = NodeId(1)
+    private val thumbnailList: List<NodeId> = listOf(testNodeId, NodeId(2))
     private val numberOfVideos = 10
     private val totalDuration = "10:00"
 
@@ -98,7 +99,8 @@ class VideoPlaylistUIEntityMapperTest {
                 { assertThat(it.cover).isEqualTo(cover) },
                 { assertThat(it.creationTime).isEqualTo(creationTime) },
                 { assertThat(it.modificationTime).isEqualTo(modificationTime) },
-                { assertThat(it.thumbnailList).isNull() },
+                { assertThat(it.thumbnailList?.size).isEqualTo(thumbnailList.size) },
+                { assertThat(it.thumbnailList?.get(0)).isEqualTo(testNodeId) },
                 { assertThat(it.numberOfVideos).isEqualTo(numberOfVideos) },
                 { assertThat(it.totalDuration).isEqualTo(totalDuration) },
                 { assertThat(it.videos?.size).isEqualTo(expectedVideosSize) }

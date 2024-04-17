@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.videosection.mapper
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -24,9 +23,7 @@ class VideoPlaylistUIEntityMapper @Inject constructor(
             cover = videoPlaylist.cover,
             creationTime = videoPlaylist.creationTime,
             modificationTime = videoPlaylist.modificationTime,
-            thumbnailList = videoPlaylist.thumbnailList?.map { path ->
-                path?.let { File(it) }
-            },
+            thumbnailList = videoPlaylist.thumbnailList,
             numberOfVideos = videoPlaylist.numberOfVideos,
             totalDuration = durationInSecondsTextMapper(videoPlaylist.totalDuration),
             videos = videoPlaylist.videos?.map {

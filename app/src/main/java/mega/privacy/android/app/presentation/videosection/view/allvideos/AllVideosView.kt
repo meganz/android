@@ -199,11 +199,7 @@ internal fun AllVideosView(
                                             videoItem.label
                                         )
                                     ) else null,
-                                thumbnailData = if (videoItem.thumbnail?.exists() == true) {
-                                    videoItem.thumbnail
-                                } else {
-                                    ThumbnailRequest(videoItem.id)
-                                },
+                                thumbnailData = ThumbnailRequest(videoItem.id),
                                 nodeAvailableOffline = videoItem.nodeAvailableOffline,
                                 onClick = { onClick(videoItem, it) },
                                 onMenuClick = { onMenuClick(videoItem) },

@@ -21,14 +21,14 @@ internal class VideoPlaylistMapper @Inject constructor() {
         thumbnailList = if (videoNodeList.isEmpty()) {
             null
         } else {
-            getThumbnailList(videoNodeList)
+            getNodeIdListRelatedToThumbnail(videoNodeList)
         },
         numberOfVideos = videoNodeList.size,
         totalDuration = videoNodeList.sumOf { it.duration.inWholeSeconds }.seconds,
         videos = videoNodeList
     )
 
-    private fun getThumbnailList(videoNodeList: List<TypedVideoNode>) =
+    private fun getNodeIdListRelatedToThumbnail(videoNodeList: List<TypedVideoNode>) =
         videoNodeList.take(
             if (videoNodeList.size > MAX_THUMBNAIL_COUNT) {
                 MAX_THUMBNAIL_COUNT
@@ -36,7 +36,7 @@ internal class VideoPlaylistMapper @Inject constructor() {
                 videoNodeList.size
             }
         ).map { videoNode ->
-            videoNode.thumbnailPath
+            videoNode.id
         }
 
     companion object {

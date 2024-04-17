@@ -2,6 +2,7 @@ package mega.privacy.android.data.mapper.videosection
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
@@ -23,20 +24,19 @@ class VideoPlaylistMapperTest {
     private val creationTime = 100L
     private val modificationTime = 200L
     private val duration = 100
-    private val videoNode = mock<TypedVideoNode> {
+
+    private val videoNodeList = listOf(
+        getVideoNode(NodeId(0)),
+        getVideoNode(NodeId(1)),
+        getVideoNode(NodeId(2)),
+        getVideoNode(NodeId(3))
+    )
+
+    private fun getVideoNode(nodeId: NodeId) = mock<TypedVideoNode> {
+        on { id }.thenReturn(nodeId)
         on { duration }.thenReturn(duration.seconds)
         on { thumbnailPath }.thenReturn("thumbnailPath")
     }
-    private val videoNodeList = listOf(
-        videoNode, videoNode, videoNode, videoNode
-    )
-    private val videoNodeWithNullThumbnail = mock<TypedVideoNode> {
-        on { duration }.thenReturn(duration.seconds)
-        on { thumbnailPath }.thenReturn(null)
-    }
-    private val videoNodeListWithNullThumbnail = listOf(
-        videoNodeWithNullThumbnail, videoNodeWithNullThumbnail, videoNodeWithNullThumbnail
-    )
 
     @BeforeAll
     fun setUp() {
@@ -53,7 +53,7 @@ class VideoPlaylistMapperTest {
             assertMappedVideoPlaylistObject(
                 videoPlaylist = videoPlaylist,
                 expectedThumbnailSize = null,
-                expectedThumbnail = null,
+                expectedNodeIdRelatedToThumbnail = null,
                 expectedNumberOfVideos = 0,
                 expectedTotalDuration = 0.seconds,
                 expectedVideoSize = 0
@@ -71,7 +71,7 @@ class VideoPlaylistMapperTest {
             assertMappedVideoPlaylistObject(
                 videoPlaylist = videoPlaylist,
                 expectedThumbnailSize = videoNodeList.size,
-                expectedThumbnail = videoNodeList[0].thumbnailPath,
+                expectedNodeIdRelatedToThumbnail = videoNodeList[0].id,
                 expectedNumberOfVideos = videoNodeList.size,
                 expectedTotalDuration = expectedTotalDuration,
                 expectedVideoSize = videoNodeList.size
@@ -81,18 +81,17 @@ class VideoPlaylistMapperTest {
     @Test
     fun `test that VideoPlaylist can be mapped correctly when thumbnailList item is null`() =
         runTest {
-            val expectedTotalDuration = (duration * videoNodeListWithNullThumbnail.size).seconds
             val videoPlaylist = underTest(
                 userSet = initUserSet(),
-                videoNodeList = videoNodeListWithNullThumbnail,
+                videoNodeList = emptyList(),
             )
             assertMappedVideoPlaylistObject(
                 videoPlaylist = videoPlaylist,
-                expectedThumbnailSize = videoNodeListWithNullThumbnail.size,
-                expectedThumbnail = null,
-                expectedNumberOfVideos = videoNodeListWithNullThumbnail.size,
-                expectedTotalDuration = expectedTotalDuration,
-                expectedVideoSize = videoNodeListWithNullThumbnail.size
+                expectedThumbnailSize = null,
+                expectedNodeIdRelatedToThumbnail = null,
+                expectedNumberOfVideos = 0,
+                expectedTotalDuration = 0.seconds,
+                expectedVideoSize = 0
             )
         }
 
@@ -107,7 +106,7 @@ class VideoPlaylistMapperTest {
     private fun assertMappedVideoPlaylistObject(
         videoPlaylist: VideoPlaylist,
         expectedThumbnailSize: Int?,
-        expectedThumbnail: String?,
+        expectedNodeIdRelatedToThumbnail: NodeId?,
         expectedNumberOfVideos: Int,
         expectedTotalDuration: Duration,
         expectedVideoSize: Int?,
@@ -121,7 +120,7 @@ class VideoPlaylistMapperTest {
                 { assertThat(it.creationTime).isEqualTo(creationTime) },
                 { assertThat(it.modificationTime).isEqualTo(modificationTime) },
                 { assertThat(it.thumbnailList?.size).isEqualTo(expectedThumbnailSize) },
-                { assertThat(it.thumbnailList?.get(0)).isEqualTo(expectedThumbnail) },
+                { assertThat(it.thumbnailList?.get(0)).isEqualTo(expectedNodeIdRelatedToThumbnail) },
                 { assertThat(it.numberOfVideos).isEqualTo(expectedNumberOfVideos) },
                 { assertThat(it.totalDuration).isEqualTo(expectedTotalDuration) },
                 { assertThat(it.videos?.size).isEqualTo(expectedVideoSize) }

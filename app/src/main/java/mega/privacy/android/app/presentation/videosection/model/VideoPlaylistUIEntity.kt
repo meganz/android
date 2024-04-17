@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.videosection.model
 
 import mega.privacy.android.domain.entity.node.NodeId
-import java.io.File
 
 /**
  * The entity for the playlist in videos section
@@ -11,7 +10,7 @@ import java.io.File
  * @property cover the playlist's cover
  * @property creationTime the playlist's creation time
  * @property modificationTime the playlist's modification time
- * @property thumbnailList the playlist's thumbnail list
+ * @property thumbnailList The node ID of the video item that is associated with the thumbnail.
  * @property numberOfVideos the number of videos in the playlist
  * @property totalDuration the total duration of videos in the playlist
  * @property videos the videos in the playlist
@@ -23,7 +22,7 @@ data class VideoPlaylistUIEntity(
     val cover: Long?,
     val creationTime: Long,
     val modificationTime: Long,
-    val thumbnailList: List<File?>?,
+    val thumbnailList: List<NodeId>?,
     val numberOfVideos: Int,
     val totalDuration: String,
     val videos: List<VideoUIEntity>?,

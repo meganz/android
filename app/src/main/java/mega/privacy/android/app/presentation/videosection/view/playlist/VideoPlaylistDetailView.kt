@@ -270,7 +270,7 @@ fun VideoPlaylistDetailView(
                     ) {
                         Column {
                             VideoPlaylistHeaderView(
-                                thumbnailList = playlist?.thumbnailList,
+                                thumbnailList = playlist?.thumbnailList?.map { ThumbnailRequest(it) },
                                 title = playlist?.title,
                                 totalDuration = playlist?.totalDuration,
                                 numberOfVideos = playlist?.numberOfVideos,
@@ -294,11 +294,7 @@ fun VideoPlaylistDetailView(
                                     duration = videoItem.durationString,
                                     isFavourite = videoItem.isFavourite,
                                     isSelected = videoItem.isSelected,
-                                    thumbnailData = if (videoItem.thumbnail?.exists() == true) {
-                                        videoItem.thumbnail
-                                    } else {
-                                        ThumbnailRequest(videoItem.id)
-                                    },
+                                    thumbnailData = ThumbnailRequest(videoItem.id),
                                     isSharedWithPublicLink = videoItem.isSharedItems,
                                     labelColor = if (videoItem.label != MegaNode.NODE_LBL_UNKNOWN)
                                         colorResource(
