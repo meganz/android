@@ -26,15 +26,12 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.toColorInt
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.google.accompanist.placeholder.PlaceholderHighlight
-import com.google.accompanist.placeholder.fade
-import com.google.accompanist.placeholder.placeholder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_900
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.white_black
+import mega.privacy.android.core.ui.utils.shimmerEffect
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import timber.log.Timber
 
@@ -120,12 +117,7 @@ fun ChatAvatarView(
                 modifier = modifier
                     .fillMaxSize()
                     .clip(CircleShape)
-                    .placeholder(
-                        visible = true,
-                        color = MaterialTheme.colors.grey_020_grey_900,
-                        shape = CircleShape,
-                        highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
-                    ),
+                    .shimmerEffect(shape = CircleShape),
             )
         }
 

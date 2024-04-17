@@ -6,11 +6,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -38,21 +39,19 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.Visibility
 import androidx.core.graphics.toColorInt
-import com.google.accompanist.placeholder.PlaceholderHighlight
-import com.google.accompanist.placeholder.fade
-import com.google.accompanist.placeholder.placeholder
 import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_900
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.core.ui.utils.shimmerEffect
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.GroupChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.IndividualChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
+import mega.privacy.android.shared.theme.MegaAppTheme
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
@@ -163,12 +162,7 @@ internal fun ChatRoomItemView(
                     bottom.linkTo(middleText.top)
                     width = Dimension.preferredWrapContent
                 }
-                .placeholder(
-                    color = MaterialTheme.colors.grey_020_grey_900,
-                    shape = RoundedCornerShape(4.dp),
-                    highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
-                    visible = isLoading,
-                ),
+                .shimmerEffect(isLoading, CircleShape),
         )
 
         if (!isLoading) {
@@ -181,7 +175,8 @@ internal fun ChatRoomItemView(
                         start.linkTo(titleText.end, 4.dp)
                         top.linkTo(titleText.top)
                         bottom.linkTo(titleText.bottom)
-                        visibility = if (userChatStatus != null) Visibility.Visible else Visibility.Gone
+                        visibility =
+                            if (userChatStatus != null) Visibility.Visible else Visibility.Gone
                     },
             )
 
@@ -290,12 +285,7 @@ internal fun ChatRoomItemView(
                     width = Dimension.preferredWrapContent
                 }
                 .padding(vertical = if (isLoading) 2.dp else 0.dp)
-                .placeholder(
-                    color = MaterialTheme.colors.grey_020_grey_900,
-                    shape = RoundedCornerShape(4.dp),
-                    highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
-                    visible = isLoading,
-                ),
+                .shimmerEffect(isLoading, CircleShape),
             lastMessage = item.lastMessage,
             isPending = item is MeetingChatRoomItem && item.isPending,
             scheduledTimestamp = if (item is MeetingChatRoomItem) item.scheduledTimestampFormatted else null,
@@ -323,12 +313,7 @@ internal fun ChatRoomItemView(
                     bottom.linkTo(parent.bottom)
                     width = Dimension.preferredWrapContent
                 }
-                .placeholder(
-                    color = MaterialTheme.colors.grey_020_grey_900,
-                    shape = RoundedCornerShape(4.dp),
-                    highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
-                    visible = isLoading,
-                ),
+                .shimmerEffect(isLoading, CircleShape),
             isRecurring = item is MeetingChatRoomItem && item.isRecurring(),
             isPending = item is MeetingChatRoomItem && item.isPending,
             highlight = item.highlight,
@@ -617,13 +602,15 @@ private fun PreviewLoadingState() {
         title = "Photos Meeting #1325",
         isPublic = true,
     )
-    ChatRoomItemView(
-        item = item,
-        isSelected = false,
-        isSelectionEnabled = false,
-        onItemClick = {},
-        onItemMoreClick = {},
-        onItemSelected = {},
-    )
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        ChatRoomItemView(
+            item = item,
+            isSelected = false,
+            isSelectionEnabled = false,
+            onItemClick = {},
+            onItemMoreClick = {},
+            onItemSelected = {},
+        )
+    }
 }
 
