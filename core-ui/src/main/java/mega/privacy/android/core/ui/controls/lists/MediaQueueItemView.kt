@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import mega.privacy.android.core.R
+import mega.privacy.android.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -66,7 +67,8 @@ fun MediaQueueItemView(
             MegaText(
                 modifier = Modifier.testTag(MEDIA_QUEUE_ITEM_NAME_TEST_TAG),
                 text = name,
-                textColor = TextColor.Primary
+                textColor = TextColor.Primary,
+                overflow = LongTextBehaviour.MiddleEllipsis
             )
         },
         modifier = modifier.testTag(MEDIA_QUEUE_ITEM_VIEW_TEST_TAG),

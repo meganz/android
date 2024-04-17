@@ -893,7 +893,9 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
 
                     when (currentFragmentId) {
-                        R.id.audio_playlist -> {
+                        R.id.audio_playlist,
+                        R.id.audio_queue,
+                        -> {
                             menu.toggleAllMenuItemsVisibility(false)
                             searchMenuItem?.isVisible = true
                             // Display the select option

@@ -4,12 +4,18 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemUiEntity
 import mega.privacy.android.core.ui.controls.lists.DragDropListView
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.theme.MegaAppTheme
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun MediaQueueView(
     items: List<MediaQueueItemUiEntity>,
@@ -17,10 +23,12 @@ internal fun MediaQueueView(
     isAudio: Boolean,
     isPaused: Boolean,
     lazyListState: LazyListState,
+    modifier: Modifier = Modifier,
     onClick: (index: Int, item: MediaQueueItemUiEntity) -> Unit,
     onMove: (Int, Int) -> Unit,
 ) {
     DragDropListView(
+        modifier = modifier.semantics { testTagsAsResourceId = true },
         items = items,
         lazyListState = lazyListState,
         onMove = onMove
@@ -90,7 +98,7 @@ private fun initMediaQueueItemUiEntity(
 ) =
     MediaQueueItemUiEntity(
         icon = iconPackR.drawable.ic_audio_medium_solid,
-        nodeHandle = handle,
+        id = NodeId(handle),
         nodeName = "Media Name",
         thumbnail = null,
         type = type,

@@ -14,6 +14,10 @@
             app:destination="@+id/audio_playlist" />
 
         <action
+            android:id="@+id/action_audio_player_to_queue"
+            app:destination="@+id/audio_queue" />
+
+        <action
             android:id="@+id/action_audio_player_to_track_info"
             app:destination="@+id/track_info" />
     </fragment>
@@ -26,6 +30,12 @@
         <action
             android:id="@+id/action_audio_playlist_to_track_info"
             app:destination="@+id/track_info" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/audio_queue"
+        android:name="mega.privacy.android.app.mediaplayer.queue.AudioQueueFragment"
+        android:label="">
     </fragment>
 
     <fragment

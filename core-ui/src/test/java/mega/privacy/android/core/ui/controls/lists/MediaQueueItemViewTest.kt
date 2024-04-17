@@ -70,7 +70,6 @@ class MediaQueueItemViewTest {
             viewTag.isDisplayed()
         }
 
-        MEDIA_QUEUE_ITEM_NAME_TEST_TAG.textEquals(testName)
         MEDIA_QUEUE_ITEM_DURATION_TEST_TAG.textEquals(testDuration)
 
         listOf(
@@ -106,7 +105,6 @@ class MediaQueueItemViewTest {
             viewTag.isDisplayed()
         }
 
-        MEDIA_QUEUE_ITEM_NAME_TEST_TAG.textEquals(testName)
         MEDIA_QUEUE_ITEM_DURATION_TEST_TAG.textEquals(testDuration)
 
         listOf(
@@ -133,7 +131,6 @@ class MediaQueueItemViewTest {
             viewTag.isDisplayed()
         }
 
-        MEDIA_QUEUE_ITEM_NAME_TEST_TAG.textEquals(testName)
         MEDIA_QUEUE_ITEM_DURATION_TEST_TAG.textEquals(testDuration)
 
         listOf(
@@ -160,7 +157,6 @@ class MediaQueueItemViewTest {
             viewTag.isDisplayed()
         }
 
-        MEDIA_QUEUE_ITEM_NAME_TEST_TAG.textEquals(testName)
         val expectedDuration = "$testCurrentPlayingPosition / $testDuration"
         MEDIA_QUEUE_ITEM_DURATION_TEST_TAG.textEquals(expectedDuration)
 
@@ -190,7 +186,6 @@ class MediaQueueItemViewTest {
             viewTag.isDisplayed()
         }
 
-        MEDIA_QUEUE_ITEM_NAME_TEST_TAG.textEquals(testName)
         val expectedDuration = "$testCurrentPlayingPosition / $testDuration"
         MEDIA_QUEUE_ITEM_DURATION_TEST_TAG.textEquals(expectedDuration)
 

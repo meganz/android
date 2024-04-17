@@ -16,6 +16,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Enables new audio queue
+     */
+    NewAudioQueue(
+        "Enable new audio queue",
+        false,
+    ),
+
+    /**
      * Enables recent actions compose tab
      */
     RecentActionsCompose(

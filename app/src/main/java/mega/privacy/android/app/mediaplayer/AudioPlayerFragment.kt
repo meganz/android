@@ -12,14 +12,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
@@ -28,13 +31,21 @@ import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_D
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util.isOnline
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * MediaPlayer Fragment
  */
 @AndroidEntryPoint
 class AudioPlayerFragment : Fragment() {
+    /**
+     * Inject [GetFeatureFlagValueUseCase] to the Fragment
+     */
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
     private var playerViewHolder: AudioPlayerViewHolder? = null
 
     private var serviceGateway: MediaPlayerServiceGateway? = null
@@ -187,8 +198,15 @@ class AudioPlayerFragment : Fragment() {
             serviceViewModelGateway?.run {
                 viewHolder.setupPlaylistButton(requireContext(), getPlaylistItems()) {
                     findNavController().let {
-                        if (it.currentDestination?.id == R.id.audio_main_player) {
-                            it.navigate(AudioPlayerFragmentDirections.actionAudioPlayerToPlaylist())
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            if (it.currentDestination?.id == R.id.audio_main_player) {
+                                it.navigate(
+                                    if (getFeatureFlagValueUseCase(AppFeatures.NewAudioQueue))
+                                        AudioPlayerFragmentDirections.actionAudioPlayerToQueue()
+                                    else
+                                        AudioPlayerFragmentDirections.actionAudioPlayerToPlaylist()
+                                )
+                            }
                         }
                     }
                 }
