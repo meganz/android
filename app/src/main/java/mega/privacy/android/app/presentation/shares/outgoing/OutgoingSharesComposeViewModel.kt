@@ -392,7 +392,7 @@ class OutgoingSharesComposeViewModel @Inject constructor(
      *
      * @param folderHandle The Folder Handle
      */
-    private fun onFolderItemClicked(folderHandle: Long) {
+    fun onFolderItemClicked(folderHandle: Long) {
         val updatedOpenedFolderNodeHandles = _state.value.openedFolderNodeHandles.toMutableSet()
             .apply { add(_state.value.currentHandle) }
         viewModelScope.launch {
@@ -515,14 +515,6 @@ class OutgoingSharesComposeViewModel @Inject constructor(
             _state.value.nodesList.indexOfFirst { it.node == nodeUIItem.node }
         if (_state.value.isInSelection) {
             updateNodeInSelectionState(nodeUIItem = nodeUIItem, index = index)
-        } else {
-            if (nodeUIItem.node is FileNode) {
-                _state.update {
-                    it.copy(itemIndex = index, currentFileNode = nodeUIItem.node)
-                }
-            } else {
-                onFolderItemClicked(nodeUIItem.id.longValue)
-            }
         }
     }
 
@@ -609,15 +601,6 @@ class OutgoingSharesComposeViewModel @Inject constructor(
     }
 
     /**
-     * When item is clicked on activity
-     */
-    fun onItemPerformedClicked() {
-        _state.update {
-            it.copy(currentFileNode = null, itemIndex = -1)
-        }
-    }
-
-    /**
      * Consume open authenticity credentials
      */
     fun consumeOpenAuthenticityCredentials() {
@@ -659,4 +642,15 @@ class OutgoingSharesComposeViewModel @Inject constructor(
      */
     fun resetIsAccessedFolderExited() =
         _state.update { it.copy(isAccessedFolderExited = false) }
+
+    /**
+     *  Download file triggered
+     */
+    fun onDownloadFileTriggered(triggerEvent: TransferTriggerEvent) {
+        _state.update {
+            it.copy(
+                downloadEvent = triggered(triggerEvent)
+            )
+        }
+    }
 }
