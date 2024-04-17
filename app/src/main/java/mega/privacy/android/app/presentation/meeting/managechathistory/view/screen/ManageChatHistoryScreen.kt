@@ -39,10 +39,10 @@ import mega.privacy.android.app.presentation.meeting.managechathistory.model.Cha
 import mega.privacy.android.app.presentation.meeting.managechathistory.model.DisplayValueUiState
 import mega.privacy.android.app.presentation.meeting.managechathistory.model.ManageChatHistoryUIState
 import mega.privacy.android.app.presentation.meeting.managechathistory.model.TimePickerItemUiState
+import mega.privacy.android.app.presentation.meeting.managechathistory.view.dialog.ChatHistoryRetentionConfirmationDialog
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.core.ui.controls.dividers.DividerType
 import mega.privacy.android.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.core.ui.controls.lists.GenericTwoLineListItem
@@ -86,7 +86,6 @@ internal fun ManageChatHistoryRoute(
             }
         },
         onClearChatConfirmationDismiss = viewModel::dismissClearChatConfirmation,
-        onRetentionTimeOptionSelected = viewModel::updateHistoryRetentionTimeConfirmation,
         onConfirmRetentionTimeClick = {
             viewModel.apply {
                 onNewRetentionTimeOptionConfirmed(it)
@@ -105,7 +104,6 @@ internal fun ManageChatHistoryScreen(
     onNavigateUp: () -> Unit,
     onConfirmClearChatClick: (chatRoomId: Long) -> Unit,
     onClearChatConfirmationDismiss: () -> Unit,
-    onRetentionTimeOptionSelected: (option: ChatHistoryRetentionOption) -> Unit,
     onConfirmRetentionTimeClick: (option: ChatHistoryRetentionOption) -> Unit,
     onRetentionTimeConfirmationDismiss: () -> Unit,
     onHistoryClearingCheckChange: (value: Boolean) -> Unit,
@@ -171,21 +169,10 @@ internal fun ManageChatHistoryScreen(
     }
 
     if (uiState.shouldShowHistoryRetentionConfirmation) {
-        ConfirmationDialogWithRadioButtons(
-            modifier = Modifier.testTag(CHAT_HISTORY_RETENTION_TIME_CONFIRMATION_TAG),
-            titleText = stringResource(id = R.string.title_properties_history_retention),
-            subTitleText = stringResource(id = R.string.subtitle_properties_manage_chat),
-            radioOptions = ChatHistoryRetentionOption.entries,
-            initialSelectedOption = uiState.selectedHistoryRetentionTimeOption,
-            optionDescriptionMapper = @Composable {
-                stringResource(id = it.stringId)
-            },
-            onOptionSelected = onRetentionTimeOptionSelected,
-            confirmButtonText = stringResource(id = uiState.confirmButtonStringId),
-            isConfirmButtonEnable = { uiState.isConfirmButtonEnable },
-            onConfirmRequest = onConfirmRetentionTimeClick,
-            cancelButtonText = stringResource(id = R.string.general_cancel),
+        ChatHistoryRetentionConfirmationDialog(
+            currentRetentionTime = uiState.retentionTime,
             onDismissRequest = onRetentionTimeConfirmationDismiss,
+            onConfirmClick = onConfirmRetentionTimeClick
         )
     }
 }
@@ -332,7 +319,6 @@ private fun ManageChatHistoryScreenWithRetentionTimePreview() {
             onNavigateUp = {},
             onConfirmClearChatClick = {},
             onClearChatConfirmationDismiss = {},
-            onRetentionTimeOptionSelected = {},
             onConfirmRetentionTimeClick = {},
             onRetentionTimeConfirmationDismiss = {},
             onHistoryClearingCheckChange = {},
@@ -350,7 +336,6 @@ private fun ManageChatHistoryScreenWithoutRetentionTimePreview() {
             onNavigateUp = {},
             onConfirmClearChatClick = {},
             onClearChatConfirmationDismiss = {},
-            onRetentionTimeOptionSelected = {},
             onConfirmRetentionTimeClick = {},
             onRetentionTimeConfirmationDismiss = {},
             onHistoryClearingCheckChange = {},
@@ -370,7 +355,6 @@ private fun ManageChatHistoryScreenWithCustomPickerPreview() {
             onNavigateUp = {},
             onConfirmClearChatClick = {},
             onClearChatConfirmationDismiss = {},
-            onRetentionTimeOptionSelected = {},
             onConfirmRetentionTimeClick = {},
             onRetentionTimeConfirmationDismiss = {},
             onHistoryClearingCheckChange = {},
@@ -379,7 +363,5 @@ private fun ManageChatHistoryScreenWithCustomPickerPreview() {
     }
 }
 
-internal const val CHAT_HISTORY_RETENTION_TIME_CONFIRMATION_TAG =
-    "manage_chat_history_screen:chat_history_retention_time_confirmation_set_custom_retention_time"
 internal const val CUSTOM_TIME_PICKER_TAG =
     "manage_chat_history_screen:custom_time_picker_custom_retention_time_picker"

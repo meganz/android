@@ -253,5 +253,9 @@ internal const val CONFIRMATION_DIALOG_OPTIONS_TAG =
     "confirmation_dialog_with_radio_buttons:text_option"
 internal const val CONFIRMATION_DIALOG_CANCEL_BUTTON_TAG =
     "confirmation_dialog_with_radio_buttons:button_cancel"
-internal const val CONFIRMATION_DIALOG_CONFIRM_BUTTON_TAG =
+
+/**
+ * Test tag for the confirm button
+ */
+const val CONFIRMATION_DIALOG_CONFIRM_BUTTON_TAG =
     "confirmation_dialog_with_radio_buttons:button_confirm"

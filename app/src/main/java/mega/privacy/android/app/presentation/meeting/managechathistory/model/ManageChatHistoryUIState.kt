@@ -4,7 +4,6 @@ import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.chat.ChatRoom
 
 /**
@@ -12,9 +11,6 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
  *
  * @property chatRoom The current [ChatRoom].
  * @property retentionTime The chat history retention time.
- * @property selectedHistoryRetentionTimeOption The current selected chat history retention time option.
- * @property confirmButtonStringId The string resource ID for the confirm button text
- * @property isConfirmButtonEnable True if should enable the confirm button of the history retention confirmation, false otherwise.
  * @property shouldShowClearChatConfirmation True if should show the clear chat confirmation, false otherwise
  * @property shouldShowHistoryRetentionConfirmation True if should show the chat history retention confirmation, false otherwise
  * @property shouldNavigateUp True if we should navigate to the previous screen, false otherwise
@@ -26,9 +22,6 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 data class ManageChatHistoryUIState(
     val chatRoom: ChatRoom? = null,
     val retentionTime: Long = 0L,
-    val selectedHistoryRetentionTimeOption: ChatHistoryRetentionOption = ChatHistoryRetentionOption.Disabled,
-    @StringRes val confirmButtonStringId: Int = R.string.general_ok,
-    val isConfirmButtonEnable: Boolean = false,
     val shouldShowClearChatConfirmation: Boolean = false,
     val shouldShowHistoryRetentionConfirmation: Boolean = false,
     val shouldNavigateUp: Boolean = false,

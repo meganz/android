@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_C
 import mega.privacy.android.app.presentation.meeting.chat.view.message.management.getRetentionTimeString
 import mega.privacy.android.app.presentation.meeting.managechathistory.model.ChatHistoryRetentionOption
 import mega.privacy.android.app.presentation.meeting.managechathistory.model.ManageChatHistoryUIState
+import mega.privacy.android.app.presentation.meeting.managechathistory.view.dialog.CHAT_HISTORY_RETENTION_TIME_CONFIRMATION_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -201,70 +202,11 @@ class ManageChatHistoryScreenTest {
         }
     }
 
-    @Test
-    fun `test that the dismiss retention time confirmation request callback is invoked when the cancel button is clicked`() {
-        composeRule.apply {
-            var isDismissRequestInvoked = false
-            setScreen(
-                uiState = ManageChatHistoryUIState(
-                    shouldShowHistoryRetentionConfirmation = true
-                ),
-                onRetentionTimeConfirmationDismiss = { isDismissRequestInvoked = true }
-            )
-
-            onNodeWithText(R.string.general_cancel).performClick()
-
-            assertThat(isDismissRequestInvoked).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that the confirm retention time callback is invoked with the correct selected option when the confirm button is clicked`() {
-        val currentOption = ChatHistoryRetentionOption.OneDay
-
-        composeRule.apply {
-            var confirmOption: ChatHistoryRetentionOption? = null
-            setScreen(
-                uiState = ManageChatHistoryUIState(
-                    shouldShowHistoryRetentionConfirmation = true,
-                    selectedHistoryRetentionTimeOption = currentOption,
-                    isConfirmButtonEnable = true,
-                    confirmButtonStringId = R.string.general_ok
-                ),
-                onConfirmRetentionTimeClick = { confirmOption = it }
-            )
-
-            onNodeWithText(R.string.general_ok).performClick()
-
-            assertThat(confirmOption).isEqualTo(currentOption)
-        }
-    }
-
-    @Test
-    fun `test that the retention time option selected callback is invoked when an option is chosen`() {
-        val option = ChatHistoryRetentionOption.OneDay
-
-        composeRule.apply {
-            var selectedOption: ChatHistoryRetentionOption? = null
-            setScreen(
-                uiState = ManageChatHistoryUIState(
-                    shouldShowHistoryRetentionConfirmation = true
-                ),
-                onRetentionTimeOptionSelected = { selectedOption = it }
-            )
-
-            onNodeWithText(option.stringId).performClick()
-
-            assertThat(selectedOption).isEqualTo(option)
-        }
-    }
-
     private fun ComposeContentTestRule.setScreen(
         uiState: ManageChatHistoryUIState = ManageChatHistoryUIState(),
         onNavigateUp: () -> Unit = {},
         onConfirmClearChatClick: (chatRoomId: Long) -> Unit = {},
         onClearChatConfirmationDismiss: () -> Unit = {},
-        onRetentionTimeOptionSelected: (option: ChatHistoryRetentionOption) -> Unit = {},
         onConfirmRetentionTimeClick: (option: ChatHistoryRetentionOption) -> Unit = {},
         onRetentionTimeConfirmationDismiss: () -> Unit = {},
         onHistoryClearingCheckChange: (value: Boolean) -> Unit = {},
@@ -276,7 +218,6 @@ class ManageChatHistoryScreenTest {
                 onNavigateUp = onNavigateUp,
                 onConfirmClearChatClick = onConfirmClearChatClick,
                 onClearChatConfirmationDismiss = onClearChatConfirmationDismiss,
-                onRetentionTimeOptionSelected = onRetentionTimeOptionSelected,
                 onConfirmRetentionTimeClick = onConfirmRetentionTimeClick,
                 onRetentionTimeConfirmationDismiss = onRetentionTimeConfirmationDismiss,
                 onHistoryClearingCheckChange = onHistoryClearingCheckChange,

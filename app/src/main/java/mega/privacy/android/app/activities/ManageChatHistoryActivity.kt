@@ -7,14 +7,8 @@ import android.widget.NumberPicker.OnScrollListener
 import android.widget.NumberPicker.OnValueChangeListener
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -25,8 +19,7 @@ import mega.privacy.android.app.databinding.ActivityManageChatHistoryBinding
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ClearChatConfirmationDialog
 import mega.privacy.android.app.presentation.meeting.managechathistory.ManageChatHistoryViewModel
-import mega.privacy.android.app.presentation.meeting.managechathistory.model.ChatHistoryRetentionOption
-import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.CHAT_HISTORY_RETENTION_TIME_CONFIRMATION_TAG
+import mega.privacy.android.app.presentation.meeting.managechathistory.view.dialog.ChatHistoryRetentionConfirmationDialog
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants.DISABLED_RETENTION_TIME
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_DAY
@@ -35,7 +28,6 @@ import mega.privacy.android.app.utils.Constants.SECONDS_IN_MONTH_30
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_WEEK
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_YEAR
 import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -117,28 +109,15 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
                 }
 
                 if (uiState.shouldShowHistoryRetentionConfirmation) {
-                    ConfirmationDialogWithRadioButtons(
-                        modifier = Modifier
-                            .semantics { testTagsAsResourceId = true }
-                            .testTag(CHAT_HISTORY_RETENTION_TIME_CONFIRMATION_TAG),
-                        titleText = stringResource(id = R.string.title_properties_history_retention),
-                        subTitleText = stringResource(id = R.string.subtitle_properties_manage_chat),
-                        radioOptions = ChatHistoryRetentionOption.entries,
-                        initialSelectedOption = uiState.selectedHistoryRetentionTimeOption,
-                        optionDescriptionMapper = @Composable {
-                            stringResource(id = it.stringId)
-                        },
-                        onOptionSelected = viewModel::updateHistoryRetentionTimeConfirmation,
-                        confirmButtonText = stringResource(id = uiState.confirmButtonStringId),
-                        isConfirmButtonEnable = { uiState.isConfirmButtonEnable },
-                        onConfirmRequest = {
+                    ChatHistoryRetentionConfirmationDialog(
+                        currentRetentionTime = uiState.retentionTime,
+                        onDismissRequest = viewModel::dismissHistoryRetentionConfirmation,
+                        onConfirmClick = {
                             viewModel.apply {
                                 onNewRetentionTimeOptionConfirmed(it)
                                 dismissHistoryRetentionConfirmation()
                             }
-                        },
-                        cancelButtonText = stringResource(id = R.string.general_cancel),
-                        onDismissRequest = viewModel::dismissHistoryRetentionConfirmation,
+                        }
                     )
                 }
             }

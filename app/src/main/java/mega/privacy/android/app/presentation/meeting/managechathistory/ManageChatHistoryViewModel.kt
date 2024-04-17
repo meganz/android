@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.managechathistory
 
-import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -137,11 +136,6 @@ class ManageChatHistoryViewModel @Inject constructor(
         monitorChatRetentionTimeUpdateJob?.cancel()
         monitorChatRetentionTimeUpdateJob = viewModelScope.launch {
             monitorChatRetentionTimeUpdateUseCase(chatRoomId).collectLatest { retentionTime ->
-                updateHistoryRetentionTimeConfirmation(
-                    getOptionFromRetentionTime(
-                        retentionTime
-                    )
-                )
                 updateRetentionTimeState(retentionTime)
             }
         }
@@ -195,12 +189,6 @@ class ManageChatHistoryViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching { setChatRetentionTimeUseCase(chatId = chatRoomId, period = period) }
                 .onSuccess {
-                    updateHistoryRetentionTimeConfirmation(
-                        getOptionFromRetentionTime(
-                            period
-                        )
-                    )
-
                     if (_uiState.value.shouldShowCustomTimePicker) {
                         hideCustomTimePicker()
                     }
@@ -210,52 +198,10 @@ class ManageChatHistoryViewModel @Inject constructor(
     }
 
     /**
-     * Update the chat history retention confirmation related state based on the selected option
-     *
-     * @param option The selected option
-     */
-    internal fun updateHistoryRetentionTimeConfirmation(option: ChatHistoryRetentionOption) {
-        _uiState.update {
-            val shouldEnableConfirmButton =
-                getOptionFromRetentionTime(_uiState.value.retentionTime) != ChatHistoryRetentionOption.Disabled ||
-                        option != ChatHistoryRetentionOption.Disabled
-            it.copy(
-                selectedHistoryRetentionTimeOption = option,
-                confirmButtonStringId = getConfirmButtonStringId(option),
-                isConfirmButtonEnable = shouldEnableConfirmButton
-            )
-        }
-    }
-
-    /**
      * Reset the visibility state of the custom time picker
      */
     internal fun hideCustomTimePicker() {
         _uiState.update { it.copy(shouldShowCustomTimePicker = false) }
-    }
-
-    private fun getOptionFromRetentionTime(period: Long): ChatHistoryRetentionOption {
-        if (period == DISABLED_RETENTION_TIME) {
-            return ChatHistoryRetentionOption.Disabled
-        }
-
-        val days = period % SECONDS_IN_DAY
-        val weeks = period % SECONDS_IN_WEEK
-        val months = period % SECONDS_IN_MONTH_30
-
-        val isOneMonthPeriod = period / SECONDS_IN_MONTH_30 == 1L
-        val isOneWeekPeriod = period / SECONDS_IN_WEEK == 1L
-        val isOneDayPeriod = period / SECONDS_IN_DAY == 1L
-
-        return when {
-            months == 0L && isOneMonthPeriod -> ChatHistoryRetentionOption.OneMonth
-
-            weeks == 0L && isOneWeekPeriod -> ChatHistoryRetentionOption.OneWeek
-
-            days == 0L && isOneDayPeriod -> ChatHistoryRetentionOption.OneDay
-
-            else -> ChatHistoryRetentionOption.Custom
-        }
     }
 
     /**
@@ -399,24 +345,7 @@ class ManageChatHistoryViewModel @Inject constructor(
      * Show the history retention confirmation
      */
     internal fun showHistoryRetentionConfirmation() {
-        _uiState.update {
-            val selectedOption = getOptionFromRetentionTime(_uiState.value.retentionTime)
-            it.copy(
-                shouldShowHistoryRetentionConfirmation = true,
-                selectedHistoryRetentionTimeOption = selectedOption,
-                confirmButtonStringId = getConfirmButtonStringId(selectedOption),
-                isConfirmButtonEnable = selectedOption != ChatHistoryRetentionOption.Disabled
-            )
-        }
-    }
-
-    @StringRes
-    private fun getConfirmButtonStringId(option: ChatHistoryRetentionOption): Int {
-        return if (option == ChatHistoryRetentionOption.Custom) {
-            R.string.general_next
-        } else {
-            R.string.general_ok
-        }
+        _uiState.update { it.copy(shouldShowHistoryRetentionConfirmation = true) }
     }
 
     /**

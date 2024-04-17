@@ -36,7 +36,6 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.NullSource
 import org.junit.jupiter.params.provider.ValueSource
@@ -112,13 +111,7 @@ class ManageChatHistoryViewModelTest {
             )
 
             underTest.uiState.test {
-                val item = expectMostRecentItem()
-                assertThat(item.retentionTime).isEqualTo(retentionTime)
-                assertThat(
-                    item.selectedHistoryRetentionTimeOption
-                ).isEqualTo(
-                    ChatHistoryRetentionOption.Custom
-                )
+                assertThat(expectMostRecentItem().retentionTime).isEqualTo(retentionTime)
             }
         }
 
@@ -279,48 +272,6 @@ class ManageChatHistoryViewModelTest {
                 assertThat(expectMostRecentItem().retentionTime).isEqualTo(retentionTime)
             }
         }
-
-    @ParameterizedTest
-    @MethodSource("provideRetentionTimePeriod")
-    fun `test that the selected chat history retention time should be set with the correct option`(
-        period: Long,
-        expectedOption: ChatHistoryRetentionOption,
-    ) = runTest {
-        savedStateHandle = SavedStateHandle(mapOf("CHAT_ROOM_ID_KEY" to chatRoomId))
-        initializeViewModel()
-        underTest.setChatRetentionTime(period)
-
-        underTest.uiState.test {
-            assertThat(
-                expectMostRecentItem().selectedHistoryRetentionTimeOption
-            ).isEqualTo(
-                expectedOption
-            )
-        }
-    }
-
-    private fun provideRetentionTimePeriod() = Stream.of(
-        Arguments.of(
-            DISABLED_RETENTION_TIME,
-            ChatHistoryRetentionOption.Disabled
-        ),
-        Arguments.of(
-            SECONDS_IN_DAY,
-            ChatHistoryRetentionOption.OneDay
-        ),
-        Arguments.of(
-            SECONDS_IN_WEEK,
-            ChatHistoryRetentionOption.OneWeek
-        ),
-        Arguments.of(
-            SECONDS_IN_MONTH_30,
-            ChatHistoryRetentionOption.OneMonth
-        ),
-        Arguments.of(
-            100L,
-            ChatHistoryRetentionOption.Custom
-        )
-    )
 
     @ParameterizedTest
     @MethodSource("provideTimePickerItems")
@@ -526,94 +477,6 @@ class ManageChatHistoryViewModelTest {
 
         underTest.uiState.test {
             assertThat(expectMostRecentItem().shouldShowHistoryRetentionConfirmation).isFalse()
-        }
-    }
-
-    @ParameterizedTest
-    @EnumSource(ChatHistoryRetentionOption::class)
-    fun `test that the correct string resource id is set when updating the history retention time confirmation`(
-        option: ChatHistoryRetentionOption,
-    ) = runTest {
-        underTest.updateHistoryRetentionTimeConfirmation(option)
-
-        underTest.uiState.test {
-            val expected = if (option == ChatHistoryRetentionOption.Custom) {
-                R.string.general_next
-            } else {
-                R.string.general_ok
-            }
-            assertThat(expectMostRecentItem().confirmButtonStringId).isEqualTo(expected)
-        }
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideRetentionTimeAndOptionWithExpectedValue")
-    fun `test that the correct enablement value for the confirm button is set when updating the history retention time confirmation`(
-        retentionTime: Long,
-        option: ChatHistoryRetentionOption,
-        expected: Boolean,
-    ) = runTest {
-        setRetentionTime(retentionTime)
-
-        underTest.updateHistoryRetentionTimeConfirmation(option)
-
-        underTest.uiState.test {
-            assertThat(expectMostRecentItem().isConfirmButtonEnable).isEqualTo(expected)
-        }
-    }
-
-    private fun provideRetentionTimeAndOptionWithExpectedValue() = Stream.of(
-        Arguments.of(
-            DISABLED_RETENTION_TIME,
-            ChatHistoryRetentionOption.Disabled,
-            false
-        ),
-        Arguments.of(
-            DISABLED_RETENTION_TIME,
-            ChatHistoryRetentionOption.OneMonth,
-            true
-        ),
-        Arguments.of(
-            SECONDS_IN_DAY,
-            ChatHistoryRetentionOption.Disabled,
-            true
-        )
-    )
-
-    @ParameterizedTest
-    @ValueSource(longs = [100L, DISABLED_RETENTION_TIME])
-    fun `test that the correct string resource id is set when showing the history retention time confirmation`(
-        retentionTime: Long,
-    ) = runTest {
-        setRetentionTime(retentionTime)
-
-        underTest.showHistoryRetentionConfirmation()
-
-        underTest.uiState.test {
-            val expected = if (retentionTime == 100L) {
-                R.string.general_next
-            } else {
-                R.string.general_ok
-            }
-            assertThat(expectMostRecentItem().confirmButtonStringId).isEqualTo(expected)
-        }
-    }
-
-    @ParameterizedTest
-    @ValueSource(longs = [DISABLED_RETENTION_TIME, SECONDS_IN_DAY.toLong()])
-    fun `test that the correct enablement value for the confirm button is set when showing the history retention time confirmation`(
-        retentionTime: Long,
-    ) = runTest {
-        setRetentionTime(retentionTime)
-
-        underTest.showHistoryRetentionConfirmation()
-
-        underTest.uiState.test {
-            assertThat(
-                expectMostRecentItem().isConfirmButtonEnable
-            ).isEqualTo(
-                retentionTime != DISABLED_RETENTION_TIME
-            )
         }
     }
 
