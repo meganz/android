@@ -14,6 +14,7 @@ import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.node.FileNodeContent
@@ -176,31 +177,58 @@ private fun openImageViewerActivity(
     currentFileNode: TypedFileNode,
     nodeSourceType: Int?,
 ) {
-    when (nodeSourceType) {
-        Constants.FILE_BROWSER_ADAPTER -> {
-            val intent = ImagePreviewActivity.createIntent(
-                context = context,
-                imageSource = ImagePreviewFetcherSource.CLOUD_DRIVE,
-                menuOptionsSource = ImagePreviewMenuSource.CLOUD_DRIVE,
-                anchorImageNodeId = currentFileNode.id,
-                params = mapOf(CloudDriveImageNodeFetcher.PARENT_ID to currentFileNode.parentId.longValue),
-                showScreenLabel = false,
-            )
-            context.startActivity(intent)
-        }
+    val currentFileNodeParentId = currentFileNode.parentId.longValue
 
-        Constants.RUBBISH_BIN_ADAPTER -> {
-            val intent = ImagePreviewActivity.createIntent(
-                context = context,
-                imageSource = ImagePreviewFetcherSource.RUBBISH_BIN,
-                menuOptionsSource = ImagePreviewMenuSource.RUBBISH_BIN,
-                anchorImageNodeId = currentFileNode.id,
-                params = mapOf(RubbishBinImageNodeFetcher.PARENT_ID to currentFileNode.parentId.longValue),
-                showScreenLabel = false,
+    val (imageSource, menuOptionsSource, paramKey) = when (nodeSourceType) {
+        Constants.FILE_BROWSER_ADAPTER ->
+            Triple(
+                ImagePreviewFetcherSource.CLOUD_DRIVE,
+                ImagePreviewMenuSource.CLOUD_DRIVE,
+                CloudDriveImageNodeFetcher.PARENT_ID
             )
-            context.startActivity(intent)
+
+        Constants.RUBBISH_BIN_ADAPTER ->
+            Triple(
+                ImagePreviewFetcherSource.RUBBISH_BIN,
+                ImagePreviewMenuSource.RUBBISH_BIN,
+                RubbishBinImageNodeFetcher.PARENT_ID
+            )
+
+        Constants.INCOMING_SHARES_ADAPTER, Constants.OUTGOING_SHARES_ADAPTER ->
+            Triple(
+                ImagePreviewFetcherSource.SHARED_ITEMS,
+                ImagePreviewMenuSource.SHARED_ITEMS,
+                SharedItemsImageNodeFetcher.PARENT_ID
+            )
+
+        Constants.LINKS_ADAPTER ->
+            Triple(
+                ImagePreviewFetcherSource.SHARED_ITEMS,
+                ImagePreviewMenuSource.LINKS,
+                SharedItemsImageNodeFetcher.PARENT_ID
+            )
+
+        Constants.BACKUPS_ADAPTER ->
+            Triple(
+                ImagePreviewFetcherSource.CLOUD_DRIVE,
+                ImagePreviewMenuSource.CLOUD_DRIVE,
+                CloudDriveImageNodeFetcher.PARENT_ID
+            )
+
+        else -> {
+            Timber.e("Unknown node source type: $nodeSourceType")
+            return
         }
     }
+    val intent = ImagePreviewActivity.createIntent(
+        context = context,
+        imageSource = imageSource,
+        menuOptionsSource = menuOptionsSource,
+        anchorImageNodeId = currentFileNode.id,
+        params = mapOf(paramKey to currentFileNodeParentId),
+        showScreenLabel = false
+    )
+    context.startActivity(intent)
 }
 
 private suspend fun openVideoOrAudioFile(
