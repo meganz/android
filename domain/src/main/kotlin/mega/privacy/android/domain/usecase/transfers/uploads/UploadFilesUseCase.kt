@@ -44,7 +44,7 @@ class UploadFilesUseCase @Inject constructor(
     operator fun invoke(
         filesAndNames: Map<File, String?>,
         parentFolderId: NodeId,
-        appData: TransferAppData?,
+        appData: List<TransferAppData>?,
         isHighPriority: Boolean,
         isSourceTemporary: Boolean = false,
     ): Flow<MultiTransferEvent> {
@@ -52,12 +52,13 @@ class UploadFilesUseCase @Inject constructor(
             items = filesAndNames.keys.toList(),
             null,
         ) { file ->
-            if (appData is TransferAppData.ChatTransferAppData) {
+            if (!appData.isNullOrEmpty() && appData.all { it is TransferAppData.ChatTransferAppData }) {
+                @Suppress("UNCHECKED_CAST")
                 transferRepository.startUploadForChat(
                     localPath = file.absolutePath,
                     parentNodeId = parentFolderId,
                     fileName = filesAndNames[file],
-                    appData = appData,
+                    appData = appData as List<TransferAppData.ChatTransferAppData>,
                     isSourceTemporary = isSourceTemporary,
                 )
             } else {

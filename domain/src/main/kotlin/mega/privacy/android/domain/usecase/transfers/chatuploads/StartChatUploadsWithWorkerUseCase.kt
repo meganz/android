@@ -73,7 +73,7 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
         emitAll(startTransfersAndThenWorkerFlow(
             doTransfers = {
                 uploadFilesUseCase(
-                    filesAndNames, chatFilesFolderId, appData, false
+                    filesAndNames, chatFilesFolderId, listOf(appData), false
                 ).onEach { event ->
                     val singleTransferEvent = (event as? MultiTransferEvent.SingleTransferEvent)
                     //update transfer tag on Start event

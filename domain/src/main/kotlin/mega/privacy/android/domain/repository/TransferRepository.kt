@@ -334,7 +334,7 @@ interface TransferRepository {
         parentNodeId: NodeId,
         fileName: String?,
         modificationTime: Long,
-        appData: TransferAppData?,
+        appData: List<TransferAppData>?,
         isSourceTemporary: Boolean,
         shouldStartFirst: Boolean,
     ): Flow<TransferEvent>
@@ -357,7 +357,7 @@ interface TransferRepository {
         localPath: String,
         parentNodeId: NodeId,
         fileName: String?,
-        appData: TransferAppData.ChatTransferAppData,
+        appData: List<TransferAppData.ChatTransferAppData>,
         isSourceTemporary: Boolean,
     ): Flow<TransferEvent>
 

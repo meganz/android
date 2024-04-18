@@ -112,7 +112,7 @@ class UploadFilesUseCaseTest {
     @ParameterizedTest(name = "appdata: \"{0}\"")
     @MethodSource("provideAppDataExceptChat")
     fun `test that repository start upload is called with the proper appData when appData is not a chat upload`(
-        appData: TransferAppData?,
+        appData: List<TransferAppData>?,
     ) = runTest {
         underTest(
             mapOf(file to null), parentId, appData,
@@ -135,7 +135,7 @@ class UploadFilesUseCaseTest {
     @ParameterizedTest(name = "appdata: \"{0}\"")
     @MethodSource("provideChatAppData")
     fun `test that repository start upload for chat is called when appData is chat transfer app data`(
-        appData: TransferAppData.ChatTransferAppData,
+        appData: List<TransferAppData.ChatTransferAppData>,
     ) = runTest {
         underTest(
             mapOf(file to null), parentId, appData,
@@ -154,16 +154,19 @@ class UploadFilesUseCaseTest {
     }
 
     private fun provideAppDataExceptChat() = listOf(
-        TransferAppData.BackgroundTransfer,
-        TransferAppData.SdCardDownload("target", null),
-        TransferAppData.CameraUpload,
-        TransferAppData.TextFileUpload(TransferAppData.TextFileUpload.Mode.Create, false),
-        null,
+        listOf(TransferAppData.BackgroundTransfer),
+        listOf(TransferAppData.SdCardDownload("target", null)),
+        listOf(TransferAppData.CameraUpload),
+        listOf(TransferAppData.TextFileUpload(TransferAppData.TextFileUpload.Mode.Create, false)),
+        listOf(TransferAppData.CameraUpload, TransferAppData.SdCardDownload("target", null)),
+        listOf(null),
     )
 
     private fun provideChatAppData() = listOf(
-        TransferAppData.ChatUpload(12345L),
-        TransferAppData.VoiceClip,
+        listOf(TransferAppData.ChatUpload(12345L)),
+        listOf(TransferAppData.VoiceClip),
+        listOf(TransferAppData.ChatUpload(234L), TransferAppData.ChatUpload(345L)),
+        listOf(TransferAppData.ChatUpload(234L), TransferAppData.VoiceClip),
     )
 
 
@@ -296,7 +299,7 @@ class UploadFilesUseCaseTest {
     @ParameterizedTest(name = "appdata: \"{0}\"")
     @MethodSource("provideChatAppData")
     fun `test that fileName is used in startUploadForChat when is not null`(
-        appData: TransferAppData.ChatTransferAppData
+        appData: List<TransferAppData.ChatTransferAppData>,
     ) = runTest {
         val name = "RenamedFile"
         underTest(mapOf(file to name), parentId, appData, false, false).test {

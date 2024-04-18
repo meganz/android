@@ -45,7 +45,7 @@ class StartUploadUseCase @Inject constructor(
             parentNodeId = parentNodeId,
             fileName = fileName,
             modificationTime = modificationTime,
-            appData = appData,
+            appData = listOfNotNull(appData),
             isSourceTemporary = isSourceTemporary,
             shouldStartFirst = shouldStartFirst,
         )

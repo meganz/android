@@ -136,7 +136,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
             verify(uploadFilesUseCase).invoke(
                 any(),
                 NodeId(any()),
-                eq(TransferAppData.ChatUpload(pendingMessageId)),
+                eq(listOf(TransferAppData.ChatUpload(pendingMessageId))),
                 any(),
                 any()
             )
@@ -265,7 +265,6 @@ class StartChatUploadsWithWorkerUseCaseTest {
         runTest {
             val file = mockFile()
             val pendingMessageId = 15L
-            val nodeHandle = 12L
             val event = MultiTransferEvent.SingleTransferEvent(
                 mock<TransferEvent.TransferTemporaryErrorEvent>(),
                 1L, 1L,
