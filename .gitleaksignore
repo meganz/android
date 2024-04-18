@@ -36,7 +36,6 @@ data/src/test/java/mega/privacy/android/data/mapper/psa/PsaMapperTest.kt:hashico
 data/src/test/java/mega/privacy/android/data/repository/DefaultAccountRepositoryTest.kt:hashicorp-tf-password:1375
 data/src/test/java/mega/privacy/android/data/repository/DefaultAccountRepositoryTest.kt:hashicorp-tf-password:1402
 ata/src/test/java/mega/privacy/android/data/repository/DefaultAccountRepositoryTest.kt:hashicorp-tf-password:1429
-data/src/test/java/mega/privacy/android/data/repository/DefaultLoginRepositoryTest.kt:hashicorp-tf-password:73
 domain/src/test/kotlin/mega/privacy/android/domain/usecase/login/LoginUseCaseTest.kt:hashicorp-tf-password:36
 domain/src/test/kotlin/mega/privacy/android/domain/usecase/login/LoginWith2FAUseCaseTest.kt:hashicorp-tf-password:35
 app/src/gms/google-services.json:gcp-api-key:24
@@ -74,7 +73,7 @@ data/src/main/java/mega/privacy/android/data/mapper/security/PasscodeTypeStringM
 data/src/test/java/mega/privacy/android/data/mapper/login/EphemeralCredentialsMapperTest.kt:hashicorp-tf-password:32
 data/src/test/java/mega/privacy/android/data/mapper/login/EphemeralCredentialsMapperTest.kt:hashicorp-tf-password:41
 data/src/test/java/mega/privacy/android/data/mapper/psa/PsaMapperTest.kt:hashicorp-tf-password:23
-data/src/test/java/mega/privacy/android/data/repository/DefaultLoginRepositoryTest.kt:hashicorp-tf-password:73
+data/src/test/java/mega/privacy/android/data/repository/DefaultLoginRepositoryTest.kt:hashicorp-tf-password:74
 domain/src/test/kotlin/mega/privacy/android/domain/usecase/login/LoginWith2FAUseCaseTest.kt:hashicorp-tf-password:35
 domain/src/test/kotlin/mega/privacy/android/domain/usecase/login/LoginUseCaseTest.kt:hashicorp-tf-password:36
 app/src/gms/google-services.json:gcp-api-key:24

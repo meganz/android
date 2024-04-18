@@ -239,6 +239,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ShowStringsForNewFeatures(
         "Show strings for new features (meetings and VPN)",
         false
+    ),
+
+    /**
+     * To enable the new add and manage description feature to node
+     */
+    NodeWithDescription(
+        "Enable node with description",
+        false
     );
 
     companion object : FeatureFlagValueProvider {
