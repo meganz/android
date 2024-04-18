@@ -53,8 +53,6 @@ data class IncomingSharesState(
     val isPendingRefresh: Boolean = false,
     val nodesList: List<NodeUIItem<ShareNode>> = emptyList(),
     val isInSelection: Boolean = false,
-    val itemIndex: Int = -1,
-    val currentFileNode: FileNode? = null,
     val selectedNodes: Set<ShareNode> = emptySet(),
     val totalSelectedFileNodes: Int = 0,
     val totalSelectedFolderNodes: Int = 0,

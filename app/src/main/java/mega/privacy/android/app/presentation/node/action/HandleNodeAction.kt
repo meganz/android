@@ -9,6 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
+import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
@@ -95,9 +96,7 @@ fun HandleNodeAction(
 
                 is FileNodeContent.UrlContent -> {
                     openUrlFile(
-                        context = context,
-                        content = content,
-                        snackBarHostState = snackBarHostState
+                        context = context, content = content, snackBarHostState = snackBarHostState
                     )
                 }
 
@@ -180,46 +179,44 @@ private fun openImageViewerActivity(
     val currentFileNodeParentId = currentFileNode.parentId.longValue
 
     val (imageSource, menuOptionsSource, paramKey) = when (nodeSourceType) {
-        Constants.FILE_BROWSER_ADAPTER ->
-            Triple(
-                ImagePreviewFetcherSource.CLOUD_DRIVE,
-                ImagePreviewMenuSource.CLOUD_DRIVE,
-                CloudDriveImageNodeFetcher.PARENT_ID
-            )
+        Constants.FILE_BROWSER_ADAPTER -> Triple(
+            ImagePreviewFetcherSource.CLOUD_DRIVE,
+            ImagePreviewMenuSource.CLOUD_DRIVE,
+            CloudDriveImageNodeFetcher.PARENT_ID
+        )
 
-        Constants.RUBBISH_BIN_ADAPTER ->
-            Triple(
-                ImagePreviewFetcherSource.RUBBISH_BIN,
-                ImagePreviewMenuSource.RUBBISH_BIN,
-                RubbishBinImageNodeFetcher.PARENT_ID
-            )
+        Constants.RUBBISH_BIN_ADAPTER -> Triple(
+            ImagePreviewFetcherSource.RUBBISH_BIN,
+            ImagePreviewMenuSource.RUBBISH_BIN,
+            RubbishBinImageNodeFetcher.PARENT_ID
+        )
 
-        Constants.INCOMING_SHARES_ADAPTER, Constants.OUTGOING_SHARES_ADAPTER ->
-            Triple(
-                ImagePreviewFetcherSource.SHARED_ITEMS,
-                ImagePreviewMenuSource.SHARED_ITEMS,
-                SharedItemsImageNodeFetcher.PARENT_ID
-            )
+        Constants.INCOMING_SHARES_ADAPTER,
+        Constants.OUTGOING_SHARES_ADAPTER,
+        -> Triple(
+            ImagePreviewFetcherSource.SHARED_ITEMS,
+            ImagePreviewMenuSource.SHARED_ITEMS,
+            SharedItemsImageNodeFetcher.PARENT_ID
+        )
 
-        Constants.LINKS_ADAPTER ->
-            Triple(
-                ImagePreviewFetcherSource.SHARED_ITEMS,
-                ImagePreviewMenuSource.LINKS,
-                SharedItemsImageNodeFetcher.PARENT_ID
-            )
+        Constants.LINKS_ADAPTER -> Triple(
+            ImagePreviewFetcherSource.SHARED_ITEMS,
+            ImagePreviewMenuSource.LINKS,
+            SharedItemsImageNodeFetcher.PARENT_ID
+        )
 
-        Constants.BACKUPS_ADAPTER ->
-            Triple(
-                ImagePreviewFetcherSource.CLOUD_DRIVE,
-                ImagePreviewMenuSource.CLOUD_DRIVE,
-                CloudDriveImageNodeFetcher.PARENT_ID
-            )
+        Constants.BACKUPS_ADAPTER -> Triple(
+            ImagePreviewFetcherSource.CLOUD_DRIVE,
+            ImagePreviewMenuSource.CLOUD_DRIVE,
+            CloudDriveImageNodeFetcher.PARENT_ID
+        )
 
         else -> {
             Timber.e("Unknown node source type: $nodeSourceType")
             return
         }
     }
+
     val intent = ImagePreviewActivity.createIntent(
         context = context,
         imageSource = imageSource,
@@ -228,6 +225,7 @@ private fun openImageViewerActivity(
         params = mapOf(paramKey to currentFileNodeParentId),
         showScreenLabel = false
     )
+
     context.startActivity(intent)
 }
 
@@ -241,21 +239,20 @@ private suspend fun openVideoOrAudioFile(
     viewType: Int,
 ) {
     val intent = when {
-        fileNode.type.isSupported && fileNode.type is VideoFileTypeInfo ->
-            Intent(context, VideoPlayerActivity::class.java).apply {
-                putExtra(
-                    Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                    sortOrder
-                )
-            }
-
-        fileNode.type.isSupported && fileNode.type is AudioFileTypeInfo -> Intent(
+        fileNode.type.isSupported && fileNode.type is VideoFileTypeInfo -> Intent(
             context,
-            AudioPlayerActivity::class.java
+            VideoPlayerActivity::class.java
         ).apply {
             putExtra(
-                Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                sortOrder
+                Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder
+            )
+        }
+
+        fileNode.type.isSupported && fileNode.type is AudioFileTypeInfo -> Intent(
+            context, AudioPlayerActivity::class.java
+        ).apply {
+            putExtra(
+                Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder
             )
         }
 
@@ -267,15 +264,16 @@ private suspend fun openVideoOrAudioFile(
         putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
         putExtra(Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, fileNode.parentId.longValue)
         putExtra(Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK, false)
-        val mimeType =
-            if (fileNode.type.extension == "opus") "audio/*" else fileNode.type.mimeType
+        val mimeType = if (fileNode.type.extension == "opus") "audio/*" else fileNode.type.mimeType
         nodeActionsViewModel.applyNodeContentUri(
             intent = this,
             content = content,
             mimeType = mimeType,
         )
     }
-    safeLaunchActivity(context = context, intent = intent, snackBarHostState = snackBarHostState)
+    safeLaunchActivity(
+        context = context, intent = intent, snackBarHostState = snackBarHostState
+    )
 }
 
 private suspend fun openUrlFile(
@@ -329,16 +327,14 @@ private suspend fun openZipFile(
 ) {
     Timber.d("The file is zip, open in-app.")
     if (ZipBrowserActivity.zipFileFormatCheck(context, localFile.absolutePath)) {
-        context.startActivity(
-            Intent(context, ZipBrowserActivity::class.java).apply {
-                putExtra(
-                    ZipBrowserActivity.EXTRA_PATH_ZIP, localFile.absolutePath
-                )
-                putExtra(
-                    ZipBrowserActivity.EXTRA_HANDLE_ZIP, fileNode.id.longValue
-                )
-            }
-        )
+        context.startActivity(Intent(context, ZipBrowserActivity::class.java).apply {
+            putExtra(
+                ZipBrowserActivity.EXTRA_PATH_ZIP, localFile.absolutePath
+            )
+            putExtra(
+                ZipBrowserActivity.EXTRA_HANDLE_ZIP, fileNode.id.longValue
+            )
+        })
     } else {
         snackBarHostState?.showSnackbar(context.getString(R.string.message_zip_format_error))
     }

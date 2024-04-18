@@ -17,8 +17,10 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
@@ -51,9 +53,10 @@ import mega.privacy.android.app.presentation.clouddrive.OptionItems
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.manager.model.SharesTab
-import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
+import mega.privacy.android.app.presentation.node.NodeActionsViewModel
+import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.incoming.ui.IncomingSharesView
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
@@ -71,6 +74,8 @@ import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
 import javax.inject.Inject
@@ -105,12 +110,6 @@ class IncomingSharesComposeFragment : Fragment() {
     lateinit var getThemeMode: GetThemeMode
 
     /**
-     * Mapper to open file
-     */
-    @Inject
-    lateinit var getIntentToOpenFileMapper: GetIntentToOpenFileMapper
-
-    /**
      * Mapper to get options for Action Bar
      */
     @Inject
@@ -123,6 +122,7 @@ class IncomingSharesComposeFragment : Fragment() {
     lateinit var fileTypeIconMapper: FileTypeIconMapper
 
     private val viewModel: IncomingSharesComposeViewModel by activityViewModels()
+    private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
 
     /**
@@ -168,13 +168,31 @@ class IncomingSharesComposeFragment : Fragment() {
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by viewModel.state.collectAsStateWithLifecycle()
+                val nodeActionState by nodeActionsViewModel.state.collectAsStateWithLifecycle()
                 val snackbarHostState = remember { SnackbarHostState() }
                 val coroutineScope = rememberCoroutineScope()
+                var clickedFile: TypedFileNode? by remember {
+                    mutableStateOf(null)
+                }
                 MegaAppTheme(isDark = themeMode.isDarkMode()) {
                     IncomingSharesView(
                         uiState = uiState,
                         emptyState = getEmptyFolderDrawable(uiState.isIncomingSharesEmpty),
-                        onItemClick = viewModel::onItemClicked,
+                        onItemClick = {
+                            if (uiState.selectedNodeHandles.isEmpty()) {
+                                when (it.node) {
+                                    is TypedFileNode -> clickedFile = it.node
+
+                                    is TypedFolderNode -> {
+                                        viewModel.onFolderItemClicked(it.id.longValue)
+                                    }
+
+                                    else -> Timber.e("Unsupported click")
+                                }
+                            } else {
+                                viewModel.onItemClicked(it)
+                            }
+                        },
                         onLongClick = {
                             viewModel.onLongItemClicked(it)
                             if (actionMode == null) {
@@ -220,6 +238,12 @@ class IncomingSharesComposeFragment : Fragment() {
                         },
                         snackBarHostState = snackbarHostState,
                     )
+                    EventEffect(
+                        event = nodeActionState.downloadEvent,
+                        onConsumed = nodeActionsViewModel::markDownloadEventConsumed
+                    ) {
+                        viewModel.onDownloadFileTriggered(it)
+                    }
                 }
                 LaunchedEffect(uiState.isInRootLevel) {
                     if (!uiState.isInRootLevel) {
@@ -241,8 +265,17 @@ class IncomingSharesComposeFragment : Fragment() {
                         folderCount = uiState.totalSelectedFolderNodes
                     )
                 }
-                LaunchedEffect(uiState.currentFileNode) {
-                    onItemClick(uiState.currentFileNode)
+                clickedFile?.let {
+                    HandleNodeAction(
+                        typedFileNode = it,
+                        nodeSourceType = Constants.INCOMING_SHARES_ADAPTER,
+                        sortOrder = uiState.sortOrder,
+                        snackBarHostState = snackbarHostState,
+                        onActionHandled = {
+                            clickedFile = null
+                        },
+                        nodeActionsViewModel = nodeActionsViewModel
+                    )
                 }
                 ToolbarTitleUpdateEffect(uiState.updateToolbarTitleEvent) {
                     viewModel.consumeUpdateToolbarTitleEvent()
@@ -324,22 +357,6 @@ class IncomingSharesComposeFragment : Fragment() {
             onConsumed = onConsumeEvent,
             action = { sharesActionListener?.exitSharesPage() },
         )
-    }
-
-    /**
-     * On Item click event received from [IncomingSharesComposeViewModel]
-     *
-     * @param currentFileNode [FileNode]
-     */
-    private fun onItemClick(currentFileNode: FileNode?) {
-        currentFileNode?.let {
-            openFile(fileNode = it)
-            viewModel.onItemPerformedClicked()
-        } ?: run {
-            sharesActionListener?.updateSharesPageToolbarTitleAndFAB(
-                invalidateOptionsMenu = false
-            )
-        }
     }
 
     /**
@@ -630,40 +647,6 @@ class IncomingSharesComposeFragment : Fragment() {
                     )
                     disableSelectMode()
                 }
-            }
-        }
-    }
-
-    /**
-     * Open File
-     * @param fileNode [FileNode]
-     */
-    private fun openFile(fileNode: FileNode) {
-        lifecycleScope.launch {
-            runCatching {
-                val intent = getIntentToOpenFileMapper(
-                    activity = requireActivity(),
-                    fileNode = fileNode,
-                    viewType = Constants.INCOMING_SHARES_ADAPTER
-                )
-                intent?.let {
-                    if (MegaApiUtils.isIntentAvailable(context, it)) {
-                        startActivity(it)
-                    } else {
-                        Toast.makeText(
-                            context,
-                            getString(R.string.intent_not_available),
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
-            }.onFailure {
-                Timber.e("itemClick:ERROR:httpServerGetLocalLink")
-                (activity as? BaseActivity)?.showSnackbar(
-                    type = Constants.SNACKBAR_TYPE,
-                    content = getString(R.string.general_text_error),
-                    chatId = -1,
-                )
             }
         }
     }

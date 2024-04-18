@@ -180,20 +180,18 @@ class FileBrowserComposeFragment : Fragment() {
                             uiState = uiState,
                             emptyState = getEmptyFolderDrawable(uiState.isFileBrowserEmpty),
                             onItemClick = {
-                                coroutineScope.launch {
-                                    if (uiState.selectedNodeHandles.isEmpty()) {
-                                        when (it.node) {
-                                            is TypedFileNode -> clickedFile = it.node
+                                if (uiState.selectedNodeHandles.isEmpty()) {
+                                    when (it.node) {
+                                        is TypedFileNode -> clickedFile = it.node
 
-                                            is TypedFolderNode -> {
-                                                fileBrowserViewModel.onFolderItemClicked(it.id.longValue)
-                                            }
-
-                                            else -> Timber.e("Unsupported click")
+                                        is TypedFolderNode -> {
+                                            fileBrowserViewModel.onFolderItemClicked(it.id.longValue)
                                         }
-                                    } else {
-                                        fileBrowserViewModel.onItemClicked(it)
+
+                                        else -> Timber.e("Unsupported click")
                                     }
+                                } else {
+                                    fileBrowserViewModel.onItemClicked(it)
                                 }
                             },
                             onLongClick = {
