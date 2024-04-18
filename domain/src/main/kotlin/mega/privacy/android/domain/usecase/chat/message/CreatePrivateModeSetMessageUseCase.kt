@@ -17,7 +17,7 @@ internal class CreatePrivateModeSetMessageUseCase @Inject constructor() :
             isEditable = isEditable,
             isMine = isMine,
             userHandle = userHandle,
-            shouldShowAvatar = shouldShowAvatar,
+
             reactions = reactions,
             status = status,
             content = content,

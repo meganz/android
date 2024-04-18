@@ -50,7 +50,6 @@ class TypedMessageEntityMapperTest {
         val expectedTermCode = ChatMessageTermCode.ENDED
         val expectedRowId = 123435424L
         val expectedChanges = listOf(ChatMessageChange.CONTENT)
-        val expectedShouldShowAvatar = false
         val expectedIsMine = false
         val expectedTextMessage = "textMessage"
         val expectedReactions = emptyList<Reaction>()
@@ -96,7 +95,6 @@ class TypedMessageEntityMapperTest {
         val requestResolver = CreateTypedMessageRequest(
             chatMessage = chatMessage,
             chatId = expectedChatId,
-            shouldShowAvatar = expectedShouldShowAvatar,
             isMine = expectedIsMine,
             reactions = expectedReactions,
             exists = expectedExists,
@@ -132,7 +130,6 @@ class TypedMessageEntityMapperTest {
         assertThat(actual.termCode).isEqualTo(expectedTermCode)
         assertThat(actual.rowId).isEqualTo(expectedRowId)
         assertThat(actual.changes).isEqualTo(expectedChanges)
-        assertThat(actual.shouldShowAvatar).isEqualTo(expectedShouldShowAvatar)
         assertThat(actual.isMine).isEqualTo(expectedIsMine)
         assertThat(actual.textMessage).isEqualTo(expectedTextMessage)
         assertThat(actual.reactions).isEqualTo(expectedReactions)

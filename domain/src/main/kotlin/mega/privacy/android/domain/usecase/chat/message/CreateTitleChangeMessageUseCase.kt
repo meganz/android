@@ -17,7 +17,7 @@ internal class CreateTitleChangeMessageUseCase @Inject constructor() : CreateTyp
             isMine = isMine,
             userHandle = userHandle,
             content = content.orEmpty(),
-            shouldShowAvatar = shouldShowAvatar,
+
             reactions = reactions,
             status = status,
         )

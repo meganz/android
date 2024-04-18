@@ -6,6 +6,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
+import mega.privacy.android.data.database.chat.spec.AutoMigrationSpecChat2to3
 import mega.privacy.android.data.database.dao.ChatMessageMetaDao
 import mega.privacy.android.data.database.dao.ChatNodeDao
 import mega.privacy.android.data.database.dao.PendingMessageDao
@@ -24,10 +25,12 @@ import mega.privacy.android.data.database.entity.chat.TypedMessageEntity
  */
 const val CHAT_DATABASE_NAME = "chat_database"
 
+private const val DATABASE_VERSION = 3
+
 /**
  * In memory chat database
  *
- * An in memory implementation of the chat database
+ * An implementation of the chat database
  */
 @Database(
     entities = [
@@ -39,9 +42,10 @@ const val CHAT_DATABASE_NAME = "chat_database"
         PendingMessageEntity::class,
         NodeMessageCrossRef::class,
     ],
-    version = 2,
+    version = DATABASE_VERSION,
     autoMigrations = [
         AutoMigration(1, 2),
+        AutoMigration(2, 3, spec = AutoMigrationSpecChat2to3::class),
     ],
 )
 abstract class ChatDatabase : RoomDatabase() {
@@ -76,7 +80,4 @@ abstract class ChatDatabase : RoomDatabase() {
             CHAT_DATABASE_NAME
         ).openHelperFactory(factory).build()
     }
-
-    fun inMemoryInit(context: Context): ChatDatabase =
-        Room.inMemoryDatabaseBuilder(context, ChatDatabase::class.java).build()
 }

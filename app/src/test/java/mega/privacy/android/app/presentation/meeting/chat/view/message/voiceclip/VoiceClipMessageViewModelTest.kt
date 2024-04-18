@@ -59,7 +59,6 @@ class VoiceClipMessageViewModelTest {
         size = 1,
         duration = 3000.milliseconds,
         userHandle = 1L,
-        shouldShowAvatar = true,
         reactions = emptyList(),
         exists = true,
         rowId = 765L,

@@ -458,7 +458,6 @@ class NodeAttachmentMessageViewModelTest {
             isEditable = false,
             isMine = true,
             userHandle = 23L,
-            shouldShowAvatar = true,
             fileNode = fileNode,
             reactions = emptyList(),
             status = ChatMessageStatus.UNKNOWN,

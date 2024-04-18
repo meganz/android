@@ -128,7 +128,7 @@ fun PermissionChangeMessageView(
 private fun PermissionChangeMessageViewPreview(
     @PreviewParameter(ChatRoomPermissionProvider::class) permission: ChatRoomPermission,
 ) {
-    MegaAppTheme(isDark = isSystemInDarkTheme()){
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
         PermissionChangeMessageView(
             message = PermissionChangeMessage(
                 chatId = 1L,
@@ -140,7 +140,6 @@ private fun PermissionChangeMessageViewPreview(
                 userHandle = 0,
                 privilege = permission,
                 handleOfAction = 0,
-                shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
                 content = null

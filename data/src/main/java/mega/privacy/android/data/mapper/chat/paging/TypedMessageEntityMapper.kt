@@ -45,7 +45,6 @@ class TypedMessageEntityMapper @Inject constructor() {
                 termCode = termCode,
                 rowId = rowId,
                 changes = changes,
-                shouldShowAvatar = shouldShowAvatar,
                 isMine = isMine,
                 textMessage = textMessage,
                 reactions = reactions,

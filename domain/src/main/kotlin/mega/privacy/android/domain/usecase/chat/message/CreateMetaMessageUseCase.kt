@@ -24,7 +24,7 @@ class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase
                 isMine = isMine,
                 userHandle = userHandle,
                 chatRichPreviewInfo = chatRichPreviewInfo,
-                shouldShowAvatar = shouldShowAvatar,
+
                 reactions = reactions,
                 content = content.orEmpty(),
                 // Rich preview messages are always edited because are sent as normal messages,
@@ -44,7 +44,7 @@ class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase
                 isMine = isMine,
                 userHandle = userHandle,
                 chatGeolocationInfo = chatGeolocationInfo,
-                shouldShowAvatar = shouldShowAvatar,
+
                 reactions = reactions,
                 isEdited = isEdited,
                 status = status,
@@ -61,7 +61,7 @@ class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase
                 isMine = isMine,
                 userHandle = userHandle,
                 chatGifInfo = chatGifInfo,
-                shouldShowAvatar = shouldShowAvatar,
+
                 reactions = reactions,
                 status = status,
                 content = content,
@@ -76,7 +76,7 @@ class CreateMetaMessageUseCase @Inject constructor() : CreateTypedMessageUseCase
                 isEditable = isEditable,
                 isMine = isMine,
                 userHandle = userHandle,
-                shouldShowAvatar = shouldShowAvatar,
+
                 reactions = reactions,
                 status = status,
                 content = content,

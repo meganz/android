@@ -93,7 +93,6 @@ class CreateVoiceClipMessageUseCaseTest {
                 isEditable = false,
                 isMine = isMine,
                 userHandle = userHandle,
-                shouldShowAvatar = shouldShowAvatar,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
                 content = null,
@@ -116,7 +115,6 @@ class CreateVoiceClipMessageUseCaseTest {
             chatMessage = message,
             chatId = 123L,
             isMine = true,
-            shouldShowAvatar = true,
             reactions = emptyList(),
             exists = exists
         )

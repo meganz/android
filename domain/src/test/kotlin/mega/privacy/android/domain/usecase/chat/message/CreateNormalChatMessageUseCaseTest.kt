@@ -38,7 +38,7 @@ class CreateNormalChatMessageUseCaseTest {
     @Test
     fun `test that normal message is returned`() = runTest {
         whenever(getLinkTypesUseCase(any())).thenReturn(emptyList())
-        val message = mock<ChatMessage>{
+        val message = mock<ChatMessage> {
             on { status } doReturn ChatMessageStatus.UNKNOWN
         }
         Truth.assertThat(
@@ -47,7 +47,6 @@ class CreateNormalChatMessageUseCaseTest {
                     chatMessage = message,
                     chatId = 123L,
                     isMine = true,
-                    shouldShowAvatar = true,
                     reactions = emptyList(),
                     exists = true,
                 )
@@ -66,7 +65,7 @@ class CreateNormalChatMessageUseCaseTest {
                 )
             )
         )
-        val message = mock<ChatMessage>{
+        val message = mock<ChatMessage> {
             on { status } doReturn ChatMessageStatus.UNKNOWN
         }
         Truth.assertThat(
@@ -75,7 +74,6 @@ class CreateNormalChatMessageUseCaseTest {
                     chatMessage = message,
                     chatId = 123L,
                     isMine = true,
-                    shouldShowAvatar = true,
                     reactions = emptyList(),
                     exists = true,
                 )

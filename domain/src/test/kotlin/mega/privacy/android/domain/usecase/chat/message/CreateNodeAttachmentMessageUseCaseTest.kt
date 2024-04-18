@@ -10,7 +10,6 @@ import mega.privacy.android.domain.entity.chat.messages.request.CreateTypedMessa
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.chat.ChatImageFile
-import mega.privacy.android.domain.usecase.node.DoesNodeExistUseCase
 import mega.privacy.android.domain.usecase.node.chat.AddChatFileTypeUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -87,7 +86,6 @@ class CreateNodeAttachmentMessageUseCaseTest {
                 isEditable = false,
                 isMine = isMine,
                 userHandle = userHandle,
-                shouldShowAvatar = shouldShowAvatar,
                 fileNode = typedNode,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
@@ -108,7 +106,6 @@ class CreateNodeAttachmentMessageUseCaseTest {
             chatMessage = message,
             chatId = 123L,
             isMine = true,
-            shouldShowAvatar = true,
             reactions = emptyList(),
             exists = exists
         )

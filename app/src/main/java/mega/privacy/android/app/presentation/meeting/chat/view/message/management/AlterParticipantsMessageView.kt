@@ -152,7 +152,6 @@ private fun AlterParticipantsMessageViewSameHandlePreview(
                 isDeletable = false,
                 isEditable = false,
                 msgId = 1L,
-                shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
                 content = null
@@ -180,7 +179,6 @@ private fun AlterParticipantsMessageViewDifferentHandlePreview(
                 isDeletable = false,
                 isEditable = false,
                 msgId = 1L,
-                shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
                 content = null

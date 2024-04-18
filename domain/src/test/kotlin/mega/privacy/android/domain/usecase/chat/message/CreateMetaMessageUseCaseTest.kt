@@ -39,7 +39,6 @@ class CreateMetaMessageUseCaseTest {
             on { containsMeta }.thenReturn(null)
             on { status } doReturn ChatMessageStatus.UNKNOWN
         }
-        val isMine = true
 
         assertThat(
             underTest.invoke(
@@ -47,7 +46,6 @@ class CreateMetaMessageUseCaseTest {
                     chatMessage = message,
                     chatId = 123L,
                     isMine = true,
-                    shouldShowAvatar = true,
                     reactions = emptyList(),
                     exists = true,
                 )
@@ -71,14 +69,12 @@ class CreateMetaMessageUseCaseTest {
             on { status } doReturn ChatMessageStatus.UNKNOWN
         }
 
-        val isMine = true
         assertThat(
             underTest.invoke(
                 CreateTypedMessageRequest(
                     chatMessage = message,
                     chatId = 123L,
                     isMine = true,
-                    shouldShowAvatar = true,
                     reactions = emptyList(),
                     exists = true,
                 )

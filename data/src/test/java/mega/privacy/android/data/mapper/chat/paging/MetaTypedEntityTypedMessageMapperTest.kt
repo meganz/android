@@ -13,15 +13,13 @@ import mega.privacy.android.domain.usecase.chat.message.CreateTypedMessageUseCas
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argForWhich
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MetaTypedEntityTypedMessageMapperTest {
@@ -37,14 +35,10 @@ class MetaTypedEntityTypedMessageMapperTest {
         )
     }
 
-    @ParameterizedTest(
-        name = "Test isMine {0} " +
-                "shouldShowAvatar {1} "
-    )
-    @MethodSource("booleanParameterProvider")
+    @ParameterizedTest(name = "Test isMine {0} ")
+    @ValueSource(booleans = [true, false])
     fun `test that request object is created with the correct parameters`(
         isMineParam: Boolean,
-        shouldShowAvatarParam: Boolean,
     ) = runTest {
         val mock = mock<TypedMessage>()
         whenever(createTypedMessageUseCase.invoke(any())).thenReturn(mock)
@@ -57,7 +51,6 @@ class MetaTypedEntityTypedMessageMapperTest {
         val expectedTypedMessageEntity = mock<TypedMessageEntity> {
             on { type } doReturn messageType
             on { isMine } doReturn isMineParam
-            on { shouldShowAvatar } doReturn shouldShowAvatarParam
             on { textMessage } doReturn expectedTextMessage
         }
 
@@ -77,14 +70,6 @@ class MetaTypedEntityTypedMessageMapperTest {
                     && chatGifInfo == expectedGiphyEntity
                     && textMessage == expectedTextMessage
                     && isMine == isMineParam
-                    && shouldShowAvatar == shouldShowAvatarParam
         })
     }
-
-    private fun booleanParameterProvider() = Stream.of(
-        Arguments.of(true, false),
-        Arguments.of(false, true),
-        Arguments.of(false, false),
-        Arguments.of(false, false),
-    )
 }

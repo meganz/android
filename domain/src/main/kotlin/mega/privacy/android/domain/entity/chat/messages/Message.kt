@@ -46,11 +46,6 @@ interface Message {
     val userHandle: Long
 
     /**
-     * Should show avatar
-     */
-    val shouldShowAvatar: Boolean
-
-    /**
      * List of reactions
      */
     val reactions: List<Reaction>

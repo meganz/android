@@ -37,7 +37,6 @@ class ChatCallMessageViewTest {
                 isEditable = false,
                 isMine = true,
                 userHandle = 1234567890L,
-                shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
                 content = null
@@ -62,7 +61,6 @@ class ChatCallMessageViewTest {
                 termCode = ChatMessageTermCode.ENDED,
                 duration = 0.seconds,
                 userHandle = 1234567890L,
-                shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
                 content = null
@@ -87,7 +85,6 @@ class ChatCallMessageViewTest {
                 termCode = ChatMessageTermCode.ENDED,
                 duration = 0.seconds,
                 userHandle = 1234567890L,
-                shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
                 content = null
@@ -116,7 +113,6 @@ class ChatCallMessageViewTest {
                 termCode = ChatMessageTermCode.REJECTED,
                 duration = 0.seconds,
                 userHandle = 1234567890L,
-                shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
                 content = null
@@ -145,7 +141,6 @@ class ChatCallMessageViewTest {
                 termCode = ChatMessageTermCode.NO_ANSWER,
                 duration = 0.seconds,
                 userHandle = 1234567890L,
-                shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
                 content = null
@@ -174,7 +169,6 @@ class ChatCallMessageViewTest {
                 termCode = ChatMessageTermCode.NO_ANSWER,
                 duration = 0.seconds,
                 userHandle = 1234567890L,
-                shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
                 content = null
@@ -203,7 +197,6 @@ class ChatCallMessageViewTest {
                 termCode = ChatMessageTermCode.CANCELLED,
                 duration = 0.seconds,
                 userHandle = 1234567890L,
-                shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
                 content = null
@@ -232,7 +225,6 @@ class ChatCallMessageViewTest {
                 termCode = ChatMessageTermCode.CANCELLED,
                 duration = 0.seconds,
                 userHandle = 1234567890L,
-                shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
                 content = null
@@ -261,7 +253,6 @@ class ChatCallMessageViewTest {
                 termCode = ChatMessageTermCode.FAILED,
                 duration = 0.seconds,
                 userHandle = 1234567890L,
-                shouldShowAvatar = false,
                 reactions = emptyList(),
                 status = ChatMessageStatus.UNKNOWN,
                 content = null

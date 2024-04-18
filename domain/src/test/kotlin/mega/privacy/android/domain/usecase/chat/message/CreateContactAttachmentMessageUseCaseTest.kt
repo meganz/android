@@ -62,7 +62,6 @@ class CreateContactAttachmentMessageUseCaseTest {
                     chatMessage = message,
                     chatId = 123L,
                     isMine = true,
-                    shouldShowAvatar = true,
                     reactions = emptyList(),
                     exists = true,
                 )
@@ -90,7 +89,6 @@ class CreateContactAttachmentMessageUseCaseTest {
                 chatMessage = message,
                 chatId = 123L,
                 isMine = true,
-                shouldShowAvatar = true,
                 reactions = emptyList(),
                 exists = true,
             )
@@ -121,7 +119,6 @@ class CreateContactAttachmentMessageUseCaseTest {
                     chatMessage = message,
                     chatId = 123L,
                     isMine = true,
-                    shouldShowAvatar = true,
                     reactions = emptyList(),
                     exists = true,
                 )

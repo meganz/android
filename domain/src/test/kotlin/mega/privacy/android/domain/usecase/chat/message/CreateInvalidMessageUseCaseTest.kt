@@ -38,7 +38,6 @@ class CreateInvalidMessageUseCaseTest {
                     chatMessage = message,
                     chatId = 123L,
                     isMine = true,
-                    shouldShowAvatar = true,
                     reactions = emptyList(),
                     exists = true,
                 )
@@ -62,7 +61,6 @@ class CreateInvalidMessageUseCaseTest {
                     chatMessage = message,
                     chatId = 123L,
                     isMine = true,
-                    shouldShowAvatar = true,
                     reactions = emptyList(),
                     exists = true,
                 )
@@ -86,7 +84,6 @@ class CreateInvalidMessageUseCaseTest {
                     chatMessage = message,
                     chatId = 123L,
                     isMine = true,
-                    shouldShowAvatar = true,
                     reactions = emptyList(),
                     exists = true,
                 )
@@ -110,7 +107,6 @@ class CreateInvalidMessageUseCaseTest {
                     chatMessage = message,
                     chatId = 123L,
                     isMine = true,
-                    shouldShowAvatar = true,
                     reactions = emptyList(),
                     exists = true,
                 )

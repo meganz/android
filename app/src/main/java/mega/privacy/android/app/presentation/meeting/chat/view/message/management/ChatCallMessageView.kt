@@ -174,7 +174,6 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     isEditable = false,
                     isMine = true,
                     userHandle = 123L,
-                    shouldShowAvatar = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
                     content = null
@@ -192,7 +191,6 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     termCode = ChatMessageTermCode.ENDED,
                     duration = 0.seconds,
                     userHandle = 123L,
-                    shouldShowAvatar = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
                     content = null
@@ -210,7 +208,6 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     termCode = ChatMessageTermCode.ENDED,
                     duration = 0.seconds,
                     userHandle = 123L,
-                    shouldShowAvatar = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
                     content = null
@@ -228,7 +225,6 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     termCode = ChatMessageTermCode.ENDED,
                     duration = 100.seconds,
                     userHandle = 123L,
-                    shouldShowAvatar = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
                     content = null
@@ -246,7 +242,6 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     termCode = ChatMessageTermCode.ENDED,
                     duration = 100.seconds,
                     userHandle = 123L,
-                    shouldShowAvatar = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
                     content = null
@@ -264,7 +259,6 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     termCode = ChatMessageTermCode.FAILED,
                     duration = 0.seconds,
                     userHandle = 123L,
-                    shouldShowAvatar = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
                     content = null
@@ -282,7 +276,6 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     termCode = ChatMessageTermCode.CANCELLED,
                     duration = 0.seconds,
                     userHandle = 123L,
-                    shouldShowAvatar = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
                     content = null
@@ -300,7 +293,6 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     termCode = ChatMessageTermCode.REJECTED,
                     duration = 0.seconds,
                     userHandle = 123L,
-                    shouldShowAvatar = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
                     content = null
@@ -318,7 +310,6 @@ private class ChatCallMessageViewParameterProvider : PreviewParameterProvider<Pr
                     termCode = ChatMessageTermCode.NO_ANSWER,
                     duration = 0.seconds,
                     userHandle = 123L,
-                    shouldShowAvatar = false,
                     reactions = emptyList(),
                     status = ChatMessageStatus.UNKNOWN,
                     content = null

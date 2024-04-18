@@ -31,7 +31,7 @@ class CreateNormalChatMessageUseCase @Inject constructor(
                         userHandle = userHandle,
                         links = allLinks,
                         content = content.orEmpty(),
-                        shouldShowAvatar = shouldShowAvatar,
+
                         reactions = reactions,
                         status = status,
                         rowId = rowId,
@@ -48,7 +48,7 @@ class CreateNormalChatMessageUseCase @Inject constructor(
                     userHandle = userHandle,
                     content = content.orEmpty(),
                     hasOtherLink = allLinks.any { it.type !in supportedTypes },
-                    shouldShowAvatar = shouldShowAvatar,
+
                     reactions = reactions,
                     isEdited = isEdited,
                     status = status,

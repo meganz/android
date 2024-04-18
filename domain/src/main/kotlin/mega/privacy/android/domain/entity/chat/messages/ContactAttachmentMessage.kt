@@ -23,7 +23,6 @@ data class ContactAttachmentMessage(
     override val isEditable: Boolean,
     override val isMine: Boolean,
     override val userHandle: Long,
-    override val shouldShowAvatar: Boolean,
     override val reactions: List<Reaction>,
     override val status: ChatMessageStatus,
     override val content: String?,
