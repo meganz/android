@@ -554,4 +554,13 @@ interface CameraUploadRepository {
      * @param folderTypes a list of folder type (Primary, Secondary, or both)
      */
     suspend fun clearRecords(folderTypes: List<CameraUploadFolderType>)
+
+    /**
+     * Checks whether or not the Device must be charged for the active Camera Uploads to
+     * start uploading content
+     *
+     * @return true if the Device must be charged for the active Camera Uploads to upload content.
+     * The function may return null if the value could not be retrieved from the DataStore
+     */
+    suspend fun isChargingRequiredToUploadContent(): Boolean?
 }
