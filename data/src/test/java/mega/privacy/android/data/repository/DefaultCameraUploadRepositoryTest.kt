@@ -610,6 +610,18 @@ class DefaultCameraUploadRepositoryTest {
                 assertThat(underTest.isChargingRequiredToUploadContent()).isNull()
 
             }
+
+        @ParameterizedTest(name = "new is charging required when uploading content state: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that the new charging required when uploading content state is set`(
+            chargingRequired: Boolean,
+        ) = runTest {
+            underTest.setChargingRequiredToUploadContent(chargingRequired)
+
+            verify(cameraUploadsSettingsPreferenceGateway).setChargingRequiredToUploadContent(
+                chargingRequired
+            )
+        }
     }
 
     @Nested
