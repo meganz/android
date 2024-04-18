@@ -2,6 +2,9 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -41,6 +44,7 @@ import mega.privacy.android.domain.repository.CallRepository
 import nz.mega.sdk.MegaChatError
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -61,6 +65,7 @@ import kotlin.coroutines.resumeWithException
  * @property appEventGateway                        [AppEventGateway]
  * @property dispatcher                             [CoroutineDispatcher]
  */
+@Singleton
 internal class CallRepositoryImpl @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
     private val chatCallMapper: ChatCallMapper,
@@ -77,6 +82,9 @@ internal class CallRepositoryImpl @Inject constructor(
     private val appEventGateway: AppEventGateway,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
 ) : CallRepository {
+
+    private val monitorCallRecordingConsentEvent: MutableStateFlow<Boolean?> =
+        MutableStateFlow(null)
 
     override suspend fun getChatCall(chatId: Long?): ChatCall? =
         withContext(dispatcher) {
@@ -694,11 +702,12 @@ internal class CallRepositoryImpl @Inject constructor(
             }
         }
 
-    override fun monitorCallRecordingConsentEvent(): Flow<Boolean> =
-        appEventGateway.monitorCallRecordingConsentEvent()
+    override fun monitorCallRecordingConsentEvent(): StateFlow<Boolean?> =
+        monitorCallRecordingConsentEvent.asStateFlow()
 
-    override suspend fun broadcastCallRecordingConsentEvent(isRecordingConsentAccepted: Boolean) =
-        appEventGateway.broadcastCallRecordingConsentEvent(isRecordingConsentAccepted)
+    override suspend fun broadcastCallRecordingConsentEvent(isRecordingConsentAccepted: Boolean?) {
+        monitorCallRecordingConsentEvent.emit(isRecordingConsentAccepted)
+    }
 
     override fun monitorCallEnded(): Flow<Long> =
         appEventGateway.monitorCallEnded()

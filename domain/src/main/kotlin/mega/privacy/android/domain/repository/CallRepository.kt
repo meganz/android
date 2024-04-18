@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatScheduledFlags
@@ -438,16 +439,16 @@ interface CallRepository {
     /**
      * Monitor call recording consent event (accepted/rejected).
      *
-     * @return Flow of Boolean. True if consent has been accepted or False otherwise.
+     * @return StateFlow of Boolean. True if consent has been accepted or False otherwise.
      */
-    fun monitorCallRecordingConsentEvent(): Flow<Boolean>
+    fun monitorCallRecordingConsentEvent(): StateFlow<Boolean?>
 
     /**
      * Broadcast call recording consent event (accepted/rejected).
      *
      * @param isRecordingConsentAccepted True if recording consent has been accepted or False otherwise.
      */
-    suspend fun broadcastCallRecordingConsentEvent(isRecordingConsentAccepted: Boolean)
+    suspend fun broadcastCallRecordingConsentEvent(isRecordingConsentAccepted: Boolean?)
 
     /**
      * Monitor that a specific call has ended.

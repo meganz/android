@@ -344,20 +344,6 @@ internal interface AppEventGateway {
     fun monitorBusinessAccountExpired(): Flow<Unit>
 
     /**
-     * Broadcast call recording consent event (accepted/rejected)
-     *
-     * @param isRecordingConsentAccepted True if recording consent has been accepted or False otherwise.
-     */
-    suspend fun broadcastCallRecordingConsentEvent(isRecordingConsentAccepted: Boolean)
-
-    /**
-     * Monitor call recording consent event (accepted/rejected)
-     *
-     * @return Flow of Boolean. True if consent has been accepted or False otherwise.
-     */
-    fun monitorCallRecordingConsentEvent(): Flow<Boolean>
-
-    /**
      * Broadcast that a specific call has ended.
      *
      * @param chatId    ID of the chat to which the call corresponded.

@@ -487,17 +487,19 @@ class ManagerViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            monitorCallRecordingConsentEventUseCase().conflate()
+            monitorCallRecordingConsentEventUseCase()
                 .collect { isRecordingConsentAccepted ->
-                    _state.update {
-                        it.copy(
-                            isSessionOnRecording = true,
-                            showRecordingConsentDialog = false,
-                            isRecordingConsentAccepted = isRecordingConsentAccepted
-                        )
-                    }
-                    if (!isRecordingConsentAccepted) {
-                        hangChatCall(state.value.callInProgressChatId)
+                    isRecordingConsentAccepted?.let {
+                        _state.update {
+                            it.copy(
+                                isSessionOnRecording = true,
+                                showRecordingConsentDialog = false,
+                                isRecordingConsentAccepted = isRecordingConsentAccepted
+                            )
+                        }
+                        if (!isRecordingConsentAccepted) {
+                            hangChatCall(state.value.callInProgressChatId)
+                        }
                     }
                 }
         }

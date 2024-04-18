@@ -3,6 +3,7 @@ package test.mega.privacy.android.app.presentation.settings.chat
 import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -153,7 +154,8 @@ class ChatViewModelTest {
         wheneverBlocking { monitorChatRoomUpdates(any()) }.thenReturn(flowOf())
         wheneverBlocking { loadPendingMessagesUseCase(any()) }.thenReturn(flowOf())
         wheneverBlocking { monitorChatSessionUpdatesUseCase() }.thenReturn(emptyFlow())
-        wheneverBlocking { monitorCallRecordingConsentEventUseCase() }.thenReturn(emptyFlow())
+        wheneverBlocking { monitorCallRecordingConsentEventUseCase() }
+            .thenReturn(MutableStateFlow(null))
         wheneverBlocking { monitorCallEndedUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorRichLinkPreviewConfigUseCase() }.thenReturn(emptyFlow())
         initTestClass()

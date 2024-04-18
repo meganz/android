@@ -67,7 +67,6 @@ internal class AppEventFacade @Inject constructor(
     override val monitorCompletedTransfer =
         _monitorCompletedTransfer.toSharedFlow(appScope)
 
-    private val callRecordingConsentEvent = MutableSharedFlow<Boolean>()
     private val callEnded = MutableSharedFlow<Long>()
 
     private val updateUserData = MutableSharedFlow<Unit>()
@@ -213,12 +212,6 @@ internal class AppEventFacade @Inject constructor(
     }
 
     override fun monitorBusinessAccountExpired() = _businessAccountExpired.asSharedFlow()
-
-    override fun monitorCallRecordingConsentEvent() =
-        callRecordingConsentEvent.asSharedFlow()
-
-    override suspend fun broadcastCallRecordingConsentEvent(isRecordingConsentAccepted: Boolean) =
-        callRecordingConsentEvent.emit(isRecordingConsentAccepted)
 
     override fun monitorCallEnded() = callEnded.asSharedFlow()
 

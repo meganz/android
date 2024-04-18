@@ -14,6 +14,6 @@ class BroadcastCallRecordingConsentEventUseCase @Inject constructor(
      *
      * @param isRecordingConsentAccepted True if recording consent has been accepted or False otherwise.
      */
-    suspend operator fun invoke(isRecordingConsentAccepted: Boolean) =
+    suspend operator fun invoke(isRecordingConsentAccepted: Boolean?) =
         callRepository.broadcastCallRecordingConsentEvent(isRecordingConsentAccepted)
 }

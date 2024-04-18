@@ -306,7 +306,7 @@ class ManagerViewModelTest {
     private val hangChatCallUseCase: HangChatCallUseCase = mock()
     private val monitorCallRecordingConsentEventUseCase: MonitorCallRecordingConsentEventUseCase =
         mock {
-            onBlocking { invoke() }.thenReturn(emptyFlow())
+            onBlocking { invoke() }.thenReturn(MutableStateFlow(null))
         }
     private val monitorCallEndedUseCase: MonitorCallEndedUseCase = mock {
         onBlocking { invoke() }.thenReturn(emptyFlow())
@@ -457,7 +457,7 @@ class ManagerViewModelTest {
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(flowOf(UsersCallLimitReminders.Enabled))
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(true)
         whenever(monitorUserUpdates()).thenReturn(emptyFlow())
-        whenever(monitorCallRecordingConsentEventUseCase()).thenReturn(emptyFlow())
+        whenever(monitorCallRecordingConsentEventUseCase()).thenReturn(MutableStateFlow(null))
         whenever(monitorCallEndedUseCase()).thenReturn(emptyFlow())
         whenever(monitorChatArchivedUseCase()).thenReturn(flowOf("Chat Title"))
         whenever(monitorPushNotificationSettingsUpdate()).thenReturn(flowOf(true))
