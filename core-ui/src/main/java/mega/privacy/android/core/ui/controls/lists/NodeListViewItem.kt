@@ -2,6 +2,7 @@ package mega.privacy.android.core.ui.controls.lists
 
 import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -88,25 +89,27 @@ fun NodeListViewItem(
         ),
         fillSubTitleText = showIsVerified.not(),
         icon = {
-            if (isSelected) {
-                Image(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .testTag(SELECTED_TEST_TAG),
-                    painter = painterResource(R.drawable.ic_select_folder),
-                    contentDescription = "Selected",
-                )
-            } else {
-                ThumbnailView(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .testTag(ICON_TAG),
-                    data = thumbnailData,
-                    defaultImage = icon,
-                    contentDescription = "Thumbnail",
-                )
+            AnimatedContent(targetState = isSelected, label = "node thumbnail") {
+                if (it) {
+                    Image(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .testTag(SELECTED_TEST_TAG),
+                        painter = painterResource(R.drawable.ic_select_folder),
+                        contentDescription = "Selected",
+                    )
+                } else {
+                    ThumbnailView(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .testTag(ICON_TAG),
+                        data = thumbnailData,
+                        defaultImage = icon,
+                        contentDescription = "Thumbnail",
+                    )
+                }
             }
         },
         title = {
