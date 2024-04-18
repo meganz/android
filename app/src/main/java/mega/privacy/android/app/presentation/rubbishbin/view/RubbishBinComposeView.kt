@@ -57,7 +57,8 @@ fun RubbishBinComposeView(
             gridState = gridState,
             onLinkClicked = onLinkClicked,
             onDisputeTakeDownClicked = onDisputeTakeDownClicked,
-            fileTypeIconMapper = fileTypeIconMapper
+            fileTypeIconMapper = fileTypeIconMapper,
+            inSelectionMode = uiState.isInSelection,
         )
     } else {
         LegacyMegaEmptyView(

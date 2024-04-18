@@ -53,6 +53,7 @@ fun <T : TypedNode> NodesView(
     onChangeViewTypeClick: () -> Unit,
     onLinkClicked: (String) -> Unit,
     onDisputeTakeDownClicked: (String) -> Unit,
+    fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
     listState: LazyListState = LazyListState(),
     gridState: LazyGridState = LazyGridState(),
@@ -63,9 +64,9 @@ fun <T : TypedNode> NodesView(
     showMediaDiscoveryButton: Boolean = false,
     showPublicLinkCreationTime: Boolean = false,
     isPublicNode: Boolean = false,
+    inSelectionMode: Boolean = false,
     onEnterMediaDiscoveryClick: () -> Unit = {},
     listContentPadding: PaddingValues = PaddingValues(0.dp),
-    fileTypeIconMapper: FileTypeIconMapper,
 ) {
     val takenDownDialog = remember { mutableStateOf(Pair(false, false)) }
     val orientation = LocalConfiguration.current.orientation
@@ -95,7 +96,8 @@ fun <T : TypedNode> NodesView(
             showMediaDiscoveryButton = showMediaDiscoveryButton,
             isPublicNode = isPublicNode,
             showPublicLinkCreationTime = showPublicLinkCreationTime,
-            fileTypeIconMapper = fileTypeIconMapper
+            fileTypeIconMapper = fileTypeIconMapper,
+            inSelectionMode = inSelectionMode
         )
     } else {
         val newList = rememberNodeListForGrid(nodeUIItems = nodeUIItems, spanCount = span)
@@ -122,7 +124,8 @@ fun <T : TypedNode> NodesView(
             gridState = gridState,
             showMediaDiscoveryButton = showMediaDiscoveryButton,
             isPublicNode = isPublicNode,
-            fileTypeIconMapper = fileTypeIconMapper
+            fileTypeIconMapper = fileTypeIconMapper,
+            inSelectionMode = inSelectionMode
         )
     }
     if (takenDownDialog.value.first) {

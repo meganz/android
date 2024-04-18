@@ -4,13 +4,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.core.R
+import mega.privacy.android.core.ui.theme.MegaTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,7 +45,7 @@ class NodeListViewItemTest {
                     accessPermissionIcon = R.drawable.ic_favorite,
                     showOffline = true,
                     showVersion = true,
-                    labelColor = Color.Blue,
+                    labelColor = MegaTheme.colors.indicator.pink,
                     showLink = true,
                     showFavourite = true,
                     onMoreClicked = {},
@@ -103,22 +103,24 @@ class NodeListViewItemTest {
         composeTestRule.onNodeWithText("Subtitle").assertIsDisplayed()
 
         //Check that label is displayed
-        composeTestRule.onNodeWithTag(LABEL_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(LABEL_TAG, useUnmergedTree = true).assertIsDisplayed()
 
         //Check that offline icon is displayed
-        composeTestRule.onNodeWithTag(OFFLINE_ICON_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(OFFLINE_ICON_TAG, useUnmergedTree = true).assertIsDisplayed()
 
         //Check that version icon is displayed
-        composeTestRule.onNodeWithTag(VERSION_ICON_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(VERSION_ICON_TAG, useUnmergedTree = true).assertIsDisplayed()
 
         //Check that favourite icon is displayed
-        composeTestRule.onNodeWithTag(FAVOURITE_ICON_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(FAVOURITE_ICON_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
 
         //Check that link icon is displayed
-        composeTestRule.onNodeWithTag(LINK_ICON_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(LINK_ICON_TAG, useUnmergedTree = true).assertIsDisplayed()
 
         //Check that permission icon is displayed
-        composeTestRule.onNodeWithTag(PERMISSION_ICON_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(PERMISSION_ICON_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
 
     }
 }

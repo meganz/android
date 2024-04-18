@@ -11,10 +11,12 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
@@ -38,11 +40,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.getPainter
 import mega.privacy.android.core.ui.controls.images.ThumbnailView
-import mega.privacy.android.legacy.core.ui.controls.text.MiddleEllipsisText
+import mega.privacy.android.core.ui.controls.text.LongTextBehaviour
+import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.theme.extensions.background_white_alpha_005
 import mega.privacy.android.core.ui.theme.extensions.color_button_brand
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
-import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.grey_alpha_040
 import mega.privacy.android.core.ui.theme.transparent
@@ -50,6 +52,7 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.core.ui.theme.tokens.TextColor
 
 /**
  * Grid view item for file/folder info
@@ -70,6 +73,7 @@ internal fun <T : TypedNode> NodeGridViewItem(
     onLongClick: (NodeUIItem<T>) -> Unit,
     thumbnailData: Any?,
     fileTypeIconMapper: FileTypeIconMapper,
+    inSelectionMode: Boolean = false,
 ) {
     if (nodeUIItem.node is FolderNode) {
         ConstraintLayout(
@@ -90,18 +94,24 @@ internal fun <T : TypedNode> NodeGridViewItem(
                 .padding(start = 8.dp),
         ) {
             val (menuImage, txtTitle, thumbImage, takenDownImage) = createRefs()
-            Image(
-                painter = painterResource(id = CoreUiR.drawable.ic_dots_vertical_grey),
-                contentDescription = "3 dots",
-                modifier = Modifier
-                    .clickable { onMenuClick.invoke(nodeUIItem) }
-                    .constrainAs(menuImage) {
-                        end.linkTo(parent.end)
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                    }
-                    .testTag(FOLDER_VIEW_MORE_ICON_TEST_TAG),
-            )
+            Box(modifier = Modifier
+                .constrainAs(menuImage) {
+                    end.linkTo(parent.end)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                }) {
+                if (inSelectionMode.not()) {
+                    Image(
+                        painter = painterResource(id = CoreUiR.drawable.ic_dots_vertical_grey),
+                        contentDescription = "3 dots",
+                        modifier = Modifier
+                            .clickable { onMenuClick.invoke(nodeUIItem) }
+                            .testTag(FOLDER_VIEW_MORE_ICON_TEST_TAG),
+                    )
+                } else {
+                    Spacer(modifier = Modifier.width(24.dp))
+                }
+            }
             Image(
                 painter = if (nodeUIItem.isSelected) painterResource(id = CoreUiR.drawable.ic_select_folder) else nodeUIItem.node.getPainter(
                     fileTypeIconMapper
@@ -132,10 +142,10 @@ internal fun <T : TypedNode> NodeGridViewItem(
                 painter = painterResource(id = iconPackR.drawable.ic_alert_triangle_medium_regular_outline),
                 colorFilter = ColorFilter.tint(MaterialTheme.colors.color_button_brand),
                 contentDescription = "Taken Down")
-            MiddleEllipsisText(
+            MegaText(
                 text = nodeUIItem.name,
                 modifier = Modifier
-                    .padding(end = 8.dp)
+                    .padding(horizontal = 8.dp)
                     .constrainAs(txtTitle) {
                         end.linkTo(takenDownImage.start)
                         start.linkTo(thumbImage.end)
@@ -145,7 +155,8 @@ internal fun <T : TypedNode> NodeGridViewItem(
                     }
                     .testTag(FOLDER_VIEW_NODE_TITLE_TEXT_TEST_TAG),
                 style = MaterialTheme.typography.subtitle2,
-                color = if (nodeUIItem.isTakenDown) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.textColorPrimary
+                overflow = LongTextBehaviour.MiddleEllipsis,
+                textColor = if (nodeUIItem.isTakenDown) TextColor.Error else TextColor.Primary
             )
 
         }
@@ -193,7 +204,9 @@ internal fun <T : TypedNode> NodeGridViewItem(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Image(
-                            modifier = Modifier.testTag(VIDEO_PLAY_ICON_TEST_TAG),
+                            modifier = Modifier
+                                .testTag(VIDEO_PLAY_ICON_TEST_TAG)
+                                .padding(start = 8.dp, bottom = 4.dp),
                             painter = painterResource(id = R.drawable.ic_play_arrow_white_24dp),
                             contentDescription = "Video duration",
                             colorFilter = ColorFilter.tint(color = MaterialTheme.colors.textColorPrimary)
@@ -224,20 +237,28 @@ internal fun <T : TypedNode> NodeGridViewItem(
             )
             ConstraintLayout(
                 modifier = Modifier
-                    .padding(8.dp)
+                    .padding(start = 8.dp, top = 8.dp, bottom = 8.dp)
                     .fillMaxWidth()
             ) {
                 val (menuImage, txtTitle, takenDownImage) = createRefs()
-                Image(
-                    painter = painterResource(id = CoreUiR.drawable.ic_dots_vertical_grey),
-                    contentDescription = "3 dots",
+                Box(
                     modifier = Modifier
-                        .clickable { onMenuClick.invoke(nodeUIItem) }
                         .constrainAs(menuImage) {
                             end.linkTo(parent.end)
-                        }
-                        .testTag(FILE_VIEW_MORE_ICON_TEST_TAG)
-                )
+                        },
+                ) {
+                    if (inSelectionMode.not()) {
+                        Image(
+                            painter = painterResource(id = CoreUiR.drawable.ic_dots_vertical_grey),
+                            contentDescription = "3 dots",
+                            modifier = Modifier
+                                .clickable { onMenuClick.invoke(nodeUIItem) }
+                                .testTag(FILE_VIEW_MORE_ICON_TEST_TAG)
+                        )
+                    } else {
+                        Spacer(modifier = Modifier.size(24.dp))
+                    }
+                }
                 Image(
                     modifier = Modifier
                         .constrainAs(takenDownImage) {
@@ -253,18 +274,20 @@ internal fun <T : TypedNode> NodeGridViewItem(
                     painter = painterResource(id = iconPackR.drawable.ic_alert_triangle_medium_regular_outline),
                     colorFilter = ColorFilter.tint(MaterialTheme.colors.color_button_brand),
                     contentDescription = "Taken Down")
-                MiddleEllipsisText(
+                MegaText(
                     text = nodeUIItem.name,
                     modifier = Modifier
-                        .padding(end = 8.dp)
                         .constrainAs(txtTitle) {
                             start.linkTo(parent.start)
                             end.linkTo(takenDownImage.start)
                             width = Dimension.fillToConstraints
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
                         }
                         .testTag(FILE_VIEW_NODE_TITLE_TEXT_TEST_TAG),
                     style = MaterialTheme.typography.subtitle2,
-                    color = if (nodeUIItem.isTakenDown) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.textColorPrimary
+                    overflow = LongTextBehaviour.MiddleEllipsis,
+                    textColor = if (nodeUIItem.isTakenDown) TextColor.Error else TextColor.Primary
                 )
             }
         }

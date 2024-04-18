@@ -112,7 +112,8 @@ fun FileBrowserComposeView(
                         showMediaDiscoveryButton = uiState.showMediaDiscoveryIcon,
                         onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
                         listContentPadding = PaddingValues(top = 18.dp),
-                        fileTypeIconMapper = fileTypeIconMapper
+                        fileTypeIconMapper = fileTypeIconMapper,
+                        inSelectionMode = uiState.isInSelection
                     )
                 }
             } else {

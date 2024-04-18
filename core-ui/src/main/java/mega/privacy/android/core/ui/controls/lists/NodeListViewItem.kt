@@ -3,7 +3,10 @@ package mega.privacy.android.core.ui.controls.lists
 import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
@@ -41,11 +44,15 @@ import mega.privacy.android.core.ui.theme.tokens.TextColor
  * @param showOffline Show offline
  * @param showVersion Show version
  * @param showChecked Show checked
+ * @param isSelected Is selected
+ * @param showIsVerified Show is verified
+ * @param isTakenDown Is taken down
  * @param labelColor Label color
  * @param showLink Show link
  * @param showFavourite Show favourite
  * @param onMoreClicked On more clicked
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NodeListViewItem(
     title: String,
@@ -61,30 +68,52 @@ fun NodeListViewItem(
     showOffline: Boolean = false,
     showVersion: Boolean = false,
     showChecked: Boolean = false,
+    isSelected: Boolean = false,
+    showIsVerified: Boolean = false,
+    isTakenDown: Boolean = false,
     labelColor: Color? = null,
     showLink: Boolean = false,
     showFavourite: Boolean = false,
     onMoreClicked: (() -> Unit)? = null,
     onInfoClicked: (() -> Unit)? = null,
+    onItemClicked: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
 ) {
     GenericTwoLineListItem(
-        modifier = modifier,
+        modifier = modifier.combinedClickable(
+            onLongClick = onLongClick,
+            onClick = {
+                onItemClicked?.invoke()
+            }
+        ),
+        fillSubTitleText = showIsVerified.not(),
         icon = {
-            ThumbnailView(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .testTag(ICON_TAG),
-                data = thumbnailData,
-                defaultImage = icon,
-                contentDescription = "Thumbnail",
-            )
+            if (isSelected) {
+                Image(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .testTag(SELECTED_TEST_TAG),
+                    painter = painterResource(R.drawable.ic_select_folder),
+                    contentDescription = "Selected",
+                )
+            } else {
+                ThumbnailView(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .testTag(ICON_TAG),
+                    data = thumbnailData,
+                    defaultImage = icon,
+                    contentDescription = "Thumbnail",
+                )
+            }
         },
         title = {
             MegaText(
                 text = title,
                 overflow = titleOverflow,
-                textColor = titleColor,
+                textColor = if (isTakenDown) TextColor.Error else titleColor,
                 modifier = Modifier.testTag(TITLE_TAG),
             )
         },
@@ -144,6 +173,15 @@ fun NodeListViewItem(
                         .testTag(OFFLINE_ICON_TAG),
                     painter = painterResource(id = R.drawable.ic_offline_indicator),
                     contentDescription = "Offline",
+                )
+            }
+            if (showIsVerified) {
+                Image(
+                    modifier = Modifier
+                        .size(16.dp)
+                        .testTag(OFFLINE_ICON_TAG),
+                    painter = painterResource(id = IconPackR.drawable.ic_contact_verified),
+                    contentDescription = "Verified",
                 )
             }
         },
@@ -259,6 +297,8 @@ private fun PreviewGenericTwoLineListItemWithoutMoreOption() {
             onMoreClicked = { },
             accessPermissionIcon = R.drawable.ic_sync,
             labelColor = MegaTheme.colors.indicator.pink,
+            showIsVerified = true,
+            isTakenDown = true,
             thumbnailData = "https://www.mega.com/resources/images/mega-logo.svg"
         )
     }
@@ -274,4 +314,5 @@ internal const val VERSION_ICON_TAG = "node_list_view_item:version_icon"
 internal const val PERMISSION_ICON_TAG = "node_list_view_item:permission_icon"
 internal const val LABEL_TAG = "node_list_view_item:label"
 internal const val MORE_ICON_TAG = "node_list_view_item:more_icon"
+internal const val SELECTED_TEST_TAG = "node_list_view_item:image_selected"
 

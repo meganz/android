@@ -276,7 +276,8 @@ internal fun FolderLinkView(
                     showMediaDiscoveryButton = state.hasMediaItem,
                     onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
                     isPublicNode = true,
-                    fileTypeIconMapper = fileTypeIconMapper
+                    fileTypeIconMapper = fileTypeIconMapper,
+                    inSelectionMode = state.selectedNodeCount > 0
                 )
                 ImportDownloadView(
                     Modifier

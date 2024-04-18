@@ -41,6 +41,8 @@ import mega.privacy.android.core.ui.theme.tokens.TextColor
  * @param subtitleTextColor [TextColor] to apply to the subtitle. If no color set, this will be [TextColor.Secondary].
  * @param showEntireSubtitle If true, the entire [subtitle] is displayed. Otherwise, only one line
  * is provided for the [subtitle]
+ * @param fillTitleText If true, the title will fill the available space
+ * @param fillSubTitleText If true, the subtitle will fill the available space
  * @param icon Icon
  * @param modifier Modifier
  * @param subTitlePrefixIcons Subtitle prefix
@@ -57,6 +59,8 @@ fun GenericTwoLineListItem(
     titleTextColor: TextColor = TextColor.Primary,
     subtitleTextColor: TextColor = TextColor.Secondary,
     showEntireSubtitle: Boolean = false,
+    fillTitleText: Boolean = false,
+    fillSubTitleText: Boolean = true,
     icon: @Composable (() -> Unit)? = null,
     subTitlePrefixIcons: @Composable (RowScope.() -> Unit)? = null,
     subTitleSuffixIcons: @Composable (RowScope.() -> Unit)? = null,
@@ -98,6 +102,8 @@ fun GenericTwoLineListItem(
         titleIcons = titleIcons,
         trailingIcons = trailingIcons,
         onItemClicked = onItemClicked,
+        fillTitleText = fillTitleText,
+        fillSubTitleText = fillSubTitleText,
     )
 }
 
@@ -119,6 +125,8 @@ internal fun GenericTwoLineListItem(
     title: @Composable (() -> Unit),
     modifier: Modifier = Modifier,
     subtitle: @Composable (() -> Unit)? = null,
+    fillTitleText: Boolean = false,
+    fillSubTitleText: Boolean = true,
     icon: @Composable (() -> Unit)? = null,
     subTitlePrefixIcons: @Composable (RowScope.() -> Unit)? = null,
     subTitleSuffixIcons: @Composable (RowScope.() -> Unit)? = null,
@@ -145,8 +153,8 @@ internal fun GenericTwoLineListItem(
                 .weight(1f),
             verticalArrangement = Arrangement.Center,
         ) {
-            TitleRow(title, titleIcons)
-            SubTitleRow(subtitle, subTitlePrefixIcons, subTitleSuffixIcons)
+            TitleRow(title, titleIcons, fillTitleText)
+            SubTitleRow(subtitle, subTitlePrefixIcons, subTitleSuffixIcons, fillSubTitleText)
         }
         TrailingIcons(trailingIcons)
     }
@@ -166,13 +174,14 @@ private fun RowScope.TrailingIcons(trailingIcons: @Composable (RowScope.() -> Un
 private fun TitleRow(
     title: @Composable () -> Unit,
     titleIcons: @Composable (RowScope.() -> Unit)?,
+    fillTitleText: Boolean,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        Box(modifier = Modifier.weight(1f, fill = false)) {
+        Box(modifier = Modifier.weight(1f, fill = fillTitleText)) {
             CompositionLocalProvider(
                 LocalContentColor provides MegaTheme.colors.text.primary,
                 LocalTextStyle provides MaterialTheme.typography.subtitle1,
@@ -195,6 +204,7 @@ private fun SubTitleRow(
     subtitle: @Composable (() -> Unit)?,
     subTitlePrefixIcons: @Composable (RowScope.() -> Unit)?,
     subTitleSuffixIcons: @Composable (RowScope.() -> Unit)?,
+    fillSubTitleText: Boolean,
 ) {
     if (subtitle != null) {
         Row(
@@ -208,7 +218,7 @@ private fun SubTitleRow(
             ) {
                 subTitlePrefixIcons?.invoke(this)
             }
-            Box(modifier = Modifier.weight(1f)) {
+            Box(modifier = Modifier.weight(1f, fill = fillSubTitleText)) {
                 CompositionLocalProvider(
                     LocalContentColor provides MegaTheme.colors.text.secondary,
                     LocalTextStyle provides MaterialTheme.typography.subtitle2

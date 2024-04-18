@@ -106,7 +106,8 @@ fun OutgoingSharesView(
                 showMediaDiscoveryButton = false,
                 onEnterMediaDiscoveryClick = { },
                 listContentPadding = PaddingValues(top = 18.dp),
-                fileTypeIconMapper = fileTypeIconMapper
+                fileTypeIconMapper = fileTypeIconMapper,
+                inSelectionMode = uiState.isInSelection
             )
         } else {
             LegacyMegaEmptyView(

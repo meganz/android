@@ -55,6 +55,7 @@ fun <T : TypedNode> NodeGridView(
     spanCount: Int = 2,
     showChangeViewType: Boolean = true,
     isPublicNode: Boolean = false,
+    inSelectionMode: Boolean = false,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
     fileTypeIconMapper: FileTypeIconMapper,
 ) {
@@ -102,6 +103,7 @@ fun <T : TypedNode> NodeGridView(
                 onLongClick = onLongClick,
                 thumbnailData = ThumbnailRequest(nodeUIItems[it].node.id, isPublicNode),
                 fileTypeIconMapper = fileTypeIconMapper,
+                inSelectionMode = inSelectionMode
             )
         }
     }

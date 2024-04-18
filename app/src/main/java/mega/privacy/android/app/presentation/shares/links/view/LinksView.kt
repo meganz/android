@@ -102,7 +102,8 @@ fun LinksView(
                 showMediaDiscoveryButton = false,
                 onEnterMediaDiscoveryClick = { },
                 showPublicLinkCreationTime = uiState.isInRootLevel,
-                fileTypeIconMapper = fileTypeIconMapper
+                fileTypeIconMapper = fileTypeIconMapper,
+                inSelectionMode = uiState.isInSelection
             )
         } else {
             LegacyMegaEmptyView(
