@@ -385,8 +385,12 @@ internal class DefaultPhotosRepository @Inject constructor(
         cameraUploadsSettingsPreferenceGateway.getMediaUploadsHandle()
     }
 
-    override suspend fun getPhotoFromNodeID(nodeId: NodeId, albumPhotoId: AlbumPhotoId?): Photo? {
-        return when (val photo = photosCache[nodeId]) {
+    override suspend fun getPhotoFromNodeID(
+        nodeId: NodeId,
+        albumPhotoId: AlbumPhotoId?,
+        refresh: Boolean,
+    ): Photo? {
+        return when (val photo = photosCache[nodeId].takeIf { !refresh }) {
             is Photo.Image -> {
                 photo.copy(albumPhotoId = albumPhotoId?.id)
             }

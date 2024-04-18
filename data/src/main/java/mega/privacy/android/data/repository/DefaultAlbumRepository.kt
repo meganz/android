@@ -35,7 +35,9 @@ import mega.privacy.android.data.mapper.PhotoMapper
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.node.ImageNodeMapper
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumIdLink
@@ -85,7 +87,8 @@ internal class DefaultAlbumRepository @Inject constructor(
 
     private val userSetsFlow: MutableSharedFlow<List<UserSet>> = MutableSharedFlow(replay = 1)
 
-    private val userSetsElementsFlow: MutableSharedFlow<List<UserSet>> =
+    @VisibleForTesting
+    internal val userSetsElementsFlow: MutableSharedFlow<List<Pair<UserSet, List<AlbumPhotoId>>>> =
         MutableSharedFlow(replay = 1)
 
     private val albumElements: MutableMap<AlbumId, List<AlbumPhotoId>> = mutableMapOf()
@@ -109,15 +112,27 @@ internal class DefaultAlbumRepository @Inject constructor(
         monitorNodeUpdatesJob?.cancel()
         monitorNodeUpdatesJob = nodeRepository.monitorNodeUpdates()
             .onEach { nodeUpdate ->
-                val userSets = nodeUpdate.changes.keys
-                    .flatMap { node ->
-                        val setIds = nodeSetsMap[node.id] ?: emptySet()
-                        setIds.mapNotNull { userSets[it] }
-                    }.distinctBy { it.id }
+                val targets = mutableMapOf<UserSet, List<AlbumPhotoId>>()
 
-                if (userSets.isNotEmpty()) {
-                    userSetsFlow.tryEmit(userSets)
-                    userSetsElementsFlow.tryEmit(userSets)
+                for ((node, changes) in nodeUpdate.changes) {
+                    if (node is FolderNode && changes.contains(NodeChanges.Sensitive)) {
+                        targets.putAll(userSets.values.associateWith { listOf(AlbumPhotoId.default) })
+                        break
+                    } else {
+                        val setIds = nodeSetsMap[node.id] ?: emptySet()
+                        for (userSet in setIds.mapNotNull { userSets[it] }) {
+                            val nodeIds = targets[userSet] ?: listOf()
+                            targets[userSet] = nodeIds + AlbumPhotoId.default.copy(
+                                nodeId = node.id,
+                                albumId = AlbumId(userSet.id),
+                            )
+                        }
+                    }
+                }
+
+                if (targets.isNotEmpty()) {
+                    userSetsFlow.tryEmit(targets.keys.toList())
+                    userSetsElementsFlow.tryEmit(targets.map { it.key to it.value })
                 }
             }.launchIn(appScope)
     }
@@ -222,11 +237,11 @@ internal class DefaultAlbumRepository @Inject constructor(
             .mapNotNull { it.elements }
             .map { elements -> elements.filter { it.setId() == albumId.id } }
             .onEach(::checkSetsCoverRemoved)
-            .map { listOf(AlbumPhotoId.default) }
+            .map { it.map { it.toAlbumPhotoId() }.ifEmpty { listOf(AlbumPhotoId.default) } }
             .onEach { albumElements.remove(albumId) },
         userSetsElementsFlow
-            .mapNotNull { sets -> sets.find { it.id == albumId.id } }
-            .map { listOf(AlbumPhotoId.default) }
+            .mapNotNull { sets -> sets.find { it.first.id == albumId.id } }
+            .map { it.second.ifEmpty { listOf(AlbumPhotoId.default) } }
             .onEach { albumElements.remove(albumId) },
     )
 

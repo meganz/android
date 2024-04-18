@@ -25,16 +25,16 @@ class DefaultGetUserAlbum @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : GetUserAlbum {
     override fun invoke(albumId: AlbumId): Flow<Album.UserAlbum?> = flow {
-        emit(getUserAlbum(albumId))
+        emit(getUserAlbum(albumId, false))
         emitAll(monitorUserAlbumUpdate(albumId))
     }.flowOn(defaultDispatcher)
 
-    private suspend fun getUserAlbum(albumId: AlbumId): Album.UserAlbum? =
+    private suspend fun getUserAlbum(albumId: AlbumId, refresh: Boolean): Album.UserAlbum? =
         albumRepository.getUserSet(albumId)?.let { set ->
             val photo = set.cover?.let { eid ->
                 albumRepository.getAlbumElementIDs(albumId = AlbumId(set.id))
                     .find { it.id == eid }
-                    ?.run { photosRepository.getPhotoFromNodeID(nodeId, this) }
+                    ?.run { photosRepository.getPhotoFromNodeID(nodeId, this, refresh) }
             }
             Album.UserAlbum(
                 id = AlbumId(set.id),
@@ -51,6 +51,6 @@ class DefaultGetUserAlbum @Inject constructor(
             .mapNotNull { sets -> sets.find { it.id == albumId.id } }
             .mapLatest {
                 albumRepository.clearAlbumCache(albumId)
-                getUserAlbum(albumId)
+                getUserAlbum(albumId, true)
             }
 }

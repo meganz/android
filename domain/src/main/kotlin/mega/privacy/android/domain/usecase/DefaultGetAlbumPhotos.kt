@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -27,18 +26,27 @@ class DefaultGetAlbumPhotos @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : GetAlbumPhotos {
     override fun invoke(albumId: AlbumId): Flow<List<Photo>> = flow {
-        emit(getAlbumPhotos(albumId))
+        emit(getAlbumPhotos(albumId, toInvalidatePhotos = listOf()))
         emitAll(monitorAlbumPhotosUpdate(albumId))
     }.flowOn(defaultDispatcher)
 
-    private suspend fun getAlbumPhotos(albumId: AlbumId): List<Photo> =
+    private suspend fun getAlbumPhotos(
+        albumId: AlbumId,
+        toInvalidatePhotos: List<AlbumPhotoId>,
+    ): List<Photo> =
         albumRepository.getAlbumElementIDs(albumId)
             .mapNotNull { albumPhotoId ->
-                photosRepository.getPhotoFromNodeID(albumPhotoId.nodeId, albumPhotoId)
+                photosRepository.getPhotoFromNodeID(
+                    nodeId = albumPhotoId.nodeId,
+                    albumPhotoId = albumPhotoId,
+                    refresh = toInvalidatePhotos.let { list ->
+                        list.any { it.nodeId == albumPhotoId.nodeId || it.nodeId.longValue == -1L }
+                    },
+                )
             }
 
     private fun monitorAlbumPhotosUpdate(albumId: AlbumId): Flow<List<Photo>> =
         albumRepository.monitorAlbumElementIds(albumId)
             .filter(List<AlbumPhotoId>::isNotEmpty)
-            .mapLatest { getAlbumPhotos(albumId) }
+            .mapLatest { getAlbumPhotos(albumId, it) }
 }

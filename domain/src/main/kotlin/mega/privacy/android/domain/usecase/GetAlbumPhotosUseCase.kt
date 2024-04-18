@@ -23,19 +23,29 @@ class GetAlbumPhotosUseCase @Inject constructor(
     private val photosRepository: PhotosRepository,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) {
-    operator fun invoke(albumId: AlbumId, refresh: Boolean): Flow<List<Photo>> = flow {
-        emit(getAlbumPhotos(albumId, refresh))
+    operator fun invoke(albumId: AlbumId, refreshElements: Boolean): Flow<List<Photo>> = flow {
+        emit(getAlbumPhotos(albumId, refreshElements, toInvalidatePhotos = listOf()))
         emitAll(monitorAlbumPhotosUpdate(albumId))
     }.flowOn(defaultDispatcher)
 
-    private suspend fun getAlbumPhotos(albumId: AlbumId, refresh: Boolean): List<Photo> =
-        albumRepository.getAlbumElementIDs(albumId, refresh)
+    private suspend fun getAlbumPhotos(
+        albumId: AlbumId,
+        refreshElements: Boolean,
+        toInvalidatePhotos: List<AlbumPhotoId>,
+    ): List<Photo> =
+        albumRepository.getAlbumElementIDs(albumId, refreshElements)
             .mapNotNull { albumPhotoId ->
-                photosRepository.getPhotoFromNodeID(albumPhotoId.nodeId, albumPhotoId)
+                photosRepository.getPhotoFromNodeID(
+                    nodeId = albumPhotoId.nodeId,
+                    albumPhotoId = albumPhotoId,
+                    refresh = toInvalidatePhotos.let { list ->
+                        list.any { it.nodeId == albumPhotoId.nodeId || it.nodeId.longValue == -1L }
+                    },
+                )
             }
 
     private fun monitorAlbumPhotosUpdate(albumId: AlbumId): Flow<List<Photo>> =
         albumRepository.monitorAlbumElementIds(albumId)
             .filter(List<AlbumPhotoId>::isNotEmpty)
-            .mapLatest { getAlbumPhotos(albumId, false) }
+            .mapLatest { getAlbumPhotos(albumId, refreshElements = false, toInvalidatePhotos = it) }
 }

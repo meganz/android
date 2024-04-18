@@ -549,6 +549,35 @@ class DefaultAlbumRepositoryTest {
         assertEquals(testUri, uri)
     }
 
+    @Test
+    fun `test that node update will trigger corresponding elements`() = runTest {
+        // given
+        val userSet = createUserSet(
+            id = 1L,
+            name = "Album 1",
+            type = MegaSet.SET_TYPE_ALBUM,
+            cover = -1L,
+            creationTime = 0L,
+            modificationTime = 0L,
+            isExported = false,
+        )
+
+        whenever(megaApiGateway.globalUpdates)
+            .thenReturn(flowOf())
+
+        // when
+        underTest = createUnderTest(this)
+        (underTest as DefaultAlbumRepository).userSetsElementsFlow.emit(
+            listOf(userSet to listOf(AlbumPhotoId.default))
+        )
+
+        // then
+        underTest.monitorAlbumElementIds(AlbumId(userSet.id)).test {
+            val elementIds = awaitItem()
+            assertThat(elementIds).isNotEmpty()
+        }
+    }
+
     private fun createUnderTest(coroutineScope: CoroutineScope) = DefaultAlbumRepository(
         nodeRepository = nodeRepository,
         megaApiGateway = megaApiGateway,
