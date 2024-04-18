@@ -14,10 +14,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -39,7 +37,6 @@ import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
-import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.AlertsAndWarnings.showConfirmRemoveLinkDialog
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -82,6 +79,7 @@ import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
+import mega.privacy.android.domain.usecase.node.CopyChatNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
@@ -132,12 +130,12 @@ class TextEditorViewModel @Inject constructor(
     private val moveNodeUseCase: MoveNodeUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
     private val getNodeByHandle: GetNodeByHandle,
-    private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
     private val downloadBackgroundFile: DownloadBackgroundFile,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getChatFileUseCase: GetChatFileUseCase,
+    private val copyChatNodeUseCase: CopyChatNodeUseCase,
     private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase,
     private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
@@ -716,17 +714,7 @@ class TextEditorViewModel @Inject constructor(
                     onError = { error ->
                         when (error) {
                             is MegaNodeException.ChildDoesNotExistsException -> {
-                                legacyCopyNodeUseCase.copy(
-                                    node = node,
-                                    parentHandle = newParentHandle
-                                ).subscribeAndComplete(
-                                    completeAction = {
-                                        snackBarMessage.value =
-                                            R.string.context_correctly_copied
-                                    },
-                                    errorAction = { copyError ->
-                                        throwable.value = copyError
-                                    })
+                                copyChatNode(NodeId(newParentHandle))
                             }
 
                             else -> Timber.e(error)
@@ -736,25 +724,29 @@ class TextEditorViewModel @Inject constructor(
                 .addTo(composite)
         }
 
-
-    private fun Completable.subscribeAndComplete(
-        addToComposite: Boolean = false,
-        completeAction: (() -> Unit)? = null,
-        errorAction: ((Throwable) -> Unit)? = null,
-    ) {
-        subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = {
-                    completeAction?.invoke()
-                },
-                onError = { error ->
-                    errorAction?.invoke(error)
-                    Timber.e(error)
-                }
-            ).also {
-                if (addToComposite) it.addTo(composite)
+    /**
+     * Copies a chat node
+     *
+     * @param newParentNodeId Parent handle in which the node will be copied.
+     */
+    private fun copyChatNode(newParentNodeId: NodeId) {
+        viewModelScope.launch {
+            runCatching {
+                val viewerNode = textEditorData.value?.viewerNode
+                if (viewerNode !is ViewerNode.ChatNode) throw IllegalStateException("ViewerNode must be a ChatNode type")
+                copyChatNodeUseCase(
+                    chatId = viewerNode.chatId,
+                    messageId = viewerNode.messageId,
+                    newNodeParent = newParentNodeId,
+                )
+            }.onSuccess {
+                snackBarMessage.value =
+                    R.string.context_correctly_copied
+            }.onFailure {
+                Timber.e(it, "Error not copied")
+                throwable.value = it
             }
+        }
     }
 
     /**
@@ -779,7 +771,7 @@ class TextEditorViewModel @Inject constructor(
                     snackBarMessage.value = R.string.context_correctly_copied
                 }.onFailure {
                     throwable.value = it
-                    Timber.e("Error not copied $it")
+                    Timber.e(it, "Error not copied")
                 }
             }
         }
@@ -807,7 +799,7 @@ class TextEditorViewModel @Inject constructor(
                         snackBarMessage.value = R.string.context_correctly_moved
                     }.onFailure {
                         throwable.value = it
-                        Timber.e("Not moved: $it")
+                        Timber.e(it, "Not moved")
                     }
                 }
             }
