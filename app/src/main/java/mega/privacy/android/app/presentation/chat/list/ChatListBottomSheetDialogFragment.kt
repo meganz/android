@@ -32,11 +32,11 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkMandatoryCallPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestCallPermissions
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.ScheduledMeetingCancelMenuItemEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingEditMenuItemEvent
 import javax.inject.Inject
@@ -233,5 +233,13 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
      */
     fun show(manager: FragmentManager) {
         if (manager.findFragmentByTag(TAG) == null) super.show(manager, TAG)
+    }
+
+    /**
+     * On destroy view event
+     */
+    override fun onDestroyView() {
+        super.onDestroyView()
+        scheduledMeetingManagementViewModel.stopMonitoringLoadMessages()
     }
 }
