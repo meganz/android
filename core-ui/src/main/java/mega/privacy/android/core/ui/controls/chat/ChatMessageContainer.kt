@@ -7,9 +7,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -79,11 +78,13 @@ fun ChatMessageContainer(
     isSelected: Boolean = false,
     onSelectionChanged: (Boolean) -> Unit = {},
     avatarOrIcon: @Composable ((modifier: Modifier) -> Unit)? = null,
+    avatarAlignment: Alignment.Vertical = Alignment.Bottom,
     content: @Composable (interactionEnabled: Boolean) -> Unit,
 ) {
-    Column(
+    Row(
         modifier = modifier
             .fillMaxWidth()
+            .padding(start = 8.dp)
             .conditional(
                 condition = isSelectMode
             ) {
@@ -94,41 +95,45 @@ fun ChatMessageContainer(
                     onValueChange = onSelectionChanged
                 )
             },
-        verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        val indicatorSizeModifier = Modifier.size(24.dp)
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(start = 8.dp, end = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
-        ) {
-            if (avatarOrIcon != null) {
-                Box(
-                    modifier = Modifier
-                        .width(40.dp)
-                        .fillMaxHeight(),
-                ) {
-                    if (isSelectMode) {
-                        MegaCheckbox(
-                            checked = isSelected,
-                            onCheckedChange = onSelectionChanged,
-                            modifier = indicatorSizeModifier.align(Alignment.Center)
-                        )
-                    } else {
-                        avatarOrIcon(indicatorSizeModifier.align(Alignment.BottomCenter))
-                    }
+        if (avatarOrIcon != null) {
+            Box(
+                modifier = Modifier
+                    .width(40.dp)
+                    .height(24.dp)
+                    .align(if (isSelectMode) Alignment.Top else avatarAlignment),
+            ) {
+                if (isSelectMode) {
+                    MegaCheckbox(
+                        checked = isSelected,
+                        onCheckedChange = onSelectionChanged,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                } else {
+                    avatarOrIcon(Modifier.align(Alignment.Center))
                 }
             }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
             Row(
                 horizontalArrangement = if (isMine) Arrangement.End else Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .align(Alignment.CenterVertically)
                     .fillMaxWidth()
+                    .padding(end = 16.dp),
             ) {
                 val forward: @Composable () -> Unit = {
-                    if (shouldDisplayForwardIcon(showForwardIcon, isSelectMode, isSendError)) {
+                    if (shouldDisplayForwardIcon(
+                            showForwardIcon,
+                            isSelectMode,
+                            isSendError
+                        )
+                    ) {
                         ForwardIcon(
                             onForwardClicked,
                             Modifier
@@ -148,43 +153,35 @@ fun ChatMessageContainer(
                     forward()
                 }
             }
-        }
 
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(start = 8.dp, end = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
-        ) {
-            Spacer(
-                modifier = Modifier
-                    .width(40.dp)
-            )
-            Row(
-                horizontalArrangement = if (isMine) Arrangement.End else Arrangement.Start,
-                modifier = Modifier
-                    .align(Alignment.Top)
-                    .fillMaxWidth()
-            ) {
-                if (isSendError) {
-                    MegaText(
-                        modifier = Modifier
-                            .padding(top = 2.dp),
-                        text = stringResource(id = R.string.manual_retry_alert),
-                        style = MaterialTheme.typography.body4,
-                        textColor = TextColor.Error
-                    )
-                } else if (reactions.isNotEmpty()) {
-                    ReactionsView(
-                        modifier = Modifier.padding(end = 8.dp),
-                        reactions = reactions,
-                        isMine = isMine,
-                        onMoreReactionsClick = onMoreReactionsClick,
-                        onReactionClick = onReactionClick,
-                        onReactionLongClick = onReactionLongClick,
-                        interactionEnabled = !isSelectMode,
-                    )
+            if (isSendError || reactions.isNotEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 16.dp),
+                ) {
+                    if (isSendError) {
+                        MegaText(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(top = 2.dp),
+                            text = stringResource(id = R.string.manual_retry_alert),
+                            style = MaterialTheme.typography.body4,
+                            textColor = TextColor.Error
+                        )
+                    } else {
+                        ReactionsView(
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .align(if (isMine) Alignment.TopEnd else Alignment.TopStart),
+                            reactions = reactions,
+                            isMine = isMine,
+                            onMoreReactionsClick = onMoreReactionsClick,
+                            onReactionClick = onReactionClick,
+                            onReactionLongClick = onReactionLongClick,
+                            interactionEnabled = !isSelectMode,
+                        )
+                    }
                 }
             }
         }

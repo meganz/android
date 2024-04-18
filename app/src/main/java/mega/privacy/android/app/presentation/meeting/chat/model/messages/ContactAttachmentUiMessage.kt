@@ -98,7 +98,6 @@ data class ContactAttachmentUiMessage(
                 .fillMaxWidth()
         }
 
-    override val showAvatar = message.shouldShowAvatar
     override val displayAsMine = message.isMine
     override val shouldDisplayForwardIcon = true
     override val timeSent = message.time

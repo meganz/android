@@ -5,8 +5,10 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
+import mega.privacy.android.app.presentation.meeting.chat.view.LastItemAvatarPosition
 import mega.privacy.android.core.ui.controls.chat.ChatMessageContainer
 import mega.privacy.android.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.core.ui.theme.extensions.conditional
@@ -37,8 +39,12 @@ abstract class AvatarMessage : UiChatMessage {
      * Avatar composable
      */
     @Composable
-    open fun MessageAvatar(lastUpdatedCache: Long, modifier: Modifier) {
-        if (showAvatar) {
+    open fun MessageAvatar(
+        lastUpdatedCache: Long,
+        modifier: Modifier,
+        lastItemAvatarPosition: LastItemAvatarPosition?,
+    ) {
+        if (showAvatar(lastItemAvatarPosition)) {
             ChatAvatar(
                 modifier = modifier,
                 handle = userHandle,
@@ -52,7 +58,9 @@ abstract class AvatarMessage : UiChatMessage {
     /**
      * Show avatar
      */
-    abstract val showAvatar: Boolean
+    private fun showAvatar(lastItemAvatarPosition: LastItemAvatarPosition?): Boolean =
+        lastItemAvatarPosition?.shouldBeDrawnByMessage() == true
+
 
     @Composable
     override fun MessageListItem(
@@ -81,7 +89,13 @@ abstract class AvatarMessage : UiChatMessage {
                 MessageAvatar(
                     lastUpdatedCache = state.lastUpdatedCache,
                     avatarModifier,
+                    state.lastItemAvatarPosition,
                 )
+            },
+            avatarAlignment = if (state.lastItemAvatarPosition == LastItemAvatarPosition.Top) {
+                Alignment.Top
+            } else {
+                Alignment.Bottom
             },
             isSendError = message.isSendError()
         ) { interactionEnabled ->
@@ -139,5 +153,5 @@ abstract class AvatarMessage : UiChatMessage {
 
     override val isSelectable = true
 
-    override fun key() = super.key() + "_${showAvatar}"
+    override fun key() = super.key() + "_${message.shouldShowAvatar}"
 }

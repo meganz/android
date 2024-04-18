@@ -321,7 +321,6 @@ data class NodeAttachmentUiMessage(
         }
     }
 
-    override val showAvatar = message.shouldShowAvatar
     override val displayAsMine = message.isMine
     override val shouldDisplayForwardIcon = message.exists
     override val timeSent = message.time

@@ -30,7 +30,6 @@ data class TextUiMessage(
         )
     }
 
-    override val showAvatar = message.shouldShowAvatar
     override val displayAsMine = message.isMine
     override val shouldDisplayForwardIcon = false
     override val timeSent = message.time
