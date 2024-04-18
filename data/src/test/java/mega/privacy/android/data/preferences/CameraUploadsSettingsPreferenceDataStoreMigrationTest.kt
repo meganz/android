@@ -9,8 +9,10 @@ import mega.privacy.android.data.preferences.migration.CameraUploadsSettingsPref
 import mega.privacy.android.domain.entity.VideoQuality
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 
@@ -44,85 +46,89 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigrationTest {
     }
 
     @Test
-    internal fun `test that default values are set if no preferences exist`() = runTest {
-        databaseHandler.stub {
-            on { preferences }.thenReturn(null)
-        }
+    internal fun `test that default values are set if the old mega preferences does not exist`() =
+        runTest {
+            databaseHandler.stub {
+                on { preferences }.thenReturn(null)
+            }
 
-        underTest.migrate(mock())
-        verify(dataStore).setCameraUploadsHandle(null)
-        verify(dataStore).setMediaUploadsHandle(null)
-        verify(dataStore).setCameraUploadsLocalPath(null)
-        verify(dataStore).setMediaUploadsLocalPath(null)
-        verify(dataStore).setLocationTagsEnabled(false)
-        verify(dataStore).setUploadVideoQuality(VideoQuality.ORIGINAL.value)
-        verify(dataStore).setChargingRequiredForVideoCompression(true)
-        verify(dataStore).setUploadFileNamesKept(false)
-        verify(dataStore).setVideoCompressionSizeLimit(200)
-        verify(dataStore).setFileUploadOption(1003)
-        verify(dataStore).setUploadsByWifi(true)
-    }
+            underTest.migrate(mock())
+            verify(dataStore).setCameraUploadsHandle(null)
+            verify(dataStore).setMediaUploadsHandle(null)
+            verify(dataStore).setCameraUploadsLocalPath(null)
+            verify(dataStore).setMediaUploadsLocalPath(null)
+            verify(dataStore).setLocationTagsEnabled(false)
+            verify(dataStore).setUploadVideoQuality(VideoQuality.ORIGINAL.value)
+            verify(dataStore).setChargingRequiredForVideoCompression(true)
+            verify(dataStore).setUploadFileNamesKept(false)
+            verify(dataStore).setVideoCompressionSizeLimit(200)
+            verify(dataStore).setFileUploadOption(1003)
+            verify(dataStore).setUploadsByWifi(true)
+            verify(dataStore).setChargingRequiredToUploadContent(false)
+        }
 
     @Test
-    internal fun `test that existing values are transferred if they exist`() = runTest {
-        val expectedCameraUploadsEnabled = true
-        val expectedMediaUploadsEnabled = true
-        val expectedCameraUploadsHandle = 1234L
-        val expectedMediaUploadsHandle = 5678L
-        val expectedCameraUploadsLocalPath = "/path/to/CU"
-        val expectedMediaUploadsLocalPath = "/path/to/MU"
-        val expectedLocationTagsEnabled = true
-        val expectedUploadVideoQuality = VideoQuality.HIGH.value
-        val expectedUploadFileNamesKept = true
-        val expectedChargingRequiredForVideoCompression = true
-        val expectedVideoCompressionSizeLimit = 400
-        val expectedFileUploadOption = 1001
-        val expectedPhotoTimeStamp = 1234L
-        val expectedVideoTimeStamp = 5678L
-        val expectedMediaUploadsPhotoTimeStamp = 1234L
-        val expectedMediaUploadsVideoTimeStamp = 5678L
-        val expectedUploadsByWifi = true
+    internal fun `test that existing mega preferences values are transferred to the data store`() =
+        runTest {
+            val expectedCameraUploadsEnabled = true
+            val expectedMediaUploadsEnabled = true
+            val expectedCameraUploadsHandle = 1234L
+            val expectedMediaUploadsHandle = 5678L
+            val expectedCameraUploadsLocalPath = "/path/to/CU"
+            val expectedMediaUploadsLocalPath = "/path/to/MU"
+            val expectedLocationTagsEnabled = true
+            val expectedUploadVideoQuality = VideoQuality.HIGH.value
+            val expectedUploadFileNamesKept = true
+            val expectedChargingRequiredForVideoCompression = true
+            val expectedVideoCompressionSizeLimit = 400
+            val expectedFileUploadOption = 1001
+            val expectedPhotoTimeStamp = 1234L
+            val expectedVideoTimeStamp = 5678L
+            val expectedMediaUploadsPhotoTimeStamp = 1234L
+            val expectedMediaUploadsVideoTimeStamp = 5678L
+            val expectedUploadsByWifi = true
 
-        val megaPreferences = mock<MegaPreferences> {
-            on { camSyncEnabled }.thenReturn(expectedCameraUploadsEnabled.toString())
-            on { secondaryMediaFolderEnabled }.thenReturn(expectedMediaUploadsEnabled.toString())
-            on { camSyncHandle }.thenReturn(expectedCameraUploadsHandle.toString())
-            on { megaHandleSecondaryFolder }.thenReturn(expectedMediaUploadsHandle.toString())
-            on { camSyncLocalPath }.thenReturn(expectedCameraUploadsLocalPath)
-            on { localPathSecondaryFolder }.thenReturn(expectedMediaUploadsLocalPath)
-            on { removeGPS }.thenReturn(expectedLocationTagsEnabled.toString())
-            on { uploadVideoQuality }.thenReturn(expectedUploadVideoQuality.toString())
-            on { keepFileNames }.thenReturn(expectedUploadFileNamesKept.toString())
-            on { conversionOnCharging }.thenReturn(expectedChargingRequiredForVideoCompression.toString())
-            on { chargingOnSize }.thenReturn(expectedVideoCompressionSizeLimit.toString())
-            on { camSyncFileUpload }.thenReturn(expectedFileUploadOption.toString())
-            on { camSyncTimeStamp }.thenReturn(expectedPhotoTimeStamp.toString())
-            on { camVideoSyncTimeStamp }.thenReturn(expectedVideoTimeStamp.toString())
-            on { secSyncTimeStamp }.thenReturn(expectedMediaUploadsPhotoTimeStamp.toString())
-            on { secVideoSyncTimeStamp }.thenReturn(expectedMediaUploadsVideoTimeStamp.toString())
-            on { camSyncWifi }.thenReturn(expectedUploadsByWifi.toString())
+            val megaPreferences = mock<MegaPreferences> {
+                on { camSyncEnabled }.thenReturn(expectedCameraUploadsEnabled.toString())
+                on { secondaryMediaFolderEnabled }.thenReturn(expectedMediaUploadsEnabled.toString())
+                on { camSyncHandle }.thenReturn(expectedCameraUploadsHandle.toString())
+                on { megaHandleSecondaryFolder }.thenReturn(expectedMediaUploadsHandle.toString())
+                on { camSyncLocalPath }.thenReturn(expectedCameraUploadsLocalPath)
+                on { localPathSecondaryFolder }.thenReturn(expectedMediaUploadsLocalPath)
+                on { removeGPS }.thenReturn(expectedLocationTagsEnabled.toString())
+                on { uploadVideoQuality }.thenReturn(expectedUploadVideoQuality.toString())
+                on { keepFileNames }.thenReturn(expectedUploadFileNamesKept.toString())
+                on { conversionOnCharging }.thenReturn(expectedChargingRequiredForVideoCompression.toString())
+                on { chargingOnSize }.thenReturn(expectedVideoCompressionSizeLimit.toString())
+                on { camSyncFileUpload }.thenReturn(expectedFileUploadOption.toString())
+                on { camSyncTimeStamp }.thenReturn(expectedPhotoTimeStamp.toString())
+                on { camVideoSyncTimeStamp }.thenReturn(expectedVideoTimeStamp.toString())
+                on { secSyncTimeStamp }.thenReturn(expectedMediaUploadsPhotoTimeStamp.toString())
+                on { secVideoSyncTimeStamp }.thenReturn(expectedMediaUploadsVideoTimeStamp.toString())
+                on { camSyncWifi }.thenReturn(expectedUploadsByWifi.toString())
+            }
+
+            databaseHandler.stub {
+                on { preferences }.thenReturn(megaPreferences)
+            }
+
+            underTest.migrate(mock())
+
+            verify(dataStore).setCameraUploadsEnabled(expectedCameraUploadsEnabled)
+            verify(dataStore).setMediaUploadsEnabled(expectedMediaUploadsEnabled)
+            verify(dataStore).setCameraUploadsHandle(expectedCameraUploadsHandle)
+            verify(dataStore).setMediaUploadsHandle(expectedMediaUploadsHandle)
+            verify(dataStore).setCameraUploadsLocalPath(expectedCameraUploadsLocalPath)
+            verify(dataStore).setMediaUploadsLocalPath(expectedMediaUploadsLocalPath)
+            verify(dataStore).setLocationTagsEnabled(!expectedLocationTagsEnabled)
+            verify(dataStore).setUploadVideoQuality(expectedUploadVideoQuality)
+            verify(dataStore).setUploadFileNamesKept(expectedUploadFileNamesKept)
+            verify(dataStore).setChargingRequiredForVideoCompression(
+                expectedChargingRequiredForVideoCompression
+            )
+            verify(dataStore).setVideoCompressionSizeLimit(expectedVideoCompressionSizeLimit)
+            verify(dataStore).setFileUploadOption(expectedFileUploadOption)
+            verify(dataStore).setUploadsByWifi(expectedUploadsByWifi)
+            verify(dataStore, never()).setChargingRequiredToUploadContent(any())
         }
-
-        databaseHandler.stub {
-            on { preferences }.thenReturn(megaPreferences)
-        }
-
-        underTest.migrate(mock())
-
-        verify(dataStore).setCameraUploadsEnabled(expectedCameraUploadsEnabled)
-        verify(dataStore).setMediaUploadsEnabled(expectedMediaUploadsEnabled)
-        verify(dataStore).setCameraUploadsHandle(expectedCameraUploadsHandle)
-        verify(dataStore).setMediaUploadsHandle(expectedMediaUploadsHandle)
-        verify(dataStore).setCameraUploadsLocalPath(expectedCameraUploadsLocalPath)
-        verify(dataStore).setMediaUploadsLocalPath(expectedMediaUploadsLocalPath)
-        verify(dataStore).setLocationTagsEnabled(!expectedLocationTagsEnabled)
-        verify(dataStore).setUploadVideoQuality(expectedUploadVideoQuality)
-        verify(dataStore).setUploadFileNamesKept(expectedUploadFileNamesKept)
-        verify(dataStore).setChargingRequiredForVideoCompression(
-            expectedChargingRequiredForVideoCompression
-        )
-        verify(dataStore).setVideoCompressionSizeLimit(expectedVideoCompressionSizeLimit)
-        verify(dataStore).setFileUploadOption(expectedFileUploadOption)
-        verify(dataStore).setUploadsByWifi(expectedUploadsByWifi)
-    }
 }

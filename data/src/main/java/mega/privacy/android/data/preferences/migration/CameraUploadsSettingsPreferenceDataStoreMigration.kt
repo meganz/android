@@ -9,6 +9,9 @@ import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import javax.inject.Inject
 
+/**
+ * Handles the Preference migration from the old [MegaPreferences] to the new [CameraUploadsSettingsPreferenceDataStore]
+ */
 internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constructor(
     private val databaseHandler: DatabaseHandler,
     private val cameraUploadsSettingsPreferenceDataStoreFactory: CameraUploadsSettingsPreferenceDataStoreFactory,
@@ -32,6 +35,12 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
         return newPreferences
     }
 
+    /**
+     * Sets default values to the [CameraUploadsSettingsPreferenceDataStore] if the old
+     * [MegaPreferences] cannot be found
+     *
+     * @param store The latest Preferences
+     */
     private suspend fun setDefaults(store: CameraUploadsSettingsPreferenceDataStore) {
         store.setValues(
             isCameraUploadsEnabled = null,
@@ -47,9 +56,16 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
             videoCompressionSizeLimit = GetVideoCompressionSizeLimitUseCase.DEFAULT_SIZE,
             fileUploadOption = 1003,
             isUploadsByWifi = true,
+            isChargingRequiredToUploadContent = false,
         )
     }
 
+    /**
+     * Sets the existing values from [MegaPreferences] to the new [CameraUploadsSettingsPreferenceDataStore]
+     *
+     * @param store the latest Preferences
+     * @param oldPreferences the legacy Preferences
+     */
     private suspend fun setExistingValues(
         store: CameraUploadsSettingsPreferenceDataStore,
         oldPreferences: MegaPreferences,
@@ -75,6 +91,8 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
             fileUploadOption = oldPreferences.camSyncFileUpload?.toIntOrNull()
                 ?: 1003,
             isUploadsByWifi = oldPreferences.camSyncWifi?.toBooleanStrictOrNull() ?: true,
+            // This is a new Preference value that does not exist in the old MegaPreferences
+            isChargingRequiredToUploadContent = null
         )
     }
 
@@ -92,6 +110,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
         videoCompressionSizeLimit: Int,
         fileUploadOption: Int,
         isUploadsByWifi: Boolean,
+        isChargingRequiredToUploadContent: Boolean?,
     ) {
         with(this) {
             isCameraUploadsEnabled?.let { setCameraUploadsEnabled(it) }
@@ -107,7 +126,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
             setVideoCompressionSizeLimit(videoCompressionSizeLimit)
             setFileUploadOption(fileUploadOption)
             setUploadsByWifi(isUploadsByWifi)
+            isChargingRequiredToUploadContent?.let { setChargingRequiredToUploadContent(it) }
         }
     }
-
 }

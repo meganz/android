@@ -19,7 +19,7 @@ import javax.inject.Named
 internal const val cameraUploadsSettingsPreferenceDataStoreName = "cameraUploadsSettingsDataStore"
 
 /**
- * CameraUploads Setting sPreference DataStore
+ * The [DataStore] that stores the User's preferred Camera Uploads Settings
  */
 internal class CameraUploadsSettingsPreferenceDataStore(
     private val getPreferenceFlow: () -> Flow<Preferences>,
@@ -67,7 +67,8 @@ internal class CameraUploadsSettingsPreferenceDataStore(
     private val fileUploadOptionKey =
         stringPreferencesKey("fileUploadOptionKey")
     private val uploadByWifiKey = stringPreferencesKey("uploadByWifiKey")
-
+    private val chargingRequiredToUploadContent =
+        stringPreferencesKey("chargingRequiredToUploadContent")
 
     override suspend fun isCameraUploadsEnabled(): Boolean? {
         return getPreferenceFlow().monitor(cameraUploadsEnabledKey)
@@ -280,6 +281,22 @@ internal class CameraUploadsSettingsPreferenceDataStore(
     override suspend fun clearPreferences() {
         editPreferences {
             it.clear()
+        }
+    }
+
+    override suspend fun isChargingRequiredToUploadContent(): Boolean? {
+        return getPreferenceFlow().monitor(chargingRequiredToUploadContent)
+            .map { decryptData(it)?.toBooleanStrictOrNull() }.firstOrNull()
+    }
+
+    override suspend fun setChargingRequiredToUploadContent(chargingRequired: Boolean) {
+        val encryptedValue = encryptData(chargingRequired.toString())
+        editPreferences {
+            if (encryptedValue == null) {
+                it.remove(chargingRequiredToUploadContent)
+            } else {
+                it[chargingRequiredToUploadContent] = encryptedValue
+            }
         }
     }
 }

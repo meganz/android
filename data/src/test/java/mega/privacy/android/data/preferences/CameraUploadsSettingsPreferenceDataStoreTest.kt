@@ -2,7 +2,7 @@ package mega.privacy.android.data.preferences
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
@@ -18,12 +18,17 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verifyBlocking
 
+/**
+ * Test class for [CameraUploadsSettingsPreferenceDataStore]
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class CameraUploadsSettingsPreferenceDataStoreTest {
@@ -62,42 +67,48 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
         Dispatchers.resetMain()
     }
 
-    @Test
-    internal fun `test that camera uploads enabled is encrypted when set`() = runTest {
-        val input = true
+    @ParameterizedTest(name = "new camera uploads enabled state: {0}")
+    @ValueSource(booleans = [true, false])
+    internal fun `test that the new camera uploads enabled state is encrypted when set`(
+        isCameraUploadsEnabled: Boolean,
+    ) = runTest {
+        underTest.setCameraUploadsEnabled(isCameraUploadsEnabled)
 
-        underTest.setCameraUploadsEnabled(input)
+        verifyBlocking(encryptData) { invoke(isCameraUploadsEnabled.toString()) }
+    }
 
-        verifyBlocking(encryptData) { invoke(input.toString()) }
+    @ParameterizedTest(name = "is camera uploads enabled: {0}")
+    @ValueSource(booleans = [true, false])
+    internal fun `test that the camera uploads enabled state is decrypted when retrieved`(
+        isCameraUploadsEnabled: Boolean,
+    ) = runTest {
+        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(isCameraUploadsEnabled.toString()) }
+
+        assertThat(underTest.isCameraUploadsEnabled()).isEqualTo(isCameraUploadsEnabled)
+    }
+
+    @ParameterizedTest(name = "new media uploads enabled state: {0}")
+    @ValueSource(booleans = [true, false])
+    internal fun `test that the new media uploads enabled state is encrypted when set`(
+        isMediaUploadsEnabled: Boolean,
+    ) = runTest {
+        underTest.setMediaUploadsEnabled(isMediaUploadsEnabled)
+
+        verifyBlocking(encryptData) { invoke(isMediaUploadsEnabled.toString()) }
+    }
+
+    @ParameterizedTest(name = "is media uploads enabled: {0}")
+    @ValueSource(booleans = [true, false])
+    internal fun `test that the media uploads enabled state is decrypted when retrieved`(
+        isMediaUploadsEnabled: Boolean,
+    ) = runTest {
+        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(isMediaUploadsEnabled.toString()) }
+
+        assertThat(underTest.isMediaUploadsEnabled()).isEqualTo(isMediaUploadsEnabled)
     }
 
     @Test
-    internal fun `test that camera uploads enabled  is decrypted when retrieved`() = runTest {
-        val expected = true
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(true.toString()) }
-
-        Truth.assertThat(underTest.isCameraUploadsEnabled()).isEqualTo(expected)
-    }
-
-    @Test
-    internal fun `test that media uploads enabled is encrypted when set`() = runTest {
-        val input = true
-
-        underTest.setMediaUploadsEnabled(input)
-
-        verifyBlocking(encryptData) { invoke(input.toString()) }
-    }
-
-    @Test
-    internal fun `test that media uploads enabled  is decrypted when retrieved`() = runTest {
-        val expected = true
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(true.toString()) }
-
-        Truth.assertThat(underTest.isMediaUploadsEnabled()).isEqualTo(expected)
-    }
-
-    @Test
-    internal fun `test that camera uploads handle is encrypted when set`() = runTest {
+    internal fun `test that the new camera uploads handle is encrypted when set`() = runTest {
         val input = 1L
 
         underTest.setCameraUploadsHandle(input)
@@ -106,16 +117,16 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
     }
 
     @Test
-    internal fun `test that camera uploads handle is decrypted when retrieved`() = runTest {
+    internal fun `test that the camera uploads handle is decrypted when retrieved`() = runTest {
         val expected = 1L
 
         decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
 
-        Truth.assertThat(underTest.getCameraUploadsHandle()).isEqualTo(expected)
+        assertThat(underTest.getCameraUploadsHandle()).isEqualTo(expected)
     }
 
     @Test
-    internal fun `test that media uploads handle is encrypted when set`() = runTest {
+    internal fun `test that the new media uploads handle is encrypted when set`() = runTest {
         val input = 2L
 
         underTest.setMediaUploadsHandle(input)
@@ -124,16 +135,16 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
     }
 
     @Test
-    internal fun `test that media uploads handle is decrypted when retrieved`() = runTest {
+    internal fun `test that the media uploads handle is decrypted when retrieved`() = runTest {
         val expected = 2L
 
         decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
 
-        Truth.assertThat(underTest.getMediaUploadsHandle()).isEqualTo(expected)
+        assertThat(underTest.getMediaUploadsHandle()).isEqualTo(expected)
     }
 
     @Test
-    internal fun `test that camera uploads local path is encrypted when set`() = runTest {
+    internal fun `test that the new camera uploads local path is encrypted when set`() = runTest {
         val input = "/path/to/CU"
 
         underTest.setCameraUploadsLocalPath(input)
@@ -142,16 +153,16 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
     }
 
     @Test
-    internal fun `test that camera uploads local path is decrypted when retrieved`() = runTest {
+    internal fun `test that the camera uploads local path is decrypted when retrieved`() = runTest {
         val expected = "/path/to/CU"
 
         decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected) }
 
-        Truth.assertThat(underTest.getCameraUploadsLocalPath()).isEqualTo(expected)
+        assertThat(underTest.getCameraUploadsLocalPath()).isEqualTo(expected)
     }
 
     @Test
-    internal fun `test that media uploads local path is encrypted when set`() = runTest {
+    internal fun `test that the new media uploads local path is encrypted when set`() = runTest {
         val input = "/path/to/MU"
 
         underTest.setMediaUploadsLocalPath(input)
@@ -160,34 +171,36 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
     }
 
     @Test
-    internal fun `test that media uploads local path is decrypted when retrieved`() = runTest {
+    internal fun `test that the media uploads local path is decrypted when retrieved`() = runTest {
         val expected = "/path/to/MU"
 
         decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected) }
 
-        Truth.assertThat(underTest.getMediaUploadsLocalPath()).isEqualTo(expected)
+        assertThat(underTest.getMediaUploadsLocalPath()).isEqualTo(expected)
+    }
+
+    @ParameterizedTest(name = "new are location tags enabled state: {0}")
+    @ValueSource(booleans = [true, false])
+    internal fun `test that the new location tags enabled state is encrypted when set`(
+        areLocationTagsEnabled: Boolean,
+    ) = runTest {
+        underTest.setLocationTagsEnabled(areLocationTagsEnabled)
+
+        verifyBlocking(encryptData) { invoke(areLocationTagsEnabled.toString()) }
+    }
+
+    @ParameterizedTest(name = "are location tags enabled: {0}")
+    @ValueSource(booleans = [true, false])
+    internal fun `test that the location tags enabled state is decrypted when retrieved`(
+        areLocationTagsEnabled: Boolean,
+    ) = runTest {
+        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(areLocationTagsEnabled.toString()) }
+
+        assertThat(underTest.areLocationTagsEnabled()).isEqualTo(areLocationTagsEnabled)
     }
 
     @Test
-    internal fun `test that location tags enabled  is encrypted when set`() = runTest {
-        val input = true
-
-        underTest.setLocationTagsEnabled(input)
-
-        verifyBlocking(encryptData) { invoke(input.toString()) }
-    }
-
-    @Test
-    internal fun `test that location tags enabled is decrypted when retrieved`() = runTest {
-        val expected = true
-
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
-
-        Truth.assertThat(underTest.areLocationTagsEnabled()).isEqualTo(expected)
-    }
-
-    @Test
-    internal fun `test that video quality  is encrypted when set`() = runTest {
+    internal fun `test that the new video quality is encrypted when set`() = runTest {
         val input = 1
 
         underTest.setUploadVideoQuality(input)
@@ -196,51 +209,53 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
     }
 
     @Test
-    internal fun `test that video quality is decrypted when retrieved`() = runTest {
+    internal fun `test that the video quality is decrypted when retrieved`() = runTest {
         val expected = 1
 
         decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
 
-        Truth.assertThat(underTest.getUploadVideoQuality()).isEqualTo(expected)
+        assertThat(underTest.getUploadVideoQuality()).isEqualTo(expected)
     }
 
-    @Test
-    internal fun `test that upload file names kept is encrypted when set`() = runTest {
-        val input = true
+    @ParameterizedTest(name = "new are upload file names kept state: {0}")
+    @ValueSource(booleans = [true, false])
+    internal fun `test that the new upload file names kept state is encrypted when set`(
+        areUploadFileNamesKept: Boolean,
+    ) = runTest {
+        underTest.setUploadFileNamesKept(areUploadFileNamesKept)
 
-        underTest.setUploadFileNamesKept(input)
-
-        verifyBlocking(encryptData) { invoke(input.toString()) }
+        verifyBlocking(encryptData) { invoke(areUploadFileNamesKept.toString()) }
     }
 
-    @Test
-    internal fun `test that upload file names kept is decrypted when retrieved`() = runTest {
-        val expected = true
+    @ParameterizedTest(name = "are upload file names kept: {0}")
+    @ValueSource(booleans = [true, false])
+    internal fun `test that the upload file names kept state is decrypted when retrieved`(
+        areUploadFileNamesKept: Boolean,
+    ) = runTest {
+        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(areUploadFileNamesKept.toString()) }
 
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
-
-        Truth.assertThat(underTest.areUploadFileNamesKept()).isEqualTo(expected)
+        assertThat(underTest.areUploadFileNamesKept()).isEqualTo(areUploadFileNamesKept)
     }
 
-    @Test
-    internal fun `test that charging required for video compression is encrypted when set`() =
-        runTest {
-            val input = true
+    @ParameterizedTest(name = "new is charging required for video compression state: {0}")
+    @ValueSource(booleans = [true, false])
+    internal fun `test that the new charging required for video compression state is encrypted when set`(
+        chargingRequired: Boolean,
+    ) = runTest {
+        underTest.setChargingRequiredForVideoCompression(chargingRequired)
 
-            underTest.setChargingRequiredForVideoCompression(input)
+        verifyBlocking(encryptData) { invoke(chargingRequired.toString()) }
+    }
 
-            verifyBlocking(encryptData) { invoke(input.toString()) }
-        }
+    @ParameterizedTest(name = "is charging required for video compression: {0}")
+    @ValueSource(booleans = [true, false])
+    internal fun `test that the charging required for video compression state is decrypted when retrieved`(
+        chargingRequired: Boolean,
+    ) = runTest {
+        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(chargingRequired.toString()) }
 
-    @Test
-    internal fun `test that charging required for video compression is decrypted when retrieved`() =
-        runTest {
-            val expected = true
-
-            decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
-
-            Truth.assertThat(underTest.isChargingRequiredForVideoCompression()).isEqualTo(expected)
-        }
+        assertThat(underTest.isChargingRequiredForVideoCompression()).isEqualTo(chargingRequired)
+    }
 
     @Test
     internal fun `test that video compression size limit is encrypted when set`() =
@@ -259,7 +274,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
 
             decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
 
-            Truth.assertThat(underTest.getVideoCompressionSizeLimit()).isEqualTo(expected)
+            assertThat(underTest.getVideoCompressionSizeLimit()).isEqualTo(expected)
         }
 
     @Test
@@ -279,26 +294,44 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
 
             decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
 
-            Truth.assertThat(underTest.getFileUploadOption()).isEqualTo(expected)
+            assertThat(underTest.getFileUploadOption()).isEqualTo(expected)
         }
 
-    @Test
-    internal fun `test that upload by wifi is encrypted when set`() =
+    @ParameterizedTest(name = "new should upload by wifi state: {0}")
+    @ValueSource(booleans = [true, false])
+    internal fun `test that the new upload by wifi state is encrypted when set`(shouldUploadByWifi: Boolean) =
         runTest {
-            val input = true
+            underTest.setUploadsByWifi(shouldUploadByWifi)
 
-            underTest.setUploadsByWifi(input)
-
-            verifyBlocking(encryptData) { invoke(input.toString()) }
+            verifyBlocking(encryptData) { invoke(shouldUploadByWifi.toString()) }
         }
 
-    @Test
-    internal fun `test that upload by wifi is decrypted when retrieved`() =
+    @ParameterizedTest(name = "should upload by wifi: {0}")
+    @ValueSource(booleans = [true, false])
+    internal fun `test that the upload by wifi state is decrypted when retrieved`(shouldUploadByWifi: Boolean) =
         runTest {
-            val expected = true
+            decryptData.stub { onBlocking { invoke(any()) }.thenReturn(shouldUploadByWifi.toString()) }
 
-            decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
-
-            Truth.assertThat(underTest.isUploadByWifi()).isEqualTo(expected)
+            assertThat(underTest.isUploadByWifi()).isEqualTo(shouldUploadByWifi)
         }
+
+    @ParameterizedTest(name = "new is charging required to upload content state: {0}")
+    @ValueSource(booleans = [true, false])
+    internal fun `test that the new charging required to upload content state is encrypted when set`(
+        chargingRequired: Boolean,
+    ) = runTest {
+        underTest.setChargingRequiredToUploadContent(chargingRequired)
+
+        verifyBlocking(encryptData) { invoke(chargingRequired.toString()) }
+    }
+
+    @ParameterizedTest(name = "is charging required to upload content: {0}")
+    @ValueSource(booleans = [true, false])
+    internal fun `test that the charging required to upload content state is decrypted when retrieved`(
+        chargingRequired: Boolean,
+    ) = runTest {
+        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(chargingRequired.toString()) }
+
+        assertThat(underTest.isChargingRequiredToUploadContent()).isEqualTo(chargingRequired)
+    }
 }
