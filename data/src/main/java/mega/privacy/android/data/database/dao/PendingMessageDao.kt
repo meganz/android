@@ -28,6 +28,15 @@ interface PendingMessageDao {
     suspend fun insert(pendingMessageEntity: PendingMessageEntity): Long
 
     /**
+     * Insert multiple
+     *
+     * @param pendingMessageEntities
+     * @return list of ids of the inserted rows
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(pendingMessageEntities: List<PendingMessageEntity>): List<Long>
+
+    /**
      * Update the pending message
      *
      * @param updatePendingMessageStateRequest

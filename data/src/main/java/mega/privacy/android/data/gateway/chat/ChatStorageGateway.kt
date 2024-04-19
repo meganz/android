@@ -70,6 +70,17 @@ interface ChatStorageGateway {
     ): Long
 
     /**
+     * Store multiple pending messages
+     *
+     * @param pendingMessageEntities
+     *
+     * @return the ids of the inserted [PendingMessageEntity]
+     */
+    suspend fun storePendingMessages(
+        pendingMessageEntities: List<PendingMessageEntity>,
+    ): List<Long>
+
+    /**
      * Update pending message
      *
      * @param updatePendingMessageRequest

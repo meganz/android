@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository.chat
 
+import android.content.res.Resources.NotFoundException
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -279,6 +280,45 @@ class ChatMessageRepositoryImplTest {
             .thenReturn(id)
         val actual = underTest.savePendingMessage(savePendingMessageRequest)
         assertThat(actual.id).isEqualTo(id)
+    }
+
+    @Test
+    fun `test that savePendingMessages saves the mapped entities`() = runTest {
+        val chatIds = listOf(19L, 22L, 55L)
+        val expected = chatIds.map { it * 2 }
+        val savePendingMessageRequest = SavePendingMessageRequest(
+            chatId = 19L,
+            type = 1,
+            uploadTimestamp = 123L,
+            state = PendingMessageState.UPLOADING,
+            tempIdKarere = 123L,
+            videoDownSampled = "video",
+            filePath = "file",
+            nodeHandle = 123L,
+            fingerprint = "fingerprint",
+            name = "name",
+            transferTag = 123
+        )
+        val savePendingMessageRequests = chatIds.associateWith {
+            savePendingMessageRequest.copy(chatId = it)
+        }
+        val pendingMessageEntities = chatIds.associateWith {
+            mock<PendingMessageEntity>()
+        }
+        chatIds.forEach { chatId ->
+            whenever(
+                pendingMessageEntityMapper(
+                    savePendingMessageRequests[chatId] ?: throw NotFoundException()
+                )
+            )
+                .thenReturn(pendingMessageEntities[chatId])
+        }
+        whenever(chatStorageGateway.storePendingMessages(pendingMessageEntities.values.toList()))
+            .thenReturn(expected)
+
+        val actual = underTest.savePendingMessages(savePendingMessageRequest, chatIds)
+
+        assertThat(actual).isEqualTo(expected)
     }
 
     @Test
