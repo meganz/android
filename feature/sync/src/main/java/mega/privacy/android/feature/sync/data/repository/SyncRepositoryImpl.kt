@@ -46,10 +46,11 @@ internal class SyncRepositoryImpl @Inject constructor(
     private val _refreshShow = MutableSharedFlow<Unit>()
 
     override suspend fun setupFolderPair(
+        name: String?,
         localPath: String,
         remoteFolderId: Long,
     ): Boolean = withContext(ioDispatcher) {
-        syncGateway.syncFolderPair(localPath, remoteFolderId)
+        syncGateway.syncFolderPair(name, localPath, remoteFolderId)
     }
 
     override suspend fun pauseSync(folderPairId: Long) = withContext(ioDispatcher) {

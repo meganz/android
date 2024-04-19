@@ -59,6 +59,7 @@ internal class SyncGatewayImpl @Inject constructor(
     private var stalledIssuesListener: StalledIssuesReceiver? = null
 
     override suspend fun syncFolderPair(
+        name: String?,
         localPath: String,
         remoteFolderId: Long,
     ): Boolean =
@@ -75,7 +76,7 @@ internal class SyncGatewayImpl @Inject constructor(
             megaApi.syncFolder(
                 MegaSync.SyncType.TYPE_TWOWAY,
                 localPath,
-                "",
+                name,
                 remoteFolderId,
                 null,
                 requestListener

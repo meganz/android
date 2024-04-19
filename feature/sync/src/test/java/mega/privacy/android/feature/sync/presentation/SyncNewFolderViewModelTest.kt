@@ -96,6 +96,7 @@ internal class SyncNewFolderViewModelTest {
         underTest.handleAction(SyncNewFolderAction.NextClicked)
 
         verify(syncFolderPairUseCase).invoke(
+            name = remoteFolder.name,
             localPath = state.selectedLocalFolder,
             remotePath = state.selectedMegaFolder ?: return@runTest
         )
