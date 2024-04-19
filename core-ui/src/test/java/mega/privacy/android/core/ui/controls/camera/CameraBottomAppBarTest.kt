@@ -10,6 +10,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 
 @RunWith(AndroidJUnit4::class)
 class CameraBottomAppBarTest {
@@ -69,7 +70,7 @@ class CameraBottomAppBarTest {
         val onToggleCaptureMode = mock<() -> Unit>()
         composeTestRule.setContent {
             CameraBottomAppBar(
-                isCaptureVideo = false,
+                isCaptureVideo = true,
                 isRecording = false,
                 onToggleCaptureMode = onToggleCaptureMode
             )
@@ -80,7 +81,37 @@ class CameraBottomAppBarTest {
     }
 
     @Test
+    fun `test that onToggleCaptureMode doesn't trigger when photo button is clicked and the mode is capturing photo`() {
+        val onToggleCaptureMode = mock<() -> Unit>()
+        composeTestRule.setContent {
+            CameraBottomAppBar(
+                isCaptureVideo = false,
+                isRecording = false,
+                onToggleCaptureMode = onToggleCaptureMode
+            )
+        }
+
+        composeTestRule.onNodeWithTag(TEST_TAG_CAMERA_BOTTOM_APP_BAR_PHOTO).performClick()
+        verifyNoInteractions(onToggleCaptureMode)
+    }
+
+    @Test
     fun `test that onToggleCaptureMode triggers when video button is clicked`() {
+        val onToggleCaptureMode = mock<() -> Unit>()
+        composeTestRule.setContent {
+            CameraBottomAppBar(
+                isCaptureVideo = false,
+                isRecording = false,
+                onToggleCaptureMode = onToggleCaptureMode
+            )
+        }
+
+        composeTestRule.onNodeWithTag(TEST_TAG_CAMERA_BOTTOM_APP_BAR_VIDEO).performClick()
+        verify(onToggleCaptureMode).invoke()
+    }
+
+    @Test
+    fun `test that onToggleCaptureMode doesn't trigger when video button is clicked and the mode is capturing video`() {
         val onToggleCaptureMode = mock<() -> Unit>()
         composeTestRule.setContent {
             CameraBottomAppBar(
@@ -91,7 +122,7 @@ class CameraBottomAppBarTest {
         }
 
         composeTestRule.onNodeWithTag(TEST_TAG_CAMERA_BOTTOM_APP_BAR_VIDEO).performClick()
-        verify(onToggleCaptureMode).invoke()
+        verifyNoInteractions(onToggleCaptureMode)
     }
 
     @Test
