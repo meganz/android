@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,6 +52,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
@@ -71,6 +73,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdInFolderLinkUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
@@ -104,13 +107,15 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val getPublicNodeListByIds: GetPublicNodeListByIds,
     private val setViewType: SetViewType,
     private val monitorSubFolderMediaDiscoverySettingsUseCase: MonitorSubFolderMediaDiscoverySettingsUseCase,
-    private var getFeatureFlagUseCase: GetFeatureFlagValueUseCase,
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
-    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    @DefaultDispatcher val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
@@ -123,6 +128,7 @@ class MediaDiscoveryViewModel @Inject constructor(
 
     private var fetchPhotosJob: Job? = null
     private var fromFolderLink: Boolean? = null
+    internal var showHiddenItems: Boolean? = null
 
     init {
         fromFolderLink =
@@ -130,10 +136,43 @@ class MediaDiscoveryViewModel @Inject constructor(
         checkConnectivity()
         checkMDSetting()
         loadSortRule()
-        fetchPhotos()
-        monitorAccountDetail()
-        monitorIsHiddenNodesOnboarded()
+        monitorPhotos()
+        handleHiddenNodes()
     }
+
+    private fun handleHiddenNodes() = viewModelScope.launch {
+        if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes) && fromFolderLink != true) {
+            monitorShowHiddenItems(
+                loadPhotosDone = _state.value.loadPhotosDone,
+                sourcePhotos = _state.value.sourcePhotos,
+            )
+            monitorAccountDetail(
+                loadPhotosDone = _state.value.loadPhotosDone,
+                sourcePhotos = _state.value.sourcePhotos,
+            )
+            monitorIsHiddenNodesOnboarded()
+        }
+    }
+
+    internal fun monitorShowHiddenItems(loadPhotosDone: Boolean, sourcePhotos: List<Photo>) =
+        monitorShowHiddenItemsUseCase()
+            .onEach {
+                showHiddenItems = it
+                if (!loadPhotosDone) return@onEach
+
+                handleFolderPhotosAndLogic(sourcePhotos)
+            }.launchIn(viewModelScope)
+
+    internal fun monitorAccountDetail(loadPhotosDone: Boolean, sourcePhotos: List<Photo>) =
+        monitorAccountDetailUseCase()
+            .onEach { accountDetail ->
+                _state.update {
+                    it.copy(accountType = accountDetail.levelDetail?.accountType)
+                }
+                if (!loadPhotosDone) return@onEach
+
+                handleFolderPhotosAndLogic(sourcePhotos)
+            }.launchIn(viewModelScope)
 
     /**
      * Is connected
@@ -186,10 +225,10 @@ class MediaDiscoveryViewModel @Inject constructor(
         }
     }
 
-    private fun fetchPhotos() {
+    private fun monitorPhotos() {
         fetchPhotosJob?.cancel()
 
-        val currentFolderId = savedStateHandle.get<Long>(INTENT_KEY_CURRENT_FOLDER_ID)
+        val currentFolderId = _state.value.currentFolderId
 
         fetchPhotosJob = currentFolderId?.let { folderId ->
             viewModelScope.launch {
@@ -235,24 +274,24 @@ class MediaDiscoveryViewModel @Inject constructor(
             }
     }
 
-    private suspend fun handleFolderPhotosAndLogic(
+    internal suspend fun handleFolderPhotosAndLogic(
         sourcePhotos: List<Photo>,
     ) {
-        if (isMDFolderInRubbish(sourcePhotos)) {
+        if (sourcePhotos.isEmpty() && isMDFolderInRubbish()) {
             _state.update {
                 it.copy(shouldGoBack = true)
             }
         } else {
             handlePhotoItems(
-                sortedPhotos = sortAndFilterPhotos(sourcePhotos),
+                sortedPhotosWithoutHandleSensitive = sortAndFilterPhotos(sourcePhotos),
                 sourcePhotos = sourcePhotos
             )
         }
     }
 
-    private suspend fun isMDFolderInRubbish(sourcePhotos: List<Photo>) =
+    private suspend fun isMDFolderInRubbish() =
         _state.value.currentFolderId?.let { currentFolderId ->
-            sourcePhotos.isEmpty() && isNodeInRubbishBinUseCase(NodeId(currentFolderId))
+            isNodeInRubbishBinUseCase(NodeId(currentFolderId))
         } ?: false
 
     internal fun sortAndFilterPhotos(sourcePhotos: List<Photo>): List<Photo> {
@@ -268,7 +307,25 @@ class MediaDiscoveryViewModel @Inject constructor(
         }
     }
 
-    internal fun handlePhotoItems(sortedPhotos: List<Photo>, sourcePhotos: List<Photo>? = null) {
+    internal fun filterNonSensitivePhotos(photos: List<Photo>, isPaid: Boolean?): List<Photo> {
+        val showHiddenItems = showHiddenItems ?: return photos
+        isPaid ?: return photos
+
+        return if (showHiddenItems || !isPaid) {
+            photos
+        } else {
+            photos.filter { !it.isSensitive && !it.isSensitiveInherited }
+        }
+    }
+
+    internal fun handlePhotoItems(
+        sortedPhotosWithoutHandleSensitive: List<Photo>,
+        sourcePhotos: List<Photo>? = null,
+    ) = viewModelScope.launch(defaultDispatcher) {
+        val sortedPhotos = filterNonSensitivePhotos(
+            photos = sortedPhotosWithoutHandleSensitive,
+            isPaid = _state.value.accountType?.isPaid,
+        )
         val dayPhotos = groupPhotosByDay(sortedPhotos = sortedPhotos)
         val yearsCardList = createYearsCardList(dayPhotos = dayPhotos)
         val monthsCardList = createMonthsCardList(dayPhotos = dayPhotos)
@@ -640,7 +697,7 @@ class MediaDiscoveryViewModel @Inject constructor(
      */
     fun onSaveToDeviceClicked(legacySaveToDevice: () -> Unit) {
         viewModelScope.launch {
-            if (getFeatureFlagUseCase(AppFeatures.DownloadWorker)) {
+            if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
                 val nodes = getNodes().mapNotNull {
                     if (fromFolderLink == true) {
                         getPublicChildNodeFromIdUseCase(NodeId(it.handle))
@@ -669,16 +726,6 @@ class MediaDiscoveryViewModel @Inject constructor(
                 }.onFailure { Timber.e("Hide node exception: $it") }
             }
         }
-    }
-
-    private fun monitorAccountDetail() {
-        monitorAccountDetailUseCase()
-            .onEach { accountDetail ->
-                _state.update {
-                    it.copy(accountType = accountDetail.levelDetail?.accountType)
-                }
-            }
-            .launchIn(viewModelScope)
     }
 
     private fun monitorIsHiddenNodesOnboarded() {

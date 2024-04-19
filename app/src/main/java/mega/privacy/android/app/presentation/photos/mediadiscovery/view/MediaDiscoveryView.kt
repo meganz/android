@@ -473,7 +473,8 @@ private fun MDView(
                         ListViewIconButton(
                             onSwitchListView = onSwitchListView
                         )
-                    }
+                    },
+                    accountType = mediaDiscoveryViewState.accountType,
                 )
             } else {
                 val dateCards = when (mediaDiscoveryViewState.selectedTimeBarTab) {
@@ -500,7 +501,8 @@ private fun MDView(
                                     onSwitchListView = onSwitchListView
                                 )
                             }
-                        }
+                        },
+                        accountType = mediaDiscoveryViewState.accountType,
                     )
                 }
             }

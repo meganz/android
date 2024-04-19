@@ -36,6 +36,8 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -63,6 +65,7 @@ import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_YEAR_WITH_M
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.core.ui.theme.grey_alpha_032
 import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Photo
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
@@ -70,18 +73,18 @@ import java.time.ZoneId
 import java.util.Date
 import java.util.Locale
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun PhotosGridView(
+    photoDownland: PhotoDownload,
+    selectedPhotoIds: Set<Long>,
+    uiPhotoList: List<UIPhoto>,
     modifier: Modifier = Modifier,
+    accountType: AccountType? = null,
     currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
     endSpacing: Dp = 56.dp,
-    photoDownland: PhotoDownload,
     lazyGridState: LazyGridState = rememberLazyGridState(),
     onClick: (Photo) -> Unit = {},
     onLongPress: (Photo) -> Unit = {},
-    selectedPhotoIds: Set<Long>,
-    uiPhotoList: List<UIPhoto>,
     isBlurUnselectItem: Boolean = false,
     separatorRightPlaceHolderView: @Composable () -> Unit = {},
     showSeparatorRightView: (index: Int) -> Boolean = { false },
@@ -143,6 +146,7 @@ internal fun PhotosGridView(
                                 isPreview = isDownloadPreview(configuration, currentZoomLevel),
                                 downloadPhoto = photoDownland,
                                 alpha = if (isBlurUnselectItem && !isSelected) 0.4f else 1.0f,
+                                accountType = accountType,
                             )
                         }
                     )
@@ -238,6 +242,7 @@ internal fun PhotoViewContainer(
 internal fun PhotoView(
     photo: Photo,
     isPreview: Boolean,
+    accountType: AccountType?,
     downloadPhoto: PhotoDownload,
     alpha: Float = DefaultAlpha,
 ) {
@@ -266,6 +271,12 @@ internal fun PhotoView(
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1f)
+            .alpha(0.5f.takeIf {
+                accountType?.isPaid == true && (photo.isSensitive || photo.isSensitiveInherited)
+            } ?: 1f)
+            .blur(16.dp.takeIf {
+                accountType?.isPaid == true && (photo.isSensitive || photo.isSensitiveInherited)
+            } ?: 0.dp)
     )
 }
 

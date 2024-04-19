@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
@@ -44,11 +45,11 @@ import mega.privacy.android.domain.entity.AccountType
 
 @Composable
 fun CardListView(
-    state: LazyGridState = LazyGridState(),
     dateCards: List<DateCard>,
-    accountType: AccountType? = null,
     photoDownload: PhotoDownload,
     onCardClick: (DateCard) -> Unit,
+    state: LazyGridState = rememberLazyGridState(),
+    accountType: AccountType? = null,
     cardListViewHeaderView: @Composable () -> Unit = {},
 ) {
     val spanCount =
