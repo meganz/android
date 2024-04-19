@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
 import mega.privacy.android.app.presentation.settings.camerauploads.mapper.UploadOptionUiItemMapper
 import mega.privacy.android.app.presentation.settings.camerauploads.mapper.VideoQualityUiItemMapper
@@ -48,6 +49,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSize
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredToUploadContentUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderNodeValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderNodeValidUseCase
@@ -58,6 +60,7 @@ import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsSet
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredToUploadContentUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
@@ -70,6 +73,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupDefaultSecondaryFo
 import mega.privacy.android.domain.usecase.camerauploads.SetupMediaUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
@@ -111,6 +115,7 @@ internal class SettingsCameraUploadsViewModelTest {
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase =
         mock<DeleteCameraUploadsTemporaryRootDirectoryUseCase>()
     private val disableMediaUploadsSettingsUseCase = mock<DisableMediaUploadsSettingsUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getPrimaryFolderNodeUseCase = mock<GetPrimaryFolderNodeUseCase>()
     private val getPrimaryFolderPathUseCase = mock<GetPrimaryFolderPathUseCase>()
     private val getSecondaryFolderNodeUseCase = mock<GetSecondaryFolderNodeUseCase>()
@@ -122,6 +127,8 @@ internal class SettingsCameraUploadsViewModelTest {
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val isChargingRequiredForVideoCompressionUseCase =
         mock<IsChargingRequiredForVideoCompressionUseCase>()
+    private val isChargingRequiredToUploadContentUseCase =
+        mock<IsChargingRequiredToUploadContentUseCase>()
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private val isPrimaryFolderNodeValidUseCase = mock<IsPrimaryFolderNodeValidUseCase>()
     private val isPrimaryFolderPathValidUseCase = mock<IsPrimaryFolderPathValidUseCase>()
@@ -137,6 +144,8 @@ internal class SettingsCameraUploadsViewModelTest {
     private val setCameraUploadsByWifiUseCase = mock<SetCameraUploadsByWifiUseCase>()
     private val setChargingRequiredForVideoCompressionUseCase =
         mock<SetChargingRequiredForVideoCompressionUseCase>()
+    private val setChargingRequiredToUploadContentUseCase =
+        mock<SetChargingRequiredToUploadContentUseCase>()
     private val setLocationTagsEnabledUseCase = mock<SetLocationTagsEnabledUseCase>()
     private val setPrimaryFolderPathUseCase = mock<SetPrimaryFolderPathUseCase>()
     private val setSecondaryFolderLocalPathUseCase = mock<SetSecondaryFolderLocalPathUseCase>()
@@ -168,6 +177,7 @@ internal class SettingsCameraUploadsViewModelTest {
             clearCameraUploadsRecordUseCase,
             deleteCameraUploadsTemporaryRootDirectoryUseCase,
             disableMediaUploadsSettingsUseCase,
+            getFeatureFlagValueUseCase,
             getPrimaryFolderNodeUseCase,
             getPrimaryFolderPathUseCase,
             getSecondaryFolderNodeUseCase,
@@ -178,6 +188,7 @@ internal class SettingsCameraUploadsViewModelTest {
             isCameraUploadsByWifiUseCase,
             isCameraUploadsEnabledUseCase,
             isChargingRequiredForVideoCompressionUseCase,
+            isChargingRequiredToUploadContentUseCase,
             isConnectedToInternetUseCase,
             isPrimaryFolderNodeValidUseCase,
             isPrimaryFolderPathValidUseCase,
@@ -190,6 +201,7 @@ internal class SettingsCameraUploadsViewModelTest {
             preparePrimaryFolderPathUseCase,
             setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompressionUseCase,
+            setChargingRequiredToUploadContentUseCase,
             setLocationTagsEnabledUseCase,
             setPrimaryFolderPathUseCase,
             setSecondaryFolderLocalPathUseCase,
@@ -218,6 +230,7 @@ internal class SettingsCameraUploadsViewModelTest {
         maximumNonChargingVideoCompressionSize: Int = 500,
         primaryFolderPath: String = "primary/folder/path",
         requireChargingDuringVideoCompression: Boolean = true,
+        requireChargingWhenUploadingContent: Boolean = false,
         secondaryFolderPath: String = "secondary/folder/path",
         shouldIncludeLocationTags: Boolean = true,
         shouldKeepUploadFileNames: Boolean = true,
@@ -234,6 +247,9 @@ internal class SettingsCameraUploadsViewModelTest {
         }
         whenever(areLocationTagsEnabledUseCase()).thenReturn(shouldIncludeLocationTags)
         whenever(areUploadFileNamesKeptUseCase()).thenReturn(shouldKeepUploadFileNames)
+        whenever(getFeatureFlagValueUseCase(AppFeatures.SettingsCameraUploadsUploadWhileCharging)).thenReturn(
+            true
+        )
         whenever(getPrimaryFolderNodeUseCase()).thenReturn(cameraUploadsFolderNode)
         whenever(getPrimaryFolderPathUseCase()).thenReturn(primaryFolderPath)
         whenever(getSecondaryFolderNodeUseCase()).thenReturn(mediaUploadsFolderNode)
@@ -248,6 +264,9 @@ internal class SettingsCameraUploadsViewModelTest {
         whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(
             requireChargingDuringVideoCompression
         )
+        whenever(isChargingRequiredToUploadContentUseCase()).thenReturn(
+            requireChargingWhenUploadingContent
+        )
         whenever(isSecondaryFolderEnabled()).thenReturn(isMediaUploadsEnabled)
         whenever(monitorCameraUploadsSettingsActionsUseCase()).thenReturn(
             fakeMonitorCameraUploadsSettingsActionsFlow
@@ -261,6 +280,7 @@ internal class SettingsCameraUploadsViewModelTest {
             clearCameraUploadsRecordUseCase = clearCameraUploadsRecordUseCase,
             deleteCameraUploadsTemporaryRootDirectoryUseCase = deleteCameraUploadsTemporaryRootDirectoryUseCase,
             disableMediaUploadsSettingsUseCase = disableMediaUploadsSettingsUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getPrimaryFolderNodeUseCase = getPrimaryFolderNodeUseCase,
             getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
             getSecondaryFolderNodeUseCase = getSecondaryFolderNodeUseCase,
@@ -271,6 +291,7 @@ internal class SettingsCameraUploadsViewModelTest {
             isCameraUploadsByWifiUseCase = isCameraUploadsByWifiUseCase,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             isChargingRequiredForVideoCompressionUseCase = isChargingRequiredForVideoCompressionUseCase,
+            isChargingRequiredToUploadContentUseCase = isChargingRequiredToUploadContentUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             isPrimaryFolderNodeValidUseCase = isPrimaryFolderNodeValidUseCase,
             isPrimaryFolderPathValidUseCase = isPrimaryFolderPathValidUseCase,
@@ -283,6 +304,7 @@ internal class SettingsCameraUploadsViewModelTest {
             preparePrimaryFolderPathUseCase = preparePrimaryFolderPathUseCase,
             setCameraUploadsByWifiUseCase = setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompressionUseCase = setChargingRequiredForVideoCompressionUseCase,
+            setChargingRequiredToUploadContentUseCase = setChargingRequiredToUploadContentUseCase,
             setLocationTagsEnabledUseCase = setLocationTagsEnabledUseCase,
             setPrimaryFolderPathUseCase = setPrimaryFolderPathUseCase,
             setupSecondaryFolderUseCase = setupSecondaryFolderUseCase,
@@ -632,6 +654,50 @@ internal class SettingsCameraUploadsViewModelTest {
                 assertThat(state.uploadConnectionType).isEqualTo(uploadConnectionType)
             }
         }
+    }
+
+    /**
+     * The Test Group that verifies behaviors when Device Charging is enabled / disabled when
+     * the active Camera Uploads begins uploading content
+     */
+    @Nested
+    @DisplayName("Upload only while charging")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    internal inner class UploadOnlyWhileChargingTestGroup {
+        @Test
+        fun `test that an error snackbar is displayed when changing the device charging state throws an exception`() =
+            runTest {
+                initializeUnderTest()
+                whenever(setChargingRequiredToUploadContentUseCase(any())).thenThrow(
+                    RuntimeException()
+                )
+
+                assertDoesNotThrow { underTest.onChargingWhenUploadingContentStateChanged(false) }
+                verify(snackBarHandler).postSnackbarMessage(
+                    resId = R.string.general_error,
+                    snackbarDuration = MegaSnackbarDuration.Long,
+                )
+            }
+
+        @ParameterizedTest(name = "new device charging state when uploading content: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that the device charging state is changed`(requireChargingWhenUploadingContent: Boolean) =
+            runTest {
+                initializeUnderTest()
+
+                underTest.onChargingWhenUploadingContentStateChanged(
+                    requireChargingWhenUploadingContent
+                )
+
+                verify(setChargingRequiredToUploadContentUseCase).invoke(
+                    requireChargingWhenUploadingContent
+                )
+                underTest.uiState.test {
+                    assertThat(awaitItem().requireChargingWhenUploadingContent).isEqualTo(
+                        requireChargingWhenUploadingContent
+                    )
+                }
+            }
     }
 
     /**

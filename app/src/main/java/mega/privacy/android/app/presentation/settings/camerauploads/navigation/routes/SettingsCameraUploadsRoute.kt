@@ -23,6 +23,7 @@ internal fun SettingsCameraUploadsRoute(
         onCameraUploadsStateChanged = viewModel::onCameraUploadsStateChanged,
         onCameraUploadsProcessStarted = viewModel::onCameraUploadsProcessStarted,
         onChargingDuringVideoCompressionStateChanged = viewModel::onChargingDuringVideoCompressionStateChanged,
+        onChargingWhenUploadingContentStateChanged = viewModel::onChargingWhenUploadingContentStateChanged,
         onHowToUploadPromptOptionSelected = viewModel::onHowToUploadPromptOptionSelected,
         onIncludeLocationTagsStateChanged = viewModel::onIncludeLocationTagsStateChanged,
         onKeepFileNamesStateChanged = viewModel::onKeepFileNamesStateChanged,

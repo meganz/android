@@ -9,6 +9,8 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
  *
  * @property businessAccountPromptType The type of prompt to be shown when a Business Account User
  * attempts to enable Camera Uploads
+ * @property canChangeChargingWhenUploadingContentState Checks if the User can change whether or not
+ * charging is required when the active Camera Uploads begins uploading content
  * @property isCameraUploadsEnabled true if Camera Uploads is enabled
  * @property isMediaUploadsEnabled true if Media Uploads is enabled
  * @property maximumNonChargingVideoCompressionSize The maximum aggregated Video Size that can be
@@ -17,8 +19,10 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
  * @property primaryFolderPath The Camera Uploads Local Primary Folder Path
  * @property requestPermissions State Event that triggers a request to grant Camera Uploads
  * permissions
- * @property requireChargingDuringVideoCompression, If true, the Device needs to be charged when
+ * @property requireChargingDuringVideoCompression If true, the Device needs to be charged when
  * compressing Videos
+ * @property requireChargingWhenUploadingContent If true, the Device needs to be charged for the
+ * active Camera Uploads to begin uploading content
  * @property secondaryFolderName The Media Uploads Cloud Drive Folder name, which can be null
  * @property secondaryFolderPath The Media Uploads Local Secondary Folder Path
  * @property shouldIncludeLocationTags If true, Location Tags are added when uploading Photos through
@@ -30,6 +34,7 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
  */
 internal data class SettingsCameraUploadsUiState(
     val businessAccountPromptType: EnableCameraUploadsStatus? = null,
+    val canChangeChargingWhenUploadingContentState: Boolean = false,
     val isCameraUploadsEnabled: Boolean = false,
     val isMediaUploadsEnabled: Boolean = false,
     val maximumNonChargingVideoCompressionSize: Int = 200,
@@ -37,6 +42,7 @@ internal data class SettingsCameraUploadsUiState(
     val primaryFolderPath: String = "",
     val requestPermissions: StateEvent = consumed,
     val requireChargingDuringVideoCompression: Boolean = true,
+    val requireChargingWhenUploadingContent: Boolean = false,
     val secondaryFolderName: String? = null,
     val secondaryFolderPath: String = "",
     val shouldIncludeLocationTags: Boolean = false,

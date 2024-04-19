@@ -28,6 +28,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.tiles.MEDIA_
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.MEDIA_UPLOADS_LOCAL_FOLDER_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.MEDIA_UPLOADS_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.REQUIRE_CHARGING_DURING_VIDEO_COMPRESSION_TILE
+import mega.privacy.android.app.presentation.settings.camerauploads.tiles.UPLOAD_ONLY_WHILE_CHARGING_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VIDEO_COMPRESSION_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VIDEO_QUALITY_TILE
 import org.junit.Rule
@@ -69,6 +70,27 @@ internal class SettingsCameraUploadsViewTest {
                 assertIsDisplayed()
             }
         }
+    }
+
+    @Test
+    fun `test that the upload only while charging tile is hidden when the feature flag is disabled`() {
+        initializeComposeContent(
+            isCameraUploadsEnabled = true,
+            canChangeChargingWhenUploadingContentState = false,
+        )
+
+        composeTestRule.onNodeWithTag(UPLOAD_ONLY_WHILE_CHARGING_TILE).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the upload only while charging tile is shown when the feature flag is enabled`() {
+        initializeComposeContent(
+            isCameraUploadsEnabled = true,
+            canChangeChargingWhenUploadingContentState = true,
+        )
+
+        composeTestRule.onNodeWithTag(UPLOAD_ONLY_WHILE_CHARGING_TILE).performScrollTo()
+            .assertIsDisplayed()
     }
 
     @Test
@@ -325,6 +347,7 @@ internal class SettingsCameraUploadsViewTest {
     }
 
     private fun initializeComposeContent(
+        canChangeChargingWhenUploadingContentState: Boolean = false,
         isCameraUploadsEnabled: Boolean = false,
         isMediaUploadsEnabled: Boolean = false,
         primaryFolderName: String? = "Primary Folder Name",
@@ -337,6 +360,7 @@ internal class SettingsCameraUploadsViewTest {
         composeTestRule.setContent {
             SettingsCameraUploadsView(
                 uiState = SettingsCameraUploadsUiState(
+                    canChangeChargingWhenUploadingContentState = canChangeChargingWhenUploadingContentState,
                     isCameraUploadsEnabled = isCameraUploadsEnabled,
                     isMediaUploadsEnabled = isMediaUploadsEnabled,
                     primaryFolderName = primaryFolderName,
@@ -350,6 +374,7 @@ internal class SettingsCameraUploadsViewTest {
                 onCameraUploadsProcessStarted = {},
                 onCameraUploadsStateChanged = {},
                 onChargingDuringVideoCompressionStateChanged = {},
+                onChargingWhenUploadingContentStateChanged = {},
                 onHowToUploadPromptOptionSelected = {},
                 onIncludeLocationTagsStateChanged = {},
                 onKeepFileNamesStateChanged = {},

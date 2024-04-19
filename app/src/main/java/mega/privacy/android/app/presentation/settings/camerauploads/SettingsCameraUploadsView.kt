@@ -56,6 +56,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.tiles.MediaU
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.MediaUploadsLocalFolderTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.MediaUploadsTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.RequireChargingDuringVideoCompressionTile
+import mega.privacy.android.app.presentation.settings.camerauploads.tiles.UploadOnlyWhileChargingTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VideoCompressionTile
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VideoQualityTile
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
@@ -75,6 +76,8 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  * @param onCameraUploadsStateChanged Lambda to execute when the Camera Uploads state changes
  * @param onChargingDuringVideoCompressionStateChanged Lambda to execute when the Device charging
  * state has changed when compressing Videos
+ * @param onChargingWhenUploadingContentStateChanged Lambda to execute when the Device charging
+ * state for the active Camera Uploads to begin uploading content has changed
  * @param onHowToUploadPromptOptionSelected Lambda to execute when the User selects a new
  * @param onIncludeLocationTagsStateChanged Lambda to execute when the Include Location Tags state
  * changes
@@ -110,6 +113,7 @@ internal fun SettingsCameraUploadsView(
     onCameraUploadsProcessStarted: () -> Unit,
     onCameraUploadsStateChanged: (Boolean) -> Unit,
     onChargingDuringVideoCompressionStateChanged: (Boolean) -> Unit,
+    onChargingWhenUploadingContentStateChanged: (Boolean) -> Unit,
     onHowToUploadPromptOptionSelected: (UploadConnectionType) -> Unit,
     onIncludeLocationTagsStateChanged: (Boolean) -> Unit,
     onKeepFileNamesStateChanged: (Boolean) -> Unit,
@@ -246,6 +250,12 @@ internal fun SettingsCameraUploadsView(
                         uploadConnectionType = uiState.uploadConnectionType,
                         onItemClicked = { showHowToUploadPrompt = true },
                     )
+                    if (uiState.canChangeChargingWhenUploadingContentState) {
+                        UploadOnlyWhileChargingTile(
+                            isChecked = uiState.requireChargingWhenUploadingContent,
+                            onCheckedChange = onChargingWhenUploadingContentStateChanged,
+                        )
+                    }
                     FileUploadTile(
                         uploadOptionUiItem = uiState.uploadOptionUiItem,
                         onItemClicked = { showFileUploadPrompt = true },
@@ -354,6 +364,7 @@ private fun SettingsCameraUploadsViewPreview(
             onCameraUploadsProcessStarted = {},
             onCameraUploadsStateChanged = {},
             onChargingDuringVideoCompressionStateChanged = {},
+            onChargingWhenUploadingContentStateChanged = {},
             onHowToUploadPromptOptionSelected = {},
             onIncludeLocationTagsStateChanged = {},
             onKeepFileNamesStateChanged = {},
@@ -380,10 +391,12 @@ private class SettingsCameraUploadsViewParameterProvider
             SettingsCameraUploadsUiState(),
             // Camera Uploads Enabled - All Options Shown
             SettingsCameraUploadsUiState(
+                canChangeChargingWhenUploadingContentState = true,
                 isCameraUploadsEnabled = true,
                 isMediaUploadsEnabled = true,
                 primaryFolderName = "Camera Uploads",
                 primaryFolderPath = "primary/folder/path",
+                requireChargingWhenUploadingContent = true,
                 secondaryFolderName = "Media Uploads",
                 secondaryFolderPath = "secondary/folder/path",
                 shouldIncludeLocationTags = true,
