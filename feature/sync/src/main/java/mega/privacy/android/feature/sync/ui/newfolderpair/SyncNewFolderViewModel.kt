@@ -46,17 +46,10 @@ internal class SyncNewFolderViewModel @Inject constructor(
                 }
             }
 
-            is SyncNewFolderAction.FolderNameChanged -> {
-                _state.update { state ->
-                    state.copy(folderPairName = action.name)
-                }
-            }
-
             is SyncNewFolderAction.NextClicked -> {
                 viewModelScope.launch {
                     state.value.selectedMegaFolder?.let { remoteFolder ->
                         syncFolderPairUseCase(
-                            name = state.value.folderPairName,
                             localPath = state.value.selectedLocalFolder,
                             remotePath = remoteFolder,
                         )

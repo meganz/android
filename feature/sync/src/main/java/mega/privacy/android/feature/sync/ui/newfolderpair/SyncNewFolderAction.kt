@@ -9,10 +9,5 @@ internal sealed interface SyncNewFolderAction {
      */
     data class LocalFolderSelected(val path: Uri) : SyncNewFolderAction
 
-    /**
-     * @param name - new name of the folder pair
-     */
-    data class FolderNameChanged(val name: String) : SyncNewFolderAction
-
     object NextClicked : SyncNewFolderAction
 }

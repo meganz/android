@@ -82,8 +82,8 @@ class SyncRepositoryImplTest {
 
     @Test
     fun `test that setupFolderPair invokes gateway syncFolderPair method`() = runTest {
-        underTest.setupFolderPair("name", "localPath", 123)
-        verify(syncGateway).syncFolderPair("name", "localPath", 123)
+        underTest.setupFolderPair("localPath", 123)
+        verify(syncGateway).syncFolderPair("localPath", 123)
     }
 
     @Test

@@ -10,12 +10,10 @@ import javax.inject.Inject
 internal class SyncFolderPairUseCase @Inject constructor(private val syncRepository: SyncRepository) {
 
     suspend operator fun invoke(
-        name: String?,
         localPath: String,
         remotePath: RemoteFolder
     ): Boolean =
         syncRepository.setupFolderPair(
-            name,
             localPath,
             remotePath.id
         )

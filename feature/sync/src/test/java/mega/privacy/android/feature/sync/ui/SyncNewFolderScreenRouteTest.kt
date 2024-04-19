@@ -52,34 +52,13 @@ class SyncNewFolderScreenRouteTest {
 
         composeTestRule.onNodeWithTag(TAG_SYNC_NEW_FOLDER_SCREEN_TOOLBAR)
             .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_two_way))
+            .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_folder_choose_device_folder_title))
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_folders_choose_mega_folder_title))
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_folders_method))
-            .assertIsDisplayed()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_two_way))
-            .assertIsDisplayed()
         composeTestRule.onNodeWithTag(TAG_SYNC_NEW_FOLDER_SCREEN_SYNC_BUTTON)
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that entered folder pair name is correctly displayed`() {
-        val folderPairName = "some_folder_pair"
-        whenever(state.value).thenReturn(SyncNewFolderState(folderPairName = folderPairName))
-        whenever(viewModel.state).thenReturn(state)
-        composeTestRule.setContent {
-            SyncNewFolderScreenRoute(
-                viewModel,
-                syncPermissionsManager = syncPermissionsManager,
-                openNextScreen = {},
-                openSelectMegaFolderScreen = {},
-                onBackClicked = {}
-            )
-        }
-
-        composeTestRule.onNodeWithText(folderPairName)
             .assertIsDisplayed()
     }
 

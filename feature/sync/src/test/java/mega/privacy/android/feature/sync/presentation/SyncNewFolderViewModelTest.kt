@@ -59,18 +59,6 @@ internal class SyncNewFolderViewModelTest {
     }
 
     @Test
-    fun `test that folder name changed action results in updated state`() {
-        whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flowOf(mock()))
-        initViewModel()
-        val folderPairName = "folderPairName"
-        val expectedState = SyncNewFolderState(folderPairName = folderPairName)
-
-        underTest.handleAction(SyncNewFolderAction.FolderNameChanged(folderPairName))
-
-        assertThat(expectedState.folderPairName).isEqualTo(underTest.state.value.folderPairName)
-    }
-
-    @Test
     fun `test that when mega folder is updated state is also updated`() = runTest {
         val remoteFolder = RemoteFolder(123L, "someFolder")
         whenever(monitorSelectedMegaFolderUseCase()).thenReturn(
@@ -108,9 +96,8 @@ internal class SyncNewFolderViewModelTest {
         underTest.handleAction(SyncNewFolderAction.NextClicked)
 
         verify(syncFolderPairUseCase).invoke(
-            name = "",
             localPath = state.selectedLocalFolder,
-            remotePath = state.selectedMegaFolder!!
+            remotePath = state.selectedMegaFolder ?: return@runTest
         )
     }
 
