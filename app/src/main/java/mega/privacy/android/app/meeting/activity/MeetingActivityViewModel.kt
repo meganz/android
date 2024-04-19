@@ -2106,7 +2106,7 @@ class MeetingActivityViewModel @Inject constructor(
      */
     fun muteParticipant() {
         _state.value.chatParticipantSelected?.let { participant ->
-            muteParticipant(participant.callParticipantData.clientId)
+            muteParticipantByClientId(participant.callParticipantData.clientId)
         }
     }
 
@@ -2115,7 +2115,7 @@ class MeetingActivityViewModel @Inject constructor(
      *
      * @param clientId   Client id of a participant
      */
-    fun muteParticipant(clientId: Long) {
+    fun muteParticipantByClientId(clientId: Long) {
         viewModelScope.launch {
             runCatching {
                 mutePeersUseCase(

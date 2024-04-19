@@ -190,7 +190,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
      * Mute participant from this meeting
      */
     private fun onMuteParticipant() {
-        sharedViewModel.muteParticipant(participantItem.clientId)
+        sharedViewModel.muteParticipantByClientId(participantItem.clientId)
     }
 
     /**

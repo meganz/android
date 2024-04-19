@@ -6,6 +6,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
+import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.presentation.meeting.view.BottomPanelView
 import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_MUTE_ALL_ITEM_VIEW
 import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_PARTICIPANTS_WARNING
@@ -58,7 +59,8 @@ class ParticipantBottomPanelViewTest {
     ) {
         composeRule.setContent {
             BottomPanelView(
-                state = uiState,
+                uiState = uiState,
+                waitingRoomManagementState = WaitingRoomManagementState(),
                 onWaitingRoomClick = { },
                 onInCallClick = { },
                 onNotInCallClick = { },

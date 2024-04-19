@@ -46,6 +46,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
+import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.theme.extensions.black_white
@@ -73,12 +74,16 @@ fun ParticipantsBottomPanelView(
     onParticipantMoreOptionsClicked: (ChatParticipant) -> Unit = {},
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val waitingRoomManagementState by waitingRoomManagementViewModel.state.collectAsStateWithLifecycle()
 
-    BottomPanelView(state = uiState, onWaitingRoomClick = {
-        viewModel.updateParticipantsSection(
-            ParticipantsSection.WaitingRoomSection
-        )
-    },
+    BottomPanelView(
+        uiState = uiState,
+        waitingRoomManagementState = waitingRoomManagementState,
+        onWaitingRoomClick = {
+            viewModel.updateParticipantsSection(
+                ParticipantsSection.WaitingRoomSection
+            )
+        },
         onInCallClick = {
             viewModel.updateParticipantsSection(
                 ParticipantsSection.InCallSection
@@ -133,7 +138,8 @@ fun ParticipantsBottomPanelView(
  */
 @Composable
 fun BottomPanelView(
-    state: MeetingState,
+    uiState: MeetingState,
+    waitingRoomManagementState: WaitingRoomManagementState,
     onWaitingRoomClick: () -> Unit,
     onInCallClick: () -> Unit,
     onNotInCallClick: () -> Unit,
@@ -151,16 +157,28 @@ fun BottomPanelView(
 ) {
 
     val listState = rememberLazyListState()
-    val maxNumParticipantsNoSeeAllOption = 4
 
     var isAdmitAllButtonEnabled by rememberSaveable { mutableStateOf(true) }
     var isCallUserLimitWarningShown by rememberSaveable { mutableStateOf(false) }
     var isAllowNonHostAddParticipantEnabled by rememberSaveable { mutableStateOf(true) }
 
-    with(state) {
-        isCallUserLimitWarningShown = showUserLimitWarningDialog
-        isAdmitAllButtonEnabled = !isAdmitAllButtonDisabled
-        isAllowNonHostAddParticipantEnabled = !isAllowNonHostAddParticipantsButtonDisabled
+    with(uiState) {
+        isCallUserLimitWarningShown =
+            if (hasHostPermission() && participantsSection == ParticipantsSection.WaitingRoomSection)
+                waitingRoomManagementState.showUserLimitWarningDialogInWR
+            else
+                false
+        isAdmitAllButtonEnabled =
+            if (hasHostPermission() && participantsSection == ParticipantsSection.WaitingRoomSection)
+                !waitingRoomManagementState.isAdmitAllButtonDisabled
+            else
+                false
+
+        isAllowNonHostAddParticipantEnabled =
+            if (hasHostPermission() && participantsSection == ParticipantsSection.InCallSection)
+                !waitingRoomManagementState.isAllowNonHostAddParticipantsButtonDisabled
+            else
+                false
 
         Column(
             modifier = Modifier
@@ -409,12 +427,12 @@ fun BottomPanelView(
                             ParticipantsSection.WaitingRoomSection -> {
                                 if (shouldWaitingRoomSectionBeShown() && chatParticipantsInWaitingRoom.isNotEmpty()) {
                                     chatParticipantsInWaitingRoom.indices.forEach { i ->
-                                        if (i < maxNumParticipantsNoSeeAllOption) {
+                                        if (i < MeetingState.MAX_PARTICIPANTS_IN_BOTTOM_PANEL) {
                                             ParticipantInCallItem(
                                                 section = participantsSection,
                                                 myPermission = myPermission,
                                                 isGuest = isGuest,
-                                                isUsersLimitInCallReached = isUsersLimitInCallReached(),
+                                                isUsersLimitInCallReached = waitingRoomManagementState.isUsersLimitInCallReached(),
                                                 participant = chatParticipantsInWaitingRoom[i],
                                                 onAdmitParticipantClicked = onAdmitParticipantClicked,
                                                 onDenyParticipantClicked = onDenyParticipantClicked,
@@ -434,7 +452,7 @@ fun BottomPanelView(
                             }
 
                             ParticipantsSection.InCallSection -> chatParticipantsInCall.indices.forEach { i ->
-                                if (i < maxNumParticipantsNoSeeAllOption) {
+                                if (i < MeetingState.MAX_PARTICIPANTS_IN_BOTTOM_PANEL) {
                                     ParticipantInCallItem(
                                         section = participantsSection,
                                         myPermission = myPermission,
@@ -450,7 +468,7 @@ fun BottomPanelView(
                             ParticipantsSection.NotInCallSection -> {
                                 if (chatParticipantsNotInCall.isNotEmpty()) {
                                     chatParticipantsNotInCall.indices.forEach { i ->
-                                        if (i < maxNumParticipantsNoSeeAllOption) {
+                                        if (i < MeetingState.MAX_PARTICIPANTS_IN_BOTTOM_PANEL) {
                                             ParticipantInCallItem(
                                                 section = participantsSection,
                                                 myPermission = myPermission,
@@ -478,11 +496,7 @@ fun BottomPanelView(
                     }
 
                     item(key = "See all") {
-                        if (
-                            (participantsSection == ParticipantsSection.WaitingRoomSection && shouldWaitingRoomSectionBeShown() && chatParticipantsInWaitingRoom.size > maxNumParticipantsNoSeeAllOption) ||
-                            (participantsSection == ParticipantsSection.InCallSection && chatParticipantsInCall.size > maxNumParticipantsNoSeeAllOption) ||
-                            (participantsSection == ParticipantsSection.NotInCallSection && chatParticipantsNotInCall.size > maxNumParticipantsNoSeeAllOption)
-                        ) {
+                        if (showSeeAllButton) {
                             SeeAllParticipantsButton(
                                 onSeeAllClicked = onSeeAllClick
                             )
@@ -638,13 +652,14 @@ private fun InviteParticipantsButton(
 @Composable
 fun ParticipantsBottomPanelGuestInCallSectionPreview() {
     MegaAppTheme(isDark = true) {
-        BottomPanelView(state = MeetingState(
+        BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith4Participants(),
             hasWaitingRoom = true,
             myPermission = ChatRoomPermission.Standard,
             isGuest = true
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -667,13 +682,14 @@ fun ParticipantsBottomPanelGuestInCallSectionPreview() {
 @Composable
 fun ParticipantsBottomPanelGuestNotInCallSectionPreview() {
     MegaAppTheme(isDark = true) {
-        BottomPanelView(state = MeetingState(
+        BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = getListWith4Participants(),
             hasWaitingRoom = true,
             myPermission = ChatRoomPermission.Standard,
             isGuest = true
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -696,13 +712,14 @@ fun ParticipantsBottomPanelGuestNotInCallSectionPreview() {
 @Composable
 fun ParticipantsBottomPanelGuestNotInCallSectionEmptyStatePreview() {
     MegaAppTheme(isDark = true) {
-        BottomPanelView(state = MeetingState(
+        BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = emptyList(),
             hasWaitingRoom = true,
             myPermission = ChatRoomPermission.Standard,
             isGuest = true
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -725,13 +742,14 @@ fun ParticipantsBottomPanelGuestNotInCallSectionEmptyStatePreview() {
 @Composable
 fun ParticipantsBottomPanelNonHostInCallSectionPreview() {
     MegaAppTheme(isDark = true) {
-        BottomPanelView(state = MeetingState(
+        BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith4Participants(),
             hasWaitingRoom = true,
             myPermission = ChatRoomPermission.Standard,
             isGuest = false
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -754,7 +772,7 @@ fun ParticipantsBottomPanelNonHostInCallSectionPreview() {
 @Composable
 fun ParticipantsBottomPanelNonHostAndOpenInviteInCallSectionPreview() {
     MegaAppTheme(isDark = true) {
-        BottomPanelView(state = MeetingState(
+        BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith4Participants(),
             hasWaitingRoom = true,
@@ -763,6 +781,7 @@ fun ParticipantsBottomPanelNonHostAndOpenInviteInCallSectionPreview() {
             isOpenInvite = true,
             isGuest = false
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -785,13 +804,14 @@ fun ParticipantsBottomPanelNonHostAndOpenInviteInCallSectionPreview() {
 @Composable
 fun ParticipantsBottomPanelNonHostNotInCallSectionPreview() {
     MegaAppTheme(isDark = true) {
-        BottomPanelView(state = MeetingState(
+        BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = getListWith4Participants(),
             hasWaitingRoom = true,
             myPermission = ChatRoomPermission.Standard,
             isGuest = false
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -814,13 +834,14 @@ fun ParticipantsBottomPanelNonHostNotInCallSectionPreview() {
 @Composable
 fun ParticipantsBottomPanelNonHostNotInCallSectionEmptyStatePreview() {
     MegaAppTheme(isDark = true) {
-        BottomPanelView(state = MeetingState(
+        BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = emptyList(),
             hasWaitingRoom = true,
             myPermission = ChatRoomPermission.Standard,
             isGuest = false
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -843,12 +864,13 @@ fun ParticipantsBottomPanelNonHostNotInCallSectionEmptyStatePreview() {
 @Composable
 fun ParticipantsBottomPanelInCallView4ParticipantsPreview() {
     MegaAppTheme(isDark = true) {
-        BottomPanelView(state = MeetingState(
+        BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith4Participants(),
             hasWaitingRoom = true,
             myPermission = ChatRoomPermission.Moderator,
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -871,12 +893,13 @@ fun ParticipantsBottomPanelInCallView4ParticipantsPreview() {
 @Composable
 fun ParticipantsBottomPanelInCallView6ParticipantsPreview() {
     MegaAppTheme(isDark = true) {
-        BottomPanelView(state = MeetingState(
+        BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getListWith6Participants(),
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -899,12 +922,13 @@ fun ParticipantsBottomPanelInCallView6ParticipantsPreview() {
 @Composable
 fun ParticipantsBottomPanelNotInCallViewEmptyStatePreview() {
     MegaAppTheme(isDark = true) {
-        BottomPanelView(state = MeetingState(
+        BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = emptyList(),
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -927,13 +951,14 @@ fun ParticipantsBottomPanelNotInCallViewEmptyStatePreview() {
 @Composable
 fun ParticipantsBottomPanelNotInCallView4ParticipantsPreview() {
     MegaAppTheme(isDark = true) {
-        BottomPanelView(state = MeetingState(
+        BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = getListWith4Participants(),
             hasWaitingRoom = true,
             isRingingAll = true,
             myPermission = ChatRoomPermission.Moderator,
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -956,13 +981,14 @@ fun ParticipantsBottomPanelNotInCallView4ParticipantsPreview() {
 @Composable
 fun ParticipantsBottomPanelNotInCallView6ParticipantsPreview() {
     MegaAppTheme(isDark = true) {
-        BottomPanelView(state = MeetingState(
+        BottomPanelView(uiState = MeetingState(
             isRingingAll = true,
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = getListWith6Participants(),
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -985,12 +1011,13 @@ fun ParticipantsBottomPanelNotInCallView6ParticipantsPreview() {
 @Composable
 fun ParticipantsBottomPanelNotInCallViewLandEmptyStatePreview() {
     MegaAppTheme(isDark = true) {
-        BottomPanelView(state = MeetingState(
+        BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = emptyList(),
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -1013,13 +1040,14 @@ fun ParticipantsBottomPanelNotInCallViewLandEmptyStatePreview() {
 @Composable
 fun ParticipantsBottomPanelWaitingRoomViewEmptyStatePreview() {
     MegaAppTheme(isDark = true) {
-        BottomPanelView(state = MeetingState(
+        BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = emptyList(),
             usersInWaitingRoomIDs = emptyList(),
             hasWaitingRoom = true,
             myPermission = ChatRoomPermission.Moderator,
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -1042,13 +1070,14 @@ fun ParticipantsBottomPanelWaitingRoomViewEmptyStatePreview() {
 @Composable
 fun ParticipantsBottomPanelWaitingRoomView4ParticipantsPreview() {
     MegaAppTheme(isDark = true) {
-        BottomPanelView(state = MeetingState(
+        BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = getListWith4Participants(),
             usersInWaitingRoomIDs = get4UsersInWaitingRoomIDs(),
             hasWaitingRoom = true,
             myPermission = ChatRoomPermission.Moderator,
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -1071,13 +1100,14 @@ fun ParticipantsBottomPanelWaitingRoomView4ParticipantsPreview() {
 @Composable
 fun ParticipantsBottomPanelWaitingRoomView4ParticipantsLandPreview() {
     MegaAppTheme(isDark = true) {
-        BottomPanelView(state = MeetingState(
+        BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = getListWith4Participants(),
             usersInWaitingRoomIDs = get4UsersInWaitingRoomIDs(),
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -1100,13 +1130,14 @@ fun ParticipantsBottomPanelWaitingRoomView4ParticipantsLandPreview() {
 @Composable
 fun ParticipantsBottomPanelWaitingRoomView6ParticipantsPreview() {
     MegaAppTheme(isDark = true) {
-        BottomPanelView(state = MeetingState(
+        BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = getListWith6Participants(),
             usersInWaitingRoomIDs = get6UsersInWaitingRoomIDs(),
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -1129,13 +1160,14 @@ fun ParticipantsBottomPanelWaitingRoomView6ParticipantsPreview() {
 @Composable
 fun ParticipantsBottomPanelWaitingRoomView6ParticipantsLandPreview() {
     MegaAppTheme(isDark = true) {
-        BottomPanelView(state = MeetingState(
+        BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = getListWith6Participants(),
             usersInWaitingRoomIDs = get6UsersInWaitingRoomIDs(),
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},
@@ -1158,13 +1190,14 @@ fun ParticipantsBottomPanelWaitingRoomView6ParticipantsLandPreview() {
 @Composable
 fun ParticipantsBottomPanelWaitingRoomViewLandEmptyStatePreview() {
     MegaAppTheme(isDark = true) {
-        BottomPanelView(state = MeetingState(
+        BottomPanelView(uiState = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = emptyList(),
             usersInWaitingRoomIDs = emptyList(),
             myPermission = ChatRoomPermission.Moderator,
             hasWaitingRoom = true
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onWaitingRoomClick = {},
             onInCallClick = {},
             onNotInCallClick = {},

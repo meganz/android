@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.model
 
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingViewModel
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 
 /**
@@ -52,15 +51,52 @@ data class WaitingRoomManagementState(
      */
     val showUserLimitWarning
         get() = callUsersLimit != null && isCallUnlimitedProPlanFeatureFlagEnabled &&
-                numUsersInCall >= callUsersLimit
+                isUsersLimitInCallReached()
+
+    /**
+     * Show dialog in WR section
+     */
+    val showUserLimitWarningDialogInWR
+        get() = isCallUnlimitedProPlanFeatureFlagEnabled &&
+                usersInWaitingRoomIDs.isNotEmpty() &&
+                (isUsersLimitInCallReached() || isUserLimitInCallAndInWRWillBeReached())
 
     /**
      * Check if should be disabled admit all participants button
      */
-    val shouldDisableAdmitAllParticipants
+    val isAdmitAllButtonDisabled
         get() = callUsersLimit != null && isCallUnlimitedProPlanFeatureFlagEnabled &&
-                (numUsersInCall >= callUsersLimit ||
-                        ((numUsersInCall + usersInWaitingRoomIDs.size) >= callUsersLimit))
+                (isUsersLimitInCallReached() || isUserLimitInCallAndInWRWillBeReached())
+
+    /**
+     * Check if admit all participants should be disabled
+     */
+    val isAllowNonHostAddParticipantsButtonDisabled
+        get() = isCallUnlimitedProPlanFeatureFlagEnabled &&
+                isUsersLimitInCallReached()
+
+    /**
+     * Check if participants in the call is equal o more than the limit
+     */
+    fun isUsersLimitInCallReached(): Boolean {
+        callUsersLimit?.let { limit ->
+            return numUsersInCall >= limit
+        }
+
+        return false
+    }
+
+    /**
+     * Check if participants in the call and in the WR is more than the limit
+     */
+    private fun isUserLimitInCallAndInWRWillBeReached(): Boolean {
+        callUsersLimit?.let { limit ->
+            return (numUsersInCall + usersInWaitingRoomIDs.size) > limit
+        }
+
+        return false
+    }
+
 
     /**
      * Check if the dialog is relative to the open call

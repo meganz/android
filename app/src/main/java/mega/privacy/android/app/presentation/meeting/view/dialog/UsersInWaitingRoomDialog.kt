@@ -131,7 +131,7 @@ private fun UsersInWaitingRoomDialog(
 
             cancelEnabled = when {
                 isOneParticipantInWaitingRoom -> true
-                else -> !shouldDisableAdmitAllParticipants
+                else -> !isAdmitAllButtonDisabled
             },
             cancelButtonText = stringResource(
                 id = when {

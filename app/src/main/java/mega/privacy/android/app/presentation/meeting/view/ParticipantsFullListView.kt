@@ -26,10 +26,14 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,11 +41,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
+import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.view.sheet.CallParticipantBottomSheetView
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
+import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
@@ -55,12 +64,109 @@ import mega.privacy.android.domain.entity.meeting.CallType
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 
 /**
+ * Participants full list view
+ */
+@Composable
+fun ParticipantsFullListView(
+    onEditProfileClicked: () -> Unit,
+    onContactInfoClicked: (String) -> Unit,
+    meetingViewModel: MeetingActivityViewModel = hiltViewModel(),
+    waitingRoomManagementViewModel: WaitingRoomManagementViewModel = hiltViewModel(),
+    onScrollChange: (Boolean) -> Unit,
+) {
+    val uiState by meetingViewModel.state.collectAsStateWithLifecycle()
+    val waitingRoomManagementState by waitingRoomManagementViewModel.state.collectAsStateWithLifecycle()
+
+    ParticipantsFullListView(
+        uiState = uiState,
+        waitingRoomManagementState = waitingRoomManagementState,
+        onScrollChange = onScrollChange,
+        onBackPressed = {
+            meetingViewModel.onConsumeShouldWaitingRoomListBeShownEvent()
+            meetingViewModel.onConsumeShouldInCallListBeShownEvent()
+            meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
+        },
+        onDenyParticipantClicked = { participant ->
+            waitingRoomManagementViewModel.denyUsersClick(
+                participant
+            )
+        },
+        onAdmitParticipantClicked = { participant ->
+            waitingRoomManagementViewModel.admitUsersClick(
+                participant
+            )
+            meetingViewModel.onConsumeShouldWaitingRoomListBeShownEvent()
+            meetingViewModel.onConsumeShouldInCallListBeShownEvent()
+            meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
+        },
+        onAdmitAllClicked = {
+            waitingRoomManagementViewModel.admitUsersClick()
+            meetingViewModel.onConsumeShouldWaitingRoomListBeShownEvent()
+            meetingViewModel.onConsumeShouldInCallListBeShownEvent()
+            meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
+        },
+        onShareMeetingLink = {
+            meetingViewModel.queryMeetingLink(shouldShareMeetingLink = true)
+        },
+        onParticipantMoreOptionsClicked = { chatParticipant ->
+            meetingViewModel.onParticipantMoreOptionsClick(chatParticipant)
+        },
+        onConsumeSelectParticipantEvent = { meetingViewModel.onConsumeSelectParticipantEvent() },
+        onBottomPanelHiddenClicked = {
+            meetingViewModel.onParticipantMoreOptionsClick(
+                null
+            )
+        },
+        onAddContactClicked = { meetingViewModel.onAddContactClick() },
+        onEditProfileClicked = onEditProfileClicked,
+        onContactInfoClicked = onContactInfoClicked,
+        onMakeHostClicked = {
+            meetingViewModel.updateParticipantPermissions(
+                ChatRoomPermission.Moderator
+            )
+        },
+        onRemoveAsHostClicked = {
+            meetingViewModel.updateParticipantPermissions(
+                ChatRoomPermission.Standard
+            )
+        },
+        onRemoveParticipant = {
+            meetingViewModel.removeParticipantFromChat()
+        },
+        onRemoveParticipantClicked = {
+            meetingViewModel.showOrHideRemoveParticipantDialog(true)
+        },
+        onDismissRemoveParticipantDialog = {
+            meetingViewModel.showOrHideRemoveParticipantDialog(false)
+        },
+        onSendMessageClicked = { meetingViewModel.sendMessageToChat() },
+        onDisplayInMainViewClicked = {
+            meetingViewModel.onPinToSpeakerView(true)
+            meetingViewModel.onConsumeShouldWaitingRoomListBeShownEvent()
+            meetingViewModel.onConsumeShouldInCallListBeShownEvent()
+            meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
+        },
+        onRingParticipantClicked = { chatParticipant ->
+            meetingViewModel.ringParticipant(chatParticipant.handle)
+        },
+        onRingAllParticipantsClicked = {
+            meetingViewModel.ringAllAbsentsParticipants()
+        },
+        onMuteParticipantClick = meetingViewModel::muteParticipant,
+        onMuteAllParticipantsClick = meetingViewModel::muteAllParticipants,
+        onResetStateSnackbarMessage = meetingViewModel::onSnackbarMessageConsumed
+    )
+}
+
+/**
  * Participant list view
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ParticipantsFullListView(
-    state: MeetingState,
+
+private fun ParticipantsFullListView(
+    uiState: MeetingState,
+    waitingRoomManagementState: WaitingRoomManagementState,
     onAdmitAllClicked: () -> Unit,
     onShareMeetingLink: () -> Unit,
     onBackPressed: () -> Unit,
@@ -86,207 +192,226 @@ fun ParticipantsFullListView(
     onRingAllParticipantsClicked: () -> Unit = {},
     onResetStateSnackbarMessage: () -> Unit = {},
 ) {
-    if ((state.participantsSection == ParticipantsSection.WaitingRoomSection &&
-                state.shouldWaitingRoomListBeShown &&
-                state.chatParticipantsInWaitingRoom.isNotEmpty()) ||
-        (state.participantsSection == ParticipantsSection.InCallSection &&
-                state.shouldInCallListBeShown &&
-                state.chatParticipantsInCall.isNotEmpty()) ||
-        (state.participantsSection == ParticipantsSection.NotInCallSection &&
-                state.shouldNotInCallListBeShown &&
-                state.chatParticipantsNotInCall.isNotEmpty())
-    ) {
-        val listState = rememberLazyListState()
-        val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
-        val scaffoldState = rememberScaffoldState()
-        val snackbarHostState = remember { SnackbarHostState() }
-        val coroutineScope = rememberCoroutineScope()
-        val modalSheetState = rememberModalBottomSheetState(
-            initialValue = ModalBottomSheetValue.Hidden,
-            confirmValueChange = { it != ModalBottomSheetValue.HalfExpanded },
-            skipHalfExpanded = true,
-        )
+    val listState = rememberLazyListState()
+    val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
+    val scaffoldState = rememberScaffoldState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+    val modalSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        confirmValueChange = { it != ModalBottomSheetValue.HalfExpanded },
+        skipHalfExpanded = true,
+    )
+    var isAdmitAllButtonEnabled by rememberSaveable { mutableStateOf(true) }
+    var isCallUserLimitWarningShown by rememberSaveable { mutableStateOf(false) }
 
-        BackHandler(enabled = modalSheetState.isVisible) {
-            coroutineScope.launch {
-                modalSheetState.hide()
-                onBottomPanelHiddenClicked()
-            }
-        }
+    with(uiState) {
 
-        EventEffect(
-            event = state.selectParticipantEvent,
-            onConsumed = onConsumeSelectParticipantEvent,
-            action = { modalSheetState.show() }
-        )
+        if (isRightSection()) {
+            isCallUserLimitWarningShown =
+                if (hasHostPermission() && participantsSection == ParticipantsSection.WaitingRoomSection)
+                    waitingRoomManagementState.showUserLimitWarningDialogInWR
+                else
+                    false
+            isAdmitAllButtonEnabled =
+                if (hasHostPermission() && participantsSection == ParticipantsSection.WaitingRoomSection)
+                    !waitingRoomManagementState.isAdmitAllButtonDisabled
+                else
+                    false
 
-        Scaffold(
-            modifier = Modifier.padding(top = 34.dp),
-            scaffoldState = scaffoldState,
-            topBar = {
-                ParticipantsFullListAppBar(
-                    participantsSize = when (state.participantsSection) {
-                        ParticipantsSection.WaitingRoomSection -> state.chatParticipantsInWaitingRoom.size
-                        ParticipantsSection.InCallSection -> state.chatParticipantsInCall.size
-                        ParticipantsSection.NotInCallSection -> state.chatParticipantsNotInCall.size
-                    },
-                    section = state.participantsSection,
-                    onBackPressed = onBackPressed,
-                    elevation = !firstItemVisible
-                )
-            }
-        ) { paddingValues ->
-
-            state.chatParticipantSelected?.apply {
-                RemoveParticipantAlertDialog(
-                    shouldShowDialog = state.removeParticipantDialog,
-                    participantName = data.fullName ?: email ?: "",
-                    onDismiss = { onDismissRemoveParticipantDialog() },
-                    onRemove = { onRemoveParticipant() })
+            BackHandler(enabled = modalSheetState.isVisible) {
+                coroutineScope.launch {
+                    modalSheetState.hide()
+                    onBottomPanelHiddenClicked()
+                }
             }
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(paddingValues),
-            ) {
+            EventEffect(
+                event = selectParticipantEvent,
+                onConsumed = onConsumeSelectParticipantEvent,
+                action = { modalSheetState.show() }
+            )
+
+            Scaffold(
+                modifier = Modifier.padding(top = 34.dp),
+                scaffoldState = scaffoldState,
+                topBar = {
+                    ParticipantsFullListAppBar(
+                        participantsSize = when (participantsSection) {
+                            ParticipantsSection.WaitingRoomSection -> chatParticipantsInWaitingRoom.size
+                            ParticipantsSection.InCallSection -> chatParticipantsInCall.size
+                            ParticipantsSection.NotInCallSection -> chatParticipantsNotInCall.size
+                        },
+                        section = participantsSection,
+                        onBackPressed = onBackPressed,
+                        elevation = !firstItemVisible
+                    )
+                }
+            ) { paddingValues ->
+
+                chatParticipantSelected?.apply {
+                    RemoveParticipantAlertDialog(
+                        shouldShowDialog = removeParticipantDialog,
+                        participantName = data.fullName ?: email ?: "",
+                        onDismiss = { onDismissRemoveParticipantDialog() },
+                        onRemove = { onRemoveParticipant() })
+                }
+
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f)
+                        .padding(paddingValues),
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth()
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
                     ) {
-                        Column {
-                            LazyColumn(
-                                state = listState,
-                            ) {
-                                item(key = "Participants lists") {
-                                    when (state.participantsSection) {
-                                        ParticipantsSection.WaitingRoomSection ->
-                                            state.chatParticipantsInWaitingRoom.indices.forEach { i ->
-                                                ParticipantInCallItem(
-                                                    section = state.participantsSection,
-                                                    myPermission = state.myPermission,
-                                                    isGuest = state.isGuest,
-                                                    participant = state.chatParticipantsInWaitingRoom[i],
-                                                    onAdmitParticipantClicked = onAdmitParticipantClicked,
-                                                    onDenyParticipantClicked = onDenyParticipantClicked,
-                                                    onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked
-                                                )
-                                            }
+                        Row(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column {
+                                if (isCallUserLimitWarningShown) {
+                                    ParticipantsLimitWarningComposeView(
+                                        modifier = Modifier.testTag(
+                                            TEST_TAG_PARTICIPANTS_WARNING
+                                        ),
+                                        isModerator = hasHostPermission(),
+                                    )
+                                }
 
-                                        ParticipantsSection.InCallSection ->
-                                            state.chatParticipantsInCall.indices.forEach { i ->
-                                                ParticipantInCallItem(
-                                                    section = state.participantsSection,
-                                                    myPermission = state.myPermission,
-                                                    isGuest = state.isGuest,
-                                                    participant = state.chatParticipantsInCall[i],
-                                                    onAdmitParticipantClicked = onAdmitParticipantClicked,
-                                                    onDenyParticipantClicked = onDenyParticipantClicked,
-                                                    onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked
-                                                )
-                                            }
+                                LazyColumn(
+                                    state = listState,
+                                ) {
+                                    item(key = "Participants lists") {
+                                        when (participantsSection) {
+                                            ParticipantsSection.WaitingRoomSection ->
+                                                chatParticipantsInWaitingRoom.indices.forEach { i ->
+                                                    ParticipantInCallItem(
+                                                        section = participantsSection,
+                                                        myPermission = myPermission,
+                                                        isGuest = isGuest,
+                                                        isUsersLimitInCallReached = waitingRoomManagementState.isUsersLimitInCallReached(),
+                                                        participant = chatParticipantsInWaitingRoom[i],
+                                                        onAdmitParticipantClicked = onAdmitParticipantClicked,
+                                                        onDenyParticipantClicked = onDenyParticipantClicked,
+                                                        onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked
+                                                    )
+                                                }
 
-                                        ParticipantsSection.NotInCallSection ->
-                                            state.chatParticipantsNotInCall.indices.forEach { i ->
-                                                ParticipantInCallItem(
-                                                    section = state.participantsSection,
-                                                    myPermission = state.myPermission,
-                                                    isGuest = state.isGuest,
-                                                    participant = state.chatParticipantsNotInCall[i],
-                                                    isRingingAll = state.isRingingAll,
-                                                    onAdmitParticipantClicked = onAdmitParticipantClicked,
-                                                    onDenyParticipantClicked = onDenyParticipantClicked,
-                                                    onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked,
-                                                    onRingParticipantClicked = onRingParticipantClicked
-                                                )
-                                            }
+                                            ParticipantsSection.InCallSection ->
+                                                chatParticipantsInCall.indices.forEach { i ->
+                                                    ParticipantInCallItem(
+                                                        section = participantsSection,
+                                                        myPermission = myPermission,
+                                                        isGuest = isGuest,
+                                                        participant = chatParticipantsInCall[i],
+                                                        onAdmitParticipantClicked = onAdmitParticipantClicked,
+                                                        onDenyParticipantClicked = onDenyParticipantClicked,
+                                                        onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked
+                                                    )
+                                                }
+
+                                            ParticipantsSection.NotInCallSection ->
+                                                chatParticipantsNotInCall.indices.forEach { i ->
+                                                    ParticipantInCallItem(
+                                                        section = participantsSection,
+                                                        myPermission = myPermission,
+                                                        isGuest = isGuest,
+                                                        participant = chatParticipantsNotInCall[i],
+                                                        isRingingAll = isRingingAll,
+                                                        onAdmitParticipantClicked = onAdmitParticipantClicked,
+                                                        onDenyParticipantClicked = onDenyParticipantClicked,
+                                                        onParticipantMoreOptionsClicked = onParticipantMoreOptionsClicked,
+                                                        onRingParticipantClicked = onRingParticipantClicked
+                                                    )
+                                                }
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(68.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    RaisedDefaultMegaButton(
+                    Row(
                         modifier = Modifier
-                            .padding(start = 24.dp, end = 24.dp, bottom = 15.dp)
-                            .fillMaxWidth(),
-                        textId = when {
-                            state.participantsSection == ParticipantsSection.WaitingRoomSection -> {
-                                R.string.meetings_waiting_room_admit_users_to_call_dialog_admit_button
-                            }
-
-                            state.participantsSection == ParticipantsSection.NotInCallSection && state.myPermission > ChatRoomPermission.ReadOnly -> {
-                                R.string.meetings_bottom_panel_not_in_call_participants_call_all_button
-                            }
-
-                            state.participantsSection == ParticipantsSection.InCallSection &&
-                                    state.myPermission == ChatRoomPermission.Moderator -> {
-                                when (state.areAllParticipantsMuted()) {
-                                    true -> R.string.meetings_bottom_panel_in_call_participants_all_muted_label
-                                    false -> R.string.meetings_bottom_panel_in_call_participants_mute_all_participants_button
+                            .fillMaxWidth()
+                            .height(68.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        RaisedDefaultMegaButton(
+                            modifier = Modifier
+                                .padding(start = 24.dp, end = 24.dp, bottom = 15.dp)
+                                .fillMaxWidth(),
+                            textId = when {
+                                participantsSection == ParticipantsSection.WaitingRoomSection -> {
+                                    R.string.meetings_waiting_room_admit_users_to_call_dialog_admit_button
                                 }
+
+                                participantsSection == ParticipantsSection.NotInCallSection && myPermission > ChatRoomPermission.ReadOnly -> {
+                                    R.string.meetings_bottom_panel_not_in_call_participants_call_all_button
+                                }
+
+                                participantsSection == ParticipantsSection.InCallSection &&
+                                        myPermission == ChatRoomPermission.Moderator -> {
+                                    when (areAllParticipantsMuted()) {
+                                        true -> R.string.meetings_bottom_panel_in_call_participants_all_muted_label
+                                        false -> R.string.meetings_bottom_panel_in_call_participants_mute_all_participants_button
+                                    }
+                                }
+
+                                else -> if (callType == CallType.Meeting) R.string.meetings_scheduled_meeting_info_share_meeting_link_label else R.string.meetings_group_call_bottom_panel_share_chat_link_button
+                            },
+                            onClick = when {
+                                participantsSection == ParticipantsSection.WaitingRoomSection -> onAdmitAllClicked
+                                participantsSection == ParticipantsSection.NotInCallSection && myPermission > ChatRoomPermission.ReadOnly -> onRingAllParticipantsClicked
+                                participantsSection == ParticipantsSection.InCallSection &&
+                                        myPermission == ChatRoomPermission.Moderator &&
+                                        !areAllParticipantsMuted() -> onMuteAllParticipantsClick
+
+                                else -> onShareMeetingLink
+                            },
+                            enabled = when {
+                                participantsSection == ParticipantsSection.NotInCallSection && myPermission > ChatRoomPermission.ReadOnly -> !isRingingAll
+                                participantsSection == ParticipantsSection.InCallSection &&
+                                        myPermission == ChatRoomPermission.Moderator &&
+                                        areAllParticipantsMuted() -> false
+
+                                participantsSection == ParticipantsSection.WaitingRoomSection -> isAdmitAllButtonEnabled
+                                else -> true
                             }
+                        )
+                    }
+                }
 
-                            else -> if (state.callType == CallType.Meeting) R.string.meetings_scheduled_meeting_info_share_meeting_link_label else R.string.meetings_group_call_bottom_panel_share_chat_link_button
-                        },
-                        onClick = when {
-                            state.participantsSection == ParticipantsSection.WaitingRoomSection -> onAdmitAllClicked
-                            state.participantsSection == ParticipantsSection.NotInCallSection && state.myPermission > ChatRoomPermission.ReadOnly -> onRingAllParticipantsClicked
-                            state.participantsSection == ParticipantsSection.InCallSection &&
-                                    state.myPermission == ChatRoomPermission.Moderator &&
-                                    !state.areAllParticipantsMuted() -> onMuteAllParticipantsClick
-
-                            else -> onShareMeetingLink
-                        },
-                        enabled = when {
-                            state.participantsSection == ParticipantsSection.NotInCallSection && state.myPermission > ChatRoomPermission.ReadOnly -> !state.isRingingAll
-                            state.participantsSection == ParticipantsSection.InCallSection &&
-                                    state.myPermission == ChatRoomPermission.Moderator &&
-                                    state.areAllParticipantsMuted() -> false
-
-                            else -> true
-                        }
-                    )
+                EventEffect(
+                    event = snackbarMsg, onConsumed = onResetStateSnackbarMessage
+                ) {
+                    scaffoldState.snackbarHostState.showSnackbar(it)
                 }
             }
 
-            EventEffect(
-                event = state.snackbarMsg, onConsumed = onResetStateSnackbarMessage
-            ) {
-                scaffoldState.snackbarHostState.showSnackbar(it)
-            }
+            SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
+
+            onScrollChange(!firstItemVisible)
+
+            CallParticipantBottomSheetView(
+                modalSheetState = modalSheetState,
+                coroutineScope = coroutineScope,
+                state = uiState,
+                onAddContactClick = onAddContactClicked,
+                onContactInfoClick = onContactInfoClicked,
+                onEditProfileClick = onEditProfileClicked,
+                onSendMessageClick = onSendMessageClicked,
+                onMakeHostClick = onMakeHostClicked,
+                onRemoveAsHostClick = onRemoveAsHostClicked,
+                onDisplayInMainViewClick = onDisplayInMainViewClicked,
+                onMuteParticipantClick = onMuteParticipantClick,
+                onRemoveParticipantClick = onRemoveParticipantClicked,
+            )
         }
-
-        SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
-
-        onScrollChange(!firstItemVisible)
-
-        CallParticipantBottomSheetView(
-            modalSheetState = modalSheetState,
-            coroutineScope = coroutineScope,
-            state = state,
-            onAddContactClick = onAddContactClicked,
-            onContactInfoClick = onContactInfoClicked,
-            onEditProfileClick = onEditProfileClicked,
-            onSendMessageClick = onSendMessageClicked,
-            onMakeHostClick = onMakeHostClicked,
-            onRemoveAsHostClick = onRemoveAsHostClicked,
-            onDisplayInMainViewClick = onDisplayInMainViewClicked,
-            onMuteParticipantClick = onMuteParticipantClick,
-            onRemoveParticipantClick = onRemoveParticipantClicked,
-        )
     }
+
 }
 
 /**
@@ -389,11 +514,12 @@ private fun ParticipantsFullListAppBar(
 @Composable
 fun PreviewUsersListViewWaitingRoom() {
     MegaAppTheme(isDark = true) {
-        ParticipantsFullListView(state = MeetingState(
+        ParticipantsFullListView(uiState = MeetingState(
             participantsSection = ParticipantsSection.WaitingRoomSection,
             chatParticipantsInWaitingRoom = getParticipants(),
             hasWaitingRoom = true
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onBackPressed = {},
             onShareMeetingLink = {},
             onScrollChange = {},
@@ -426,11 +552,12 @@ fun PreviewUsersListViewWaitingRoom() {
 @Composable
 fun PreviewUsersListViewInCall() {
     MegaAppTheme(isDark = true) {
-        ParticipantsFullListView(state = MeetingState(
+        ParticipantsFullListView(uiState = MeetingState(
             participantsSection = ParticipantsSection.InCallSection,
             chatParticipantsInCall = getParticipants(),
             hasWaitingRoom = true
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onBackPressed = {},
             onShareMeetingLink = {},
             onScrollChange = {},
@@ -463,11 +590,12 @@ fun PreviewUsersListViewInCall() {
 @Composable
 fun PreviewUsersListViewNotInCall() {
     MegaAppTheme(isDark = true) {
-        ParticipantsFullListView(state = MeetingState(
+        ParticipantsFullListView(uiState = MeetingState(
             participantsSection = ParticipantsSection.NotInCallSection,
             chatParticipantsNotInCall = getParticipants(),
             hasWaitingRoom = true
         ),
+            waitingRoomManagementState = WaitingRoomManagementState(),
             onBackPressed = {},
             onShareMeetingLink = {},
             onScrollChange = {},

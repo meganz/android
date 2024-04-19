@@ -116,8 +116,9 @@ data class MeetingState(
     val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
     val callEndedDueToFreePlanLimits: Boolean = false,
     val action: String? = null,
-    val currentCall: ChatCall? = null
+    val currentCall: ChatCall? = null,
 ) {
+
     /**
      * Check if waiting room is opened
      */
@@ -181,67 +182,38 @@ data class MeetingState(
                 (participantsSection == ParticipantsSection.WaitingRoomSection && chatParticipantsInWaitingRoom.isNotEmpty())
 
     /**
-     * Get the users limit
+     * Check if the section is right
      */
-    private val callUsersLimit
-        get() = currentCall?.callUsersLimit
+    fun isRightSection(): Boolean =
+        ((participantsSection == ParticipantsSection.WaitingRoomSection &&
+                shouldWaitingRoomListBeShown &&
+                chatParticipantsInWaitingRoom.isNotEmpty()) ||
+                (participantsSection == ParticipantsSection.InCallSection &&
+                        shouldInCallListBeShown &&
+                        chatParticipantsInCall.isNotEmpty()) ||
+                (participantsSection == ParticipantsSection.NotInCallSection &&
+                        shouldNotInCallListBeShown &&
+                        chatParticipantsNotInCall.isNotEmpty())
+                )
 
     /**
-     * Check if participants in the call is equal o more than the limit
+     * Check if see all should be shown
      */
-    fun isUsersLimitInCallReached(): Boolean {
-        callUsersLimit?.let { limit ->
-            return chatParticipantsInCall.size >= limit
-        }
-
-        return false
-    }
-
-    /**
-     * Check if participants in the call and in the WR is more than the limit
-     */
-    private fun isUsersLimitInCallAndInWRReached(): Boolean {
-        callUsersLimit?.let { limit ->
-            return (chatParticipantsInCall.size + chatParticipantsInWaitingRoom.size) >= limit
-        }
-
-        return false
-    }
-
-    /**
-     * Check if user limit warning dialog should be shown
-     */
-    val showUserLimitWarningDialog
-        get() = isCallUnlimitedProPlanFeatureFlagEnabled &&
-                hasHostPermission() &&
-                chatParticipantsInWaitingRoom.isNotEmpty() &&
-                participantsSection == ParticipantsSection.WaitingRoomSection &&
-                (isUsersLimitInCallReached() || isUsersLimitInCallAndInWRReached())
-
-
-    /**
-     * Check if admit all participants should be disabled
-     */
-    val isAdmitAllButtonDisabled
-        get() = isCallUnlimitedProPlanFeatureFlagEnabled &&
-                hasHostPermission() &&
-                chatParticipantsInWaitingRoom.isNotEmpty() &&
-                participantsSection == ParticipantsSection.WaitingRoomSection &&
-                (isUsersLimitInCallReached() || isUsersLimitInCallAndInWRReached())
-
-    /**
-     * Check if admit all participants should be disabled
-     */
-    val isAllowNonHostAddParticipantsButtonDisabled
-        get() = isCallUnlimitedProPlanFeatureFlagEnabled &&
-                hasHostPermission() &&
-                participantsSection == ParticipantsSection.InCallSection &&
-                isUsersLimitInCallReached()
+    val showSeeAllButton
+        get() = ((participantsSection == ParticipantsSection.WaitingRoomSection && shouldWaitingRoomSectionBeShown() && chatParticipantsInWaitingRoom.size > MAX_PARTICIPANTS_IN_BOTTOM_PANEL) ||
+                (participantsSection == ParticipantsSection.InCallSection && chatParticipantsInCall.size > MAX_PARTICIPANTS_IN_BOTTOM_PANEL) ||
+                (participantsSection == ParticipantsSection.NotInCallSection && chatParticipantsNotInCall.size > MAX_PARTICIPANTS_IN_BOTTOM_PANEL))
 
     companion object {
         /**
          * Free plan participants limit
          */
         const val FREE_PLAN_PARTICIPANTS_LIMIT = 100
+
+        /**
+         * Max participants in bottom panel
+         */
+        const val MAX_PARTICIPANTS_IN_BOTTOM_PANEL = 4
+
     }
 }

@@ -220,90 +220,16 @@ class MeetingActivity : PasscodeActivity() {
             isVisible = true
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                val state by meetingViewModel.state.collectAsStateWithLifecycle()
                 MegaAppTheme(isDark = true) {
                     ParticipantsFullListView(
-                        state = state,
                         onScrollChange = { scrolled ->
                             this@MeetingActivity.changeStatusBarColor(
                                 scrolled,
                                 true
                             )
                         },
-                        onBackPressed = {
-                            meetingViewModel.onConsumeShouldWaitingRoomListBeShownEvent()
-                            meetingViewModel.onConsumeShouldInCallListBeShownEvent()
-                            meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
-                        },
-                        onDenyParticipantClicked = { participant ->
-                            waitingRoomManagementViewModel.denyUsersClick(
-                                participant
-                            )
-                        },
-                        onAdmitParticipantClicked = { participant ->
-                            waitingRoomManagementViewModel.admitUsersClick(
-                                participant
-                            )
-                            meetingViewModel.onConsumeShouldWaitingRoomListBeShownEvent()
-                            meetingViewModel.onConsumeShouldInCallListBeShownEvent()
-                            meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
-                        },
-                        onAdmitAllClicked = {
-                            waitingRoomManagementViewModel.admitUsersClick()
-                            meetingViewModel.onConsumeShouldWaitingRoomListBeShownEvent()
-                            meetingViewModel.onConsumeShouldInCallListBeShownEvent()
-                            meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
-                        },
-                        onShareMeetingLink = {
-                            meetingViewModel.queryMeetingLink(shouldShareMeetingLink = true)
-                        },
-                        onParticipantMoreOptionsClicked = { chatParticipant ->
-                            meetingViewModel.onParticipantMoreOptionsClick(chatParticipant)
-                        },
-                        onConsumeSelectParticipantEvent = { meetingViewModel.onConsumeSelectParticipantEvent() },
-                        onBottomPanelHiddenClicked = {
-                            meetingViewModel.onParticipantMoreOptionsClick(
-                                null
-                            )
-                        },
-                        onAddContactClicked = { meetingViewModel.onAddContactClick() },
                         onEditProfileClicked = { editProfile() },
                         onContactInfoClicked = { email -> openContactInfo(email) },
-                        onMakeHostClicked = {
-                            meetingViewModel.updateParticipantPermissions(
-                                ChatRoomPermission.Moderator
-                            )
-                        },
-                        onRemoveAsHostClicked = {
-                            meetingViewModel.updateParticipantPermissions(
-                                ChatRoomPermission.Standard
-                            )
-                        },
-                        onRemoveParticipant = {
-                            meetingViewModel.removeParticipantFromChat()
-                        },
-                        onRemoveParticipantClicked = {
-                            meetingViewModel.showOrHideRemoveParticipantDialog(true)
-                        },
-                        onDismissRemoveParticipantDialog = {
-                            meetingViewModel.showOrHideRemoveParticipantDialog(false)
-                        },
-                        onSendMessageClicked = { meetingViewModel.sendMessageToChat() },
-                        onDisplayInMainViewClicked = {
-                            meetingViewModel.onPinToSpeakerView(true)
-                            meetingViewModel.onConsumeShouldWaitingRoomListBeShownEvent()
-                            meetingViewModel.onConsumeShouldInCallListBeShownEvent()
-                            meetingViewModel.onConsumeShouldNotInCallListBeShownEvent()
-                        },
-                        onRingParticipantClicked = { chatParticipant ->
-                            meetingViewModel.ringParticipant(chatParticipant.handle)
-                        },
-                        onRingAllParticipantsClicked = {
-                            meetingViewModel.ringAllAbsentsParticipants()
-                        },
-                        onMuteParticipantClick = meetingViewModel::muteParticipant,
-                        onMuteAllParticipantsClick = meetingViewModel::muteAllParticipants,
-                        onResetStateSnackbarMessage = meetingViewModel::onSnackbarMessageConsumed
                     )
                 }
             }
