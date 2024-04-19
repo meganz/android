@@ -760,4 +760,13 @@ interface NodeRepository {
      * @param node the folder node to check
      */
     suspend fun isEmptyFolder(node: TypedNode): Boolean
+
+    /**
+     * Set description for a node
+     *
+     * to remove description of a node we need to pass null as description
+     * @param nodeHandle [NodeId]
+     * @param description [String]
+     */
+    suspend fun setNodeDescription(nodeHandle: NodeId, description: String?)
 }

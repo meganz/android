@@ -40,16 +40,6 @@ class DefaultStatisticsRepositoryTest {
     }
 
     @Test
-    internal fun `test that send event would invoke api sendevent`() = runTest {
-        val eventID = 1234
-        val message = "ABCD"
-
-        underTest.sendEvent(eventID, message)
-
-        verify(megaApiGateway).sendEvent(eventID, message)
-    }
-
-    @Test
     internal fun `test that get click count would invoke getclickcount`() = runTest {
         underTest.getMediaDiscoveryClickCount()
 

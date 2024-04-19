@@ -1108,4 +1108,15 @@ internal class NodeRepositoryImpl @Inject constructor(
             return true
         }
     }
+
+    override suspend fun setNodeDescription(nodeHandle: NodeId, description: String?) =
+        withContext(ioDispatcher) {
+            val node = megaApiGateway.getMegaNodeByHandle(nodeHandle.longValue)
+            requireNotNull(node) { "Node not found" }
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("setNodeDescription") {}
+                megaApiGateway.setNodeDescription(node, description, listener)
+                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+            }
+        }
 }

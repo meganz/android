@@ -8,11 +8,6 @@ interface StatisticsRepository {
     /**
      * Send an event to MEGA stats
      */
-    @Deprecated(
-        message = "This has been deprecated in favour of the below sendEvent",
-        replaceWith = ReplaceWith("sendEvent(eventId, message, addJourneyId, viewId)")
-    )
-    suspend fun sendEvent(eventID: Int, message: String)
 
     /**
      * Send an event to the stats server.
