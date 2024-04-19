@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -29,10 +31,10 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable
 internal fun BottomSheetContentLayout(
-    modifier: Modifier = Modifier,
     title: String,
     options: List<FilterOptionEntity>,
     onItemSelected: (FilterOptionEntity) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column {
         MegaText(
@@ -41,32 +43,32 @@ internal fun BottomSheetContentLayout(
             textColor = TextColor.Secondary,
             style = MaterialTheme.typography.subtitle1,
         )
-
-        options.map { option ->
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .clickable(
-                        onClick = { onItemSelected(option) })
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                MegaText(
-                    text = stringResource(id = option.title),
-                    textColor = TextColor.Primary,
-                    style = MaterialTheme.typography.subtitle2,
-                )
-
-                if (option.isSelected) {
-                    Icon(
-                        painter = painterResource(id = iconPackR.drawable.ic_check_medium_regular_outline),
-                        tint = colorResource(id = R.color.teal_300),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(24.dp)
+        LazyColumn {
+            items(options) { option ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .clickable(
+                            onClick = { onItemSelected(option) })
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    MegaText(
+                        text = stringResource(id = option.title),
+                        textColor = TextColor.Primary,
+                        style = MaterialTheme.typography.subtitle2,
                     )
+
+                    if (option.isSelected) {
+                        Icon(
+                            painter = painterResource(id = iconPackR.drawable.ic_check_medium_regular_outline),
+                            tint = colorResource(id = R.color.teal_300),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 }
             }
         }
