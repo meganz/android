@@ -50,7 +50,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -58,7 +57,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountFragment.Companion.PRIVACY_POLICY_URL
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
@@ -70,10 +68,9 @@ import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceString
 import mega.privacy.android.app.upgradeAccount.view.components.MonthlyYearlyTabs
 import mega.privacy.android.app.upgradeAccount.view.components.ProPlanInfoCard
 import mega.privacy.android.app.upgradeAccount.view.components.SaveUpToLabel
+import mega.privacy.android.app.upgradeAccount.view.components.SubscriptionDetails
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.PRICING_PAGE_URL
-import mega.privacy.android.app.utils.Constants.TERMS_OF_SERVICE_URL
-import mega.privacy.android.app.utils.PLAY_STORE_SUBSCRIPTION_URL
 import mega.privacy.android.core.ui.controls.text.MegaSpannedClickableText
 import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.model.MegaSpanStyle
@@ -82,8 +79,6 @@ import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.Typography
 import mega.privacy.android.core.ui.theme.extensions.black_yellow_700
-import mega.privacy.android.core.ui.theme.extensions.body2medium
-import mega.privacy.android.core.ui.theme.extensions.body4
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_800
 import mega.privacy.android.core.ui.theme.extensions.grey_100_alpha_060_dark_grey
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
@@ -97,7 +92,6 @@ import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleNoTitleTopAppBar
 import mega.privacy.android.shared.theme.MegaAppTheme
-import java.util.Locale
 
 internal const val UPGRADE_ACCOUNT_SCREEN_TAG = "upgrade_account_screen:"
 internal const val BILLING_WARNING_TAG = "upgrade_account_screen:box_warning_unavailable_payments"
@@ -616,145 +610,6 @@ private fun FeaturesOfPlans(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun SubscriptionDetails(
-    onLinkClick: (link: String) -> Unit,
-    chosenPlan: AccountType,
-    subscriptionList: List<LocalisedSubscription>,
-    isMonthly: Boolean,
-) {
-    var subscriptionDetailsBodyString =
-        stringResource(
-            id = if (isMonthly) {
-                R.string.account_upgrade_account_subscription_details_body_monthly_without_price
-            } else {
-                R.string.account_upgrade_account_subscription_details_body_yearly_without_price
-            }
-        )
-    val subscription = subscriptionList.firstOrNull { it.accountType == chosenPlan }
-    val formattedPrice = subscription?.localisePriceCurrencyCode(Locale.getDefault(), isMonthly)
-    var testTag = if (isMonthly) "_monthly_no_price" else "_yearly_no_price"
-    when (chosenPlan) {
-        AccountType.PRO_LITE -> {
-            if (formattedPrice != null) {
-                subscriptionDetailsBodyString = stringResource(
-                    id = if (isMonthly) {
-                        R.string.account_upgrade_account_subscription_details_body_monthly_with_price
-                    } else {
-                        R.string.account_upgrade_account_subscription_details_body_yearly_with_price
-                    },
-                    formattedPrice.price,
-                    formattedPrice.price
-                )
-                testTag = if (isMonthly) "_monthly_lite_with_price" else "_yearly_lite_with_price"
-            }
-        }
-
-        AccountType.PRO_I -> {
-            if (formattedPrice != null) {
-                subscriptionDetailsBodyString = stringResource(
-                    id = if (isMonthly) {
-                        R.string.account_upgrade_account_subscription_details_body_monthly_with_price
-                    } else {
-                        R.string.account_upgrade_account_subscription_details_body_yearly_with_price
-                    },
-                    formattedPrice.price,
-                    formattedPrice.price
-                )
-                testTag = if (isMonthly) "_monthly_pro_i_with_price" else "_yearly_pro_i_with_price"
-            }
-        }
-
-        AccountType.PRO_II -> {
-            if (formattedPrice != null) {
-                subscriptionDetailsBodyString = stringResource(
-                    id = if (isMonthly) {
-                        R.string.account_upgrade_account_subscription_details_body_monthly_with_price
-                    } else {
-                        R.string.account_upgrade_account_subscription_details_body_yearly_with_price
-                    },
-                    formattedPrice.price,
-                    formattedPrice.price
-                )
-                testTag =
-                    if (isMonthly) "_monthly_pro_ii_with_price" else "_yearly_pro_ii_with_price"
-            }
-        }
-
-        AccountType.PRO_III -> {
-            if (formattedPrice != null) {
-                subscriptionDetailsBodyString = stringResource(
-                    id = if (isMonthly) {
-                        R.string.account_upgrade_account_subscription_details_body_monthly_with_price
-                    } else {
-                        R.string.account_upgrade_account_subscription_details_body_yearly_with_price
-                    },
-                    formattedPrice.price,
-                    formattedPrice.price
-                )
-                testTag =
-                    if (isMonthly) "_monthly_pro_iii_with_price" else "_yearly_pro_iii_with_price"
-            }
-        }
-
-        else -> {
-            subscriptionDetailsBodyString = stringResource(
-                id = if (isMonthly) {
-                    R.string.account_upgrade_account_subscription_details_body_monthly_without_price
-                } else {
-                    R.string.account_upgrade_account_subscription_details_body_yearly_without_price
-                }
-            )
-            testTag = if (isMonthly) "_monthly_no_price" else "_yearly_no_price"
-        }
-    }
-    Column(
-        modifier = Modifier
-            .padding(
-                start = 24.dp,
-                end = 24.dp,
-                bottom = 50.dp
-            )
-            .testTag(GOOGLE_PLAY_STORE_SUBSCRIPTION_LINK_TAG)
-    ) {
-        MegaText(
-            modifier = Modifier.testTag(SUBSCRIPTION_DETAILS_TITLE_TAG),
-            text = stringResource(id = R.string.account_upgrade_account_description_subscription_title),
-            style = MaterialTheme.typography.body2medium,
-            textColor = TextColor.Primary,
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        MegaSpannedClickableText(
-            modifier = Modifier.testTag("$SUBSCRIPTION_DETAILS_DESCRIPTION_TAG$testTag"),
-            value = subscriptionDetailsBodyString,
-            styles = hashMapOf(
-                SpanIndicator('A') to MegaSpanStyleWithAnnotation(
-                    MegaSpanStyle(
-                        SpanStyle(textDecoration = TextDecoration.None),
-                        color = TextColor.Accent,
-                    ), PLAY_STORE_SUBSCRIPTION_URL
-                ),
-                SpanIndicator('B') to MegaSpanStyleWithAnnotation(
-                    MegaSpanStyle(
-                        SpanStyle(textDecoration = TextDecoration.None),
-                        color = TextColor.Accent,
-                    ), TERMS_OF_SERVICE_URL
-                ),
-                SpanIndicator('C') to MegaSpanStyleWithAnnotation(
-                    MegaSpanStyle(
-                        SpanStyle(textDecoration = TextDecoration.None),
-                        color = TextColor.Accent,
-                    ), PRIVACY_POLICY_URL
-                ),
-            ),
-            onAnnotationClick = onLinkClick,
-            baseStyle = MaterialTheme.typography.body4.copy(lineHeight = 16.sp),
-            color = TextColor.Primary
-        )
-        Spacer(modifier = Modifier.height(42.dp))
     }
 }
 

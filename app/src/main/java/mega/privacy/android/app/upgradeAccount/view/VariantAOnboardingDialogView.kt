@@ -26,10 +26,6 @@ import com.google.accompanist.placeholder.fade
 import com.google.accompanist.placeholder.placeholder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
-import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
-import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
-import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
-import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.view.components.ButtonsRow
 import mega.privacy.android.app.upgradeAccount.view.components.FeatureRow
 import mega.privacy.android.app.upgradeAccount.view.components.GetProPlanColumn
@@ -38,22 +34,20 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_900
 import mega.privacy.android.core.ui.theme.extensions.subtitle1medium
 import mega.privacy.android.core.ui.theme.tokens.TextColor
-import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.Currency
-import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.app.upgradeAccount.view.ChooseAccountPreviewProvider.Companion.subscriptionProLite
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 internal const val IMAGE_TAG = "onboarding_screen_variant_a:image"
-internal const val PRO_PLAN_TITLE = "onboarding_screen_variant_a:pro_plan_title"
-internal const val PRO_PLAN_TEXT = "onboarding_screen_variant_a:pro_plan_description"
-internal const val FEATURE_TITLE = "onboarding_screen_variant_a:feature_title"
-internal const val STORAGE_DESCRIPTION_ROW = "onboarding_screen_variant_a:storage_description_row"
+internal const val PRO_PLAN_TITLE = "onboarding_screen:pro_plan_title"
+internal const val PRO_PLAN_TEXT = "onboarding_screen:pro_plan_description"
+internal const val FEATURE_TITLE = "onboarding_screen:feature_title"
+internal const val STORAGE_DESCRIPTION_ROW = "onboarding_screen:storage_description_row"
 internal const val FILE_SHARING_DESCRIPTION_ROW =
-    "onboarding_screen_variant_a:file_sharing_description_row"
-internal const val BACKUP_DESCRIPTION_ROW = "onboarding_screen_variant_a:backup_description_row"
-internal const val VPN_DESCRIPTION_ROW = "onboarding_screen_variant_a:vpn_description_row"
-internal const val CHAT_DESCRIPTION_ROW = "onboarding_screen_variant_a:chat_description_row"
+    "onboarding_screen:file_sharing_description_row"
+internal const val BACKUP_DESCRIPTION_ROW = "onboarding_screen:backup_description_row"
+internal const val VPN_DESCRIPTION_ROW = "onboarding_screen:vpn_description_row"
+internal const val CHAT_DESCRIPTION_ROW = "onboarding_screen:chat_description_row"
 internal const val SKIP_BUTTON = "onboarding_screen_variant_a:skip_button"
 internal const val VIEW_PRO_PLAN_BUTTON = "onboarding_screen_variant_a:view_pro_plan_button"
 
@@ -189,25 +183,4 @@ private class VariantAOnboardingDialogPreviewProvider :
                 cheapestSubscriptionAvailable = subscriptionProLite
             )
         )
-
-    companion object {
-        val localisedPriceStringMapper = LocalisedPriceStringMapper()
-        val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
-        val formattedSizeMapper = FormattedSizeMapper()
-
-        val subscriptionProLite = LocalisedSubscription(
-            accountType = AccountType.PRO_LITE,
-            storage = 400,
-            monthlyTransfer = 1024,
-            yearlyTransfer = 12288,
-            monthlyAmount = CurrencyAmount(4.99F, Currency("EUR")),
-            yearlyAmount = CurrencyAmount(
-                49.99F,
-                Currency("EUR")
-            ),
-            localisedPrice = localisedPriceStringMapper,
-            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
-            formattedSize = formattedSizeMapper,
-        )
-    }
 }

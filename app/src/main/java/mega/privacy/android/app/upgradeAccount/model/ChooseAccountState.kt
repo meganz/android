@@ -1,5 +1,6 @@
 package mega.privacy.android.app.upgradeAccount.model
 
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Product
 
 /**
@@ -9,6 +10,8 @@ import mega.privacy.android.domain.entity.Product
  * @property product list of Product subscriptions
  * @property cheapestSubscriptionAvailable cheapest subscription, which is available for user (Pro Lite or Pro I)
  * @property enableVariantAUI Boolean, to check if feature flag ChooseAccountScreenVariantA is enabled
+ * @property chosenPlan account type chosen by user (when user taps on one of the plans)
+ * @property isPaymentMethodAvailable boolean to determine if Payments are available through Google Play Store
  * @constructor Create default Upgrade Account state
  */
 data class ChooseAccountState(
@@ -16,4 +19,6 @@ data class ChooseAccountState(
     val product: List<Product> = emptyList(),
     val cheapestSubscriptionAvailable: LocalisedSubscription? = null,
     val enableVariantAUI: Boolean = false,
+    val chosenPlan: AccountType = AccountType.FREE,
+    val isPaymentMethodAvailable: Boolean = true,
 )

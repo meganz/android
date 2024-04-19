@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,30 +27,25 @@ import mega.privacy.android.app.upgradeAccount.model.extensions.toUIAccountType
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
+import mega.privacy.android.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.core.ui.controls.text.MegaText
+import mega.privacy.android.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.body2
 import mega.privacy.android.core.ui.theme.caption
-import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.grey_050_grey_800
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_050_white_alpha_050
 import mega.privacy.android.core.ui.theme.extensions.h6Medium
+import mega.privacy.android.core.ui.theme.extensions.subtitle1medium
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
-import mega.privacy.android.core.ui.theme.subtitle1
-import mega.privacy.android.core.ui.theme.subtitle2
-import mega.privacy.android.core.ui.theme.teal_100
+import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyAmount
-import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedAlignedText
-import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import java.util.Locale
 
-internal const val CURRENT_PLAN_TAG = "label_current_plan"
-internal const val RECOMMENDED_PLAN_TAG = "label_recommended_plan"
 
 /**
  * common component for screen with Pro plans info, e.g. UpgradeAccountView or Onboarding dialog Variant B
@@ -69,16 +63,26 @@ internal fun ProPlanInfoCard(
     testTag: String,
     modifier: Modifier = Modifier,
 ) {
+    val isFreePlan = proPlan == AccountType.FREE
     val storageValueString =
-        stringResource(
-            id = subscription.formatStorageSize().unit,
-            subscription.formatStorageSize().size
-        )
+        if (isFreePlan) {
+            "20 GB"
+        } else {
+            stringResource(
+                id = subscription.formatStorageSize().unit,
+                subscription.formatStorageSize().size
+            )
+        }
     val transferValueString =
-        stringResource(
-            id = subscription.formatTransferSize(isMonthly).unit,
-            subscription.formatTransferSize(isMonthly).size
-        )
+
+        if (isFreePlan) {
+            "Limited"
+        } else {
+            stringResource(
+                id = subscription.formatTransferSize(isMonthly).unit,
+                subscription.formatTransferSize(isMonthly).size
+            )
+        }
 
     val uiAccountType = proPlan.toUIAccountType()
 
@@ -123,25 +127,22 @@ internal fun ProPlanInfoCard(
             .testTag("$testTag${uiAccountType.ordinal}")) {
         Column {
             Row {
-                Text(
+                MegaText(
                     text = stringResource(id = uiAccountType.textValue),
-                    style = subtitle1,
+                    textColor = TextColor.Primary,
+                    style = MaterialTheme.typography.subtitle1medium,
                     modifier = Modifier.padding(
                         start = 16.dp,
                         top = 12.dp,
                         end = 8.dp,
                         bottom = 12.dp
                     ),
-                    fontWeight = FontWeight.Medium,
                 )
                 if (showCurrentPlanLabel) {
-                    Text(
+                    MegaText(
                         text = stringResource(id = R.string.account_upgrade_account_pro_plan_info_current_plan_label),
-                        style = subtitle2,
-                        fontSize = 11.sp,
-                        lineHeight = 14.sp,
-                        fontWeight = FontWeight(500),
-                        color = MaterialTheme.colors.black_white,
+                        textColor = TextColor.Primary,
+                        style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight(600)),
                         modifier = Modifier
                             .background(
                                 color = MaterialTheme.colors.grey_050_grey_800,
@@ -155,16 +156,13 @@ internal fun ProPlanInfoCard(
                     )
                 }
                 if (isRecommended) {
-                    Text(
+                    MegaText(
                         text = stringResource(id = R.string.account_upgrade_account_pro_plan_info_recommended_label),
-                        style = subtitle2,
-                        fontSize = 11.sp,
-                        lineHeight = 14.sp,
-                        fontWeight = FontWeight(500),
-                        color = black,
+                        textColor = TextColor.OnColor,
+                        style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight(600)),
                         modifier = Modifier
                             .background(
-                                color = teal_100,
+                                color = MaterialTheme.colors.teal_300_teal_200,
                                 shape = RoundedCornerShape(8.dp)
                             )
                             .align(Alignment.CenterVertically)
@@ -191,55 +189,60 @@ internal fun ProPlanInfoCard(
                         value = storageString,
                         baseStyle = body2,
                         styles = hashMapOf(
-                            SpanIndicator('A') to SpanStyle(
-                                color = MaterialTheme.colors.black_white,
-                                fontWeight = FontWeight.Medium
+                            SpanIndicator('A') to MegaSpanStyle(
+                                spanStyle = SpanStyle(fontWeight = FontWeight.Medium),
+                                color = TextColor.Primary,
                             ),
-                            SpanIndicator('B') to SpanStyle(
-                                color = MaterialTheme.colors.grey_alpha_050_white_alpha_050,
+                            SpanIndicator('B') to MegaSpanStyle(
+                                color = TextColor.Secondary,
                             )
                         ),
+                        color = TextColor.Primary,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                     MegaSpannedText(
                         value = transferString,
                         baseStyle = body2,
                         styles = hashMapOf(
-                            SpanIndicator('A') to SpanStyle(
-                                color = MaterialTheme.colors.black_white,
-                                fontWeight = FontWeight.Medium
+                            SpanIndicator('A') to MegaSpanStyle(
+                                spanStyle = SpanStyle(fontWeight = FontWeight.Medium),
+                                color = TextColor.Primary,
                             ),
-                            SpanIndicator('B') to SpanStyle(
-                                color = MaterialTheme.colors.grey_alpha_050_white_alpha_050,
+                            SpanIndicator('B') to MegaSpanStyle(
+                                color = TextColor.Secondary,
                             )
-                        )
+                        ),
+                        color = TextColor.Primary,
                     )
                 }
                 Column(
                     modifier = Modifier.weight(0.5f),
                     horizontalAlignment = Alignment.End
                 ) {
-                    if (proPlan == AccountType.FREE)
-                        Text(
+                    if (isFreePlan)
+                        MegaText(
                             text = "Free",
+                            textColor = TextColor.Primary,
                             style = MaterialTheme.typography.h6Medium,
-                            color = MaterialTheme.colors.black_white,
                             modifier = Modifier.padding(top = 8.dp)
                         )
                     else
-                        MegaSpannedAlignedText(
+                        MegaSpannedText(
                             value = priceString,
                             baseStyle = caption,
                             styles = hashMapOf(
-                                SpanIndicator('A') to SpanStyle(
-                                    color = MaterialTheme.colors.black_white,
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight(500),
+                                SpanIndicator('A') to MegaSpanStyle(
+                                    spanStyle = SpanStyle(
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Medium
+                                    ),
+                                    color = TextColor.Primary,
                                 ),
-                                SpanIndicator('B') to SpanStyle(
-                                    color = MaterialTheme.colors.grey_alpha_050_white_alpha_050,
+                                SpanIndicator('B') to MegaSpanStyle(
+                                    color = TextColor.Secondary,
                                 )
                             ),
+                            color = TextColor.Primary,
                             modifier = Modifier
                                 .padding(
                                     start = 24.dp,
@@ -286,3 +289,40 @@ fun ProPlanInfoCardPreview() {
         )
     }
 }
+
+@CombinedThemePreviews
+@Composable
+fun FreePlanInfoCardPreview() {
+    val localisedPriceStringMapper = LocalisedPriceStringMapper()
+    val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
+    val formattedSizeMapper = FormattedSizeMapper()
+    val subscriptionProI = LocalisedSubscription(
+        accountType = AccountType.PRO_I,
+        storage = 2048,
+        monthlyTransfer = 2048,
+        yearlyTransfer = 24576,
+        monthlyAmount = CurrencyAmount(9.99.toFloat(), Currency("EUR")),
+        yearlyAmount = CurrencyAmount(
+            99.99.toFloat(),
+            Currency("EUR")
+        ),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
+    )
+    MegaAppTheme(isDark = isSystemInDarkTheme()) {
+        ProPlanInfoCard(
+            proPlan = AccountType.FREE,
+            subscription = subscriptionProI,
+            isRecommended = true,
+            onPlanClicked = { /*TODO*/ },
+            isMonthly = true,
+            isClicked = false,
+            showCurrentPlanLabel = false,
+            testTag = "upgrade_account_screen:card_pro_plan_",
+        )
+    }
+}
+
+internal const val CURRENT_PLAN_TAG = "label_current_plan"
+internal const val RECOMMENDED_PLAN_TAG = "label_recommended_plan"

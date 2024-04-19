@@ -81,6 +81,7 @@ internal fun FeatureRow(
                 style = MaterialTheme.typography.subtitle2,
                 modifier = Modifier
                     .testTag("$testTag:description")
+                    .padding(top = 2.dp)
                     .placeholder(
                         color = MaterialTheme.colors.grey_020_grey_900,
                         shape = RoundedCornerShape(4.dp),

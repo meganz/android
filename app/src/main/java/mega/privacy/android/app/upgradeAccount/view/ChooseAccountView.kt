@@ -394,14 +394,8 @@ private fun PreviewChooseAccountView(
     }
 }
 
-private class ChooseAccountPreviewProvider :
+internal class ChooseAccountPreviewProvider :
     PreviewParameterProvider<ChooseAccountState> {
-    val localisedSubscriptionsList: List<LocalisedSubscription> = listOf(
-        subscriptionProLite,
-        subscriptionProI,
-        subscriptionProII,
-        subscriptionProIII
-    )
     override val values: Sequence<ChooseAccountState>
         get() = sequenceOf(
             ChooseAccountState(
@@ -472,6 +466,13 @@ private class ChooseAccountPreviewProvider :
             localisedPrice = localisedPriceStringMapper,
             localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
             formattedSize = formattedSizeMapper,
+        )
+
+        val localisedSubscriptionsList: List<LocalisedSubscription> = listOf(
+            subscriptionProLite,
+            subscriptionProI,
+            subscriptionProII,
+            subscriptionProIII
         )
     }
 }

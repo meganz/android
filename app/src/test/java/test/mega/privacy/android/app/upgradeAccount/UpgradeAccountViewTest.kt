@@ -52,76 +52,6 @@ import test.mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class UpgradeAccountViewTest {
-    private val localisedPriceStringMapper = LocalisedPriceStringMapper()
-    private val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
-    private val formattedSizeMapper = FormattedSizeMapper()
-
-    private val localisedSubscriptionProI = LocalisedSubscription(
-        accountType = AccountType.PRO_I,
-        storage = 2048,
-        monthlyTransfer = 2048,
-        yearlyTransfer = 24576,
-        monthlyAmount = CurrencyAmount(9.99.toFloat(), Currency("EUR")),
-        yearlyAmount = CurrencyAmount(
-            99.99.toFloat(),
-            Currency("EUR")
-        ),
-        localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
-        formattedSize = formattedSizeMapper,
-    )
-
-    private val localisedSubscriptionProII = LocalisedSubscription(
-        accountType = AccountType.PRO_II,
-        storage = 8192,
-        monthlyTransfer = 8192,
-        yearlyTransfer = 98304,
-        monthlyAmount = CurrencyAmount(19.99.toFloat(), Currency("EUR")),
-        yearlyAmount = CurrencyAmount(
-            199.99.toFloat(),
-            Currency("EUR")
-        ),
-        localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
-        formattedSize = formattedSizeMapper,
-    )
-
-    private val localisedSubscriptionProIII = LocalisedSubscription(
-        accountType = AccountType.PRO_III,
-        storage = 16384,
-        monthlyTransfer = 16384,
-        yearlyTransfer = 196608,
-        monthlyAmount = CurrencyAmount(29.99.toFloat(), Currency("EUR")),
-        yearlyAmount = CurrencyAmount(
-            299.99.toFloat(),
-            Currency("EUR")
-        ),
-        localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
-        formattedSize = formattedSizeMapper,
-    )
-
-    private val localisedSubscriptionProLite = LocalisedSubscription(
-        accountType = AccountType.PRO_LITE,
-        storage = 400,
-        monthlyTransfer = 1024,
-        yearlyTransfer = 12288,
-        monthlyAmount = CurrencyAmount(4.99.toFloat(), Currency("EUR")),
-        yearlyAmount = CurrencyAmount(
-            49.99.toFloat(),
-            Currency("EUR")
-        ),
-        localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
-        formattedSize = formattedSizeMapper,
-    )
-
-    private val expectedLocalisedSubscriptionsList = listOf(
-        localisedSubscriptionProLite,
-        localisedSubscriptionProI,
-        localisedSubscriptionProII,
-        localisedSubscriptionProIII
-    )
 
     @get:Rule
     var composeRule = createComposeRule()
@@ -767,4 +697,78 @@ class UpgradeAccountViewTest {
             isPaymentMethodAvailable = isPaymentMethodAvailable,
             userSubscription = userSubscription
         )
+
+    companion object {
+        private val localisedPriceStringMapper = LocalisedPriceStringMapper()
+        private val localisedPriceCurrencyCodeStringMapper =
+            LocalisedPriceCurrencyCodeStringMapper()
+        private val formattedSizeMapper = FormattedSizeMapper()
+
+        private val localisedSubscriptionProI = LocalisedSubscription(
+            accountType = AccountType.PRO_I,
+            storage = 2048,
+            monthlyTransfer = 2048,
+            yearlyTransfer = 24576,
+            monthlyAmount = CurrencyAmount(9.99.toFloat(), Currency("EUR")),
+            yearlyAmount = CurrencyAmount(
+                99.99.toFloat(),
+                Currency("EUR")
+            ),
+            localisedPrice = localisedPriceStringMapper,
+            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+            formattedSize = formattedSizeMapper,
+        )
+
+        private val localisedSubscriptionProII = LocalisedSubscription(
+            accountType = AccountType.PRO_II,
+            storage = 8192,
+            monthlyTransfer = 8192,
+            yearlyTransfer = 98304,
+            monthlyAmount = CurrencyAmount(19.99.toFloat(), Currency("EUR")),
+            yearlyAmount = CurrencyAmount(
+                199.99.toFloat(),
+                Currency("EUR")
+            ),
+            localisedPrice = localisedPriceStringMapper,
+            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+            formattedSize = formattedSizeMapper,
+        )
+
+        private val localisedSubscriptionProIII = LocalisedSubscription(
+            accountType = AccountType.PRO_III,
+            storage = 16384,
+            monthlyTransfer = 16384,
+            yearlyTransfer = 196608,
+            monthlyAmount = CurrencyAmount(29.99.toFloat(), Currency("EUR")),
+            yearlyAmount = CurrencyAmount(
+                299.99.toFloat(),
+                Currency("EUR")
+            ),
+            localisedPrice = localisedPriceStringMapper,
+            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+            formattedSize = formattedSizeMapper,
+        )
+
+        private val localisedSubscriptionProLite = LocalisedSubscription(
+            accountType = AccountType.PRO_LITE,
+            storage = 400,
+            monthlyTransfer = 1024,
+            yearlyTransfer = 12288,
+            monthlyAmount = CurrencyAmount(4.99.toFloat(), Currency("EUR")),
+            yearlyAmount = CurrencyAmount(
+                49.99.toFloat(),
+                Currency("EUR")
+            ),
+            localisedPrice = localisedPriceStringMapper,
+            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+            formattedSize = formattedSizeMapper,
+        )
+
+        val expectedLocalisedSubscriptionsList = listOf(
+            localisedSubscriptionProLite,
+            localisedSubscriptionProI,
+            localisedSubscriptionProII,
+            localisedSubscriptionProIII
+        )
+    }
 }

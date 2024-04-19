@@ -11,28 +11,22 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.body2
+import mega.privacy.android.core.ui.theme.extensions.body2medium
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.core.ui.theme.extensions.white_grey_alpha_087
+import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.core.ui.theme.transparent
 
-
-internal const val MONTHLY_TAB_TAG = "tab_monthly"
-internal const val YEARLY_TAB_TAG = "tab_yearly"
-internal const val MONTHLY_CHECK_ICON_TAG = "image_monthly_check"
-internal const val YEARLY_CHECK_ICON_TAG = "image_yearly_check"
 
 /**
  * Composable UI for monthly/yearly tabs to reuse on Upgrade account screen
@@ -90,13 +84,10 @@ internal fun MonthlyYearlyTabs(
                         .testTag("$testTag$MONTHLY_CHECK_ICON_TAG"),
                 )
             }
-            Text(
+            MegaText(
                 text = stringResource(id = R.string.account_upgrade_account_tab_monthly),
-                color =
-                if (isMonthly) MaterialTheme.colors.white_grey_alpha_087
-                else MaterialTheme.colors.textColorSecondary,
-                style = body2,
-                fontWeight = FontWeight.Medium,
+                textColor = if (isMonthly) TextColor.OnColor else TextColor.OnColorDisabled,
+                style = MaterialTheme.typography.body2medium,
             )
         }
 
@@ -141,13 +132,10 @@ internal fun MonthlyYearlyTabs(
                         .testTag("$testTag$YEARLY_CHECK_ICON_TAG"),
                 )
             }
-            Text(
+            MegaText(
                 text = stringResource(id = R.string.account_upgrade_account_tab_yearly),
-                color =
-                if (isMonthly) MaterialTheme.colors.textColorSecondary
-                else MaterialTheme.colors.white_grey_alpha_087,
-                style = body2,
-                fontWeight = FontWeight.Medium,
+                textColor = if (isMonthly) TextColor.OnColorDisabled else TextColor.OnColor,
+                style = MaterialTheme.typography.body2medium,
             )
         }
     }
@@ -164,3 +152,8 @@ private fun MonthlyYearlyTabsPreview() {
         )
     }
 }
+
+internal const val MONTHLY_TAB_TAG = "tab_monthly"
+internal const val YEARLY_TAB_TAG = "tab_yearly"
+internal const val MONTHLY_CHECK_ICON_TAG = "image_monthly_check"
+internal const val YEARLY_CHECK_ICON_TAG = "image_yearly_check"
