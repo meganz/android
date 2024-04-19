@@ -409,12 +409,14 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         }
 
     override suspend fun getLocalFilePath(typedFileNode: TypedFileNode?): String? =
-        typedFileNode?.let {
-            fileGateway.getLocalFile(
-                typedFileNode.name,
-                typedFileNode.size,
-                typedFileNode.modificationTime
-            )?.path
+        withContext(ioDispatcher) {
+            typedFileNode?.let {
+                fileGateway.getLocalFile(
+                    typedFileNode.name,
+                    typedFileNode.size,
+                    typedFileNode.modificationTime
+                )?.path
+            }
         }
 
     override suspend fun deletePlaybackInformation(mediaId: Long) {
