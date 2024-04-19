@@ -141,7 +141,7 @@ class ManageChatHistoryViewModel @Inject constructor(
         }
     }
 
-    private fun updateRetentionTimeState(value: Long) {
+    internal fun updateRetentionTimeState(value: Long) {
         _uiState.update { it.copy(retentionTime = value) }
     }
 

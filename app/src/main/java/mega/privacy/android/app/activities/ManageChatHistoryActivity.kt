@@ -1,5 +1,9 @@
 package mega.privacy.android.app.activities
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -8,13 +12,14 @@ import android.widget.NumberPicker.OnValueChangeListener
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME
+import mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME
 import mega.privacy.android.app.databinding.ActivityManageChatHistoryBinding
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.chat.view.dialog.ClearChatConfirmationDialog
@@ -72,7 +77,19 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
         }
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
+    private val retentionTimeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == null || intent.action != ACTION_UPDATE_RETENTION_TIME) {
+                return
+            }
+
+            val seconds =
+                intent.getLongExtra(RETENTION_TIME, DISABLED_RETENTION_TIME)
+            viewModel.updateRetentionTimeState(seconds)
+            updateRetentionTimeUI(seconds)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -84,6 +101,11 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
         viewModel.initializeChatRoom()
 
         collectFlows()
+
+        registerReceiver(
+            retentionTimeReceiver,
+            IntentFilter(ACTION_UPDATE_RETENTION_TIME)
+        )
 
         binding = ActivityManageChatHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -555,5 +577,10 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
             onBackPressedDispatcher.onBackPressed()
 
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onDestroy() {
+        unregisterReceiver(retentionTimeReceiver)
+        super.onDestroy()
     }
 }
