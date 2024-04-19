@@ -3510,7 +3510,7 @@ interface MegaApiGateway {
      * @param name     Full name of the user (firstname + lastname)
      * @param listener MegaRequestListener to track this request
      */
-    fun resendSignupLink(email: String, name: String, listener: MegaRequestListenerInterface)
+    fun resendSignupLink(email: String, name: String?, listener: MegaRequestListenerInterface)
 
     /**
      * Cancel a registration process

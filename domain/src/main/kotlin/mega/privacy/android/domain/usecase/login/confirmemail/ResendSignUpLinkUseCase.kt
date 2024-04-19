@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.login.confirmemail
 
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.security.LoginRepository
 import javax.inject.Inject
 
@@ -17,8 +18,10 @@ class ResendSignUpLinkUseCase @Inject constructor(
      *
      * @param email    Email for the account
      * @param fullName Full name of the user
+     *
+     * @return The corresponding email
      */
-    suspend operator fun invoke(email: String, fullName: String) {
+    @Throws(MegaException::class)
+    suspend operator fun invoke(email: String, fullName: String?) =
         loginRepository.resendSignupLink(email, fullName)
-    }
 }

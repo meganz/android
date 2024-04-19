@@ -639,6 +639,8 @@ interface AccountRepository {
 
     /**
      * Cancel a registration process
+     *
+     * @return The corresponding email
      */
-    suspend fun cancelCreateAccount()
+    suspend fun cancelCreateAccount(): String
 }

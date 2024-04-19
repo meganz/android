@@ -154,6 +154,8 @@ interface LoginRepository {
      *
      * @param email    Email for the account
      * @param fullName Full name of the user
+     *
+     * @return The corresponding email
      */
-    suspend fun resendSignupLink(email: String, fullName: String)
+    suspend fun resendSignupLink(email: String, fullName: String?): String
 }

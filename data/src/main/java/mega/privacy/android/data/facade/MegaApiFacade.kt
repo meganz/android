@@ -1576,7 +1576,7 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun resendSignupLink(
         email: String,
-        name: String,
+        name: String?,
         listener: MegaRequestListenerInterface,
     ) = megaApi.resendSignupLink(email, name, listener)
 

@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.account
 
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.AccountRepository
 import javax.inject.Inject
 
@@ -12,8 +13,9 @@ class CancelCreateAccountUseCase @Inject constructor(
 
     /**
      * Invocation method
+     *
+     * @return The corresponding email
      */
-    suspend operator fun invoke() {
-        accountRepository.cancelCreateAccount()
-    }
+    @Throws(MegaException::class)
+    suspend operator fun invoke() = accountRepository.cancelCreateAccount()
 }

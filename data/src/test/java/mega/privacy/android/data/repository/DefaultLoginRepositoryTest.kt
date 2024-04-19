@@ -707,6 +707,9 @@ class DefaultLoginRepositoryTest {
         val error = mock<MegaError> {
             on { errorCode }.thenReturn(MegaError.API_OK)
         }
+        val megaRequest = mock<MegaRequest> {
+            on { it.email }.thenReturn(email)
+        }
         whenever(
             megaApiGateway.resendSignupLink(
                 eq(email),
@@ -716,13 +719,14 @@ class DefaultLoginRepositoryTest {
         ).thenAnswer {
             ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
                 mock(),
-                mock(),
+                megaRequest,
                 error,
             )
         }
 
-        underTest.resendSignupLink(email, fullName)
+        val actual = underTest.resendSignupLink(email, fullName)
 
+        assertThat(actual).isEqualTo(email)
         verify(megaApiGateway).resendSignupLink(eq(email), eq(fullName), any())
     }
 

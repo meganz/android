@@ -398,10 +398,12 @@ internal class DefaultLoginRepository @Inject constructor(
         }
     }
 
-    override suspend fun resendSignupLink(email: String, fullName: String) =
+    override suspend fun resendSignupLink(email: String, fullName: String?): String =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->
-                val listener = continuation.getRequestListener("resendSignupLink") { }
+                val listener = continuation.getRequestListener("resendSignupLink") {
+                    it.email
+                }
                 megaApiGateway.resendSignupLink(email, fullName, listener)
                 continuation.invokeOnCancellation {
                     megaApiGateway.removeRequestListener(listener)

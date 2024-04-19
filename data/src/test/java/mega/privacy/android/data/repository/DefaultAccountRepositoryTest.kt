@@ -1862,6 +1862,10 @@ class DefaultAccountRepositoryTest {
         val megaErrorCode = mock<MegaError> {
             on { errorCode }.thenReturn(MegaError.API_OK)
         }
+        val email = "test@test.com"
+        val megaRequest = mock<MegaRequest> {
+            on { it.email }.thenReturn(email)
+        }
         whenever(
             megaApiGateway.cancelCreateAccount(
                 listener = any()
@@ -1869,13 +1873,14 @@ class DefaultAccountRepositoryTest {
         ).thenAnswer {
             ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
                 api = mock(),
-                request = mock(),
+                request = megaRequest,
                 error = megaErrorCode
             )
         }
 
-        underTest.cancelCreateAccount()
+        val actual = underTest.cancelCreateAccount()
 
+        assertThat(actual).isEqualTo(email)
         verify(megaApiGateway).cancelCreateAccount(any())
     }
 }

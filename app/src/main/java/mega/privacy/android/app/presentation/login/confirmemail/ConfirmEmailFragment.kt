@@ -13,6 +13,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentConfirmEmailBinding
@@ -21,14 +23,8 @@ import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaRequestListenerInterface
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * Confirm email fragment.
@@ -38,11 +34,7 @@ import javax.inject.Inject
  * @property firstNameTemp Temporary first name.
  */
 @AndroidEntryPoint
-class ConfirmEmailFragment : Fragment(), MegaRequestListenerInterface {
-
-    @MegaApi
-    @Inject
-    lateinit var megaApi: MegaApiAndroid
+class ConfirmEmailFragment : Fragment() {
 
     private val viewModel: ConfirmEmailViewModel by viewModels()
     private val loginViewModel: LoginViewModel by activityViewModels()
@@ -71,12 +63,21 @@ class ConfirmEmailFragment : Fragment(), MegaRequestListenerInterface {
     }
 
     private fun setupObservers() {
-        viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
+        viewLifecycleOwner.collectFlow(viewModel.uiState) { uiState ->
             with(uiState) {
                 if (isPendingToShowFragment != null) {
                     (requireActivity() as LoginActivity).showFragment(isPendingToShowFragment)
                     viewModel.isPendingToShowFragmentConsumed()
                 }
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(
+            viewModel.uiState.map { it.registeredEmail }.distinctUntilChanged()
+        ) { registeredEmail ->
+            registeredEmail?.let {
+                (requireActivity() as LoginActivity).setTemporalEmail(it)
+                loginViewModel.saveLastRegisteredEmail(it)
             }
         }
     }
@@ -103,14 +104,9 @@ class ConfirmEmailFragment : Fragment(), MegaRequestListenerInterface {
         confirmEmailMisspelled.text = Html.fromHtml(textMisspelled, Html.FROM_HTML_MODE_LEGACY)
         confirmEmailNewEmailResend.setOnClickListener { submitForm() }
         confirmEmailCancel.setOnClickListener {
-            megaApi.cancelCreateAccount(this@ConfirmEmailFragment)
+            viewModel.cancelCreateAccount()
             (requireActivity() as LoginActivity).cancelConfirmationAccount()
         }
-    }
-
-    override fun onDestroyView() {
-        megaApi.removeRequestListener(this)
-        super.onDestroyView()
     }
 
     /**
@@ -131,7 +127,7 @@ class ConfirmEmailFragment : Fragment(), MegaRequestListenerInterface {
             }
 
             binding.confirmEmailNewEmail.text.toString().lowercase().trim { it <= ' ' }.let {
-                megaApi.resendSignupLink(it, firstNameTemp, this@ConfirmEmailFragment)
+                viewModel.resendSignUpLink(email = it, fullName = firstNameTemp)
             }
         }
     }
@@ -179,37 +175,5 @@ class ConfirmEmailFragment : Fragment(), MegaRequestListenerInterface {
             setHintTextAppearance(com.google.android.material.R.style.TextAppearance_Design_Hint)
         }
         confirmEmailNewEmailErrorIcon.isVisible = false
-    }
-
-    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
-        Timber.d("onRequestStart - %s", request.requestString)
-    }
-
-    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
-        Timber.d("onRequestUpdate - %s", request.requestString)
-    }
-
-    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        Timber.d("onRequestFinish - %s_%d", request.requestString, e.errorCode)
-        if (isAdded) {
-            Timber.d("isAdded true")
-            with(requireActivity() as LoginActivity) {
-                showSnackbar(
-                    if (e.errorCode == MegaError.API_OK) {
-                        setTemporalEmail(request.email)
-                        loginViewModel.saveLastRegisteredEmail(request.email)
-                        getString(R.string.confirm_email_misspelled_email_sent)
-                    } else {
-                        e.errorString
-                    }
-                )
-            }
-        } else {
-            Timber.d("isAdded false")
-        }
-    }
-
-    override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        Timber.w("onRequestTemporaryError - %s", request.requestString)
     }
 }

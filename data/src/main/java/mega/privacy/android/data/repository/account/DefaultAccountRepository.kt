@@ -1322,9 +1322,11 @@ internal class DefaultAccountRepository @Inject constructor(
             }
         }
 
-    override suspend fun cancelCreateAccount() = withContext(ioDispatcher) {
+    override suspend fun cancelCreateAccount(): String = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener("cancelCreateAccount") {}
+            val listener = continuation.getRequestListener("cancelCreateAccount") {
+                it.email
+            }
             megaApiGateway.cancelCreateAccount(listener)
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)
