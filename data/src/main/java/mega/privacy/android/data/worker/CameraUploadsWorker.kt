@@ -303,19 +303,7 @@ class CameraUploadsWorker @AssistedInject constructor(
 
             handleLocalIpChangeUseCase(shouldRetryChatConnections = false)
 
-            canRunCameraUploads()?.let { finishedReason ->
-                when (finishedReason) {
-                    CameraUploadsFinishedReason.MEDIA_PERMISSION_NOT_GRANTED,
-                    CameraUploadsFinishedReason.LOCAL_PRIMARY_FOLDER_NOT_VALID,
-                    ->
-                        abortWork(
-                            reason = finishedReason,
-                            restartMode = CameraUploadsRestartMode.StopAndDisable,
-                        )
-
-                    else -> abortWork(reason = finishedReason)
-                }
-            } ?: run {
+            if (canRunCameraUploads()) {
                 Timber.d("Starting upload process")
                 sendStartUploadStatus()
 
@@ -535,34 +523,46 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     /**
-     * Checks if Camera Uploads can run by checking multiple conditions
+     * Checks if Camera Uploads can run by checking multiple conditions.
+     * Abort the worker if an abort reason is raised.
      *
-     * @return null if the Camera Uploads can run, and a [CameraUploadsFinishedReason] otherwise
+     * @return true if the Camera Uploads can run, false otherwise
      */
-    private suspend fun canRunCameraUploads(): CameraUploadsFinishedReason? {
-        return when {
-            !isCameraUploadsEnabled() -> CameraUploadsFinishedReason.DISABLED
-            !hasMediaPermission() -> CameraUploadsFinishedReason.MEDIA_PERMISSION_NOT_GRANTED
-            !isWifiConstraintSatisfied() -> CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
-            !isDeviceAboveMinimumBatteryLevel() -> CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW
-            !isLoginSuccessful() -> CameraUploadsFinishedReason.LOGIN_FAILED
-            isStorageQuotaExceeded() -> CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA
-            !isLocalPrimaryFolderValid() -> CameraUploadsFinishedReason.LOCAL_PRIMARY_FOLDER_NOT_VALID
-            else -> {
-                if (isSecondaryFolderEnabled())
-                    isLocalSecondaryFolderValid()
+    private suspend fun canRunCameraUploads(): Boolean = when {
+        !isLoginSuccessful() -> CameraUploadsFinishedReason.LOGIN_FAILED
+        !isCameraUploadsEnabled() -> CameraUploadsFinishedReason.DISABLED
+        !hasMediaPermission() -> CameraUploadsFinishedReason.MEDIA_PERMISSION_NOT_GRANTED
+        !isLocalPrimaryFolderValid() -> CameraUploadsFinishedReason.LOCAL_PRIMARY_FOLDER_NOT_VALID
+        !isWifiConstraintSatisfied() -> CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
+        !isDeviceAboveMinimumBatteryLevel() -> CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW
+        isStorageQuotaExceeded() -> CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA
+        else -> {
+            if (isSecondaryFolderEnabled())
+                isLocalSecondaryFolderValid()
 
-                when {
-                    !synchronizeUploadNodeHandles() -> CameraUploadsFinishedReason.ERROR_DURING_PROCESS
-                    !checkOrCreatePrimaryUploadNodes() -> CameraUploadsFinishedReason.ERROR_DURING_PROCESS
-                    isSecondaryFolderEnabled() && !checkOrCreateSecondaryUploadNodes() -> CameraUploadsFinishedReason.ERROR_DURING_PROCESS
-                    !initializeBackup() -> CameraUploadsFinishedReason.ERROR_DURING_PROCESS
-                    !createTempCacheFile() -> CameraUploadsFinishedReason.ERROR_DURING_PROCESS
-                    else -> null
-                }
+            when {
+                !synchronizeUploadNodeHandles() -> CameraUploadsFinishedReason.ERROR_DURING_PROCESS
+                !checkOrCreatePrimaryUploadNodes() -> CameraUploadsFinishedReason.ERROR_DURING_PROCESS
+                isSecondaryFolderEnabled() && !checkOrCreateSecondaryUploadNodes() -> CameraUploadsFinishedReason.ERROR_DURING_PROCESS
+                !initializeBackup() -> CameraUploadsFinishedReason.ERROR_DURING_PROCESS
+                !createTempCacheFile() -> CameraUploadsFinishedReason.ERROR_DURING_PROCESS
+                else -> null
             }
         }
-    }
+    }?.let { reasonToAbort ->
+        val restartMode = when (reasonToAbort) {
+            // disable
+            CameraUploadsFinishedReason.DISABLED,
+            CameraUploadsFinishedReason.MEDIA_PERMISSION_NOT_GRANTED,
+            CameraUploadsFinishedReason.LOCAL_PRIMARY_FOLDER_NOT_VALID,
+            -> CameraUploadsRestartMode.StopAndDisable
+
+            // reschedule
+            else -> CameraUploadsRestartMode.Reschedule
+        }
+        abortWork(reasonToAbort, restartMode)
+        false
+    } ?: true
 
 
     /**
