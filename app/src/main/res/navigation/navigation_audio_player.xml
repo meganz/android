@@ -34,7 +34,7 @@
 
     <fragment
         android:id="@+id/audio_queue"
-        android:name="mega.privacy.android.app.mediaplayer.queue.AudioQueueFragment"
+        android:name="mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment"
         android:label="">
     </fragment>
 

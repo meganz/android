@@ -24,8 +24,8 @@ internal fun MediaQueueView(
     isPaused: Boolean,
     lazyListState: LazyListState,
     modifier: Modifier = Modifier,
-    onClick: (index: Int, item: MediaQueueItemUiEntity) -> Unit,
-    onMove: (Int, Int) -> Unit,
+    onClick: (index: Int, item: MediaQueueItemUiEntity) -> Unit = { _, _ -> },
+    onMove: (Int, Int) -> Unit = { _, _ -> },
 ) {
     DragDropListView(
         modifier = modifier.semantics { testTagsAsResourceId = true },
@@ -39,7 +39,9 @@ internal fun MediaQueueView(
             currentPlayingPosition = currentPlayingPosition,
             duration = item.duration,
             thumbnailData = item.thumbnail,
-            isHeaderVisible = index == 0 && item.type == MediaQueueItemType.Previous,
+            isHeaderVisible = (index == 0 && item.type == MediaQueueItemType.Previous)
+                    || item.type == MediaQueueItemType.Playing,
+            isFooterVisible = index != items.size - 1 && item.type == MediaQueueItemType.Playing,
             queueItemType = item.type,
             isAudio = isAudio,
             isPaused = isPaused,

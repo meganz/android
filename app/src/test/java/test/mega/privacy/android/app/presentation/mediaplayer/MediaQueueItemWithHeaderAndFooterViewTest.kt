@@ -37,6 +37,7 @@ class MediaQueueItemWithHeaderAndFooterViewTest {
         duration: String = "10:00",
         thumbnailData: Any? = null,
         isHeaderVisible: Boolean = false,
+        isFooterVisible: Boolean = false,
         queueItemType: MediaQueueItemType = MediaQueueItemType.Playing,
         isAudio: Boolean = true,
         isPaused: Boolean = false,
@@ -52,6 +53,7 @@ class MediaQueueItemWithHeaderAndFooterViewTest {
                 duration = duration,
                 thumbnailData = thumbnailData,
                 isHeaderVisible = isHeaderVisible,
+                isFooterVisible = isFooterVisible,
                 queueItemType = queueItemType,
                 isAudio = isAudio,
                 isPaused = isPaused,
@@ -64,7 +66,7 @@ class MediaQueueItemWithHeaderAndFooterViewTest {
 
     @Test
     fun `test that the UIs are displayed correctly when the queueItemType is Playing`() {
-        setComposeContent()
+        setComposeContent(isHeaderVisible = true, isFooterVisible = true)
 
         MEDIA_QUEUE_ITEM_HEADER_TEXT_VIEW_TEST_TAG.isDisplayed()
         MEDIA_QUEUE_ITEM_FOOTER_TEXT_VIEW_TEST_TAG.isDisplayed()
@@ -88,7 +90,7 @@ class MediaQueueItemWithHeaderAndFooterViewTest {
 
     @Test
     fun `test that the UIs are displayed correctly when the queueItemType is Playing and isPaused is true`() {
-        setComposeContent(isPaused = true)
+        setComposeContent(isPaused = true, isHeaderVisible = true, isFooterVisible = true)
 
         MEDIA_QUEUE_ITEM_HEADER_TEXT_VIEW_TEST_TAG.isDisplayed()
         MEDIA_QUEUE_ITEM_FOOTER_TEXT_VIEW_TEST_TAG.isDisplayed()
@@ -101,7 +103,20 @@ class MediaQueueItemWithHeaderAndFooterViewTest {
     }
 
     @Test
-    fun `test that the UIs are displayed correctly when isHeaderVisible is true`() {
+    fun `test that the UIs are displayed correctly when the queueItemType is Playing and isFooterVisible is false`() {
+        setComposeContent(isPaused = true, isHeaderVisible = true)
+
+        MEDIA_QUEUE_ITEM_HEADER_TEXT_VIEW_TEST_TAG.isDisplayed()
+        MEDIA_QUEUE_ITEM_FOOTER_TEXT_VIEW_TEST_TAG.isNotDisplayed()
+        MEDIA_QUEUE_ITEM_FOOTER_LAYOUT_VIEW_TEST_TAG.isNotDisplayed()
+        MEDIA_QUEUE_ITEM_DIVIDER_LAYOUT_TEST_TAG.isNotDisplayed()
+        MEDIA_QUEUE_ITEM_DIVIDER_TEST_TAG.isNotDisplayed()
+
+        MEDIA_QUEUE_ITEM_HEADER_TEXT_VIEW_TEST_TAG.textEquals(testHeaderTextPlayingWithPaused)
+    }
+
+    @Test
+    fun `test that the UIs are displayed correctly when isHeaderVisible is true and queueItemType is Previous`() {
         setComposeContent(isHeaderVisible = true, queueItemType = MediaQueueItemType.Previous)
 
         MEDIA_QUEUE_ITEM_HEADER_TEXT_VIEW_TEST_TAG.isDisplayed()

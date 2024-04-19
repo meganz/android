@@ -33,6 +33,7 @@ internal fun MediaQueueItemWithHeaderAndFooterView(
     duration: String,
     thumbnailData: Any?,
     isHeaderVisible: Boolean,
+    isFooterVisible: Boolean,
     queueItemType: MediaQueueItemType,
     isAudio: Boolean,
     isPaused: Boolean,
@@ -61,7 +62,7 @@ internal fun MediaQueueItemWithHeaderAndFooterView(
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     visibility =
-                        if (isHeaderVisible || queueItemType == MediaQueueItemType.Playing) {
+                        if (isHeaderVisible) {
                             Visibility.Visible
                         } else {
                             Visibility.Gone
@@ -84,7 +85,7 @@ internal fun MediaQueueItemWithHeaderAndFooterView(
                 }
             ),
             textColor = TextColor.Accent,
-            style = MaterialTheme.typography.caption
+            style = MaterialTheme.typography.body2
         )
 
         MediaQueueItemView(
@@ -107,7 +108,7 @@ internal fun MediaQueueItemWithHeaderAndFooterView(
             modifier = Modifier.constrainAs(footer) {
                 top.linkTo(item.bottom)
                 start.linkTo(parent.start)
-                visibility = if (queueItemType == MediaQueueItemType.Playing) {
+                visibility = if (isFooterVisible) {
                     Visibility.Visible
                 } else {
                     Visibility.Gone
@@ -193,7 +194,8 @@ private fun PlayingMediaQueueItemPreview() {
             duration = "10:00",
             thumbnailData = null,
             onClick = {},
-            isHeaderVisible = false,
+            isHeaderVisible = true,
+            isFooterVisible = true,
             queueItemType = MediaQueueItemType.Playing,
             isAudio = true,
             isPaused = false,
@@ -213,7 +215,8 @@ private fun PausedPlayingMediaQueueItemPreview() {
             duration = "10:00",
             thumbnailData = null,
             onClick = {},
-            isHeaderVisible = false,
+            isHeaderVisible = true,
+            isFooterVisible = true,
             queueItemType = MediaQueueItemType.Playing,
             isAudio = true,
             isPaused = true,
@@ -234,6 +237,7 @@ private fun FirstMediaQueueItemPreview() {
             thumbnailData = null,
             onClick = {},
             isHeaderVisible = true,
+            isFooterVisible = false,
             queueItemType = MediaQueueItemType.Previous,
             isAudio = true,
             isPaused = false,
@@ -254,6 +258,7 @@ private fun NextMediaQueueItemPreview() {
             thumbnailData = null,
             onClick = {},
             isHeaderVisible = false,
+            isFooterVisible = false,
             queueItemType = MediaQueueItemType.Next,
             isAudio = true,
             isPaused = false,

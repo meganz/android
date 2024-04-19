@@ -162,6 +162,13 @@ interface PlayerServiceViewModelGateway {
     fun getIndexFromPlaylistItems(item: PlaylistItem): Int?
 
     /**
+     * Get the index from playlistItems to keep the play order is correct after reordered
+     * @param handle handle of clicked item
+     * @return the index of clicked item in playlistItems or null
+     */
+    fun getIndexFromPlaylistItems(handle: Long): Int?
+
+    /**
      * Get the position of playing item
      *
      * @return the position of playing item
@@ -261,4 +268,9 @@ interface PlayerServiceViewModelGateway {
      * @param value true is in search mode, otherwise is false
      */
     fun setSearchMode(value: Boolean)
+
+    /**
+     * Monitor the media item transition state
+     */
+    fun monitorMediaItemTransitionState(): Flow<Long?>
 }

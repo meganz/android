@@ -16,6 +16,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -256,6 +257,8 @@ class AudioPlayerServiceViewModel @Inject constructor(
     private val cancellableJobs = mutableMapOf<String, Job>()
 
     private var isSearchMode: Boolean = false
+
+    private var mediaItemTransitionState = MutableStateFlow<Long?>(null)
 
     init {
         itemsSelectedCount.value = 0
@@ -1125,6 +1128,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
             )
         }
         postPlayingThumbnail()
+        mediaItemTransitionState.update { handle }
     }
 
     override fun getPlaylistItem(handle: String?): PlaylistItem? =
@@ -1361,6 +1365,15 @@ class AudioPlayerServiceViewModel @Inject constructor(
             index in playlistItems.indices
         }
 
+    override fun getIndexFromPlaylistItems(handle: Long): Int? =
+        /* The media items of ExoPlayer are still the original order even the shuffleEnable is true,
+         so the index of media item should be got from original playlist items */
+        playlistItems.indexOfFirst {
+            it.nodeHandle == handle
+        }.takeIf { index ->
+            index in playlistItems.indices
+        }
+
     override fun updatePlaySource() {
         playlistItemsFlow.update {
             it.copy(playlistItemsChanged.toList())
@@ -1439,6 +1452,8 @@ class AudioPlayerServiceViewModel @Inject constructor(
     override fun setSearchMode(value: Boolean) {
         isSearchMode = value
     }
+
+    override fun monitorMediaItemTransitionState(): Flow<Long?> = mediaItemTransitionState
 
     companion object {
         private const val MAX_RETRY = 6
