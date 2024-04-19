@@ -11,6 +11,7 @@ import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Photo
 
 /**
@@ -42,6 +43,8 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property shouldGoBack when current folder is deleted, should automatic go back
  * @property downloadEvent event to trigger the download
  * @property errorMessage The [StringRes] of the message to display in the error banner
+ * @property accountType the account detail
+ * @property isHiddenNodesOnboarded if is hidden nodes onboarded
  */
 data class MediaDiscoveryViewState(
     val currentFolderId: Long? = null,
@@ -70,4 +73,6 @@ data class MediaDiscoveryViewState(
     val shouldGoBack: Boolean = false,
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     @StringRes val errorMessage: Int? = null,
+    val accountType: AccountType? = null,
+    val isHiddenNodesOnboarded: Boolean = false,
 )

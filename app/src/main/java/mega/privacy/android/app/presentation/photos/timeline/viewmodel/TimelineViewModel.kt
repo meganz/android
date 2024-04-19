@@ -52,6 +52,7 @@ import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatusUseCase
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
+import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -117,6 +118,7 @@ class TimelineViewModel @Inject constructor(
     private val monitorCameraUploadsStatusInfoUseCase: MonitorCameraUploadsStatusInfoUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
 ) : ViewModel() {
 
     internal val _state = MutableStateFlow(TimelineViewState(loadPhotosDone = false))
@@ -136,6 +138,7 @@ class TimelineViewModel @Inject constructor(
             if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
                 monitorShowHiddenItems()
                 monitorAccountDetail()
+                monitorIsHiddenNodesOnboarded()
             }
         }
     }
@@ -818,6 +821,25 @@ class TimelineViewModel @Inject constructor(
                     updateNodeSensitiveUseCase(nodeId = NodeId(node.handle), isSensitive = hide)
                 }.onFailure { Timber.e("Update sensitivity failed: $it") }
             }
+        }
+    }
+
+    private fun monitorIsHiddenNodesOnboarded() {
+        viewModelScope.launch {
+            val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
+            _state.update {
+                it.copy(isHiddenNodesOnboarded = isHiddenNodesOnboarded)
+            }
+        }
+    }
+
+
+    /**
+     * Mark hidden nodes onboarding has shown
+     */
+    fun setHiddenNodesOnboarded() {
+        _state.update {
+            it.copy(isHiddenNodesOnboarded = true)
         }
     }
 }

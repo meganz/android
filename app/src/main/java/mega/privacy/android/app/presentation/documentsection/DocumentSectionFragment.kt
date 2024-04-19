@@ -404,7 +404,7 @@ class DocumentSectionFragment : Fragment(), HomepageSearchable {
             resources.getQuantityString(
                 R.plurals.hidden_nodes_result_message,
                 tempNodeIds.size,
-                1
+                tempNodeIds.size,
             )
         Util.showSnackbar(requireActivity(), message)
     }

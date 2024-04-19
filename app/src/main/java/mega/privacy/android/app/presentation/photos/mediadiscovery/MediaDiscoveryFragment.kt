@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.mediadiscovery
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,6 +9,9 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.appcompat.view.ActionMode
 import androidx.compose.foundation.background
@@ -31,6 +35,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_CLOUD_SLOT_ID
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportPreviewProvider
 import mega.privacy.android.app.presentation.photos.mediadiscovery.actionMode.MediaDiscoveryActionModeCallback
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
@@ -38,6 +43,7 @@ import mega.privacy.android.app.presentation.photos.mediadiscovery.view.MediaDis
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -326,6 +332,61 @@ class MediaDiscoveryFragment : Fragment() {
                 state.value.sourcePhotos
             )
         }
+    }
+
+    fun handleHideNodeClick() {
+        val (isPaid, isHiddenNodesOnboarded) = with(mediaDiscoveryViewModel.state.value) {
+            (this.accountType?.isPaid ?: false) to this.isHiddenNodesOnboarded
+        }
+
+        if (!isPaid) {
+            val intent = HiddenNodesOnboardingActivity.createScreen(
+                context = requireContext(),
+                isOnboarding = false,
+            )
+            hiddenNodesOnboardingLauncher.launch(intent)
+            activity?.overridePendingTransition(0, 0)
+        } else if (isHiddenNodesOnboarded) {
+            mediaDiscoveryViewModel.hideOrUnhideNodes(
+                hide = true,
+            )
+        } else {
+            showHiddenNodesOnboarding()
+        }
+    }
+
+    private fun showHiddenNodesOnboarding() {
+        mediaDiscoveryViewModel.setHiddenNodesOnboarded()
+
+        val intent = HiddenNodesOnboardingActivity.createScreen(
+            context = requireContext(),
+            isOnboarding = true,
+        )
+        hiddenNodesOnboardingLauncher.launch(intent)
+        activity?.overridePendingTransition(0, 0)
+    }
+
+    private val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleHiddenNodesOnboardingResult,
+        )
+
+    private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+
+        mediaDiscoveryViewModel.hideOrUnhideNodes(
+            hide = true,
+        )
+        val selectedSize = mediaDiscoveryViewModel.getSelectedIds().size
+
+        val message =
+            resources.getQuantityString(
+                R.plurals.hidden_nodes_result_message,
+                selectedSize,
+                selectedSize,
+            )
+        Util.showSnackbar(requireActivity(), message)
     }
 
     companion object {

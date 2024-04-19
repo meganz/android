@@ -13,8 +13,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -42,8 +44,10 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
@@ -101,6 +105,8 @@ class FileBrowserViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -122,6 +128,8 @@ class FileBrowserViewModel @Inject constructor(
         changeTransferOverQuotaBannerVisibility()
         monitorConnectivity()
         monitorNodeUpdates()
+        monitorAccountDetail()
+        monitorIsHiddenNodesOnboarded()
     }
 
     private fun monitorConnectivity() {
@@ -783,6 +791,34 @@ class FileBrowserViewModel @Inject constructor(
                     Timber.e(it)
                 }
             }
+        }
+    }
+
+    private fun monitorAccountDetail() {
+        monitorAccountDetailUseCase()
+            .onEach { accountDetail ->
+                _state.update {
+                    it.copy(accountType = accountDetail.levelDetail?.accountType)
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun monitorIsHiddenNodesOnboarded() {
+        viewModelScope.launch {
+            val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
+            _state.update {
+                it.copy(isHiddenNodesOnboarded = isHiddenNodesOnboarded)
+            }
+        }
+    }
+
+    /**
+     * Mark hidden nodes onboarding has shown
+     */
+    fun setHiddenNodesOnboarded() {
+        _state.update {
+            it.copy(isHiddenNodesOnboarded = true)
         }
     }
 

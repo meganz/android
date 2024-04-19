@@ -2,7 +2,6 @@ package test.mega.privacy.android.app.presentation.clouddrive
 
 import android.view.MenuItem
 import app.cash.turbine.test
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
@@ -10,6 +9,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -27,7 +27,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Trans
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
@@ -38,8 +38,10 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
@@ -95,6 +97,16 @@ class FileBrowserViewModelTest {
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
+        on {
+            invoke()
+        }.thenReturn(flowOf(AccountDetail()))
+    }
+    private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
+        on {
+            runBlocking { invoke() }
+        }.thenReturn(false)
+    }
 
     @BeforeEach
     fun setUp() {
@@ -126,6 +138,8 @@ class FileBrowserViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
         )
     }
 

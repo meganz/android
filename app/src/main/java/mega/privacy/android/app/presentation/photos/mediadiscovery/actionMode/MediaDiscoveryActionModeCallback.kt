@@ -61,7 +61,7 @@ class MediaDiscoveryActionModeCallback(
                 fragment.actionClearSelection()
             }
             R.id.cab_menu_hide -> {
-                fragment.mediaDiscoveryViewModel.hideOrUnhideNodes(hide = true)
+                fragment.handleHideNodeClick()
                 fragment.destroyActionMode()
             }
             R.id.cab_menu_unhide -> {

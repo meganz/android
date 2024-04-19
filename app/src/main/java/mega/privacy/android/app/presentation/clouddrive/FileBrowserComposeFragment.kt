@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.clouddrive
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -10,6 +11,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -57,6 +61,7 @@ import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetD
 import mega.privacy.android.app.presentation.clouddrive.ui.FileBrowserComposeView
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
@@ -126,6 +131,8 @@ class FileBrowserComposeFragment : Fragment() {
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val fileBrowserViewModel: FileBrowserViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
+
+    private var tempNodeIds: List<NodeId> = listOf()
 
     /**
      * onAttach
@@ -596,9 +603,8 @@ class FileBrowserComposeFragment : Fragment() {
                 }
 
                 OptionItems.HIDE_CLICKED -> {
-                    fileBrowserViewModel.hideOrUnhideNodes(
+                    handleHideNodeClick(
                         nodeIds = it.selectedMegaNode.map { node -> NodeId(node.handle) },
-                        hide = true
                     )
                     disableSelectMode()
                 }
@@ -660,5 +666,63 @@ class FileBrowserComposeFragment : Fragment() {
     private fun disableSelectMode() {
         fileBrowserViewModel.clearAllNodes()
         actionMode?.finish()
+    }
+
+    fun handleHideNodeClick(nodeIds: List<NodeId>) {
+        val (isPaid, isHiddenNodesOnboarded) = with(fileBrowserViewModel.state.value) {
+            (this.accountType?.isPaid ?: false) to this.isHiddenNodesOnboarded
+        }
+
+
+        if (!isPaid) {
+            val intent = HiddenNodesOnboardingActivity.createScreen(
+                context = requireContext(),
+                isOnboarding = false,
+            )
+            hiddenNodesOnboardingLauncher.launch(intent)
+            activity?.overridePendingTransition(0, 0)
+        } else if (isHiddenNodesOnboarded) {
+            fileBrowserViewModel.hideOrUnhideNodes(
+                nodeIds = nodeIds,
+                hide = true,
+            )
+        } else {
+            tempNodeIds = nodeIds
+            showHiddenNodesOnboarding()
+        }
+    }
+
+    private fun showHiddenNodesOnboarding() {
+        fileBrowserViewModel.setHiddenNodesOnboarded()
+
+        val intent = HiddenNodesOnboardingActivity.createScreen(
+            context = requireContext(),
+            isOnboarding = true,
+        )
+        hiddenNodesOnboardingLauncher.launch(intent)
+        activity?.overridePendingTransition(0, 0)
+    }
+
+    private val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleHiddenNodesOnboardingResult,
+        )
+
+    private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+
+        fileBrowserViewModel.hideOrUnhideNodes(
+            nodeIds = tempNodeIds,
+            hide = true,
+        )
+
+        val message =
+            resources.getQuantityString(
+                R.plurals.hidden_nodes_result_message,
+                tempNodeIds.size,
+                tempNodeIds.size,
+            )
+        Util.showSnackbar(requireActivity(), message)
     }
 }

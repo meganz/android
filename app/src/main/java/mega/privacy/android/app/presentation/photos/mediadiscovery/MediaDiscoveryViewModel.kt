@@ -15,6 +15,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
@@ -54,10 +56,12 @@ import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
+import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
@@ -105,6 +109,8 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
@@ -125,6 +131,8 @@ class MediaDiscoveryViewModel @Inject constructor(
         checkMDSetting()
         loadSortRule()
         fetchPhotos()
+        monitorAccountDetail()
+        monitorIsHiddenNodesOnboarded()
     }
 
     /**
@@ -660,6 +668,34 @@ class MediaDiscoveryViewModel @Inject constructor(
                     updateNodeSensitiveUseCase(nodeId = NodeId(nodeId), isSensitive = hide)
                 }.onFailure { Timber.e("Hide node exception: $it") }
             }
+        }
+    }
+
+    private fun monitorAccountDetail() {
+        monitorAccountDetailUseCase()
+            .onEach { accountDetail ->
+                _state.update {
+                    it.copy(accountType = accountDetail.levelDetail?.accountType)
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun monitorIsHiddenNodesOnboarded() {
+        viewModelScope.launch {
+            val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
+            _state.update {
+                it.copy(isHiddenNodesOnboarded = isHiddenNodesOnboarded)
+            }
+        }
+    }
+
+    /**
+     * Mark hidden nodes onboarding has shown
+     */
+    fun setHiddenNodesOnboarded() {
+        _state.update {
+            it.copy(isHiddenNodesOnboarded = true)
         }
     }
 }

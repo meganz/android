@@ -4,6 +4,7 @@ import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.Manifest.permission.READ_MEDIA_VIDEO
 import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
@@ -46,6 +47,7 @@ import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.advertisements.model.AdsSlotIDs.TAB_PHOTOS_SLOT_ID
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
@@ -758,6 +760,62 @@ class PhotosFragment : Fragment() {
      * @return Boolean value
      */
     fun doesAccountHavePhotos(): Boolean = timelineViewModel.state.value.photos.isNotEmpty()
+
+    fun handleHideNodeClick() {
+        val (isPaid, isHiddenNodesOnboarded) = with(timelineViewModel.state.value) {
+            (this.accountType?.isPaid ?: false) to this.isHiddenNodesOnboarded
+        }
+
+
+        if (!isPaid) {
+            val intent = HiddenNodesOnboardingActivity.createScreen(
+                context = requireContext(),
+                isOnboarding = false,
+            )
+            hiddenNodesOnboardingLauncher.launch(intent)
+            activity?.overridePendingTransition(0, 0)
+        } else if (isHiddenNodesOnboarded) {
+            timelineViewModel.hideOrUnhideNodes(
+                hide = true,
+            )
+        } else {
+            showHiddenNodesOnboarding()
+        }
+    }
+
+    private fun showHiddenNodesOnboarding() {
+        timelineViewModel.setHiddenNodesOnboarded()
+
+        val intent = HiddenNodesOnboardingActivity.createScreen(
+            context = requireContext(),
+            isOnboarding = true,
+        )
+        hiddenNodesOnboardingLauncher.launch(intent)
+        activity?.overridePendingTransition(0, 0)
+    }
+
+    private val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleHiddenNodesOnboardingResult,
+        )
+
+    private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+
+        timelineViewModel.hideOrUnhideNodes(
+            hide = true,
+        )
+        val selectedSize = timelineViewModel.getSelectedIds().size
+
+        val message =
+            resources.getQuantityString(
+                R.plurals.hidden_nodes_result_message,
+                selectedSize,
+                selectedSize,
+            )
+        Util.showSnackbar(requireActivity(), message)
+    }
 
     override fun onPause() {
         albumsViewModel.updateAlbumDeletedMessage(message = "")

@@ -8,6 +8,7 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -48,6 +49,8 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property openedFolderNodeHandles Set of opened folder node handles
  * @property errorMessage The [StringRes] of the message to display in the error banner
  * @property hasNoOpenedFolders true if there are no opened folders
+ * @property accountType the account detail
+ * @property isHiddenNodesOnboarded if is hidden nodes onboarded
  */
 data class FileBrowserState(
     val currentViewType: ViewType = ViewType.LIST,
@@ -76,6 +79,8 @@ data class FileBrowserState(
     val exitFileBrowserEvent: StateEvent = consumed,
     val openedFolderNodeHandles: Set<Long> = emptySet(),
     @StringRes val errorMessage: Int? = null,
+    val accountType: AccountType? = null,
+    val isHiddenNodesOnboarded: Boolean = false,
 ) {
     val hasNoOpenedFolders get() = openedFolderNodeHandles.isEmpty()
 }

@@ -97,4 +97,5 @@ data class TimelineViewState(
     val showCameraUploadsChangePermissionsMessage: Boolean = false,
     val showCameraUploadsCompletedMessage: Boolean = false,
     val accountType: AccountType? = null,
+    val isHiddenNodesOnboarded: Boolean = false,
 )

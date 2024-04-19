@@ -5,6 +5,8 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
@@ -17,6 +19,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Trans
 import mega.privacy.android.app.usecase.CopyNodeListUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
@@ -24,10 +27,12 @@ import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
+import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
@@ -87,6 +92,16 @@ class MediaDiscoveryViewModelTest {
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getPublicChildNodeFromIdUseCase = mock<GetPublicChildNodeFromIdUseCase>()
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
+        on {
+            invoke()
+        }.thenReturn(flowOf(AccountDetail()))
+    }
+    private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
+        on {
+            runBlocking { invoke() }
+        }.thenReturn(false)
+    }
 
     @BeforeAll
     fun setup() {
@@ -120,6 +135,8 @@ class MediaDiscoveryViewModelTest {
             getNodeByIdUseCase,
             getPublicChildNodeFromIdUseCase,
             updateNodeSensitiveUseCase,
+            monitorAccountDetailUseCase,
+            isHiddenNodesOnboardedUseCase,
         )
     }
 
