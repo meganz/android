@@ -3,11 +3,9 @@ package mega.privacy.android.app.presentation.contact.view
 
 import android.text.format.DateFormat
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -31,6 +29,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.R as IconR
+import androidx.compose.animation.togetherWith
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.core.ui.controls.text.MarqueeText
@@ -183,8 +183,8 @@ private fun compareLastSeenWithToday(lastGreen: Calendar): Int {
 
 @Composable
 private fun ContactAvatar(
-    modifier: Modifier = Modifier,
     contactItem: ContactItem,
+    modifier: Modifier = Modifier,
 ) {
     val avatarUri = contactItem.contactData.avatarUri
 
@@ -199,7 +199,6 @@ private fun ContactAvatar(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 internal fun ContactAvatarVerified(
     contactItem: ContactItem,
@@ -218,11 +217,11 @@ internal fun ContactAvatarVerified(
         AnimatedContent(
             targetState = selected,
             transitionSpec = {
-                scaleIn(animationSpec = tween(220)) with scaleOut(animationSpec = tween(90))
+                scaleIn(animationSpec = tween(220)) togetherWith scaleOut(animationSpec = tween(90))
             },
             label = ""
-        ) {
-            if (selected) {
+        ) { targetState ->
+            if (targetState) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_chat_avatar_select),
                     contentDescription = stringResource(id = R.string.selected_items, 1),
@@ -240,7 +239,7 @@ internal fun ContactAvatarVerified(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(10.dp),
-                painter = painterResource(id = R.drawable.ic_verified),
+                painter = painterResource(id = IconR.drawable.ic_contact_verified),
                 contentDescription = "Verified user"
             )
         }

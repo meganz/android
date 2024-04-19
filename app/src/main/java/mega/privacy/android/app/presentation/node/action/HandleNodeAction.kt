@@ -9,7 +9,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
-import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
@@ -47,11 +46,11 @@ import java.io.File
 @Composable
 fun HandleNodeAction(
     typedFileNode: TypedFileNode,
+    snackBarHostState: SnackbarHostState,
+    onActionHandled: () -> Unit,
     nodeSourceType: Int? = null,
     nodeActionsViewModel: NodeActionsViewModel = hiltViewModel(),
     sortOrder: SortOrder = SortOrder.ORDER_NONE,
-    onActionHandled: () -> Unit,
-    snackBarHostState: SnackbarHostState,
 ) {
     val context = LocalContext.current
 

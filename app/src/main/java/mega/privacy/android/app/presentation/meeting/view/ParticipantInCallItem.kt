@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.R as IconR
 import mega.privacy.android.app.presentation.contact.view.ContactStatusView
 import mega.privacy.android.app.presentation.contact.view.DefaultAvatarView
 import mega.privacy.android.app.presentation.contact.view.UriAvatarView
@@ -112,7 +113,7 @@ fun ParticipantInCallItem(
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
                                     .padding(6.dp),
-                                painter = painterResource(id = R.drawable.ic_verified),
+                                painter = painterResource(id = IconR.drawable.ic_contact_verified),
                                 contentDescription = "Verified user"
                             )
                         }

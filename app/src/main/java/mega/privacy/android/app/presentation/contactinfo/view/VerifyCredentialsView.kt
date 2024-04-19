@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.R as IconR
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
@@ -58,8 +59,8 @@ internal fun VerifyCredentialsView(isVerified: Boolean) = Column {
                     Image(
                         modifier = Modifier
                             .padding(end = 8.dp)
-                            .testTag(R.drawable.ic_verified.toString()),
-                        painter = painterResource(id = R.drawable.ic_verified),
+                            .testTag(IconR.drawable.ic_contact_verified.toString()),
+                        painter = painterResource(id = IconR.drawable.ic_contact_verified),
                         contentDescription = "Verified user",
                     )
                     Text(

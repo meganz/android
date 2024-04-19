@@ -403,7 +403,7 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_marginEnd="8dp"
-                        android:src="@drawable/ic_verified" />
+                        android:src="@drawable/ic_contact_verified" />
 
                     <TextView
                         android:id="@+id/verify_credentials_info"

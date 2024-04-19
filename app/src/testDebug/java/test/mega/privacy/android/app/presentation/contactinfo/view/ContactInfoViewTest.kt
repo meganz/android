@@ -5,6 +5,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoState
 import mega.privacy.android.app.presentation.contactinfo.view.ContactInfoView
 import mega.privacy.android.domain.entity.chat.ChatRoom
@@ -153,7 +154,7 @@ class ContactInfoViewTest {
     fun `test that the verified icon is shown when the credentials are verified`() {
         setupRule(ContactInfoState(contactItem = contactItemWithVerifiedCredentials))
         composeRule.onNodeWithText(R.string.contact_verify_credentials_verified_text).assertExists()
-        composeRule.onNodeWithTag(R.drawable.ic_verified.toString()).assertExists()
+        composeRule.onNodeWithTag(IconPackR.drawable.ic_contact_verified.toString()).assertExists()
     }
 
     @Test

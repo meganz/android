@@ -23,7 +23,7 @@
         android:contentDescription="@string/contact_verify_credentials_verified_text"
         android:layout_marginStart="40dp"
         android:layout_marginTop="8dp"
-        android:src="@drawable/ic_verified"
+        android:src="@drawable/ic_contact_verified"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

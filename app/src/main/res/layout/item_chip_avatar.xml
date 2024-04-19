@@ -14,7 +14,7 @@
         android:layout_toEndOf="@id/name_chip"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:src="@drawable/ic_verified"
+        android:src="@drawable/ic_contact_verified"
         android:visibility="gone"/>
 
     <mega.privacy.android.app.components.twemoji.EmojiTextView

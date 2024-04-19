@@ -985,7 +985,7 @@
                         android:layout_height="24dp"
                         android:layout_alignTop="@+id/content_own_message_contact_layout_avatar"
                         android:layout_marginStart="22dp"
-                        android:src="@drawable/ic_verified"
+                        android:src="@drawable/ic_contact_verified"
                         tools:ignore="ContentDescription" />
 
                     <ImageView
@@ -1801,7 +1801,7 @@
                         android:layout_height="24dp"
                         android:layout_alignTop="@+id/content_contact_message_contact_layout_avatar"
                         android:layout_marginStart="22dp"
-                        android:src="@drawable/ic_verified"
+                        android:src="@drawable/ic_contact_verified"
                         tools:ignore="ContentDescription" />
 
                     <ImageView

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.view
 
 import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.icon.pack.R as IconPackR
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -1047,7 +1048,7 @@ private fun ParticipantItemView(
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .padding(10.dp),
-                            painter = painterResource(id = R.drawable.ic_verified),
+                            painter = painterResource(id = IconPackR.drawable.ic_contact_verified),
                             contentDescription = "Verified user"
                         )
                     }

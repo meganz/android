@@ -1085,7 +1085,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                             holder.textViewFileSize.setText(mS.getUser());
                         }
                         if (isContactVerificationOn && isContactVerifiedByMega) {
-                            holder.textViewFileSize.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_verified, 0);
+                            holder.textViewFileSize.setCompoundDrawablesWithIntrinsicBounds(0, 0, mega.privacy.android.icon.pack.R.drawable.ic_contact_verified, 0);
                         } else {
                             holder.textViewFileSize.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
                         }
