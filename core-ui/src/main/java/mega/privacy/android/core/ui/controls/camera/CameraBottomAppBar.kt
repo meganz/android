@@ -114,7 +114,7 @@ fun CameraBottomAppBar(
                         contentDescription = stringResource(id = R.string.video_button),
                         selected = true,
                         shape = CircleShape,
-                        onClick = onToggleCaptureMode
+                        onClick = {}
                     ) {
                         Text(
                             text = stringResource(id = R.string.video_button),
@@ -149,7 +149,7 @@ fun CameraBottomAppBar(
                         contentDescription = stringResource(id = R.string.camera_photo_button),
                         selected = true,
                         shape = CircleShape,
-                        onClick = onToggleCaptureMode
+                        onClick = {}
                     ) {
                         Text(text = stringResource(id = R.string.camera_photo_button))
                     }
