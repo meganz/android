@@ -17,39 +17,39 @@
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
     <string name="general_sync_account_expired">由于您的方案已过期，因此无法同步或备份此文件夹</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
-    <string name="general_sync_foreign_target_overshare">Folder can’t be synced as the user who shared this folder has reached their storage limit</string>
+    <string name="general_sync_foreign_target_overshare">无法同步该文件夹，因为共享此文件夹的用户已达到其存储限制</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
     <string name="general_sync_remote_path_has_changed">无法找到MEGA中的文件夹，因为它已被移动或删除，或者您可能没有访问权限</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
-    <string name="general_sync_share_non_full_access">Folder can’t be synced as it’s a shared folder that you don’t have full access to</string>
+    <string name="general_sync_share_non_full_access">无法同步该文件夹，因为您没有完全访问此共享文件夹的权限</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
-    <string name="general_sync_put_nodes_error">Files in this folder can’t be synced or backed up. You’ll need to re-enable the sync or backup from the desktop app.</string>
+    <string name="general_sync_put_nodes_error">无法同步或备份此文件夹中的文件。您需要从桌面应用程序重新启用同步或备份。</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
-    <string name="general_sync_active_sync_below_path">Folder can’t be synced as it already contains synced folders</string>
+    <string name="general_sync_active_sync_below_path">文件夹无法同步，因为它已经包含在已经同步的文件夹中</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
-    <string name="general_sync_vboxsharedfolder_unsupported">MEGA can’t sync or back up VirtualBox folders</string>
+    <string name="general_sync_vboxsharedfolder_unsupported">MEGA无法同步或备份VirtualBox文件夹</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
-    <string name="general_sync_account_blocked">Unable to sync or back up this folder as the account has been blocked</string>
+    <string name="general_sync_account_blocked">由于该帐户已被封锁，无法同步或备份此文件夹</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
     <string name="general_sync_unknown_temporary_error">同步或备份此文件夹时出现问题。请稍后再试。如果问题仍然存在，请联系客服部门。</string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
     <string name="general_sync_too_many_action_packets">帐户已重新加载。对备份或同步的任何更新尚未应用。</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
-    <string name="general_sync_logged_out">Sync or backup has been stopped as you appear to have logged out of the desktop app. Log back in via the desktop app, and resume the sync or backup.</string>
+    <string name="general_sync_logged_out">由于您似乎已登出桌面应用程序，因此同步或备份已停止。通过桌面应用程序重新登录，然后恢复同步或备份。</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
     <string name="general_sync_missing_parent_node">N/A</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="general_sync_backup_source_not_below_drive">无法定位外部驱动器中的文件夹。</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
-    <string name="general_sync_active_sync_same_path">There’s already a synced folder at the same location</string>
+    <string name="general_sync_active_sync_same_path">在同一个位置已经有一个同步的文件夹</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
-    <string name="general_sync_could_not_move_cloud_nodes">Renaming failed</string>
+    <string name="general_sync_could_not_move_cloud_nodes">重命名失败</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
-    <string name="general_sync_could_not_create_ignore_file">Couldn’t create a .megaignore file for this sync</string>
+    <string name="general_sync_could_not_create_ignore_file">无法为此同步创建.megaignore文件</string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
     <string name="general_sync_config_read_failure">无法读取同步配置。稍后重试或检查文件夹权限。</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
-    <string name="general_sync_unknown_drive_path">Sync location is unknown</string>
+    <string name="general_sync_unknown_drive_path">同步位置未知</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
     <string name="general_sync_invalid_scan_interval">扫描间隔无效。请检查扫描间隔设置，然后重试。</string>
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
@@ -61,17 +61,17 @@
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_OPEN_DATABASE -->
     <string name="general_sync_unable_to_open_database">Unable to open state cache database</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
-    <string name="general_sync_insufficient_disk_space">Insufficient storage space on your device</string>
+    <string name="general_sync_insufficient_disk_space">您设备上的存储空间不足</string>
     <!-- The name of the Device or Folder Sub State when its code is FAILURE_ACCESSING_PERSISTENT_STORAGE -->
     <string name="general_sync_failure_accessing_persistent_storage">无法读取同步位置。检查该位置是否可访问以及是否已授予该文件夹位置的权限。</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">An unknown error occurred. Contact Support.</string>
+    <string name="general_sync_message_unknown_error">出现未知错误。请联系客服。</string>
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
-    <string name="general_sync_message_node_in_rubbish_bin">Folder can’t be synced or backed up as the MEGA folder is in the Rubbish bin</string>
+    <string name="general_sync_message_node_in_rubbish_bin">由于MEGA文件夹位于回收站中，文件夹无法同步或备份</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
-    <string name="general_sync_message_cannot_locate_local_drive_now">Folder in your device can’t be located right now. Try again later.</string>
+    <string name="general_sync_message_cannot_locate_local_drive_now">目前无法找到您设备中的文件夹。稍后重试。</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
     <string name="general_sync_message_cannot_locate_local_drive">无法找到您设备中的文件夹</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
@@ -79,19 +79,19 @@
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
     <string name="general_sync_message_folder_backup_issue">同步或备份此文件夹时出现问题。停止同步或备份，然后尝试在桌面应用程序中重新进行设置，或者联系客服。</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
-    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Folder can’t be synced as it’s already inside a synced folder</string>
+    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">文件夹无法同步，因为它已经在同步的文件夹中</string>
     <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
-    <string name="general_sync_local_filesystem_mismatch">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the desktop app.</string>
+    <string name="general_sync_local_filesystem_mismatch">此文件夹中的文件无法同步或备份。您需要从桌面应用程序重新启用同步或备份。</string>
     <!-- Warning message to display when sync has been paused due a low battery level -->
-    <string name="general_message_sync_paused_low_battery_level">Syncing paused, battery level too low. Charge battery to resume syncing.</string>
+    <string name="general_message_sync_paused_low_battery_level">同步已暂停，电池电量太低。为电池充电以恢复同步。</string>
     <!-- Title for File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_file_sharing">Easy, secure file sharing</string>
+    <string name="dialog_onboarding_feature_title_file_sharing">轻松、安全的文件共享</string>
     <!-- Description about File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_file_sharing">Share large files thanks to a generous transfer quota and ensure security with password-protected links.</string>
+    <string name="dialog_onboarding_feature_description_file_sharing">感谢充足的传输流量共享大文件，并通过受密码保护的链接确保安全。</string>
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_backup_rewind">Never lose data again</string>
+    <string name="dialog_onboarding_feature_title_backup_rewind">再也不会丢失数据</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Back up and sync your data for complete confidence. Plus, use Rewind to restore folders to any date up to 180 days.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">让您完全放心的备份和同步您的数据。另外，使用还原功能将可将文件夹恢复到任何日期，最长可达180天。</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -99,7 +99,7 @@
     <!-- Title for chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_chat">无限制的通话和会议</string>
     <!-- Description about chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_chat">Message, video call, and meet in total privacy with unlimited participants.</string>
+    <string name="dialog_onboarding_feature_description_chat">消息，视频通话，以及无限参与者的完全私密会议。</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">类型</string>
     <!-- Search drop down chips filter type file type images -->
@@ -119,7 +119,7 @@
     <!-- Search drop down chips filter type file type folders -->
     <string name="search_dropdown_chip_filter_type_file_type_folders">文件夹</string>
     <!-- Search drop down chips filter type file type others -->
-    <string name="search_dropdown_chip_filter_type_file_type_others">Others</string>
+    <string name="search_dropdown_chip_filter_type_file_type_others">其它</string>
     <!-- Search drop down chips filter type date added -->
     <string name="search_dropdown_chip_filter_type_date_added">添加日期</string>
     <!-- Search drop down chips filter type last modified -->
@@ -137,78 +137,79 @@
     <!-- Search drop down chips filter type date modified older -->
     <string name="search_dropdown_chip_filter_type_date_older">较旧的</string>
     <!-- All videos tab title of the video section  -->
-    <string name="video_section_tab_title_all_videos">Videos</string>
+    <string name="video_section_tab_title_all_videos">视频</string>
     <!-- Playlists tab title of the video section  -->
-    <string name="video_section_tab_title_playlists">Playlists</string>
+    <string name="video_section_tab_title_playlists">播放列表</string>
     <!-- Location filter title of the video section  -->
-    <string name="video_section_videos_location_filter_title">Location</string>
+    <string name="video_section_videos_location_filter_title">位置</string>
     <!-- All locations option of the video section location filter  -->
-    <string name="video_section_videos_location_option_all_locations">All locations</string>
+    <string name="video_section_videos_location_option_all_locations">所有位置</string>
     <!-- Cloud drive option of the video section location filter  -->
-    <string name="video_section_videos_location_option_cloud_drive">Cloud drive</string>
+    <string name="video_section_videos_location_option_cloud_drive">云盘</string>
     <!-- Camera uploads option of the video section location filter  -->
-    <string name="video_section_videos_location_option_camera_uploads">Camera uploads</string>
+    <string name="video_section_videos_location_option_camera_uploads">相机上传</string>
     <!-- Shared items option of the video section location filter  -->
-    <string name="video_section_videos_location_option_shared_items">Shared items</string>
+    <string name="video_section_videos_location_option_shared_items">已共享项目</string>
     <!-- Duration filter title of the video section  -->
-    <string name="video_section_videos_duration_filter_title">Duration</string>
+    <string name="video_section_videos_duration_filter_title">时长</string>
     <!-- All Duration option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_all_duration">All durations</string>
+    <string name="video_section_videos_duration_option_all_duration">所有时长</string>
     <!-- Less than 10 seconds option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_less_than_10_seconds">Less than 10 seconds</string>
+    <string name="video_section_videos_duration_option_less_than_10_seconds">少于10秒</string>
     <!-- Between 10 and 60 seconds option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_10_and_60_seconds">Between 10 and 60 seconds</string>
+    <string name="video_section_videos_duration_option_between_10_and_60_seconds">在10到60秒之间</string>
     <!-- Between 1 and 4 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_1_and_4_minutes">Between 1 and 4 minutes</string>
+    <string name="video_section_videos_duration_option_between_1_and_4_minutes">在1到4分钟之间</string>
     <!-- Between 4 and 20 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_4_and_20_minutes">Between 4 and 20 minutes</string>
+    <string name="video_section_videos_duration_option_between_4_and_20_minutes">在4到20分钟之间</string>
     <!-- More than 20 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_more_than_20_minutes">More than 20 minutes</string>
+    <string name="video_section_videos_duration_option_more_than_20_minutes">超过20分钟</string>
     <!-- Create playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_create_playlist_dialog_title">Enter playlist name</string>
+    <string name="video_section_playlists_create_playlist_dialog_title">输入播放列表名称</string>
     <!-- Rename playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_rename_playlist_dialog_title">Rename</string>
+    <string name="video_section_playlists_rename_playlist_dialog_title">重命名</string>
     <!-- Error message when the playlist name already exists -->
-    <string name="video_section_playlists_error_message_playlist_name_exists">A playlist with this name already exists. Enter a different name.</string>
+    <string name="video_section_playlists_error_message_playlist_name_exists">使用此名称的播放列表已经存在。输入不同的名称。</string>
     <!-- Delete playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_delete_playlist_dialog_title">Delete playlist\?</string>
+    <string name="video_section_playlists_delete_playlist_dialog_title">删除播放列表？</string>
     <!-- Delete button title of the video section playlists tab delete playlist dialog -->
-    <string name="video_section_playlists_delete_playlist_dialog_delete_button">Delete</string>
+    <string name="video_section_playlists_delete_playlist_dialog_delete_button">删除</string>
     <!-- Text that indicates that there’s no playlist to show. -->
-    <string name="video_section_playlists_empty_hint_playlist">No playlists found</string>
+    <string name="video_section_playlists_empty_hint_playlist">未找到播放列表</string>
     <!-- Delete option title of the video section playlist bottom sheet -->
-    <string name="video_section_playlist_bottom_sheet_option_title_delete">Delete playlist</string>
+    <string name="video_section_playlist_bottom_sheet_option_title_delete">删除播放列表</string>
     <!-- Remove videos dialog title of the video section playlist detail -->
-    <string name="video_section_playlist_detail_remove_videos_dialog_title">Remove from playlist\?</string>
+    <string name="video_section_playlist_detail_remove_videos_dialog_title">从播放列表中移除？</string>
     <!-- Remove button title of the video section playlist detail remove videos dialog -->
-    <string name="video_section_playlist_detail_remove_videos_dialog_remove_button">Remove</string>
+    <string name="video_section_playlist_detail_remove_videos_dialog_remove_button">移除</string>
     <!-- Play all button title of the video section playlist detail -->
-    <string name="video_section_playlist_detail_play_all_button">Play all</string>
+    <string name="video_section_playlist_detail_play_all_button">全部播放</string>
     <!-- Text that indicates that there’s no videos in the video playlist detail to show. -->
-    <string name="video_section_playlist_detail_empty_hint_videos">No videos</string>
+    <string name="video_section_playlist_detail_empty_hint_videos">没有视频</string>
     <!-- Top bar title of the video section video selected page -->
-    <string name="video_section_video_selected_top_bar_title">Choose files</string>
+    <string name="video_section_video_selected_top_bar_title">选择文件</string>
     <!-- Message when deleting the playlists of the video section playlists tab. %1$d will be replaced the number of deleted playlists -->
     <plurals name="video_section_playlists_delete_playlists_message">
-        <item quantity="other"></item>
+        <item quantity="other">已删除%1$d个播放列表</item>
     </plurals>
     <!-- Message when adding the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_add_videos_message">
-        <item quantity="one">Added %1$d item to “%2$s”</item>
-        <item quantity="other">Added %1$d items to “%2$s”</item>
+        <item quantity="other">已添加%1$d个项目到“%2$s”</item>
     </plurals>
     <!-- Message when removing the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_remove_videos_message">
-        <item quantity="one">Removed %1$d item from “%2$s”</item>
-        <item quantity="other">Removed %1$d items from “%2$s”</item>
+        <item quantity="other">已从“%2$s”中移除了%1$d个项目</item>
     </plurals>
     <!-- Text of the video section playlist detail video number -->
     <plurals name="video_section_playlist_detail_video_number">
-        <item quantity="one">%1$d video</item>
-        <item quantity="other">%1$d videos</item>
+        <item quantity="other">%1$d个视频</item>
     </plurals>
     <!-- Warning shown when the user clicks on a web link and there is no app available at the moment for opening it. -->
-    <string name="chat_click_link_in_message_intent_not_available">You may not have any apps installed which can open this website</string>
+    <string name="chat_click_link_in_message_intent_not_available">您可能没有安装任何可以打开此网站的应用程序</string>
     <!-- Message when deleting a singular playlist of the video section playlists tab. %1$s will be replaced the name of deleted playlist -->
-    <string name="video_section_playlists_delete_playlists_message_singular">“%1$s” deleted</string>
+    <string name="video_section_playlists_delete_playlists_message_singular">已删除“%1$s”</string>
+    <!-- The name of the Settings Camera Uploads Option, which decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
+    <string name="settings_camera_uploads_upload_only_while_charging_option_name">仅在充电时上传</string>
+    <!-- Text for the header of the screen to add a new sync folder -->
+    <string name="sync_add_new_sync_folder_header_text">Add synchronised folder:</string>
 </resources>

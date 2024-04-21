@@ -9,7 +9,7 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Synchronisations [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">Nous devons accéder à la mémoire de votre appareil pour synchroniser votre dossier local. Touchez ici pour autoriser l’accès.</string>
+    <string name="sync_storage_permission_banner">MEGA a besoin d’accéder à la mémoire de votre appareil pour synchroniser votre dossier local. Touchez ici pour autoriser l’accès.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
     <string name="sync_battery_optimisation_banner">Afin de synchroniser en permanence vos fichiers et dossiers, autorisez MEGA à fonctionner en arrière-plan</string>
     <!-- Sync file counts to show ongoing syncing-->
@@ -165,7 +165,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Choisir</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">Un fichier ou un dossier présente un problème qui nécessite une décision de votre part pour le résoudre</string>
+    <string name="sync_stalled_issue_file_issue_detail">Un élément présente un problème qui nécessite une décision de votre part pour le résoudre</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">Attente de la fin d’autres processus</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->

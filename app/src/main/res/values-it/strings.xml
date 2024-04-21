@@ -824,7 +824,7 @@
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">Acquisizione delle informazioni in corso&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
-    <string name="email_verification_text_change_mail">Your new email address needs to be validated. Check the inbox of the new email address to proceed.</string>
+    <string name="email_verification_text_change_mail">Il tuo nuovo indirizzo email deve essere verificato. Controlla la casella di posta elettronica del nuovo indirizzo email per procedere.</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
     <string name="confirmation_delete_avatar">Cancellare l’immagine del profilo?</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
@@ -2101,8 +2101,9 @@
     <string name="contact_info_button_more">Altro</string>
     <!-- Section title to select a file to perform an action, more files -->
     <plurals name="plural_select_file">
-        <item quantity="one">Choose file</item>
-        <item quantity="other">Choose files</item>
+        <item quantity="one">Scegli il file</item>
+        <item quantity="many">Scegli i file</item>
+        <item quantity="other">Scegli i file</item>
     </plurals>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">Scegli cartella</string>
@@ -2365,7 +2366,7 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Imposta MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed to use features and services that this app provides.</string>
+    <string name="setup_mega_explanation">MEGA ha bisogno del tuo permesso per accedere ai tuoi contenuti multimediali e ai tuoi file per la condivisione. Potrebbero essere necessarie altre autorizzazioni di accesso per utilizzare le funzionalità e i servizi forniti da questa app.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Permetti l’accesso a foto, media e file</string>
     <!-- Subtitle of the screen asking permissions for files -->
@@ -3983,7 +3984,7 @@
     <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
     <string name="settings_camera_uploads_grant_media_permissions_body">Per attivare i Caricamenti da fotocamera, permetti a MEGA l\’accesso alle tue foto e agli altri media sul tuo dispositivo.</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
-    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Permetti accesso</string>
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Permetti l\’accesso</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">Non permettere</string>
     <!--  -->
@@ -4583,9 +4584,9 @@
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Inizia</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">Questo file è stato rimosso seguendo la nostra [A]Politica sulla chiusura[/A].</string>
+    <string name="cloud_drive_info_taken_down_file_warning">Questo file è stato rimosso seguendo la nostra [A]Politica sulla rimozione[/A].</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">Questa cartella è stata rimossa seguendo la nostra [A]Politica sulla chiusura[/A].</string>
+    <string name="cloud_drive_info_taken_down_folder_warning">Questa cartella è stata rimossa seguendo la nostra [A]Politica sulla rimozione[/A].</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">Unisciti</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
@@ -4869,9 +4870,9 @@
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">Impossibile aprire il file</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
+    <string name="dialog_taken_down_folder_description">Questa cartella è stata rimossa in conformità con la nostra [A]Politica sulla rimozione[/A]. Puoi contestare questa rimozione se ritieni che abbiamo commesso un errore.</string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
+    <string name="dialog_taken_down_file_description">Questo file è stato rimosso in conformità con la nostra [A]Politica sulla rimozione[/A]. Puoi contestare questa rimozione se ritieni che abbiamo commesso un errore.</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">Solo Pro</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
@@ -5337,15 +5338,15 @@
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_get_pro_title">Ottieni di più con un piano Pro</string>
     <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">Upgrade to a Pro plan and get more storage and access to Pro features. Plans start from as low as %1$s a month.</string>
+    <string name="dialog_onboarding_get_pro_description">Effettua l\’upgrade ad un piano Pro ed ottieni più spazio di archiviazione e accesso alle funzionalità Pro. I piani partono da un minimo di %1$s al mese.</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_some_features_title">MEGA&#160;Pro plans include:</string>
+    <string name="dialog_onboarding_some_features_title">I piani MEGA&#160;Pro includono:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_storage">Ultimate storage flexibility</string>
+    <string name="dialog_onboarding_feature_title_storage">Massima flessibilità di archiviazione</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
-    <string name="dialog_onboarding_feature_description_storage">Starting from %1$s, find the perfect fit for your storage needs.</string>
+    <string name="dialog_onboarding_feature_description_storage">A partire da %1$s, trova la soluzione perfetta per le tue esigenze di archiviazione.</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
-    <string name="dialog_onboarding_button_view_pro_plan">Upgrade to Pro today</string>
+    <string name="dialog_onboarding_button_view_pro_plan">Effettua oggi l\’upgrade a Pro</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s sta presentando</string>
     <!-- Warning indicating that a participant is sharing the screen-->
@@ -5449,7 +5450,7 @@
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Permetti l\’accesso alla tua Galleria</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
-    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Permetti accesso</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Permetti l\’accesso</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">Aggiornamento necessario</string>
     <!-- The Body of the Dialog shown to Update the application from playstore -->
@@ -5629,9 +5630,9 @@
     <!--  -->
     <string name="camera_flash_mode_on">Flash attivo</string>
     <!--  -->
-    <string name="camera_flash_mode_off">Flash mode off</string>
+    <string name="camera_flash_mode_off">Flash non attivo</string>
     <!--  -->
-    <string name="camera_flash_mode_auto">Flash mode auto</string>
+    <string name="camera_flash_mode_auto">Flash automatico</string>
     <!--  -->
     <string name="camera_send_to">Invia a %1$s</string>
 </resources>

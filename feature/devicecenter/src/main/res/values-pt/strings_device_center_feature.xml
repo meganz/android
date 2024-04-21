@@ -135,7 +135,7 @@
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
     <string name="device_center_list_view_item_sub_state_message_folder_backup_issue">Não foi possível sincronizar ou fazer o backup desta pasta. Cancele a sincronização ou o backup e tente configurá-lo novamente no aplicativo para desktop, ou entre em contato com a nossa equipe de Suporte.</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Não é possível sincronizar esta pasta porque está dentro de uma pasta sincronizada</string>
+    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Não é possível sincronizar esta pasta porque ela está dentro de uma pasta sincronizada</string>
     <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
     <string name="device_center_list_view_item_status_camera_uploads_disabled">Uploads da câmera desativados</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->

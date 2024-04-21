@@ -169,7 +169,7 @@
     <!-- Header of the Info view field for what is the content of a device/folder -->
     <string name="device_center_info_content">Contiene</string>
     <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
-    <string name="device_center_info_total_size">Dimensione Totale</string>
+    <string name="device_center_info_total_size">Dimensione totale</string>
     <!-- String which indicates the number of files contained into a device/folder -->
     <plurals name="device_center_info_num_files">
         <item quantity="one">%1$d file</item>

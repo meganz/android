@@ -73,11 +73,11 @@
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
     <string name="device_center_list_view_item_sub_state_account_expired">由於您的方案已過期，因此無法同步或備份此資料夾。</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
-    <string name="device_center_list_view_item_sub_state_foreign_target_overshare">Folder can’t be synced as the user who shared this folder has reached their storage quota</string>
+    <string name="device_center_list_view_item_sub_state_foreign_target_overshare">無法同步資料夾，因為共享此資料夾的使用者已達到其儲存配額上限</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
     <string name="device_center_list_view_item_sub_state_remote_path_has_changed">無法找到MEGA中的資料夾，因為它已被移動或刪除，或者您可能無權權存取。</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
-    <string name="device_center_list_view_item_sub_state_share_non_full_access">Folder can’t be synced as it’s a shared folder without full access</string>
+    <string name="device_center_list_view_item_sub_state_share_non_full_access">資料夾無法同步，因為它是沒有完全存取權限的共享資料夾</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
     <string name="device_center_list_view_item_sub_state_put_nodes_error">此資料夾中的檔案無法同步或備份。您需要從桌面應用程式重新啟用同步或備份。</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
@@ -87,7 +87,7 @@
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
     <string name="device_center_list_view_item_sub_state_account_blocked">由於帳戶已被封鎖，因此無法同步或備份此資料夾</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
-    <string name="device_center_list_view_item_sub_state_unknown_temporary_error">Problem syncing or backing up this folder. Try again later. If the issue continues, contact support.</string>
+    <string name="device_center_list_view_item_sub_state_unknown_temporary_error">同步或備份此資料夾時出現問題。稍後再試。如果問題仍然存在，請聯繫客服。</string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
     <string name="device_center_list_view_item_sub_state_too_many_action_packets">帳戶已重新載入。您備份或同步的任何遺失的更新尚未套用。</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
@@ -97,7 +97,7 @@
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="device_center_list_view_item_sub_state_backup_source_not_below_drive">無法找到外部磁碟的資料夾。</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
-    <string name="device_center_list_view_item_sub_state_active_sync_same_path">There’s already a synced folder at the same path</string>
+    <string name="device_center_list_view_item_sub_state_active_sync_same_path">同一路徑下已有一個同步資料夾</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">重新命名失敗。</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
@@ -105,7 +105,7 @@
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
     <string name="device_center_list_view_item_sub_state_sync_config_read_failure">無法讀取同步設定。稍後再試或檢查資料夾權限。</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
-    <string name="device_center_list_view_item_sub_state_unknown_drive_path">Sync folder location is unknown</string>
+    <string name="device_center_list_view_item_sub_state_unknown_drive_path">同步資料夾位置未知</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
     <string name="device_center_list_view_item_sub_state_invalid_scan_interval">掃描間隔無效。檢查掃描間隔設定並且重試。</string>
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
@@ -131,7 +131,7 @@
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
     <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive">無法找到您裝置中的資料夾</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">Problem syncing or backing up this folder because of changes to the MEGA folder. Stop the sync or backup and try setting it up again in the desktop app, or contact support.</string>
+    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">由於MEGA資料夾發生變動，因此同步或備份此資料夾時出現問題。請停止同步或備份，然後嘗試在桌面應用程式中再次設定，或者聯繫客服。</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
     <string name="device_center_list_view_item_sub_state_message_folder_backup_issue">同步或備份此資料夾時出現問題。停止同步或備份，然後嘗試在桌面應用程式中重新設定，或聯繫客服。</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->

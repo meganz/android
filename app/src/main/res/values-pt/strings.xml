@@ -868,7 +868,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">Esperando confirmação por e-mail</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Acesse o seu email e clique no link para confirmar a sua conta.</string>
+    <string name="confirm_email_explanation">Acesse o seu email e use o link para confirmar a sua conta.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">%1$d item</item>
@@ -5344,7 +5344,7 @@
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_storage">Flexibilidade de armazenamento máxima</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
-    <string name="dialog_onboarding_feature_description_storage">Encontre o melhor opção para as suas necessidades de armazenamento a partir de %1$s.</string>
+    <string name="dialog_onboarding_feature_description_storage">Encontre a melhor opção para as suas necessidades de armazenamento a partir de %1$s.</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
     <string name="dialog_onboarding_button_view_pro_plan">Fazer o upgrade a um plano Pro</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->

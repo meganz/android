@@ -2582,7 +2582,7 @@
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">Pentru a te alătura acestui apel, trebuie să închei sau să pui în așteptare apelul actual.</string>
     <!-- Explanation of the dialog shown to share a chat link -->
-    <string name="copy_link_explanation">Oamenii se pot alătura grupului folosind acest link.</string>
+    <string name="copy_link_explanation">Oamenii se pot alătura grupului dvs. folosind acest link.</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">Introduceți numele grupului</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->

@@ -119,7 +119,7 @@
     <!-- Search drop down chips filter type file type folders -->
     <string name="search_dropdown_chip_filter_type_file_type_folders">مجلدات</string>
     <!-- Search drop down chips filter type file type others -->
-    <string name="search_dropdown_chip_filter_type_file_type_others">Others</string>
+    <string name="search_dropdown_chip_filter_type_file_type_others">أخرى</string>
     <!-- Search drop down chips filter type date added -->
     <string name="search_dropdown_chip_filter_type_date_added">تاريخ الإضافة</string>
     <!-- Search drop down chips filter type last modified -->
@@ -137,65 +137,61 @@
     <!-- Search drop down chips filter type date modified older -->
     <string name="search_dropdown_chip_filter_type_date_older">أقدم</string>
     <!-- All videos tab title of the video section  -->
-    <string name="video_section_tab_title_all_videos">Videos</string>
+    <string name="video_section_tab_title_all_videos">مقاطع الفيديو</string>
     <!-- Playlists tab title of the video section  -->
-    <string name="video_section_tab_title_playlists">Playlists</string>
+    <string name="video_section_tab_title_playlists">قائمة تشغيل</string>
     <!-- Location filter title of the video section  -->
-    <string name="video_section_videos_location_filter_title">Location</string>
+    <string name="video_section_videos_location_filter_title">الموقع</string>
     <!-- All locations option of the video section location filter  -->
-    <string name="video_section_videos_location_option_all_locations">All locations</string>
+    <string name="video_section_videos_location_option_all_locations">جميع المواقع</string>
     <!-- Cloud drive option of the video section location filter  -->
-    <string name="video_section_videos_location_option_cloud_drive">Cloud drive</string>
+    <string name="video_section_videos_location_option_cloud_drive">السواقة السحابية</string>
     <!-- Camera uploads option of the video section location filter  -->
-    <string name="video_section_videos_location_option_camera_uploads">Camera uploads</string>
+    <string name="video_section_videos_location_option_camera_uploads">ترفيعات الكاميرا</string>
     <!-- Shared items option of the video section location filter  -->
-    <string name="video_section_videos_location_option_shared_items">Shared items</string>
+    <string name="video_section_videos_location_option_shared_items">عناصر مشاركة</string>
     <!-- Duration filter title of the video section  -->
-    <string name="video_section_videos_duration_filter_title">Duration</string>
+    <string name="video_section_videos_duration_filter_title">مدة</string>
     <!-- All Duration option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_all_duration">All durations</string>
+    <string name="video_section_videos_duration_option_all_duration">جميع المدد</string>
     <!-- Less than 10 seconds option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_less_than_10_seconds">Less than 10 seconds</string>
+    <string name="video_section_videos_duration_option_less_than_10_seconds">أقل من 10 ثوانٍ</string>
     <!-- Between 10 and 60 seconds option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_10_and_60_seconds">Between 10 and 60 seconds</string>
+    <string name="video_section_videos_duration_option_between_10_and_60_seconds">بين 10 و60 ثانية</string>
     <!-- Between 1 and 4 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_1_and_4_minutes">Between 1 and 4 minutes</string>
+    <string name="video_section_videos_duration_option_between_1_and_4_minutes">بين 1 و 4 دقائق</string>
     <!-- Between 4 and 20 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_4_and_20_minutes">Between 4 and 20 minutes</string>
+    <string name="video_section_videos_duration_option_between_4_and_20_minutes">بين 4 و 20 دقيقة</string>
     <!-- More than 20 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_more_than_20_minutes">More than 20 minutes</string>
+    <string name="video_section_videos_duration_option_more_than_20_minutes">أكثر من 20 دقيقة</string>
     <!-- Create playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_create_playlist_dialog_title">Enter playlist name</string>
+    <string name="video_section_playlists_create_playlist_dialog_title">أدخل اسم قائمة التشغيل</string>
     <!-- Rename playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_rename_playlist_dialog_title">Rename</string>
+    <string name="video_section_playlists_rename_playlist_dialog_title">إعادة التسمية</string>
     <!-- Error message when the playlist name already exists -->
-    <string name="video_section_playlists_error_message_playlist_name_exists">A playlist with this name already exists. Enter a different name.</string>
+    <string name="video_section_playlists_error_message_playlist_name_exists">قائمة تشغيل بهذا الاسم موجودة بالفعل. أدخل اسمًا مختلفًا.</string>
     <!-- Delete playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_delete_playlist_dialog_title">Delete playlist\?</string>
+    <string name="video_section_playlists_delete_playlist_dialog_title">حذف قائمة التشغيل؟</string>
     <!-- Delete button title of the video section playlists tab delete playlist dialog -->
-    <string name="video_section_playlists_delete_playlist_dialog_delete_button">Delete</string>
+    <string name="video_section_playlists_delete_playlist_dialog_delete_button">حذف</string>
     <!-- Text that indicates that there’s no playlist to show. -->
-    <string name="video_section_playlists_empty_hint_playlist">No playlists found</string>
+    <string name="video_section_playlists_empty_hint_playlist">لم يتم العثور على قوائم تشغيل</string>
     <!-- Delete option title of the video section playlist bottom sheet -->
-    <string name="video_section_playlist_bottom_sheet_option_title_delete">Delete playlist</string>
+    <string name="video_section_playlist_bottom_sheet_option_title_delete">حذف قائمة التشغيل</string>
     <!-- Remove videos dialog title of the video section playlist detail -->
-    <string name="video_section_playlist_detail_remove_videos_dialog_title">Remove from playlist\?</string>
+    <string name="video_section_playlist_detail_remove_videos_dialog_title">إزالة من قائمة التشغيل؟</string>
     <!-- Remove button title of the video section playlist detail remove videos dialog -->
-    <string name="video_section_playlist_detail_remove_videos_dialog_remove_button">Remove</string>
+    <string name="video_section_playlist_detail_remove_videos_dialog_remove_button">احذف</string>
     <!-- Play all button title of the video section playlist detail -->
-    <string name="video_section_playlist_detail_play_all_button">Play all</string>
+    <string name="video_section_playlist_detail_play_all_button">تشغل الكل</string>
     <!-- Text that indicates that there’s no videos in the video playlist detail to show. -->
-    <string name="video_section_playlist_detail_empty_hint_videos">No videos</string>
+    <string name="video_section_playlist_detail_empty_hint_videos">لا يوجد مقطع فيديو</string>
     <!-- Top bar title of the video section video selected page -->
-    <string name="video_section_video_selected_top_bar_title">Choose files</string>
+    <string name="video_section_video_selected_top_bar_title">اختر الملفات</string>
     <!-- Message when deleting the playlists of the video section playlists tab. %1$d will be replaced the number of deleted playlists -->
     <plurals name="video_section_playlists_delete_playlists_message">
-        <item quantity="zero"></item>
-        <item quantity="one"></item>
-        <item quantity="two"></item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Deleted %1$d playlist</item>
+        <item quantity="other">Deleted %1$d playlists</item>
     </plurals>
     <!-- Message when adding the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_add_videos_message">
@@ -204,16 +200,28 @@
     </plurals>
     <!-- Message when removing the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_remove_videos_message">
-        <item quantity="one">Removed %1$d item from “%2$s”</item>
-        <item quantity="other">Removed %1$d items from “%2$s”</item>
+        <item quantity="zero">تم إزالة %1$d عنصر من ”%2$s“</item>
+        <item quantity="one">تم إزالة %1$d عنصر من ”%2$s“</item>
+        <item quantity="two">تم إزالة %1$d عنصرين من ”%2$s“</item>
+        <item quantity="few">تم إزالة %1$d عناصر من ”%2$s“</item>
+        <item quantity="many">تم إزالة %1$d عنصراً من ”%2$s“</item>
+        <item quantity="other">تم إزالة %1$d عنصر من ”%2$s“</item>
     </plurals>
     <!-- Text of the video section playlist detail video number -->
     <plurals name="video_section_playlist_detail_video_number">
-        <item quantity="one">%1$d video</item>
-        <item quantity="other">%1$d videos</item>
+        <item quantity="zero">%1$d مقطع فيديو</item>
+        <item quantity="one">%1$d مقطع فيديو</item>
+        <item quantity="two">%1$d مقطعي فيديو</item>
+        <item quantity="few">%1$d مقاطع فيديو</item>
+        <item quantity="many">%1$d مقطع فيديو</item>
+        <item quantity="other">%1$d فيديوهات</item>
     </plurals>
     <!-- Warning shown when the user clicks on a web link and there is no app available at the moment for opening it. -->
     <string name="chat_click_link_in_message_intent_not_available">You may not have any apps installed which can open this website</string>
     <!-- Message when deleting a singular playlist of the video section playlists tab. %1$s will be replaced the name of deleted playlist -->
     <string name="video_section_playlists_delete_playlists_message_singular">تم حذف ”%1$s“</string>
+    <!-- The name of the Settings Camera Uploads Option, which decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
+    <string name="settings_camera_uploads_upload_only_while_charging_option_name">Upload only while charging</string>
+    <!-- Text for the header of the screen to add a new sync folder -->
+    <string name="sync_add_new_sync_folder_header_text">Add synchronised folder:</string>
 </resources>

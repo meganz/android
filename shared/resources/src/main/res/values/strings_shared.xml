@@ -212,8 +212,8 @@
     <string name="chat_click_link_in_message_intent_not_available">You may not have any apps installed which can open this website</string>
     <!-- Message when deleting a singular playlist of the video section playlists tab. %1$s will be replaced the name of deleted playlist -->
     <string name="video_section_playlists_delete_playlists_message_singular">“%1$s” deleted</string>
-    <!-- Text for the header of the screen to add a new sync folder -->
-    <string name="sync_add_new_sync_folder_header_text">Add synchronised folder:</string>
     <!-- The name of the Settings Camera Uploads Option, which decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
     <string name="settings_camera_uploads_upload_only_while_charging_option_name">Upload only while charging</string>
+    <!-- Text for the header of the screen to add a new sync folder -->
+    <string name="sync_add_new_sync_folder_header_text">Add synchronised folder:</string>
 </resources>

@@ -9,7 +9,7 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Sincronizações [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">Nós precisamos acessar o armazenamento do seu dispositivo para sincronizar a sua pasta local. Toque aqui para permitir o acesso</string>
+    <string name="sync_storage_permission_banner">O MEGA precisa acessar o armazenamento do seu dispositivo para sincronizar a sua pasta local. Toque aqui para permitir o acesso</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
     <string name="sync_battery_optimisation_banner">Para a sincronização contínua dos seus arquivos e das suas pastas, permita que o MEGA seja executado em segundo plano</string>
     <!-- Sync file counts to show ongoing syncing-->
@@ -165,7 +165,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Selecionar</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">Há um problema com um arquivo ou uma pasta que precisa de uma decisão sua para ser resolvido</string>
+    <string name="sync_stalled_issue_file_issue_detail">Há um problema com um item que precisa de uma decisão sua para ser resolvido</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">Esperando a conclusão de outros processos</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -189,7 +189,7 @@
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">Foi detectada no MEGA uma ação para mover ou renomear, mas não foi possível replicá-la no dispositivo local.</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">Foi detectado que uma mudança ou renomeação foi feita localmente, mas não foi possível replicá-la no MEGA.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">Foi detectada no dispositivo local uma ação para mover ou renomear, mas não foi possível replicá-la no MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Esperando terminar de escanear para comprovar se o arquivo foi movido ou deletado.</string>
     <!-- Sync subtitle for sync screen to choose folders-->

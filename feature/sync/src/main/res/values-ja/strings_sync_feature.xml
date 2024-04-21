@@ -9,7 +9,7 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">同期 [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">ローカルフォルダを同期するには、お使いのデバイスのストレージにアクセスする必要があります。こちらをタップしてアクセスを許可してください。</string>
+    <string name="sync_storage_permission_banner">ローカルフォルダを同期するには、MEGAはお使いのデバイスのストレージにアクセスする必要があります。こちらをタップしてアクセスを許可してください。</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
     <string name="sync_battery_optimisation_banner">ファイルとフォルダを継続的に同期するには、MEGAをバックグラウンドで実行できるようにします</string>
     <!-- Sync file counts to show ongoing syncing-->
@@ -157,7 +157,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">選ぶ</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">あるファイルやフォルダに問題があり、それを解決するにはあなたの決定が必要です。</string>
+    <string name="sync_stalled_issue_file_issue_detail">ある項目に問題があり、それを解決するにはあなたの決定が必要です</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">他のプロセスが完了するのを待っています</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -181,7 +181,7 @@
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">MEGAで移動または名前変更アクションが検出されましたが、ローカルで複製できませんでした。</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">移動または名前変更がローカルで行われたものとして検出されましたが、MEGAでは複製できませんでした。</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">移動または名前変更アクションがローカルで検出されましたが、MEGAで複製できませんでした。</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">ファイルが移動または削除されたかどうかを判断するために、スキャンが完了するのを待っています。</string>
     <!-- Sync subtitle for sync screen to choose folders-->

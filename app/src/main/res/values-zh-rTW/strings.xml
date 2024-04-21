@@ -5112,7 +5112,7 @@
     <!-- The title of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_title">升級到Pro方案可獲得無限的通話</string>
     <!-- The body of the Upgrade bottom sheet dialog  -->
-    <string name="meetings_upgrade_pro_plan_body">您的通話時間已達60分鐘的限制並已結束。Pro使用者的通話時間不受限制，最多可邀請1000位與會者。</string>
+    <string name="meetings_upgrade_pro_plan_body">您的通話時間已達60分鐘的限制並已結束。Pro使用者的通話時間不受限制，而且最多可邀請1000位與會者。</string>
     <!-- The button text of the Upgrade bottom sheet dialog  -->
     <string name="meetings_upgrade_pro_plan_button">立即升級</string>
     <!-- Search drop down chips filter type file type -->

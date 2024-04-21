@@ -9,7 +9,7 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Sincronizări [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">Trebuie să accesăm spațiul de stocare al dispozitivului pentru a vă sincroniza folderul local. Atingeți aici pentru a permite accesul.</string>
+    <string name="sync_storage_permission_banner">MEGA trebuie să acceseze spațiul de stocare al dispozitivului dvs. pentru a sincroniza folderul local. Atingeți aici pentru a permite accesul.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
     <string name="sync_battery_optimisation_banner">Pentru a sincroniza continuu fișierele și folderele, permiteți MEGA să ruleze în fundal</string>
     <!-- Sync file counts to show ongoing syncing-->
@@ -165,7 +165,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Selectează</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">Un fișier sau folder are o problemă care necesită decizia dvs. pentru a o rezolva</string>
+    <string name="sync_stalled_issue_file_issue_detail">Un element are o problemă care necesită decizia dvs. pentru a o rezolva</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">În așteptarea finalizării altor procese</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -189,7 +189,7 @@
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">O mutare sau redenumire a fost detectată în MEGA, dar nu a putut fi replicată local.</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">O mutare sau redenumire a fost detectată la nivel local, dar nu a putut fi reprodusă în MEGA.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">O mutare sau redenumire a fost detectată local, dar nu a putut fi replicată în MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Așteptarea finalizării scanării pentru a determina dacă fișierul a fost mutat sau șters.</string>
     <!-- Sync subtitle for sync screen to choose folders-->
