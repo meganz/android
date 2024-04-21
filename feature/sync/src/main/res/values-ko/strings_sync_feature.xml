@@ -9,9 +9,9 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">동기화 [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">We need to access your device storage in order to sync your local folder. Tap here to allow access.</string>
+    <string name="sync_storage_permission_banner">당신의 로컬 폴더를 동기화하기 위해 MEGA가 장치 저장소에 접근이 필요합니다. 접근을 승인하려면 여기를 탭하세요</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">To continuously sync your files and folders, allow MEGA to run in the background</string>
+    <string name="sync_battery_optimisation_banner">파일과 폴더를 계속 동기화하려면, MEGA가 백그라운드에서 작동하도록 허용하세요</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="other">%d개의 파일</item>
@@ -103,7 +103,7 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">와이파이 전용</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">You’ll need to set up a local folder on your device that will sync with a chosen folder on your Cloud drive</string>
+    <string name="sync_empty_state_message">당신의 클라우드 드라이브에서 선택한 폴더와 동기화할 장치의 로컬 폴더를 설정해야 합니다</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_notification_monitoring_description">동기화 감시 중</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
@@ -157,7 +157,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">선택</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">한 개의 파일 또는 폴더에 해결하기 위해 당신의 결정이 필요한 문제가 있습니다</string>
+    <string name="sync_stalled_issue_file_issue_detail">한 개의 항목에 문제를 해결하기 위해 당신의 결정이 필요합니다</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">다른 프로세스가 완료되기를 기다리는 중입니다.</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -179,7 +179,7 @@
     <!-- Sync stalled issue reason is Name clash detailed description-->
     <string name="sync_stalled_issue_name_clash_detail">동기화의 한쪽에서 같은 이름을 다신 여러 항목이 있지만 동기화의 다른 쪽에서 같은 하나의 항목이 될 것입니다</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename action was detected in MEGA, but couldn’t be replicated locally.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_mega">MEGA에서 이동 또는 이름 변경을 감지하였지만, 로컬에 반영할 수 없었습니다</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_local">로컬에서 이동 또는 이름 변경을 감지하였지만, MEGA에 반영할 수 없었습니다.</string>
     <!-- Sync stalled issue delete or move scanning detail-->

@@ -73,39 +73,39 @@
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
     <string name="device_center_list_view_item_sub_state_account_expired">由于您的方案已过期，因此无法同步或备份此文件夹</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
-    <string name="device_center_list_view_item_sub_state_foreign_target_overshare">Folder can’t be synced as the user who shared this folder has reached their storage quota</string>
+    <string name="device_center_list_view_item_sub_state_foreign_target_overshare">无法同步文件夹，因为共享此文件夹的用户已达到其存储容量上限</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
     <string name="device_center_list_view_item_sub_state_remote_path_has_changed">MEGA中的文件夹已被移动或删除，因此无法定位，或者您可能没有访问权限。</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
-    <string name="device_center_list_view_item_sub_state_share_non_full_access">Folder can’t be synced as it’s a shared folder without full access</string>
+    <string name="device_center_list_view_item_sub_state_share_non_full_access">无法同步文件夹，因为它是没有完全访问权限的共享文件夹</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
-    <string name="device_center_list_view_item_sub_state_put_nodes_error">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the desktop app.</string>
+    <string name="device_center_list_view_item_sub_state_put_nodes_error">此文件夹中的文件无法同步或备份。您需要从桌面应用程序重新启用同步或备份。</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
-    <string name="device_center_list_view_item_sub_state_active_sync_below_path">Folder can’t be synced as it already contains synced folders</string>
+    <string name="device_center_list_view_item_sub_state_active_sync_below_path">文件夹无法同步，因为它已经包含在已经同步的文件夹中</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
-    <string name="device_center_list_view_item_sub_state_vboxsharedfolder_unsupported">MEGA can’t sync or back up VirtualBox folders</string>
+    <string name="device_center_list_view_item_sub_state_vboxsharedfolder_unsupported">MEGA无法同步或备份VirtualBox文件夹</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
-    <string name="device_center_list_view_item_sub_state_account_blocked">Unable to sync or back up this folder as the account has been blocked</string>
+    <string name="device_center_list_view_item_sub_state_account_blocked">由于该帐户已被封锁，无法同步或备份此文件夹</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
-    <string name="device_center_list_view_item_sub_state_unknown_temporary_error">Problem syncing or backing up this folder. Try again later. If the issue continues, contact support.</string>
+    <string name="device_center_list_view_item_sub_state_unknown_temporary_error">同步或备份此文件夹时出现问题。请稍后再试。如果问题仍然存在，请联系客服。</string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
     <string name="device_center_list_view_item_sub_state_too_many_action_packets">帐户已重新加载。对备份或同步的任何更新尚未应用。</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
-    <string name="device_center_list_view_item_sub_state_logged_out">Sync or backup has been stopped as you appear to have logged out of the desktop app. Log back in via the desktop app, and resume the sync or backup.</string>
+    <string name="device_center_list_view_item_sub_state_logged_out">由于您似乎已登出桌面应用程序，因此同步或备份已停止。通过桌面应用程序重新登录，然后恢复同步或备份。</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
     <string name="device_center_list_view_item_sub_state_missing_parent_node">N/A</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="device_center_list_view_item_sub_state_backup_source_not_below_drive">无法定位外部驱动器中的文件夹。</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
-    <string name="device_center_list_view_item_sub_state_active_sync_same_path">There’s already a synced folder at the same path</string>
+    <string name="device_center_list_view_item_sub_state_active_sync_same_path">同一路径下已经有一个同步文件夹</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">重命名失败。</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
-    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">Couldn’t create a .megaignore file for this sync</string>
+    <string name="device_center_list_view_item_sub_state_could_not_create_ignore_file">无法为此同步创建.megaignore文件</string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
     <string name="device_center_list_view_item_sub_state_sync_config_read_failure">无法读取同步配置。稍后重试或检查文件夹权限。</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
-    <string name="device_center_list_view_item_sub_state_unknown_drive_path">Sync folder location is unknown</string>
+    <string name="device_center_list_view_item_sub_state_unknown_drive_path">同步文件夹位置未知</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
     <string name="device_center_list_view_item_sub_state_invalid_scan_interval">扫描间隔无效。请检查扫描间隔设置，然后重试。</string>
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
@@ -125,17 +125,17 @@
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="device_center_list_view_item_sub_state_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
-    <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">Folder can’t be synced or backed up as the MEGA folder is in the Rubbish bin</string>
+    <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">由于MEGA文件夹位于回收站中，文件夹无法同步或备份</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
     <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now">现在无法定位您设备中的文件夹，请稍后重试。</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
     <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive">无法找到您设备中的文件夹</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">Problem syncing or backing up this folder because of changes to the MEGA folder. Stop the sync or backup and try setting it up again in the desktop app, or contact support.</string>
+    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">由于MEGA文件夹发生变动，同步或备份此文件夹时出现问题。请停止同步或备份，然后尝试在桌面应用程序中重新进行设置，或者联系客服。</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
     <string name="device_center_list_view_item_sub_state_message_folder_backup_issue">同步或备份此文件夹时出现问题。停止同步或备份，然后尝试在桌面应用程序中重新进行设置，或者联系客服。</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Folder can’t be synced as it’s already inside a synced folder</string>
+    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">文件夹无法同步，因为它已经在同步的文件夹中</string>
     <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
     <string name="device_center_list_view_item_status_camera_uploads_disabled">相机上传已禁用</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
@@ -157,7 +157,7 @@
     <!-- Text to show in the Device Center for a No Network State when there is no network connectivity -->
     <string name="device_center_no_network_state">无网络连接</string>
     <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
-    <string name="device_center_list_view_item_sub_state_local_filesystem_mismatch">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the desktop app.</string>
+    <string name="device_center_list_view_item_sub_state_local_filesystem_mismatch">此文件夹中的文件无法同步或备份。您需要从桌面应用程序重新启用同步或备份。</string>
     <!-- Text to display in Device Center for an empty state when inspecting a device where no sync or backup has been configured -->
     <string name="device_center_nothing_setup_state">尚未设置任何内容</string>
     <!-- The hint text for the search bar in the Device Center feature when the User is searching for Devices -->

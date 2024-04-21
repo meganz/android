@@ -3,7 +3,7 @@
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="general_sync_no_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="general_sync_unsupported_file_system">MEGA can’t sync or backup this folder because the file system on your device is not supported</string>
+    <string name="general_sync_unsupported_file_system">이 폴더는 당신의 기기의 파일 시스템이 지원하지 않기 때문에 MEGA에서 동기화 하거나 백업할 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
     <string name="general_sync_invalid_remote_type">선택한 폴더는 동기화할 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
@@ -13,7 +13,7 @@
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_NODE_NOT_FOUND -->
     <string name="general_sync_remote_node_not_found">MEGA의 폴더가 이동 되었거나, 삭제 되었거나, 접근 권한이 없어서 찾을 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
-    <string name="general_sync_storage_overquota">Unable to sync or back up this folder as your storage is full</string>
+    <string name="general_sync_storage_overquota">저장소가 가득 찼기 때문에 이 폴더를 동기화 또는 백업할 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
     <string name="general_sync_account_expired">요금제가 만료되었기 때문에 이 폴더를 동기화 또는 백업할 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
@@ -23,19 +23,19 @@
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="general_sync_share_non_full_access">당신에게 전체 권한 없이 공유된 폴더이기 때문에 폴더를 동기화할 수 없습니다.</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
-    <string name="general_sync_put_nodes_error">Files in this folder can’t be synced or backed up. You’ll need to re-enable the sync or backup from the desktop app.</string>
+    <string name="general_sync_put_nodes_error">이 폴더의 파일을 동기화 또는 백업할 수 없습니다. 데스크톱 앱에서 동기화 또는 백업을 다시 활성화 해야 합니다.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
     <string name="general_sync_active_sync_below_path">동기화된 폴더가 포함되어 있는 폴더이기 때문에 동기화할 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
     <string name="general_sync_vboxsharedfolder_unsupported">MEGA는 VirtualBox 폴더를 동기화 또는 백업할 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
-    <string name="general_sync_account_blocked">Unable to sync or back up this folder as the account has been blocked</string>
+    <string name="general_sync_account_blocked">계정이 차단되었기 때문에 이 폴더를 동기화 또는 백업할 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
     <string name="general_sync_unknown_temporary_error">이 폴더를 동기화 또는 백업하던 중 문제가 발생했습니다. 나중에 다시 시도하세요. 만약 문제가 계속되면, 지원에 연락주세요.</string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
     <string name="general_sync_too_many_action_packets">계정을 다시 불러왔습니다. 백업 또는 동기화에 누락된 변경사항이 적용되지 않습니다.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
-    <string name="general_sync_logged_out">Sync or backup has been stopped as you appear to have logged out of the desktop app. Log back in via the desktop app, and resume the sync or backup.</string>
+    <string name="general_sync_logged_out">데스크톱 앱에서 로그아웃한 것으로 나타나서 동기화 또는 백업이 멈추었습니다. 데스크톱 앱에서 다시 로그인하고, 동기화 또는 백업을 재개하세요.</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
     <string name="general_sync_missing_parent_node">N/A</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
@@ -43,13 +43,13 @@
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
     <string name="general_sync_active_sync_same_path">같은 위치에 이미 동기화된 폴더가 있습니다.</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
-    <string name="general_sync_could_not_move_cloud_nodes">Renaming failed</string>
+    <string name="general_sync_could_not_move_cloud_nodes">이름 변경 실패</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
     <string name="general_sync_could_not_create_ignore_file">이 동기화를 위한 .megaignore 파일을 만들 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
     <string name="general_sync_config_read_failure">동기화 설정을 읽을 수 없습니다. 나중에 다시 시도하거나 폴더 권한을 확인하세요.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
-    <string name="general_sync_unknown_drive_path">Sync location is unknown</string>
+    <string name="general_sync_unknown_drive_path">동기화 위치를 알 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
     <string name="general_sync_invalid_scan_interval">잘못된 탐색 간격. 탐색 간격 설정을 확인하고 다시 시도하세요.</string>
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
@@ -69,7 +69,7 @@
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
-    <string name="general_sync_message_node_in_rubbish_bin">Folder can’t be synced or backed up as the MEGA folder is in the Rubbish bin</string>
+    <string name="general_sync_message_node_in_rubbish_bin">MEGA 폴더가 휴지통에 있어서 폴더를 동기화 또는 백업할 수 없습니다</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
     <string name="general_sync_message_cannot_locate_local_drive_now">장치의 폴더를 찾을 수 없습니다. 나중에 다시 시도하세요.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
@@ -79,19 +79,19 @@
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
     <string name="general_sync_message_folder_backup_issue">이 폴더를 동기화 또는 백업하던 중 문제가 발생했습니다. 동기화 또는 백업을 멈추고 데스크톱 앱에서 다시 설정하세요, 또는 지원에 연락주세요.</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
-    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Folder can’t be synced as it’s already inside a synced folder</string>
+    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">동기화된 폴더 안에 위치한 폴더이기 때문에 동기화할 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
-    <string name="general_sync_local_filesystem_mismatch">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the desktop app.</string>
+    <string name="general_sync_local_filesystem_mismatch">이 폴더의 파일을 동기화 또는 백업할 수 없습니다. 데스크톱 앱에서 동기화 또는 백업을 다시 활성화 해야 합니다.</string>
     <!-- Warning message to display when sync has been paused due a low battery level -->
-    <string name="general_message_sync_paused_low_battery_level">Syncing paused, battery level too low. Charge battery to resume syncing.</string>
+    <string name="general_message_sync_paused_low_battery_level">배터리 수준이 너무 낮아서, 동기화가 일시정지 되었습니다. 동기화를 재개하려면 배터리를 충전하세요.</string>
     <!-- Title for File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_file_sharing">Easy, secure file sharing</string>
+    <string name="dialog_onboarding_feature_title_file_sharing">쉽고, 안전한 파일 공유</string>
     <!-- Description about File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_file_sharing">Share large files thanks to a generous transfer quota and ensure security with password-protected links.</string>
+    <string name="dialog_onboarding_feature_description_file_sharing">넉넉한 전송 할당량 덕분에 큰 파일을 공유하고 암호로 공유된 링크로 보안을 보장하세요.</string>
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_backup_rewind">Never lose data again</string>
+    <string name="dialog_onboarding_feature_title_backup_rewind">다시는 데이터를 잃지 마세요</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Back up and sync your data for complete confidence. Plus, use Rewind to restore folders to any date up to 180 days.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">완벽한 확신을 위해 데이터를 백업하고 동기화하세요. 또한, 되돌리기를 이용하여 폴더를 최대 180일까지 원하는 날짜로 복원하세요.</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -99,7 +99,7 @@
     <!-- Title for chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_chat">제한 없는 통화와 회의</string>
     <!-- Description about chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_chat">Message, video call, and meet in total privacy with unlimited participants.</string>
+    <string name="dialog_onboarding_feature_description_chat">제한 없는 참가자와 함께 완벽한 개인 정보 보호 안에서 메시지, 영상 통화, 회의하세요.</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">형식</string>
     <!-- Search drop down chips filter type file type images -->
@@ -119,7 +119,7 @@
     <!-- Search drop down chips filter type file type folders -->
     <string name="search_dropdown_chip_filter_type_file_type_folders">폴더</string>
     <!-- Search drop down chips filter type file type others -->
-    <string name="search_dropdown_chip_filter_type_file_type_others">Others</string>
+    <string name="search_dropdown_chip_filter_type_file_type_others">기타</string>
     <!-- Search drop down chips filter type date added -->
     <string name="search_dropdown_chip_filter_type_date_added">추가된 날짜</string>
     <!-- Search drop down chips filter type last modified -->
@@ -137,78 +137,79 @@
     <!-- Search drop down chips filter type date modified older -->
     <string name="search_dropdown_chip_filter_type_date_older">더 오래됨</string>
     <!-- All videos tab title of the video section  -->
-    <string name="video_section_tab_title_all_videos">Videos</string>
+    <string name="video_section_tab_title_all_videos">동영상</string>
     <!-- Playlists tab title of the video section  -->
-    <string name="video_section_tab_title_playlists">Playlists</string>
+    <string name="video_section_tab_title_playlists">재생 목록</string>
     <!-- Location filter title of the video section  -->
-    <string name="video_section_videos_location_filter_title">Location</string>
+    <string name="video_section_videos_location_filter_title">위치</string>
     <!-- All locations option of the video section location filter  -->
-    <string name="video_section_videos_location_option_all_locations">All locations</string>
+    <string name="video_section_videos_location_option_all_locations">모든 위치</string>
     <!-- Cloud drive option of the video section location filter  -->
-    <string name="video_section_videos_location_option_cloud_drive">Cloud drive</string>
+    <string name="video_section_videos_location_option_cloud_drive">클라우드 드라이브</string>
     <!-- Camera uploads option of the video section location filter  -->
-    <string name="video_section_videos_location_option_camera_uploads">Camera uploads</string>
+    <string name="video_section_videos_location_option_camera_uploads">카메라 업로드</string>
     <!-- Shared items option of the video section location filter  -->
-    <string name="video_section_videos_location_option_shared_items">Shared items</string>
+    <string name="video_section_videos_location_option_shared_items">공유된 항목</string>
     <!-- Duration filter title of the video section  -->
-    <string name="video_section_videos_duration_filter_title">Duration</string>
+    <string name="video_section_videos_duration_filter_title">길이</string>
     <!-- All Duration option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_all_duration">All durations</string>
+    <string name="video_section_videos_duration_option_all_duration">모든 기간</string>
     <!-- Less than 10 seconds option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_less_than_10_seconds">Less than 10 seconds</string>
+    <string name="video_section_videos_duration_option_less_than_10_seconds">10초 이하</string>
     <!-- Between 10 and 60 seconds option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_10_and_60_seconds">Between 10 and 60 seconds</string>
+    <string name="video_section_videos_duration_option_between_10_and_60_seconds">10초와 60초 사이</string>
     <!-- Between 1 and 4 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_1_and_4_minutes">Between 1 and 4 minutes</string>
+    <string name="video_section_videos_duration_option_between_1_and_4_minutes">1분과 4분 사이</string>
     <!-- Between 4 and 20 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_4_and_20_minutes">Between 4 and 20 minutes</string>
+    <string name="video_section_videos_duration_option_between_4_and_20_minutes">4분과 20분 사이</string>
     <!-- More than 20 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_more_than_20_minutes">More than 20 minutes</string>
+    <string name="video_section_videos_duration_option_more_than_20_minutes">20분 이상</string>
     <!-- Create playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_create_playlist_dialog_title">Enter playlist name</string>
+    <string name="video_section_playlists_create_playlist_dialog_title">재생목록 이름을 입력하세요</string>
     <!-- Rename playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_rename_playlist_dialog_title">Rename</string>
+    <string name="video_section_playlists_rename_playlist_dialog_title">이름 바꾸기</string>
     <!-- Error message when the playlist name already exists -->
-    <string name="video_section_playlists_error_message_playlist_name_exists">A playlist with this name already exists. Enter a different name.</string>
+    <string name="video_section_playlists_error_message_playlist_name_exists">이 이름을 가진 재생목록이 이미 존재합니다. 다른 이름을 입력하세요.</string>
     <!-- Delete playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_delete_playlist_dialog_title">Delete playlist\?</string>
+    <string name="video_section_playlists_delete_playlist_dialog_title">재생목록을 삭제할까요\?</string>
     <!-- Delete button title of the video section playlists tab delete playlist dialog -->
-    <string name="video_section_playlists_delete_playlist_dialog_delete_button">Delete</string>
+    <string name="video_section_playlists_delete_playlist_dialog_delete_button">삭제</string>
     <!-- Text that indicates that there’s no playlist to show. -->
-    <string name="video_section_playlists_empty_hint_playlist">No playlists found</string>
+    <string name="video_section_playlists_empty_hint_playlist">재생목록 없음</string>
     <!-- Delete option title of the video section playlist bottom sheet -->
-    <string name="video_section_playlist_bottom_sheet_option_title_delete">Delete playlist</string>
+    <string name="video_section_playlist_bottom_sheet_option_title_delete">재생목록 삭제</string>
     <!-- Remove videos dialog title of the video section playlist detail -->
-    <string name="video_section_playlist_detail_remove_videos_dialog_title">Remove from playlist\?</string>
+    <string name="video_section_playlist_detail_remove_videos_dialog_title">재생목록에서 제거할까요\?</string>
     <!-- Remove button title of the video section playlist detail remove videos dialog -->
-    <string name="video_section_playlist_detail_remove_videos_dialog_remove_button">Remove</string>
+    <string name="video_section_playlist_detail_remove_videos_dialog_remove_button">제거</string>
     <!-- Play all button title of the video section playlist detail -->
-    <string name="video_section_playlist_detail_play_all_button">Play all</string>
+    <string name="video_section_playlist_detail_play_all_button">모두 재생</string>
     <!-- Text that indicates that there’s no videos in the video playlist detail to show. -->
-    <string name="video_section_playlist_detail_empty_hint_videos">No videos</string>
+    <string name="video_section_playlist_detail_empty_hint_videos">동영상 없음</string>
     <!-- Top bar title of the video section video selected page -->
-    <string name="video_section_video_selected_top_bar_title">Choose files</string>
+    <string name="video_section_video_selected_top_bar_title">파일 선택</string>
     <!-- Message when deleting the playlists of the video section playlists tab. %1$d will be replaced the number of deleted playlists -->
     <plurals name="video_section_playlists_delete_playlists_message">
-        <item quantity="other"></item>
+        <item quantity="other">%1$d개의 재생목록 삭제됨</item>
     </plurals>
     <!-- Message when adding the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_add_videos_message">
-        <item quantity="one">Added %1$d item to “%2$s”</item>
-        <item quantity="other">Added %1$d items to “%2$s”</item>
+        <item quantity="other">%1$d개의 항목을 “%2$s”에 추가함</item>
     </plurals>
     <!-- Message when removing the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_remove_videos_message">
-        <item quantity="one">Removed %1$d item from “%2$s”</item>
-        <item quantity="other">Removed %1$d items from “%2$s”</item>
+        <item quantity="other">“%2$s”에서 %1$d개의 항목 제거함</item>
     </plurals>
     <!-- Text of the video section playlist detail video number -->
     <plurals name="video_section_playlist_detail_video_number">
-        <item quantity="one">%1$d video</item>
-        <item quantity="other">%1$d videos</item>
+        <item quantity="other">동영상 %1$d개</item>
     </plurals>
     <!-- Warning shown when the user clicks on a web link and there is no app available at the moment for opening it. -->
-    <string name="chat_click_link_in_message_intent_not_available">You may not have any apps installed which can open this website</string>
+    <string name="chat_click_link_in_message_intent_not_available">이 웹사이트를 열 수 있는 앱을 설치하지 않은 것 같습니다</string>
     <!-- Message when deleting a singular playlist of the video section playlists tab. %1$s will be replaced the name of deleted playlist -->
-    <string name="video_section_playlists_delete_playlists_message_singular">“%1$s” deleted</string>
+    <string name="video_section_playlists_delete_playlists_message_singular">“%1$s” 삭제됨</string>
+    <!-- The name of the Settings Camera Uploads Option, which decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
+    <string name="settings_camera_uploads_upload_only_while_charging_option_name">충전 중일 때만 업로드</string>
+    <!-- Text for the header of the screen to add a new sync folder -->
+    <string name="sync_add_new_sync_folder_header_text">동기화된 폴더 추가:</string>
 </resources>

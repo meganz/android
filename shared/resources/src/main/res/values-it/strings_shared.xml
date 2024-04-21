@@ -49,7 +49,7 @@
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
     <string name="general_sync_config_read_failure">Impossibile leggere la configurazione della sincronizzazione. Riprova più tardi o controlla le autorizzazioni della cartella.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
-    <string name="general_sync_unknown_drive_path">Sync location is unknown</string>
+    <string name="general_sync_unknown_drive_path">La posizione della sincronizzazione è sconosciuta</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
     <string name="general_sync_invalid_scan_interval">Intervallo della scansione invalido. Controlla l’impostazione dell’intervallo della scansione e riprova.</string>
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
@@ -85,13 +85,13 @@
     <!-- Warning message to display when sync has been paused due a low battery level -->
     <string name="general_message_sync_paused_low_battery_level">Sincronizzazione interrotta, livello della batteria troppo basso. Carica la batteria per riprendere la sincronizzazione.</string>
     <!-- Title for File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_file_sharing">Easy, secure file sharing</string>
+    <string name="dialog_onboarding_feature_title_file_sharing">Condivisione di file facile e sicura</string>
     <!-- Description about File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_file_sharing">Share large files thanks to a generous transfer quota and ensure security with password-protected links.</string>
+    <string name="dialog_onboarding_feature_description_file_sharing">Condividi file di grandi dimensioni grazie a una generosa banda di trasferimento e garantisci la sicurezza con link protetti da password.</string>
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_backup_rewind">Never lose data again</string>
+    <string name="dialog_onboarding_feature_title_backup_rewind">Non perdere mai più dati</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Back up and sync your data for complete confidence. Plus, use Rewind to restore folders to any date up to 180 days.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">Effettua il backup e la sincronizzazione dei dati per la massima sicurezza. Inoltre, utilizza il Riavvolgimento per ripristinare le cartelle a qualsiasi data fino a 180 giorni.</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -99,7 +99,7 @@
     <!-- Title for chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_chat">Chiamate e meeting senza limiti</string>
     <!-- Description about chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_chat">Message, video call, and meet in total privacy with unlimited participants.</string>
+    <string name="dialog_onboarding_feature_description_chat">Invia messaggi, videochiama, e incontra in totale privacy con partecipanti illimitati.</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">Tipo</string>
     <!-- Search drop down chips filter type file type images -->
@@ -119,7 +119,7 @@
     <!-- Search drop down chips filter type file type folders -->
     <string name="search_dropdown_chip_filter_type_file_type_folders">Cartelle</string>
     <!-- Search drop down chips filter type file type others -->
-    <string name="search_dropdown_chip_filter_type_file_type_others">Others</string>
+    <string name="search_dropdown_chip_filter_type_file_type_others">Altro</string>
     <!-- Search drop down chips filter type date added -->
     <string name="search_dropdown_chip_filter_type_date_added">Data aggiunta</string>
     <!-- Search drop down chips filter type last modified -->
@@ -137,80 +137,87 @@
     <!-- Search drop down chips filter type date modified older -->
     <string name="search_dropdown_chip_filter_type_date_older">Vecchio</string>
     <!-- All videos tab title of the video section  -->
-    <string name="video_section_tab_title_all_videos">Videos</string>
+    <string name="video_section_tab_title_all_videos">Video</string>
     <!-- Playlists tab title of the video section  -->
-    <string name="video_section_tab_title_playlists">Playlists</string>
+    <string name="video_section_tab_title_playlists">Playlist</string>
     <!-- Location filter title of the video section  -->
-    <string name="video_section_videos_location_filter_title">Location</string>
+    <string name="video_section_videos_location_filter_title">Posizione</string>
     <!-- All locations option of the video section location filter  -->
-    <string name="video_section_videos_location_option_all_locations">All locations</string>
+    <string name="video_section_videos_location_option_all_locations">Tutte le posizioni</string>
     <!-- Cloud drive option of the video section location filter  -->
     <string name="video_section_videos_location_option_cloud_drive">Cloud drive</string>
     <!-- Camera uploads option of the video section location filter  -->
-    <string name="video_section_videos_location_option_camera_uploads">Camera uploads</string>
+    <string name="video_section_videos_location_option_camera_uploads">Caricamenti da fotocamera</string>
     <!-- Shared items option of the video section location filter  -->
-    <string name="video_section_videos_location_option_shared_items">Shared items</string>
+    <string name="video_section_videos_location_option_shared_items">Oggetti condivisi</string>
     <!-- Duration filter title of the video section  -->
-    <string name="video_section_videos_duration_filter_title">Duration</string>
+    <string name="video_section_videos_duration_filter_title">Durata</string>
     <!-- All Duration option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_all_duration">All durations</string>
+    <string name="video_section_videos_duration_option_all_duration">Tutte le durate</string>
     <!-- Less than 10 seconds option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_less_than_10_seconds">Less than 10 seconds</string>
+    <string name="video_section_videos_duration_option_less_than_10_seconds">Meno di 10 secondi</string>
     <!-- Between 10 and 60 seconds option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_10_and_60_seconds">Between 10 and 60 seconds</string>
+    <string name="video_section_videos_duration_option_between_10_and_60_seconds">Tra 10 e 60 secondi</string>
     <!-- Between 1 and 4 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_1_and_4_minutes">Between 1 and 4 minutes</string>
+    <string name="video_section_videos_duration_option_between_1_and_4_minutes">Tra 1 e 4 minuti</string>
     <!-- Between 4 and 20 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_between_4_and_20_minutes">Between 4 and 20 minutes</string>
+    <string name="video_section_videos_duration_option_between_4_and_20_minutes">Tra 4 e 20 minuti</string>
     <!-- More than 20 minutes option of the video section duration filter  -->
-    <string name="video_section_videos_duration_option_more_than_20_minutes">More than 20 minutes</string>
+    <string name="video_section_videos_duration_option_more_than_20_minutes">Più di 20 minuti</string>
     <!-- Create playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_create_playlist_dialog_title">Enter playlist name</string>
+    <string name="video_section_playlists_create_playlist_dialog_title">Inserisci un nome per la playlist</string>
     <!-- Rename playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_rename_playlist_dialog_title">Rename</string>
+    <string name="video_section_playlists_rename_playlist_dialog_title">Rinomina</string>
     <!-- Error message when the playlist name already exists -->
-    <string name="video_section_playlists_error_message_playlist_name_exists">A playlist with this name already exists. Enter a different name.</string>
+    <string name="video_section_playlists_error_message_playlist_name_exists">Una playlist con questo nome già esiste. Inserisci un nome differente.</string>
     <!-- Delete playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_delete_playlist_dialog_title">Delete playlist\?</string>
+    <string name="video_section_playlists_delete_playlist_dialog_title">Eliminare la playlist\?</string>
     <!-- Delete button title of the video section playlists tab delete playlist dialog -->
-    <string name="video_section_playlists_delete_playlist_dialog_delete_button">Delete</string>
+    <string name="video_section_playlists_delete_playlist_dialog_delete_button">Cancella</string>
     <!-- Text that indicates that there’s no playlist to show. -->
-    <string name="video_section_playlists_empty_hint_playlist">No playlists found</string>
+    <string name="video_section_playlists_empty_hint_playlist">Nessuna playlist trovata</string>
     <!-- Delete option title of the video section playlist bottom sheet -->
-    <string name="video_section_playlist_bottom_sheet_option_title_delete">Delete playlist</string>
+    <string name="video_section_playlist_bottom_sheet_option_title_delete">Elimina la playlist</string>
     <!-- Remove videos dialog title of the video section playlist detail -->
-    <string name="video_section_playlist_detail_remove_videos_dialog_title">Remove from playlist\?</string>
+    <string name="video_section_playlist_detail_remove_videos_dialog_title">Rimuovere dalla playlist\?</string>
     <!-- Remove button title of the video section playlist detail remove videos dialog -->
-    <string name="video_section_playlist_detail_remove_videos_dialog_remove_button">Remove</string>
+    <string name="video_section_playlist_detail_remove_videos_dialog_remove_button">Rimuovi</string>
     <!-- Play all button title of the video section playlist detail -->
-    <string name="video_section_playlist_detail_play_all_button">Play all</string>
+    <string name="video_section_playlist_detail_play_all_button">Riproduci tutto</string>
     <!-- Text that indicates that there’s no videos in the video playlist detail to show. -->
-    <string name="video_section_playlist_detail_empty_hint_videos">No videos</string>
+    <string name="video_section_playlist_detail_empty_hint_videos">Nessun video</string>
     <!-- Top bar title of the video section video selected page -->
-    <string name="video_section_video_selected_top_bar_title">Choose files</string>
+    <string name="video_section_video_selected_top_bar_title">Scegli i file</string>
     <!-- Message when deleting the playlists of the video section playlists tab. %1$d will be replaced the number of deleted playlists -->
     <plurals name="video_section_playlists_delete_playlists_message">
-        <item quantity="one"></item>
-        <item quantity="many"></item>
-        <item quantity="other"></item>
+        <item quantity="one">%1$d playlist eliminata</item>
+        <item quantity="many">%1$d di playlist eliminate</item>
+        <item quantity="other">%1$d playlist eliminate</item>
     </plurals>
     <!-- Message when adding the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_add_videos_message">
-        <item quantity="one">Added %1$d item to “%2$s”</item>
-        <item quantity="other">Added %1$d items to “%2$s”</item>
+        <item quantity="one">%1$d oggetto aggiunto a “%2$s”</item>
+        <item quantity="many">%1$d di oggetti aggiunti a “%2$s”</item>
+        <item quantity="other">%1$d oggetti aggiunti a “%2$s”</item>
     </plurals>
     <!-- Message when removing the videos to the video section playlist -->
     <plurals name="video_section_playlist_detail_remove_videos_message">
-        <item quantity="one">Removed %1$d item from “%2$s”</item>
-        <item quantity="other">Removed %1$d items from “%2$s”</item>
+        <item quantity="one">%1$d oggetto rimosso da “%2$s”</item>
+        <item quantity="many">%1$d di oggetti rimossi da “%2$s”</item>
+        <item quantity="other">%1$d oggetti rimossi da “%2$s”</item>
     </plurals>
     <!-- Text of the video section playlist detail video number -->
     <plurals name="video_section_playlist_detail_video_number">
         <item quantity="one">%1$d video</item>
-        <item quantity="other">%1$d videos</item>
+        <item quantity="many">%1$d di video</item>
+        <item quantity="other">%1$d video</item>
     </plurals>
     <!-- Warning shown when the user clicks on a web link and there is no app available at the moment for opening it. -->
-    <string name="chat_click_link_in_message_intent_not_available">You may not have any apps installed which can open this website</string>
+    <string name="chat_click_link_in_message_intent_not_available">Potresti non avere alcuna app installata in grado di aprire questo sito web</string>
     <!-- Message when deleting a singular playlist of the video section playlists tab. %1$s will be replaced the name of deleted playlist -->
-    <string name="video_section_playlists_delete_playlists_message_singular">“%1$s” deleted</string>
+    <string name="video_section_playlists_delete_playlists_message_singular">“%1$s” eliminata</string>
+    <!-- The name of the Settings Camera Uploads Option, which decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
+    <string name="settings_camera_uploads_upload_only_while_charging_option_name">Carica solo durante la ricarica</string>
+    <!-- Text for the header of the screen to add a new sync folder -->
+    <string name="sync_add_new_sync_folder_header_text">Aggiungi cartella sincronizzata:</string>
 </resources>

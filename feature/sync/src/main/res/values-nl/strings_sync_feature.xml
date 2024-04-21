@@ -9,7 +9,7 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Synchronisaties [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">We hebben toegang tot de opslag van uw apparaat nodig om uw lokale map te kunnen synchroniseren. Tik hier om toegang toe te staan.</string>
+    <string name="sync_storage_permission_banner">MEGA needs to access your device storage in order to sync your local folder. Tap here to allow access.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
     <string name="sync_battery_optimisation_banner">Als u uw bestanden en mappen continu wilt synchroniseren, moet u MEGA op de achtergrond laten draaien</string>
     <!-- Sync file counts to show ongoing syncing-->
@@ -161,7 +161,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Selecteer</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">Er is een probleem met een bestand of map waarvoor u een beslissing moet nemen om het probleem op te lossen</string>
+    <string name="sync_stalled_issue_file_issue_detail">An item has an issue that needs your decision to resolve it</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">Wachten tot andere processen zijn voltooid</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -185,7 +185,7 @@
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">Er is een actie voor het verplaatsen of hernoemen van de naam gedetecteerd in MEGA, maar deze kon niet lokaal worden gerepliceerd.</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">Verplaatsen of hernoemen werd lokaal gedetecteerd, maar kon niet worden gerepliceerd in MEGA.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">A move or rename action was detected locally, but couldn’t be replicated in MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Wacht tot de scan is voltooid om te bepalen of het bestand is verplaatst of verwijderd.</string>
     <!-- Sync subtitle for sync screen to choose folders-->

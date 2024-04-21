@@ -305,7 +305,7 @@
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
     <string name="intent_not_available_location">Aucune appli n’est proposée sur votre appareil pour ouvrir cette position</string>
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
-    <string name="intent_not_available_file">Il semble qu’aucune appli n’est installée qui prenne ce type de fichier en charge</string>
+    <string name="intent_not_available_file">Il semble qu’aucune appli installée ne prend ce type de fichier en charge</string>
     <!-- create a link of a file and send it using an app from the device -->
     <string name="context_get_link">Partager le lien</string>
     <!-- Delete a link label -->
@@ -2582,7 +2582,7 @@
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">Pour vous joindre à cet appel, vous devez mettre fin à l’appel en cours ou le mettre en attente.</string>
     <!-- Explanation of the dialog shown to share a chat link -->
-    <string name="copy_link_explanation">D’autres peuvent se joindre à votre groupe en utilisant ce lien.</string>
+    <string name="copy_link_explanation">D’autres peuvent se joindre à votre groupe grâce à ce lien.</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">Saisissez le nom du groupe</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->

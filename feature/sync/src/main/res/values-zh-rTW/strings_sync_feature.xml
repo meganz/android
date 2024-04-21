@@ -9,9 +9,9 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">同步[A]（%1$d）[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">We need to access your device storage in order to sync your local folder. Tap here to allow access.</string>
+    <string name="sync_storage_permission_banner">MEGA需要存取您裝置的儲存空間，以便同步您的本地資料夾。點選此處以允許存取。</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">To continuously sync your files and folders, allow MEGA to run in the background</string>
+    <string name="sync_battery_optimisation_banner">若要持續同步您的檔案和資料夾，請允許MEGA在背景中運行</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="other">%d個檔案</item>
@@ -103,7 +103,7 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">只在WiFi連線</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">You’ll need to set up a local folder on your device that will sync with a chosen folder on your Cloud drive</string>
+    <string name="sync_empty_state_message">您需要在您的裝置上設定一個本地資料夾，該資料夾將與您雲端硬碟上選定的資料夾同步</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_notification_monitoring_description">監控同步</string>
     <!-- Snackbar message shown when Wi-Fi only sync option is selected -->
@@ -157,7 +157,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">選擇</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">檔案或資料夾存在需要您決策以解決的問題</string>
+    <string name="sync_stalled_issue_file_issue_detail">An item has an issue that needs your decision to resolve it</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">正在等待其它程序完成</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -179,9 +179,9 @@
     <!-- Sync stalled issue reason is Name clash detailed description-->
     <string name="sync_stalled_issue_name_clash_detail">同步的一側有多個具有相同名稱的項目，這些項目在同步的另一側都將成為相同的單一項目</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename action was detected in MEGA, but couldn’t be replicated locally.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_mega">在MEGA中偵測到移動或重新命名操作，但無法在本地複製。</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">偵測到本地發生的移動或重新命名，但無法在MEGA中複製。</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">在本地偵測到移動或重新命名操作，但無法在MEGA中複製。</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">等待掃描完成以確定檔案是否已移動或刪除。</string>
     <!-- Sync subtitle for sync screen to choose folders-->

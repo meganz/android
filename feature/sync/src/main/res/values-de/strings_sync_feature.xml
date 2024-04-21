@@ -9,7 +9,7 @@
     <!-- Sync spannable section to show sync count with notification count-->
     <string name="section_sync_with_notification">Synchronisierungen [A](%1$d)[/A]</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">We need to access your device storage in order to sync your local folder. Tap here to allow access.</string>
+    <string name="sync_storage_permission_banner">MEGA needs to access your device storage in order to sync your local folder. Tap here to allow access.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
     <string name="sync_battery_optimisation_banner">To continuously sync your files and folders, allow MEGA to run in the background</string>
     <!-- Sync file counts to show ongoing syncing-->
@@ -161,7 +161,7 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="sync_general_select">Auswählen</string>
     <!-- Sync stalled issue reason is no file issue detailed description-->
-    <string name="sync_stalled_issue_file_issue_detail">Ein Problem mit einer Datei oder einem Ordner erfordert Ihren Eingriff</string>
+    <string name="sync_stalled_issue_file_issue_detail">An item has an issue that needs your decision to resolve it</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
     <string name="sync_stalled_issue_delete_or_move_detail">Es wird auf den Abschluss anderer Prozesse gewartet</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
@@ -185,7 +185,7 @@
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename action was detected in MEGA, but couldn’t be replicated locally.</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">Ein lokal erkannter Verschiebe- oder Umbenennungsvorgang konnte auf MEGA nicht repliziert werden.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">A move or rename action was detected locally, but couldn’t be replicated in MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Abschluss des Scanvorgangs wird abgewartet, um zu bestimmen, ob die Datei verschoben oder gelöscht wurde.</string>
     <!-- Sync subtitle for sync screen to choose folders-->
