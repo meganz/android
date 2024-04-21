@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.favourites
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,6 +9,9 @@ import android.view.MenuItem
 import android.view.MenuItem.SHOW_AS_ACTION_ALWAYS
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
@@ -49,6 +53,7 @@ import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
 import mega.privacy.android.app.presentation.favourites.model.FavouriteItem
 import mega.privacy.android.app.presentation.favourites.model.FavouriteLoadState
 import mega.privacy.android.app.presentation.favourites.model.FavouritePlaceholderItem
+import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.FavouriteImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -106,6 +111,12 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
      * Is online - Temporary variable to hold state until view is migrated to compose
      */
     private var isOnLine: Boolean = false
+
+    private val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleHiddenNodesOnboardingResult,
+        )
 
     /**
      * onCreateView
@@ -435,6 +446,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
                 FavouriteActionModeCallback(
                     (requireActivity() as ManagerActivity),
                     viewModel,
+                    this@FavouritesFragment,
                     requireContext()
                 )
         }
@@ -590,5 +602,49 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
             }
             itemAnimator = SelectAnimator()
         }
+    }
+
+    fun onHideClicked(
+        nodeIds: List<NodeId>,
+    ) {
+        val isHiddenNodesOnboarded = viewModel.isHiddenNodesOnboarded()
+        val isPaid = viewModel.getIsPaidAccount()
+        if (!isPaid) {
+            val intent = HiddenNodesOnboardingActivity.createScreen(
+                context = requireContext(),
+                isOnboarding = false,
+            )
+            hiddenNodesOnboardingLauncher.launch(intent)
+            activity?.overridePendingTransition(0, 0)
+        } else if (isHiddenNodesOnboarded) {
+            viewModel.hideOrUnhideNodes(nodeIds, true)
+        } else {
+            showHiddenNodesOnboarding()
+        }
+    }
+
+    private fun showHiddenNodesOnboarding() {
+        viewModel.setHiddenNodesOnboarded()
+
+        val intent = HiddenNodesOnboardingActivity.createScreen(
+            context = requireContext(),
+            isOnboarding = true,
+        )
+        hiddenNodesOnboardingLauncher.launch(intent)
+        activity?.overridePendingTransition(0, 0)
+    }
+
+    private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+        val selectedNodesCount = viewModel.getItemsSelected().size
+        val nodeIds = viewModel.getItemsSelected().values.map { it.typedNode.id }
+        viewModel.hideOrUnhideNodes(nodeIds, true)
+
+        val message = resources.getQuantityString(
+            R.plurals.hidden_nodes_result_message,
+            selectedNodesCount,
+            selectedNodesCount,
+        )
+        Util.showSnackbar(requireActivity(), message)
     }
 }

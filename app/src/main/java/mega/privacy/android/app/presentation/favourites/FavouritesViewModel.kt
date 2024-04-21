@@ -4,11 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
@@ -25,7 +27,9 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.favourites.GetFavouriteSortOrderUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
@@ -62,6 +66,8 @@ class FavouritesViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
 ) : ViewModel() {
 
     private val query = MutableStateFlow<String?>(null)
@@ -79,18 +85,39 @@ class FavouritesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            order = MutableStateFlow(getFavouriteSortOrderUseCase())
-            combine(
-                order,
-                query,
-                getAllFavoritesUseCase(),
-                selected,
-                monitorConnectivityUseCase(),
-                ::mapToFavourite
-            ).catch {
-                Timber.e(it)
-            }.collectLatest { newState ->
-                _state.update { newState }
+            combineInitFlows()
+                .catch { Timber.e(it) }
+                .collectLatest { newState ->
+                    _state.update { newState }
+                }
+        }
+    }
+
+    private suspend fun combineInitFlows(): Flow<FavouriteLoadState> {
+        val accountDetailFlow = monitorAccountDetailUseCase()
+        val isHiddenNodesOnboardedFlow = flowOf(isHiddenNodesOnboardedUseCase())
+        order = MutableStateFlow(getFavouriteSortOrderUseCase())
+        val favouritesFlow = combine(
+            order,
+            query,
+            getAllFavoritesUseCase(),
+            selected,
+            monitorConnectivityUseCase(),
+            ::mapToFavourite
+        )
+
+        return combine(
+            accountDetailFlow,
+            isHiddenNodesOnboardedFlow,
+            favouritesFlow
+        ) { accountDetail, isHiddenNodesOnboarded, favouritesState ->
+            if (favouritesState is FavouriteLoadState.Success) {
+                favouritesState.copy(
+                    accountDetail = accountDetail,
+                    isHiddenNodesOnboarded = isHiddenNodesOnboarded
+                )
+            } else {
+                favouritesState
             }
         }
     }
@@ -289,6 +316,29 @@ class FavouritesViewModel @Inject constructor(
                 runCatching {
                     updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = hide)
                 }.onFailure { Timber.e("Update sensitivity failed: ", it) }
+            }
+        }
+    }
+
+    fun getIsPaidAccount(): Boolean {
+        val state = _state.value
+        return (state as? FavouriteLoadState.Success)
+            ?.accountDetail
+            ?.levelDetail
+            ?.accountType
+            ?.isPaid ?: false
+    }
+
+    fun isHiddenNodesOnboarded(): Boolean {
+        return (_state.value as? FavouriteLoadState.Success)?.isHiddenNodesOnboarded ?: false
+    }
+
+    fun setHiddenNodesOnboarded() {
+        _state.value.let {
+            if (it is FavouriteLoadState.Success) {
+                it.copy(isHiddenNodesOnboarded = true)
+            } else {
+                it
             }
         }
     }

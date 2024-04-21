@@ -600,7 +600,7 @@ class RecentActionBucketFragment : Fragment() {
         val message = resources.getQuantityString(
             R.plurals.hidden_nodes_result_message,
             selectedNodesCount,
-            1
+            selectedNodesCount
         )
         Util.showSnackbar(requireActivity(), message)
     }

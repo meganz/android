@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.favourites.FavouritesViewModel
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
@@ -20,10 +21,13 @@ import mega.privacy.android.app.presentation.favourites.model.mapper.HeaderMappe
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.favourite.FavouriteSortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.favourites.GetFavouriteSortOrderUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
@@ -100,7 +104,16 @@ class FavouritesViewModelTest {
     }
 
     private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
-
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
+        on {
+            invoke()
+        }.thenReturn(flowOf(AccountDetail()))
+    }
+    private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
+        on {
+            runBlocking { invoke() }
+        }.thenReturn(false)
+    }
     @BeforeEach
     fun setUp() {
         Mockito.reset(
@@ -128,6 +141,8 @@ class FavouritesViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             isAvailableOfflineUseCase = isAvailableOfflineUseCase,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
         )
     }
 

@@ -29,6 +29,7 @@ import timber.log.Timber
 class FavouriteActionModeCallback(
     private val mainActivity: ManagerActivity,
     private val viewModel: FavouritesViewModel,
+    private val fragment: FavouritesFragment,
     private val context: Context,
 ) :
     ActionMode.Callback {
@@ -40,18 +41,30 @@ class FavouriteActionModeCallback(
     }
 
     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        mainActivity.lifecycleScope.launch {
-            val isHiddenNodesEnabled = mainActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
-            val hasNonSensitiveNode =
-                viewModel.getItemsSelected().any { !it.value.node.isMarkedSensitive }
-
-            menu?.findItem(R.id.cab_menu_hide)?.isVisible =
-                isHiddenNodesEnabled && hasNonSensitiveNode
-
-            menu?.findItem(R.id.cab_menu_unhide)?.isVisible =
-                isHiddenNodesEnabled && !hasNonSensitiveNode
+        menu?.let {
+            handleHiddenNodes(it)
         }
         return true
+    }
+
+    private fun handleHiddenNodes(menu: Menu) {
+        mainActivity.lifecycleScope.launch {
+            val isHiddenNodesEnabled =
+                mainActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+            if (isHiddenNodesEnabled) {
+                val isPaid =
+                    viewModel.getIsPaidAccount()
+
+                val hasNonSensitiveNode =
+                    viewModel.getItemsSelected().mapNotNull { it.value.typedNode }
+                        .any { !it.isMarkedSensitive }
+                menu.findItem(R.id.cab_menu_hide)?.isVisible =
+                    hasNonSensitiveNode || !isPaid
+
+                menu.findItem(R.id.cab_menu_unhide)?.isVisible =
+                    !hasNonSensitiveNode && isPaid
+            }
+        }
     }
 
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
@@ -93,7 +106,8 @@ class FavouriteActionModeCallback(
                         } else {
                             LinksUtil.showGetLinkActivity(mainActivity, nodeHandles[0])
                         }
-                    } else {}
+                    } else {
+                    }
                 }
 
                 R.id.cab_menu_send_to_chat -> {
@@ -108,15 +122,17 @@ class FavouriteActionModeCallback(
                                 mainActivity.supportFragmentManager,
                                 ConfirmMoveToRubbishBinDialogFragment.TAG
                             )
-                    } else {}
+                    } else {
+                    }
                 }
 
                 R.id.cab_menu_select_all -> viewModel.selectAll()
 
-                R.id.cab_menu_hide -> viewModel.hideOrUnhideNodes(
-                    nodeIds = nodeHandles.map { NodeId(longValue = it) },
-                    hide = true,
-                )
+                R.id.cab_menu_hide -> {
+                    fragment.onHideClicked(
+                        nodeIds = nodeHandles.map { NodeId(longValue = it) },
+                    )
+                }
 
                 R.id.cab_menu_unhide -> viewModel.hideOrUnhideNodes(
                     nodeIds = nodeHandles.map { NodeId(longValue = it) },
