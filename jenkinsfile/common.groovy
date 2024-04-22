@@ -616,4 +616,54 @@ void downloadDependencyLibForSdk() {
     }
 }
 
+/**
+ * Enable Artifactory and call the closure function
+ * @param closure
+ */
+void useArtifactory(Closure closure) {
+    withCredentials([
+            string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
+            string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN'),
+    ]) {
+        withEnv([
+                "ARTIFACTORY_USER=${ARTIFACTORY_USER}",
+                "ARTIFACTORY_ACCESS_TOKEN=${ARTIFACTORY_ACCESS_TOKEN}"
+        ]) {
+            closure.call()
+        }
+    }
+
+}
+
+/**
+ * Download a file from remoteUrl and save it to localTarget
+ * @param remoteUrl
+ * @param localTarget
+ */
+void downloadFromArtifactory(String remoteUrl, String localTarget) {
+    useArtifactory() {
+        sh """
+            cd ${WORKSPACE}
+            rm -fv ${localTarget}
+            curl -f -u ${env.ARTIFACTORY_USER}:${env.ARTIFACTORY_ACCESS_TOKEN} -o ${localTarget} ${remoteUrl}
+            ls
+        """
+    }
+}
+
+/**
+ * Upload a localFile to a remoteTarget on Artifactory
+ * @param remoteTarget
+ * @param localFile
+ */
+void uploadToArtifactory(String localFile, String remoteTarget) {
+    useArtifactory() {
+        sh """
+            cd ${WORKSPACE}
+            curl -u ${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T ${localFile} ${remoteTarget}
+            ls   
+        """
+    }
+}
+
 return this

@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurperClassic
+
 /**
  * This script is to build and upload Android AAB to Google Play Store
  */
@@ -32,6 +34,7 @@ ARTIFACTORY_BUILD_INFO = "buildinfo.txt"
  * Default release notes content files
  */
 RELEASE_NOTES = "default_release_notes.json"
+RELEASE_NOTES_CONTENT = ""
 
 /**
  * common.groovy file with common methods
@@ -100,6 +103,43 @@ pipeline {
                                 "<br/>Build Log:\t${link}"
                         common.sendToMR(message)
 
+                        // send to android slack channel
+                        // the version name can be a <major>.<minor>.<point> (for hotfix) or <major>.<minor> format it to <major>.<minor>
+                        // we are using the same channel if the version has hotfix
+                        def formattedVersionName = common.readAppVersion()[0].split("\\.")[0..1].join(".")
+                        def slackVersionInfo = getSlackBuildVersionInfo(common)
+                        def slackInfoFileName = "slack_info.txt"
+
+                        // fetch slack channel id from Artifactory if exists
+                        String slackInfoPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/release/v${formattedVersionName}/${slackInfoFileName}"
+                        try {
+                            common.downloadFromArtifactory(slackInfoPath, slackInfoFileName)
+                        } catch (Exception ignored) {
+                            println("slack_info.txt not found in Artifactory.")
+                        }
+
+                        def slackChannelId = ""
+                        if (fileExists(WORKSPACE + "/" + slackInfoFileName)) {
+                            slackChannelId = readFile(WORKSPACE + "/" + slackInfoFileName).trim()
+                        }
+
+                        if (slackChannelId == "") {
+                            def slackResponse = slackSend(channel: "android", message: slackVersionInfo)
+                            // write slackResponse.threadId to local file and upload to slackInfoPath
+                            slackChannelId = slackResponse.threadId
+                            sh """
+                               cd ${WORKSPACE}
+                               echo ${slackChannelId} > ${slackInfoFileName}
+                            """
+                            common.uploadToArtifactory(slackInfoFileName, slackInfoPath)
+                        } else {
+                            slackSend channel: slackChannelId, message: slackVersionInfo, replyBroadcast: true
+                        }
+
+                        // always send new message to QA channel
+                        slackSend channel: "qa", message: slackVersionInfo
+
+                        // send to MR
                         common.sendToMR(getBuildVersionInfo(common))
 
                         slackSend color: "good", message: releaseSuccessMessage("\n", common)
@@ -110,7 +150,6 @@ pipeline {
 
                         slackSend color: "good", message: common.uploadSymbolSuccessMessage("\n")
                     }
-
                 }
             }
         }
@@ -310,17 +349,17 @@ pipeline {
                             sh '''
                                 cd ${WORKSPACE}/archive
                                 ls -l ${WORKSPACE}/archive
-    
+
                                 echo Uploading APK files
                                 for FILE in *.apk; do
                                     curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T ${FILE} \"${TARGET_PATH}\"
                                 done
-                                
+
                                 echo Uploading AAB files
                                 for FILE in *.aab; do
                                     curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T ${FILE} \"${TARGET_PATH}\"
                                 done
-                                
+
                                 echo Uploading documentation
                                 for FILE in *.txt; do
                                     curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T ${FILE} \"${TARGET_PATH}\"
@@ -343,7 +382,7 @@ pipeline {
                 }
                 script {
                     // Get the formatted release notes
-                    String release_notes = common.releaseNotes(RELEASE_NOTES)
+                    RELEASE_NOTES_CONTENT = common.releaseNotes(RELEASE_NOTES)
 
                     // Upload the AAB to Google Play
                     androidApkUpload googleCredentialsId: 'GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIAL',
@@ -352,7 +391,7 @@ pipeline {
                             rolloutPercentage: '0',
                             additionalVersionCodes: '487,233140859',
                             nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOLS_FILE}",
-                            recentChangeList: common.getRecentChangeList(release_notes),
+                            recentChangeList: common.getRecentChangeList(RELEASE_NOTES_CONTENT),
                             releaseName: common.readAppVersion1()
                 }
             }
@@ -416,6 +455,39 @@ private String getBuildVersionInfo(Object common) {
        - [SDK commit](${sdkCommitLink}) (`${common.queryPrebuiltSdkProperty("sdk-branch", sdkVersion)}`) <br/>
        - [Karere commit](${chatCommitLink}) (`${common.queryPrebuiltSdkProperty("chat-branch", sdkVersion)}`) <br/>
     """
+    return message
+}
+
+private String getSlackBuildVersionInfo(Object common) {
+    println("entering getSlackBuildVersionInfo")
+    String artifactoryUrl = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/release/${common.artifactoryUploadPath()}"
+    String artifactVersion = common.readAppVersion2()
+
+    String gmsAabUrl = "${artifactoryUrl}/${artifactVersion}-gms-release.aab"
+    String gmsApkUrl = "${artifactoryUrl}/${artifactVersion}-gms-release.apk"
+
+    String sdkVersion = common.readPrebuiltSdkVersion()
+    String appCommitLink = "${env.GITLAB_BASE_URL}/mobile/android/android/-/commit/" + common.appCommitId()
+    String sdkCommitLink = "${env.GITLAB_BASE_URL}/sdk/sdk/-/commit/" + common.queryPrebuiltSdkProperty("sdk-commit", sdkVersion)
+    String chatCommitLink = "${env.GITLAB_BASE_URL}/megachat/MEGAchat/-/commit/" + common.queryPrebuiltSdkProperty("chat-commit", sdkVersion)
+
+    String appBranch = env.gitlabSourceBranch
+    def (versionName, versionNameChannel, versionCode, appGitHash) = common.readAppVersion()
+    def packageLink = "https://jira.developers.mega.co.nz/issues/?jql=fixVersion%20%3D%20%22Android%20${versionName}%22%20%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC"
+    def appVersionNameAndVersionCode = versionName + versionNameChannel + "(" + versionCode + ")"
+    String releaseNote = new JsonSlurperClassic().parseText(RELEASE_NOTES_CONTENT)['en-US']
+    def message = """
+    The Android team has uploaded a new ALPHA version `${appVersionNameAndVersionCode}` for QA testing.\n
+    *App Bundles and APKs:*\n
+    • Google (GMS):  <${gmsAabUrl}|AAB> | <${gmsApkUrl}|APK>\n
+    *Build info:*\n
+    • <${appCommitLink}|Android commit> (`${appBranch}`)\n
+    • <${sdkCommitLink}|SDK commit> (`${common.queryPrebuiltSdkProperty("sdk-branch", sdkVersion)}`)\n
+    • <${chatCommitLink}|Karere commit> (`${common.queryPrebuiltSdkProperty("chat-branch", sdkVersion)}`)\n
+    *Full JIRA cross-project release package:* <${packageLink}|v${versionName + versionNameChannel}> (AND + AP + BAC + CC + CU + MEET + TRAN + SHR + FM + SAT + SAO).
+    *Release notes:*\n
+    ```${releaseNote}```
+    """.stripIndent()
     return message
 }
 
