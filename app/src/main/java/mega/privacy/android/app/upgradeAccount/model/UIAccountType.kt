@@ -8,6 +8,7 @@ import mega.privacy.android.core.ui.theme.orange_300
 import mega.privacy.android.core.ui.theme.orange_500
 import mega.privacy.android.core.ui.theme.red_300
 import mega.privacy.android.core.ui.theme.red_600
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  *  UI enum class for Account Type
@@ -30,7 +31,7 @@ enum class UIAccountType(
      */
     FREE(
         R.drawable.ic_free_crest,
-        R.string.free_account,
+        sharedR.string.general_free_plan_name,
         green_500,
         green_200,
         0,

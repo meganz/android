@@ -44,6 +44,7 @@ import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.shared.resources.R as sharedR
 import java.util.Locale
 
 
@@ -66,7 +67,7 @@ internal fun ProPlanInfoCard(
     val isFreePlan = proPlan == AccountType.FREE
     val storageValueString =
         if (isFreePlan) {
-            "20 GB"
+            stringResource(id = sharedR.string.general_size_giga_byte, "20")
         } else {
             stringResource(
                 id = subscription.formatStorageSize().unit,
@@ -76,7 +77,7 @@ internal fun ProPlanInfoCard(
     val transferValueString =
 
         if (isFreePlan) {
-            "Limited"
+            stringResource(id = sharedR.string.dialog_onboarding_transfer_quota_free_limited)
         } else {
             stringResource(
                 id = subscription.formatTransferSize(isMonthly).unit,
@@ -221,7 +222,7 @@ internal fun ProPlanInfoCard(
                 ) {
                     if (isFreePlan)
                         MegaText(
-                            text = "Free",
+                            text = stringResource(id = sharedR.string.dialog_onboarding_free_account_price),
                             textColor = TextColor.Primary,
                             style = MaterialTheme.typography.h6Medium,
                             modifier = Modifier.padding(top = 8.dp)
@@ -314,7 +315,7 @@ fun FreePlanInfoCardPreview() {
         ProPlanInfoCard(
             proPlan = AccountType.FREE,
             subscription = subscriptionProI,
-            isRecommended = true,
+            isRecommended = false,
             onPlanClicked = { /*TODO*/ },
             isMonthly = true,
             isClicked = false,

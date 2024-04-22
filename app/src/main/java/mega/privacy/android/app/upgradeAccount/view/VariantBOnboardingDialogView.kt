@@ -30,6 +30,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -60,7 +61,7 @@ fun VariantBOnboardingDialogView(
         topBar = {
             MegaAppBar(
                 appBarType = AppBarType.BACK_NAVIGATION,
-                title = "Choose your MEGA plan",
+                title = stringResource(id = sharedR.string.dialog_onboarding_app_bar_title),
             )
         },
         content = {
@@ -225,16 +226,14 @@ internal fun VariantBOnboardingDialogColumn(
                             testTag = PRO_PLAN_CARD_VARIANT_B,
                         )
                     }
-
-                    // The button will be uncommented when strings will be approved and uploaded on Transifex
-//                    RaisedDefaultMegaButton(
-//                        textId = sharedR.string.dialog_onboarding_variant_b_button_continue,
-//                        onClick = { /*TODO*/ },
-//                        modifier = Modifier
-//                            .padding(17.dp)
-//                            .fillMaxWidth()
-//                            .testTag(CONTINUE_BUTTON),
-//                    )
+                    RaisedDefaultMegaButton(
+                        textId = sharedR.string.dialog_onboarding_button_continue,
+                        onClick = { /*TODO*/ },
+                        modifier = Modifier
+                            .padding(17.dp)
+                            .fillMaxWidth()
+                            .testTag(CONTINUE_BUTTON),
+                    )
 
                     if (uiState.localisedSubscriptionsList.isNotEmpty()) {
                         SubscriptionDetails(
