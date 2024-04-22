@@ -1,5 +1,6 @@
 plugins {
     alias(convention.plugins.mega.android.library)
+    alias(convention.plugins.mega.android.test)
     id("kotlin-android")
     id("kotlin-kapt")
 }
@@ -19,12 +20,6 @@ android {
     defaultConfig {
 
         consumerProguardFiles("consumer-rules.pro")
-    }
-
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
     }
 
     kotlin {
@@ -51,8 +46,4 @@ android {
         implementation(platform(androidx.compose.bom))
         implementation(androidx.bundles.compose.bom)
     }
-}
-
-tasks.withType<Test> {
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
 }

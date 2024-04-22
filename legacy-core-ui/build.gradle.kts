@@ -1,5 +1,6 @@
 plugins {
     alias(convention.plugins.mega.android.library)
+    alias(convention.plugins.mega.android.test)
     id("kotlin-android")
     id("kotlin-kapt")
 }
@@ -17,12 +18,6 @@ android {
 
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
-    }
-
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
     }
 
     kotlin {
@@ -43,10 +38,6 @@ android {
         xmlOutput = file("build/reports/lint-results.xml")
     }
     namespace = "mega.privacy.android.legacy.core.ui"
-}
-
-tasks.withType<Test> {
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
 }
 
 dependencies {
@@ -75,14 +66,6 @@ dependencies {
 
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)
-    testImplementation(testlib.arch.core.test)
-    testImplementation(testlib.test.core.ktx)
-    testImplementation(testlib.junit)
-    testImplementation(testlib.junit.test.ktx)
-    testImplementation(testlib.espresso)
-    androidTestImplementation(testlib.junit.test.ktx)
-    androidTestImplementation(testlib.espresso)
-
     testImplementation(testlib.compose.junit)
 
     debugImplementation(lib.kotlinpoet)

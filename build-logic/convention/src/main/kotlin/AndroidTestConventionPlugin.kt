@@ -1,11 +1,8 @@
 import mega.privacy.android.gradle.configureTestOptionsIfAndroidApplication
 import mega.privacy.android.gradle.configureTestOptionsIfAndroidLibrary
-import mega.privacy.android.gradle.configureAndroidTestDependencies
 import mega.privacy.android.gradle.enableParallelTest
-import mega.privacy.android.gradle.useJUnit5
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-
 
 /**
  * Convention plugin for Android tests.
@@ -21,9 +18,8 @@ class AndroidTestConventionPlugin : Plugin<Project> {
         with(target) {
             configureTestOptionsIfAndroidLibrary()
             configureTestOptionsIfAndroidApplication()
-            useJUnit5()
             enableParallelTest()
-            configureAndroidTestDependencies()
         }
     }
 }
+

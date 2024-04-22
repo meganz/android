@@ -36,13 +36,6 @@ android {
         jvmToolchain(jdk.toInt())
     }
 
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-            isReturnDefaultValues = true
-        }
-    }
-
     lint {
         abortOnError = false
         xmlOutput = file("build/reports/lint-results.xml")
@@ -93,4 +86,9 @@ dependencies {
     implementation(platform(androidx.compose.bom))
     implementation(androidx.bundles.compose.bom)
     implementation(lib.compose.state.events)
+
+    testImplementation(testlib.compose.junit)
+    testImplementation(testlib.bundles.ui.test)
+    testImplementation(testlib.bundles.unit.test)
+    testImplementation(testlib.bundles.junit5.api)
 }

@@ -36,6 +36,7 @@ plugins {
     id("com.google.firebase.crashlytics")
     id("com.google.firebase.firebase-perf")
     id("androidx.baselineprofile")
+    alias(convention.plugins.mega.android.test)
 }
 
 configurations {
@@ -241,12 +242,6 @@ android {
         freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
 
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
-    }
-
     flavorDimensions += "service"
     productFlavors {
         create("gms") {
@@ -286,10 +281,6 @@ project.extensions.configure<com.android.build.api.dsl.ApplicationExtension> {
             }
         }
     }
-}
-
-tasks.withType<Test> {
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
 }
 
 applyTestLiteForTasks()

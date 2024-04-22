@@ -24,7 +24,7 @@ internal class MenuActionListTileWithBodyTest {
             MenuActionListTileWithBody(
                 title = "Tile Title",
                 body = "Tile Body",
-                icon = R.drawable.ic_folder_medium_solid
+                icon = R.drawable.ic_icon_mic_medium_regular_solid
             )
         }
         composeTestRule.onNodeWithTag(TILE_WITH_BODY_MAIN_CONTAINER).assertIsDisplayed()
@@ -40,7 +40,7 @@ internal class MenuActionListTileWithBodyTest {
             MenuActionListTileWithBody(
                 title = "Tile Title",
                 body = "Tile Body",
-                icon = R.drawable.ic_folder_medium_solid,
+                icon = R.drawable.ic_icon_mic_medium_regular_solid,
                 addSeparator = false,
             )
         }

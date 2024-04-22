@@ -59,10 +59,6 @@ dependencies {
     implementation(androidx.exifinterface)
     implementation(files("src/main/jni/megachat/webrtc/libwebrtc.jar"))
 
-    testImplementation(testlib.junit)
-    androidTestImplementation(testlib.junit.test.ktx)
-    androidTestImplementation(testlib.espresso)
-
     // temporary fix reference to sdk/src/main/jni/ExoPlayer/library/common/build.gradle
     // due to guava uses old dependencies
     // https://github.com/google/ExoPlayer/blob/release-v2/library/common/build.gradle

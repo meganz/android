@@ -3,6 +3,7 @@ import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
     alias(convention.plugins.mega.android.library)
+    alias(convention.plugins.mega.android.test)
     id("kotlin-android")
     id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")
@@ -17,12 +18,6 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion = androidx.versions.compose.compiler.get()
-    }
-
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
     }
 
     kotlin {
@@ -75,8 +70,4 @@ dependencies {
     testRuntimeOnly(testlib.junit.jupiter.engine)
     testImplementation(platform(testlib.junit5.bom))
     testImplementation(testlib.bundles.junit5.api)
-}
-
-tasks.withType<Test> {
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
 }

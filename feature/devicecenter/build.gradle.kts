@@ -3,11 +3,11 @@ import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
     alias(convention.plugins.mega.android.library)
+    alias(convention.plugins.mega.android.test)
     id("kotlin-android")
     id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")
 }
-
 
 android {
     buildFeatures {
@@ -16,13 +16,6 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion = androidx.versions.compose.compiler.get()
-    }
-
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-            isReturnDefaultValues = true
-        }
     }
 
     kotlin {
@@ -43,10 +36,6 @@ android {
         xmlOutput = file("build/reports/lint-results.xml")
     }
     namespace = "mega.privacy.android.feature.devicecenter"
-}
-
-tasks.withType<Test> {
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
 }
 
 dependencies {
@@ -97,19 +86,10 @@ dependencies {
     implementation(androidx.constraintlayout.compose)
     implementation(lib.compose.state.events)
 
-    testImplementation(testlib.junit)
-    testImplementation(testlib.junit.test.ktx)
-    testImplementation(testlib.espresso)
     testImplementation(testlib.compose.junit)
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)
-    testImplementation(testlib.arch.core.test)
-    testImplementation(testlib.test.core.ktx)
-    testImplementation(testlib.mockito)
-    testImplementation(testlib.mockito.kotlin)
-    testImplementation(testlib.mockito.android)
 
     testRuntimeOnly(testlib.junit.jupiter.engine)
-    testImplementation(platform(testlib.junit5.bom))
     testImplementation(testlib.bundles.junit5.api)
 }

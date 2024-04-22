@@ -1,10 +1,10 @@
-import groovy.lang.Closure
 import mega.privacy.android.build.preBuiltSdkDependency
 import mega.privacy.android.build.shouldApplyDefaultConfiguration
 
 plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.room)
+    alias(convention.plugins.mega.android.test)
     id("kotlin-android")
     id("kotlin-kapt")
     id("de.mannodermaus.android-junit5")
@@ -62,10 +62,6 @@ android {
         getByName("androidTest").assets.srcDir("$projectDir/schemas")
     }
     namespace = "mega.privacy.android.data"
-}
-
-tasks.withType<Test> {
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
 }
 
 android.testVariants.all {
