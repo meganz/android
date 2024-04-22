@@ -3,7 +3,6 @@ package test.mega.privacy.android.app.presentation.imageviewer
 import android.content.Context
 import com.google.common.truth.Truth
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -21,7 +20,6 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.usecase.exception.MegaNodeException
@@ -36,6 +34,7 @@ import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodePublicLinkU
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByOfflineNodeHandleUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageForChatMessageUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageFromFileUseCase
+import mega.privacy.android.domain.usecase.node.CopyChatNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.DisableExportUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
@@ -69,7 +68,7 @@ internal class ImageViewerViewModelTest {
     private val checkNameCollisionUseCase = mock<CheckNameCollisionUseCase>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val copyNodeUseCase = mock<CopyNodeUseCase>()
-    private val legacyCopyNodeUseCase = mock<LegacyCopyNodeUseCase>()
+    private val copyChatNodeUseCase = mock<CopyChatNodeUseCase>()
     private val moveNodeUseCase = mock<MoveNodeUseCase>()
     private val isUserLoggedIn = mock<IsUserLoggedIn>()
     private val getGlobalChangesUseCase = mock<GetGlobalChangesUseCase>()
@@ -114,6 +113,13 @@ internal class ImageViewerViewModelTest {
         on { getNodeHandle() } doReturn 123456L
         on { id } doReturn 123456L
     }
+    private val chatImageItem = mock<ImageItem.ChatNode> {
+        on { chatRoomId } doReturn 123L
+        on { chatMessageId } doReturn 345L
+        on { nodeItem } doReturn megaNodeItem
+        on { getNodeHandle() } doReturn 123456L
+        on { id } doReturn 123456L
+    }
 
 
     @BeforeAll
@@ -128,7 +134,7 @@ internal class ImageViewerViewModelTest {
             checkNameCollisionUseCase,
             getNodeByHandle,
             copyNodeUseCase,
-            legacyCopyNodeUseCase,
+            copyChatNodeUseCase,
             moveNodeUseCase,
             isUserLoggedIn,
             getGlobalChangesUseCase,
@@ -196,7 +202,7 @@ internal class ImageViewerViewModelTest {
             deleteNodeByHandleUseCase = deleteNodeByHandleUseCase,
             checkNameCollision = checkNameCollision,
             getNodeByHandle = getNodeByHandle,
-            legacyCopyNodeUseCase = legacyCopyNodeUseCase,
+            copyChatNodeUseCase = copyChatNodeUseCase,
             checkNameCollisionUseCase = checkNameCollisionUseCase,
             moveNodeToRubbishBinUseCase = moveNodeToRubbishBinUseCase,
             getImageByAlbumImportNodeUseCase = getImageByAlbumImportNodeUseCase,
@@ -210,16 +216,25 @@ internal class ImageViewerViewModelTest {
     }
 
     @Test
-    internal fun `test that copy complete snack bar is shown when file is imported to different directory`() =
+    internal fun `test that copy complete snack bar is shown when chat node is imported to different directory`() =
         runTest {
             runBlocking {
+                whenever(
+                    getImageHandlesUseCase.get(
+                        nodeHandles = longArrayOf(123456),
+                        isOffline = false
+                    )
+                ).thenReturn(Single.just(listOf(chatImageItem)))
                 whenever(getNodeByHandle(654321)).thenReturn(targetNode)
                 whenever(
-                    legacyCopyNodeUseCase.copy(
-                        node = selectedNode,
-                        parentHandle = 654321
+                    copyChatNodeUseCase(
+                        chatId = chatImageItem.chatRoomId,
+                        messageId = chatImageItem.chatMessageId,
+                        messageIndex = 0,
+                        newNodeParent = targetNodeId,
+                        newNodeName = null
                     )
-                ).thenReturn(Completable.complete())
+                ).thenReturn(NodeId(4567L))
             }
             whenever(
                 checkNameCollisionUseCase.check(
@@ -243,8 +258,14 @@ internal class ImageViewerViewModelTest {
         }
 
     @Test
-    internal fun `test that onExceptionThrown is triggered when import failed`() =
+    internal fun `test that onExceptionThrown is triggered when chat node import failed`() =
         runTest {
+            whenever(
+                getImageHandlesUseCase.get(
+                    nodeHandles = longArrayOf(123456),
+                    isOffline = false
+                )
+            ).thenReturn(Single.just(listOf(chatImageItem)))
             whenever(getNodeByHandle(targetNode.handle)).thenReturn(targetNode)
             whenever(
                 checkNameCollisionUseCase.check(
@@ -255,11 +276,14 @@ internal class ImageViewerViewModelTest {
             ).thenReturn(Single.error(MegaNodeException.ChildDoesNotExistsException()))
             val runtimeException = RuntimeException("Import node failed")
             whenever(
-                legacyCopyNodeUseCase.copy(
-                    node = selectedNode,
-                    parentHandle = targetNode.handle
+                copyChatNodeUseCase(
+                    chatId = chatImageItem.chatRoomId,
+                    messageId = chatImageItem.chatMessageId,
+                    messageIndex = 0,
+                    newNodeParent = targetNodeId,
+                    newNodeName = null
                 )
-            ).thenReturn(Completable.error(runtimeException))
+            ).thenThrow(runtimeException)
             initViewModel()
             underTest.retrieveImages(longArrayOf(selectedNode.handle), selectedNode.handle, false)
             scheduler.scheduleDirect({

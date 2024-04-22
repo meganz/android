@@ -43,7 +43,6 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result
 import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.usecase.exception.MegaException
@@ -66,6 +65,7 @@ import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodePublicLinkU
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByOfflineNodeHandleUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageForChatMessageUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageFromFileUseCase
+import mega.privacy.android.domain.usecase.node.CopyChatNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.DisableExportUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
@@ -131,7 +131,7 @@ class ImageViewerViewModel @Inject constructor(
     private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase,
     private val checkNameCollision: CheckNameCollision,
     private val getNodeByHandle: GetNodeByHandle,
-    private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
+    private val copyChatNodeUseCase: CopyChatNodeUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase,
     private val getImageByAlbumImportNodeUseCase: GetImageByAlbumImportNodeUseCase,
@@ -706,37 +706,55 @@ class ImageViewerViewModel @Inject constructor(
      * @param newParentHandle   Parent handle in which the node will be copied.
      */
     fun importNode(newParentHandle: Long) = viewModelScope.launch {
-        val importNode = images.value?.find { it.id == currentImageId.value }?.nodeItem?.node
+        val importNodeItem = images.value?.find { it.id == currentImageId.value }
+        val importNode = importNodeItem?.nodeItem?.node
             ?: return@launch
-        val parentNode = getNodeByHandle(newParentHandle)
-        checkNameCollisionUseCase.check(
-            node = importNode,
-            parentNode = parentNode,
-            type = NameCollisionType.COPY,
-        ).observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { collisionResult -> collision.value = collisionResult },
-                onError = { error ->
-                    when (error) {
-                        is MegaNodeException.ChildDoesNotExistsException -> {
-                            legacyCopyNodeUseCase.copy(
-                                node = importNode,
-                                parentHandle = newParentHandle
-                            ).subscribeAndComplete(
-                                completeAction = {
-                                    snackBarMessage.value =
-                                        context.getString(R.string.context_correctly_copied)
-                                },
-                                errorAction = { copyError ->
-                                    copyMoveException.value = copyError
-                                })
-                        }
+        if (importNodeItem is ImageItem.ChatNode) {
+            val parentNode = getNodeByHandle(newParentHandle)
+            checkNameCollisionUseCase.check(
+                node = importNode,
+                parentNode = parentNode,
+                type = NameCollisionType.COPY,
+            ).observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onSuccess = { collisionResult -> collision.value = collisionResult },
+                    onError = { error ->
+                        when (error) {
+                            is MegaNodeException.ChildDoesNotExistsException -> {
+                                copyChatNode(importNodeItem, NodeId(newParentHandle))
+                            }
 
-                        else -> Timber.e(error)
+                            else -> Timber.e(error)
+                        }
                     }
-                }
-            )
-            .addTo(composite)
+                )
+                .addTo(composite)
+        } else {
+            copyNode(importNode.handle, newParentHandle)
+        }
+    }
+
+    /**
+     * Copies a chat node
+     * @param nodeItem Node to copy
+     * @param newParentNodeId Parent handle in which the node will be copied.
+     */
+    private fun copyChatNode(nodeItem: ImageItem.ChatNode, newParentNodeId: NodeId) {
+        viewModelScope.launch {
+            runCatching {
+                copyChatNodeUseCase(
+                    chatId = nodeItem.chatRoomId,
+                    messageId = nodeItem.chatMessageId,
+                    newNodeParent = newParentNodeId,
+                )
+            }.onSuccess {
+                snackBarMessage.value =
+                    context.getString(R.string.context_correctly_copied)
+            }.onFailure {
+                Timber.e(it, "The chat node is not copied")
+                copyMoveException.value = it
+            }
+        }
     }
 
     /**
@@ -762,7 +780,7 @@ class ImageViewerViewModel @Inject constructor(
                     snackBarMessage.value = context.getString(R.string.context_correctly_copied)
                 }.onFailure {
                     copyMoveException.value = it
-                    Timber.e("Error not copied $it")
+                    Timber.e(it, "The node is not copied")
                 }
             }
         }
