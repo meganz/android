@@ -230,7 +230,10 @@ class FileBrowserViewModel @Inject constructor(
                 }
             } else {
                 _state.update {
-                    it.copy(fileBrowserHandle = handle)
+                    it.copy(
+                        fileBrowserHandle = handle,
+                        updateToolbarTitleEvent = triggered
+                    )
                 }
             }
             refreshNodesState()
