@@ -3,14 +3,7 @@ package mega.privacy.android.app.presentation.photos.timeline.viewmodel
 import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
-import mega.privacy.android.app.presentation.photos.timeline.model.CameraUploadsStatus
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
-
-fun TimelineViewModel.updateZoomLevel(newZoomLevel: ZoomLevel) {
-    _state.update {
-        it.copy(currentZoomLevel = newZoomLevel)
-    }
-}
 
 fun TimelineViewModel.zoomIn() {
     if (_state.value.currentZoomLevel == ZoomLevel.values()[ZoomLevel.values().first().ordinal]) {
@@ -101,12 +94,6 @@ fun TimelineViewModel.showingFilterPage(isShowing: Boolean) {
     }
 }
 
-fun TimelineViewModel.setEnableCUButtonShowing(show: Boolean) {
-    _state.update {
-        it.copy(enableCameraUploadButtonShowing = show)
-    }
-}
-
 fun TimelineViewModel.shouldEnableCUPage(show: Boolean) {
     if (show && _state.value.currentMediaSource != TimelinePhotosSource.CLOUD_DRIVE) {
         _state.update {
@@ -125,18 +112,6 @@ fun TimelineViewModel.shouldEnableCUPage(show: Boolean) {
     }
 }
 
-fun TimelineViewModel.setCUUploadVideos(onOff: Boolean) {
-    _state.update {
-        it.copy(cuUploadsVideos = onOff)
-    }
-}
-
-fun TimelineViewModel.setCUUseCellularConnection(onOff: Boolean) {
-    _state.update {
-        it.copy(cuUseCellularConnection = onOff)
-    }
-}
-
 fun TimelineViewModel.setShowProgressBar(show: Boolean) {
     _state.update {
         it.copy(progressBarShowing = show)
@@ -146,12 +121,6 @@ fun TimelineViewModel.setShowProgressBar(show: Boolean) {
 fun TimelineViewModel.setProgress(progress: Float) {
     _state.update {
         it.copy(progress = progress)
-    }
-}
-
-fun TimelineViewModel.setPending(pending: Int) {
-    _state.update {
-        it.copy(pending = pending)
     }
 }
 

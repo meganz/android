@@ -418,6 +418,7 @@ class TimelineViewModel @Inject constructor(
                 photos = sourcePhotos,
                 loadPhotosDone = true,
                 currentShowingPhotos = sortedPhotos,
+                enableCameraUploadPageShowing = sortedPhotos.isEmpty(),
             )
         }
         handleEnableZoomAndSortOptions()
