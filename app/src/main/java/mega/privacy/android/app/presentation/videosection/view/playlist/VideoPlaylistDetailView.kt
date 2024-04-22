@@ -150,7 +150,9 @@ fun VideoPlaylistDetailView(
                 numberOfAddedVideos,
                 playlist?.title
             )
-            snackBarHostState.showSnackbar(message)
+            coroutineScope.launch {
+                snackBarHostState.showSnackbar(message)
+            }
             addedMessageShown()
         }
     }
@@ -163,7 +165,9 @@ fun VideoPlaylistDetailView(
                 numberOfRemovedItems,
                 playlist?.title
             )
-            snackBarHostState.showSnackbar(message)
+            coroutineScope.launch {
+                snackBarHostState.showSnackbar(message)
+            }
             removedMessageShown()
         }
     }

@@ -67,6 +67,14 @@ internal fun VideoSectionNavHost(
     viewModel: VideoSectionViewModel = hiltViewModel(),
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
+
+    val onDeleteVideosDialogPositiveButtonClicked: (VideoPlaylistUIEntity) -> Unit = { playlist ->
+        viewModel.setShouldDeleteVideosFromPlaylist(false)
+        val removedVideoIDs = state.selectedVideoElementIDs
+        viewModel.removeVideosFromPlaylist(playlist.id, removedVideoIDs)
+        onActionModeFinished()
+    }
+
     if (state.isVideoPlaylistCreatedSuccessfully) {
         viewModel.setIsVideoPlaylistCreatedSuccessfully(false)
         navHostController.navigate(
@@ -74,11 +82,11 @@ internal fun VideoSectionNavHost(
         )
     }
 
-    if (state.areVideoPlaylistsRemovedSuccessfully &&
-        navHostController.currentDestination?.route == videoPlaylistDetailRoute
-    ) {
+    if (state.areVideoPlaylistsRemovedSuccessfully) {
         viewModel.setAreVideoPlaylistsRemovedSuccessfully(false)
-        navHostController.popBackStack()
+        if (navHostController.currentDestination?.route == videoPlaylistDetailRoute) {
+            navHostController.popBackStack()
+        }
     }
 
     navHostController.addOnDestinationChangedListener { _, destination, _ ->
@@ -141,17 +149,15 @@ internal fun VideoSectionNavHost(
                 onDeleteDialogPositiveButtonClicked = viewModel::removeVideoPlaylists,
                 onAddElementsClicked = onAddElementsClicked,
                 errorMessage = state.createDialogErrorMessage,
-                onClick = onPlaylistDetailItemClick,
+                onClick = { item, index ->
+                    if (navHostController.currentDestination?.route == videoPlaylistDetailRoute)
+                        onPlaylistDetailItemClick(item, index)
+                },
                 onMenuClick = onMenuClick,
                 onLongClick = onPlaylistDetailLongClicked,
                 shouldDeleteVideosDialog = state.shouldDeleteVideosFromPlaylist,
                 setShouldDeleteVideosDialog = viewModel::setShouldDeleteVideosFromPlaylist,
-                onDeleteVideosDialogPositiveButtonClicked = { playlist ->
-                    viewModel.setShouldDeleteVideosFromPlaylist(false)
-                    val removedVideoIDs = state.selectedVideoElementIDs
-                    viewModel.removeVideosFromPlaylist(playlist.id, removedVideoIDs)
-                    onActionModeFinished()
-                },
+                onDeleteVideosDialogPositiveButtonClicked = onDeleteVideosDialogPositiveButtonClicked,
                 onPlayAllClicked = onPlayAllClicked,
                 onUpdatedTitle = viewModel::setUpdateToolbarTitle
             )

@@ -119,7 +119,9 @@ internal fun VideoPlaylistsView(
                     deletedVideoPlaylistTitles.size
                 )
             }
-            snackBarHostState.showSnackbar(deletedMessage)
+            coroutineScope.launch {
+                snackBarHostState.showSnackbar(deletedMessage)
+            }
             onDeletedMessageShown()
         }
     }
