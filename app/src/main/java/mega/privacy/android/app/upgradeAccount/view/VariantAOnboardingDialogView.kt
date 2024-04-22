@@ -38,19 +38,6 @@ import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.upgradeAccount.view.ChooseAccountPreviewProvider.Companion.subscriptionProLite
 import mega.privacy.android.shared.theme.MegaAppTheme
 
-internal const val IMAGE_TAG = "onboarding_screen_variant_a:image"
-internal const val PRO_PLAN_TITLE = "onboarding_screen:pro_plan_title"
-internal const val PRO_PLAN_TEXT = "onboarding_screen:pro_plan_description"
-internal const val FEATURE_TITLE = "onboarding_screen:feature_title"
-internal const val STORAGE_DESCRIPTION_ROW = "onboarding_screen:storage_description_row"
-internal const val FILE_SHARING_DESCRIPTION_ROW =
-    "onboarding_screen:file_sharing_description_row"
-internal const val BACKUP_DESCRIPTION_ROW = "onboarding_screen:backup_description_row"
-internal const val VPN_DESCRIPTION_ROW = "onboarding_screen:vpn_description_row"
-internal const val CHAT_DESCRIPTION_ROW = "onboarding_screen:chat_description_row"
-internal const val SKIP_BUTTON = "onboarding_screen_variant_a:skip_button"
-internal const val VIEW_PRO_PLAN_BUTTON = "onboarding_screen_variant_a:view_pro_plan_button"
-
 /**
  *  Compose UI for new Onboarding dialog (Choose account screen), this is Variant A
  *  User will see this account when the registration was finished and user signs in for the first time ever
@@ -90,21 +77,6 @@ fun VariantAOnboardingDialogView(
                 state = state,
                 isLoading = isLoading,
                 bodyTextStyle = MaterialTheme.typography.subtitle2
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            MegaText(
-                text = stringResource(id = R.string.dialog_onboarding_some_features_title),
-                textColor = TextColor.Primary,
-                style = MaterialTheme.typography.subtitle1medium,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .testTag(FEATURE_TITLE)
-                    .placeholder(
-                        color = MaterialTheme.colors.grey_020_grey_900,
-                        shape = RoundedCornerShape(4.dp),
-                        highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
-                        visible = isLoading,
-                    ),
             )
             Spacer(modifier = Modifier.height(16.dp))
             //Storage
@@ -184,3 +156,15 @@ private class VariantAOnboardingDialogPreviewProvider :
             )
         )
 }
+
+internal const val IMAGE_TAG = "onboarding_screen_variant_a:image"
+internal const val PRO_PLAN_TITLE = "onboarding_screen:pro_plan_title"
+internal const val PRO_PLAN_TEXT = "onboarding_screen:pro_plan_description"
+internal const val STORAGE_DESCRIPTION_ROW = "onboarding_screen:storage_description_row"
+internal const val FILE_SHARING_DESCRIPTION_ROW =
+    "onboarding_screen:file_sharing_description_row"
+internal const val BACKUP_DESCRIPTION_ROW = "onboarding_screen:backup_description_row"
+internal const val VPN_DESCRIPTION_ROW = "onboarding_screen:vpn_description_row"
+internal const val CHAT_DESCRIPTION_ROW = "onboarding_screen:chat_description_row"
+internal const val SKIP_BUTTON = "onboarding_screen_variant_a:skip_button"
+internal const val VIEW_PRO_PLAN_BUTTON = "onboarding_screen_variant_a:view_pro_plan_button"

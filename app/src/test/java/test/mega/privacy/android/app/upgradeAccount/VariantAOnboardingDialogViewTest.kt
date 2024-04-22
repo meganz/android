@@ -14,7 +14,6 @@ import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurren
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.view.BACKUP_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.CHAT_DESCRIPTION_ROW
-import mega.privacy.android.app.upgradeAccount.view.FEATURE_TITLE
 import mega.privacy.android.app.upgradeAccount.view.FILE_SHARING_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.IMAGE_TAG
 import mega.privacy.android.app.upgradeAccount.view.PRO_PLAN_TEXT
@@ -62,14 +61,6 @@ class VariantAOnboardingDialogViewTest {
             .assertIsDisplayed()
         composeRule.onNodeWithText(fromId(R.string.dialog_onboarding_get_pro_description, "€4.99"))
             .assertExists()
-    }
-
-    @Test
-    fun `test that title for features is shown correctly`() {
-        setContent()
-        composeRule.onNodeWithTag(FEATURE_TITLE).assertIsDisplayed()
-        composeRule.onNodeWithText(fromId(R.string.dialog_onboarding_some_features_title))
-            .assertIsDisplayed()
     }
 
     @Test
