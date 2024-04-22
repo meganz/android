@@ -15,7 +15,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
-import mega.privacy.android.domain.entity.transfer.pendingMessageId
+import mega.privacy.android.domain.entity.transfer.pendingMessageIds
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
@@ -85,22 +85,24 @@ class ChatUploadsWorker @AssistedInject constructor(
     }
 
     override suspend fun onTransferEventReceived(event: TransferEvent) {
-        event.transfer.pendingMessageId()?.let { pendingMessageId ->
+        event.transfer.pendingMessageIds()?.let { pendingMessageIds ->
             (event as? TransferEvent.TransferFinishEvent)?.let { finishEvent ->
-                if (finishEvent.error == null) {
-                    runCatching {
-                        Timber.d("Node will be attached")
-                        //once uploaded, it can be attached to the chat
-                        attachNodeWithPendingMessageUseCase(
-                            pendingMessageId,
-                            NodeId(event.transfer.nodeHandle)
-                        )
-                    }.onFailure {
-                        updateState(pendingMessageId, PendingMessageState.ERROR_ATTACHING)
-                        Timber.e(it, "Node could not be attached")
+                pendingMessageIds.forEach { pendingMessageId ->
+                    if (finishEvent.error == null) {
+                        runCatching {
+                            Timber.d("Node will be attached")
+                            //once uploaded, it can be attached to the chat
+                            attachNodeWithPendingMessageUseCase(
+                                pendingMessageId,
+                                NodeId(event.transfer.nodeHandle)
+                            )
+                        }.onFailure {
+                            updateState(pendingMessageId, PendingMessageState.ERROR_ATTACHING)
+                            Timber.e(it, "Node could not be attached")
+                        }
+                    } else {
+                        updateState(pendingMessageId, PendingMessageState.ERROR_UPLOADING)
                     }
-                } else {
-                    updateState(pendingMessageId, PendingMessageState.ERROR_UPLOADING)
                 }
             }
         }

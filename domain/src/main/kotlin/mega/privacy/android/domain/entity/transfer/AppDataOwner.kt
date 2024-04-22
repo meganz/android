@@ -42,11 +42,24 @@ fun AppDataOwner.isBackgroundTransfer(): Boolean =
 /**
  * Gets the pending message id if the transfer is a chat upload. Null otherwise.
  */
+@Deprecated(
+    message = "This should be avoid in favor of pendingMessageIds because there can be more than one pending message for a transfer",
+    replaceWith = ReplaceWith("appData.pendingMessageIds()")
+)
 fun AppDataOwner.pendingMessageId() =
     appData
         .filterIsInstance(TransferAppData.ChatUpload::class.java)
         .firstOrNull()
         ?.pendingMessageId
+
+/**
+ * Gets the pending message ids if the transfer is a chat upload. Null otherwise.
+ */
+fun AppDataOwner.pendingMessageIds() =
+    appData
+        .takeIf { it.any { it is TransferAppData.ChatUpload } }
+        ?.filterIsInstance(TransferAppData.ChatUpload::class.java)
+        ?.map { it.pendingMessageId }
 
 /**
  * Get the sdcard transfer path, if the transfer is a sdcard transfer

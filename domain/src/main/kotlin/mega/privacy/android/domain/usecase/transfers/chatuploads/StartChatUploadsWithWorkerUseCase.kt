@@ -47,13 +47,13 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
      * Invoke
      *
      * @param file the file that will be uploaded to chats folder in the cloud drive. If it's a folder will be filtered out because folders are not allowed as chat uploads
-     * @param pendingMessageId the message id to be included in the app data, so the ChatUploadsWorker can associate the files to the corresponding message
+     * @param pendingMessageIds the message ids to be included in the app data, so the ChatUploadsWorker can associate the files to the corresponding message
      * @param chatFilesFolderId the id of the folder where the files will be uploaded
      */
     operator fun invoke(
         file: File,
-        pendingMessageId: Long,
         chatFilesFolderId: NodeId,
+        vararg pendingMessageIds: Long,
     ): Flow<MultiTransferEvent> = flow {
         if (!fileSystemRepository.isFilePath(file.path)) {
             emit(
@@ -64,26 +64,36 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
             )
             return@flow
         }
+        val name = runCatching {
+            chatMessageRepository.getPendingMessage(pendingMessageIds.first())?.name
+        }.getOrElse {
+            emit(
+                MultiTransferEvent.TransferNotStarted(file, it)
+            )
+            return@flow
+        }
         val filesAndNames = mapOf(
             (runCatching { compressFileForChatUseCase(file) }.getOrNull() ?: file)
-                    to chatMessageRepository.getPendingMessage(pendingMessageId)?.name
+                    to name
         )
         coroutineContext.ensureActive()
-        val appData = TransferAppData.ChatUpload(pendingMessageId)
+        val appData = pendingMessageIds.map { TransferAppData.ChatUpload(it) }
         emitAll(startTransfersAndThenWorkerFlow(
             doTransfers = {
                 uploadFilesUseCase(
-                    filesAndNames, chatFilesFolderId, listOf(appData), false
+                    filesAndNames, chatFilesFolderId, appData, false
                 ).onEach { event ->
                     val singleTransferEvent = (event as? MultiTransferEvent.SingleTransferEvent)
                     //update transfer tag on Start event
                     (singleTransferEvent?.transferEvent as? TransferEvent.TransferStartEvent)?.transfer?.tag?.let { transferTag ->
-                        updatePendingMessageUseCase(
-                            UpdatePendingMessageTransferTagRequest(
-                                pendingMessageId,
-                                transferTag
+                        pendingMessageIds.forEach { pendingMessageId ->
+                            updatePendingMessageUseCase(
+                                UpdatePendingMessageTransferTagRequest(
+                                    pendingMessageId,
+                                    transferTag
+                                )
                             )
-                        )
+                        }
                     }
                     //attach it if it's already uploaded
                     singleTransferEvent
@@ -91,19 +101,23 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
                         ?.singleOrNull()
                         ?.takeIf { it.longValue != -1L }
                         ?.let { alreadyTransferredNodeId ->
-                            attachNodeWithPendingMessageUseCase(
-                                pendingMessageId,
-                                alreadyTransferredNodeId
-                            )
+                            pendingMessageIds.forEach { pendingMessageId ->
+                                attachNodeWithPendingMessageUseCase(
+                                    pendingMessageId,
+                                    alreadyTransferredNodeId
+                                )
+                            }
                         }
                     //mark as error if it's a temporary error (typically an over quota error)
                     if (singleTransferEvent?.transferEvent is TransferEvent.TransferTemporaryErrorEvent) {
-                        updatePendingMessageUseCase(
-                            UpdatePendingMessageStateRequest(
-                                pendingMessageId,
-                                PendingMessageState.ERROR_UPLOADING
+                        pendingMessageIds.forEach { pendingMessageId ->
+                            updatePendingMessageUseCase(
+                                UpdatePendingMessageStateRequest(
+                                    pendingMessageId,
+                                    PendingMessageState.ERROR_UPLOADING
+                                )
                             )
-                        )
+                        }
                     }
                 }
             },

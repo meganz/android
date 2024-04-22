@@ -12,7 +12,7 @@ import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMa
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.chat.messages.PendingAttachmentMessage
 import mega.privacy.android.domain.entity.transfer.TransferEvent
-import mega.privacy.android.domain.entity.transfer.pendingMessageId
+import mega.privacy.android.domain.entity.transfer.pendingMessageIds
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import javax.inject.Inject
 
@@ -39,12 +39,14 @@ class PendingAttachmentMessageViewModel @Inject constructor(
             monitorTransferEventsUseCase()
                 .filterIsInstance<TransferEvent.TransferUpdateEvent>()
                 .mapNotNull { event ->
-                    event.transfer.pendingMessageId()
+                    event.transfer.pendingMessageIds()
                         ?.let { it to event.transfer }
                 }
-                .collectLatest { (pendingMessageId, transfer) ->
-                    getUiStateFlow(pendingMessageId)?.update {
-                        it.copy(loadProgress = transfer.progress)
+                .collectLatest { (pendingMessageIds, transfer) ->
+                    pendingMessageIds.forEach { pendingMessageId ->
+                        getUiStateFlow(pendingMessageId)?.update {
+                            it.copy(loadProgress = transfer.progress)
+                        }
                     }
                 }
         }

@@ -27,8 +27,8 @@ class RetryPendingMessageUseCase @Inject constructor(
                 message.file?.let {
                     startChatUploadsWithWorkerUseCase(
                         file = it,
-                        pendingMessageId = message.msgId,
-                        chatFilesFolderId = getMyChatsFilesFolderIdUseCase()
+                        chatFilesFolderId = getMyChatsFilesFolderIdUseCase(),
+                        message.msgId
                     ).collect()
                 }
                     ?: throw IllegalArgumentException("Only messages with file can be retried when the state is ERROR_UPLOADING")

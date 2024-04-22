@@ -69,7 +69,7 @@ class SendChatAttachmentsUseCaseTest {
         underTest(chatId, uris).test {
             cancelAndIgnoreRemainingEvents()
         }
-        verify(startChatUploadsWithWorkerUseCase)(eq(file), any(), NodeId(any()))
+        verify(startChatUploadsWithWorkerUseCase)(eq(file), NodeId(any()), any())
     }
 
     @Test
@@ -84,7 +84,7 @@ class SendChatAttachmentsUseCaseTest {
         underTest(chatId, uris).test {
             cancelAndIgnoreRemainingEvents()
         }
-        verify(startChatUploadsWithWorkerUseCase, times(uris.size))(any(), any(), NodeId(any()))
+        verify(startChatUploadsWithWorkerUseCase, times(uris.size))(any(), NodeId(any()), any())
     }
 
     @Test
@@ -96,7 +96,7 @@ class SendChatAttachmentsUseCaseTest {
         underTest(chatId, uris).test {
             cancelAndIgnoreRemainingEvents()
         }
-        verify(startChatUploadsWithWorkerUseCase)(eq(file), eq(pendingMsgId), NodeId(any()))
+        verify(startChatUploadsWithWorkerUseCase)(eq(file), NodeId(any()), eq(pendingMsgId))
     }
 
     @Test
@@ -145,7 +145,7 @@ class SendChatAttachmentsUseCaseTest {
                 cancelAndConsumeRemainingEvents()
 
                 verify(startChatUploadsWithWorkerUseCase, times(uris.size))
-                    .invoke(any(), any(), NodeId(eq(myChatFolderId.longValue)))
+                    .invoke(any(), NodeId(eq(myChatFolderId.longValue)), any())
                 verify(getMyChatsFilesFolderIdUseCase).invoke()
             }
         }
@@ -159,7 +159,7 @@ class SendChatAttachmentsUseCaseTest {
         val event = mock<MultiTransferEvent.SingleTransferEvent> {
             on { scanningFinished } doReturn true
         }
-        whenever(startChatUploadsWithWorkerUseCase(any(), any(), NodeId(any()))).thenReturn(
+        whenever(startChatUploadsWithWorkerUseCase(any(), NodeId(any()), any())).thenReturn(
             flowOf(event)
         )
         whenever(getFileForChatUploadUseCase(any())).thenReturn(file)

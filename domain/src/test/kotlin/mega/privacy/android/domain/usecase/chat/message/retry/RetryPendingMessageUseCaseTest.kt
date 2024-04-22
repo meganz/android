@@ -101,15 +101,15 @@ class RetryPendingMessageUseCaseTest {
             whenever(
                 startChatUploadsWithWorkerUseCase(
                     any(),
-                    any(),
-                    NodeId(any())
+                    NodeId(any()),
+                    any()
                 )
             ) doReturn emptyFlow()
             whenever(getMyChatsFilesFolderIdUseCase()) doReturn myChatFilesFolderId
 
             underTest(message)
 
-            verify(startChatUploadsWithWorkerUseCase).invoke(file, msgId, myChatFilesFolderId)
+            verify(startChatUploadsWithWorkerUseCase).invoke(file, myChatFilesFolderId, msgId)
         }
 
     @Test
