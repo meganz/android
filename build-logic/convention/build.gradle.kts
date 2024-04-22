@@ -30,4 +30,10 @@ gradlePlugin {
             implementationClass = "AndroidTestConventionPlugin"
         }
     }
+    plugins {
+        register("jvmTest") {
+            id = "mega.jvm.test"
+            implementationClass = "JvmTestConventionPlugin"
+        }
+    }
 }

@@ -6,6 +6,7 @@ plugins {
     id("com.android.lint")
     id("kotlin-kapt")
     kotlin("plugin.serialization") version "1.9.21"
+    alias(convention.plugins.mega.jvm.test)
 }
 
 lint {
@@ -38,11 +39,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
         freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
     kotlinJavaToolchain.toolchain.use(customLauncher)
-}
-
-tasks.test {
-    useJUnitPlatform()
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
 }
 
 dependencies {

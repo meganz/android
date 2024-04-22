@@ -34,7 +34,6 @@ android {
 }
 
 dependencies {
-
     lintChecks(project(":lint"))
     implementation(lib.kotlin.ktx)
 }
