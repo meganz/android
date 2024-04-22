@@ -236,11 +236,11 @@ class TextEditorViewModel @Inject constructor(
 
     fun isViewMode(): Boolean = mode.value == VIEW_MODE
 
-    private fun isEditMode(): Boolean = mode.value == EDIT_MODE
+    internal fun isEditMode(): Boolean = mode.value == EDIT_MODE
 
     fun isCreateMode(): Boolean = mode.value == CREATE_MODE
 
-    private fun setViewMode() {
+    internal fun setViewMode() {
         mode.value = VIEW_MODE
     }
 

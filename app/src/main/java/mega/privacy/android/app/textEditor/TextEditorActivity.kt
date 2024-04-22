@@ -15,6 +15,7 @@ import android.provider.Settings.System.getFloat
 import android.util.TypedValue.COMPLEX_UNIT_PX
 import android.view.Menu
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.ViewPropertyAnimator
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -146,6 +147,11 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 binding.contentEditText.hideKeyboard()
                 showDiscardChangesConfirmationDialog()
             } else {
+                if (viewModel.isEditMode()) {
+                    viewModel.setViewMode()
+                    return
+                }
+
                 if (viewModel.isCreateMode()) {
                     viewModel.saveFile(
                         this@TextEditorActivity,
@@ -584,6 +590,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
      *
      * @param savedInstanceState Saved state if available.
      */
+    @SuppressLint("ClickableViewAccessibility")
     private fun setUpView(savedInstanceState: Bundle?) {
         binding.contentEditText.apply {
             doAfterTextChanged { editable ->
@@ -652,6 +659,13 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             checkScroll()
             hideUI()
             animatePaginationUI()
+        }
+
+        binding.fileEditorScrollView.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                animateUI()
+            }
+            false
         }
     }
 
@@ -898,7 +912,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         if (isFinishing || animator != null) {
             return
         }
-
+        Timber.d("animateUI $currentUIState")
         if (currentUIState == STATE_SHOWN) {
             currentUIState = STATE_HIDDEN
             binding.editFab.hide()
