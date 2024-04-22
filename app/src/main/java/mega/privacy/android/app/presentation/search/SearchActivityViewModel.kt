@@ -43,7 +43,6 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.search.GetSearchCategoriesUseCase
-import mega.privacy.android.domain.usecase.search.SearchNodesUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -56,7 +55,6 @@ import kotlin.coroutines.cancellation.CancellationException
  * SearchActivity View Model
  * @property getFeatureFlagValueUseCase [GetFeatureFlagValueUseCase]
  * @property monitorNodeUpdatesUseCase [MonitorNodeUpdatesUseCase]
- * @property searchNodesUseCase [SearchNodesUseCase]
  * @property getSearchCategoriesUseCase [GetSearchCategoriesUseCase]
  * @property searchFilterMapper [SearchFilterMapper]
  * @property typeFilterToSearchMapper [TypeFilterToSearchMapper]
@@ -71,7 +69,6 @@ import kotlin.coroutines.cancellation.CancellationException
 class SearchActivityViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
-    private val searchNodesUseCase: SearchNodesUseCase,
     private val searchUseCase: SearchUseCase,
     private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase,
     private val searchFilterMapper: SearchFilterMapper,
@@ -97,7 +94,6 @@ class SearchActivityViewModel @Inject constructor(
     val state: StateFlow<SearchActivityState> = _state
     private var searchJob: Job? = null
 
-    private val isFirstLevel = stateHandle.get<Boolean>(SearchActivity.IS_FIRST_LEVEL) ?: false
     private val nodeSourceType =
         stateHandle.get<NodeSourceType>(SearchActivity.SEARCH_TYPE) ?: OTHER
     private val parentHandle =
@@ -166,24 +162,16 @@ class SearchActivityViewModel @Inject constructor(
         searchJob = viewModelScope.launch {
             runCatching {
                 cancelCancelTokenUseCase()
-                if (state.value.dropdownChipsEnabled == true) {
-                    searchUseCase(
-                        query = getCurrentSearchQuery(),
-                        parentHandle = NodeId(getCurrentParentHandle()),
-                        nodeSourceType = nodeSourceType,
-                        searchCategory = typeFilterToSearchMapper(state.value.typeSelectedFilterOption?.type),
-                        modificationDate = state.value.dateModifiedSelectedFilterOption?.date,
-                        creationDate = state.value.dateAddedSelectedFilterOption?.date
-                    )
-                } else {
-                    searchNodesUseCase(
-                        query = getCurrentSearchQuery(),
-                        parentHandle = getCurrentParentHandle(),
-                        nodeSourceType = nodeSourceType,
-                        isFirstLevel = isFirstLevel,
-                        searchCategory = state.value.selectedFilter?.filter ?: SearchCategory.ALL
-                    )
-                }
+                searchUseCase(
+                    query = getCurrentSearchQuery(),
+                    parentHandle = NodeId(getCurrentParentHandle()),
+                    nodeSourceType = nodeSourceType,
+                    searchCategory = state.value.typeSelectedFilterOption?.let {
+                        typeFilterToSearchMapper(it.type)
+                    } ?: state.value.selectedFilter?.filter ?: SearchCategory.ALL,
+                    modificationDate = state.value.dateModifiedSelectedFilterOption?.date,
+                    creationDate = state.value.dateAddedSelectedFilterOption?.date,
+                )
             }.onSuccess {
                 onSearchSuccess(it)
             }.onFailure { ex ->

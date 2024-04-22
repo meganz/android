@@ -39,7 +39,6 @@ import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.search.GetSearchCategoriesUseCase
-import mega.privacy.android.domain.usecase.search.SearchNodesUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -63,7 +62,6 @@ class SearchActivityViewModelTest {
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase = mock()
-    private val searchNodesUseCase: SearchNodesUseCase = mock()
     private val getSearchCategoriesUseCase: GetSearchCategoriesUseCase = mock()
     private val searchFilterMapper: SearchFilterMapper = mock()
     private val typeFilterToSearchMapper: TypeFilterToSearchMapper = mock()
@@ -85,7 +83,6 @@ class SearchActivityViewModelTest {
     private val nodeList = mutableListOf<TypedNode>()
 
     private val parentHandle = 123456L
-    private val isFirstLevel = false
     private val nodeSourceType = NodeSourceType.CLOUD_DRIVE
 
     @BeforeEach
@@ -105,7 +102,6 @@ class SearchActivityViewModelTest {
             stateHandle = stateHandle,
             getCloudSortOrder = getCloudSortOrder,
             cancelCancelTokenUseCase = cancelCancelTokenUseCase,
-            searchNodesUseCase = searchNodesUseCase,
             getSearchCategoriesUseCase = getSearchCategoriesUseCase,
             searchFilterMapper = searchFilterMapper,
             typeFilterToSearchMapper = typeFilterToSearchMapper,
@@ -290,11 +286,10 @@ class SearchActivityViewModelTest {
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
             whenever(
-                searchNodesUseCase(
+                searchUseCase(
                     query = "",
-                    parentHandle = parentHandle,
+                    parentHandle = NodeId(parentHandle),
                     nodeSourceType = nodeSourceType,
-                    isFirstLevel = isFirstLevel,
                     searchCategory = filter.filter
                 )
             ).thenReturn(listOf(typedFileNode, typedFolderNode))
@@ -322,7 +317,6 @@ class SearchActivityViewModelTest {
             }
 
             val parentHandle = 123456L
-            val isFirstLevel = false
             val nodeSourceType = NodeSourceType.CLOUD_DRIVE
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
@@ -331,11 +325,10 @@ class SearchActivityViewModelTest {
             nodeList.add(typedFolderNode)
 
             whenever(
-                searchNodesUseCase(
+                searchUseCase(
                     query = query,
-                    parentHandle = parentHandle,
+                    parentHandle = NodeId(parentHandle),
                     nodeSourceType = nodeSourceType,
-                    isFirstLevel = isFirstLevel,
                 )
             ).thenReturn(nodeList)
             underTest.updateSearchQuery(query)
@@ -352,16 +345,14 @@ class SearchActivityViewModelTest {
         runTest {
             val filter = SearchFilter(name = "Images", filter = SearchCategory.IMAGES)
             val parentHandle = 123456L
-            val isFirstLevel = false
             val nodeSourceType = NodeSourceType.CLOUD_DRIVE
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
             whenever(
-                searchNodesUseCase(
+                searchUseCase(
                     query = "",
-                    parentHandle = parentHandle,
+                    parentHandle = NodeId(parentHandle),
                     nodeSourceType = nodeSourceType,
-                    isFirstLevel = isFirstLevel,
                     searchCategory = filter.filter
                 )
             ).thenThrow(IllegalStateException("Search exception"))
@@ -405,11 +396,10 @@ class SearchActivityViewModelTest {
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(monitorViewType()).thenReturn(flowOf(ViewType.LIST))
             whenever(
-                searchNodesUseCase(
+                searchUseCase(
                     query = query,
-                    parentHandle = parentHandle,
+                    parentHandle = NodeId(parentHandle),
                     nodeSourceType = nodeSourceType,
-                    isFirstLevel = isFirstLevel,
                 )
             ).thenReturn(listOf(typedFileNode, typedFolderNode))
             underTest.updateSearchQuery(query)
@@ -474,7 +464,6 @@ class SearchActivityViewModelTest {
         reset(
             monitorNodeUpdatesUseCase,
             cancelCancelTokenUseCase,
-            searchNodesUseCase,
             getSearchCategoriesUseCase,
             searchFilterMapper,
             emptySearchViewMapper,
