@@ -2,6 +2,7 @@ package mega.privacy.android.data.preferences
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -313,6 +314,29 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
             decryptData.stub { onBlocking { invoke(any()) }.thenReturn(shouldUploadByWifi.toString()) }
 
             assertThat(underTest.isUploadByWifi()).isEqualTo(shouldUploadByWifi)
+        }
+
+    @Test
+    internal fun `test that the charging required to upload content state is monitored and decrypted`() =
+        runTest {
+            val chargingRequired = true
+            decryptData.stub { onBlocking { invoke(any()) }.thenReturn(chargingRequired.toString()) }
+
+            underTest.monitorIsChargingRequiredToUploadContent().test {
+                assertThat(awaitItem()).isEqualTo(chargingRequired)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    internal fun `test that the charging required to upload content state is monitored and decrypted as null when it is not a boolean`() =
+        runTest {
+            decryptData.stub { onBlocking { invoke(any()) }.thenReturn("12345") }
+
+            underTest.monitorIsChargingRequiredToUploadContent().test {
+                assertThat(awaitItem()).isNull()
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     @ParameterizedTest(name = "new is charging required to upload content state: {0}")

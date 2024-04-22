@@ -588,6 +588,20 @@ class DefaultCameraUploadRepositoryTest {
     @DisplayName("Charging Required When Uploading")
     inner class ChargingRequiredWhenUploadingTest {
 
+        @Test
+        fun `test that the charging required when uploading content state is being monitored`() =
+            runTest {
+                val chargingRequiredFlow = flowOf(true)
+                whenever(cameraUploadsSettingsPreferenceGateway.monitorIsChargingRequiredToUploadContent()).thenReturn(
+                    chargingRequiredFlow
+                )
+
+                underTest.monitorIsChargingRequiredToUploadContent().test {
+                    assertThat(awaitItem()).isTrue()
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+
         @ParameterizedTest(name = "is charging required when uploading content: {0}")
         @ValueSource(booleans = [true, false])
         fun `test that the charging required when uploading content state is retrieved`(

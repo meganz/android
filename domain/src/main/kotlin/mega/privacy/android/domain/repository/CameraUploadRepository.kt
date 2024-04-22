@@ -556,6 +556,15 @@ interface CameraUploadRepository {
     suspend fun clearRecords(folderTypes: List<CameraUploadFolderType>)
 
     /**
+     * Observes the User's Setting in the DataStore, as to whether or not the Device must be charged
+     * for the active Camera Uploads to start uploading content
+     *
+     * @return A Boolean [Flow] that observes the User's Setting. The [Flow] may emit null if the
+     * Setting cannot be found
+     */
+    fun monitorIsChargingRequiredToUploadContent(): Flow<Boolean?>
+
+    /**
      * Checks whether or not the Device must be charged for the active Camera Uploads to
      * start uploading content
      *

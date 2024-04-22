@@ -284,6 +284,11 @@ internal class CameraUploadsSettingsPreferenceDataStore(
         }
     }
 
+    override fun monitorIsChargingRequiredToUploadContent(): Flow<Boolean?> {
+        return getPreferenceFlow().monitor(chargingRequiredToUploadContent)
+            .map { decryptData(it)?.toBooleanStrictOrNull() }
+    }
+
     override suspend fun isChargingRequiredToUploadContent(): Boolean? {
         return getPreferenceFlow().monitor(chargingRequiredToUploadContent)
             .map { decryptData(it)?.toBooleanStrictOrNull() }.firstOrNull()
