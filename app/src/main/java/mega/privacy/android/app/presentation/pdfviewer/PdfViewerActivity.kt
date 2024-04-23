@@ -1575,7 +1575,18 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             }
             val toHandle = intent.getLongExtra(Constants.INTENT_EXTRA_KEY_IMPORT_TO, 0)
             node?.let { megaNode ->
-                viewModel.importNode(node = megaNode, newParentHandle = toHandle)
+                if (fromChat)
+                    viewModel.importChatNode(
+                        node = megaNode,
+                        chatId = chatId,
+                        messageId = msgId,
+                        newParentHandle = NodeId(toHandle)
+                    )
+                else
+                    viewModel.copyNode(
+                        nodeHandle = megaNode.handle,
+                        newParentHandle = toHandle
+                    )
             }
         }
     }
