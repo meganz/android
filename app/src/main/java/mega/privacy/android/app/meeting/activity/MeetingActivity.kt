@@ -242,7 +242,7 @@ class MeetingActivity : PasscodeActivity() {
                 val state by meetingViewModel.state.collectAsStateWithLifecycle()
                 if (state.isSessionOnRecording && state.showRecordingConsentDialog && !state.isRecordingConsentAccepted) {
                     MegaAppTheme(isDark = true) {
-                        CallRecordingConsentDialog()
+                        CallRecordingConsentDialog(meetingViewModel = meetingViewModel)
                     }
                 }
             }
