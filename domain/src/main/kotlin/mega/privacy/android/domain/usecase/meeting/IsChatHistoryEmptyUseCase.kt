@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.meeting
 
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase.Companion.NUMBER_MESSAGES_TO_LOAD
@@ -9,7 +10,6 @@ import javax.inject.Inject
 /**
  * Monitor if chat history is empty (only management messages)
  *
- * @property chatRepository [ChatRepository]
  * @property loadMessagesUseCase [LoadMessagesUseCase]
  */
 class IsChatHistoryEmptyUseCase @Inject constructor(
@@ -26,15 +26,14 @@ class IsChatHistoryEmptyUseCase @Inject constructor(
      * @param chatId    Chat ID
      * @return          True if the chat history is empty (only management messages) or false otherwise.
      */
-    operator fun invoke(chatId: Long) = callbackFlow {
+    operator fun invoke(chatId: Long): Flow<Boolean> = flow {
         chatRepository.monitorOnMessageLoaded(chatId)
             .collect { message ->
                 message?.let { chatMessage ->
                     pendingToLoad--
 
                     if (!chatMessage.isManagementMessage) {
-                        trySend(false)
-                        close()
+                        emit(false)
                     } else {
                         //Management message, no action required.
                     }
@@ -46,8 +45,7 @@ class IsChatHistoryEmptyUseCase @Inject constructor(
                     when (chatHistoryLoadStatus) {
                         ChatHistoryLoadStatus.NONE -> {
                             // Full history loaded
-                            trySend(true)
-                            close()
+                            emit(true)
                         }
 
                         else -> {
