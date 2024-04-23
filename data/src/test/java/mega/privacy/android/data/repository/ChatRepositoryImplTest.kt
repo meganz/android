@@ -28,6 +28,7 @@ import mega.privacy.android.data.mapper.chat.ChatHistoryLoadStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatInitStateMapper
 import mega.privacy.android.data.mapper.chat.ChatListItemMapper
 import mega.privacy.android.data.mapper.chat.ChatMessageMapper
+import mega.privacy.android.data.mapper.chat.ChatPresenceConfigMapper
 import mega.privacy.android.data.mapper.chat.ChatPreviewMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.chat.ChatRoomMapper
@@ -36,6 +37,7 @@ import mega.privacy.android.data.mapper.chat.ConnectionStateMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.chat.messages.reactions.ReactionUpdateMapper
 import mega.privacy.android.data.mapper.chat.update.ChatRoomMessageUpdateMapper
+import mega.privacy.android.data.mapper.contact.UserChatStatusMapper
 import mega.privacy.android.data.mapper.notification.ChatMessageNotificationBehaviourMapper
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.chat.NonContactInfo
@@ -50,12 +52,14 @@ import mega.privacy.android.domain.entity.chat.messages.reactions.ReactionUpdate
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.ChatRepository
+import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatContainsMeta
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatNotificationListenerInterface
+import nz.mega.sdk.MegaChatPresenceConfig
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
@@ -66,6 +70,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -78,6 +85,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
+import java.util.stream.Stream
 import kotlin.random.Random
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -122,6 +130,8 @@ class ChatRepositoryImplTest {
     private val reactionUpdateMapper = mock<ReactionUpdateMapper>()
 
     private val chatRoomMessageUpdateMapper = ChatRoomMessageUpdateMapper(chatMessageMapper)
+    private val userChatStatusMapper = UserChatStatusMapper()
+    private val chatPresenceConfigMapper = ChatPresenceConfigMapper(userChatStatusMapper)
 
     @BeforeEach
     fun setUp() {
@@ -157,6 +167,7 @@ class ChatRepositoryImplTest {
             chatNodeEntityListMapper = mock(),
             reactionUpdateMapper = reactionUpdateMapper,
             chatRoomMessageUpdateMapper = chatRoomMessageUpdateMapper,
+            chatPresenceConfigMapper = chatPresenceConfigMapper,
             context = context,
         )
 
@@ -541,7 +552,6 @@ class ChatRepositoryImplTest {
 
     @Test
     fun `test that attachVoiceMessage invokes megaApi returns the temp id`() = runTest {
-
         val handle = 2L
         val expectedTempId = 3L
         val message = mock<MegaChatMessage> { on { tempId }.thenReturn(expectedTempId) }
@@ -1171,4 +1181,34 @@ class ChatRepositoryImplTest {
 
         verify(megaChatApiGateway).setChatRetentionTime(eq(chatId), eq(period), any())
     }
+
+    @ParameterizedTest
+    @MethodSource("provideMegaChatPresenceConfig")
+    fun `test that the correct chat presence config is returned`(megaChatPresenceConfig: MegaChatPresenceConfig?) =
+        runTest {
+            whenever(megaChatApiGateway.getChatPresenceConfig()) doReturn megaChatPresenceConfig
+
+            val actual = underTest.getChatPresenceConfig()
+
+            val expected = if (megaChatPresenceConfig != null) {
+                chatPresenceConfigMapper(megaChatPresenceConfig)
+            } else {
+                null
+            }
+            assertThat(actual).isEqualTo(expected)
+        }
+
+    private fun provideMegaChatPresenceConfig() = Stream.of(
+        Arguments.of(
+            mock<MegaChatPresenceConfig> {
+                on { onlineStatus } doReturn MegaChatApi.STATUS_AWAY
+                on { isAutoawayEnabled } doReturn true
+                on { autoawayTimeout } doReturn 1L
+                on { isPersist } doReturn true
+                on { isPending } doReturn true
+                on { isLastGreenVisible } doReturn true
+            }
+        ),
+        Arguments.of(null)
+    )
 }

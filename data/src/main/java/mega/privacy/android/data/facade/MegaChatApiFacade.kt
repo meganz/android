@@ -866,4 +866,6 @@ internal class MegaChatApiFacade @Inject constructor(
     ) {
         chatApi.setChatRetentionTime(chatId, period, listener)
     }
+
+    override suspend fun getChatPresenceConfig(): MegaChatPresenceConfig? = chatApi.presenceConfig
 }

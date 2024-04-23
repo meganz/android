@@ -13,6 +13,7 @@ import nz.mega.sdk.MegaChatLoggerInterface
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatNotificationListenerInterface
 import nz.mega.sdk.MegaChatPeerList
+import nz.mega.sdk.MegaChatPresenceConfig
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatScheduledFlags
@@ -1865,4 +1866,11 @@ interface MegaChatApiGateway {
      * @param listener MegaChatRequestListener to track this request. This is an optional parameter
      */
     fun setChatRetentionTime(chatId: Long, period: Long, listener: MegaChatRequestListenerInterface)
+
+    /**
+     * Get the current presence configuration
+     *
+     * @return The current presence configuration
+     */
+    suspend fun getChatPresenceConfig(): MegaChatPresenceConfig?
 }

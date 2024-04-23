@@ -43,6 +43,7 @@ import mega.privacy.android.data.mapper.chat.ChatHistoryLoadStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatInitStateMapper
 import mega.privacy.android.data.mapper.chat.ChatListItemMapper
 import mega.privacy.android.data.mapper.chat.ChatMessageMapper
+import mega.privacy.android.data.mapper.chat.ChatPresenceConfigMapper
 import mega.privacy.android.data.mapper.chat.ChatPreviewMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.chat.ChatRoomMapper
@@ -67,6 +68,7 @@ import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatInitState
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
+import mega.privacy.android.domain.entity.chat.ChatPresenceConfig
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.RichLinkConfig
@@ -130,6 +132,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property giphyEntityMapper
  * @property chatGeolocationEntityMapper
  * @property chatNodeEntityListMapper
+ * @property chatPresenceConfigMapper
  */
 @Singleton
 internal class ChatRepositoryImpl @Inject constructor(
@@ -162,6 +165,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val chatNodeEntityListMapper: ChatNodeEntityListMapper,
     private val reactionUpdateMapper: ReactionUpdateMapper,
     private val chatRoomMessageUpdateMapper: ChatRoomMessageUpdateMapper,
+    private val chatPresenceConfigMapper: ChatPresenceConfigMapper,
     @ApplicationContext private val context: Context,
 ) : ChatRepository {
     private val richLinkConfig = MutableStateFlow(RichLinkConfig())
@@ -1373,4 +1377,8 @@ internal class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun broadcastUpgradeDialogClosed() =
         appEventGateway.broadcastUpgradeDialogClosed()
+
+    override suspend fun getChatPresenceConfig(): ChatPresenceConfig? = withContext(ioDispatcher) {
+        megaChatApiGateway.getChatPresenceConfig()?.let { chatPresenceConfigMapper(it) }
+    }
 }

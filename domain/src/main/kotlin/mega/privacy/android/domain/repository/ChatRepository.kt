@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.chat.ChatInitState
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
+import mega.privacy.android.domain.entity.chat.ChatPresenceConfig
 import mega.privacy.android.domain.entity.chat.ChatPreview
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
@@ -1025,4 +1026,13 @@ interface ChatRepository {
      *
      */
     suspend fun broadcastUpgradeDialogClosed()
+
+    /**
+     * Get the current presence configuration
+     *
+     * @see [ChatPresenceConfig] for further details.
+     *
+     * @return The current presence configuration
+     */
+    suspend fun getChatPresenceConfig(): ChatPresenceConfig?
 }
