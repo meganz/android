@@ -548,16 +548,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             }
         } else {
             Timber.d("Active video when listener is not null, clientId ${speaker.clientId}")
-            speaker.videoListener?.textureView?.let { textureView ->
-                textureView.parent?.let { textureViewParent ->
-                    (textureViewParent as ViewGroup).removeView(textureView)
-                }
-            }
-
-            surfaceContainer.addView(speaker.videoListener?.textureView)
-
-            speaker.videoListener?.height = 0
-            speaker.videoListener?.width = 0
         }
 
         surfaceContainer.isVisible = true
