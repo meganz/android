@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -15,11 +16,14 @@ import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.SUBTI
 import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_OFF
 import mega.privacy.android.app.mediaplayer.model.SubtitleDisplayState
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiJava
@@ -49,6 +53,16 @@ internal class VideoPlayerViewModelTest {
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val savedStateHandle = SavedStateHandle(mapOf())
     private val monitorVideoRepeatModeUseCase = mock<MonitorVideoRepeatModeUseCase>()
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
+        on {
+            invoke()
+        }.thenReturn(flowOf(AccountDetail()))
+    }
+    private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
+        on {
+            runBlocking { invoke() }
+        }.thenReturn(false)
+    }
 
     private val expectedId = 123456L
     private val expectedName = "testName"
@@ -106,7 +120,9 @@ internal class VideoPlayerViewModelTest {
             getVideosBySearchTypeUseCase = mock(),
             savedStateHandle = savedStateHandle,
             monitorVideoRepeatModeUseCase = monitorVideoRepeatModeUseCase,
-            monitorSubFolderMediaDiscoverySettingsUseCase = mock()
+            monitorSubFolderMediaDiscoverySettingsUseCase = mock(),
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
         )
         savedStateHandle[underTest.subtitleDialogShowKey] = false
         savedStateHandle[underTest.subtitleShowKey] = false

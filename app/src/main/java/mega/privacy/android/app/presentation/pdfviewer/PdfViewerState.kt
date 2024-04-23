@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.pdfviewer
 
 import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.domain.entity.AccountType
 
 /**
  * Pdf viewer UI state
@@ -10,6 +11,8 @@ import mega.privacy.android.app.namecollision.data.NameCollision
  * @property nodeCopyError                  Error when copying a node
  * @property shouldFinishActivity           Checks if activity should be finished
  * @property nameCollision                  Name collision if identified
+ * @property accountType                    the account type
+ * @property isHiddenNodesOnboarded         if the user has been onboarded with hidden nodes
  */
 data class PdfViewerState(
     val snackBarMessage: Int? = null,
@@ -18,4 +21,6 @@ data class PdfViewerState(
     val shouldFinishActivity: Boolean = false,
     val nameCollision: NameCollision? = null,
     val pdfStreamData: ByteArray? = null,
+    val accountType: AccountType? = null,
+    val isHiddenNodesOnboarded: Boolean = false,
 )

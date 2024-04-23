@@ -13,6 +13,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -20,6 +22,7 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.mediaplayer.model.MediaPlayerMenuClickedEvent
+import mega.privacy.android.app.mediaplayer.model.MediaPlayerState
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
@@ -29,6 +32,8 @@ import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import nz.mega.sdk.MegaNode
@@ -51,6 +56,8 @@ class MediaPlayerViewModel @Inject constructor(
     private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val legacyPublicAlbumPhotoNodeProvider: LegacyPublicAlbumPhotoNodeProvider,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
 ) : BaseRxViewModel() {
 
     private val collision = SingleLiveEvent<NameCollision>()
@@ -76,8 +83,16 @@ class MediaPlayerViewModel @Inject constructor(
      */
     val renameUpdate: LiveData<MegaNode?> = _renameUpdate
 
+    private val _state = MutableStateFlow(MediaPlayerState(null, false))
+    internal val state: StateFlow<MediaPlayerState> = _state
+
     private val _metadataState = MutableStateFlow(Metadata(null, null, null, ""))
     internal val metadataState: StateFlow<Metadata> = _metadataState
+
+    init {
+        monitorAccountDetail()
+        monitorIsHiddenNodesOnboarded()
+    }
 
     /**
      * Update clicked event flow
@@ -288,12 +303,37 @@ class MediaPlayerViewModel @Inject constructor(
     fun getNodeForAlbumSharing(handle: Long) =
         legacyPublicAlbumPhotoNodeProvider.getPublicNode(handle)
 
+    private fun monitorAccountDetail() {
+        monitorAccountDetailUseCase()
+            .onEach { accountDetail ->
+                _state.update {
+                    it.copy(accountType = accountDetail.levelDetail?.accountType)
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun monitorIsHiddenNodesOnboarded() {
+        viewModelScope.launch {
+            val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
+            _state.update {
+                it.copy(isHiddenNodesOnboarded = isHiddenNodesOnboarded)
+            }
+        }
+    }
+
+    fun setHiddenNodesOnboarded() {
+        _state.update {
+            it.copy(isHiddenNodesOnboarded = true)
+        }
+    }
+
     internal fun updateMetaData(metadata: Metadata) = _metadataState.update {
         it.copy(
             title = metadata.title,
             artist = metadata.artist,
             album = metadata.album,
-            nodeName = metadata.nodeName
+            nodeName = metadata.nodeName,
         )
     }
 }

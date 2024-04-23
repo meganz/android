@@ -9,6 +9,8 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -20,7 +22,9 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
@@ -44,6 +48,8 @@ class PdfViewerViewModel @Inject constructor(
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val getDataBytesFromUrlUseCase: GetDataBytesFromUrlUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
 ) : BaseRxViewModel() {
 
     private val _state = MutableStateFlow(PdfViewerState())
@@ -53,6 +59,11 @@ class PdfViewerViewModel @Inject constructor(
      * Flow of [PdfViewerState]
      */
     val uiState = _state.asStateFlow()
+
+    init {
+        monitorAccountDetail()
+        monitorIsHiddenNodesOnboarded()
+    }
 
     /**
      * Imports a node if there is no name collision.
@@ -273,5 +284,30 @@ class PdfViewerViewModel @Inject constructor(
      */
     fun hideOrUnhideNode(nodeId: NodeId, hide: Boolean) = viewModelScope.launch {
         updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = hide)
+    }
+
+    private fun monitorAccountDetail() {
+        monitorAccountDetailUseCase()
+            .onEach { accountDetail ->
+                _state.update {
+                    it.copy(accountType = accountDetail.levelDetail?.accountType)
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun monitorIsHiddenNodesOnboarded() {
+        viewModelScope.launch {
+            val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
+            _state.update {
+                it.copy(isHiddenNodesOnboarded = isHiddenNodesOnboarded)
+            }
+        }
+    }
+
+    fun setHiddenNodesOnboarded() {
+        _state.update {
+            it.copy(isHiddenNodesOnboarded = true)
+        }
     }
 }

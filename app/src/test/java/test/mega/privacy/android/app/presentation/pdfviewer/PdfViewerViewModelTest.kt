@@ -7,6 +7,8 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -19,8 +21,11 @@ import mega.privacy.android.app.presentation.pdfviewer.PdfViewerViewModel
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
@@ -52,6 +57,16 @@ internal class PdfViewerViewModelTest {
     private lateinit var legacyCopyNodeUseCase: LegacyCopyNodeUseCase
     private lateinit var getDataBytesFromUrlUseCase: GetDataBytesFromUrlUseCase
     private lateinit var updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
+        on {
+            invoke()
+        }.thenReturn(flowOf(AccountDetail()))
+    }
+    private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
+        on {
+            runBlocking { invoke() }
+        }.thenReturn(false)
+    }
 
     @BeforeAll
     fun initialise() {
@@ -76,6 +91,8 @@ internal class PdfViewerViewModelTest {
             checkNameCollisionUseCase = checkNameCollisionUseCase,
             getDataBytesFromUrlUseCase = getDataBytesFromUrlUseCase,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
         )
     }
 

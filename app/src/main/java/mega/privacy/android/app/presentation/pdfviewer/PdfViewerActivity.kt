@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.pdfviewer
 
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.DialogInterface
@@ -23,6 +24,9 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -50,10 +54,12 @@ import mega.privacy.android.app.databinding.ActivityPdfviewerBinding
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
+import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
@@ -186,6 +192,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     private val startDownloadViewModel by viewModels<StartDownloadViewModel>()
 
     private var isHiddenNodesEnabled: Boolean = false
+    private var tempNodeId: NodeId? = null
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
@@ -1276,15 +1283,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             }
 
             R.id.pdf_viewer_hide -> {
-                viewModel.hideOrUnhideNode(
-                    nodeId = NodeId(handle),
-                    hide = true,
-                )
-
-                RunOnUIThreadUtils.runDelay(500L) {
-                    item.isVisible = false
-                    menu?.findItem(R.id.pdf_viewer_unhide)?.isVisible = true
-                }
+                handleHideNodeClick(playingHandle = handle)
             }
 
             R.id.pdf_viewer_unhide -> {
@@ -1749,6 +1748,68 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         transfer: MegaTransfer,
         buffer: ByteArray,
     ): Boolean = false
+
+    private fun handleHideNodeClick(playingHandle: Long) {
+        val (isPaid, isHiddenNodesOnboarded) = with(viewModel.uiState.value) {
+            (this.accountType?.isPaid ?: false) to this.isHiddenNodesOnboarded
+        }
+
+        if (!isPaid) {
+            val intent = HiddenNodesOnboardingActivity.createScreen(
+                context = this,
+                isOnboarding = false,
+            )
+            hiddenNodesOnboardingLauncher.launch(intent)
+            this.overridePendingTransition(0, 0)
+        } else if (isHiddenNodesOnboarded) {
+            viewModel.hideOrUnhideNode(
+                nodeId = NodeId(playingHandle),
+                hide = true,
+            )
+        } else {
+            tempNodeId = NodeId(longValue = playingHandle)
+            showHiddenNodesOnboarding()
+        }
+    }
+
+    private fun showHiddenNodesOnboarding() {
+        viewModel.setHiddenNodesOnboarded()
+
+        val intent = HiddenNodesOnboardingActivity.createScreen(
+            context = this,
+            isOnboarding = true,
+        )
+        hiddenNodesOnboardingLauncher.launch(intent)
+        this.overridePendingTransition(0, 0)
+    }
+
+    private val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleHiddenNodesOnboardingResult,
+        )
+
+    private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+
+        viewModel.hideOrUnhideNode(
+            nodeId = NodeId(tempNodeId?.longValue ?: 0),
+            hide = true,
+        )
+
+        val message =
+            resources.getQuantityString(
+                R.plurals.hidden_nodes_result_message,
+                1,
+                1,
+            )
+        Util.showSnackbar(this, message)
+
+        RunOnUIThreadUtils.runDelay(500L) {
+            menu?.findItem(R.id.pdf_viewer_hide)?.isVisible = false
+            menu?.findItem(R.id.pdf_viewer_unhide)?.isVisible = true
+        }
+    }
 
     companion object {
 

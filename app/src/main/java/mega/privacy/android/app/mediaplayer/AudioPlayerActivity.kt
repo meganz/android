@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer
 
+import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -11,6 +12,9 @@ import android.os.IBinder
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
@@ -45,6 +49,7 @@ import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragmentArgs
 import mega.privacy.android.app.presentation.extensions.getStorageState
+import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -104,6 +109,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     private var isHiddenNodesEnabled: Boolean = false
 
     private var takenDownDialog: AlertDialog? = null
+
+    private var tempNodeId: NodeId? = null
 
     /**
      * Inject [GetFeatureFlagValueUseCase] to the Fragment
@@ -453,39 +460,11 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                 }
 
                 R.id.hide -> {
-                    megaApi.getNodeByHandle(playingHandle)?.let { node ->
-                        megaApi.setNodeSensitive(
-                            node,
-                            true,
-                            OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
-                                if (error.errorCode == MegaError.API_OK) {
-                                    // Some times checking node.isMarkedSensitive immediately will still
-                                    // get true, so let's add some delay here.
-                                    RunOnUIThreadUtils.runDelay(500L) {
-                                        refreshMenuOptionsVisibility()
-                                    }
-                                }
-                            })
-                        )
-                    }
+                    handleHideNodeClick(playingHandle = playingHandle)
                 }
 
                 R.id.unhide -> {
-                    megaApi.getNodeByHandle(playingHandle)?.let { node ->
-                        megaApi.setNodeSensitive(
-                            node,
-                            false,
-                            OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
-                                if (error.errorCode == MegaError.API_OK) {
-                                    // Some times checking node.isMarkedSensitive immediately will still
-                                    // get true, so let's add some delay here.
-                                    RunOnUIThreadUtils.runDelay(500L) {
-                                        refreshMenuOptionsVisibility()
-                                    }
-                                }
-                            })
-                        )
-                    }
+                    hideOrUnhideNode(playingHandle = playingHandle, hide = false)
                 }
 
                 R.id.move -> {
@@ -1082,4 +1061,78 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             }
         }
     }
+
+    private fun handleHideNodeClick(playingHandle: Long) {
+        val (isPaid, isHiddenNodesOnboarded) = with(viewModel.state.value) {
+            (this.accountType?.isPaid ?: false) to this.isHiddenNodesOnboarded
+        }
+
+        if (!isPaid) {
+            val intent = HiddenNodesOnboardingActivity.createScreen(
+                context = this,
+                isOnboarding = false,
+            )
+            hiddenNodesOnboardingLauncher.launch(intent)
+            this.overridePendingTransition(0, 0)
+        } else if (isHiddenNodesOnboarded) {
+            hideOrUnhideNode(
+                playingHandle = playingHandle,
+                hide = true,
+            )
+        } else {
+            tempNodeId = NodeId(longValue = playingHandle)
+            showHiddenNodesOnboarding()
+        }
+    }
+
+    private fun showHiddenNodesOnboarding() {
+        viewModel.setHiddenNodesOnboarded()
+
+        val intent = HiddenNodesOnboardingActivity.createScreen(
+            context = this,
+            isOnboarding = true,
+        )
+        hiddenNodesOnboardingLauncher.launch(intent)
+        this.overridePendingTransition(0, 0)
+    }
+
+    private val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleHiddenNodesOnboardingResult,
+        )
+
+    private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+
+        hideOrUnhideNode(
+            playingHandle = tempNodeId?.longValue ?: 0,
+            hide = true,
+        )
+
+        val message =
+            resources.getQuantityString(
+                R.plurals.hidden_nodes_result_message,
+                1,
+                1,
+            )
+        mega.privacy.android.app.utils.Util.showSnackbar(this, message)
+    }
+
+    private fun hideOrUnhideNode(playingHandle: Long, hide: Boolean) =
+        megaApi.getNodeByHandle(playingHandle)?.let { node ->
+            megaApi.setNodeSensitive(
+                node,
+                hide,
+                OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        // Some times checking node.isMarkedSensitive immediately will still
+                        // get true, so let's add some delay here.
+                        RunOnUIThreadUtils.runDelay(500L) {
+                            refreshMenuOptionsVisibility()
+                        }
+                    }
+                })
+            )
+        }
 }
