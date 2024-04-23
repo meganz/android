@@ -26,7 +26,6 @@ import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingUseCase
-import mega.privacy.android.domain.usecase.meeting.IsChatHistoryEmptyUseCase
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
@@ -65,7 +64,6 @@ internal class ChatTabsViewModelTest {
     private val rtcAudioManagerGateway: RTCAudioManagerGateway = mock()
     private val getCurrentChatStatusUseCase: GetCurrentChatStatusUseCase = mock()
     private val clearChatHistoryUseCase: ClearChatHistoryUseCase = mock()
-    private val isChatHistoryEmptyUseCase: IsChatHistoryEmptyUseCase = mock()
     private val loadMessagesUseCase: LoadMessagesUseCase = mock()
     private val cancelScheduledMeetingUseCase: CancelScheduledMeetingUseCase = mock()
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase = mock()
@@ -98,7 +96,6 @@ internal class ChatTabsViewModelTest {
             rtcAudioManagerGateway,
             getCurrentChatStatusUseCase,
             clearChatHistoryUseCase,
-            isChatHistoryEmptyUseCase,
             loadMessagesUseCase,
             cancelScheduledMeetingUseCase,
             isParticipatingInChatCallUseCase,

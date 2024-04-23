@@ -40,6 +40,7 @@ import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
+import mega.privacy.android.domain.usecase.chat.message.MonitorChatRoomMessagesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastScheduledMeetingCanceledUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingOccurrenceUseCase
@@ -158,6 +159,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
      * @return          True if the chat history is empty (only management messages) or false otherwise.
      */
     fun checkIfIsChatHistoryEmpty(chatId: Long) = viewModelScope.launch {
+        monitorLoadedMessages(chatId)
         loadMessagesUseCase(chatId)
     }
 
