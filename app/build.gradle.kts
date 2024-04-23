@@ -371,16 +371,17 @@ dependencies {
     implementation(google.accompanist.systemui)
 
     // Google GMS
-    "gmsImplementation"(lib.billing.client.ktx)
-    "gmsImplementation"(google.services.location)
-    "gmsImplementation"(google.services.maps)
-    "gmsImplementation"(google.maps.utils)
-    "gmsImplementation"(google.code.scanner)
-    "gmsImplementation"(google.install.referrer)
+    implementation(lib.billing.client.ktx)
+    implementation(google.services.location)
+    implementation(google.services.maps)
+    implementation(google.maps.utils)
+    implementation(google.code.scanner)
+    implementation(google.install.referrer)
 
     // Firebase
-    "gmsImplementation"(platform(google.firebase.bom))
-    "gmsImplementation"(google.bundles.firebase.bom)
+    implementation(platform(google.firebase.bom))
+    implementation(google.bundles.firebase.bom)
+    implementation(google.firebase.analytics)
 
     // Play Core
     implementation(google.play.core)
