@@ -2,15 +2,18 @@ package mega.privacy.android.app.presentation.recentactions.view
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -29,6 +32,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  * @param onMenuClick              Callback when the menu button is clicked
  * @param onItemClick              Callback when an item is clicked
  * @param onScrollStateChanged     Callback when the scroll state changes
+ * @param backgroundColor          Background color
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -37,6 +41,7 @@ fun RecentActionsListView(
     onMenuClick: (TypedFileNode) -> Unit = {},
     onItemClick: (RecentActionBucket) -> Unit = {},
     onScrollStateChanged: (isScrolling: Boolean) -> Unit = {},
+    backgroundColor: Color = MaterialTheme.colors.surface
 ) {
     val listState = rememberLazyListState()
     LaunchedEffect(listState) {
@@ -48,7 +53,8 @@ fun RecentActionsListView(
     }
 
     LazyColumn(
-        state = listState
+        state = listState,
+        contentPadding = PaddingValues(bottom = 86.dp)
     ) {
         groupedRecentActions.forEach { (date, list) ->
             item {
@@ -57,7 +63,8 @@ fun RecentActionsListView(
 
             stickyHeader {
                 RecentActionHeaderView(
-                    text = date
+                    text = date,
+                    backgroundColor = backgroundColor
                 )
             }
 

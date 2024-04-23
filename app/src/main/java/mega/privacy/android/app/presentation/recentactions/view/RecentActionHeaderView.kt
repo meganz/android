@@ -11,6 +11,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -19,15 +20,18 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
  * Composable for the recent actions list sticky header
+ * @param text Text to display
+ * @param backgroundColor Background color
  */
 @Composable
 fun RecentActionHeaderView(
     text: String,
+    backgroundColor: Color = MaterialTheme.colors.surface,
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colors.surface)
+            .background(backgroundColor)
             .height(36.dp)
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.CenterStart

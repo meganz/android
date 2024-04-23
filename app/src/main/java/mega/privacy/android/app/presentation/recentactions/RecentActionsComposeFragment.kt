@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -36,7 +37,9 @@ import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
 import mega.privacy.android.app.presentation.recentactions.view.RecentActionsView
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
+import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -68,6 +71,13 @@ class RecentActionsComposeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
+        val backgroundColor = Color(
+            ColorUtils.getColorForElevation(
+                requireContext(),
+                Util.dp2px(HomepageFragment.BOTTOM_SHEET_ELEVATION).toFloat()
+            )
+        )
+
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
@@ -84,10 +94,12 @@ class RecentActionsComposeFragment : Fragment() {
 
                 MegaAppTheme(isDark = themeMode.isDarkMode()) {
                     Surface(
-                        modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection())
+                        modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+                        color = backgroundColor
                     ) {
                         RecentActionsView(
                             uiState = uiState,
+                            backgroundColor = backgroundColor,
                             onItemClick = {
                                 if (!it.isKeyVerified) {
                                     openAuthenticityCredentialsActivity(it)
