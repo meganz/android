@@ -84,8 +84,9 @@ class AlbumPhotosSelectionViewModelTest {
         whenever(filterCameraUploadPhotos(any())).thenReturn(images)
 
         underTest = createSUT()
+        advanceUntilIdle()
 
-        underTest?.state?.drop(1)?.test {
+        underTest?.state?.test {
             val actualPhotos = awaitItem().photos
             assertThat(actualPhotos.size).isEqualTo(3)
         }
@@ -187,6 +188,11 @@ class AlbumPhotosSelectionViewModelTest {
         filterCameraUploadPhotos = filterCameraUploadPhotos,
         addPhotosToAlbum = addPhotosToAlbum,
         defaultDispatcher = UnconfinedTestDispatcher(),
+        mock {
+            onBlocking { invoke(any()) }.thenReturn(false)
+        },
+        monitorShowHiddenItemsUseCase = mock(),
+        monitorAccountDetailUseCase = mock(),
     )
 
     private fun createUserAlbum(

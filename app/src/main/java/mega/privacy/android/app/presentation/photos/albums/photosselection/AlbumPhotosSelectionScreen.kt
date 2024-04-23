@@ -63,6 +63,7 @@ import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.core.ui.theme.white_alpha_087
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -201,6 +202,7 @@ fun AlbumPhotosSelectionScreen(
                 lazyGridState = lazyGridState,
                 uiPhotos = state.uiPhotos,
                 selectedPhotoIds = state.selectedPhotoIds,
+                accountType = state.accountType,
                 onPhotoDownload = viewModel::downloadPhoto,
                 onPhotoSelection = { photo ->
                     if (photo.id in state.selectedPhotoIds) {
@@ -321,6 +323,7 @@ private fun AlbumPhotosSelectionHeader(
 private fun AlbumPhotosSelectionContent(
     lazyGridState: LazyGridState,
     uiPhotos: List<UIPhoto>,
+    accountType: AccountType?,
     selectedPhotoIds: Set<Long>,
     onPhotoDownload: PhotoDownload,
     onPhotoSelection: (Photo) -> Unit,
@@ -335,7 +338,8 @@ private fun AlbumPhotosSelectionContent(
         onLongPress = onPhotoSelection,
         selectedPhotoIds = selectedPhotoIds,
         uiPhotoList = uiPhotos,
-        isBlurUnselectItem = selectedPhotoIds.size >= MAX_SELECTION_NUM
+        isBlurUnselectItem = selectedPhotoIds.size >= MAX_SELECTION_NUM,
+        accountType = accountType,
     )
 }
 

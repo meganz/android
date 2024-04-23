@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.mobile.analytics.event.AlbumContentRemoveItemsEvent
@@ -56,8 +57,31 @@ class AlbumContentActionModeCallback(
             }
 
             R.id.cab_menu_hide -> {
-                fragment.albumContentViewModel.hideOrUnhideNodes(true)
-                clearSelection()
+                val isPaid =
+                    fragment.albumContentViewModel.state.value.accountType?.isPaid ?: false
+                val isHiddenNodesOnboarded =
+                    fragment.albumContentViewModel.state.value.isHiddenNodesOnboarded ?: false
+
+                if (!isPaid) {
+                    val intent = HiddenNodesOnboardingActivity.createScreen(
+                        context = fragment.requireContext(),
+                        isOnboarding = false,
+                    )
+                    fragment.hiddenNodesOnboardingLauncher.launch(intent)
+                    fragment.activity?.overridePendingTransition(0, 0)
+                } else if (isHiddenNodesOnboarded) {
+                    fragment.albumContentViewModel.hideOrUnhideNodes(true)
+                    clearSelection()
+                } else {
+                    fragment.albumContentViewModel.setHiddenNodesOnboarded()
+
+                    val intent = HiddenNodesOnboardingActivity.createScreen(
+                        context = fragment.requireContext(),
+                        isOnboarding = true,
+                    )
+                    fragment.hiddenNodesOnboardingLauncher.launch(intent)
+                    fragment.activity?.overridePendingTransition(0, 0)
+                }
             }
 
             R.id.cab_menu_unhide -> {
@@ -93,12 +117,16 @@ class AlbumContentActionModeCallback(
                     fragment.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
                 val hasNonSensitiveNode =
                     fragment.albumContentViewModel.getSelectedNodes().any { !it.isMarkedSensitive }
+                val accountType =
+                    fragment.albumContentViewModel.state.value.accountType
+                val isHiddenNodesOnboarded =
+                    fragment.albumContentViewModel.state.value.isHiddenNodesOnboarded
 
                 menu.findItem(R.id.cab_menu_hide)?.isVisible =
-                    isHiddenNodesEnabled && hasNonSensitiveNode
+                    isHiddenNodesEnabled && accountType != null && (!accountType.isPaid || hasNonSensitiveNode && isHiddenNodesOnboarded != null)
 
                 menu.findItem(R.id.cab_menu_unhide)?.isVisible =
-                    isHiddenNodesEnabled && !hasNonSensitiveNode
+                    isHiddenNodesEnabled && accountType?.isPaid == true && !hasNonSensitiveNode
             }
         }
     }

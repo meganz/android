@@ -33,9 +33,7 @@ class UIAlbumMapper @Inject constructor() {
             videoCount = videoCount,
             coverPhoto = cover,
             defaultCover = defaultCover,
-            photos = listOf(),
             id = album,
-            isLoadingDone = true,
         )
     }
 }

@@ -7,13 +7,19 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -21,12 +27,15 @@ import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbums
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.CreateAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,6 +46,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -58,10 +68,30 @@ class AlbumsViewModelTest {
     private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase = mock()
     private val proscribedStrings =
         listOf("My albums", "Shared albums", "Favourites", "RAW", "GIFs")
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock {
+        on { invoke() }.thenReturn(flowOf(true))
+    }
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock {
+        on { invoke() }.thenReturn(
+            flowOf(
+                AccountDetail(
+                    levelDetail = AccountLevelDetail(
+                        accountType = AccountType.FREE,
+                        subscriptionStatus = null,
+                        subscriptionRenewTime = 0L,
+                        accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
+                        proExpirationTime = 0L,
+                    )
+                )
+            )
+        )
+    }
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     @BeforeEach
     fun setUp() {
         whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(listOf()))
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
         initUnderTest()
     }
 
@@ -78,6 +108,9 @@ class AlbumsViewModelTest {
             disableExportAlbumsUseCase = disableExportAlbumsUseCase,
             defaultDispatcher = dispatcher,
             getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -584,6 +617,54 @@ class AlbumsViewModelTest {
         underTest.state.test {
             val selectedAlbumIds = awaitItem().selectedAlbumIds
             assertThat(selectedAlbumIds.isEmpty()).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that refresh album works correctly`() = runTest {
+        // given
+        underTest.systemAlbumPhotos[Album.FavouriteAlbum] = listOf(
+            createImage(id = 1L),
+            createImage(id = 2L),
+            createImage(id = 3L),
+        )
+
+        underTest.userAlbums[AlbumId(1L)] = createUserAlbum()
+        underTest.userAlbumPhotos[AlbumId(1L)] = listOf(
+            createImage(id = 4L),
+            createImage(id = 5L),
+            createImage(id = 6L),
+        )
+
+        underTest.userAlbums[AlbumId(2L)] = createUserAlbum()
+        underTest.userAlbumPhotos[AlbumId(2L)] = listOf(
+            createImage(id = 7L),
+            createImage(id = 8L),
+            createImage(id = 9L),
+        )
+
+        // when
+        underTest.refreshAlbums()
+
+        // then
+        underTest.state.test {
+            val albums = awaitItem().albums
+            assertThat(albums.size).isEqualTo(3)
+        }
+    }
+
+    @Test
+    fun `test that showHiddenItems and accountDetail are fetched properly`() = runTest {
+        // given
+        wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.HiddenNodes) }.thenReturn(true)
+        initUnderTest()
+        advanceUntilIdle()
+
+        // then
+        underTest.state.test {
+            val accountType = awaitItem().accountType
+            assertThat(accountType).isEqualTo(AccountType.FREE)
+            assertThat(underTest.showHiddenItems).isTrue()
         }
     }
 

@@ -10,12 +10,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
@@ -33,17 +35,21 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbum
+import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.mobile.analytics.event.PhotoItemSelected
 import mega.privacy.mobile.analytics.event.PhotoItemSelectedEvent
 import nz.mega.sdk.MegaNode
@@ -69,11 +75,19 @@ internal class AlbumContentViewModel @Inject constructor(
     private val getProscribedAlbumNamesUseCase: GetProscribedAlbumNamesUseCase,
     private val updateAlbumNameUseCase: UpdateAlbumNameUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumContentState())
     val state = _state.asStateFlow()
 
     private var observeAlbumPhotosJob: Job? = null
+
+    private var sourcePhotos: List<Photo>? = null
+
+    private var showHiddenItems: Boolean? = null
 
     private val albumType: String?
         get() = savedStateHandle["type"]
@@ -90,11 +104,64 @@ internal class AlbumContentViewModel @Inject constructor(
 
     init {
         fetchPhotos()
+        fetchIsHiddenNodesOnboarded()
+
+        viewModelScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+                monitorShowHiddenItems()
+                monitorAccountDetail()
+            }
+        }
     }
 
     private fun fetchPhotos() {
         val photosFetcher = photosFetchers[albumType] ?: return
         photosFetcher()
+    }
+
+    private fun fetchIsHiddenNodesOnboarded() = viewModelScope.launch {
+        val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
+        _state.update {
+            it.copy(isHiddenNodesOnboarded = isHiddenNodesOnboarded)
+        }
+    }
+
+    private fun monitorShowHiddenItems() = monitorShowHiddenItemsUseCase()
+        .onEach {
+            showHiddenItems = it
+            if (_state.value.isLoading) return@onEach
+
+            val filteredPhotos = filterNonSensitivePhotos(photos = sourcePhotos.orEmpty())
+            _state.update { state ->
+                state.copy(photos = filteredPhotos)
+            }
+
+            updateSelection(filteredPhotos)
+        }.launchIn(viewModelScope)
+
+    private fun monitorAccountDetail() = monitorAccountDetailUseCase()
+        .onEach { accountDetail ->
+            _state.update {
+                it.copy(accountType = accountDetail.levelDetail?.accountType)
+            }
+            if (_state.value.isLoading) return@onEach
+
+            val filteredPhotos = filterNonSensitivePhotos(photos = sourcePhotos.orEmpty())
+            _state.update { state ->
+                state.copy(photos = filteredPhotos)
+            }
+
+            updateSelection(filteredPhotos)
+        }.launchIn(viewModelScope)
+
+    private fun updateSelection(photos: List<Photo>) {
+        val selectedPhotos = _state.value.selectedPhotos.filter { selectedPhoto ->
+            photos.any { it.id == selectedPhoto.id }
+        }.toSet()
+
+        _state.update {
+            it.copy(selectedPhotos = selectedPhotos)
+        }
     }
 
     private fun fetchSystemPhotos(systemAlbum: Album) {
@@ -103,6 +170,9 @@ internal class AlbumContentViewModel @Inject constructor(
 
             runCatching {
                 getDefaultAlbumPhotos(listOf(filter))
+                    .onEach { sourcePhotos = it }
+                    .map(::filterNonSensitivePhotos)
+                    .onEach(::updateSelection)
                     .collectLatest { photos ->
                         val uiAlbum = uiAlbumMapper(
                             count = 0,
@@ -167,6 +237,9 @@ internal class AlbumContentViewModel @Inject constructor(
         observeAlbumPhotosJob = viewModelScope.launch {
             runCatching {
                 getAlbumPhotosUseCase(albumId, refresh)
+                    .onEach { sourcePhotos = it }
+                    .map(::filterNonSensitivePhotos)
+                    .onEach(::updateSelection)
                     .collectLatest { photos ->
                         _state.update {
                             it.copy(
@@ -178,6 +251,17 @@ internal class AlbumContentViewModel @Inject constructor(
             }.onFailure { exception ->
                 Timber.e(exception)
             }
+        }
+    }
+
+    private fun filterNonSensitivePhotos(photos: List<Photo>): List<Photo> {
+        val showHiddenItems = showHiddenItems ?: return photos
+        val isPaid = _state.value.accountType?.isPaid ?: return photos
+
+        return if (showHiddenItems || !isPaid) {
+            photos
+        } else {
+            photos.filter { !it.isSensitive && !it.isSensitiveInherited }
         }
     }
 
@@ -446,13 +530,22 @@ internal class AlbumContentViewModel @Inject constructor(
         it.copy(isInputNameValid = valid)
     }
 
-    fun hideOrUnhideNodes(hide: Boolean) = viewModelScope.launch {
-        for (node in getSelectedNodes()) {
-            async {
-                runCatching {
-                    updateNodeSensitiveUseCase(nodeId = NodeId(node.handle), isSensitive = hide)
-                }.onFailure { Timber.e("Update sensitivity failed: $it") }
+    fun hideOrUnhideNodes(hide: Boolean) {
+        val photoIds = _state.value.selectedPhotos.map { it.id }
+        viewModelScope.launch {
+            for (id in photoIds) {
+                async {
+                    runCatching {
+                        updateNodeSensitiveUseCase(nodeId = NodeId(id), isSensitive = hide)
+                    }.onFailure { Timber.e("Update sensitivity failed: $it") }
+                }
             }
+        }
+    }
+
+    fun setHiddenNodesOnboarded() {
+        _state.update {
+            it.copy(isHiddenNodesOnboarded = true)
         }
     }
 }

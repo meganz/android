@@ -52,6 +52,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -129,6 +130,7 @@ fun AlbumsView(
     val displayLinkIcon by produceState(initialValue = false) {
         value = isAlbumSharingEnabled()
     }
+    val isPaid = albumsViewState.accountType?.isPaid
 
     val scaffoldState = rememberScaffoldState()
 
@@ -258,8 +260,9 @@ fun AlbumsView(
                             .fillMaxSize()
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            val cover = album.coverPhoto ?: album.defaultCover
                             val imageState = produceState<String?>(initialValue = null) {
-                                (album.coverPhoto ?: album.defaultCover)?.let {
+                                cover?.let {
                                     downloadPhoto(
                                         false,
                                         it
@@ -291,6 +294,12 @@ fun AlbumsView(
                                     .fillMaxSize()
                                     .clip(RoundedCornerShape(10.dp))
                                     .aspectRatio(1f)
+                                    .alpha(0.5f.takeIf {
+                                        isPaid == true && (cover?.isSensitive == true || cover?.isSensitiveInherited == true)
+                                    } ?: 1f)
+                                    .blur(16.dp.takeIf {
+                                        isPaid == true && (cover?.isSensitive == true || cover?.isSensitiveInherited == true)
+                                    } ?: 0.dp)
                                     .then(
                                         if (isAlbumSelected(
                                                 album,

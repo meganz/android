@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_FLOW
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
@@ -38,6 +39,9 @@ import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbum
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -54,15 +58,27 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
     private val filterCameraUploadPhotos: FilterCameraUploadPhotos,
     private val addPhotosToAlbum: AddPhotosToAlbum,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumPhotosSelectionState())
     val state: StateFlow<AlbumPhotosSelectionState> = _state
+
+    private var showHiddenItems: Boolean? = null
 
     init {
         extractAlbumFlow()
 
         fetchAlbum()
         fetchPhotos()
+
+        viewModelScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+                monitorShowHiddenItems()
+                monitorAccountDetail()
+            }
+        }
     }
 
     private fun extractAlbumFlow() = savedStateHandle.getStateFlow(ALBUM_FLOW, 0)
@@ -106,14 +122,38 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
 
     private fun fetchPhotos() = getTimelinePhotosUseCase()
         .mapLatest(::sortPhotos)
+        .mapLatest(::saveSourcePhotos)
+        .mapLatest(::filterNonSensitivePhotos)
         .mapLatest(::determineLocation)
-        .onEach { filterPhotos() }
+        .onEach {
+            filterPhotos()
+            updateSelection(photos = _state.value.photos)
+        }
         .catch { exception -> Timber.e(exception) }
         .launchIn(viewModelScope)
 
     private suspend fun sortPhotos(photos: List<Photo>): List<Photo> =
         withContext(defaultDispatcher) {
             photos.sortedByDescending { it.modificationTime }
+        }
+
+    private fun saveSourcePhotos(photos: List<Photo>): List<Photo> {
+        _state.update {
+            it.copy(sourcePhotos = photos)
+        }
+        return photos
+    }
+
+    private suspend fun filterNonSensitivePhotos(photos: List<Photo>): List<Photo> =
+        withContext(defaultDispatcher) {
+            val showHiddenItems = showHiddenItems ?: true
+            val isPaid = _state.value.accountType?.isPaid ?: false
+
+            if (showHiddenItems || !isPaid) {
+                photos
+            } else {
+                photos.filter { !it.isSensitive && !it.isSensitiveInherited }
+            }
         }
 
     private suspend fun determineLocation(photos: List<Photo>) {
@@ -160,16 +200,52 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
             CLOUD_DRIVE -> filterCloudDrivePhotos(photos)
             CAMERA_UPLOAD -> filterCameraUploadPhotos(photos)
         }
-        val filteredPhotoIds = withContext(defaultDispatcher) {
-            filteredPhotos.map { it.id }.toSet()
-        }
+
         val uiPhotos = filteredPhotos.toUIPhotos()
+        _state.update {
+            it.copy(uiPhotos = uiPhotos)
+        }
+    }
+
+    private fun monitorShowHiddenItems() = monitorShowHiddenItemsUseCase()
+        .onEach {
+            showHiddenItems = it
+            if (_state.value.sourcePhotos.isEmpty()) return@onEach
+
+            val filteredPhotos = filterNonSensitivePhotos(photos = _state.value.sourcePhotos)
+            _state.update {
+                it.copy(photos = filteredPhotos)
+            }
+
+            filterPhotos()
+            updateSelection(photos = filteredPhotos)
+        }
+        .launchIn(viewModelScope)
+
+    private fun monitorAccountDetail() = monitorAccountDetailUseCase()
+        .onEach { accountDetail ->
+            _state.update {
+                it.copy(accountType = accountDetail.levelDetail?.accountType)
+            }
+            if (_state.value.sourcePhotos.isEmpty()) return@onEach
+
+            val filteredPhotos = filterNonSensitivePhotos(photos = _state.value.sourcePhotos)
+            _state.update {
+                it.copy(photos = filteredPhotos)
+            }
+
+            filterPhotos()
+            updateSelection(photos = filteredPhotos)
+        }
+        .launchIn(viewModelScope)
+
+    private fun updateSelection(photos: List<Photo>) {
+        val selectedPhotoIds = _state.value.selectedPhotoIds.filter { id ->
+            photos.any { it.id == id }
+        }.toSet()
 
         _state.update {
-            it.copy(
-                filteredPhotoIds = filteredPhotoIds,
-                uiPhotos = uiPhotos,
-            )
+            it.copy(selectedPhotoIds = selectedPhotoIds)
         }
     }
 

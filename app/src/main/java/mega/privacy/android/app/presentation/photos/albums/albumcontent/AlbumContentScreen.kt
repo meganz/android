@@ -162,7 +162,8 @@ internal fun AlbumContentScreen(
                 onLongPress = { photo ->
                     albumContentViewModel.togglePhotoSelection(photo)
                 },
-                selectedPhotos = albumContentState.selectedPhotos
+                selectedPhotos = albumContentState.selectedPhotos,
+                accountType = albumContentState.accountType,
             )
 
             if (albumContentState.isAddingPhotos || albumContentState.isRemovingPhotos) {

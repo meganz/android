@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,11 +11,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
@@ -26,13 +31,17 @@ import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbums
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.CreateAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import timber.log.Timber
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 /**
@@ -52,6 +61,9 @@ class AlbumsViewModel @Inject constructor(
     private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase,
     private val disableExportAlbumsUseCase: DisableExportAlbumsUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumsViewState())
     val state = _state.asStateFlow()
@@ -61,8 +73,27 @@ class AlbumsViewModel @Inject constructor(
 
     private var createAlbumJob: Job? = null
 
+    @VisibleForTesting
+    internal var showHiddenItems: Boolean? = null
+
+    @VisibleForTesting
+    internal var systemAlbumPhotos: ConcurrentHashMap<Album, List<Photo>> = ConcurrentHashMap()
+
+    @VisibleForTesting
+    internal var userAlbumPhotos: ConcurrentHashMap<AlbumId, List<Photo>> = ConcurrentHashMap()
+
+    @VisibleForTesting
+    internal var userAlbums: ConcurrentHashMap<AlbumId, Album.UserAlbum> = ConcurrentHashMap()
+
     init {
         loadAlbums()
+
+        viewModelScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+                monitorShowHiddenItems()
+                monitorAccountDetail()
+            }
+        }
     }
 
     private fun loadAlbums() {
@@ -72,25 +103,35 @@ class AlbumsViewModel @Inject constructor(
                 getDefaultAlbumPhotos(
                     includedSystemAlbums.values.toList()
                 ).mapLatest { photos ->
+                    val showHiddenItems = showHiddenItems ?: true
+                    val isPaid = _state.value.accountType?.isPaid ?: false
+
                     includedSystemAlbums.mapNotNull { (key, value) ->
-                        photos.filter {
-                            value(it)
-                        }.takeIf {
-                            shouldAddAlbum(it, key)
-                        }?.let {
-                            val cover = withContext(defaultDispatcher) {
-                                it.maxByOrNull { photo -> photo.modificationTime }
-                            }
-                            val imageVideoCount = getImageAndVideoCount(it)
-                            uiAlbumMapper(
-                                count = it.size,
-                                imageCount = imageVideoCount.first,
-                                videoCount = imageVideoCount.second,
-                                cover = cover,
-                                defaultCover = cover,
-                                album = key
-                            )
+                        val albumPhotos = photos.filter { value(it) }
+                        val sortedPhotos = withContext(defaultDispatcher) {
+                            albumPhotos.sortedWith((compareByDescending<Photo> {
+                                it.modificationTime
+                            }.thenByDescending { it.id }))
                         }
+                        systemAlbumPhotos[key] = sortedPhotos
+
+                        val filteredPhotos = if (showHiddenItems || !isPaid) {
+                            sortedPhotos
+                        } else {
+                            sortedPhotos.filter { !it.isSensitive && !it.isSensitiveInherited }
+                        }
+
+                        val cover = filteredPhotos.firstOrNull()
+                        val (imageCount, videoCount) = getImageAndVideoCount(filteredPhotos)
+
+                        uiAlbumMapper(
+                            count = filteredPhotos.size,
+                            imageCount = imageCount,
+                            videoCount = videoCount,
+                            cover = cover,
+                            defaultCover = cover,
+                            album = key,
+                        ).takeIf { key is Album.FavouriteAlbum || filteredPhotos.isNotEmpty() }
                     }
                 }.collectLatest { systemAlbums ->
                     albumJob ?: loadUserAlbums()
@@ -107,6 +148,92 @@ class AlbumsViewModel @Inject constructor(
             }.onFailure { exception ->
                 Timber.e(exception)
             }
+        }
+    }
+
+    private fun monitorShowHiddenItems() = monitorShowHiddenItemsUseCase()
+        .conflate()
+        .onEach {
+            showHiddenItems = it
+            if (!_state.value.showAlbums) return@onEach
+
+            refreshAlbums()
+        }.launchIn(viewModelScope)
+
+    private fun monitorAccountDetail() = monitorAccountDetailUseCase()
+        .onEach { accountDetail ->
+            _state.update {
+                it.copy(accountType = accountDetail.levelDetail?.accountType)
+            }
+            if (!_state.value.showAlbums) return@onEach
+
+            refreshAlbums()
+        }.launchIn(viewModelScope)
+
+    @VisibleForTesting
+    internal suspend fun refreshAlbums() = withContext(defaultDispatcher) {
+        val showHiddenItems = showHiddenItems ?: true
+        val isPaid = _state.value.accountType?.isPaid ?: false
+
+        val systemAlbums = systemAlbumPhotos.mapNotNull { (album, photos) ->
+            val filteredPhotos = if (showHiddenItems || !isPaid) {
+                photos
+            } else {
+                photos.filter { !it.isSensitive && !it.isSensitiveInherited }
+            }
+            if (album !is Album.FavouriteAlbum && filteredPhotos.isEmpty()) return@mapNotNull null
+
+            val cover = filteredPhotos.firstOrNull()
+            val (imageCount, videoCount) = getImageAndVideoCount(filteredPhotos)
+
+            uiAlbumMapper(
+                count = filteredPhotos.size,
+                imageCount = imageCount,
+                videoCount = videoCount,
+                cover = cover,
+                defaultCover = cover,
+                album = album,
+            )
+        }.let { uiAlbums ->
+            listOfNotNull(
+                uiAlbums.find { it.id is Album.FavouriteAlbum },
+                uiAlbums.find { it.id is Album.GifAlbum },
+                uiAlbums.find { it.id is Album.RawAlbum },
+            )
+        }
+
+        val userAlbums = userAlbumPhotos.mapNotNull { (albumId, photos) ->
+            if (albumId in _state.value.deletedAlbumIds) return@mapNotNull null
+            val album = userAlbums[albumId] ?: return@mapNotNull null
+
+            val filteredPhotos = if (showHiddenItems || !isPaid) {
+                photos
+            } else {
+                photos.filter { !it.isSensitive && !it.isSensitiveInherited }
+            }
+
+            val cover = album.cover?.let { photo ->
+                if (showHiddenItems || !isPaid) {
+                    photo
+                } else {
+                    photo.takeIf { !it.isSensitive && !it.isSensitiveInherited }
+                }
+            }
+            val defaultCover = filteredPhotos.firstOrNull()
+            val (imageCount, videoCount) = getImageAndVideoCount(filteredPhotos)
+
+            uiAlbumMapper(
+                count = filteredPhotos.size,
+                imageCount = imageCount,
+                videoCount = videoCount,
+                cover = cover,
+                defaultCover = defaultCover,
+                album = album,
+            )
+        }.sortedByDescending { (it.id as? Album.UserAlbum)?.creationTime }
+
+        _state.update {
+            it.copy(albums = systemAlbums + userAlbums)
         }
     }
 
@@ -129,6 +256,10 @@ class AlbumsViewModel @Inject constructor(
         }
 
     private suspend fun handleUserAlbums(userAlbums: List<Album.UserAlbum>) {
+        for (userAlbum in userAlbums) {
+            this.userAlbums[userAlbum.id] = userAlbum
+        }
+
         _state.update { state ->
             val albums = updateUserAlbums(state.albums, userAlbums)
             val currentAlbumId = checkCurrentAlbumExists(albums = albums)
@@ -149,6 +280,9 @@ class AlbumsViewModel @Inject constructor(
         for (albumId in albumJobs.keys - activeAlbumIds) {
             albumJobs[albumId]?.cancel()
             albumJobs.remove(albumId)
+
+            this.userAlbums.remove(albumId)
+            this.userAlbumPhotos.remove(albumId)
         }
     }
 
@@ -156,21 +290,36 @@ class AlbumsViewModel @Inject constructor(
         uiAlbums: List<UIAlbum>,
         userAlbums: List<Album.UserAlbum>,
     ): List<UIAlbum> = withContext(defaultDispatcher) {
-        val (systemUIAlbums, userUIAlbums) = uiAlbums.partition {
+        val (systemUIAlbums, _) = uiAlbums.partition {
             it.id !is Album.UserAlbum
         }
+        val showHiddenItems = showHiddenItems ?: true
+        val isPaid = _state.value.accountType?.isPaid ?: false
 
         val updatedUserUIAlbums = userAlbums.map { userAlbum ->
-            val uiAlbum = userUIAlbums.firstOrNull { uiAlbum ->
-                (uiAlbum.id as? Album.UserAlbum)?.id == userAlbum.id
+            val photos = userAlbumPhotos[userAlbum.id].orEmpty()
+            val filteredPhotos = if (showHiddenItems || !isPaid) {
+                photos
+            } else {
+                photos.filter { !it.isSensitive && !it.isSensitiveInherited }
             }
-            val cover = userAlbum.cover
+
+            val cover = userAlbum.cover?.let { photo ->
+                if (showHiddenItems || !isPaid) {
+                    photo
+                } else {
+                    photo.takeIf { !it.isSensitive && !it.isSensitiveInherited }
+                }
+            }
+            val defaultCover = filteredPhotos.firstOrNull()
+            val (imageCount, videoCount) = getImageAndVideoCount(filteredPhotos)
+
             uiAlbumMapper(
-                count = uiAlbum?.count ?: 0,
-                imageCount = uiAlbum?.imageCount ?: 0,
-                videoCount = uiAlbum?.videoCount ?: 0,
+                count = filteredPhotos.size,
+                imageCount = imageCount,
+                videoCount = videoCount,
                 cover = cover,
-                defaultCover = uiAlbum?.defaultCover,
+                defaultCover = defaultCover,
                 album = userAlbum,
             )
         }.sortedByDescending { (it.id as? Album.UserAlbum)?.creationTime }
@@ -185,8 +334,15 @@ class AlbumsViewModel @Inject constructor(
     }
 
     private suspend fun handleAlbumPhotos(album: Album.UserAlbum, photos: List<Photo>) {
+        val sortedPhotos = withContext(defaultDispatcher) {
+            photos.sortedWith((compareByDescending<Photo> {
+                it.modificationTime
+            }.thenByDescending { it.id }))
+        }
+        userAlbumPhotos[album.id] = sortedPhotos
+
         _state.update { state ->
-            val albums = updateAlbumPhotos(state.albums, album, photos)
+            val albums = updateAlbumPhotos(state.albums, album, sortedPhotos)
             val currentAlbumId = checkCurrentAlbumExists(albums = albums)
 
             state.copy(
@@ -198,27 +354,41 @@ class AlbumsViewModel @Inject constructor(
 
     private suspend fun updateAlbumPhotos(
         uiAlbums: List<UIAlbum>,
-        userAlbum: Album.UserAlbum,
+        refUserAlbum: Album.UserAlbum,
         photos: List<Photo>,
     ): List<UIAlbum> = withContext(defaultDispatcher) {
         val (systemUIAlbums, userUIAlbums) = uiAlbums.partition {
             it.id !is Album.UserAlbum
         }
+        val showHiddenItems = showHiddenItems ?: true
+        val isPaid = _state.value.accountType?.isPaid ?: false
 
         val updatedUserUIAlbums = userUIAlbums.map { uiAlbum ->
-            if ((uiAlbum.id as? Album.UserAlbum)?.id == userAlbum.id) {
-                val cover = uiAlbum.id.cover
-                val defaultCover = photos.sortedWith((compareByDescending<Photo> {
-                    it.modificationTime
-                }.thenByDescending { it.id })).firstOrNull()
-                val imageVideoCount = getImageAndVideoCount(photos)
+            if ((uiAlbum.id as? Album.UserAlbum)?.id == refUserAlbum.id) {
+                val userAlbum = userAlbums[refUserAlbum.id] ?: uiAlbum.id
+                val filteredPhotos = if (showHiddenItems || !isPaid) {
+                    photos
+                } else {
+                    photos.filter { !it.isSensitive && !it.isSensitiveInherited }
+                }
+
+                val cover = userAlbum.cover?.let { photo ->
+                    if (showHiddenItems || !isPaid) {
+                        photo
+                    } else {
+                        photo.takeIf { !it.isSensitive && !it.isSensitiveInherited }
+                    }
+                }
+                val defaultCover = filteredPhotos.firstOrNull()
+                val (imageCount, videoCount) = getImageAndVideoCount(filteredPhotos)
+
                 uiAlbumMapper(
-                    count = photos.size,
-                    imageCount = imageVideoCount.first,
-                    videoCount = imageVideoCount.second,
+                    count = filteredPhotos.size,
+                    imageCount = imageCount,
+                    videoCount = videoCount,
                     cover = cover,
                     defaultCover = defaultCover,
-                    album = uiAlbum.id,
+                    album = userAlbum,
                 )
             } else {
                 uiAlbum
@@ -444,11 +614,6 @@ class AlbumsViewModel @Inject constructor(
     fun setIsAlbumCreatedSuccessfully(success: Boolean) = _state.update {
         it.copy(isAlbumCreatedSuccessfully = success)
     }
-
-    private fun shouldAddAlbum(
-        it: List<Photo>,
-        key: Album,
-    ) = it.isNotEmpty() || key == Album.FavouriteAlbum
 
     fun setShowCreateAlbumDialog(showCreateDialog: Boolean) = _state.update {
         it.copy(showCreateAlbumDialog = showCreateDialog)

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.albumcontent
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -42,6 +43,7 @@ import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumType
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
@@ -99,6 +101,12 @@ class AlbumContentFragment : Fragment() {
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult(),
             ::handleAlbumCoverSelectionResult,
+        )
+
+    internal val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleHiddenNodesOnboardingResult,
         )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -390,6 +398,18 @@ class AlbumContentFragment : Fragment() {
         )
         startActivity(intent)
         activity?.overridePendingTransition(0, 0)
+    }
+
+    private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
+        if (result.resultCode != Activity.RESULT_OK) return
+
+        val count = albumContentViewModel.state.value.selectedPhotos.size
+        albumContentViewModel.hideOrUnhideNodes(true)
+        albumContentViewModel.clearSelectedPhotos()
+
+        val message =
+            resources.getQuantityString(R.plurals.hidden_nodes_result_message, count, count)
+        Util.showSnackbar(requireActivity(), message)
     }
 
     companion object {

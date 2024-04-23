@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.photos.albums.albumcontent
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Photo
 
 data class AlbumContentState(
@@ -28,6 +29,8 @@ data class AlbumContentState(
     val isInputNameValid: Boolean = true,
     val createDialogErrorMessage: Int? = null,
     val newAlbumTitleInput: String = "",
+    val accountType: AccountType? = null,
+    val isHiddenNodesOnboarded: Boolean? = null,
 ) {
     val isAddingPhotosProgressCompleted: Boolean
         get() = !isAddingPhotos && totalAddedPhotos > 0

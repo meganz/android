@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.photos.albums.coverselection
 
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 
@@ -12,6 +13,7 @@ data class AlbumCoverSelectionState(
     val selectedPhoto: Photo? = null,
     val hasSelectedPhoto: Boolean = false,
     val isSelectionCompleted: Boolean = false,
+    val accountType: AccountType? = null,
 )
 
 typealias PhotoDownload = suspend (

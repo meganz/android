@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.coverselection
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.UIPhoto.PhotoItem
@@ -29,7 +31,10 @@ import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbum
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumCoverUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -43,14 +48,27 @@ class AlbumCoverSelectionViewModel @Inject constructor(
     private val downloadThumbnailUseCase: DownloadThumbnailUseCase,
     private val updateAlbumCoverUseCase: UpdateAlbumCoverUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumCoverSelectionState())
     val state: StateFlow<AlbumCoverSelectionState> = _state
 
     private var fetchPhotosJob: Job? = null
 
+    @VisibleForTesting
+    internal var showHiddenItems: Boolean? = null
+
     init {
         fetchAlbum()
+
+        viewModelScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+                monitorShowHiddenItems()
+                monitorAccountDetail()
+            }
+        }
     }
 
     private fun fetchAlbum() = savedStateHandle.getStateFlow<Long?>(ALBUM_ID, null)
@@ -62,12 +80,39 @@ class AlbumCoverSelectionViewModel @Inject constructor(
         .catch { exception -> Timber.e(exception) }
         .launchIn(viewModelScope)
 
+    private fun monitorShowHiddenItems() = monitorShowHiddenItemsUseCase()
+        .onEach {
+            showHiddenItems = it
+            if (_state.value.photos.isEmpty()) return@onEach
+
+            updatePhotos(photos = _state.value.photos)
+        }.launchIn(viewModelScope)
+
+    private fun monitorAccountDetail() = monitorAccountDetailUseCase()
+        .onEach { accountDetail ->
+            _state.update {
+                it.copy(accountType = accountDetail.levelDetail?.accountType)
+            }
+            if (_state.value.photos.isEmpty()) return@onEach
+
+            updatePhotos(photos = _state.value.photos)
+        }.launchIn(viewModelScope)
+
     private fun updateAlbum(album: Album.UserAlbum?) {
-        _state.update {
-            it.copy(
+        val showHiddenItems = showHiddenItems ?: true
+        val isPaid = _state.value.accountType?.isPaid ?: false
+
+        _state.update { state ->
+            state.copy(
                 album = album,
                 isInvalidAlbum = album == null,
-                selectedPhoto = album?.cover,
+                selectedPhoto = album?.cover?.let { photo ->
+                    if (showHiddenItems || !isPaid) {
+                        photo
+                    } else {
+                        photo.takeIf { !it.isSensitive && !it.isSensitiveInherited }
+                    }
+                },
             )
         }
     }
@@ -82,13 +127,14 @@ class AlbumCoverSelectionViewModel @Inject constructor(
 
     private suspend fun updatePhotos(photos: List<Photo>) {
         val sortedPhotos = sortPhotos(photos)
-        val uiPhotos = sortedPhotos.toUIPhotos()
+        val nonSensitivePhotos = filterNonSensitivePhotos(sortedPhotos)
+        val uiPhotos = nonSensitivePhotos.toUIPhotos()
 
         _state.update { state ->
             state.copy(
                 photos = sortedPhotos,
                 uiPhotos = uiPhotos,
-                selectedPhoto = state.selectedPhoto ?: sortedPhotos.firstOrNull(),
+                selectedPhoto = state.selectedPhoto ?: nonSensitivePhotos.firstOrNull(),
             )
         }
     }
@@ -97,6 +143,17 @@ class AlbumCoverSelectionViewModel @Inject constructor(
         withContext(defaultDispatcher) {
             photos.sortedByDescending { it.modificationTime }
         }
+
+    private fun filterNonSensitivePhotos(photos: List<Photo>): List<Photo> {
+        val showHiddenItems = showHiddenItems ?: return photos
+        val isPaid = _state.value.accountType?.isPaid ?: return photos
+
+        return if (showHiddenItems || !isPaid) {
+            photos
+        } else {
+            photos.filter { !it.isSensitive && !it.isSensitiveInherited }
+        }
+    }
 
     private suspend fun List<Photo>.toUIPhotos(): List<UIPhoto> =
         withContext(defaultDispatcher) {

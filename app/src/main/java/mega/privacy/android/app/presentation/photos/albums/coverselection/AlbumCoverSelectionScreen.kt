@@ -43,6 +43,7 @@ import mega.privacy.android.core.ui.theme.teal_200_alpha_038
 import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.teal_300_alpha_038
 import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Photo
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -74,6 +75,7 @@ fun AlbumCoverSelectionScreen(
                     lazyGridState = lazyGridState,
                     uiPhotos = state.uiPhotos,
                     selectedPhoto = state.selectedPhoto,
+                    accountType = state.accountType,
                     onPhotoDownload = viewModel::downloadPhoto,
                     onPhotoSelection = viewModel::selectPhoto,
                 )
@@ -129,6 +131,7 @@ private fun AlbumCoverSelectionContent(
     lazyGridState: LazyGridState,
     uiPhotos: List<UIPhoto>,
     selectedPhoto: Photo?,
+    accountType: AccountType?,
     onPhotoDownload: PhotoDownload,
     onPhotoSelection: (Photo) -> Unit,
 ) {
@@ -143,6 +146,7 @@ private fun AlbumCoverSelectionContent(
         onLongPress = onPhotoSelection,
         selectedPhotoIds = setOfNotNull(selectedPhoto?.id),
         uiPhotoList = uiPhotos,
+        accountType = accountType,
     )
 }
 

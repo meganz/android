@@ -13,8 +13,6 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property videoCount     The count of videos in the album
  * @property coverPhoto     The selected photos used as the cover
  * @property defaultCover   The fallback cover if main cover is null
- * @property photos         The list of all photos in the albums
- * @property isLoadingDone  To indicate if the loading of the UIAlbum is done
  */
 data class UIAlbum(
     val id: Album,
@@ -24,6 +22,4 @@ data class UIAlbum(
     val videoCount: Int,
     val coverPhoto: Photo?,
     val defaultCover: Photo? = null,
-    val photos: List<Photo>,
-    val isLoadingDone: Boolean = false,
 )

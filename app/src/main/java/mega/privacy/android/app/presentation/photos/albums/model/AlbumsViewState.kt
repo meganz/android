@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.model
 
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 
@@ -36,6 +37,7 @@ data class AlbumsViewState(
     val removedLinksCount: Int = 0,
     val selectedAlbumIds: Set<AlbumId> = setOf(),
     val showAlbums: Boolean = false,
+    val accountType: AccountType? = null,
 ) {
     val currentUIAlbum: UIAlbum?
         get() {

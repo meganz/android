@@ -8,18 +8,25 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
 import mega.privacy.android.app.presentation.photos.albums.coverselection.AlbumCoverSelectionViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumCoverUseCase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import java.time.LocalDateTime
 
@@ -50,6 +57,11 @@ class AlbumCoverSelectionViewModelTest {
             downloadThumbnailUseCase = mock(),
             updateAlbumCoverUseCase = updateAlbumCoverUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
+            getFeatureFlagValueUseCase = mock {
+                onBlocking { invoke(any()) }.thenReturn(false)
+            },
+            monitorShowHiddenItemsUseCase = mock(),
+            monitorAccountDetailUseCase = mock(),
         )
 
         // then
@@ -73,6 +85,11 @@ class AlbumCoverSelectionViewModelTest {
             downloadThumbnailUseCase = mock(),
             updateAlbumCoverUseCase = updateAlbumCoverUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
+            getFeatureFlagValueUseCase = mock {
+                onBlocking { invoke(any()) }.thenReturn(false)
+            },
+            monitorShowHiddenItemsUseCase = mock(),
+            monitorAccountDetailUseCase = mock(),
         )
 
         val expectedPhoto = createImage(id = 1L)
@@ -97,6 +114,11 @@ class AlbumCoverSelectionViewModelTest {
             downloadThumbnailUseCase = mock(),
             updateAlbumCoverUseCase = updateAlbumCoverUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
+            getFeatureFlagValueUseCase = mock {
+                onBlocking { invoke(any()) }.thenReturn(false)
+            },
+            monitorShowHiddenItemsUseCase = mock(),
+            monitorAccountDetailUseCase = mock(),
         )
 
         val album = createUserAlbum(id = AlbumId(1L))
@@ -109,6 +131,48 @@ class AlbumCoverSelectionViewModelTest {
         underTest.state.drop(1).test {
             val isCompleted = awaitItem().isSelectionCompleted
             assertThat(isCompleted).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that showHiddenItems and accountDetail are fetched properly`() = runTest {
+        // given
+        val underTest = AlbumCoverSelectionViewModel(
+            savedStateHandle = SavedStateHandle(),
+            getUserAlbum = { flowOf() },
+            getAlbumPhotos = { flowOf() },
+            downloadThumbnailUseCase = mock(),
+            updateAlbumCoverUseCase = updateAlbumCoverUseCase,
+            defaultDispatcher = UnconfinedTestDispatcher(),
+            getFeatureFlagValueUseCase = mock {
+                onBlocking { invoke(AppFeatures.HiddenNodes) }.thenReturn(true)
+            },
+            monitorShowHiddenItemsUseCase = mock {
+                on { invoke() }.thenReturn(flowOf(true))
+            },
+            monitorAccountDetailUseCase = mock {
+                on { invoke() }.thenReturn(
+                    flowOf(
+                        AccountDetail(
+                            levelDetail = AccountLevelDetail(
+                                accountType = AccountType.FREE,
+                                subscriptionStatus = null,
+                                subscriptionRenewTime = 0L,
+                                accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
+                                proExpirationTime = 0L,
+                            )
+                        )
+                    )
+                )
+            },
+        )
+        advanceUntilIdle()
+
+        // then
+        underTest.state.test {
+            val accountType = awaitItem().accountType
+            assertThat(accountType).isEqualTo(AccountType.FREE)
+            assertThat(underTest.showHiddenItems).isTrue()
         }
     }
 
