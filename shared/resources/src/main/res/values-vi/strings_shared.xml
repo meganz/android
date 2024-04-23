@@ -85,13 +85,13 @@
     <!-- Warning message to display when sync has been paused due a low battery level -->
     <string name="general_message_sync_paused_low_battery_level">Syncing paused, battery level too low. Charge battery to resume syncing.</string>
     <!-- Title for File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_file_sharing">Easy, secure file sharing</string>
+    <string name="dialog_onboarding_feature_title_file_sharing">Chia&#160;sẻ tệp&#160;tin dễ&#160;dàng và an&#160;toàn</string>
     <!-- Description about File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_file_sharing">Share large files thanks to a generous transfer quota and ensure security with password-protected links.</string>
+    <string name="dialog_onboarding_feature_description_file_sharing">Chia&#160;sẻ các tệp&#160;tin lớn nhờ băng&#160;thông truyền&#160;tải hào&#160;phóng và đảm&#160;bảo bảo&#160;mật với các đường liên&#160;kết được bảo&#160;vệ bằng mật&#160;khẩu.</string>
     <!-- Title for Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_backup_rewind">Never lose data again</string>
+    <string name="dialog_onboarding_feature_title_backup_rewind">Không bao&#160;giờ mất dữ&#160;liệu nữa</string>
     <!-- Description about Backup and Rewind features on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_backup_rewind">Back up and sync your data for complete confidence. Plus, use Rewind to restore folders to any date up to 180 days.</string>
+    <string name="dialog_onboarding_feature_description_backup_rewind">Sao lưu và đồng&#160;bộ hóa dữ&#160;liệu để bạn hoàn&#160;toàn tự&#160;tin. Ngoài ra, sử dụng Tua&#160;lại để khôi&#160;phục các thư&#160;mục về bất&#160;kỳ ngày nào trong phạm&#160;vi 180 ngày.</string>
     <!-- Title for MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_vpn">MEGA&#160;VPN</string>
     <!-- Description about MEGA VPN feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -99,7 +99,7 @@
     <!-- Title for chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_feature_title_chat">Cuộc gọi và cuộc họp không hạn&#160;chế</string>
     <!-- Description about chats and meetings feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_description_chat">Message, video call, and meet in total privacy with unlimited participants.</string>
+    <string name="dialog_onboarding_feature_description_chat">Nhắn&#160;tin, gọi video và họp hoàn&#160;toàn riêng&#160;tư với số&#160;lượng người tham&#160;gia không giới&#160;hạn.</string>
     <!-- Search drop down chips filter type file type -->
     <string name="search_dropdown_chip_filter_type_file_type">Dạng</string>
     <!-- Search drop down chips filter type file type images -->
@@ -165,7 +165,7 @@
     <!-- More than 20 minutes option of the video section duration filter  -->
     <string name="video_section_videos_duration_option_more_than_20_minutes">More than 20 minutes</string>
     <!-- Create playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_create_playlist_dialog_title">Enter playlist name</string>
+    <string name="video_section_playlists_create_playlist_dialog_title">Đặt tên danh&#160;sách phát</string>
     <!-- Rename playlist dialog title of the video section playlists tab -->
     <string name="video_section_playlists_rename_playlist_dialog_title">Đổi tên</string>
     <!-- Error message when the playlist name already exists -->
@@ -215,4 +215,16 @@
     <string name="settings_camera_uploads_upload_only_while_charging_option_name">Upload only while charging</string>
     <!-- Text for the header of the screen to add a new sync folder -->
     <string name="sync_add_new_sync_folder_header_text">Thêm thư&#160;mục đồng&#160;bộ hóa:</string>
+    <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->
+    <string name="general_size_giga_byte">%1$s&#160;GB</string>
+    <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
+    <string name="general_free_plan_name">Free</string>
+    <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
+    <string name="dialog_onboarding_transfer_quota_free_limited">Bị giới hạn</string>
+    <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
+    <string name="dialog_onboarding_free_account_price">Miễn phí</string>
+    <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
+    <string name="dialog_onboarding_button_continue">Tiếp tục</string>
+    <!-- Title of navigation bar on Onboarding dialog. -->
+    <string name="dialog_onboarding_app_bar_title">Choose your MEGA plan</string>
 </resources>

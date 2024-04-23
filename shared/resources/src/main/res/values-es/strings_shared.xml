@@ -165,7 +165,7 @@
     <!-- More than 20 minutes option of the video section duration filter  -->
     <string name="video_section_videos_duration_option_more_than_20_minutes">More than 20 minutes</string>
     <!-- Create playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_create_playlist_dialog_title">Enter playlist name</string>
+    <string name="video_section_playlists_create_playlist_dialog_title">Introducir el nombre de la lista de reproducción</string>
     <!-- Rename playlist dialog title of the video section playlists tab -->
     <string name="video_section_playlists_rename_playlist_dialog_title">Renombrar</string>
     <!-- Error message when the playlist name already exists -->
@@ -217,4 +217,16 @@
     <string name="settings_camera_uploads_upload_only_while_charging_option_name">Upload only while charging</string>
     <!-- Text for the header of the screen to add a new sync folder -->
     <string name="sync_add_new_sync_folder_header_text">Add synchronised folder:</string>
+    <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->
+    <string name="general_size_giga_byte">%1$s&#160;GB</string>
+    <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
+    <string name="general_free_plan_name">Free</string>
+    <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
+    <string name="dialog_onboarding_transfer_quota_free_limited">Limitado</string>
+    <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
+    <string name="dialog_onboarding_free_account_price">Gratis</string>
+    <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
+    <string name="dialog_onboarding_button_continue">Continuar</string>
+    <!-- Title of navigation bar on Onboarding dialog. -->
+    <string name="dialog_onboarding_app_bar_title">Choose your MEGA plan</string>
 </resources>
