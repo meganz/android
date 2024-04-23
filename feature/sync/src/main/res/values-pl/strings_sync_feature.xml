@@ -129,7 +129,7 @@
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">Nie można przenieść ani zmienić nazwy</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">Usuwanie lub przeniesienie w oczekiwaniu na skanowanie</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning">Delete or move action is waiting for scan</string>
     <!-- Sync stalled issue reason is delete or move-->
     <string name="sync_stalled_issue_delete_or_move">Nie można jeszcze usunąć</string>
     <!-- Sync stalled issue reason is upload issue-->

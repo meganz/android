@@ -834,7 +834,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">尝试登录次数过多，请一小时后再试。</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">此帐户尚未通过验证。检查您的电子邮件收件箱。</string>
+    <string name="account_not_validated_login">查看您的电子邮件收件箱并跟随链接确认您的帐户。</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">文件夹链接不可用</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->

@@ -834,7 +834,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">로그인 시도 실패가 너무 많습니다, 1시간 동안 기다려주세요.</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">이 계정은 아직 확인되지 않았습니다. 이메일 수신함을 확인하세요.</string>
+    <string name="account_not_validated_login">계정을 확인하려면 이메일 수신함을 확인하고 링크를 따라가세요.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">폴더 링크가 사용불가입니다</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->

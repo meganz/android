@@ -746,7 +746,7 @@
     <!-- Title of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_title">การยืนยันที่อยู่อีเมล</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_text">Check your email inbox to proceed.</string>
+    <string name="email_verification_text">ตรวจสอบกล่องจดหมายอีเมลของคุณเพื่อดำเนินการต่อ</string>
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">เกิดข้อผิดพลาด กรุณาลองอีกครั้ง</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
@@ -790,7 +790,7 @@
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
     <string name="mail_same_as_old">นี่คืออีเมลที่คุณมีอยู่</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
-    <string name="change_mail_text_last_step">This is the last step to change your email address. Enter your password below.</string>
+    <string name="change_mail_text_last_step">นี่เป็นขั้นตอนสุดท้ายในการเปลี่ยนที่อยู่อีเมลของคุณ กรอกรหัสผ่านของคุณด้านล่าง</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">เปลี่ยนอีเมล</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
@@ -806,7 +806,7 @@
     <!-- Message shown meanwhile the app is waiting for a request -->
     <string name="recovering_info">กำลังรับข้อมูล&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
-    <string name="email_verification_text_change_mail">Your new email address needs to be validated. Check the inbox of the new email address to proceed.</string>
+    <string name="email_verification_text_change_mail">อีเมลใหม่ของคุณยังไม่ได้รับการยืนยัน ตรวจสอบกล่องจดหมายของอีเมลใหม่เพื่อดำเนินการต่อ</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
     <string name="confirmation_delete_avatar">ลบรูปโปรไฟล์ของคุณหรือไม่</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
@@ -834,7 +834,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">มีการเข้าสู่ระบบไม่สำเร็จหลายครั้งเกินไป กรุณารอประมาณหนึ่งชั่วโมง</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">This account has not been validated yet. Check your email inbox.</string>
+    <string name="account_not_validated_login">ตรวจสอบกล่องจดหมายอีเมลของคุณและไปที่ลิงก์เพื่อยืนยันการเปิดบัญชีของคุณ</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">ลิงก์โฟลเดอร์ยังไม่พร้อมใช้งาน</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
@@ -848,7 +848,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">กำลังรอการยืนยันทางอีเมล</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Check your email inbox and follow the link to confirm your account.</string>
+    <string name="confirm_email_explanation">ตรวจสอบกล่องจดหมายอีเมลของคุณและไปที่ลิงก์เพื่อยืนยันการเปิดบัญชีของคุณ</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="other">%1$d รายการ</item>
@@ -2011,8 +2011,7 @@
     <string name="contact_info_button_more">เพิ่มเติม</string>
     <!-- Section title to select a file to perform an action, more files -->
     <plurals name="plural_select_file">
-        <item quantity="one">Choose file</item>
-        <item quantity="other">Choose files</item>
+        <item quantity="other">เลือกไฟล์</item>
     </plurals>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">เลือกโฟลเดอร์</string>
@@ -2271,7 +2270,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">เปิดใช้งานการโทร</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Allow access to your address book</string>
+    <string name="allow_acces_contact_title">อนุญาตให้เข้าถึงสมุดรายชื่อของคุณ</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">ค้นหารายชื่อจากสมุดรายชื่อของคุณได้อย่างง่ายดายบน MEGA</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3299,7 +3298,7 @@
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
     <string name="message_subscription_from_other_platform">คุณมีการสมัครใช้งานอยู่แล้ว หากคุณซื้ออีกรายการหนึ่ง คุณจะถูกเรียกเก็บเงินสองครั้ง เพื่อหลีกเลี่ยงปัญหานี้ ให้ยกเลิกการสมัครใช้งานปัจจุบันของคุณโดยไปที่ MEGA ในเบราว์เซอร์เดสก์ท็อปหรือมือถือ เยี่ยมชมศูนย์ช่วยเหลือของเราเพื่อศึกษาข้อมูลเพิ่มเติม</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
-    <string name="meeting_bluetooth_connect_required_permissions_warning">Go to Settings to allow MEGA permission to access your nearby devices using Bluetooth.</string>
+    <string name="meeting_bluetooth_connect_required_permissions_warning">ไปที่การตั้งค่าเพื่ออนุญาตให้ MEGA เข้าถึงอุปกรณ์ใกล้เคียงของคุณผ่านบลูทูธ</string>
     <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
     <string name="upgrade_billing_warning">เราไม่สามารถดำเนินการเรียกเก็บเงินได้ หากคุณกำลังใช้แอปที่ติดตั้งแบบซ้ำกันอยู่ กรุณาพิจารณาลงชื่อเข้าใช้ MEGA โดยไม่ใช้แอปนี้ หากไม่เป็นเช่นนั้น ให้ลองอัปเกรดผ่านเว็บเบราว์เซอร์ของคุณแทน</string>
     <!-- Title for subscription dialog that shows before delete account -->
@@ -3651,7 +3650,7 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">นี่คือที่จัดเก็บไฟล์และโฟลเดอร์สำหรับสำรองข้อมูล รายการที่สำรองไว้ของคุณเป็นแบบ “อ่านอย่างเดียว” เพื่อป้องกันไม่ให้ถูกแก้ไขโดยไม่ได้ตั้งใจในไดรฟ์ระบบคลาวด์ของคุณ\nคุณสามารถสำรองข้อมูลไฟล์ต่าง ๆ ได้จากคอมพิวเตอร์ของคุณไปยัง MEGA โดยใช้แอปเดสก์ท็อปของเรา</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">Your MEGA account has been suspended due to repeated allegations of copyright infringements. This means you cannot access your account or data within it.\nCheck your email inbox for more information on how to file a counter-notice.</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">บัญชี MEGA ของคุณถูกระงับชั่วคราว เนื่องจากมีการร้องเรียนเรื่องการละเมิดลิขสิทธิ์ซ้ำหลายครั้ง หมายความว่าคุณไม่สามารถเข้าถึงบัญชีหรือข้อมูลใด ๆ ภายในบัญชีของคุณได้\nตรวจสอบกล่องจดหมายอีเมลของคุณเพื่อดูข้อมูลเพิ่มเติมเกี่ยวกับวิธีการยื่นเรื่องโต้แย้ง</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">บัญชีของคุณถูกยุติการใช้งานเนื่องจากละเมิดเงื่อนไขการให้บริการของ MEGA\nคุณจะไม่สามารถเข้าถึงข้อมูลที่เก็บไว้หรือลงทะเบียนบัญชี MEGA ใหม่ได้อีกต่อไป</string>
     <!-- Title of the Meetings tab for the chat section -->
@@ -3777,7 +3776,7 @@
     <!-- Dialog confirmation text for removing photos in an album -->
     <string name="photos_album_remove_from_album_confirmation_text">นำออกจากอัลบั้มหรือไม่</string>
     <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
-    <string name="settings_camera_uploads_grant_media_permissions_body">To enable camera uploads, allow MEGA access to your photos and other media on your device.</string>
+    <string name="settings_camera_uploads_grant_media_permissions_body">หากต้องการเปิดใช้งานการอัปโหลดจากกล้อง ต้องอนุญาตให้ MEGA เข้าถึงรูปภาพและสื่ออื่น ๆ บนอุปกรณ์ของคุณ</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
     <string name="settings_camera_uploads_grant_media_permissions_positive_button">อนุญาตให้เข้าถึง</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
@@ -4761,7 +4760,7 @@
     <!-- Message to user when app update is downloaded -->
     <string name="general_app_update_message_download_success">แอปได้รับการอัปเดตแล้ว</string>
     <!-- Action allowing user to restart the app after downloading the update -->
-    <string name="general_app_update_action_restart">Relaunch the app</string>
+    <string name="general_app_update_action_restart">เริ่มต้นการทำงานแอปใหม่</string>
     <!-- Title of the screen asking permissions for Audio files -->
     <string name="allow_access_audio_title">อนุญาตให้เข้าถึงไฟล์เสียง</string>
     <!-- Photos action menu zoom in -->
@@ -4877,15 +4876,15 @@
     <!-- Title about Pro plans on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_get_pro_title">รับสิทธิประโยชน์เพิ่มเติมด้วยการอัปเกรดเป็นแผน Pro</string>
     <!-- Short description about Pro plans on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised price (e.g. $4.99). -->
-    <string name="dialog_onboarding_get_pro_description">Upgrade to a Pro plan and get more storage and access to Pro features. Plans start from as low as %1$s a month.</string>
+    <string name="dialog_onboarding_get_pro_description">อัปเกรดเป็นแผน Pro เพิ่มพื้นที่เก็บข้อมูลและเข้าถึงฟีเจอร์ Pro เริ่มต้นเพียง %1$s ต่อเดือน</string>
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_some_features_title">MEGA&#160;Pro plans include:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_storage">Ultimate storage flexibility</string>
+    <string name="dialog_onboarding_feature_title_storage">เก็บข้อมูลได้อย่างจุใจ</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
     <string name="dialog_onboarding_feature_description_storage">Starting from %1$s, find the perfect fit for your storage needs.</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->
-    <string name="dialog_onboarding_button_view_pro_plan">Upgrade to Pro today</string>
+    <string name="dialog_onboarding_button_view_pro_plan">อัปเกรดเป็นแผน Pro วันนี้เลย</string>
     <!-- Label indicating that a participant is presenting in the main view of the call -->
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s กำลังนำเสนออยู่</string>
     <!-- Warning indicating that a participant is sharing the screen-->
@@ -5147,7 +5146,7 @@
     <!-- Button text for reporting an issue on the login screen -->
     <string name="general_login_button_report_your_issue">Report your issue</string>
     <!-- Hidden nodes show items -->
-    <string name="hidden_nodes_show_items">Show hidden items</string>
+    <string name="hidden_nodes_show_items">แสดงรายการที่ถูกซ่อนไว้</string>
     <!-- Hidden nodes show items description -->
     <string name="hidden_nodes_show_items_description">All hidden items will be visible, but blurred to indicate their “hidden” status</string>
     <!-- Button text for photo option in camera screen -->

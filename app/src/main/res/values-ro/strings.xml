@@ -854,7 +854,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Prea multe încercări eșuate de autentificare, vă rugăm să așteptați o oră.</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">Acest cont nu a fost încă validat. Verificați căsuța de e-mail.</string>
+    <string name="account_not_validated_login">Verificați căsuța de e-mail și urmați linkul pentru a vă confirma contul.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Linkul folderului indisponibil</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->

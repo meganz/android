@@ -884,7 +884,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">هناك الكثير من المحاولات الفاشلة لتسجيل الدخول، يرجى الانتظار لمدة ساعة.</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">لم يتم التحقق من صحة هذا الحساب حتى الآن. تحقق من صندوق البريد الإلكتروني الخاص بك.</string>
+    <string name="account_not_validated_login">تحقق من صندوق البريد الإلكتروني الخاص بك واتبع الرابط لتأكيد حسابك.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">رابط المجلد غير متوفر</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->

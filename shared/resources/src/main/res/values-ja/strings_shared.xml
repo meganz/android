@@ -212,4 +212,16 @@
     <string name="settings_camera_uploads_upload_only_while_charging_option_name">充電中のみアップロード</string>
     <!-- Text for the header of the screen to add a new sync folder -->
     <string name="sync_add_new_sync_folder_header_text">同期フォルダを追加：</string>
+    <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->
+    <string name="general_size_giga_byte">%1$s&#160;GB</string>
+    <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
+    <string name="general_free_plan_name">Free</string>
+    <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
+    <string name="dialog_onboarding_transfer_quota_free_limited">制限付き</string>
+    <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
+    <string name="dialog_onboarding_free_account_price">無料</string>
+    <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
+    <string name="dialog_onboarding_button_continue">続ける</string>
+    <!-- Title of navigation bar on Onboarding dialog. -->
+    <string name="dialog_onboarding_app_bar_title">MEGAプランのご選択</string>
 </resources>

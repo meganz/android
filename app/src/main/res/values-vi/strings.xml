@@ -834,7 +834,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Đăng nhập sai quá nhiều lần, xin chờ một tiếng đồng hồ rồi thử lại.</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">This account has not been validated yet. Check your email inbox.</string>
+    <string name="account_not_validated_login">Kiểm&#160;tra hộp&#160;thư email của bạn và đi theo đường liên&#160;kết để xác&#160;nhận tài&#160;khoản của bạn.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Liên kết thư mục bất khả dụng</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
@@ -848,7 +848,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">Đang chờ xác nhận địa chỉ e-mail</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Check your email inbox and follow the link to confirm your account.</string>
+    <string name="confirm_email_explanation">Kiểm&#160;tra hộp&#160;thư email của bạn và đi theo đường liên&#160;kết để xác&#160;nhận tài&#160;khoản của bạn.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="other">%1$d mục</item>
@@ -4880,7 +4880,7 @@
     <!-- Title about features available on Pro plan on Onboarding dialog (for user to choose account - Free or Pro).  -->
     <string name="dialog_onboarding_some_features_title">Các gói MEGA&#160;Pro có bao&#160;gồm:</string>
     <!-- Title for Storage feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
-    <string name="dialog_onboarding_feature_title_storage">Ultimate storage flexibility</string>
+    <string name="dialog_onboarding_feature_title_storage">Tính linh&#160;hoạt không&#160;gian tối&#160;ưu</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400GB or 2TB)  -->
     <string name="dialog_onboarding_feature_description_storage">Starting from %1$s, find the perfect fit for your storage needs.</string>
     <!-- Title for Button to view Pro plans on Onboarding dialog (for user to choose account - Free or Pro). After clicking on the button user will redirecting to Upgrade Account screen.  -->

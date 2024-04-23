@@ -844,7 +844,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Teveel mislukte pogingen om in te loggen, alstublieft wacht voor een uur.</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">Dit account is nog niet gevalideerd. Controleer uw e-mailinbox.</string>
+    <string name="account_not_validated_login">Controleer uw e-mailinbox en volg de link om uw account te bevestigen.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Link naar map is niet beschikbaar</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->

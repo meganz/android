@@ -3,7 +3,7 @@
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="general_sync_no_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="general_sync_unsupported_file_system">MEGA can’t sync or backup this folder because the file system on your device is not supported</string>
+    <string name="general_sync_unsupported_file_system">MEGA не может синхронизировать эту папку или сделать резервную копию, потому что файловая система на вашем устройстве не поддерживается</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
     <string name="general_sync_invalid_remote_type">Выбранную папку невозможно синхронизировать</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
@@ -23,7 +23,7 @@
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="general_sync_share_non_full_access">Невозможно синхронизировать папку, так как это общая папка, к которой у вас нет полного доступа</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
-    <string name="general_sync_put_nodes_error">Files in this folder can’t be synced or backed up. You’ll need to re-enable the sync or backup from the desktop app.</string>
+    <string name="general_sync_put_nodes_error">Файлы в этой папке невозможно синхронизировать или создать их резервные копии. Вам нужно снова включить синхронизацию или резервное копирование из настольного приложения.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
     <string name="general_sync_active_sync_below_path">Папку нельзя синхронизировать, так как она уже содержит синхронизируемые папки</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
@@ -35,7 +35,7 @@
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
     <string name="general_sync_too_many_action_packets">Аккаунт перезагружен. Любые пропущенные обновления ваших резервных копий или синхронизаций не были применены.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
-    <string name="general_sync_logged_out">Sync or backup has been stopped as you appear to have logged out of the desktop app. Log back in via the desktop app, and resume the sync or backup.</string>
+    <string name="general_sync_logged_out">Синхронизация или резервное копирование остановлены, поскольку вы, похоже, вышли из настольного приложения. Снова войдите в систему в настольном приложении и возобновите синхронизацию или резервное копирование.</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
     <string name="general_sync_missing_parent_node">N/A</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
@@ -43,7 +43,7 @@
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
     <string name="general_sync_active_sync_same_path">В том же расположении уже есть синхронизируемая папка</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
-    <string name="general_sync_could_not_move_cloud_nodes">Renaming failed</string>
+    <string name="general_sync_could_not_move_cloud_nodes">Не удалось переименовать</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
     <string name="general_sync_could_not_create_ignore_file">Не удалось создать файл .megaignore для этой синхронизации</string>
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
@@ -69,7 +69,7 @@
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="general_sync_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
-    <string name="general_sync_message_node_in_rubbish_bin">Folder can’t be synced or backed up as the MEGA folder is in the Rubbish bin</string>
+    <string name="general_sync_message_node_in_rubbish_bin">Папку невозможно синхронизировать или создать её резервную копию, так как папка MEGA находится в Корзине</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
     <string name="general_sync_message_cannot_locate_local_drive_now">Не удалось найти папку на вашем устройстве в данный момент. Повторите попытку позже.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
@@ -79,9 +79,9 @@
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
     <string name="general_sync_message_folder_backup_issue">Проблема с синхронизацией или резервным копированием этой папки. Остановите синхронизацию или резервное копирование и попробуйте настроить их снова в настольном приложении или обратитесь в поддержку.</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
-    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Folder can’t be synced as it’s already inside a synced folder</string>
+    <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Папку нельзя синхронизировать, так как она уже находится внутри синхронизируемой папки</string>
     <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
-    <string name="general_sync_local_filesystem_mismatch">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the desktop app.</string>
+    <string name="general_sync_local_filesystem_mismatch">Файлы в этой папке невозможно синхронизировать или создать их резервную копию. Вам нужно будет повторно включить синхронизацию или резервное копирование из настольного приложения.</string>
     <!-- Warning message to display when sync has been paused due a low battery level -->
     <string name="general_message_sync_paused_low_battery_level">Syncing paused, battery level too low. Charge battery to resume syncing.</string>
     <!-- Title for File sharing feature on Onboarding dialog (for user to choose account - Free or Pro).  -->
@@ -187,7 +187,7 @@
     <!-- Text that indicates that there’s no videos in the video playlist detail to show. -->
     <string name="video_section_playlist_detail_empty_hint_videos">Нет видео</string>
     <!-- Top bar title of the video section video selected page -->
-    <string name="video_section_video_selected_top_bar_title">Choose files</string>
+    <string name="video_section_video_selected_top_bar_title">Выберите файлы</string>
     <!-- Message when deleting the playlists of the video section playlists tab. %1$d will be replaced the number of deleted playlists -->
     <plurals name="video_section_playlists_delete_playlists_message">
         <item quantity="one">Deleted %1$d playlist</item>
@@ -218,4 +218,16 @@
     <string name="settings_camera_uploads_upload_only_while_charging_option_name">Upload only while charging</string>
     <!-- Text for the header of the screen to add a new sync folder -->
     <string name="sync_add_new_sync_folder_header_text">Add synchronised folder:</string>
+    <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->
+    <string name="general_size_giga_byte">%1$s&#160;ГБ</string>
+    <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
+    <string name="general_free_plan_name">Free</string>
+    <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
+    <string name="dialog_onboarding_transfer_quota_free_limited">Ограничено</string>
+    <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
+    <string name="dialog_onboarding_free_account_price">Бесплатный</string>
+    <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
+    <string name="dialog_onboarding_button_continue">Продолжить</string>
+    <!-- Title of navigation bar on Onboarding dialog. -->
+    <string name="dialog_onboarding_app_bar_title">Choose your MEGA plan</string>
 </resources>

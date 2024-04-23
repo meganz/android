@@ -117,7 +117,7 @@
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">无法移动或重命名</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">等待删除或移动的扫描中</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning">Delete or move action is waiting for scan</string>
     <!-- Sync stalled issue reason is delete or move-->
     <string name="sync_stalled_issue_delete_or_move">还无法删除</string>
     <!-- Sync stalled issue reason is upload issue-->

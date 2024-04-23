@@ -137,7 +137,7 @@
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">لا يمكن النقل أو إعادة التسمية</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">الحذف أو الانتقال أثناء انتظار الفحص</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning">Delete or move action is waiting for scan</string>
     <!-- Sync stalled issue reason is delete or move-->
     <string name="sync_stalled_issue_delete_or_move">لا يمكن الحذف بعد</string>
     <!-- Sync stalled issue reason is upload issue-->

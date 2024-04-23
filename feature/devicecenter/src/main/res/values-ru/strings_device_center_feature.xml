@@ -59,7 +59,7 @@
     <!-- The name of the Device or Folder Sub State when its code is NO_SYNC_ERROR -->
     <string name="device_center_list_view_item_sub_state_no_sync_error">No sync error</string>
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA can’t sync or backup this folder because the file system on your device is not supported</string>
+    <string name="device_center_list_view_item_sub_state_unsupported_file_system">MEGA не может синхронизировать эту папку или сделать резервную копию, потому что файловая система на вашем устройстве не поддерживается</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
     <string name="device_center_list_view_item_sub_state_invalid_remote_type">Выбранную папку невозможно синхронизировать</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
@@ -73,13 +73,13 @@
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
     <string name="device_center_list_view_item_sub_state_account_expired">Невозможно синхронизировать или создать резервную копию этой папки, так как срок действия вашего плана истёк</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
-    <string name="device_center_list_view_item_sub_state_foreign_target_overshare">Folder can’t be synced as the user who shared this folder has reached their storage quota</string>
+    <string name="device_center_list_view_item_sub_state_foreign_target_overshare">Невозможно синхронизировать папку, так как у пользователя, который поделился ей, хранилище полностью заполнено</string>
     <!-- The name of the Device or Folder Sub State when its code is REMOTE_PATH_HAS_CHANGED -->
     <string name="device_center_list_view_item_sub_state_remote_path_has_changed">Не удалось найти папку в MEGA, так как она была перемещена или удалена, либо у вас нет доступа.</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
-    <string name="device_center_list_view_item_sub_state_share_non_full_access">Folder can’t be synced as it’s a shared folder without full access</string>
+    <string name="device_center_list_view_item_sub_state_share_non_full_access">Папку нельзя синхронизировать, так как это общая папка без полного доступа</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
-    <string name="device_center_list_view_item_sub_state_put_nodes_error">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the desktop app.</string>
+    <string name="device_center_list_view_item_sub_state_put_nodes_error">Файлы в этой папке невозможно синхронизировать или создать их резервную копию. Вам нужно будет повторно включить синхронизацию или резервное копирование из настольного приложения.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
     <string name="device_center_list_view_item_sub_state_active_sync_below_path">Папку нельзя синхронизировать, так как она уже содержит синхронизируемые папки</string>
     <!-- The name of the Device or Folder Sub State when its code is VBOXSHAREDFOLDER_UNSUPPORTED -->
@@ -87,17 +87,17 @@
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
     <string name="device_center_list_view_item_sub_state_account_blocked">Невозможно синхронизировать или создать резервную копию этой папки, так как аккаунт заблокирован</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
-    <string name="device_center_list_view_item_sub_state_unknown_temporary_error">Problem syncing or backing up this folder. Try again later. If the issue continues, contact support.</string>
+    <string name="device_center_list_view_item_sub_state_unknown_temporary_error">Проблема с синхронизацией или резервным копированием этой папки. Повторите попытку позже. Если проблема не исчезнет, обратитесь в поддержку.</string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
     <string name="device_center_list_view_item_sub_state_too_many_action_packets">Аккаунт перезагружен. Любые пропущенные обновления ваших резервных копий или синхронизаций не были применены.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
-    <string name="device_center_list_view_item_sub_state_logged_out">Sync or backup has been stopped as you appear to have logged out of the desktop app. Log back in via the desktop app, and resume the sync or backup.</string>
+    <string name="device_center_list_view_item_sub_state_logged_out">Синхронизация или резервное копирование остановлены, поскольку вы, похоже, вышли из настольного приложения. Снова войдите в систему в настольном приложении и возобновите синхронизацию или резервное копирование.</string>
     <!-- The name of the Device or Folder Sub State when its code is MISSING_PARENT_NODE -->
     <string name="device_center_list_view_item_sub_state_missing_parent_node">N/A</string>
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="device_center_list_view_item_sub_state_backup_source_not_below_drive">Не удаётся найти папку на внешнем диске.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
-    <string name="device_center_list_view_item_sub_state_active_sync_same_path">There’s already a synced folder at the same path</string>
+    <string name="device_center_list_view_item_sub_state_active_sync_same_path">По тому же пути уже есть синхронизируемая папка</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
     <string name="device_center_list_view_item_sub_state_could_not_move_cloud_nodes">Не удалось переименовать.</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
@@ -105,7 +105,7 @@
     <!-- The name of the Device or Folder Sub State when its code is SYNC_CONFIG_READ_FAILURE -->
     <string name="device_center_list_view_item_sub_state_sync_config_read_failure">Не удалось прочитать конфигурацию синхронизации. Повторите попытку позже или проверьте права доступа к папке.</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_DRIVE_PATH -->
-    <string name="device_center_list_view_item_sub_state_unknown_drive_path">Sync folder location is unknown</string>
+    <string name="device_center_list_view_item_sub_state_unknown_drive_path">Расположение папки синхронизации неизвестно</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
     <string name="device_center_list_view_item_sub_state_invalid_scan_interval">Недействительный интервал сканирования. Проверьте настройку интервала сканирования и попробуйте ещё раз.</string>
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
@@ -125,17 +125,17 @@
     <!-- The name for specific Sub States to indicate that something went wrong -->
     <string name="device_center_list_view_item_sub_state_message_something_went_wrong">Something went wrong.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
-    <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">Folder can’t be synced or backed up as the MEGA folder is in the Rubbish bin</string>
+    <string name="device_center_list_view_item_sub_state_message_node_in_rubbish_bin">Папку невозможно синхронизировать или создать её резервную копию, так как папка MEGA находится в Корзине</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
     <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive_now">Не удалось найти папку на вашем устройстве. Повторите попытку позже.</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
     <string name="device_center_list_view_item_sub_state_message_cannot_locate_local_drive">Не удалось найти папку на вашем устройстве</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">Problem syncing or backing up this folder because of changes to the MEGA folder. Stop the sync or backup and try setting it up again in the desktop app, or contact support.</string>
+    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_recent_changes">Проблема с синхронизацией или резервным копированием этой папки из-за изменений в папке MEGA. Остановите синхронизацию или резервное копирование и попробуйте настроить их снова в настольном приложении или обратитесь в поддержку.</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
     <string name="device_center_list_view_item_sub_state_message_folder_backup_issue">Проблема с синхронизацией или резервным копированием этой папки. Остановите синхронизацию или резервное копирование и попробуйте настроить их снова в настольном приложении или обратитесь в поддержку.</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
-    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Folder can’t be synced as it’s already inside a synced folder</string>
+    <string name="device_center_list_view_item_sub_state_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">Папку нельзя синхронизировать, так как она уже находится внутри синхронизируемой папки</string>
     <!-- The name of the Device Status informing the User that Camera Uploads is disabled for the Current Device -->
     <string name="device_center_list_view_item_status_camera_uploads_disabled">Загрузки из камеры отключены</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
@@ -157,7 +157,7 @@
     <!-- Text to show in the Device Center for a No Network State when there is no network connectivity -->
     <string name="device_center_no_network_state">Нет подключения к Интернету</string>
     <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
-    <string name="device_center_list_view_item_sub_state_local_filesystem_mismatch">Files in this folder can’t be synced or backed up. You will need to re-enable the sync or backup from the desktop app.</string>
+    <string name="device_center_list_view_item_sub_state_local_filesystem_mismatch">Файлы в этой папке невозможно синхронизировать или создать их резервную копию. Вам нужно будет повторно включить синхронизацию или резервное копирование из настольного приложения.</string>
     <!-- Text to display in Device Center for an empty state when inspecting a device where no sync or backup has been configured -->
     <string name="device_center_nothing_setup_state">Пока ничего не настроено</string>
     <!-- The hint text for the search bar in the Device Center feature when the User is searching for Devices -->

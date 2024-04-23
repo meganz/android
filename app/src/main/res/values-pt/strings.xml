@@ -854,7 +854,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Muitas tentativas de login incorretas. Por favor, aguarde uma hora.</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">Esta conta ainda não foi confirmada. Acesse o seu email.</string>
+    <string name="account_not_validated_login">Acesse o seu email e use o link para confirmar a sua conta.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">O link da pasta não está disponível</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->

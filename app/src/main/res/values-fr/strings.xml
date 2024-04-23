@@ -854,7 +854,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Trop de tentatives infructueuses de connexion, veuillez patienter pendant une heure.</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">Ce compte n’a pas encore été validé. Vérifiez votre boîte de réception des courriels.</string>
+    <string name="account_not_validated_login">Vérifiez votre boîte de réception des courriels et suivez le lien pour confirmer votre compte.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Le lien de dossier est inaccessible</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->

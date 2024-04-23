@@ -834,7 +834,7 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">ログインに失敗した回数が多すぎます。1時間お待ちください</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">このアカウントはまだ検証されていません。メール受信箱をご確認ください。</string>
+    <string name="account_not_validated_login">メール受信箱を確認し、リンクをクリックしてアカウントを認証してください。</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">フォルダリンクが使用できません</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->

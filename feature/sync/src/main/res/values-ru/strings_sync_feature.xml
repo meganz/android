@@ -129,7 +129,7 @@
     <!-- Sync stalled issue reason is move or rename-->
     <string name="sync_stalled_issue_move_or_rename">Невозможно переместить или переименовать</string>
     <!-- Sync stalled issue reason is delete or move scanning-->
-    <string name="sync_stalled_issue_delete_or_move_scanning">Поиск ожидающих операций удаления или перемещения</string>
+    <string name="sync_stalled_issue_delete_or_move_scanning">Delete or move action is waiting for scan</string>
     <!-- Sync stalled issue reason is delete or move-->
     <string name="sync_stalled_issue_delete_or_move">Пока нельзя удалить</string>
     <!-- Sync stalled issue reason is upload issue-->
@@ -191,9 +191,9 @@
     <!-- Sync stalled issue reason is Name clash detailed description-->
     <string name="sync_stalled_issue_name_clash_detail">На одной стороне синхронизации есть несколько элементов с одинаковым названием, которые на другой стороне синхронизации станут одним и тем же элементом</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_mega">A move or rename action was detected in MEGA, but couldn’t be replicated locally.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_mega">В MEGA обнаружена операция перемещения или переименования, но её не удалось воспроизвести локально.</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_local">A move or rename action was detected locally, but couldn’t be replicated in MEGA.</string>
+    <string name="sync_stalled_issues_move_or_rename_message_local">Обнаружена локальная операция перемещения или переименования, но её не удалось воспроизвести в MEGA.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Ожидание завершения сканирования, чтобы определить, был ли файл перемещён или удалён.</string>
     <!-- Sync subtitle for sync screen to choose folders-->
