@@ -14,6 +14,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
+import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.presentation.chat.ChatViewModel
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.controls.text.MegaSpannedClickableText
@@ -31,15 +32,18 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 @Composable
 fun CallRecordingConsentDialog(
     viewModel: ChatViewModel = hiltViewModel(),
+    meetingViewModel: MeetingActivityViewModel? = null
 ) {
     CallRecordingConsentDialog(
         onConfirm = {
             viewModel.setIsRecordingConsentAccepted(value = true)
             viewModel.setShowRecordingConsentDialogConsumed()
+            meetingViewModel?.setShowRecordingConsentDialogConsumed()
         },
         onDismiss = {
             viewModel.setIsRecordingConsentAccepted(value = false)
             viewModel.setShowRecordingConsentDialogConsumed()
+            meetingViewModel?.setShowRecordingConsentDialogConsumed()
         },
     )
 }
