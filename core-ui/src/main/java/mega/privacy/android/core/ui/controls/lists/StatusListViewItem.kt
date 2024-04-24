@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.core.ui.controls.status.MegaStatusIndicator
 import mega.privacy.android.core.ui.controls.status.StatusColor
 import mega.privacy.android.core.ui.controls.text.MegaText
@@ -93,7 +94,7 @@ fun StatusListViewItem(
             }
             if (onMoreClicked != null) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_more),
+                    painter = painterResource(id = IconPackR.drawable.ic_more_vertical_medium_regular_outline),
                     contentDescription = "More",
                     modifier = Modifier
                         .size(24.dp)

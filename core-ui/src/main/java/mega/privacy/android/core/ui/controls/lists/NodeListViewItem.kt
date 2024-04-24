@@ -64,7 +64,7 @@ fun NodeListViewItem(
     titleColor: TextColor = TextColor.Primary,
     subtitleColor: TextColor = TextColor.Secondary,
     @DrawableRes accessPermissionIcon: Int? = null,
-    titleOverflow: LongTextBehaviour = LongTextBehaviour.Clip(),
+    titleOverflow: LongTextBehaviour = LongTextBehaviour.MiddleEllipsis,
     subTitleOverflow: LongTextBehaviour = LongTextBehaviour.Clip(),
     showOffline: Boolean = false,
     showVersion: Boolean = false,
@@ -210,7 +210,7 @@ fun NodeListViewItem(
             }
             if (onMoreClicked != null) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_more),
+                    painter = painterResource(id = IconPackR.drawable.ic_more_vertical_medium_regular_outline),
                     contentDescription = "More",
                     modifier = Modifier
                         .size(24.dp)

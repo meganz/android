@@ -13,6 +13,17 @@ import androidx.compose.ui.Modifier
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.theme.MegaTheme
 
+/**
+ * MegaScaffold is a wrapper around Scaffold that provides a convenient way to show a snackBar from any view inside this scaffold.
+ * It also provides a the appropriate look and feel,such as background color or snack bar style.
+ *
+ * @param modifier Modifier
+ * @param scaffoldState ScaffoldState
+ * @param topBar TopBar
+ * @param bottomBar BottomBar
+ * @param floatingActionButton FloatingActionButton
+ * @param content Content
+ */
 @Composable
 fun MegaScaffold(
     modifier: Modifier = Modifier,

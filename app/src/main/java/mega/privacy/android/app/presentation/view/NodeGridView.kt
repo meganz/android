@@ -51,13 +51,13 @@ fun <T : TypedNode> NodeGridView(
     showSortOrder: Boolean,
     gridState: LazyGridState,
     showMediaDiscoveryButton: Boolean,
+    fileTypeIconMapper: FileTypeIconMapper,
     modifier: Modifier = Modifier,
     spanCount: Int = 2,
     showChangeViewType: Boolean = true,
     isPublicNode: Boolean = false,
     inSelectionMode: Boolean = false,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
-    fileTypeIconMapper: FileTypeIconMapper,
 ) {
     LazyVerticalGrid(
         state = gridState,

@@ -29,7 +29,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.R
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.core.ui.controls.appbar.LocalMegaAppBarColors
 import mega.privacy.android.core.ui.controls.tooltips.Tooltip
 import mega.privacy.android.core.ui.model.MenuAction
@@ -146,7 +146,7 @@ private fun DropDown(
     }
     Box(contentAlignment = Alignment.BottomEnd) {
         IconButtonWithTooltip(
-            iconPainter = painterResource(id = R.drawable.ic_more),
+            iconPainter = painterResource(id = IconPackR.drawable.ic_more_vertical_medium_regular_outline),
             description = stringResource(id = com.google.android.material.R.string.abc_action_menu_overflow_description),
             onClick = { showMoreMenu = !showMoreMenu },
             modifier = Modifier.testTag(TAG_MENU_ACTIONS_SHOW_MORE),
@@ -187,7 +187,7 @@ private fun DropDown(
     }
     Box(contentAlignment = Alignment.BottomEnd) {
         IconButtonWithTooltip(
-            iconPainter = painterResource(id = R.drawable.ic_more),
+            iconPainter = painterResource(id = IconPackR.drawable.ic_more_vertical_medium_regular_outline),
             description = stringResource(id = com.google.android.material.R.string.abc_action_menu_overflow_description),
             onClick = { showMoreMenu = !showMoreMenu },
             modifier = Modifier.testTag(TAG_MENU_ACTIONS_SHOW_MORE),
