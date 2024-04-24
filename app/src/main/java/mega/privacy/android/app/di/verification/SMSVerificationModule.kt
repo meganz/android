@@ -10,7 +10,6 @@ import mega.privacy.android.app.presentation.verification.model.mapper.SMSVerifi
 import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerificationTextErrorMapper
 import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerificationTextErrorMapperImpl
 import mega.privacy.android.domain.repository.VerificationRepository
-import mega.privacy.android.domain.usecase.GetCountryCallingCodes
 import mega.privacy.android.domain.usecase.IsSMSVerificationShown
 import mega.privacy.android.domain.usecase.verification.DefaultMonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.DefaultMonitorVerifiedPhoneNumber
@@ -58,13 +57,6 @@ abstract class SMSVerificationModule {
         @Provides
         fun provideIsSMSVerificationShown(repository: VerificationRepository): IsSMSVerificationShown =
             IsSMSVerificationShown(repository::isSMSVerificationShown)
-
-        /**
-         * Provides the Use Case [GetCountryCallingCodes]
-         */
-        @Provides
-        fun provideGetCountryCallingCodes(repository: VerificationRepository): GetCountryCallingCodes =
-            GetCountryCallingCodes(repository::getCountryCallingCodes)
 
         /**
          * Provides the Use Case [SendSMSVerificationCode]

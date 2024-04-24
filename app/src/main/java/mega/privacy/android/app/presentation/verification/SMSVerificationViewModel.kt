@@ -15,9 +15,9 @@ import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.verification.model.SMSVerificationUIState
 import mega.privacy.android.app.presentation.verification.model.mapper.SMSVerificationTextMapper
 import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerificationTextErrorMapper
-import mega.privacy.android.domain.usecase.GetCountryCallingCodes
 import mega.privacy.android.domain.usecase.GetCurrentCountryCodeUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
+import mega.privacy.android.domain.usecase.verification.GetCountryCallingCodesUseCase
 import mega.privacy.android.domain.usecase.verification.GetFormattedPhoneNumberUseCase
 import mega.privacy.android.domain.usecase.verification.SendSMSVerificationCode
 import mega.privacy.android.domain.usecase.verification.SetSMSVerificationShownUseCase
@@ -31,7 +31,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SMSVerificationViewModel @Inject constructor(
     private val setSMSVerificationShownUseCase: SetSMSVerificationShownUseCase,
-    private val getCountryCallingCodes: GetCountryCallingCodes,
+    private val getCountryCallingCodesUseCase: GetCountryCallingCodesUseCase,
     private val sendSMSVerificationCode: SendSMSVerificationCode,
     private val getCurrentCountryCodeUseCase: GetCurrentCountryCodeUseCase,
     private val getFormattedPhoneNumberUseCase: GetFormattedPhoneNumberUseCase,
@@ -152,7 +152,7 @@ class SMSVerificationViewModel @Inject constructor(
     private fun getCountryCodes() {
         viewModelScope.launch {
             runCatching {
-                val countryCallingCodes = getCountryCallingCodes()
+                val countryCallingCodes = getCountryCallingCodesUseCase()
                 resolveSelectedDialCode(countryCallingCodes)
             }.onFailure {
                 Timber.d("Error getCountryCallingCodes $it")

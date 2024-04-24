@@ -12,9 +12,9 @@ import mega.privacy.android.app.presentation.verification.model.SMSVerificationU
 import mega.privacy.android.app.presentation.verification.model.mapper.SMSVerificationTextMapper
 import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerificationTextErrorMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.usecase.GetCountryCallingCodes
 import mega.privacy.android.domain.usecase.GetCurrentCountryCodeUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
+import mega.privacy.android.domain.usecase.verification.GetCountryCallingCodesUseCase
 import mega.privacy.android.domain.usecase.verification.GetFormattedPhoneNumberUseCase
 import mega.privacy.android.domain.usecase.verification.SendSMSVerificationCode
 import mega.privacy.android.domain.usecase.verification.SetSMSVerificationShownUseCase
@@ -38,7 +38,7 @@ class SMSVerificationViewModelTest {
     private lateinit var underTest: SMSVerificationViewModel
 
     private val setSMSVerificationShownUseCase: SetSMSVerificationShownUseCase = mock()
-    private val getCountryCallingCodes: GetCountryCallingCodes = mock()
+    private val getCountryCallingCodesUseCase: GetCountryCallingCodesUseCase = mock()
     private val sendSMSVerificationCode: SendSMSVerificationCode = mock()
     private val smsVerificationTextMapper: SMSVerificationTextMapper = mock()
     private val smsVerificationTextErrorMapper: SmsVerificationTextErrorMapper = mock()
@@ -64,11 +64,11 @@ class SMSVerificationViewModelTest {
             whenever(savedState.get<String>(COUNTRY_CODE)).thenReturn(countryCode)
             whenever(savedState.get<String>(COUNTRY_NAME)).thenReturn(countryName)
             whenever(savedState.get<String>(DIAL_CODE)).thenReturn(dialCode)
-            whenever(getCountryCallingCodes()).thenReturn(countryCallingCodes)
+            whenever(getCountryCallingCodesUseCase()).thenReturn(countryCallingCodes)
         }
         underTest = SMSVerificationViewModel(
             setSMSVerificationShownUseCase = setSMSVerificationShownUseCase,
-            getCountryCallingCodes = getCountryCallingCodes,
+            getCountryCallingCodesUseCase = getCountryCallingCodesUseCase,
             sendSMSVerificationCode = sendSMSVerificationCode,
             getCurrentCountryCodeUseCase = getCurrentCountryCodeUseCase,
             getFormattedPhoneNumberUseCase = getFormattedPhoneNumberUseCase,
