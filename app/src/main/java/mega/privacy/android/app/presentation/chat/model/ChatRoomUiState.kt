@@ -1,0 +1,79 @@
+package mega.privacy.android.app.presentation.chat.model
+
+import androidx.compose.runtime.Immutable
+import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatRoomChange
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+
+/**
+ * Chat room UI state.
+ *
+ * @property chatId                  Handle identifying the chat.
+ * @property ownPrivilege            Own privilege level in this chatroom [ChatRoomPermission].
+ * @property numPreviewers           The number of previewers in this chat.
+ * @property peerPrivilegesByHandles Map of peer privileges by their handles.
+ * @property peerCount               Number of participants in the chat.
+ * @property peerHandlesList         List of handles depending on the position of the peer.
+ * @property peerPrivilegesList      List of peer privileges depending on the position of the peer.
+ * @property isGroup                 If chat room is a group chat room.
+ * @property isPublic                If chat room is public.
+ * @property isPreview               If chat room is in preview mode.
+ * @property authorizationToken      Get the authorization token in preview mode.
+ *                                   This method returns an authorization token that can be used to authorize
+ *                                   nodes received as attachments wle hiin preview mode, so the node can be
+ *                                   downloaded/imported into the account via MegaApi::authorizeChatNode.
+ *                                   If the chat is not in preview mode, this function will return NULL.
+ * @property title                   Title of the chat if any.
+ * @property hasCustomTitle          True if the chatroom has a customized title, false otherwise.
+ * @property unreadCount             Number of unread messages for the chatroom.
+ * @property userTyping              Handle of the user who is typing or has stopped typing a message.
+ * @property userHandle              The handle of the user who has been joined/removed/change its name.
+ *                                   This method return a valid value when hasChanged(CHANGE_TYPE_PARTICIPANTS) true.
+ * @property isActive                True if the chat is active, false otherwise.
+ *                                   Returns whether the user is member of the chatroom (for group chats),
+ *                                   or the user is contact with the peer (for 1on1 chats).
+ * @property isArchived              If chat room is archived.
+ * @property retentionTime           Retention time.
+ * @property creationTime            Returns the creation timestamp of the chat.
+ * @property isMeeting               If chat room is a meeting.
+ * @property isWaitingRoom           If chat room is a waiting room.
+ * @property isOpenInvite            True if users with [ChatRoomPermission.Standard], can invite other users into the chat
+ * @property isSpeakRequest          True if during calls, non moderator users, must request permission to speak.
+ * @property changes                 Changes [ChatRoomChange].
+ */
+@Immutable
+data class ChatRoomUiState(
+    val chatId: Long = MEGACHAT_INVALID_HANDLE,
+    val ownPrivilege: ChatRoomPermission = ChatRoomPermission.Unknown,
+    val numPreviewers: Long = 0L,
+    val peerPrivilegesByHandles: Map<Long, ChatRoomPermission> = mapOf(),
+    val peerCount: Long = 0L,
+    val peerHandlesList: List<Long> = emptyList(),
+    val peerPrivilegesList: List<ChatRoomPermission> = emptyList(),
+    val isGroup: Boolean = false,
+    val isPublic: Boolean = false,
+    val isPreview: Boolean = false,
+    val authorizationToken: String? = null,
+    val title: String = "",
+    val hasCustomTitle: Boolean = false,
+    val unreadCount: Int = 0,
+    val userTyping: Long = 0L,
+    val userHandle: Long = 0L,
+    val isActive: Boolean = false,
+    val isArchived: Boolean = false,
+    val retentionTime: Long = 0L,
+    val creationTime: Long = 0L,
+    val isMeeting: Boolean = false,
+    val isWaitingRoom: Boolean = false,
+    val isOpenInvite: Boolean = false,
+    val isSpeakRequest: Boolean = false,
+    val changes: List<ChatRoomChange>? = null,
+) {
+    /**
+     * Checks if the chat has a change.
+     *
+     * @param change [ChatRoomChange] to check.
+     * @return True if the chat has the change in question, false otherwise.
+     */
+    fun hasChanged(change: ChatRoomChange) = changes?.contains(change) == true
+}

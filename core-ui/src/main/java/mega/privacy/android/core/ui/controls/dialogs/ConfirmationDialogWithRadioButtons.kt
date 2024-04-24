@@ -251,7 +251,11 @@ internal const val CONFIRMATION_DIALOG_SUBTITLE_TAG =
     "confirmation_dialog_with_radio_buttons:text_subtitle"
 internal const val CONFIRMATION_DIALOG_OPTIONS_TAG =
     "confirmation_dialog_with_radio_buttons:text_option"
-internal const val CONFIRMATION_DIALOG_CANCEL_BUTTON_TAG =
+
+/**
+ * Test tag for the cancel button
+ */
+const val CONFIRMATION_DIALOG_CANCEL_BUTTON_TAG =
     "confirmation_dialog_with_radio_buttons:button_cancel"
 
 /**
