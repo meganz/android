@@ -4,8 +4,6 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -16,18 +14,17 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
-import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.node.CopyChatNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import nz.mega.sdk.MegaNode
@@ -51,9 +48,8 @@ internal class MediaPlayerViewModelTest {
     private lateinit var checkNameCollision: CheckNameCollision
     private lateinit var checkNameCollisionUseCase: CheckNameCollisionUseCase
     private lateinit var copyNodeUseCase: CopyNodeUseCase
-    private lateinit var legacyCopyNodeUseCase: LegacyCopyNodeUseCase
+    private lateinit var copyChatNodeUseCase: CopyChatNodeUseCase
     private lateinit var moveNodeUseCase: MoveNodeUseCase
-    private lateinit var getNodeByHandle: GetNodeByHandle
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
         on {
             invoke()
@@ -76,14 +72,12 @@ internal class MediaPlayerViewModelTest {
         copyNodeUseCase = mock()
         moveNodeUseCase = mock()
         checkNameCollisionUseCase = mock()
-        legacyCopyNodeUseCase = mock()
-        getNodeByHandle = mock()
+        copyChatNodeUseCase = mock()
         underTest = MediaPlayerViewModel(
             checkNameCollision = checkNameCollision,
             copyNodeUseCase = copyNodeUseCase,
             moveNodeUseCase = moveNodeUseCase,
-            getNodeByHandle = getNodeByHandle,
-            legacyCopyNodeUseCase = legacyCopyNodeUseCase,
+            copyChatNodeUseCase = copyChatNodeUseCase,
             checkNameCollisionUseCase = checkNameCollisionUseCase,
             legacyPublicAlbumPhotoNodeProvider = mock(),
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
@@ -203,30 +197,30 @@ internal class MediaPlayerViewModelTest {
         }
 
     @Test
-    internal fun `test copy complete snack bar is shown when file is imported to different directory`() =
+    internal fun `test that copy complete snack bar is shown when file is imported to different directory`() =
         runTest {
-            val selectedNode = 73248538798194
-            val newParentNode = 158401030174851
-            val nodeToImport = mock<MegaNode> {
-                on { handle }.thenReturn(selectedNode)
-            }
-            val parentNode = mock<MegaNode>()
-            whenever(getNodeByHandle(newParentNode)).thenReturn(parentNode)
+            val newParentNode = NodeId(158401030174851)
+            val chatId = 1000L
+            val messageId = 2000L
+            val nodeToImport = mock<MegaNode>()
             whenever(
                 checkNameCollisionUseCase.check(
                     node = nodeToImport,
-                    parentNode = parentNode,
+                    parentHandle = newParentNode.longValue,
                     type = NameCollisionType.COPY,
                 )
-            ).thenReturn(Single.error(MegaNodeException.ChildDoesNotExistsException()))
+            ).thenThrow(MegaNodeException.ChildDoesNotExistsException())
             whenever(
-                legacyCopyNodeUseCase.copy(
-                    node = nodeToImport,
-                    parentHandle = newParentNode
+                copyChatNodeUseCase(
+                    chatId = chatId,
+                    messageId = messageId,
+                    newNodeParent = newParentNode
                 )
-            ).thenReturn(Completable.complete())
-            underTest.importNode(
+            ).thenReturn(NodeId(1234567890))
+            underTest.importChatNode(
                 node = nodeToImport,
+                chatId = chatId,
+                messageId = messageId,
                 newParentHandle = newParentNode,
             )
             advanceUntilIdle()
@@ -239,28 +233,31 @@ internal class MediaPlayerViewModelTest {
     internal fun `test that onExceptionThrown is triggered when import failed`() =
         runTest {
             val selectedNode = 73248538798194
-            val newParentNode = 158401030174851
+            val newParentNode = NodeId(158401030174851)
+            val chatId = 1000L
+            val messageId = 2000L
             val nodeToImport = mock<MegaNode> {
                 on { handle }.thenReturn(selectedNode)
             }
-            val parentNode = mock<MegaNode>()
-            whenever(getNodeByHandle(newParentNode)).thenReturn(parentNode)
             whenever(
                 checkNameCollisionUseCase.check(
                     node = nodeToImport,
-                    parentNode = parentNode,
+                    parentHandle = newParentNode.longValue,
                     type = NameCollisionType.COPY,
                 )
-            ).thenReturn(Single.error(MegaNodeException.ChildDoesNotExistsException()))
+            ).thenThrow(MegaNodeException.ChildDoesNotExistsException())
             val runtimeException = RuntimeException("Import node failed")
             whenever(
-                legacyCopyNodeUseCase.copy(
-                    node = nodeToImport,
-                    parentHandle = newParentNode
+                copyChatNodeUseCase(
+                    chatId = chatId,
+                    messageId = messageId,
+                    newNodeParent = newParentNode
                 )
-            ).thenReturn(Completable.error(runtimeException))
-            underTest.importNode(
+            ).thenThrow(runtimeException)
+            underTest.importChatNode(
                 node = nodeToImport,
+                chatId = chatId,
+                messageId = messageId,
                 newParentHandle = newParentNode,
             )
             advanceUntilIdle()

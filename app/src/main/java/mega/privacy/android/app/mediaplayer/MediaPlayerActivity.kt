@@ -100,9 +100,17 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
     internal val selectImportFolderLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val node = getChatMessageNode()
+            val chatMessage = getChatMessage()
+            val chatId = chatMessage.first
+            val messageId = chatMessage.second?.msgId
             val toHandle = result.data?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
-            if (node != null && toHandle != null) {
-                viewModel.importNode(node = node, newParentHandle = toHandle)
+            if (node != null && toHandle != null && messageId != null) {
+                viewModel.importChatNode(
+                    node = node,
+                    chatId = chatId,
+                    messageId = messageId,
+                    newParentHandle = NodeId(toHandle)
+                )
             }
         }
 

@@ -49,17 +49,6 @@ class LegacyCopyNodeUseCase @Inject constructor(
     /**
      * Copies a node.
      *
-     * @param node          The MegaNode to copy.
-     * @param parentHandle  The parent MegaNode where the node has to be copied.
-     * @return Completable.
-     */
-    fun copy(node: MegaNode?, parentHandle: Long) = rxCompletable(ioDispatcher) {
-        copyAsync(node, getMegaNode(parentHandle))
-    }
-
-    /**
-     * Copies a node.
-     *
      * @param node          The MegaNoe to copy.
      * @param parentNode    The parent MegaNode where the node has to be copied.
      * @param newName       New name for the copied node. Null if it wants to keep the original one.
@@ -79,7 +68,7 @@ class LegacyCopyNodeUseCase @Inject constructor(
      * @param newName       New name for the copied node. Null if it wants to keep the original one.
      * @return CopyRequestResult.
      */
-    suspend fun copyAsync(
+    private suspend fun copyAsync(
         node: MegaNode?,
         parentNode: MegaNode?,
         newName: String? = null,

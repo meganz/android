@@ -3,13 +3,9 @@ package mega.privacy.android.app.mediaplayer
 import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,9 +14,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.mediaplayer.model.MediaPlayerMenuClickedEvent
 import mega.privacy.android.app.mediaplayer.model.MediaPlayerState
 import mega.privacy.android.app.mediaplayer.service.Metadata
@@ -28,12 +22,12 @@ import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.photos.util.LegacyPublicAlbumPhotoNodeProvider
-import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.node.CopyChatNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import nz.mega.sdk.MegaNode
@@ -52,13 +46,12 @@ class MediaPlayerViewModel @Inject constructor(
     private val checkNameCollision: CheckNameCollision,
     private val copyNodeUseCase: CopyNodeUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
-    private val getNodeByHandle: GetNodeByHandle,
-    private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
+    private val copyChatNodeUseCase: CopyChatNodeUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val legacyPublicAlbumPhotoNodeProvider: LegacyPublicAlbumPhotoNodeProvider,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
-) : BaseRxViewModel() {
+) : ViewModel() {
 
     private val collision = SingleLiveEvent<NameCollision>()
     private val throwable = SingleLiveEvent<Throwable>()
@@ -170,66 +163,62 @@ class MediaPlayerViewModel @Inject constructor(
         }
     }
 
-
     /**
-     * Imports a node if there is no name collision.
+     * Imports a chat node if there is no name collision.
      *
      * @param node              Node handle to copy.
+     * @param chatId            Chat ID where the node is.
+     * @param messageId         Message ID where the node is.
      * @param newParentHandle   Parent handle in which the node will be copied.
      */
-    fun importNode(node: MegaNode, newParentHandle: Long) =
-        viewModelScope.launch {
-            val parentNode = getNodeByHandle(newParentHandle)
+    fun importChatNode(
+        node: MegaNode,
+        chatId: Long,
+        messageId: Long,
+        newParentHandle: NodeId,
+    ) = viewModelScope.launch {
+        runCatching {
             checkNameCollisionUseCase.check(
                 node = node,
-                parentNode = parentNode,
+                parentHandle = newParentHandle.longValue,
                 type = NameCollisionType.COPY,
-            ).observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = { collisionResult -> collision.value = collisionResult },
-                    onError = { error ->
-                        when (error) {
-                            is MegaNodeException.ChildDoesNotExistsException -> {
-                                legacyCopyNodeUseCase.copy(
-                                    node = node,
-                                    parentHandle = newParentHandle
-                                ).subscribeAndComplete(
-                                    completeAction = {
-                                        snackbarMessage.value =
-                                            R.string.context_correctly_copied
-                                    },
-                                    errorAction = { copyError ->
-                                        throwable.value = copyError
-                                    })
-                            }
-
-                            else -> Timber.e(error)
-                        }
-                    }
-                )
-                .addTo(composite)
-        }
-
-
-    private fun Completable.subscribeAndComplete(
-        addToComposite: Boolean = false,
-        completeAction: (() -> Unit)? = null,
-        errorAction: ((Throwable) -> Unit)? = null,
-    ) {
-        subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = {
-                    completeAction?.invoke()
-                },
-                onError = { error ->
-                    errorAction?.invoke(error)
-                    Timber.e(error)
+            )
+        }.onSuccess { collisionResult ->
+            collision.value = collisionResult
+        }.onFailure { throwable ->
+            when (throwable) {
+                is MegaNodeException.ChildDoesNotExistsException -> {
+                    copyChatNode(chatId, messageId, newParentHandle)
                 }
-            ).also {
-                if (addToComposite) it.addTo(composite)
+
+                else -> Timber.e(throwable)
             }
+        }
     }
+
+    /**
+     * Copies a chat node
+     * @param chatId Chat ID where the node is.
+     * @param messageId Message ID where the node is.
+     * @param newParentNodeId Parent handle in which the node will be copied.
+     */
+    private fun copyChatNode(chatId: Long, messageId: Long, newParentNodeId: NodeId) {
+        viewModelScope.launch {
+            runCatching {
+                copyChatNodeUseCase(
+                    chatId = chatId,
+                    messageId = messageId,
+                    newNodeParent = newParentNodeId,
+                )
+            }.onSuccess {
+                snackbarMessage.value = R.string.context_correctly_copied
+            }.onFailure { copyError ->
+                Timber.e(copyError, "The chat node is not copied")
+                throwable.value = copyError
+            }
+        }
+    }
+
 
     /**
      * Moves a node if there is no name collision.
