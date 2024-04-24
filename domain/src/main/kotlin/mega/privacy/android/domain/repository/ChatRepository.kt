@@ -141,6 +141,13 @@ interface ChatRepository {
     suspend fun getChatFilesFolderId(): NodeId?
 
     /**
+     * Get chat rooms
+     *
+     * @return  List of [ChatRoom]
+     */
+    suspend fun getChatRooms(): List<ChatRoom>
+
+    /**
      * Get all chat rooms
      *
      * @return  List of [CombinedChatRoom]

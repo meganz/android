@@ -2,15 +2,11 @@ package mega.privacy.android.app.contacts.group
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.contacts.usecase.GetContactGroupsUseCase
 import mega.privacy.android.app.utils.notifyObserver
@@ -28,22 +24,21 @@ import javax.inject.Inject
 class ContactGroupsViewModel @Inject constructor(
     getContactGroupsUseCase: GetContactGroupsUseCase,
     private val createGroupChatRoomUseCase: CreateGroupChatRoomUseCase,
-) : BaseRxViewModel() {
+) : ViewModel() {
 
     private val groups: MutableLiveData<List<ContactGroupItem>> = MutableLiveData()
     private var queryString: String? = null
 
     init {
-        getContactGroupsUseCase.get()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { items ->
-                    groups.value = items.toList()
-                },
-                onError = Timber::e
-            )
-            .addTo(composite)
+        viewModelScope.launch {
+            runCatching {
+                getContactGroupsUseCase()
+            }.onSuccess {
+                groups.value = it
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     fun getGroups(): LiveData<List<ContactGroupItem>> =

@@ -340,6 +340,12 @@ internal class ChatRepositoryImpl @Inject constructor(
         localStorageGateway.getChatFilesFolderHandle()?.let { NodeId(it) }
     }
 
+    override suspend fun getChatRooms(): List<ChatRoom> =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getChatRooms()
+                .map { chatRoomMapper(it) }
+        }
+
     override suspend fun getAllChatRooms(): List<CombinedChatRoom> =
         withContext(ioDispatcher) {
             megaChatApiGateway.getChatRooms().mapNotNull { chatRoom ->
