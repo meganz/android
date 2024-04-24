@@ -32,8 +32,9 @@ class AudioQueueViewModel @Inject constructor(
 
     internal fun initMediaQueueItemList(items: List<PlaylistItem>) {
         val queueItems = items.convertToMediaQueueItemList()
+        val playingIndex = queueItems.indexOfFirst { it.type == MediaQueueItemType.Playing }
         _uiState.update {
-            it.copy(items = queueItems)
+            it.copy(items = queueItems, indexOfCurrentPlayingItem = playingIndex)
         }
     }
 
@@ -79,7 +80,8 @@ class AudioQueueViewModel @Inject constructor(
     internal fun updateMediaQueueAfterMediaItemTransition(playingHandle: Long) {
         val index = uiState.value.items.indexOfFirst { playingHandle == it.id.longValue }
         val newItems = uiState.value.items.updateMediaQueueItemType(index)
-        _uiState.update { it.copy(items = newItems) }
+        val playingIndex = newItems.indexOfFirst { it.type == MediaQueueItemType.Playing }
+        _uiState.update { it.copy(items = newItems, indexOfCurrentPlayingItem = playingIndex) }
     }
 
     private fun List<MediaQueueItemUiEntity>.updateMediaQueueItemType(playingIndex: Int) =

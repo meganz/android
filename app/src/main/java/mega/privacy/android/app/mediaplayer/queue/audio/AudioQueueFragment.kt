@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.ui.PlayerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -55,6 +56,8 @@ class AudioQueueFragment : Fragment() {
     lateinit var getThemeMode: GetThemeMode
 
     private val audioQueueViewModel by viewModels<AudioQueueViewModel>()
+
+    private var simpleAudioPlayerView: PlayerView? = null
 
     private var serviceGateway: MediaPlayerServiceGateway? = null
     private var playerServiceViewModelGateway: PlayerServiceViewModelGateway? = null
@@ -92,11 +95,22 @@ class AudioQueueFragment : Fragment() {
                 playerServiceViewModelGateway?.run {
                     audioQueueViewModel.initMediaQueueItemList(getPlaylistItems())
                     audioQueueViewModel.updatePlaybackState(isPaused())
+                    simpleAudioPlayerView?.let { setupPlayerView(it) }
                     tryObservePlaylist()
                     scrollToPlayingPosition()
                 }
             }
         }
+    }
+
+    /**
+     * Setup PlayerView
+     */
+    private fun setupPlayerView(playerView: PlayerView) {
+        serviceGateway?.setupPlayerView(
+            playerView = playerView,
+            showShuffleButton = true
+        )
     }
 
     /**
@@ -150,7 +164,12 @@ class AudioQueueFragment : Fragment() {
                 MegaAppTheme(isDark = themeMode.isDarkMode()) {
                     AudioQueueView(
                         viewModel = audioQueueViewModel,
+                        setupAudioPlayer = { playerView ->
+                            simpleAudioPlayerView = playerView
+                            setupPlayerView(playerView)
+                        },
                         onClick = { _, item -> itemClicked(item) },
+                        onDragFinished = { playerServiceViewModelGateway?.updatePlaySource() },
                         onMove = { from, to ->
                             audioQueueViewModel.updateMediaQueueAfterReorder(from, to)
                             playerServiceViewModelGateway?.swapItems(from, to)

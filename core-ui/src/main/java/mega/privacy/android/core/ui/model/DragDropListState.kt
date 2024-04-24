@@ -2,21 +2,12 @@ package mega.privacy.android.core.ui.model
 
 import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import kotlinx.coroutines.Job
-
-@Composable
-internal fun rememberDragDropListState(
-    lazyListState: LazyListState,
-    onMove: (from: Int, to: Int) -> Unit,
-): DragDropListState =
-    remember { DragDropListState(lazyListState = lazyListState, onMove = onMove) }
 
 /**
  * State for drag and drop reordering of items in a list.
@@ -51,9 +42,12 @@ internal class DragDropListState(
 
     private var overscrollJob by mutableStateOf<Job?>(null)
 
-    fun onDragStart(offset: Offset) {
+    fun onDragStart(offset: Offset, indexOfDisabledItem: Int = -1) {
         lazyListState.layoutInfo.visibleItemsInfo
-            .firstOrNull { item -> offset.y.toInt() in item.offset..(item.offset + item.size) }
+            .firstOrNull { item ->
+                item.index > indexOfDisabledItem &&
+                        offset.y.toInt() in item.offset..(item.offset + item.size)
+            }
             ?.also {
                 draggedItemIndex = it.index
                 initDraggedLayoutInfo = it
@@ -67,31 +61,35 @@ internal class DragDropListState(
         overscrollJob?.cancel()
     }
 
-    fun onDrag(offset: Offset) {
-        draggedDistance += offset.y
+    fun onDrag(offset: Offset, indexOfDisabledItem: Int = -1) {
+        if (draggedItemIndex != null) {
+            draggedDistance += offset.y
 
-        initOffsets?.let { (topOffset, bottomOffset) ->
-            val startOffset = topOffset + draggedDistance
-            val endOffset = bottomOffset + draggedDistance
+            initOffsets?.let { (topOffset, bottomOffset) ->
+                val startOffset = topOffset + draggedDistance
+                val endOffset = bottomOffset + draggedDistance
 
-            draggedItemLayoutInfo?.let { layoutInfo ->
-                lazyListState.layoutInfo.visibleItemsInfo
-                    .filterNot { item ->
-                        item.offsetEnd < startOffset || item.offset > endOffset || layoutInfo.index == item.index
-                    }
-                    .firstOrNull { item ->
-                        val draggedOffset = startOffset - layoutInfo.offset
-                        when {
-                            draggedOffset > 0 -> (endOffset > item.offsetEnd - item.size / 2)
-                            else -> (startOffset < item.offset + item.size / 2)
+                draggedItemLayoutInfo?.let { layoutInfo ->
+                    lazyListState.layoutInfo.visibleItemsInfo
+                        .filterNot { item ->
+                            item.offsetEnd < startOffset || item.offset > endOffset || layoutInfo.index == item.index
                         }
-                    }
-                    ?.also { item ->
-                        draggedItemIndex?.let { current ->
-                            onMove(current, item.index)
+                        .firstOrNull { item ->
+                            val draggedOffset = startOffset - layoutInfo.offset
+                            when {
+                                draggedOffset > 0 -> (endOffset > item.offsetEnd - item.size / 2)
+                                else -> (startOffset < item.offset + item.size / 2)
+                            }
                         }
-                        draggedItemIndex = item.index
-                    }
+                        ?.also { item ->
+                            if (item.index > indexOfDisabledItem) {
+                                draggedItemIndex?.let { current ->
+                                    onMove(current, item.index)
+                                }
+                                draggedItemIndex = item.index
+                            }
+                        }
+                }
             }
         }
     }

@@ -1342,18 +1342,21 @@ class AudioPlayerServiceViewModel @Inject constructor(
         type == FOLDER_LINK_ADAPTER && areCredentialsNullUseCase()
 
     override fun swapItems(current: Int, target: Int) {
-        if (playlistItemsChanged.isEmpty()) {
-            playlistItemsChanged.addAll(playlistItemsFlow.value.first)
-        }
-        Collections.swap(playlistItemsChanged, current, target)
-        val index = playlistItemsChanged[current].index
-        playlistItemsChanged[current] =
-            playlistItemsChanged[current].copy(index = playlistItemsChanged[target].index)
-        playlistItemsChanged[target] = playlistItemsChanged[target].copy(index = index)
+        val indicesOfItems = playlistItemsFlow.value.first.indices
+        if (target in indicesOfItems && current in indicesOfItems) {
+            if (playlistItemsChanged.isEmpty()) {
+                playlistItemsChanged.addAll(playlistItemsFlow.value.first)
+            }
+            Collections.swap(playlistItemsChanged, current, target)
+            val index = playlistItemsChanged[current].index
+            playlistItemsChanged[current] =
+                playlistItemsChanged[current].copy(index = playlistItemsChanged[target].index)
+            playlistItemsChanged[target] = playlistItemsChanged[target].copy(index = index)
 
-        initPlayerSourceChanged()
-        // Swap the items of play source
-        Collections.swap(playSourceChanged, current, target)
+            initPlayerSourceChanged()
+            // Swap the items of play source
+            Collections.swap(playSourceChanged, current, target)
+        }
     }
 
     override fun getIndexFromPlaylistItems(item: PlaylistItem): Int? =
@@ -1375,18 +1378,20 @@ class AudioPlayerServiceViewModel @Inject constructor(
         }
 
     override fun updatePlaySource() {
-        playlistItemsFlow.update {
-            it.copy(playlistItemsChanged.toList())
+        if (playlistItemsChanged.isNotEmpty() && playSourceChanged.isNotEmpty()) {
+            playlistItemsFlow.update {
+                it.copy(playlistItemsChanged.toList())
+            }
+            playerSource.value?.run {
+                playerSource.value =
+                    copy(
+                        mediaItems = playSourceChanged.toList(),
+                        newIndexForCurrentItem = playingPosition
+                    )
+            }
+            playSourceChanged.clear()
+            playlistItemsChanged.clear()
         }
-        playerSource.value?.run {
-            playerSource.value =
-                copy(
-                    mediaItems = playSourceChanged.toList(),
-                    newIndexForCurrentItem = playingPosition
-                )
-        }
-        playSourceChanged.clear()
-        playlistItemsChanged.clear()
     }
 
     override fun isPaused() = paused

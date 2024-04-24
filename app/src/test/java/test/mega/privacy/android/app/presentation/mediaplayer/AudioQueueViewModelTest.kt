@@ -11,7 +11,6 @@ import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemUiEntity
 import mega.privacy.android.app.presentation.time.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
-import mega.privacy.android.icon.pack.R
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -29,25 +28,15 @@ class AudioQueueViewModelTest {
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
     private val isParticipatingInChatCallUseCase = mock<IsParticipatingInChatCallUseCase>()
 
-    private val testIcon = R.drawable.ic_audio_medium_solid
-    private val testNodeId = NodeId(1L)
     private val testName = "Audio"
     private val testType = MediaQueueItemType.Playing
     private val testDuration = 10.minutes
 
-    private val testPlaylistItem = mock<PlaylistItem> {
-        on { nodeHandle }.thenReturn(1L)
-        on { thumbnail }.thenReturn(null)
-        on { nodeName }.thenReturn(testName)
-        on { type }.thenReturn(2)
-        on { duration }.thenReturn(testDuration)
-    }
-
-    private fun getPlaylistItem(handle: Long) = mock<PlaylistItem> {
+    private fun getPlaylistItem(handle: Long, playlistType: Int = 2) = mock<PlaylistItem> {
         on { nodeHandle }.thenReturn(handle)
         on { thumbnail }.thenReturn(null)
         on { nodeName }.thenReturn(testName)
-        on { type }.thenReturn(2)
+        on { type }.thenReturn(playlistType)
         on { duration }.thenReturn(testDuration)
     }
 
@@ -81,28 +70,59 @@ class AudioQueueViewModelTest {
             assertThat(initial.items).isEmpty()
             assertThat(initial.isPaused).isFalse()
             assertThat(initial.currentPlayingPosition).isEqualTo("00:00")
+            assertThat(initial.indexOfCurrentPlayingItem).isEqualTo(-1)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
     fun `test that state is updated correctly after media queue items initialised`() = runTest {
-        val items = listOf(testPlaylistItem, testPlaylistItem)
+        val list = (1..3).map {
+            val handle = it.toLong()
+            initMediaQueueItemMapperResult(
+                handle = handle,
+                itemType = when (it) {
+                    1 -> MediaQueueItemType.Previous
+                    2 -> MediaQueueItemType.Playing
+                    else -> MediaQueueItemType.Next
+                }
+            )
+            getPlaylistItem(handle, it)
+        }
+
+        initUnderTest()
+        underTest.initMediaQueueItemList(list)
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.items).isNotEmpty()
+            assertThat(actual.indexOfCurrentPlayingItem).isEqualTo(1)
+        }
+    }
+
+    private fun initMediaQueueItemMapperResult(
+        handle: Long,
+        itemType: MediaQueueItemType = testType,
+    ) {
+        val nodeId = mock<NodeId> { on { longValue }.thenReturn(handle) }
+        val mediaQueueItem = getMockedMediaQueueItem(nodeId, itemType)
         whenever(
             mediaQueueItemUiEntityMapper(
-                testIcon,
-                null,
-                testNodeId,
-                testName,
-                testType,
-                testDuration
+                icon = 0,
+                thumbnailFile = null,
+                id = NodeId(handle),
+                name = testName,
+                type = itemType,
+                duration = testDuration
             )
-        ).thenReturn(mock())
-        initUnderTest()
-        underTest.initMediaQueueItemList(items)
-        underTest.uiState.test {
-            assertThat(awaitItem().items).isNotEmpty()
-        }
+        ).thenReturn(mediaQueueItem)
+    }
+
+    private fun getMockedMediaQueueItem(
+        nodeId: NodeId,
+        itemType: MediaQueueItemType = testType,
+    ) = mock<MediaQueueItemUiEntity> {
+        on { id }.thenReturn(nodeId)
+        on { type }.thenReturn(itemType)
     }
 
     @Test
@@ -149,29 +169,6 @@ class AudioQueueViewModelTest {
             }
         }
 
-    private fun initMediaQueueItemMapperResult(handle: Long) {
-        val nodeId = mock<NodeId> { on { longValue }.thenReturn(handle) }
-        val mediaQueueItem = getMockedMediaQueueItem(nodeId)
-        whenever(
-            mediaQueueItemUiEntityMapper(
-                icon = 0,
-                thumbnailFile = null,
-                id = NodeId(handle),
-                name = testName,
-                type = testType,
-                duration = testDuration
-            )
-        ).thenReturn(mediaQueueItem)
-    }
-
-    private fun getMockedMediaQueueItem(
-        nodeId: NodeId,
-        itemType: MediaQueueItemType = testType,
-    ) = mock<MediaQueueItemUiEntity> {
-        on { id }.thenReturn(nodeId)
-        on { type }.thenReturn(itemType)
-    }
-
     @Test
     fun `test that state is updated correctly when updateMediaQueueAfterMediaItemTransition is called`() =
         runTest {
@@ -197,11 +194,12 @@ class AudioQueueViewModelTest {
             underTest.initMediaQueueItemList(list)
             underTest.updateMediaQueueAfterMediaItemTransition(0)
             underTest.uiState.test {
-                val actual = awaitItem().items
-                assertThat(actual.size).isEqualTo(3)
-                assertThat(actual[0].type.ordinal).isEqualTo(MediaQueueItemType.Previous.ordinal)
-                assertThat(actual[1].type.ordinal).isEqualTo(MediaQueueItemType.Playing.ordinal)
-                assertThat(actual[2].type.ordinal).isEqualTo(MediaQueueItemType.Next.ordinal)
+                val actual = awaitItem()
+                assertThat(actual.indexOfCurrentPlayingItem).isEqualTo(1)
+                assertThat(actual.items.size).isEqualTo(3)
+                assertThat(actual.items[0].type.ordinal).isEqualTo(MediaQueueItemType.Previous.ordinal)
+                assertThat(actual.items[1].type.ordinal).isEqualTo(MediaQueueItemType.Playing.ordinal)
+                assertThat(actual.items[2].type.ordinal).isEqualTo(MediaQueueItemType.Next.ordinal)
             }
         }
 

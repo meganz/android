@@ -27,7 +27,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.model.DragDropListState
-import mega.privacy.android.core.ui.model.rememberDragDropListState
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
@@ -48,20 +47,24 @@ fun <T : Any> DragDropListView(
     items: List<T>,
     lazyListState: LazyListState,
     onMove: (from: Int, to: Int) -> Unit,
+    onDragFinished: () -> Unit,
     modifier: Modifier = Modifier,
+    indexOfDisabledItem: Int = -1,
     elevation: Dp = 10.dp,
     content: @Composable (index: Int, item: T) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val overscrollJob = remember { mutableStateOf<Job?>(null) }
     val dragDropListState =
-        rememberDragDropListState(lazyListState = lazyListState, onMove = onMove)
+        remember { DragDropListState(lazyListState = lazyListState, onMove = onMove) }
 
     LazyColumn(
         modifier = modifier.setDragGesturesAfterLongPress(
+            indexOfDisabledItem = indexOfDisabledItem,
             dragDropListState = dragDropListState,
             scope = scope,
             overscrollJob = overscrollJob,
+            onDragFinished = onDragFinished
         ),
         state = dragDropListState.lazyListState
     ) {
@@ -84,30 +87,18 @@ fun <T : Any> DragDropListView(
     }
 }
 
-@CombinedThemePreviews
-@Composable
-private fun DragDropListViewPreview() {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
-        DragDropListView(
-            items = listOf("test1", "test2", "test3", "test4", "test5"),
-            lazyListState = LazyListState(),
-            onMove = { _, _ -> }
-        ) { _, item ->
-            MegaText(modifier = Modifier.fillMaxWidth(), text = item, textColor = TextColor.Primary)
-        }
-    }
-}
-
 @SuppressLint("ModifierFactoryUnreferencedReceiver")
 private fun Modifier.setDragGesturesAfterLongPress(
     dragDropListState: DragDropListState,
     scope: CoroutineScope,
     overscrollJob: MutableState<Job?>,
+    onDragFinished: () -> Unit,
+    indexOfDisabledItem: Int = -1,
 ) =
-    pointerInput(Unit) {
+    pointerInput(indexOfDisabledItem) {
         detectDragGesturesAfterLongPress(
             onDrag = { change, offset ->
-                dragDropListState.onDrag(offset)
+                dragDropListState.onDrag(offset, indexOfDisabledItem)
                 handleOverscrollJob(
                     overscrollJob = overscrollJob,
                     scope = scope,
@@ -116,10 +107,11 @@ private fun Modifier.setDragGesturesAfterLongPress(
                 change.consume()
             },
             onDragStart = { offset ->
-                dragDropListState.onDragStart(offset)
+                dragDropListState.onDragStart(offset, indexOfDisabledItem)
             },
             onDragEnd = {
                 dragDropListState.onDragInterrupted()
+                onDragFinished()
             },
             onDragCancel = {
                 dragDropListState.onDragInterrupted()
@@ -140,5 +132,20 @@ private fun handleOverscrollJob(
         }
     } else {
         overscrollJob.value?.cancel()
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun DragDropListViewPreview() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        DragDropListView(
+            items = listOf("test1", "test2", "test3", "test4", "test5"),
+            lazyListState = LazyListState(),
+            onDragFinished = {},
+            onMove = { _, _ -> }
+        ) { _, item ->
+            MegaText(modifier = Modifier.fillMaxWidth(), text = item, textColor = TextColor.Primary)
+        }
     }
 }

@@ -24,13 +24,17 @@ internal fun MediaQueueView(
     isPaused: Boolean,
     lazyListState: LazyListState,
     modifier: Modifier = Modifier,
+    indexOfDisabledItem: Int = -1,
     onClick: (index: Int, item: MediaQueueItemUiEntity) -> Unit = { _, _ -> },
+    onDragFinished: () -> Unit = { },
     onMove: (Int, Int) -> Unit = { _, _ -> },
 ) {
     DragDropListView(
         modifier = modifier.semantics { testTagsAsResourceId = true },
         items = items,
+        indexOfDisabledItem = indexOfDisabledItem,
         lazyListState = lazyListState,
+        onDragFinished = onDragFinished,
         onMove = onMove
     ) { index, item ->
         MediaQueueItemWithHeaderAndFooterView(
