@@ -108,6 +108,7 @@ dependencies {
 
     implementation(lib.sqlcipher)
     implementation(androidx.security.crypto)
+    implementation(google.tink)
 
     // Testing dependencies
     testImplementation(testlib.bundles.unit.test)
