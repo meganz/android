@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -29,6 +31,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.SettingsConstants.SELECTED_MEGA_FOLDER
@@ -100,6 +103,8 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  * request should be done (triggered) or not (consumed)
  * @param onSecondaryFolderNodeSelected Lambda to execute when selecting the new Media Uploads
  * Secondary Folder Node
+ * @param onSnackbarMessageConsumed Lambda to execute when the Snackbar has been shown with the
+ * specific message
  * @param onUploadOptionUiItemSelected Lambda to execute when the User selects a new
  * [UploadOptionUiItem] from the File Upload prompt
  * @param onVideoQualityUiItemSelected Lambda to execute when the User selects a new
@@ -126,10 +131,12 @@ internal fun SettingsCameraUploadsView(
     onRegularBusinessAccountSubUserPromptAcknowledged: () -> Unit,
     onRequestPermissionsStateChanged: (StateEvent) -> Unit,
     onSecondaryFolderNodeSelected: (NodeId) -> Unit,
+    onSnackbarMessageConsumed: () -> Unit,
     onUploadOptionUiItemSelected: (UploadOptionUiItem) -> Unit,
     onVideoQualityUiItemSelected: (VideoQualityUiItem) -> Unit,
 ) {
     val context = LocalContext.current
+    val scaffoldState = rememberScaffoldState()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
 
@@ -173,9 +180,20 @@ internal fun SettingsCameraUploadsView(
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
+    EventEffect(
+        event = uiState.snackbarMessage,
+        onConsumed = { onSnackbarMessageConsumed.invoke() },
+        action = { messageResId ->
+            scaffoldState.snackbarHostState.showSnackbar(
+                message = context.resources.getString(messageResId),
+                duration = SnackbarDuration.Long,
+            )
+        },
+    )
 
     MegaScaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
+        scaffoldState = scaffoldState,
         topBar = {
             MegaAppBar(
                 modifier = Modifier.testTag(SETTINGS_CAMERA_UPLOADS_TOOLBAR),
@@ -377,6 +395,7 @@ private fun SettingsCameraUploadsViewPreview(
             onRegularBusinessAccountSubUserPromptAcknowledged = {},
             onRequestPermissionsStateChanged = {},
             onSecondaryFolderNodeSelected = {},
+            onSnackbarMessageConsumed = {},
             onUploadOptionUiItemSelected = {},
             onVideoQualityUiItemSelected = {},
         )

@@ -387,6 +387,7 @@ internal class SettingsCameraUploadsViewTest {
                 onRegularBusinessAccountSubUserPromptAcknowledged = {},
                 onRequestPermissionsStateChanged = {},
                 onSecondaryFolderNodeSelected = {},
+                onSnackbarMessageConsumed = {},
                 onUploadOptionUiItemSelected = {},
                 onVideoQualityUiItemSelected = {},
             )

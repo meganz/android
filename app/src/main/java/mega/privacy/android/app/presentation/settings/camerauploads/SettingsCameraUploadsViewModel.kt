@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
@@ -21,8 +22,6 @@ import mega.privacy.android.app.presentation.settings.camerauploads.model.Settin
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadOptionUiItem
 import mega.privacy.android.app.presentation.settings.camerauploads.model.VideoQualityUiItem
-import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
-import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
@@ -139,7 +138,6 @@ import javax.inject.Inject
  * @property setupMediaUploadsSettingUseCase Sets up Media Uploads and its Backup Folder
  * @property setupPrimaryFolderUseCase Sets the new Camera Uploads Folder Node
  * @property setupSecondaryFolderUseCase Sets the new Media Uploads Folder Node
- * @property snackBarHandler Handler to display a Snackbar
  * @property startCameraUploadUseCase Starts the Camera Uploads operation
  * @property stopCameraUploadsUseCase Stops the Camera Uploads operation
  * @property uploadOptionUiItemMapper UI Mapper that maps the Upload Option into [UploadOptionUiItem]
@@ -191,7 +189,6 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val setupMediaUploadsSettingUseCase: SetupMediaUploadsSettingUseCase,
     private val setupPrimaryFolderUseCase: SetupPrimaryFolderUseCase,
     private val setupSecondaryFolderUseCase: SetupSecondaryFolderUseCase,
-    private val snackBarHandler: SnackBarHandler,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
     private val uploadOptionUiItemMapper: UploadOptionUiItemMapper,
@@ -822,24 +819,26 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Uses [SnackBarHandler] to display a generic Error Message
+     * Notifies the UI State that the Snackbar has been displayed with the specific message
+     */
+    fun onSnackbarMessageConsumed() = _uiState.update { it.copy(snackbarMessage = consumed()) }
+
+    /**
+     * Updates the UI State to display a Snackbar with a generic Error Message
      */
     private fun showGenericErrorSnackbar() = showSnackbar(R.string.general_error)
 
     /**
-     * Uses [SnackBarHandler] to display an Invalid Folder Error Message
+     * Updates the UI State to display a Snackbar with an Invalid Folder Error Message
      */
     private fun showInvalidFolderSnackbar() = showSnackbar(R.string.error_invalid_folder_selected)
 
     /**
-     * Uses [SnackBarHandler] to display a specific message
+     * Updates the UI State to display a Snackbar with a specific message
      *
-     * @param messageRes A String Resource containing the message to display
+     * @param messageRes The String Resource to be displayed in the Snackbar
      */
     private fun showSnackbar(@StringRes messageRes: Int) {
-        snackBarHandler.postSnackbarMessage(
-            resId = messageRes,
-            snackbarDuration = MegaSnackbarDuration.Long,
-        )
+        _uiState.update { it.copy(snackbarMessage = triggered(messageRes)) }
     }
 }

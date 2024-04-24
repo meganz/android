@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.settings.camerauploads.model
 
 import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 
@@ -28,6 +29,7 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
  * @property shouldIncludeLocationTags If true, Location Tags are added when uploading Photos through
  * Camera Uploads
  * @property shouldKeepUploadFileNames true if the content being uploaded should retain their filenames
+ * @property snackbarMessage State Event that displays a Snackbar with a specific String when triggered
  * @property uploadConnectionType Determines the connection type for uploading content in Camera Uploads
  * @property uploadOptionUiItem Determines the type of content that Camera Uploads can upload
  * @property videoQualityUiItem Determines the Video Quality of Videos being uploaded by Camera Uploads
@@ -47,6 +49,7 @@ internal data class SettingsCameraUploadsUiState(
     val secondaryFolderPath: String = "",
     val shouldIncludeLocationTags: Boolean = false,
     val shouldKeepUploadFileNames: Boolean = false,
+    val snackbarMessage: StateEventWithContent<Int> = consumed(),
     val uploadConnectionType: UploadConnectionType = UploadConnectionType.WIFI,
     val uploadOptionUiItem: UploadOptionUiItem = UploadOptionUiItem.PhotosOnly,
     val videoQualityUiItem: VideoQualityUiItem = VideoQualityUiItem.Original,
