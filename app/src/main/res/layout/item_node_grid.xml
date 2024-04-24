@@ -132,7 +132,8 @@
                 android:layout_gravity="end|center_vertical"
                 android:background="@null"
                 android:src="@drawable/ic_dots_vertical_grey"
-                app:tint="?android:attr/textColorSecondary" />
+                app:tint="?android:attr/textColorSecondary"
+                android:visibility="@{item.selected ? View.INVISIBLE : View.VISIBLE}"/>
         </LinearLayout>
     </FrameLayout>
 </layout>

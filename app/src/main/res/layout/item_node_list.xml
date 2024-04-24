@@ -185,7 +185,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="?android:attr/textColorSecondary" />
+            app:tint="?android:attr/textColorSecondary"
+            android:visibility="@{item.selected ? View.INVISIBLE : View.VISIBLE}"/>
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline"
