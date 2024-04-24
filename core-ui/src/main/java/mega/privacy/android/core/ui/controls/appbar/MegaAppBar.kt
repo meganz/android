@@ -459,7 +459,7 @@ internal fun MegaAppBarTitleAndSubtitle(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Box(modifier = Modifier.weight(1f)) {
+            Box(modifier = Modifier.weight(1f, fill = false)) {
                 title()
             }
             CompositionLocalProvider(
