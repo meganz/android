@@ -47,6 +47,7 @@ class FavouritesGridAdapter(
     private val onThreeDotsClicked: (info: Favourite) -> Unit,
 ) : ListAdapter<FavouriteItem, FavouritesGridViewHolder>(FavouritesDiffCallback) {
 
+    private var selectionMode = false
     override fun getItemViewType(position: Int): Int = getItem(position).type
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavouritesGridViewHolder {
@@ -61,6 +62,7 @@ class FavouritesGridAdapter(
                         false
                     )
                 }
+
                 else -> {
                     SortByHeaderBinding.inflate(
                         LayoutInflater.from(parent.context),
@@ -79,6 +81,7 @@ class FavouritesGridAdapter(
             onItemClicked = onItemClicked,
             onThreeDotsClicked = onThreeDotsClicked,
             onLongClicked = onLongClicked,
+            selectionMode = selectionMode
         )
     }
 
@@ -90,6 +93,13 @@ class FavouritesGridAdapter(
                 1
             }
         }
+    }
+
+    /**
+     * Checks if the adapter is in selection mode
+     */
+    fun updateSelectionMode(isSelectionMode: Boolean) {
+        selectionMode = isSelectionMode
     }
 
 }
@@ -115,6 +125,7 @@ class FavouritesGridViewHolder(
         onItemClicked: (info: Favourite) -> Unit,
         onThreeDotsClicked: (info: Favourite) -> Unit,
         onLongClicked: (info: Favourite) -> Boolean,
+        selectionMode: Boolean,
     ) {
         with(binding) {
             when (this) {
@@ -131,11 +142,17 @@ class FavouritesGridViewHolder(
                             itemGridFolder.setBackgroundResource(backgroundColor)
                             with(folderGridIcon) {
                                 setImageResource(info.icon)
-                                isVisible = !info.isSelected
                             }
                             folderGridTakenDown.isVisible = info.typedNode.isTakenDown
                             textViewSettings(folderGridFilename, info)
-                            folderIcSelected.isVisible = info.isSelected
+                            if (selectionMode) {
+                                folderGridRadioButton.visibility = View.VISIBLE
+                                folderGridThreeDots.visibility = View.GONE
+                                folderGridRadioButton.isChecked = info.isSelected
+                            } else {
+                                folderGridThreeDots.visibility = View.VISIBLE
+                                folderGridRadioButton.visibility = View.GONE
+                            }
                             folderGridThreeDots.setOnClickListener {
                                 onThreeDotsClicked(info)
                             }
@@ -150,10 +167,13 @@ class FavouritesGridViewHolder(
                                 error(info.icon)
                             }
 
-                            icSelected.visibility = if (info.isSelected) {
-                                View.VISIBLE
+                            if (selectionMode) {
+                                fileGridRadioButton.visibility = View.VISIBLE
+                                fileGridThreeDots.visibility = View.GONE
+                                fileGridRadioButton.isChecked = info.isSelected
                             } else {
-                                View.INVISIBLE
+                                fileGridThreeDots.visibility = View.VISIBLE
+                                fileGridRadioButton.visibility = View.GONE
                             }
                             if (MimeTypeList.typeForName(info.typedNode.name).isVideo) {
                                 videoInfo.isVisible = true
@@ -181,11 +201,13 @@ class FavouritesGridViewHolder(
                         itemGridFile.isVisible = false
                     }
                 }
+
                 is SortByHeaderBinding -> {
                     orderNameStringId =
                         (item as FavouriteHeaderItem).orderStringId ?: R.string.sortby_name
                     this.sortByHeaderViewModel = sortByHeaderViewModel
                 }
+
                 else -> {}
             }
         }
@@ -210,9 +232,9 @@ class FavouritesGridViewHolder(
 
     override fun animate(listener: Animation.AnimationListener, isSelected: Boolean) {
         (binding as? ItemFavouriteBinding)?.let {
-            val flipAnimation = if (isSelected) AnimationUtils.loadAnimation(binding.root.context,
-                R.anim.multiselect_flip_reverse) else AnimationUtils.loadAnimation(binding.root.context,
-                R.anim.multiselect_flip)
+            val animationId =
+                if (isSelected) R.anim.multiselect_flip_reverse else R.anim.multiselect_flip
+            val flipAnimation = AnimationUtils.loadAnimation(binding.root.context, animationId)
             flipAnimation.duration = PlaylistAdapter.ANIMATION_DURATION
             flipAnimation.setAnimationListener(listener)
             it.imageSelected.startAnimation(flipAnimation)

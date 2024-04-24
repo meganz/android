@@ -44,6 +44,7 @@ class FavouritesAdapter(
     private val onThreeDotsClicked: (info: Favourite) -> Unit,
 ) : ListAdapter<FavouriteItem, FavouritesViewHolder>(FavouritesDiffCallback) {
 
+    private var selectionMode = false
     override fun getItemViewType(position: Int): Int = getItem(position).type
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavouritesViewHolder {
@@ -72,7 +73,15 @@ class FavouritesAdapter(
             onItemClicked = onItemClicked,
             onThreeDotsClicked = onThreeDotsClicked,
             onLongClicked = onLongClicked,
+            selectionMode = selectionMode
         )
+    }
+
+    /**
+     * Checks if the adapter is in selection mode
+     */
+    fun updateSelectionMode(isSelectionMode: Boolean) {
+        selectionMode = isSelectionMode
     }
 
 }
@@ -100,6 +109,7 @@ class FavouritesViewHolder(
         onItemClicked: (info: Favourite) -> Unit,
         onThreeDotsClicked: (info: Favourite) -> Unit,
         onLongClicked: (info: Favourite) -> Boolean,
+        selectionMode: Boolean,
     ) {
         with(binding) {
             when (this) {
@@ -147,6 +157,8 @@ class FavouritesViewHolder(
                         itemFavouriteLayout.setOnClickListener {
                             onItemClicked(favourite)
                         }
+                        itemThreeDots.visibility =
+                            if (selectionMode) View.INVISIBLE else View.VISIBLE
                         itemThreeDots.setOnClickListener {
                             onThreeDotsClicked(favourite)
                         }
@@ -156,11 +168,13 @@ class FavouritesViewHolder(
                         }
                     }
                 }
+
                 is SortByHeaderBinding -> {
                     orderNameStringId =
                         (item as FavouriteHeaderItem).orderStringId ?: R.string.sortby_name
                     this.sortByHeaderViewModel = sortByHeaderViewModel
                 }
+
                 else -> {}
             }
         }

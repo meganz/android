@@ -6,13 +6,13 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -113,31 +113,36 @@ fun NodeGridViewItem(
 
                 // Video/Audio duration
                 if (duration != null) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MegaTheme.colors.background.blur)
+                    )
                     Row(
                         modifier = Modifier
                             .align(Alignment.BottomStart)
                             .fillMaxWidth()
-                            .background(MegaTheme.colors.background.blur)
-                            .padding(vertical = 2.dp),
+                            .padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             modifier = Modifier
                                 .padding(start = 8.dp)
-                                .size(20.dp)
+                                .size(16.dp)
                                 .testTag(VIDEO_PLAY_ICON_TEST_TAG),
                             painter = painterResource(id = R.drawable.ic_play_medium_regular_solid),
                             tint = MegaTheme.colors.icon.onColor,
-                            contentDescription = "Taken Down",
+                            contentDescription = "Play Icon",
                         )
                         MegaText(
                             text = duration,
                             style = MaterialTheme.typography.body2,
                             textColor = TextColor.OnColor,
-                            modifier = Modifier.testTag(VIDEO_DURATION_TEST_TAG),
+                            modifier = Modifier
+                                .padding(start = 4.dp)
+                                .testTag(VIDEO_DURATION_TEST_TAG),
                         )
                     }
-
                 }
             }
             MegaDivider(dividerType = DividerType.FullSize)
@@ -210,7 +215,6 @@ private fun Footer(
                     contentDescription = "More",
                     modifier = Modifier
                         .size(24.dp)
-                        .clickable { onMenuClick() }
                         .testTag(GRID_VIEW_MORE_ICON_TEST_TAG)
                 )
             }

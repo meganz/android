@@ -252,8 +252,10 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
                         }
                         if (favouritesState is FavouriteLoadState.Success) {
                             if (isList) {
+                                listAdapter.updateSelectionMode(favouritesState.selectedItems.isNotEmpty())
                                 listAdapter.submitList(favouritesState.favourites)
                             } else {
+                                gridAdapter.updateSelectionMode(favouritesState.selectedItems.isNotEmpty())
                                 gridAdapter.submitList(formatGridList(favouritesState))
                             }
                             handleSelectedItems(favouritesState.selectedItems)

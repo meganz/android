@@ -15,7 +15,7 @@ import mega.privacy.android.core.ui.theme.MegaTheme
 
 /**
  * MegaScaffold is a wrapper around Scaffold that provides a convenient way to show a snackBar from any view inside this scaffold.
- * It also provides a the appropriate look and feel,such as background color or snack bar style.
+ * It also provides the appropriate look and feel,such as background color or snack bar style.
  *
  * @param modifier Modifier
  * @param scaffoldState ScaffoldState
