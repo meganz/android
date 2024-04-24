@@ -7,7 +7,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.namecollision.data.NameCollision
-import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
@@ -100,75 +99,6 @@ internal class CheckNameCollisionUseCaseTest {
         }
     }
 
-
-    @Test
-    internal fun `test that check with collision type copy returns the correct result`() = runTest {
-        val expected = 1234L
-        val child = mock<MegaNode> {
-            on { handle }.thenReturn(expected)
-        }
-        val folders = 4
-        val files = 20
-        megaApiGateway.stub {
-            onBlocking { getChildNode(anyOrNull(), anyOrNull()) }.thenReturn(child)
-            onBlocking { getNumChildFolders(any()) }.thenReturn(folders)
-            onBlocking { getNumChildFiles(any()) }.thenReturn(files)
-        }
-        underTest.check(
-            node = mock { on { name }.thenReturn("name") },
-            parentNode = mock(),
-            type = NameCollisionType.COPY,
-        ).test()
-            .assertValue {
-                it is NameCollision.Copy
-                        && it.childFolderCount == folders
-                        && it.childFileCount == files
-            }
-    }
-
-    @Test
-    internal fun `test that check with collision type move returns the correct result`() = runTest {
-        val expected = 1234L
-        val child = mock<MegaNode> {
-            on { handle }.thenReturn(expected)
-        }
-        val folders = 4
-        val files = 20
-        megaApiGateway.stub {
-            onBlocking { getChildNode(anyOrNull(), anyOrNull()) }.thenReturn(child)
-            onBlocking { getNumChildFolders(any()) }.thenReturn(folders)
-            onBlocking { getNumChildFiles(any()) }.thenReturn(files)
-        }
-        underTest.check(
-            node = mock { on { name }.thenReturn("name") },
-            parentNode = mock(),
-            type = NameCollisionType.MOVE,
-        ).test()
-            .assertValue {
-                it is NameCollision.Movement
-                        && it.childFolderCount == folders
-                        && it.childFileCount == files
-            }
-    }
-
-    @Test
-    internal fun `test that check with collision type upload throws an illegal state exception`() =
-        runTest {
-            val expected = 1234L
-            val child = mock<MegaNode> {
-                on { handle }.thenReturn(expected)
-            }
-            megaApiGateway.stub {
-                onBlocking { getChildNode(anyOrNull(), anyOrNull()) }.thenReturn(child)
-            }
-            underTest.check(
-                node = mock { on { name }.thenReturn("name") },
-                parentNode = mock(),
-                type = NameCollisionType.UPLOAD,
-            ).test()
-                .assertError(IllegalStateException::class.java)
-        }
-
     @Test
     internal fun `test that checkRestorations returns the correct file and folder count`() =
         runTest {
@@ -201,34 +131,4 @@ internal class CheckNameCollisionUseCaseTest {
                     actual.childFolderCount == folders && actual.childFileCount == files
                 }
         }
-
-    @Test
-    internal fun `test that check with node, parentHandle and collision type copy returns the correct result`() =
-        runTest {
-            val expected = 1234L
-            val parentNodeHandle = 12345L
-            val parentNode = mock<MegaNode>()
-            val child = mock<MegaNode> {
-                on { handle }.thenReturn(expected)
-            }
-            val folders = 4
-            val files = 20
-            megaApiGateway.stub {
-                onBlocking { getChildNode(anyOrNull(), anyOrNull()) }.thenReturn(child)
-                onBlocking { getNumChildFolders(any()) }.thenReturn(folders)
-                onBlocking { getNumChildFiles(any()) }.thenReturn(files)
-                onBlocking { getMegaNodeByHandle(parentNodeHandle) }.thenReturn(parentNode)
-            }
-            underTest.check(
-                node = mock { on { name }.thenReturn("name") },
-                parentNode = parentNode,
-                type = NameCollisionType.COPY,
-            ).test()
-                .assertValue {
-                    it is NameCollision.Copy
-                            && it.childFolderCount == folders
-                            && it.childFileCount == files
-                }
-        }
-
 }

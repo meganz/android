@@ -84,24 +84,6 @@ class CheckNameCollisionUseCase @Inject constructor(
             type = type,
         )
 
-
-    /**
-     * Checks if a node with the same name exists on the provided parent node.
-     *
-     * @param node          [MegaNode] to check its name.
-     * @param parentNode    Parent [MegaNode] in which to look.
-     * @param type          [NameCollisionType]
-     * @return Single Long with the node handle with which there is a name collision.
-     */
-    fun check(
-        node: MegaNode?,
-        parentNode: MegaNode?,
-        type: NameCollisionType,
-    ): Single<NameCollision> =
-        rxSingle(ioDispatcher) {
-            checkNodeCollisionsWithType(node, parentNode, type)
-        }
-
     private suspend fun checkNodeCollisionsWithType(
         node: MegaNode?,
         parentNode: MegaNode?,

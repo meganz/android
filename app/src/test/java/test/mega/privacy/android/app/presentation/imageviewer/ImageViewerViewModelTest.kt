@@ -12,7 +12,6 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.imageviewer.ImageViewerViewModel
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
@@ -66,7 +65,6 @@ internal class ImageViewerViewModelTest {
     private lateinit var underTest: ImageViewerViewModel
     private val checkNameCollision = mock<CheckNameCollision>()
     private val checkNameCollisionUseCase = mock<CheckNameCollisionUseCase>()
-    private val getNodeByHandle = mock<GetNodeByHandle>()
     private val copyNodeUseCase = mock<CopyNodeUseCase>()
     private val copyChatNodeUseCase = mock<CopyChatNodeUseCase>()
     private val moveNodeUseCase = mock<MoveNodeUseCase>()
@@ -132,7 +130,6 @@ internal class ImageViewerViewModelTest {
         reset(
             checkNameCollision,
             checkNameCollisionUseCase,
-            getNodeByHandle,
             copyNodeUseCase,
             copyChatNodeUseCase,
             moveNodeUseCase,
@@ -201,7 +198,6 @@ internal class ImageViewerViewModelTest {
             moveNodeUseCase = moveNodeUseCase,
             deleteNodeByHandleUseCase = deleteNodeByHandleUseCase,
             checkNameCollision = checkNameCollision,
-            getNodeByHandle = getNodeByHandle,
             copyChatNodeUseCase = copyChatNodeUseCase,
             checkNameCollisionUseCase = checkNameCollisionUseCase,
             moveNodeToRubbishBinUseCase = moveNodeToRubbishBinUseCase,
@@ -225,7 +221,6 @@ internal class ImageViewerViewModelTest {
                         isOffline = false
                     )
                 ).thenReturn(Single.just(listOf(chatImageItem)))
-                whenever(getNodeByHandle(654321)).thenReturn(targetNode)
                 whenever(
                     copyChatNodeUseCase(
                         chatId = chatImageItem.chatRoomId,
@@ -239,10 +234,10 @@ internal class ImageViewerViewModelTest {
             whenever(
                 checkNameCollisionUseCase.check(
                     node = selectedNode,
-                    parentNode = targetNode,
+                    parentHandle = targetNode.handle,
                     type = NameCollisionType.COPY,
                 )
-            ).thenReturn(Single.error(MegaNodeException.ChildDoesNotExistsException()))
+            ).thenThrow(MegaNodeException.ChildDoesNotExistsException())
             whenever(context.getString(R.string.context_correctly_copied)).thenReturn("Copied")
             initViewModel()
             underTest.retrieveImages(longArrayOf(123456L), 123456L, false)
@@ -266,14 +261,13 @@ internal class ImageViewerViewModelTest {
                     isOffline = false
                 )
             ).thenReturn(Single.just(listOf(chatImageItem)))
-            whenever(getNodeByHandle(targetNode.handle)).thenReturn(targetNode)
             whenever(
                 checkNameCollisionUseCase.check(
                     node = selectedNode,
-                    parentNode = targetNode,
+                    parentHandle = targetNode.handle,
                     type = NameCollisionType.COPY,
                 )
-            ).thenReturn(Single.error(MegaNodeException.ChildDoesNotExistsException()))
+            ).thenThrow(MegaNodeException.ChildDoesNotExistsException())
             val runtimeException = RuntimeException("Import node failed")
             whenever(
                 copyChatNodeUseCase(

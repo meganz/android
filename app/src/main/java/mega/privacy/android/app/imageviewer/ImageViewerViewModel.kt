@@ -28,7 +28,6 @@ import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.imageviewer.data.ImageAdapterItem
 import mega.privacy.android.app.imageviewer.data.ImageItem
@@ -130,7 +129,6 @@ class ImageViewerViewModel @Inject constructor(
     private val moveNodeUseCase: MoveNodeUseCase,
     private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase,
     private val checkNameCollision: CheckNameCollision,
-    private val getNodeByHandle: GetNodeByHandle,
     private val copyChatNodeUseCase: CopyChatNodeUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase,
@@ -710,25 +708,23 @@ class ImageViewerViewModel @Inject constructor(
         val importNode = importNodeItem?.nodeItem?.node
             ?: return@launch
         if (importNodeItem is ImageItem.ChatNode) {
-            val parentNode = getNodeByHandle(newParentHandle)
-            checkNameCollisionUseCase.check(
-                node = importNode,
-                parentNode = parentNode,
-                type = NameCollisionType.COPY,
-            ).observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = { collisionResult -> collision.value = collisionResult },
-                    onError = { error ->
-                        when (error) {
-                            is MegaNodeException.ChildDoesNotExistsException -> {
-                                copyChatNode(importNodeItem, NodeId(newParentHandle))
-                            }
-
-                            else -> Timber.e(error)
-                        }
-                    }
+            runCatching {
+                checkNameCollisionUseCase.check(
+                    node = importNode,
+                    parentHandle = newParentHandle,
+                    type = NameCollisionType.COPY,
                 )
-                .addTo(composite)
+            }.onSuccess { collisionResult ->
+                collision.value = collisionResult
+            }.onFailure { throwable ->
+                when (throwable) {
+                    is MegaNodeException.ChildDoesNotExistsException -> {
+                        copyChatNode(importNodeItem, NodeId(newParentHandle))
+                    }
+
+                    else -> Timber.e(throwable)
+                }
+            }
         } else {
             copyNode(importNode.handle, newParentHandle)
         }

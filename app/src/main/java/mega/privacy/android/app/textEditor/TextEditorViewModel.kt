@@ -9,13 +9,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -29,10 +27,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
-import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.namecollision.data.NameCollision
@@ -133,7 +129,6 @@ class TextEditorViewModel @Inject constructor(
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
-    private val getNodeByHandle: GetNodeByHandle,
     private val downloadBackgroundFile: DownloadBackgroundFile,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
@@ -145,7 +140,7 @@ class TextEditorViewModel @Inject constructor(
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
-) : BaseRxViewModel() {
+) : ViewModel() {
 
     companion object {
         const val MODE = "MODE"
@@ -712,28 +707,25 @@ class TextEditorViewModel @Inject constructor(
      * @param node              Node handle to copy.
      * @param newParentHandle   Parent handle in which the node will be copied.
      */
-    fun importNode(node: MegaNode, newParentHandle: Long) =
-        viewModelScope.launch {
-            val parentNode = getNodeByHandle(newParentHandle)
+    fun importNode(node: MegaNode, newParentHandle: Long) = viewModelScope.launch {
+        runCatching {
             checkNameCollisionUseCase.check(
                 node = node,
-                parentNode = parentNode,
+                parentHandle = newParentHandle,
                 type = NameCollisionType.COPY,
-            ).observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = { collisionResult -> collision.value = collisionResult },
-                    onError = { error ->
-                        when (error) {
-                            is MegaNodeException.ChildDoesNotExistsException -> {
-                                copyChatNode(NodeId(newParentHandle))
-                            }
+            )
+        }.onSuccess { collisionResult ->
+            collision.value = collisionResult
+        }.onFailure { throwable ->
+            when (throwable) {
+                is MegaNodeException.ChildDoesNotExistsException -> {
+                    copyChatNode(NodeId(newParentHandle))
+                }
 
-                            else -> Timber.e(error)
-                        }
-                    }
-                )
-                .addTo(composite)
+                else -> Timber.e(throwable)
+            }
         }
+    }
 
     /**
      * Copies a chat node
