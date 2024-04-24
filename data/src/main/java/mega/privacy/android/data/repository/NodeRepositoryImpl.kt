@@ -457,7 +457,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         offline: Offline? = null,
     ): UnTypedNode {
         return nodeMapper(
-            megaNode = node, offline = offline
+            megaNode = node, offline = offline,
         )
     }
 

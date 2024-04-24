@@ -28,10 +28,12 @@ import mega.privacy.android.app.presentation.shares.links.model.LinksUiState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
@@ -54,6 +56,7 @@ class LinksViewModel @Inject constructor(
     private val handleOptionClickMapper: HandleOptionClickMapper,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
 ) : ViewModel() {
 
     private val currentFlow = Channel<Flow<LinksUiState>>()
@@ -111,6 +114,7 @@ class LinksViewModel @Inject constructor(
                 isLoading = true,
                 openedFolderNodeHandles = it.openedFolderNodeHandles.toMutableSet()
                     .apply { add(parentNode.id.longValue) },
+                updateToolbarTitleEvent = triggered
             )
         }
         observeFlow(childLinks(parentNode))
@@ -242,17 +246,6 @@ class LinksViewModel @Inject constructor(
                 state.value.nodesList.indexOfFirst { it.node.id.longValue == nodeUIItem.id.longValue }
             if (_state.value.isInSelection) {
                 updateNodeInSelectionState(nodeUIItem = nodeUIItem, index = index)
-            } else {
-                if (nodeUIItem.node is FileNode) {
-                    _state.update {
-                        it.copy(
-                            itemIndex = index,
-                            currentFileNode = nodeUIItem.node
-                        )
-                    }
-                } else if (nodeUIItem.node is PublicLinkFolder) {
-                    openFolder(nodeUIItem.node)
-                }
             }
         }.onFailure {
             Timber.e(it)
@@ -279,18 +272,6 @@ class LinksViewModel @Inject constructor(
             _state.update { it.copy(updateToolbarTitleEvent = triggered) }
         } ?: run {
             _state.update { it.copy(exitLinksPageEvent = triggered) }
-        }
-    }
-
-    /**
-     * When item is clicked on activity
-     */
-    fun onItemPerformedClicked() {
-        _state.update {
-            it.copy(
-                currentFileNode = null,
-                itemIndex = -1,
-            )
         }
     }
 
@@ -492,4 +473,14 @@ class LinksViewModel @Inject constructor(
         _state.update { it.copy(updateToolbarTitleEvent = consumed) }
     }
 
+    /**
+     *  Download file triggered
+     */
+    fun onDownloadFileTriggered(triggerEvent: TransferTriggerEvent) {
+        _state.update {
+            it.copy(
+                downloadEvent = triggered(triggerEvent)
+            )
+        }
+    }
 }
