@@ -13,6 +13,7 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,11 +21,13 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentTransferPageBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.TransfersPageAdapter
@@ -42,6 +45,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.TransfersStatus
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -60,6 +64,9 @@ internal class TransferPageFragment : Fragment() {
 
     @Inject
     lateinit var downloadNodeUseCase: DownloadNodeUseCase
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     @Inject
     lateinit var uploadUseCase: UploadUseCase
@@ -114,8 +121,9 @@ internal class TransferPageFragment : Fragment() {
         root.addView(
             createStartTransferView(
                 requireActivity(),
-                emptyFlow(), //This view is just to show messages, as transfers can not be started in this screen, that's why it has no events
-            ) {}
+                transfersViewModel.uiState.map { it.startEvent },
+                transfersViewModel::consumeRetry
+            )
         )
     }
 
@@ -405,32 +413,38 @@ internal class TransferPageFragment : Fragment() {
     fun retryTransfer(transfer: CompletedTransfer) {
         when (transfer.type) {
             MegaTransfer.TYPE_DOWNLOAD -> {
-                val node = megaApi.getNodeByHandle(transfer.handle) ?: return
-                when (transfer.isOffline) {
-                    true -> {
-                        val offlineFile = File(transfer.originalPath)
-                        OfflineUtils.saveOffline(
-                            offlineFile.parentFile,
-                            node,
-                            requireActivity()
-                        )
-                    }
+                lifecycleScope.launch {
+                    if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
+                        transfersViewModel.retryTransfer(transfer)
+                    } else {
+                        val node = megaApi.getNodeByHandle(transfer.handle) ?: return@launch
+                        when (transfer.isOffline) {
+                            true -> {
+                                val offlineFile = File(transfer.originalPath)
+                                OfflineUtils.saveOffline(
+                                    offlineFile.parentFile,
+                                    node,
+                                    requireActivity()
+                                )
+                            }
 
-                    false -> {
-                        downloadNodeUseCase.download(requireActivity(), node, transfer.path)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(
-                                { Timber.d("Transfer retried: ${node.handle}") },
-                                { throwable: Throwable? ->
-                                    Timber.e(throwable, "Retry transfer failed.")
-                                }
-                            )
-                            .addTo(composite)
-                    }
+                            false -> {
+                                downloadNodeUseCase.download(requireActivity(), node, transfer.path)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(
+                                        { Timber.d("Transfer retried: ${node.handle}") },
+                                        { throwable: Throwable? ->
+                                            Timber.e(throwable, "Retry transfer failed.")
+                                        }
+                                    )
+                                    .addTo(composite)
+                            }
 
-                    null -> {
-                        Timber.d("Unable to retrieve transfer isOffline value")
+                            null -> {
+                                Timber.d("Unable to retrieve transfer isOffline value")
+                            }
+                        }
                     }
                 }
             }

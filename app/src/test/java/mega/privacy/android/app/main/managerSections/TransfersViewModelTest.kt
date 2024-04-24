@@ -2,6 +2,7 @@ package mega.privacy.android.app.main.managerSections
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -10,10 +11,14 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.globalmanagement.TransfersManagement
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
@@ -28,10 +33,12 @@ import mega.privacy.android.domain.usecase.transfers.completed.GetAllCompletedTr
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
+import nz.mega.sdk.MegaTransfer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -57,6 +64,7 @@ internal class TransfersViewModelTest {
     private val deleteCompletedTransferUseCase: DeleteCompletedTransferUseCase = mock()
     private val pauseTransferByTagUseCase: PauseTransferByTagUseCase = mock()
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase = mock()
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -80,7 +88,8 @@ internal class TransfersViewModelTest {
             deleteCompletedTransferUseCase = deleteCompletedTransferUseCase,
             pauseTransferByTagUseCase = pauseTransferByTagUseCase,
             cancelTransferByTagUseCase = cancelTransferByTagUseCase,
-            monitorPausedTransfersUseCase = monitorPausedTransfersUseCase
+            monitorPausedTransfersUseCase = monitorPausedTransfersUseCase,
+            getNodeByIdUseCase = getNodeByIdUseCase,
         )
     }
 
@@ -280,6 +289,48 @@ internal class TransfersViewModelTest {
                 assertThat(awaitItem()).isTrue()
                 assertThat(awaitItem()).isFalse()
                 this.cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that retryTransfer triggers a StartDownloadForOffline event when it is a download offline transfer`() =
+        runTest {
+            val nodeHandle = 564L
+            val transfer = mock<CompletedTransfer> {
+                on { type } doReturn MegaTransfer.TYPE_DOWNLOAD
+                on { isOffline } doReturn true
+                on { handle } doReturn nodeHandle
+            }
+            val expected = mock<TypedNode>()
+            whenever(getNodeByIdUseCase(NodeId(nodeHandle))) doReturn expected
+
+            underTest.retryTransfer(transfer)
+
+            underTest.uiState.test {
+                val newItem = awaitItem()
+                assertThat(((newItem.startEvent as? StateEventWithContentTriggered<*>)?.content as? TransferTriggerEvent.StartDownloadForOffline)?.node)
+                    .isEqualTo(expected)
+            }
+        }
+
+    @Test
+    fun `test that retryTransfer triggers a StartDownloadNode event when it is a download not offline transfer`() =
+        runTest {
+            val nodeHandle = 569L
+            val transfer = mock<CompletedTransfer> {
+                on { type } doReturn MegaTransfer.TYPE_DOWNLOAD
+                on { isOffline } doReturn false
+                on { handle } doReturn nodeHandle
+            }
+            val expected = mock<TypedNode>()
+            whenever(getNodeByIdUseCase(NodeId(nodeHandle))) doReturn expected
+
+            underTest.retryTransfer(transfer)
+
+            underTest.uiState.test {
+                val newItem = awaitItem()
+                assertThat(((newItem.startEvent as? StateEventWithContentTriggered<*>)?.content as? TransferTriggerEvent.StartDownloadNode)?.nodes)
+                    .isEqualTo(listOf(expected))
             }
         }
 

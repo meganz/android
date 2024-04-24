@@ -3,6 +3,8 @@ package mega.privacy.android.app.main.managerSections
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -16,13 +18,16 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFailedOrCanceledTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
@@ -64,6 +69,7 @@ class TransfersViewModel @Inject constructor(
     private val pauseTransferByTagUseCase: PauseTransferByTagUseCase,
     private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
     monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TransfersUiState())
 
@@ -458,6 +464,36 @@ class TransfersViewModel @Inject constructor(
      */
     fun markHandledCancelTransfersResult() {
         _uiState.update { it.copy(cancelTransfersResult = null) }
+    }
+
+    /**
+     * trigger retry transfer event
+     */
+    suspend fun retryTransfer(transfer: CompletedTransfer) {
+        val event = when (transfer.type) {
+            MegaTransfer.TYPE_DOWNLOAD -> {
+                getNodeByIdUseCase(NodeId(transfer.handle))?.let { typedNode ->
+                    if (transfer.isOffline == true) {
+                        TransferTriggerEvent.StartDownloadForOffline(typedNode)
+                    } else {
+                        TransferTriggerEvent.StartDownloadNode(listOf(typedNode))
+                    }
+                } ?: run {
+                    Timber.e("Node not found for this transfer")
+                    return
+                }
+            }
+
+            else -> throw IllegalArgumentException("This transfer type cannot be retried here for now")
+        }
+        _uiState.update { state -> state.copy(startEvent = triggered(event)) }
+    }
+
+    /**
+     * Consume retry event
+     */
+    fun consumeRetry() {
+        _uiState.update { state -> state.copy(startEvent = consumed()) }
     }
 
     companion object {
