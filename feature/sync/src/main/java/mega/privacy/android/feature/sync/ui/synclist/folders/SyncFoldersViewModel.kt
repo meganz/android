@@ -9,6 +9,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.usecase.GetFolderTreeInfo
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.feature.sync.data.service.SyncBackgroundService
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
@@ -22,6 +25,7 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetUserPause
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.RemoveFolderClicked
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction.PauseRunClicked
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,6 +39,8 @@ internal class SyncFoldersViewModel @Inject constructor(
     private val setUserPausedSyncsUseCase: SetUserPausedSyncUseCase,
     private val refreshSyncUseCase: RefreshSyncUseCase,
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val getFolderTreeInfo: GetFolderTreeInfo,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncFoldersState(emptyList()))
@@ -46,11 +52,44 @@ internal class SyncFoldersViewModel @Inject constructor(
                 .map(syncUiItemMapper::invoke)
                 .map { syncs ->
                     val stalledIssues = getSyncStalledIssuesUseCase()
+                    var numOfFiles = 0
+                    var numOfFolders = 0
+                    var totalSizeInBytes = 0L
+                    var creationTime = 0L
                     syncs.map { sync ->
-                        sync.copy(hasStalledIssues = stalledIssues.any {
-                            it.localPaths.firstOrNull()?.contains(sync.deviceStoragePath)
-                                ?: (it.nodeNames.first().contains(sync.megaStoragePath))
-                        })
+
+                        runCatching {
+                            getNodeByIdUseCase(sync.megaStorageNodeId)
+                        }.onSuccess { node ->
+                            node?.let { folder ->
+                                creationTime = folder.creationTime
+                                runCatching {
+                                    getFolderTreeInfo(folder as TypedFolderNode)
+                                }.onSuccess { folderTreeInfo ->
+                                    with(folderTreeInfo) {
+                                        numOfFiles = numberOfFiles
+                                        numOfFolders =
+                                            numberOfFolders - 1 //we don't want to count itself
+                                        totalSizeInBytes = totalCurrentSizeInBytes
+                                    }
+                                }.onFailure {
+                                    Timber.e(it)
+                                }
+                            }
+                        }.onFailure {
+                            Timber.e(it)
+                        }
+
+                        sync.copy(
+                            hasStalledIssues = stalledIssues.any {
+                                it.localPaths.firstOrNull()?.contains(sync.deviceStoragePath)
+                                    ?: (it.nodeNames.first().contains(sync.megaStoragePath))
+                            },
+                            numberOfFiles = numOfFiles,
+                            numberOfFolders = numOfFolders,
+                            totalSizeInBytes = totalSizeInBytes,
+                            creationTime = creationTime,
+                        )
                     }
                 }
                 .collect { syncs ->

@@ -214,6 +214,27 @@
     <string name="video_section_playlists_delete_playlists_message_singular">“%1$s” deleted</string>
     <!-- The name of the Settings Camera Uploads Option, which decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
     <string name="settings_camera_uploads_upload_only_while_charging_option_name">Upload only while charging</string>
+    <!-- Header of the Info view field for what is the content of a device/folder -->
+    <string name="info_content">Contains</string>
+    <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
+    <string name="info_total_size">Total size</string>
+    <!-- Header of the Info view field for the date and time a folder was added -->
+    <string name="info_added">Added</string>
+    <!-- String which indicates the number of files contained into a device/folder -->
+    <plurals name="info_num_files">
+        <item quantity="one">%1$d file</item>
+        <item quantity="other">%1$d files</item>
+    </plurals>
+    <!-- String which indicates the number of folders contained into a device/folder -->
+    <plurals name="info_num_folders">
+        <item quantity="one">%1$d folder</item>
+        <item quantity="other">%1$d folders</item>
+    </plurals>
+    <!-- First part of string, which indicates the content of a device/folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
+    <plurals name="info_num_folders_and_files">
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">%1$d folders&#160;·&#160;</item>
+    </plurals>
     <!-- Text for the header of the screen to add a new sync folder -->
     <string name="sync_add_new_sync_folder_header_text">Add synchronised folder:</string>
     <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->

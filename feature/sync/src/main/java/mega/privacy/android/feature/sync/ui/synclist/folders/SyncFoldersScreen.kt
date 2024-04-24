@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
@@ -86,14 +87,15 @@ private fun SyncFoldersScreenSyncingPreview() {
     SyncFoldersScreen(
         listOf(
             SyncUiItem(
-                1,
-                "Folder pair name",
-                SyncStatus.SYNCING,
-                false,
-                "/path/to/local/folder",
-                "/path/to/mega/folder",
-                R.string.sync_two_way,
-                false
+                id = 1,
+                folderPairName = "Folder pair name",
+                status = SyncStatus.SYNCING,
+                hasStalledIssues = false,
+                deviceStoragePath = "/path/to/local/folder",
+                megaStoragePath = "/path/to/mega/folder",
+                megaStorageNodeId = NodeId(1234L),
+                method = R.string.sync_two_way,
+                expanded = false,
             )
         ),
         cardExpanded = {},
@@ -111,14 +113,15 @@ private fun SyncFoldersScreenSyncingWithStalledIssuesPreview() {
     SyncFoldersScreen(
         listOf(
             SyncUiItem(
-                1,
-                "Folder pair name",
-                SyncStatus.SYNCING,
-                true,
-                "/path/to/local/folder",
-                "/path/to/mega/folder",
-                R.string.sync_two_way,
-                false
+                id = 1,
+                folderPairName = "Folder pair name",
+                status = SyncStatus.SYNCING,
+                hasStalledIssues = true,
+                deviceStoragePath = "/path/to/local/folder",
+                megaStoragePath = "/path/to/mega/folder",
+                megaStorageNodeId = NodeId(1234L),
+                method = R.string.sync_two_way,
+                expanded = false
             )
         ),
         cardExpanded = {},

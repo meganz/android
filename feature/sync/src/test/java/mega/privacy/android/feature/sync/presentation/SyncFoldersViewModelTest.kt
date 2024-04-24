@@ -10,6 +10,8 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetFolderTreeInfo
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
@@ -52,6 +54,8 @@ class SyncFoldersViewModelTest {
     private val setUserPausedSyncsUseCase: SetUserPausedSyncUseCase = mock()
     private val refreshSyncUseCase: RefreshSyncUseCase = mock()
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase = mock()
+    private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
+    private val getFolderTreeInfo: GetFolderTreeInfo = mock()
 
     private lateinit var underTest: SyncFoldersViewModel
 
@@ -69,6 +73,7 @@ class SyncFoldersViewModelTest {
             deviceStoragePath = "DCIM",
             hasStalledIssues = false,
             megaStoragePath = "photos",
+            megaStorageNodeId = NodeId(1234L),
             method = R.string.sync_two_way,
             expanded = false
         )
@@ -212,6 +217,7 @@ class SyncFoldersViewModelTest {
         status = status,
         deviceStoragePath = "DCIM",
         megaStoragePath = "photos",
+        megaStorageNodeId = NodeId(1234L),
         hasStalledIssues = false,
         method = R.string.sync_two_way,
         expanded = false
@@ -219,15 +225,17 @@ class SyncFoldersViewModelTest {
 
     private fun initViewModel() {
         underTest = SyncFoldersViewModel(
-            syncUiItemMapper,
-            removeFolderPairUseCase,
-            monitorSyncsUseCase,
-            resumeSyncUseCase,
-            pauseSyncUseCase,
-            getSyncStalledIssuesUseCase,
-            setUserPausedSyncsUseCase,
-            refreshSyncUseCase,
-            monitorBatteryInfoUseCase
+            syncUiItemMapper = syncUiItemMapper,
+            removeFolderPairUseCase = removeFolderPairUseCase,
+            monitorSyncsUseCase = monitorSyncsUseCase,
+            resumeSyncUseCase = resumeSyncUseCase,
+            pauseSyncUseCase = pauseSyncUseCase,
+            getSyncStalledIssuesUseCase = getSyncStalledIssuesUseCase,
+            setUserPausedSyncsUseCase = setUserPausedSyncsUseCase,
+            refreshSyncUseCase = refreshSyncUseCase,
+            monitorBatteryInfoUseCase = monitorBatteryInfoUseCase,
+            getNodeByIdUseCase = getNodeByIdUseCase,
+            getFolderTreeInfo = getFolderTreeInfo,
         )
     }
 }

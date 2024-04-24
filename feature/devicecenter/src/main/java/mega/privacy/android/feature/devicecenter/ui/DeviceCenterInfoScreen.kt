@@ -34,8 +34,8 @@ import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.tokens.TextColor
-import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterInfoUiState
 import mega.privacy.android.shared.theme.MegaAppTheme
 
@@ -93,7 +93,8 @@ private fun DeviceCenterInfoScreenContent(
         )
         if (uiState.creationTime > 0) {
             InfoRow(
-                title = "Added", info = formatModifiedDate(
+                title = stringResource(id = sharedR.string.info_added),
+                info = formatModifiedDate(
                     locale = java.util.Locale(
                         Locale.current.language, Locale.current.region
                     ),
@@ -104,30 +105,31 @@ private fun DeviceCenterInfoScreenContent(
         if (uiState.numberOfFolders > 0 || uiState.numberOfFiles > 0) {
             val content = when {
                 uiState.numberOfFolders != 0 && uiState.numberOfFiles != 0 -> pluralStringResource(
-                    id = R.plurals.device_center_info_num_folders_and_files,
+                    id = sharedR.plurals.info_num_folders_and_files,
                     count = uiState.numberOfFolders, uiState.numberOfFolders,
                 ) + pluralStringResource(
-                    id = R.plurals.device_center_info_num_files,
+                    id = sharedR.plurals.info_num_files,
                     count = uiState.numberOfFiles, uiState.numberOfFiles,
                 )
 
                 uiState.numberOfFiles == 0 -> pluralStringResource(
-                    id = R.plurals.device_center_info_num_folders,
+                    id = sharedR.plurals.info_num_folders,
                     count = uiState.numberOfFolders, uiState.numberOfFolders,
                 )
 
                 else -> pluralStringResource(
-                    id = R.plurals.device_center_info_num_files,
+                    id = sharedR.plurals.info_num_files,
                     count = uiState.numberOfFiles, uiState.numberOfFiles,
                 )
             }
             InfoRow(
-                title = stringResource(id = R.string.device_center_info_content), info = content
+                title = stringResource(id = sharedR.string.info_content),
+                info = content,
             )
         }
         if (uiState.totalSizeInBytes > 0) {
             InfoRow(
-                title = stringResource(id = R.string.device_center_info_total_size),
+                title = stringResource(id = sharedR.string.info_total_size),
                 info = formatFileSize(
                     size = uiState.totalSizeInBytes,
                     context = LocalContext.current

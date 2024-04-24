@@ -6,6 +6,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.StateFlow
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersRoute
@@ -43,6 +44,7 @@ class SyncFoldersScreenTest {
                     hasStalledIssues = false,
                     deviceStoragePath = folderName,
                     megaStoragePath = folderName,
+                    megaStorageNodeId = NodeId(1234L),
                     method = R.string.sync_two_way,
                     expanded = false
                 )

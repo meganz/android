@@ -7,50 +7,47 @@ import mega.privacy.android.shared.resources.R as sharedR
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.core.formatter.formatFileSize
+import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.core.ui.controls.buttons.MegaButtonWithIconAndText
+import mega.privacy.android.core.ui.controls.cards.MegaCard
+import mega.privacy.android.core.ui.controls.dividers.DividerType
+import mega.privacy.android.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.core.ui.controls.status.MegaStatusIndicator
+import mega.privacy.android.core.ui.controls.status.StatusColor
+import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.core.ui.theme.tokens.TextColor
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
+import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable
 internal fun SyncCard(
-    folderPairName: String,
-    status: SyncStatus,
-    hasStalledIssues: Boolean,
-    deviceStoragePath: String,
-    megaStoragePath: String,
-    method: String,
-    expanded: Boolean,
+    sync: SyncUiItem,
     expandClicked: () -> Unit,
     pauseRunClicked: () -> Unit,
     removeFolderClicked: () -> Unit,
@@ -59,57 +56,50 @@ internal fun SyncCard(
     @StringRes errorRes: Int?,
     modifier: Modifier = Modifier,
 ) {
-
-    val roundedCornersShape = RoundedCornerShape(6.dp)
-    Column(
-        modifier = modifier
-            .shadow(
-                elevation = 3.dp,
-                shape = roundedCornersShape,
-                spotColor = MaterialTheme.colors.black_white,
-                ambientColor = MaterialTheme.colors.black_white,
+    MegaCard(
+        content = {
+            SyncCardHeader(
+                folderPairName = sync.folderPairName,
+                status = sync.status,
+                hasStalledIssues = sync.hasStalledIssues,
+                method = stringResource(id = sync.method)
             )
-            .background(
-                MaterialTheme.colors.surface, shape = roundedCornersShape
+
+            if (errorRes != null) {
+                WarningBanner(
+                    textString = stringResource(errorRes),
+                    onCloseClick = null,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
+
+            AnimatedVisibility(visible = sync.expanded) {
+                SyncCardDetailedInfo(
+                    deviceStoragePath = sync.deviceStoragePath,
+                    megaStoragePath = sync.megaStoragePath,
+                    numberOfFiles = sync.numberOfFiles,
+                    numberOfFolders = sync.numberOfFolders,
+                    totalSizeInBytes = sync.totalSizeInBytes,
+                    creationTime = sync.creationTime,
+                )
+            }
+
+            SyncCardFooter(
+                isSyncRunning = sync.status in arrayOf(
+                    SyncStatus.SYNCING, SyncStatus.SYNCED
+                ),
+                hasStalledIssues = sync.hasStalledIssues,
+                pauseRunClicked = pauseRunClicked,
+                removeFolderClicked = removeFolderClicked,
+                issuesInfoClicked = issuesInfoClicked,
+                isLowBatteryLevel = isLowBatteryLevel,
+                isError = errorRes != null,
+                expanded = sync.expanded,
             )
-            .clickable { expandClicked() },
-    ) {
-        SyncCardHeader(
-            folderPairName,
-            status,
-            hasStalledIssues = hasStalledIssues,
-            expanded = expanded,
-            expandClicked,
-        )
-
-        if (errorRes != null) {
-            WarningBanner(
-                textString = stringResource(errorRes),
-                onCloseClick = null,
-                Modifier.padding(top = 16.dp)
-            )
-            Divider(Modifier.padding(start = 16.dp, end = 16.dp))
-        } else {
-            Divider(Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp))
-        }
-
-        AnimatedVisibility(visible = expanded) {
-            SyncCardDetailedInfo(deviceStoragePath, megaStoragePath, method)
-        }
-
-        SyncCardFooter(
-            isSyncRunning = status in arrayOf(
-                SyncStatus.SYNCING,
-                SyncStatus.SYNCED
-            ),
-            hasStalledIssues = hasStalledIssues,
-            pauseRunClicked,
-            removeFolderClicked,
-            issuesInfoClicked,
-            isLowBatteryLevel = isLowBatteryLevel,
-            isError = errorRes != null
-        )
-    }
+        },
+        onClicked = expandClicked,
+        modifier = modifier,
+    )
 }
 
 @Composable
@@ -117,8 +107,7 @@ private fun SyncCardHeader(
     folderPairName: String,
     status: SyncStatus,
     hasStalledIssues: Boolean,
-    expanded: Boolean,
-    expandClicked: () -> Unit,
+    method: String,
 ) {
     Row(
         modifier = Modifier
@@ -141,64 +130,34 @@ private fun SyncCardHeader(
                     style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.textColorPrimary),
                     fontWeight = FontWeight.Medium
                 )
-                Row(
-                    Modifier
-                        .padding(top = 8.dp)
-                        .height(20.dp)
-                ) {
-                    Image(
-                        painter = when {
-                            hasStalledIssues -> painterResource(iconPackR.drawable.ic_alert_circle_regular_medium_outline)
-                            status == SyncStatus.SYNCING -> painterResource(coreR.drawable.ic_sync_02)
-                            status == SyncStatus.PAUSED -> painterResource(coreR.drawable.ic_pause)
-                            else -> painterResource(coreR.drawable.ic_check_circle)
-                        },
-                        contentDescription = null,
-                        modifier = Modifier
-                            .padding(end = 8.dp)
-                            .align(Alignment.CenterVertically)
-                            .size(16.dp),
-                        colorFilter = if (hasStalledIssues) {
-                            ColorFilter.tint(MaterialTheme.colors.error)
-                        } else {
-                            ColorFilter.tint(MaterialTheme.colors.textColorPrimary)
-                        },
-                    )
-                    Text(
-                        text = when {
-                            hasStalledIssues -> stringResource(id = R.string.sync_folders_sync_state_failed)
-                            status == SyncStatus.SYNCING -> stringResource(id = R.string.sync_list_sync_state_syncing)
-                            status == SyncStatus.PAUSED -> stringResource(id = R.string.sync_list_sync_state_paused)
-                            else -> stringResource(id = R.string.sync_list_sync_state_synced)
-                        },
-                        Modifier.align(Alignment.CenterVertically),
-                        style = MaterialTheme.typography.body2.copy(
-                            color = if (hasStalledIssues) {
-                                MaterialTheme.colors.error
-                            } else {
-                                MaterialTheme.colors.textColorPrimary
-                            },
-                        )
-                    )
-                }
+                MegaStatusIndicator(
+                    modifier = Modifier.padding(top = 2.dp, bottom = 2.dp),
+                    statusText = when {
+                        hasStalledIssues -> stringResource(id = R.string.sync_folders_sync_state_failed)
+                        status == SyncStatus.SYNCING -> stringResource(id = R.string.sync_list_sync_state_syncing)
+                        status == SyncStatus.PAUSED -> stringResource(id = R.string.sync_list_sync_state_paused)
+                        else -> stringResource(id = R.string.sync_list_sync_state_synced)
+                    },
+                    statusIcon = when {
+                        hasStalledIssues -> iconPackR.drawable.ic_alert_circle_regular_medium_outline
+                        status == SyncStatus.SYNCING -> coreR.drawable.ic_sync_02
+                        status == SyncStatus.PAUSED -> coreR.drawable.ic_pause
+                        else -> coreR.drawable.ic_check_circle
+                    },
+                    statusColor = when {
+                        hasStalledIssues -> StatusColor.Error
+                        status == SyncStatus.SYNCING -> StatusColor.Info
+                        status == SyncStatus.PAUSED -> null
+                        else -> StatusColor.Success
+                    },
+                )
+                MegaText(
+                    text = method,
+                    textColor = TextColor.Secondary,
+                    style = MaterialTheme.typography.caption,
+                )
             }
         }
-
-        Image(
-            painter = if (expanded) {
-                painterResource(coreR.drawable.ic_chevron_up)
-            } else {
-                painterResource(coreR.drawable.ic_chevron_down)
-            },
-            contentDescription = null,
-            modifier = Modifier
-                .padding(end = 8.dp)
-                .height(16.dp)
-                .width(16.dp)
-                .align(Alignment.CenterVertically)
-                .clickable { expandClicked() },
-            colorFilter = ColorFilter.tint(MaterialTheme.colors.textColorPrimary)
-        )
     }
 }
 
@@ -206,46 +165,88 @@ private fun SyncCardHeader(
 private fun SyncCardDetailedInfo(
     deviceStoragePath: String,
     megaStoragePath: String,
-    method: String,
+    numberOfFiles: Int,
+    numberOfFolders: Int,
+    totalSizeInBytes: Long,
+    creationTime: Long,
 ) {
     Column(Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)) {
-        Column {
-            Text(
-                text = stringResource(id = R.string.sync_folders_device_storage),
-                style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.textColorPrimary),
+        InfoRow(
+            title = stringResource(id = R.string.sync_folders_device_storage),
+            info = deviceStoragePath,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        InfoRow(
+            title = stringResource(id = R.string.sync_folders_mega_storage),
+            info = megaStoragePath,
+            modifier = Modifier.padding(bottom = 8.dp, top = 8.dp)
+        )
+
+        InfoRow(
+            title = stringResource(id = sharedR.string.info_added),
+            info = formatModifiedDate(
+                locale = java.util.Locale(
+                    Locale.current.language, Locale.current.region
+                ),
+                modificationTime = creationTime,
+            ),
+            modifier = Modifier.padding(bottom = 8.dp, top = 8.dp)
+        )
+
+        val content = when {
+            numberOfFolders != 0 && numberOfFiles != 0 -> pluralStringResource(
+                id = sharedR.plurals.info_num_folders_and_files,
+                count = numberOfFolders, numberOfFolders,
+            ) + pluralStringResource(
+                id = sharedR.plurals.info_num_files,
+                count = numberOfFiles, numberOfFiles,
             )
-            Text(
-                text = deviceStoragePath,
-                style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.textColorSecondary),
+
+            numberOfFiles == 0 -> pluralStringResource(
+                id = sharedR.plurals.info_num_folders,
+                count = numberOfFolders, numberOfFolders,
+            )
+
+            else -> pluralStringResource(
+                id = sharedR.plurals.info_num_files,
+                count = numberOfFiles, numberOfFiles,
             )
         }
+        InfoRow(
+            title = stringResource(id = sharedR.string.info_content),
+            info = content,
+            modifier = Modifier.padding(bottom = 8.dp, top = 8.dp)
+        )
 
-        Divider(Modifier.padding(top = 16.dp, bottom = 16.dp))
+        InfoRow(
+            title = stringResource(id = sharedR.string.info_total_size),
+            info = formatFileSize(
+                size = totalSizeInBytes,
+                context = LocalContext.current,
+            ),
+            modifier = Modifier.padding(top = 8.dp)
+        )
+    }
+}
 
-        Column {
-            Text(
-                text = stringResource(id = R.string.sync_folders_mega_storage),
-                style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.textColorPrimary),
-            )
-            Text(
-                text = megaStoragePath,
-                style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.textColorSecondary),
-            )
-        }
-
-        Divider(Modifier.padding(top = 16.dp, bottom = 16.dp))
-
-        Column {
-            Text(
-                text = stringResource(id = R.string.sync_folders_method),
-                style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.textColorPrimary),
-            )
-            Text(
-                text = method,
-                style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.textColorSecondary),
-            )
-        }
-        Divider(Modifier.padding(top = 16.dp, end = 16.dp))
+@Composable
+private fun InfoRow(
+    title: String,
+    info: String,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        MegaText(
+            text = title,
+            textColor = TextColor.Primary,
+            style = MaterialTheme.typography.subtitle2,
+        )
+        MegaText(
+            text = info,
+            textColor = TextColor.Secondary,
+            style = MaterialTheme.typography.caption,
+        )
     }
 }
 
@@ -258,7 +259,16 @@ private fun SyncCardFooter(
     issuesInfoClicked: () -> Unit,
     isLowBatteryLevel: Boolean,
     isError: Boolean,
+    expanded: Boolean,
 ) {
+    when {
+        isError && !expanded -> MegaDivider(dividerType = DividerType.Centered)
+        else -> MegaDivider(
+            dividerType = DividerType.Centered,
+            modifier = Modifier.padding(top = 16.dp)
+        )
+    }
+
     Box(Modifier.fillMaxWidth()) {
         Row(
             Modifier
@@ -306,14 +316,21 @@ private fun SyncCardFooter(
 private fun SyncCardExpandedPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         SyncCard(
-            folderPairName = "Competitors documentation",
-            status = SyncStatus.SYNCING,
-            hasStalledIssues = false,
-            deviceStoragePath = "/storage/emulated/0/Download",
-            megaStoragePath = "/Root/Competitors documentation",
-            method = "Two-way",
+            SyncUiItem(
+                id = 1234L,
+                folderPairName = "Competitors documentation",
+                status = SyncStatus.SYNCING,
+                hasStalledIssues = false,
+                deviceStoragePath = "/storage/emulated/0/Download",
+                megaStoragePath = "/Root/Competitors documentation",
+                megaStorageNodeId = NodeId(1234L),
+                method = R.string.sync_two_way,
+                expanded = true,
+                numberOfFolders = 5,
+                totalSizeInBytes = 23552L,
+                creationTime = 1699454365L,
+            ),
             pauseRunClicked = {},
-            expanded = true,
             expandClicked = {},
             removeFolderClicked = {},
             issuesInfoClicked = {},
@@ -328,14 +345,21 @@ private fun SyncCardExpandedPreview() {
 private fun SyncCardExpandedWithBannerPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         SyncCard(
-            folderPairName = "Competitors documentation",
-            status = SyncStatus.SYNCING,
-            hasStalledIssues = false,
-            deviceStoragePath = "/storage/emulated/0/Download",
-            megaStoragePath = "/Root/Competitors documentation",
-            method = "Two-way",
+            SyncUiItem(
+                id = 1234L,
+                folderPairName = "Competitors documentation",
+                status = SyncStatus.SYNCING,
+                hasStalledIssues = false,
+                deviceStoragePath = "/storage/emulated/0/Download",
+                megaStoragePath = "/Root/Competitors documentation",
+                megaStorageNodeId = NodeId(1234L),
+                method = R.string.sync_two_way,
+                expanded = true,
+                numberOfFolders = 5,
+                totalSizeInBytes = 23552L,
+                creationTime = 1699454365L,
+            ),
             pauseRunClicked = {},
-            expanded = true,
             expandClicked = {},
             removeFolderClicked = {},
             issuesInfoClicked = {},
@@ -350,14 +374,21 @@ private fun SyncCardExpandedWithBannerPreview() {
 private fun SyncCardCollapsedPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         SyncCard(
-            folderPairName = "Competitors documentation",
-            status = SyncStatus.SYNCING,
-            hasStalledIssues = false,
-            deviceStoragePath = "/storage/emulated/0/Download",
-            megaStoragePath = "/Root/Competitors documentation",
-            method = "Two-way",
+            SyncUiItem(
+                id = 1234L,
+                folderPairName = "Competitors documentation",
+                status = SyncStatus.SYNCING,
+                hasStalledIssues = false,
+                deviceStoragePath = "/storage/emulated/0/Download",
+                megaStoragePath = "/Root/Competitors documentation",
+                megaStorageNodeId = NodeId(1234L),
+                method = R.string.sync_two_way,
+                expanded = false,
+                numberOfFolders = 5,
+                totalSizeInBytes = 23552L,
+                creationTime = 1699454365L,
+            ),
             pauseRunClicked = {},
-            expanded = false,
             expandClicked = {},
             removeFolderClicked = {},
             issuesInfoClicked = {},
@@ -372,14 +403,21 @@ private fun SyncCardCollapsedPreview() {
 private fun SyncCardCollapsedWithBannerPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         SyncCard(
-            folderPairName = "Competitors documentation",
-            status = SyncStatus.SYNCING,
-            hasStalledIssues = false,
-            deviceStoragePath = "/storage/emulated/0/Download",
-            megaStoragePath = "/Root/Competitors documentation",
-            method = "Two-way",
+            SyncUiItem(
+                id = 1234L,
+                folderPairName = "Competitors documentation",
+                status = SyncStatus.SYNCING,
+                hasStalledIssues = false,
+                deviceStoragePath = "/storage/emulated/0/Download",
+                megaStoragePath = "/Root/Competitors documentation",
+                megaStorageNodeId = NodeId(1234L),
+                method = R.string.sync_two_way,
+                expanded = false,
+                numberOfFolders = 5,
+                totalSizeInBytes = 23552L,
+                creationTime = 1699454365L,
+            ),
             pauseRunClicked = {},
-            expanded = false,
             expandClicked = {},
             removeFolderClicked = {},
             issuesInfoClicked = {},

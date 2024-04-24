@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 
 @Composable
@@ -22,13 +21,7 @@ internal fun SyncItemView(
     val sync = syncUiItems[itemIndex]
     SyncCard(
         modifier = modifier.testTag(TEST_TAG_SYNC_ITEM_VIEW),
-        folderPairName = sync.folderPairName,
-        status = sync.status,
-        hasStalledIssues = sync.hasStalledIssues,
-        deviceStoragePath = sync.deviceStoragePath,
-        megaStoragePath = sync.megaStoragePath,
-        method = stringResource(id = sync.method),
-        expanded = sync.expanded,
+        sync = sync,
         expandClicked = {
             cardExpanded(sync, !sync.expanded)
         },
