@@ -14,10 +14,10 @@ import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerifi
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.GetCountryCallingCodes
 import mega.privacy.android.domain.usecase.GetCurrentCountryCodeUseCase
-import mega.privacy.android.domain.usecase.SetSMSVerificationShown
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.verification.GetFormattedPhoneNumberUseCase
 import mega.privacy.android.domain.usecase.verification.SendSMSVerificationCode
+import mega.privacy.android.domain.usecase.verification.SetSMSVerificationShownUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -37,7 +37,7 @@ class SMSVerificationViewModelTest {
 
     private lateinit var underTest: SMSVerificationViewModel
 
-    private val setSMSVerificationShown: SetSMSVerificationShown = mock()
+    private val setSMSVerificationShownUseCase: SetSMSVerificationShownUseCase = mock()
     private val getCountryCallingCodes: GetCountryCallingCodes = mock()
     private val sendSMSVerificationCode: SendSMSVerificationCode = mock()
     private val smsVerificationTextMapper: SMSVerificationTextMapper = mock()
@@ -67,7 +67,7 @@ class SMSVerificationViewModelTest {
             whenever(getCountryCallingCodes()).thenReturn(countryCallingCodes)
         }
         underTest = SMSVerificationViewModel(
-            setSMSVerificationShown = setSMSVerificationShown,
+            setSMSVerificationShownUseCase = setSMSVerificationShownUseCase,
             getCountryCallingCodes = getCountryCallingCodes,
             sendSMSVerificationCode = sendSMSVerificationCode,
             getCurrentCountryCodeUseCase = getCurrentCountryCodeUseCase,

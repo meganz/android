@@ -17,10 +17,10 @@ import mega.privacy.android.app.presentation.verification.model.mapper.SMSVerifi
 import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerificationTextErrorMapper
 import mega.privacy.android.domain.usecase.GetCountryCallingCodes
 import mega.privacy.android.domain.usecase.GetCurrentCountryCodeUseCase
-import mega.privacy.android.domain.usecase.SetSMSVerificationShown
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.verification.GetFormattedPhoneNumberUseCase
 import mega.privacy.android.domain.usecase.verification.SendSMSVerificationCode
+import mega.privacy.android.domain.usecase.verification.SetSMSVerificationShownUseCase
 import timber.log.Timber
 import java.util.Locale
 import javax.inject.Inject
@@ -30,7 +30,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SMSVerificationViewModel @Inject constructor(
-    private val setSMSVerificationShown: SetSMSVerificationShown,
+    private val setSMSVerificationShownUseCase: SetSMSVerificationShownUseCase,
     private val getCountryCallingCodes: GetCountryCallingCodes,
     private val sendSMSVerificationCode: SendSMSVerificationCode,
     private val getCurrentCountryCodeUseCase: GetCurrentCountryCodeUseCase,
@@ -265,11 +265,11 @@ class SMSVerificationViewModel @Inject constructor(
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
-        owner.lifecycle.coroutineScope.launch { setSMSVerificationShown(true) }
+        owner.lifecycle.coroutineScope.launch { setSMSVerificationShownUseCase(true) }
     }
 
     override fun onDestroy(owner: LifecycleOwner) {
-        owner.lifecycle.coroutineScope.launch { setSMSVerificationShown(false) }
+        owner.lifecycle.coroutineScope.launch { setSMSVerificationShownUseCase(false) }
         super.onDestroy(owner)
     }
 

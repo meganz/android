@@ -12,7 +12,6 @@ import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerifi
 import mega.privacy.android.domain.repository.VerificationRepository
 import mega.privacy.android.domain.usecase.GetCountryCallingCodes
 import mega.privacy.android.domain.usecase.IsSMSVerificationShown
-import mega.privacy.android.domain.usecase.SetSMSVerificationShown
 import mega.privacy.android.domain.usecase.verification.DefaultMonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.DefaultMonitorVerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
@@ -53,13 +52,6 @@ abstract class SMSVerificationModule {
     abstract fun bindSMSVerificationTextMapper(implementation: SMSVerificationTextMapperImpl): SMSVerificationTextMapper
 
     companion object {
-        /**
-         * Provides the Use Case [SetSMSVerificationShown]
-         */
-        @Provides
-        fun provideSetSMSVerificationShown(repository: VerificationRepository): SetSMSVerificationShown =
-            SetSMSVerificationShown(repository::setSMSVerificationShown)
-
         /**
          * Provides the Use Case [IsSMSVerificationShown]
          */
