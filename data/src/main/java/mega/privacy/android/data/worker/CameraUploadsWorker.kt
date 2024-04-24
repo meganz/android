@@ -1,6 +1,5 @@
 package mega.privacy.android.data.worker
 
-
 import android.content.Context
 import android.os.Build
 import androidx.hilt.work.HiltWorker
@@ -22,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
@@ -100,6 +100,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorIsChargingRequiredToUploadContentUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessCameraUploadsMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.RenameCameraUploadsRecordsUseCase
@@ -147,6 +148,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase,
+    private val monitorIsChargingRequiredToUploadContentUseCase: MonitorIsChargingRequiredToUploadContentUseCase,
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val handleLocalIpChangeUseCase: HandleLocalIpChangeUseCase,
@@ -196,6 +198,11 @@ class CameraUploadsWorker @AssistedInject constructor(
      * the required battery level to run the CU
      */
     private var deviceAboveMinimumBatteryLevel: Boolean = true
+
+    /**
+     * True if the Device meets the charging constraint that was set
+     */
+    private var isChargingConstraintSatisfied: Boolean = true
 
     /**
      * True if the wifi constraint is met
@@ -254,9 +261,10 @@ class CameraUploadsWorker @AssistedInject constructor(
     private var monitorConnectivityStatusJob: Job? = null
 
     /**
-     * Job to monitor battery level status flow
+     * Job to monitor both monitor battery level status and monitor is charging required to upload
+     * content flows
      */
-    private var monitorBatteryLevelStatusJob: Job? = null
+    private var monitorBatteryLevelAndChargingStatusesJob: Job? = null
 
     /**
      * Job to monitor transfer over quota status flow
@@ -297,7 +305,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             setForegroundAsync(getForegroundInfo())
 
             monitorConnectivityStatusJob = monitorConnectivityStatus()
-            monitorBatteryLevelStatusJob = monitorBatteryLevelStatus()
+            monitorBatteryLevelAndChargingStatusesJob = monitorBatteryLevelAndChargingStatusesJob()
             monitorStorageOverQuotaStatusJob = monitorStorageOverQuotaStatus()
             monitorParentNodesDeletedJob = monitorParentNodesDeleted()
 
@@ -434,11 +442,17 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
     }
 
-    private fun CoroutineScope.monitorBatteryLevelStatus() = launch {
-        monitorBatteryInfoUseCase().collect {
-            deviceAboveMinimumBatteryLevel = (it.level > LOW_BATTERY_LEVEL || it.isCharging)
-            if (!deviceAboveMinimumBatteryLevel) {
-                abortWork(reason = CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW)
+    private fun CoroutineScope.monitorBatteryLevelAndChargingStatusesJob() = launch {
+        monitorBatteryInfoUseCase().combine(monitorIsChargingRequiredToUploadContentUseCase()) { batteryInfo, chargingRequired ->
+            Pair(batteryInfo, chargingRequired)
+        }.collect { (batteryInfo, chargingRequired) ->
+            val isCharging = batteryInfo.isCharging
+            deviceAboveMinimumBatteryLevel = (batteryInfo.level > LOW_BATTERY_LEVEL || isCharging)
+            isChargingConstraintSatisfied = if (chargingRequired) isCharging else true
+
+            when {
+                !deviceAboveMinimumBatteryLevel -> abortWork(reason = CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW)
+                !isChargingConstraintSatisfied -> abortWork(reason = CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET)
             }
         }
     }
@@ -535,6 +549,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         !isLocalPrimaryFolderValid() -> CameraUploadsFinishedReason.LOCAL_PRIMARY_FOLDER_NOT_VALID
         !isWifiConstraintSatisfied() -> CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
         !isDeviceAboveMinimumBatteryLevel() -> CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW
+        !isChargingConstraintSatisfied() -> CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
         isStorageQuotaExceeded() -> CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA
         else -> {
             if (isSecondaryFolderEnabled())
@@ -610,6 +625,17 @@ class CameraUploadsWorker @AssistedInject constructor(
     private fun isDeviceAboveMinimumBatteryLevel() = deviceAboveMinimumBatteryLevel.also {
         if (!it) Timber.e("Device Battery level requirement not met")
     }
+
+    /**
+     * Checks if the Device meets the charging constraint that was set (e.g. the Device is currently
+     * charged, and the Option to require Device charging to upload content is enabled)
+     *
+     * @return true if the Device charging constraint has been met
+     */
+    private fun isChargingConstraintSatisfied() =
+        isChargingConstraintSatisfied.also {
+            if (!it) Timber.e("The Device does not meet the charging constraint")
+        }
 
     /**
      * Retrieve the Camera Uploads Nodes from the server and update the local preferences
@@ -1226,7 +1252,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             uploadJob,
             monitorUploadPauseStatusJob,
             monitorConnectivityStatusJob,
-            monitorBatteryLevelStatusJob,
+            monitorBatteryLevelAndChargingStatusesJob,
             monitorStorageOverQuotaStatusJob,
             monitorParentNodesDeletedJob,
             sendBackupHeartbeatJob,

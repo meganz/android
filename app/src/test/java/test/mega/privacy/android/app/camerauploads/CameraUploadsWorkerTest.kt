@@ -14,6 +14,7 @@ import androidx.work.impl.utils.WorkProgressUpdater
 import androidx.work.impl.utils.taskexecutor.WorkManagerTaskExecutor
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.channelFlow
@@ -23,7 +24,9 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.R
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.ARE_UPLOADS_PAUSED
@@ -94,6 +97,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorIsChargingRequiredToUploadContentUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessCameraUploadsMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.RenameCameraUploadsRecordsUseCase
@@ -117,6 +121,7 @@ import mega.privacy.android.domain.usecase.transfers.uploads.ResetTotalUploadsUs
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import org.junit.Before
 import org.junit.Test
+import org.junit.jupiter.api.AfterAll
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.kotlin.any
@@ -133,13 +138,12 @@ import java.util.UUID
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
-
 /**
  * Test class of [CameraUploadsWorker]
  */
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
-class CameraUploadsWorkerTest {
+internal class CameraUploadsWorkerTest {
 
     private lateinit var underTest: CameraUploadsWorker
 
@@ -163,6 +167,8 @@ class CameraUploadsWorkerTest {
     private val monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase = mock()
+    private val monitorIsChargingRequiredToUploadContentUseCase: MonitorIsChargingRequiredToUploadContentUseCase =
+        mock()
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase = mock()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val handleLocalIpChangeUseCase: HandleLocalIpChangeUseCase = mock()
@@ -219,9 +225,9 @@ class CameraUploadsWorkerTest {
     private val primaryLocalPath = "primaryPath"
     private val tempPath = "tempPath"
 
-
     @Before
     fun setUp() {
+        Dispatchers.setMain(ioDispatcher)
         context = ApplicationProvider.getApplicationContext()
         executor = Executors.newSingleThreadExecutor()
         workExecutor = WorkManagerTaskExecutor(executor)
@@ -265,6 +271,7 @@ class CameraUploadsWorkerTest {
                 monitorPausedTransfersUseCase = monitorPausedTransfersUseCase,
                 monitorConnectivityUseCase = monitorConnectivityUseCase,
                 monitorBatteryInfoUseCase = monitorBatteryInfoUseCase,
+                monitorIsChargingRequiredToUploadContentUseCase = monitorIsChargingRequiredToUploadContentUseCase,
                 backgroundFastLoginUseCase = backgroundFastLoginUseCase,
                 monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
                 handleLocalIpChangeUseCase = handleLocalIpChangeUseCase,
@@ -307,6 +314,11 @@ class CameraUploadsWorkerTest {
         setupDefaultCheckConditionMocks()
     }
 
+    @AfterAll
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
     /**
      * Minimal conditions for the CU to complete successfully without any uploads
      */
@@ -318,6 +330,7 @@ class CameraUploadsWorkerTest {
         // mock monitor events
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
         whenever(monitorBatteryInfoUseCase()).thenReturn(emptyFlow())
+        whenever(monitorIsChargingRequiredToUploadContentUseCase()).thenReturn(emptyFlow())
         whenever(monitorPausedTransfersUseCase()).thenReturn(emptyFlow())
         whenever(monitorStorageOverQuotaUseCase()).thenReturn(emptyFlow())
         whenever(monitorNodeUpdatesUseCase()).thenReturn(emptyFlow())
@@ -973,6 +986,7 @@ class CameraUploadsWorkerTest {
             whenever(monitorBatteryInfoUseCase()).thenReturn(
                 flowOf(BatteryInfo(100, false))
             )
+            whenever(monitorIsChargingRequiredToUploadContentUseCase()).thenReturn(flowOf(false))
 
             underTest.doWork()
 
@@ -1006,6 +1020,8 @@ class CameraUploadsWorkerTest {
             whenever(monitorBatteryInfoUseCase()).thenReturn(
                 flowOf(BatteryInfo(100, true))
             )
+            whenever(monitorIsChargingRequiredToUploadContentUseCase()).thenReturn(flowOf(false))
+
             underTest.doWork()
 
             verify(doesCameraUploadsRecordExistsInTargetNodeUseCase)
@@ -1227,6 +1243,7 @@ class CameraUploadsWorkerTest {
 
         verify(monitorConnectivityUseCase).invoke()
         verify(monitorBatteryInfoUseCase).invoke()
+        verify(monitorIsChargingRequiredToUploadContentUseCase).invoke()
         verify(monitorStorageOverQuotaUseCase).invoke()
         verify(monitorNodeUpdatesUseCase).invoke()
     }
@@ -1284,9 +1301,10 @@ class CameraUploadsWorkerTest {
     }
 
     @Test
-    fun `test that worker returns failure when battery level too low and is not charging`() =
+    fun `test that the worker returns failure when the battery level is too low and is not charging`() =
         runTest {
             whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(10, false)))
+            whenever(monitorIsChargingRequiredToUploadContentUseCase()).thenReturn(flowOf(false))
 
             val result = underTest.doWork()
 
@@ -1300,9 +1318,38 @@ class CameraUploadsWorkerTest {
         }
 
     @Test
-    fun `test that worker is rescheduled when battery level too low and is not charging`() =
+    fun `test that the worker is rescheduled when the battery level is too low and is not charging`() =
         runTest {
             whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(10, false)))
+            whenever(monitorIsChargingRequiredToUploadContentUseCase()).thenReturn(flowOf(false))
+
+            underTest.doWork()
+
+            verify(scheduleCameraUploadUseCase).invoke()
+        }
+
+    @Test
+    fun `test that the worker returns failure when the charging requirement is not satisfied`() =
+        runTest {
+            whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(100, false)))
+            whenever(monitorIsChargingRequiredToUploadContentUseCase()).thenReturn(flowOf(true))
+
+            val result = underTest.doWork()
+
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET.name,
+                )
+            )
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        }
+
+    @Test
+    fun `test that the worker is rescheduled when the charging requirement is not satisfied`() =
+        runTest {
+            whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(100, false)))
+            whenever(monitorIsChargingRequiredToUploadContentUseCase()).thenReturn(flowOf(true))
 
             underTest.doWork()
 

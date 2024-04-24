@@ -61,6 +61,12 @@ enum class CameraUploadsFinishedReason {
     ERROR_DURING_PROCESS,
 
     /**
+     * Camera Uploads was configured to only upload content when the Device is charged, and the
+     * Device is currently not charged
+     */
+    DEVICE_CHARGING_REQUIREMENT_NOT_MET,
+
+    /**
      * Unknown reason.
      */
     UNKNOWN,
