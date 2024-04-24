@@ -169,9 +169,9 @@ abstract class AbstractTransfersWorker(
         }
 
     private suspend fun stopService(monitorJob: Job) {
-        monitorJob.cancel()
         notificationManager.cancel(updateNotificationId)
         clearActiveTransfersIfFinishedUseCase(type)
+        monitorJob.cancel()
     }
 
     @SuppressLint("MissingPermission")

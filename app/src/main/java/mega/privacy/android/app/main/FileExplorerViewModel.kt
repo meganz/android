@@ -368,8 +368,8 @@ class FileExplorerViewModel @Inject constructor(
             if (getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)) {
                 chatIds.forEach {
                     attachNodes(it, nodeIds)
-                    attachFiles(it, filePaths)
                 }
+                attachFiles(chatIds, filePaths)
             } else {
                 toDoIfFalse()
             }
@@ -377,10 +377,10 @@ class FileExplorerViewModel @Inject constructor(
         }
     }
 
-    private suspend fun attachFiles(chatId: Long, filePaths: List<String>) {
+    private suspend fun attachFiles(chatIds: List<Long>, filePaths: List<String>) {
         val filePathsWithNames =
             filePaths.associateWith { fileNames.value?.get(it.split(File.separator).last()) }
-        sendChatAttachmentsUseCase(chatId, filePathsWithNames)
+        sendChatAttachmentsUseCase(filePathsWithNames, chatIds = chatIds.toLongArray())
             .catch { Timber.e("Error attaching files", it) }
             .collect()
     }

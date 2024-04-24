@@ -3,9 +3,15 @@ package test.mega.privacy.android.app.main
 import android.content.Intent
 import android.os.Bundle
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.FileExplorerViewModel
 import mega.privacy.android.app.utils.Constants
@@ -162,14 +168,13 @@ class FileExplorerViewModelTest {
         whenever(getFeatureFlagValueUseCase(AppFeatures.NewChatActivity)) doReturn true
         val filePaths = listOf("path1", "path2")
 
-        val flow1 = mock<Flow<MultiTransferEvent>>()
-        val flow2 = mock<Flow<MultiTransferEvent>>()
+        val flow = mock<Flow<MultiTransferEvent>>()
         whenever(
-            sendChatAttachmentsUseCase(chatId1, filePaths.associateWith { null })
-        ) doReturn flow1
-        whenever(
-            sendChatAttachmentsUseCase(chatId2, filePaths.associateWith { null })
-        ) doReturn flow2
+            sendChatAttachmentsUseCase(
+                filePaths.associateWith { null },
+                chatIds = chatIds.toLongArray()
+            )
+        ) doReturn flow
 
         underTest.uploadFilesToChatIfFeatureFlagIsTrue(
             chatIds = chatIds,
@@ -178,8 +183,7 @@ class FileExplorerViewModelTest {
             {}, {}
         )
 
-        verify(flow1).collect(any())
-        verify(flow2).collect(any())
+        verify(flow).collect(any())
     }
 
     @Test
@@ -207,8 +211,6 @@ class FileExplorerViewModelTest {
         }
     }
 
-    private val chatId1 = 10L
-    private val chatId2 = 20L
-    private val chatIds = listOf(chatId1, chatId2)
+    private val chatIds = listOf(10L, 20L)
 
 }

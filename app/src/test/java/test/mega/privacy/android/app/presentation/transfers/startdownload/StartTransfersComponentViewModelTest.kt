@@ -192,8 +192,9 @@ class StartTransfersComponentViewModelTest {
         commonStub()
         underTest.startTransfer(startEvent)
         verify(sendChatAttachmentsUseCase).invoke(
-            CHAT_ID,
             listOf(chatUri.toString()).associateWith { null },
+            false,
+            CHAT_ID,
         )
     }
 
@@ -464,7 +465,7 @@ class StartTransfersComponentViewModelTest {
     }
 
     private fun stubStartChatUpload(flow: Flow<MultiTransferEvent>) {
-        whenever(sendChatAttachmentsUseCase(any(), any(), anyOrNull())).thenReturn(flow)
+        whenever(sendChatAttachmentsUseCase(any(), anyOrNull(), any())).thenReturn(flow)
     }
 
     companion object {

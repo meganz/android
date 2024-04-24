@@ -26,14 +26,14 @@ class SendChatAttachmentsUseCase @Inject constructor(
     /**
      * Invoke
      *
-     * @param chatId the id of the chat where these files will be attached
+     * @param chatIds the id of the chat where these files will be attached
      * @param urisWithNames String representation of the files associated with the desired node's name or null if there are no changes
      * @param isVoiceClip
      */
     operator fun invoke(
-        chatId: Long,
         urisWithNames: Map<String, String?>,
         isVoiceClip: Boolean = false,
+        vararg chatIds: Long,
     ) =
         flow {
             val chatFolderId = getMyChatsFilesFolderIdUseCase()
@@ -43,9 +43,9 @@ class SendChatAttachmentsUseCase @Inject constructor(
                     getFileForChatUploadUseCase(it.key)
                 }.mapNotNull { (file, name) ->
                     file?.let {
-                        val pendingMessageId = chatMessageRepository.savePendingMessage(
+                        val pendingMessageIds = chatMessageRepository.savePendingMessages(
                             SavePendingMessageRequest(
-                                chatId = chatId,
+                                chatId = chatIds.first(),
                                 type = if (isVoiceClip) PendingMessage.TYPE_VOICE_CLIP else -1,
                                 uploadTimestamp = deviceCurrentTimeUseCase() / 1000,
                                 state = PendingMessageState.UPLOADING,
@@ -56,12 +56,13 @@ class SendChatAttachmentsUseCase @Inject constructor(
                                 fingerprint = null,
                                 name = name,
                                 transferTag = -1,
-                            )
-                        ).id
+                            ),
+                            chatIds.asList()
+                        )
                         startChatUploadsWithWorkerUseCase(
                             file,
                             chatFolderId,
-                            pendingMessageId
+                            *pendingMessageIds.toLongArray()
                         )
                     }
                 }.merge()

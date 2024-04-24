@@ -66,7 +66,7 @@ class SendChatAttachmentsUseCaseTest {
         val chatId = 123L
         val uris = mapOf<String, String?>("file" to null)
         commonStub()
-        underTest(chatId, uris).test {
+        underTest(uris, false, chatId).test {
             cancelAndIgnoreRemainingEvents()
         }
         verify(startChatUploadsWithWorkerUseCase)(eq(file), NodeId(any()), any())
@@ -81,7 +81,7 @@ class SendChatAttachmentsUseCaseTest {
             val file = mockFile()
             whenever(getFileForChatUploadUseCase(it)).thenReturn(file)
         }
-        underTest(chatId, uris).test {
+        underTest(uris, false, chatId).test {
             cancelAndIgnoreRemainingEvents()
         }
         verify(startChatUploadsWithWorkerUseCase, times(uris.size))(any(), NodeId(any()), any())
@@ -93,7 +93,7 @@ class SendChatAttachmentsUseCaseTest {
         val pendingMsgId = 123L
         val uris = mapOf<String, String?>("file" to null)
         commonStub(pendingMsgId)
-        underTest(chatId, uris).test {
+        underTest(uris, false, chatId).test {
             cancelAndIgnoreRemainingEvents()
         }
         verify(startChatUploadsWithWorkerUseCase)(eq(file), NodeId(any()), eq(pendingMsgId))
@@ -106,12 +106,12 @@ class SendChatAttachmentsUseCaseTest {
             val pendingMsgId = 123L
             val uris = mapOf<String, String?>("file" to null)
             commonStub(pendingMsgId)
-            underTest(chatId, uris, isVoiceClip = true).test {
+            underTest(uris, isVoiceClip = true, chatId).test {
                 cancelAndIgnoreRemainingEvents()
             }
-            verify(chatMessageRepository).savePendingMessage(argThat {
+            verify(chatMessageRepository).savePendingMessages(argThat {
                 this.type == PendingMessage.TYPE_VOICE_CLIP
-            })
+            }, eq(listOf(chatId)))
         }
 
     @Test
@@ -122,12 +122,12 @@ class SendChatAttachmentsUseCaseTest {
             val name = "file renamed"
             val uris = mapOf<String, String?>("file" to name)
             commonStub(pendingMsgId)
-            underTest(chatId, uris, isVoiceClip = true).test {
+            underTest(uris, isVoiceClip = true, chatId).test {
                 cancelAndIgnoreRemainingEvents()
             }
-            verify(chatMessageRepository).savePendingMessage(argThat {
+            verify(chatMessageRepository).savePendingMessages(argThat {
                 this.name == name
-            })
+            }, eq(listOf(chatId)))
         }
 
     @Test
@@ -141,7 +141,7 @@ class SendChatAttachmentsUseCaseTest {
                 val file = mockFile()
                 whenever(getFileForChatUploadUseCase(it)).thenReturn(file)
             }
-            underTest(chatId, uris).test {
+            underTest(uris, false, chatId).test {
                 cancelAndConsumeRemainingEvents()
 
                 verify(startChatUploadsWithWorkerUseCase, times(uris.size))
@@ -151,11 +151,8 @@ class SendChatAttachmentsUseCaseTest {
         }
 
     private suspend fun commonStub(pendingMsgId: Long = 1L, myChatFolderId: NodeId = NodeId(-1)) {
-        val pendingMessage = mock<PendingMessage> {
-            on { id } doReturn pendingMsgId
-        }
-        whenever(chatMessageRepository.savePendingMessage(any()))
-            .thenReturn(pendingMessage)
+        whenever(chatMessageRepository.savePendingMessages(any(), any()))
+            .thenReturn(listOf(pendingMsgId))
         val event = mock<MultiTransferEvent.SingleTransferEvent> {
             on { scanningFinished } doReturn true
         }

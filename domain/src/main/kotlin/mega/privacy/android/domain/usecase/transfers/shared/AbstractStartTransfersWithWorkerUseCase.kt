@@ -46,12 +46,14 @@ abstract class AbstractStartTransfersWithWorkerUseCase(
                 emit(event)
                 if (!workerTriggered && singleTransferEvent?.scanningFinished == true) {
                     workerTriggered = true
-                    launch(NonCancellable) {
-                        startWorker()
-                        workerStarted = true
-                        // Once the Worker has started it will wait for [allNodesUpdated] to be true but with this timeout
-                        delay(800.milliseconds)
-                        channel.close()
+                    launch {
+                        withContext(NonCancellable) {
+                            startWorker()
+                            workerStarted = true
+                            // Once the Worker has started it will wait for [allNodesUpdated] to be true but with this timeout
+                            delay(800.milliseconds)
+                            channel.close()
+                        }
                     }
                 }
 

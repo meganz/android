@@ -363,7 +363,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         runCatching { clearActiveTransfersIfFinishedUseCase(TransferType.CHAT_UPLOAD) }
             .onFailure { Timber.e(it) }
         sendChatAttachmentsUseCase(
-            chatId, uris.map { it.toString() }.associateWith { null }, isVoiceClip
+            uris.map { it.toString() }.associateWith { null }, isVoiceClip, chatId
         ).catch { Timber.e(it) }.collect {
             when (it) {
                 is MultiTransferEvent.TransferNotStarted<*> -> {
