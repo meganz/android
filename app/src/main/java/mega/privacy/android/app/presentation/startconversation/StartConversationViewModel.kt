@@ -19,10 +19,8 @@ import mega.privacy.android.app.data.extensions.replaceIfExists
 import mega.privacy.android.app.data.extensions.sortList
 import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
-import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
-import mega.privacy.android.domain.usecase.AddNewContacts
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
 import mega.privacy.android.domain.usecase.GetContactDataUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
@@ -30,10 +28,12 @@ import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.chat.CreateGroupChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
+import mega.privacy.android.domain.usecase.contact.AddNewContactsUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -48,7 +48,7 @@ import javax.inject.Inject
  * @property monitorChatPresenceLastGreenUpdatesUseCase     [MonitorChatPresenceLastGreenUpdatesUseCase]
  * @property monitorChatOnlineStatusUseCase                 [MonitorChatOnlineStatusUseCase]
  * @property monitorContactRequestUpdates                   [MonitorContactRequestUpdates]
- * @property addNewContacts                                 [AddNewContacts]
+ * @property addNewContactsUseCase                          [AddNewContactsUseCase]
  * @property requestUserLastGreenUseCase                    [RequestUserLastGreenUseCase]
  * @property state                    Current view state as [StartConversationState]
  */
@@ -63,7 +63,7 @@ class StartConversationViewModel @Inject constructor(
     private val monitorChatPresenceLastGreenUpdatesUseCase: MonitorChatPresenceLastGreenUpdatesUseCase,
     private val monitorChatOnlineStatusUseCase: MonitorChatOnlineStatusUseCase,
     private val monitorContactRequestUpdates: MonitorContactRequestUpdates,
-    private val addNewContacts: AddNewContacts,
+    private val addNewContactsUseCase: AddNewContactsUseCase,
     private val requestUserLastGreenUseCase: RequestUserLastGreenUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     savedStateHandle: SavedStateHandle,
@@ -235,7 +235,7 @@ class StartConversationViewModel @Inject constructor(
     private fun observeNewContacts() {
         viewModelScope.launch {
             monitorContactRequestUpdates().collectLatest { newContacts ->
-                val contactList = addNewContacts(_state.value.contactItemList, newContacts)
+                val contactList = addNewContactsUseCase(_state.value.contactItemList, newContacts)
                 _state.update { it.copy(contactItemList = contactList.sortList()) }
             }
         }

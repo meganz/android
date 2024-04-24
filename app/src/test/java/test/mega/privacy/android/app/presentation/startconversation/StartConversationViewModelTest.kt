@@ -18,7 +18,6 @@ import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
-import mega.privacy.android.domain.usecase.AddNewContacts
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
 import mega.privacy.android.domain.usecase.GetContactDataUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
@@ -26,6 +25,7 @@ import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.chat.CreateGroupChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
+import mega.privacy.android.domain.usecase.contact.AddNewContactsUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
@@ -93,7 +93,7 @@ class StartConversationViewModelTest {
         mock<MonitorChatPresenceLastGreenUpdatesUseCase>()
     private val monitorChatOnlineStatusUseCase = mock<MonitorChatOnlineStatusUseCase>()
     private val monitorContactRequestUpdates = mock<MonitorContactRequestUpdates>()
-    private val addNewContacts = mock<AddNewContacts>()
+    private val addNewContactsUseCase = mock<AddNewContactsUseCase>()
     private val requestUserLastGreenUseCase = mock<RequestUserLastGreenUseCase>()
     private val createGroupChatRoomUseCase = mock<CreateGroupChatRoomUseCase>()
 
@@ -104,7 +104,7 @@ class StartConversationViewModelTest {
             getContactDataUseCase,
             startConversationUseCase,
             applyContactUpdates,
-            addNewContacts,
+            addNewContactsUseCase,
             requestUserLastGreenUseCase,
             createGroupChatRoomUseCase
         )
@@ -130,7 +130,7 @@ class StartConversationViewModelTest {
             monitorChatPresenceLastGreenUpdatesUseCase = monitorChatPresenceLastGreenUpdatesUseCase,
             monitorChatOnlineStatusUseCase = monitorChatOnlineStatusUseCase,
             monitorContactRequestUpdates = monitorContactRequestUpdates,
-            addNewContacts = addNewContacts,
+            addNewContactsUseCase = addNewContactsUseCase,
             requestUserLastGreenUseCase = requestUserLastGreenUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             savedStateHandle = savedStateHandle,
