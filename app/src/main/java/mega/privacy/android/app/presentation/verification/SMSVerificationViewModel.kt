@@ -19,7 +19,7 @@ import mega.privacy.android.domain.usecase.GetCurrentCountryCodeUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.verification.GetCountryCallingCodesUseCase
 import mega.privacy.android.domain.usecase.verification.GetFormattedPhoneNumberUseCase
-import mega.privacy.android.domain.usecase.verification.SendSMSVerificationCode
+import mega.privacy.android.domain.usecase.verification.SendSMSVerificationCodeUseCase
 import mega.privacy.android.domain.usecase.verification.SetSMSVerificationShownUseCase
 import timber.log.Timber
 import java.util.Locale
@@ -32,7 +32,7 @@ import javax.inject.Inject
 class SMSVerificationViewModel @Inject constructor(
     private val setSMSVerificationShownUseCase: SetSMSVerificationShownUseCase,
     private val getCountryCallingCodesUseCase: GetCountryCallingCodesUseCase,
-    private val sendSMSVerificationCode: SendSMSVerificationCode,
+    private val sendSMSVerificationCodeUseCase: SendSMSVerificationCodeUseCase,
     private val getCurrentCountryCodeUseCase: GetCurrentCountryCodeUseCase,
     private val getFormattedPhoneNumberUseCase: GetFormattedPhoneNumberUseCase,
     private val savedState: SavedStateHandle,
@@ -208,7 +208,7 @@ class SMSVerificationViewModel @Inject constructor(
                             isNextEnabled = false
                         )
                     }
-                    sendSMSVerificationCode(phoneNumber)
+                    sendSMSVerificationCodeUseCase(phoneNumber)
                     _uiState.update { state ->
                         state.copy(
                             isVerificationCodeSent = true,

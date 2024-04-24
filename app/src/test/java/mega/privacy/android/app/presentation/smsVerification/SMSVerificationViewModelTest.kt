@@ -16,7 +16,7 @@ import mega.privacy.android.domain.usecase.GetCurrentCountryCodeUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.verification.GetCountryCallingCodesUseCase
 import mega.privacy.android.domain.usecase.verification.GetFormattedPhoneNumberUseCase
-import mega.privacy.android.domain.usecase.verification.SendSMSVerificationCode
+import mega.privacy.android.domain.usecase.verification.SendSMSVerificationCodeUseCase
 import mega.privacy.android.domain.usecase.verification.SetSMSVerificationShownUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -39,7 +39,7 @@ class SMSVerificationViewModelTest {
 
     private val setSMSVerificationShownUseCase: SetSMSVerificationShownUseCase = mock()
     private val getCountryCallingCodesUseCase: GetCountryCallingCodesUseCase = mock()
-    private val sendSMSVerificationCode: SendSMSVerificationCode = mock()
+    private val sendSMSVerificationCodeUseCase: SendSMSVerificationCodeUseCase = mock()
     private val smsVerificationTextMapper: SMSVerificationTextMapper = mock()
     private val smsVerificationTextErrorMapper: SmsVerificationTextErrorMapper = mock()
     private val getCurrentCountryCodeUseCase: GetCurrentCountryCodeUseCase = mock()
@@ -69,7 +69,7 @@ class SMSVerificationViewModelTest {
         underTest = SMSVerificationViewModel(
             setSMSVerificationShownUseCase = setSMSVerificationShownUseCase,
             getCountryCallingCodesUseCase = getCountryCallingCodesUseCase,
-            sendSMSVerificationCode = sendSMSVerificationCode,
+            sendSMSVerificationCodeUseCase = sendSMSVerificationCodeUseCase,
             getCurrentCountryCodeUseCase = getCurrentCountryCodeUseCase,
             getFormattedPhoneNumberUseCase = getFormattedPhoneNumberUseCase,
             savedState = savedState,
@@ -138,7 +138,7 @@ class SMSVerificationViewModelTest {
                 phoneNumber = phoneNumber
             )
         whenever(getFormattedPhoneNumberUseCase(any(), any())).thenReturn(phoneNumber)
-        whenever(sendSMSVerificationCode(phoneNumber)).thenReturn(Unit)
+        whenever(sendSMSVerificationCodeUseCase(phoneNumber)).thenReturn(Unit)
         underTest.setPhoneNumber(phoneNumber)
         underTest.validatePhoneNumber()
         advanceUntilIdle()
