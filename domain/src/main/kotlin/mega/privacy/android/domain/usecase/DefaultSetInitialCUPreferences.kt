@@ -14,7 +14,7 @@ class DefaultSetInitialCUPreferences @Inject constructor(
 
     override suspend fun invoke() {
         accountRepository.setUserHasLoggedIn()
-        settingsRepository.setAskDownloadLocation(true)
+        settingsRepository.setAskSetDownloadLocation(true)
         settingsRepository.setDefaultStorageDownloadLocation()
         settingsRepository.setPasscodeLockEnabled(false)
         settingsRepository.setPasscodeLockCode("")

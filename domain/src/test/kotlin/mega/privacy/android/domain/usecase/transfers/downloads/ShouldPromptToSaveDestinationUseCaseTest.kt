@@ -31,7 +31,7 @@ class ShouldPromptToSaveDestinationUseCaseTest {
     fun `test that invoke returns AskDownloadLocation from settings repository`(
         expected: Boolean,
     ) = runTest {
-        whenever(settingsRepository.isAskDownloadLocation()).thenReturn(expected)
+        whenever(settingsRepository.isAskSetDownloadLocation()).thenReturn(expected)
         val actual = underTest()
         assertThat(actual).isEqualTo(expected)
     }

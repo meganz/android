@@ -13,5 +13,5 @@ class SaveDoNotPromptToSaveDestinationUseCase @Inject constructor(
     /**
      * Invoke
      */
-    suspend operator fun invoke() = settingsRepository.setAskDownloadLocation(false)
+    suspend operator fun invoke() = settingsRepository.setAskSetDownloadLocation(false)
 }

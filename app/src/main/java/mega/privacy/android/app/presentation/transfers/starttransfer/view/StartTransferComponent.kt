@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.starttransfer.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.Manifest
 import android.app.Activity
 import android.content.Context
@@ -57,7 +58,6 @@ import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
-import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialogWithRadioButtons
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.core.ui.utils.MinimumTimeVisibility
@@ -244,10 +244,6 @@ private fun StartTransferComponent(
         })
 
     var showPromptSaveDestinationDialog by rememberSaveable { mutableStateOf<String?>(null) }
-    var doNotPromptSaveDestinationAgain by rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(showPromptSaveDestinationDialog) {
-        doNotPromptSaveDestinationAgain = false
-    }
     EventEffect(
         event = uiState.promptSaveDestination,
         onConsumed = onPromptSaveDestinationConsumed,
@@ -309,25 +305,26 @@ private fun StartTransferComponent(
         folderPicker.launch(null)
     }
     showPromptSaveDestinationDialog?.let { destination ->
-        val radioOption = stringResource(id = R.string.general_do_not_show)
         //this dialog will be updated once we have a dialog defined for this case that follows our DS
-        ConfirmationDialogWithRadioButtons(
-            radioOptions = listOf(radioOption),
-            cancelButtonText = stringResource(id = R.string.general_negative_button),
-            confirmButtonText = stringResource(id = R.string.general_yes),
-            titleText = stringResource(id = R.string.confirmation_download_location),
-            initialSelectedOption = if (doNotPromptSaveDestinationAgain) radioOption else "",
-            onOptionSelected = {
-                doNotPromptSaveDestinationAgain = doNotPromptSaveDestinationAgain.not()
-            },
-            onDismissRequest = {
-                if (doNotPromptSaveDestinationAgain) {
-                    onDoNotPromptToSaveDestinationAgain()
-                }
+        ConfirmationDialog(
+            title = null,
+            text = stringResource(id = sharedR.string.transfers_dialog_save_download_location_title),
+            buttonOption1Text = stringResource(id = sharedR.string.transfers_dialog_save_download_location_only_this_time_option),
+            buttonOption2Text = stringResource(id = sharedR.string.transfers_dialog_save_download_location_always_here_option),
+            cancelButtonText = stringResource(id = sharedR.string.transfers_dialog_save_download_location_always_ask_option),
+            onOption1 = {
+                //nothing in this case, just dismiss
                 showPromptSaveDestinationDialog = null
             },
-            onConfirmRequest = {
+            onOption2 = {
                 onSaveDestination(destination)
+                showPromptSaveDestinationDialog = null
+            },
+            onCancel = {
+                onDoNotPromptToSaveDestinationAgain()
+                showPromptSaveDestinationDialog = null
+            },
+            onDismiss = {
                 showPromptSaveDestinationDialog = null
             }
         )

@@ -214,6 +214,20 @@
     <string name="video_section_playlists_delete_playlists_message_singular">“%1$s” deleted</string>
     <!-- The name of the Settings Camera Uploads Option, which decides whether or not the Device must be charged for Camera Uploads to start uploading content -->
     <string name="settings_camera_uploads_upload_only_while_charging_option_name">Upload only while charging</string>
+    <!-- Text for the header of the screen to add a new sync folder -->
+    <string name="sync_add_new_sync_folder_header_text">Add synchronised folder:</string>
+    <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->
+    <string name="general_size_giga_byte">%1$s&#160;GB</string>
+    <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
+    <string name="general_free_plan_name">Free</string>
+    <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
+    <string name="dialog_onboarding_transfer_quota_free_limited">Limited</string>
+    <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
+    <string name="dialog_onboarding_free_account_price">Free</string>
+    <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
+    <string name="dialog_onboarding_button_continue">Continue</string>
+    <!-- Title of navigation bar on Onboarding dialog. -->
+    <string name="dialog_onboarding_app_bar_title">Choose your MEGA plan</string>
     <!-- Header of the Info view field for what is the content of a device/folder -->
     <string name="info_content">Contains</string>
     <!-- Header of the Info view field for what is the total size of the content of a device/folder -->
@@ -235,23 +249,17 @@
         <item quantity="one">%1$d folder&#160;·&#160;</item>
         <item quantity="other">%1$d folders&#160;·&#160;</item>
     </plurals>
-    <!-- Text for the header of the screen to add a new sync folder -->
-    <string name="sync_add_new_sync_folder_header_text">Add synchronised folder:</string>
-    <!-- Size in gigabytes. It can be used for file/folder size or storage/transfer quota. The placeholder %1$s is for the size value, please adjust the position based on linguistics. -->
-    <string name="general_size_giga_byte">%1$s&#160;GB</string>
-    <!-- Name for Free account. DO NOT TRANSLATE! It'll only be used for Free account name. -->
-    <string name="general_free_plan_name">Free</string>
-    <!-- Description of Transfer quota for Free users. The string will be part of another string "[B]Transfer:[/B] [A]%1$s[/A]" (key: account_upgrade_account_pro_plan_info_transfer). Combined string will look like this "[B]Transfer:[/B] [A]Limited[/A]". -->
-    <string name="dialog_onboarding_transfer_quota_free_limited">Limited</string>
-    <!-- Description of the price for Free account. The meaning: this type of account is for free. This string won't be used for name of Free account. -->
-    <string name="dialog_onboarding_free_account_price">Free</string>
-    <!-- Continue button on Onboarding dialog, the user will proceed with payment for chosen account. -->
-    <string name="dialog_onboarding_button_continue">Continue</string>
-    <!-- Title of navigation bar on Onboarding dialog. -->
-    <string name="dialog_onboarding_app_bar_title">Choose your MEGA plan</string>
     <!-- Text of button label or title of the screen to share only one or several links -->
     <plurals name="label_share_links">
-        <item quantity="one">Share Link</item>
-        <item quantity="other">Share Links</item>
+        <item quantity="one">Share link</item>
+        <item quantity="other">Share links</item>
     </plurals>
+    <!-- Title of the dialog to ask the user to use the selected location as default location for next downloads-->
+    <string name="transfers_dialog_save_download_location_title">Download to this location?</string>
+    <!-- Option to don't use the selected location as default location for next downloads-->
+    <string name="transfers_dialog_save_download_location_only_this_time_option">Only this time</string>
+    <!-- Option to use the selected location as default location for next downloads-->
+    <string name="transfers_dialog_save_download_location_always_here_option">Always save here</string>
+    <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
+    <string name="transfers_dialog_save_download_location_always_ask_option">Always ask for destination</string>
 </resources>

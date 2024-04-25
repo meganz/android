@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -29,23 +30,7 @@ fun TextMegaButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     contentPadding: PaddingValues = PaddingValues(horizontal = 8.dp, vertical = 10.dp),
-) = TextButton(
-    modifier = modifier,
-    onClick = onClick,
-    enabled = enabled,
-    colors = ButtonDefaults.buttonColors(
-        backgroundColor = Color.Transparent,
-        contentColor = MegaTheme.colors.text.accent,
-        disabledBackgroundColor = Color.Transparent,
-        disabledContentColor = MegaTheme.colors.text.disabled,
-    ),
-    contentPadding = contentPadding
-) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.button
-    )
-}
+) = TextMegaButton(text, onClick, modifier, enabled, contentPadding, TextAlign.Center)
 
 /**
  * Text button
@@ -64,6 +49,34 @@ fun TextMegaButton(
     enabled = enabled,
     contentPadding = contentPadding,
 )
+
+
+@Composable
+internal fun TextMegaButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 8.dp, vertical = 10.dp),
+    textAlign: TextAlign = TextAlign.Center,
+) = TextButton(
+    modifier = modifier,
+    onClick = onClick,
+    enabled = enabled,
+    colors = ButtonDefaults.buttonColors(
+        backgroundColor = Color.Transparent,
+        contentColor = MegaTheme.colors.text.accent,
+        disabledBackgroundColor = Color.Transparent,
+        disabledContentColor = MegaTheme.colors.text.disabled,
+    ),
+    contentPadding = contentPadding
+) {
+    Text(
+        text = text,
+        textAlign = textAlign,
+        style = MaterialTheme.typography.button
+    )
+}
 
 @CombinedThemePreviews
 @Composable

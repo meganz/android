@@ -167,21 +167,41 @@ internal class DefaultSettingsRepositoryTest {
 
     @ParameterizedTest(name = "expected: {0}")
     @ValueSource(booleans = [true, false])
-    fun `test that megaLocalStorageGateway value is returned when isAskDownloadLocation is invoked`(
+    fun `test that megaLocalStorageGateway value is returned when isAskSetDownloadLocation is invoked`(
         expected: Boolean
     ) =
         runTest {
-            whenever(megaLocalStorageGateway.isAskDownloadLocation()).thenReturn(expected)
-            assertThat(underTest.isAskDownloadLocation()).isEqualTo(expected)
+            whenever(megaLocalStorageGateway.isAskSetDownloadLocation()).thenReturn(expected)
+            assertThat(underTest.isAskSetDownloadLocation()).isEqualTo(expected)
         }
 
     @ParameterizedTest(name = "expected: {0}")
     @ValueSource(booleans = [true, false])
-    fun `test that megaLocalStorageGateway is set with correct value when setAskDownloadLocation is invoked`(
+    fun `test that megaLocalStorageGateway is set with correct value when setAskSetDownloadLocation is invoked`(
         expected: Boolean
     ) =
         runTest {
-            underTest.setAskDownloadLocation(expected)
-            verify(megaLocalStorageGateway).setAskDownloadLocation(expected)
+            underTest.setAskSetDownloadLocation(expected)
+            verify(megaLocalStorageGateway).setAskSetDownloadLocation(expected)
+        }
+
+    @ParameterizedTest(name = "expected: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that megaLocalStorageGateway value is returned when isStorageAskAlways is invoked`(
+        expected: Boolean
+    ) =
+        runTest {
+            whenever(megaLocalStorageGateway.isStorageAskAlways()).thenReturn(expected)
+            assertThat(underTest.isStorageAskAlways()).isEqualTo(expected)
+        }
+
+    @ParameterizedTest(name = "expected: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that megaLocalStorageGateway is set with correct value when setStorageAskAlways is invoked`(
+        expected: Boolean
+    ) =
+        runTest {
+            underTest.setStorageAskAlways(expected)
+            verify(megaLocalStorageGateway).setStorageAskAlways(expected)
         }
 }

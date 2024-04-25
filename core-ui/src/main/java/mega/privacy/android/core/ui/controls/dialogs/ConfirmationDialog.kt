@@ -4,6 +4,7 @@ package mega.privacy.android.core.ui.controls.dialogs
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.controls.dialogs.internal.BaseMegaAlertDialog
@@ -150,7 +151,7 @@ fun ConfirmationDialog(
  */
 @Composable
 fun ConfirmationDialog(
-    title: String,
+    title: String?,
     text: String,
     buttonOption1Text: String,
     buttonOption2Text: String,
@@ -166,17 +167,17 @@ fun ConfirmationDialog(
     text = text,
     buttons = {
         ButtonsColumn {
-            TextMegaButton(
+            DialogEndButton(
                 modifier = Modifier.testTag(OPTION1_TAG),
                 text = buttonOption1Text,
                 onClick = onOption1,
             )
-            TextMegaButton(
+            DialogEndButton(
                 modifier = Modifier.testTag(OPTION2_TAG),
                 text = buttonOption2Text,
                 onClick = onOption2,
             )
-            TextMegaButton(
+            DialogEndButton(
                 modifier = Modifier.testTag(CANCEL_TAG),
                 text = cancelButtonText,
                 onClick = onCancel,
@@ -185,6 +186,16 @@ fun ConfirmationDialog(
     },
     onDismiss, modifier, title, dismissOnClickOutside, dismissOnBackPress
 )
+
+/**
+ * Button with end text alignment, in case it takes more than one line
+ */
+@Composable
+private fun DialogEndButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) = TextMegaButton(text, onClick, modifier, textAlign = TextAlign.End)
 
 @CombinedThemePreviews
 @Composable
@@ -242,7 +253,7 @@ private fun ConfirmationDialog3ButtonsPreview() {
             title = "Dialog title",
             text = "This is the message body of the dialog. And this is another line in the test.",
             buttonOption1Text = "Action 1",
-            buttonOption2Text = "Action 2",
+            buttonOption2Text = "Action 2 with a very long title that takes more than one line",
             cancelButtonText = "Cancel",
             onOption1 = {},
             onOption2 = {},

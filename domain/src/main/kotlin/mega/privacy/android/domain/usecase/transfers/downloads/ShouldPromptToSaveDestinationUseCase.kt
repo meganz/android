@@ -13,5 +13,5 @@ class ShouldPromptToSaveDestinationUseCase @Inject constructor(
      * Invoke
      */
     suspend operator fun invoke() =
-        settingsRepository.isAskDownloadLocation()
+        settingsRepository.isAskSetDownloadLocation()
 }

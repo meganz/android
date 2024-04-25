@@ -249,12 +249,19 @@ internal class DefaultSettingsRepository @Inject constructor(
         return megaLocalStorageGateway.getStorageDownloadLocation()
     }
 
-    override suspend fun isAskDownloadLocation() = withContext(ioDispatcher) {
-        megaLocalStorageGateway.isAskDownloadLocation()
+    override suspend fun isStorageAskAlways(): Boolean {
+        return megaLocalStorageGateway.isStorageAskAlways()
     }
 
-    override suspend fun setAskDownloadLocation(value: Boolean) = withContext(ioDispatcher) {
-        megaLocalStorageGateway.setAskDownloadLocation(value)
+    override suspend fun setStorageAskAlways(isStorageAskAlways: Boolean) =
+        megaLocalStorageGateway.setStorageAskAlways(isStorageAskAlways)
+
+    override suspend fun isAskSetDownloadLocation() = withContext(ioDispatcher) {
+        megaLocalStorageGateway.isAskSetDownloadLocation()
+    }
+
+    override suspend fun setAskSetDownloadLocation(value: Boolean) = withContext(ioDispatcher) {
+        megaLocalStorageGateway.setAskSetDownloadLocation(value)
     }
 
     override suspend fun setStorageDownloadLocation(storageDownloadLocation: String) =

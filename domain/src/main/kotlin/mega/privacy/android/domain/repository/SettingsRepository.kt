@@ -116,14 +116,28 @@ interface SettingsRepository {
     suspend fun getStorageDownloadLocation(): String?
 
     /**
-     * @return if should ask the user about download location
+     * Get always ask for storage download location value
+     *
+     * @return isStorageAskAlways as [Boolean]
      */
-    suspend fun isAskDownloadLocation(): Boolean
+    suspend fun isStorageAskAlways(): Boolean
 
     /**
-     * Set if should ask the user about download location
+     * Set to always ask for storage download location
+     *
+     * @param isStorageAskAlways
      */
-    suspend fun setAskDownloadLocation(value: Boolean)
+    suspend fun setStorageAskAlways(isStorageAskAlways: Boolean)
+
+    /**
+     * @return if should ask the user about set the download location as default
+     */
+    suspend fun isAskSetDownloadLocation(): Boolean
+
+    /**
+     * Set if should ask the user about set the download location as default
+     */
+    suspend fun setAskSetDownloadLocation(value: Boolean)
 
     /**
      * Set Storage download location
