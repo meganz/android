@@ -221,7 +221,10 @@ class VideoPlaylistDetailViewTest {
         val expectedNumberOfVideos = 1
 
         val testVideo = mock<VideoUIEntity> {
+            on { id }.thenReturn(NodeId(123456L))
             on { name }.thenReturn("video")
+            on { size }.thenReturn(700L)
+            on { durationString }.thenReturn("10:00")
         }
 
         val playlist = VideoPlaylistUIEntity(
