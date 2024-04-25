@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.offline.offlinecompose.model
 
+import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.model.OfflineFileInfoUiState
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 
 /**
@@ -7,7 +8,7 @@ import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
  * @property offlineNode [OfflineNodeInformation]
  * @param isSelected offlineNode is selected
  */
-data class OfflineNodeUIItem<T : OfflineNodeInformation>(
-    val offlineNode: T,
-    var isSelected: Boolean,
+data class OfflineNodeUIItem(
+    val offlineNode: OfflineFileInfoUiState,
+    var isSelected: Boolean = false,
 )

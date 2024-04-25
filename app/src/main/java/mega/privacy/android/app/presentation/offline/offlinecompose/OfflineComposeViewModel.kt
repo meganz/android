@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.offline.offlinecompose
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.conflate
@@ -11,11 +10,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineNodeUIItem
 import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineUIState
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.model.OfflineFileInfoUiState
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
-import mega.privacy.android.domain.entity.transfer.TransferFinishType
-import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
-import mega.privacy.android.domain.usecase.LoadOfflineNodesUseCase
+import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
+import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineFileTotalSizeUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineFolderInformationUseCase
+import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineWarningMessageVisibilityUseCase
 import mega.privacy.android.domain.usecase.offline.SetOfflineWarningMessageVisibilityUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersFinishedUseCase
@@ -27,10 +28,14 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class OfflineComposeViewModel @Inject constructor(
-    private val loadOfflineNodesUseCase: LoadOfflineNodesUseCase,
+    private val getOfflineNodesByParentIdUseCase: GetOfflineNodesByParentIdUseCase,
     private val monitorTransfersFinishedUseCase: MonitorTransfersFinishedUseCase,
     private val setOfflineWarningMessageVisibilityUseCase: SetOfflineWarningMessageVisibilityUseCase,
     private val monitorOfflineWarningMessageVisibilityUseCase: MonitorOfflineWarningMessageVisibilityUseCase,
+    private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
+    private val offlineFolderInformationUseCase: GetOfflineFolderInformationUseCase,
+    private val getOfflineFileUseCase: GetOfflineFileUseCase,
+    private val getOfflineFileTotalSizeUseCase: GetOfflineFileTotalSizeUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OfflineUIState())
@@ -40,45 +45,65 @@ class OfflineComposeViewModel @Inject constructor(
      */
     val uiState = _uiState.asStateFlow()
 
-    private var fetchOfflineNodesJob: Job? = null
-
     init {
         monitorOfflineWarningMessage()
-        loadOfflineNodes()
+        monitorOfflineNodeUpdates()
         viewModelScope.launch {
             monitorTransfersFinishedUseCase().conflate().collect {
-                /*
-                The flow might not be collected because the transfer services behaviour isn't
-                working as expected in the DownloadService. This issue is reported under TRAN-35.
-                 */
-                fetchOfflineNodesIfNeeded(it)
+                refreshList()
             }
         }
     }
 
-    /**
-     * Check on completed offline transfer and fetch the offline nodes accordingly
-     * @param transfersFinishedState the state of the finished transfer
-     */
-    fun fetchOfflineNodesIfNeeded(transfersFinishedState: TransfersFinishedState) {
-        val currentPath = uiState.value.currentPath
-
-        if (transfersFinishedState.type == TransferFinishType.DOWNLOAD_OFFLINE
-            && currentPath.contains(transfersFinishedState.nodeLocalPath ?: "")
-        ) {
-            loadOfflineNodes(currentPath)
-        }
-    }
-
-    /**
-     * Monitor the visibility of the offline warning message
-     */
-    fun monitorOfflineWarningMessage() {
+    private fun monitorOfflineWarningMessage() {
         viewModelScope.launch {
             monitorOfflineWarningMessageVisibilityUseCase().collect {
                 _uiState.update { state -> state.copy(showOfflineWarning = it) }
             }
         }
+    }
+
+    private fun monitorOfflineNodeUpdates() {
+        viewModelScope.launch {
+            monitorOfflineNodeUpdatesUseCase().conflate()
+                .collect {
+                    refreshList()
+                }
+        }
+    }
+
+    private fun refreshList() {
+        viewModelScope.launch {
+            runCatching {
+                getOfflineNodesByParentIdUseCase(uiState.value.parentId)
+            }.onSuccess {
+                val offlineNodeUiList = it?.map { offlineInfo ->
+                    OfflineNodeUIItem(offlineNode = loadOfflineNodeInformation(offlineInfo))
+                } ?: run {
+                    emptyList()
+                }
+                _uiState.update {
+                    it.copy(
+                        offlineNodes = offlineNodeUiList
+                    )
+                }
+            }.onFailure {
+                Timber.e(it)
+                _uiState.update {
+                    it.copy(offlineNodes = emptyList())
+                }
+            }
+        }
+    }
+
+    /**
+     * Offline folder clicked
+     */
+    fun onFolderClicked(parentId: Int) {
+        _uiState.update {
+            it.copy(parentId = parentId)
+        }
+        refreshList()
     }
 
     /**
@@ -90,46 +115,24 @@ class OfflineComposeViewModel @Inject constructor(
         }
     }
 
-    /**
-     * map a list of [OfflineNodeInformation] to [OfflineNodeUIItem] to be used in the presentation layer
-     */
-    private fun getOfflineNodeUiItems(nodeList: List<OfflineNodeInformation>): List<OfflineNodeUIItem<OfflineNodeInformation>> {
-        return if (nodeList.isNotEmpty()) {
-            val offlineNodeList = _uiState.value.offlineNodes
-            nodeList.map {
-                val isSelected = _uiState.value.selectedNodeHandles.contains(it.handle)
-                OfflineNodeUIItem(
-                    offlineNode = it,
-                    isSelected = isSelected,
-                )
-            }
-        } else emptyList()
+    private suspend fun loadOfflineNodeInformation(offlineNodeInfo: OfflineNodeInformation): OfflineFileInfoUiState {
+        val offlineFile = getOfflineFileUseCase(offlineNodeInfo)
+        val totalSize = getOfflineFileTotalSizeUseCase(offlineFile)
+        val folderInfo = getFolderInfoOrNull(offlineNodeInfo)
+        val addedTime = offlineNodeInfo.lastModifiedTime?.div(1000L)
+
+        return OfflineFileInfoUiState(
+            title = offlineNodeInfo.name,
+            isFolder = offlineNodeInfo.isFolder,
+            addedTime = addedTime,
+            totalSize = totalSize,
+            folderInfo = folderInfo,
+        )
     }
 
-    /**
-     * get the offline nodes
-     * @param path the provided path to fetch the offline nodes from
-     * @param searchQuery the provided search query to load the offline nodes based on from database
-     */
-    fun loadOfflineNodes(path: String = Constants.OFFLINE_ROOT, searchQuery: String = "") {
-        fetchOfflineNodesJob?.cancel()
-        fetchOfflineNodesJob = viewModelScope.launch {
-            _uiState.update { state ->
-                state.copy(isLoading = true)
-            }
-            runCatching {
-                loadOfflineNodesUseCase(path = path, searchQuery = searchQuery)
-            }.onSuccess {
-                val offlineNodes = getOfflineNodeUiItems(it)
-                _uiState.update { state ->
-                    state.copy(offlineNodes = offlineNodes, isLoading = false)
-                }
-            }.onFailure {
-                Timber.e(it, "Exception fetching offline nodes")
-                _uiState.update { state ->
-                    state.copy(offlineNodes = emptyList(), isLoading = false)
-                }
-            }
-        }
+    private suspend fun getFolderInfoOrNull(
+        offlineNodeInfo: OfflineNodeInformation,
+    ) = offlineNodeInfo.takeIf { it.isFolder }?.let {
+        offlineFolderInformationUseCase(it.id)
     }
 }

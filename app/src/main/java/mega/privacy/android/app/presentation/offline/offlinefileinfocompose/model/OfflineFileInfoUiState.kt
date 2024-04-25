@@ -14,7 +14,7 @@ import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
  * @property isFolder true if the node is a folder, false if it's a file
  *
  */
-internal data class OfflineFileInfoUiState(
+data class OfflineFileInfoUiState(
     val title: String = "",
     val totalSize: Long = 0L,
     val folderInfo: OfflineFolderInfo? = null,
