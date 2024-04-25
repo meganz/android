@@ -12,6 +12,7 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.domain.entity.node.NodeId
 import timber.log.Timber
 
 /**
@@ -80,7 +81,8 @@ class RecentActionBucketActionModeCallback constructor(
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         Timber.d("ActionBarCallBack::onActionItemClicked")
         val selectedMegaNodes = viewModel.getSelectedMegaNodes()
-        val nodesHandles: ArrayList<Long> = ArrayList(selectedMegaNodes.map { it.handle })
+        val nodesHandles = selectedMegaNodes.map { it.handle }
+        val nodeIds = nodesHandles.map { NodeId(it) }
         when (item!!.itemId) {
             R.id.cab_menu_download -> {
                 managerActivity.saveNodesToDevice(
@@ -129,12 +131,12 @@ class RecentActionBucketActionModeCallback constructor(
             }
 
             R.id.cab_menu_hide -> {
-                recentActionBucketFragment.onHideClicked()
+                recentActionBucketFragment.onHideClicked(nodeIds = nodeIds)
                 viewModel.clearSelection()
             }
 
             R.id.cab_menu_unhide -> {
-                viewModel.hideOrUnhideNodes(false)
+                viewModel.hideOrUnhideNodes(nodeIds = nodeIds, false)
                 viewModel.clearSelection()
             }
 

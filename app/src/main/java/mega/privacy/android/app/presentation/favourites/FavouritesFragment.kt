@@ -118,6 +118,8 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
             ::handleHiddenNodesOnboardingResult,
         )
 
+    private var tempNodeIds: List<NodeId> = listOf()
+
     /**
      * onCreateView
      */
@@ -611,6 +613,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
     ) {
         val isHiddenNodesOnboarded = viewModel.isHiddenNodesOnboarded()
         val isPaid = viewModel.getIsPaidAccount()
+
         if (!isPaid) {
             val intent = HiddenNodesOnboardingActivity.createScreen(
                 context = requireContext(),
@@ -621,6 +624,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
         } else if (isHiddenNodesOnboarded) {
             viewModel.hideOrUnhideNodes(nodeIds, true)
         } else {
+            this.tempNodeIds = nodeIds
             showHiddenNodesOnboarding()
         }
     }
@@ -638,14 +642,12 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
 
     private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
         if (result.resultCode != Activity.RESULT_OK) return
-        val selectedNodesCount = viewModel.getItemsSelected().size
-        val nodeIds = viewModel.getItemsSelected().values.map { it.typedNode.id }
-        viewModel.hideOrUnhideNodes(nodeIds, true)
+        viewModel.hideOrUnhideNodes(tempNodeIds, true)
 
         val message = resources.getQuantityString(
             R.plurals.hidden_nodes_result_message,
-            selectedNodesCount,
-            selectedNodesCount,
+            tempNodeIds.size,
+            tempNodeIds.size,
         )
         Util.showSnackbar(requireActivity(), message)
     }

@@ -432,6 +432,14 @@ interface NodeRepository {
     suspend fun getParentNode(nodeId: NodeId): UnTypedNode?
 
     /**
+     * Get the root parent node of a Node
+     *
+     * @param nodeId [NodeId]
+     * @return the root parent node of the node
+     */
+    suspend fun getRootParentNode(nodeId: NodeId): UnTypedNode?
+
+    /**
      * Get [UnTypedNode] by original fingerprint
      * @param originalFingerprint
      * @param parentNodeId NodeId

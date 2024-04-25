@@ -695,6 +695,22 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getRootParentNode(nodeId: NodeId): UnTypedNode? =
+        withContext(ioDispatcher) {
+            var currentRootParent = megaApiGateway.getMegaNodeByHandle(nodeId.longValue)
+            while (currentRootParent != null) {
+                megaApiGateway.getParentNode(currentRootParent)?.let {
+                    currentRootParent = it
+                } ?: break
+            }
+            currentRootParent?.let {
+                nodeMapper(
+                    megaNode = it,
+                    offline = getOfflineNode(nodeId.longValue)
+                )
+            }
+        }
+
     override suspend fun getNodeByOriginalFingerprint(
         originalFingerprint: String,
         parentNodeId: NodeId?,

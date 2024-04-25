@@ -114,6 +114,8 @@ class RecentActionBucketFragment : Fragment() {
             ::handleHiddenNodesOnboardingResult,
         )
 
+    private var tempNodeIds: List<NodeId> = listOf()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -564,7 +566,7 @@ class RecentActionBucketFragment : Fragment() {
         }
     }
 
-    fun onHideClicked() {
+    fun onHideClicked(nodeIds: List<NodeId>) {
         val isHiddenNodesOnboarded = viewModel.state.value.isHiddenNodesOnboarded ?: false
         val isPaid = viewModel.state.value.accountDetail?.levelDetail?.accountType?.isPaid ?: false
         if (!isPaid) {
@@ -575,8 +577,9 @@ class RecentActionBucketFragment : Fragment() {
             hiddenNodesOnboardingLauncher.launch(intent)
             activity?.overridePendingTransition(0, 0)
         } else if (isHiddenNodesOnboarded) {
-            viewModel.hideOrUnhideNodes(true)
+            viewModel.hideOrUnhideNodes(nodeIds = nodeIds, hide = true)
         } else {
+            this.tempNodeIds = nodeIds
             showHiddenNodesOnboarding()
         }
     }
@@ -594,13 +597,13 @@ class RecentActionBucketFragment : Fragment() {
 
     private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
         if (result.resultCode != Activity.RESULT_OK) return
-        val selectedNodesCount = viewModel.getSelectedNodes().size
-        viewModel.hideOrUnhideNodes(true)
+
+        viewModel.hideOrUnhideNodes(nodeIds = tempNodeIds, hide = true)
 
         val message = resources.getQuantityString(
             R.plurals.hidden_nodes_result_message,
-            selectedNodesCount,
-            selectedNodesCount
+            tempNodeIds.size,
+            tempNodeIds.size
         )
         Util.showSnackbar(requireActivity(), message)
     }

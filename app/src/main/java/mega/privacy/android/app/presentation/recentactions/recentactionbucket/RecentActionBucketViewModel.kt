@@ -21,7 +21,7 @@ import mega.privacy.android.app.presentation.recentactions.model.RecentActionBuc
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.GetParentNodeUseCase
+import mega.privacy.android.domain.usecase.GetRootParentNodeUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.UpdateRecentAction
@@ -40,11 +40,11 @@ class RecentActionBucketViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val updateRecentAction: UpdateRecentAction,
     private val getRecentActionNodes: GetRecentActionNodes,
-    private val getParentNodeUseCase: GetParentNodeUseCase,
     monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
+    private val getRootParentNodeUseCase: GetRootParentNodeUseCase,
 ) : ViewModel() {
     private val _actionMode = MutableLiveData<Boolean>()
 
@@ -89,7 +89,7 @@ class RecentActionBucketViewModel @Inject constructor(
         .map { it?.let { getRecentActionNodes(it.nodes) } ?: emptyList() }
         .onEach {
             isInShare = it.firstOrNull()?.node?.let { node ->
-                getParentNodeUseCase(NodeId(node.handle))?.isIncomingShare
+                getRootParentNodeUseCase(NodeId(node.handle))?.isIncomingShare
             } ?: false
         }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
@@ -269,14 +269,12 @@ class RecentActionBucketViewModel @Inject constructor(
             }
     }
 
-    fun hideOrUnhideNodes(hide: Boolean) = viewModelScope.launch {
-        getSelectedNodes().forEach {
-            it.node?.let { node ->
-                async {
-                    runCatching {
-                        updateNodeSensitiveUseCase(nodeId = NodeId(node.handle), isSensitive = hide)
-                    }.onFailure { throwable -> Timber.e("Update sensitivity failed: $throwable") }
-                }
+    fun hideOrUnhideNodes(nodeIds: List<NodeId>, hide: Boolean) = viewModelScope.launch {
+        nodeIds.forEach {
+            async {
+                runCatching {
+                    updateNodeSensitiveUseCase(nodeId = it, isSensitive = hide)
+                }.onFailure { throwable -> Timber.e("Update sensitivity failed: $throwable") }
             }
         }
     }
