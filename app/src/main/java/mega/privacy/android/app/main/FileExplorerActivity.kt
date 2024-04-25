@@ -103,6 +103,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.qualifier.LoginMutex
+import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
@@ -137,7 +138,7 @@ import javax.inject.Inject
  * @property getChatChangesUseCase     [GetChatChangesUseCase]
  * @property checkNameCollisionUseCase [CheckNameCollisionUseCase]
  * @property uploadUseCase             [UploadUseCase]
- * @property legacyCopyNodeUseCase           [LegacyCopyNodeUseCase]
+ * @property copyNodeUseCase           [CopyNodeUseCase]
  * @property isList                    True if the view is in list mode, false if it is in grid mode.
  * @property mode                      Mode for opening the file explorer: [UPLOAD], [MOVE], [COPY], [CAMERA], [IMPORT], [SELECT], [SELECT_CAMERA_FOLDER], [SHARE_LINK] or [SAVE]
  * @property isMultiselect             True if it should allow multiple selection, false otherwise.
@@ -166,7 +167,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
     lateinit var uploadUseCase: UploadUseCase
 
     @Inject
-    lateinit var legacyCopyNodeUseCase: LegacyCopyNodeUseCase
+    lateinit var copyNodeUseCase: CopyNodeUseCase
 
     @Inject
     @LoginMutex
@@ -1566,34 +1567,39 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         for (info in filePreparedInfos ?: return) {
             val fingerprint = megaApi.getFingerprint(info.fileAbsolutePath)
             val node = megaApi.getNodeByFingerprint(fingerprint)
-
             if (node != null) {
                 if (node.parentHandle == myChatFilesNode?.handle) {
-//					File is in My Chat Files --> Add to attach
+                    //	File is in My Chat Files --> Add to attach
                     attachNodes.add(node)
                     filesChecked++
                 } else {
-//					File is in Cloud --> Copy in My Chat Files
-                    legacyCopyNodeUseCase.copy(node, myChatFilesNode, null)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
+                    // File is already in Cloud --> Copy in My Chat Files
+                    // Note: This block is executed when a file is first uploaded to a cloud drive,
+                    //       and then sent to chat again via the Share Intent from another app.
+                    lifecycleScope.launch {
+                        val newParentNodeHandle = myChatFilesNode?.handle
+                        runCatching {
+                            requireNotNull(newParentNodeHandle)
+                            copyNodeUseCase(
+                                nodeToCopy = NodeId(node.handle),
+                                newNodeParent = NodeId(newParentNodeHandle),
+                                newNodeName = null
+                            )
+                        }.onSuccess {
                             filesChecked++
                             attachNodes.add(node)
-
-                            if (filesChecked == (filePreparedInfos ?: return@subscribe).size) {
+                            if (filesChecked == (filePreparedInfos ?: return@onSuccess).size) {
                                 startChatUploadService()
                             }
-                        }) { throwable: Throwable? ->
+                        }.onFailure { throwable ->
                             filesChecked++
                             Timber.w("Error copying node into My Chat Files")
-                            if (filesChecked == (filePreparedInfos ?: return@subscribe).size) {
+                            if (filesChecked == (filePreparedInfos ?: return@onFailure).size) {
                                 startChatUploadService()
                             }
-
                             manageCopyMoveException(throwable)
                         }
-                        .addTo(composite)
+                    }
                 }
             } else {
                 uploadInfos.add(info)

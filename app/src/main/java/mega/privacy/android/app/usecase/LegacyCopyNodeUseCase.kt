@@ -2,7 +2,6 @@ package mega.privacy.android.app.usecase
 
 import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.rx3.rxCompletable
 import kotlinx.coroutines.rx3.rxSingle
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -45,20 +44,6 @@ class LegacyCopyNodeUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
-
-    /**
-     * Copies a node.
-     *
-     * @param node          The MegaNoe to copy.
-     * @param parentNode    The parent MegaNode where the node has to be copied.
-     * @param newName       New name for the copied node. Null if it wants to keep the original one.
-     * @return Completable.
-     */
-    fun copy(node: MegaNode?, parentNode: MegaNode?, newName: String? = null) =
-        rxCompletable(ioDispatcher) {
-            copyAsync(node, parentNode, newName)
-        }
-
 
     /**
      * Copies a node.
