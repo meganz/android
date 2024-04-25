@@ -6,7 +6,10 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.theme.MegaAppTheme
@@ -29,6 +32,12 @@ class SettingsCameraUploadsComposeActivity : ComponentActivity() {
     lateinit var getThemeMode: GetThemeMode
 
     /**
+     * Handles the Passcode
+     */
+    @Inject
+    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
+
+    /**
      * onCreate
      */
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,8 +46,13 @@ class SettingsCameraUploadsComposeActivity : ComponentActivity() {
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
-            MegaAppTheme(isDark = themeMode.isDarkMode()) {
-                SettingsCameraUploadsScreen()
+            SessionContainer {
+                MegaAppTheme(isDark = themeMode.isDarkMode()) {
+                    PasscodeContainer(
+                        passcodeCryptObjectFactory = passcodeCryptObjectFactory,
+                        content = { SettingsCameraUploadsScreen() },
+                    )
+                }
             }
         }
     }
