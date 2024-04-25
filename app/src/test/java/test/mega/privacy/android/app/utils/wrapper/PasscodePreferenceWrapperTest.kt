@@ -3,7 +3,6 @@ package test.mega.privacy.android.app.utils.wrapper
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.utils.Constants.PIN_4
 import mega.privacy.android.app.utils.Constants.PIN_6
 import mega.privacy.android.app.utils.Constants.PIN_ALPHANUMERIC
@@ -13,18 +12,12 @@ import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_IM
 import mega.privacy.android.app.utils.wrapper.PasscodePreferenceWrapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.model.MegaAttributes
-import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.passcode.PasscodeTimeout
 import mega.privacy.android.domain.entity.passcode.PasscodeType
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.security.PasscodeRepository
 import mega.privacy.android.domain.usecase.MonitorPasscodeLockPreferenceUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.Nested
@@ -35,7 +28,6 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import test.mega.privacy.android.app.extensions.asHotFlow
@@ -45,8 +37,6 @@ class PasscodePreferenceWrapperTest {
     private lateinit var underTest: PasscodePreferenceWrapper
 
     private val databaseHandler = mock<DatabaseHandler?>()
-    private val megaApiGateway = mock<MegaApiGateway>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val monitorPasscodeLockPreferenceUseCase = mock<MonitorPasscodeLockPreferenceUseCase?>()
     private val passcodeRepository = mock<PasscodeRepository?>()
     private val accountRepository = mock<AccountRepository?>()
@@ -55,201 +45,16 @@ class PasscodePreferenceWrapperTest {
     internal fun setUp() {
         underTest = PasscodePreferenceWrapper(
             databaseHandler = databaseHandler,
-            ioDispatcher = StandardTestDispatcher(),
-            megaApi = megaApiGateway,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorPasscodeLockPreferenceUseCase = monitorPasscodeLockPreferenceUseCase,
             passcodeRepository = passcodeRepository,
             accountRepository = accountRepository,
         )
     }
 
-    @Nested
-    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-    inner class Legacy {
-        @BeforeAll
-        fun initialise() {
-            getFeatureFlagValueUseCase.stub {
-                onBlocking { invoke(AppFeatures.PasscodeBackend) }.thenReturn(
-                    false
-                )
-            }
-        }
-
-        @AfterAll
-        fun cleanUp() {
-            Mockito.reset(getFeatureFlagValueUseCase)
-        }
-
-        @AfterEach
-        fun reset() {
-            resetMocks()
-        }
-
-        @Test
-        internal fun `test that lock enabled returns preference value`() = runTest {
-            val expected = true
-            val megaPreferences = mock<MegaPreferences> {
-                on { passcodeLockEnabled }.thenReturn(expected.toString())
-            }
-            databaseHandler.stub { on { preferences }.thenReturn(megaPreferences) }
-
-            assertThat(underTest.isPasscodeEnabled()).isEqualTo(expected)
-        }
-
-        @Test
-        internal fun `test that get passcode returns preference value`() = runTest {
-            val expected = "passcode"
-            val megaPreferences = mock<MegaPreferences> {
-                on { passcodeLockCode }.thenReturn(expected)
-            }
-            databaseHandler.stub { on { preferences }.thenReturn(megaPreferences) }
-
-            assertThat(underTest.getPasscode()).isEqualTo(expected)
-        }
-
-        @Test
-        internal fun `test that passcode timeout returns database handler value`() = runTest {
-            val expected = 12
-            databaseHandler.stub {
-                on { passcodeRequiredTime }.thenReturn(expected)
-            }
-
-            assertThat(underTest.getPasscodeTimeOut()).isEqualTo(expected)
-        }
-
-        @Test
-        internal fun `test that passcode timeout is set on database handler`() = runTest {
-            val expected = 44
-            underTest.setPasscodeTimeOut(expected)
-            verify(databaseHandler).passcodeRequiredTime = expected
-        }
-
-        @Test
-        internal fun `test that enable biometrics value is set on the database handler`() =
-            runTest {
-                val expected = true
-                underTest.setFingerprintLockEnabled(expected)
-                verify(databaseHandler).isFingerprintLockEnabled = expected
-            }
-
-        @Test
-        internal fun `test that database handler value is returned for is fingerprint enabled`() =
-            runTest {
-                val expected = true
-                databaseHandler.stub {
-                    on { isFingerprintLockEnabled }.thenReturn(expected)
-                }
-
-                assertThat(underTest.isFingerPrintLockEnabled()).isEqualTo(expected)
-            }
-
-        @Test
-        internal fun `test that database handler value is updated when setting passcode enabled`() =
-            runTest {
-                val expected = true
-                underTest.setPasscodeEnabled(expected)
-
-                verify(databaseHandler).isPasscodeLockEnabled = expected
-            }
-
-        @Test
-        internal fun `test that database handler value is updated when setting passcode type`() =
-            runTest {
-                val expected = PIN_6
-                underTest.setPasscodeLockType(expected)
-
-                verify(databaseHandler).passcodeLockType = expected
-            }
-
-        @Test
-        internal fun `test that database handler value is updated when passcode is set`() =
-            runTest {
-                val expected = "1234"
-                underTest.setPasscode(expected)
-
-                verify(databaseHandler).passcodeLockCode = expected
-            }
-
-        @Test
-        internal fun `test that database attributes attempts are returned for failed attempts`() =
-            runTest {
-                val expected = 144
-                val megaAttributes = mock<MegaAttributes> {
-                    on { attempts }.thenReturn(expected)
-                }
-                databaseHandler.stub {
-                    on { attributes }.thenReturn(megaAttributes)
-                }
-
-                assertThat(underTest.getFailedAttemptsCount()).isEqualTo(expected)
-            }
-
-        @Test
-        internal fun `test that attributes value is set when setting failed attempts`() = runTest {
-            val expected = 411
-
-            underTest.setFailedAttemptsCount(expected)
-
-            verify(databaseHandler).setAttrAttempts(expected)
-        }
-
-        @Test
-        internal fun `test that preference value is returned when fetching passcode type`() =
-            runTest {
-                val expected = PIN_6
-                val megaPreferences = mock<MegaPreferences> {
-                    on { passcodeLockType }.thenReturn(expected)
-                }
-
-                databaseHandler.stub {
-                    on { preferences }.thenReturn(megaPreferences)
-                }
-
-                assertThat(underTest.getPasscodeType()).isEqualTo(expected)
-            }
-
-        @Test
-        internal fun `test that default of pin 4 is returned if preferences type is null`() =
-            runTest {
-                val megaPreferences = mock<MegaPreferences> {
-                    on { passcodeLockType }.thenReturn(null)
-                }
-
-                databaseHandler.stub {
-                    on { preferences }.thenReturn(megaPreferences)
-                }
-
-                assertThat(underTest.getPasscodeType()).isEqualTo(PIN_4)
-            }
-
-        @Test
-        internal fun `test that password is checked against the mega api gateway`() = runTest {
-            val expected = "A password, huzzah!"
-
-            underTest.checkPassword(expected)
-
-            verify(megaApiGateway).isCurrentPassword(expected)
-        }
-    }
-
 
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class NewImplementation {
-        @BeforeAll
-        fun initialise() {
-            getFeatureFlagValueUseCase.stub {
-                onBlocking { invoke(AppFeatures.PasscodeBackend) }.thenReturn(
-                    true
-                )
-            }
-        }
-
-        @AfterAll
-        fun cleanUp() {
-            Mockito.reset(getFeatureFlagValueUseCase)
-        }
 
         @AfterEach
         fun reset() {
@@ -545,7 +350,6 @@ class PasscodePreferenceWrapperTest {
     private fun resetMocks() {
         Mockito.reset(
             databaseHandler,
-            megaApiGateway,
             monitorPasscodeLockPreferenceUseCase,
             passcodeRepository,
             accountRepository,
@@ -553,7 +357,6 @@ class PasscodePreferenceWrapperTest {
 
         Mockito.clearInvocations(
             databaseHandler,
-            megaApiGateway,
             monitorPasscodeLockPreferenceUseCase,
             passcodeRepository,
             accountRepository,

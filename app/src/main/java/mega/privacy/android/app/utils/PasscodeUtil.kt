@@ -3,7 +3,6 @@ package mega.privacy.android.app.utils
 import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
-import android.content.Intent
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
@@ -19,8 +18,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
@@ -30,12 +27,10 @@ import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.app.utils.TextUtil.removeFormatPlaceholder
 import mega.privacy.android.app.utils.wrapper.PasscodePreferenceWrapper
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeLockStateUseCase
-import timber.log.Timber
+import mega.privacy.android.shared.theme.MegaAppTheme
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
@@ -45,7 +40,6 @@ class PasscodeUtil @Inject constructor(
     @ApplicationScope private val scope: CoroutineScope,
     private val passcodeManagement: PasscodeManagement,
     private val monitorPasscodeLockStateUseCase: MonitorPasscodeLockStateUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getThemeMode: GetThemeMode,
     private val passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
 ) {
@@ -320,26 +314,7 @@ class PasscodeUtil @Inject constructor(
      * @return True if should lock the app, false otherwise.
      */
     suspend fun shouldLock(isRotating: Boolean): Boolean {
-        val backendFlag = getFeatureFlagValueUseCase(AppFeatures.PasscodeBackend)
-        if (backendFlag) {
-            return monitorPasscodeLockStateUseCase().first()
-        } else {
-            if (isRotating) return false
-            val enabled = passcodePreferenceWrapper.isPasscodeEnabled()
-            val code = passcodePreferenceWrapper.getPasscode()
-            val timeOut = passcodePreferenceWrapper.getPasscodeTimeOut()
-            return if (enabled
-                && code != null
-                && timeOut != REQUIRE_PASSCODE_INVALID
-            ) {
-                val currentTime = System.currentTimeMillis()
-                val lastPaused = passcodeManagement.lastPause
-
-                Timber.d("Passcode value: Time: $currentTime lastPause: $lastPaused")
-
-                currentTime - lastPaused > timeOut
-            } else false
-        }
+        return monitorPasscodeLockStateUseCase().first()
     }
 
     /**
@@ -371,38 +346,28 @@ class PasscodeUtil @Inject constructor(
      * Launches an intent to show passcode screen when the app is locked
      */
     private suspend fun showLockScreen() {
-        val uiFlag = getFeatureFlagValueUseCase(AppFeatures.Passcode)
-        val backendFlag = getFeatureFlagValueUseCase(AppFeatures.PasscodeBackend)
-        if (uiFlag && backendFlag) {
-            val activity = context as Activity
-            if (activity.findViewById<ComposeView>(R.id.pass_code) == null) {
-                val themeMode = getThemeMode().first()
-                val view = ComposeView(activity)
-                    .apply {
-                        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
-                        setContent {
-                            val locked: Boolean by monitorPasscodeLockStateUseCase().collectAsStateWithLifecycle(
-                                initialValue = true
-                            )
-                            if (locked) {
-                                MegaAppTheme(isDark = themeMode.isDarkMode()) {
-                                    PasscodeView(cryptObjectFactory = passcodeCryptObjectFactory)
-                                }
+        val activity = context as Activity
+        if (activity.findViewById<ComposeView>(R.id.pass_code) == null) {
+            val themeMode = getThemeMode().first()
+            val view = ComposeView(activity)
+                .apply {
+                    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
+                    setContent {
+                        val locked: Boolean by monitorPasscodeLockStateUseCase().collectAsStateWithLifecycle(
+                            initialValue = true
+                        )
+                        if (locked) {
+                            MegaAppTheme(isDark = themeMode.isDarkMode()) {
+                                PasscodeView(cryptObjectFactory = passcodeCryptObjectFactory)
                             }
                         }
-                    }.apply {
-                        id = R.id.pass_code
                     }
-                activity.addContentView(
-                    view,
-                    (activity.findViewById(android.R.id.content) as ViewGroup).layoutParams
-                )
-            }
-
-        } else {
-            context.startActivity(
-                Intent(context, PasscodeLockActivity::class.java)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }.apply {
+                    id = R.id.pass_code
+                }
+            activity.addContentView(
+                view,
+                (activity.findViewById(android.R.id.content) as ViewGroup).layoutParams
             )
         }
 

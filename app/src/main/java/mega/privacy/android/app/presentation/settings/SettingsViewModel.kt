@@ -246,12 +246,8 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun monitorPasscodePreference() =
-        if (getFeatureFlagValueUseCase(AppFeatures.PasscodeBackend)) {
-            monitorPasscodeLockPreferenceUseCase()
-        } else {
-            flow { emit(refreshPasscodeLockPreference()) }
-        }.map { enabled ->
+    private fun monitorPasscodePreference() =
+        monitorPasscodeLockPreferenceUseCase().map { enabled ->
             { state: SettingsState -> state.copy(passcodeLock = enabled) }
         }
 

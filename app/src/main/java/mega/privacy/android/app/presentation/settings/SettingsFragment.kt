@@ -34,11 +34,11 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
-import mega.privacy.android.app.activities.settingsActivities.LegacyCameraUploadsPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.DownloadPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
+import mega.privacy.android.app.activities.settingsActivities.LegacyCameraUploadsPreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.LegacyPasscodePreferencesActivity
 import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity
 import mega.privacy.android.app.constants.SettingsConstants.KEY_2FA
@@ -77,12 +77,12 @@ import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.hideKeyboard
 import mega.privacy.android.app.presentation.settings.calls.SettingsCallsActivity
+import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsComposeActivity
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
-import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsComposeActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -274,11 +274,6 @@ class SettingsFragment :
 
     private fun refreshSummaries() {
         viewModel.refreshCameraUploadsOn()
-        viewLifecycleOwner.lifecycleScope.launch {
-            if (!getFeatureFlagUseCase(AppFeatures.PasscodeBackend)) {
-                updatePasscodeLockSummary(viewModel.fetchPasscodeEnabled())
-            }
-        }
     }
 
     private fun updatePasscodeLockSummary(enabled: Boolean) {

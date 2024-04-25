@@ -124,22 +124,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables the new compose passcode backend implementation
-     */
-    PasscodeBackend(
-        "Enables the new compose passcode backend implementation",
-        true,
-    ),
-
-    /**
-     * Enables the new compose passcode implementation
-     */
-    Passcode(
-        "Enables the new compose passcode implementation",
-        true,
-    ),
-
-    /**
      * Enables DownloadWorker for download nodes, instead of DownloadService. This is a work in progress feature.
      */
     DownloadWorker(

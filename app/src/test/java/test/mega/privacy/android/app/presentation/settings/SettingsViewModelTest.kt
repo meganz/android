@@ -214,6 +214,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `test that the subsequent value auto accept is returned from the use case`() = runTest {
+        whenever(monitorPasscodeLockPreferenceUseCase()).thenReturn(emptyFlow())
         isMultiFactorAuthEnabledUseCase.stub {
             onBlocking { invoke() }.thenReturn(false)
             monitorAutoAcceptQRLinks.stub {
@@ -470,10 +471,6 @@ class SettingsViewModelTest {
     @Test
     internal fun `test that passcodeLock is set with values returned from monitorPasscodeLockPreferenceUseCase`() =
         runTest {
-            getFeatureFlagValueUseCase.stub {
-                onBlocking { invoke(AppFeatures.PasscodeBackend) }.thenReturn(true)
-            }
-
             monitorPasscodeLockPreferenceUseCase.stub {
                 on { invoke() }.thenReturn(
                     flow {

@@ -1,11 +1,8 @@
 package mega.privacy.android.app.utils.wrapper
 
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.PIN_4
 import mega.privacy.android.app.utils.Constants.PIN_6
@@ -19,14 +16,11 @@ import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_AF
 import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_AFTER_5S
 import mega.privacy.android.app.utils.PasscodeUtil.Companion.REQUIRE_PASSCODE_IMMEDIATE
 import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.entity.passcode.PasscodeTimeout
 import mega.privacy.android.domain.entity.passcode.PasscodeType
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.security.PasscodeRepository
 import mega.privacy.android.domain.usecase.MonitorPasscodeLockPreferenceUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -34,14 +28,10 @@ import javax.inject.Singleton
  * Passcode preference wrapper
  *
  * @property databaseHandler
- * @property ioDispatcher
  */
 @Singleton
 class PasscodePreferenceWrapper @Inject constructor(
     private val databaseHandler: DatabaseHandler,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val megaApi: MegaApiGateway,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorPasscodeLockPreferenceUseCase: MonitorPasscodeLockPreferenceUseCase,
     private val passcodeRepository: PasscodeRepository,
     private val accountRepository: AccountRepository,
@@ -51,11 +41,7 @@ class PasscodePreferenceWrapper @Inject constructor(
      *
      */
     suspend fun isPasscodeEnabled() =
-        if (newImplementation()) {
-            monitorPasscodeLockPreferenceUseCase().first()
-        } else {
-            withContext(ioDispatcher) { databaseHandler.preferences?.passcodeLockEnabled.toBoolean() }
-        }
+        monitorPasscodeLockPreferenceUseCase().first()
 
     /**
      * Get passcode
@@ -63,28 +49,20 @@ class PasscodePreferenceWrapper @Inject constructor(
      * @return
      */
     suspend fun getPasscode(): String? =
-        if (newImplementation()) {
-            passcodeRepository.getPasscode()
-        } else {
-            withContext(ioDispatcher) { databaseHandler.preferences?.passcodeLockCode.takeUnless { it.isNullOrEmpty() } }
-        }
+        passcodeRepository.getPasscode()
 
     /**
      * Get passcode time out
      *
      */
     suspend fun getPasscodeTimeOut() =
-        if (newImplementation()) {
-            passcodeRepository.monitorPasscodeTimeOut().map {
-                when (it) {
-                    PasscodeTimeout.Immediate -> REQUIRE_PASSCODE_IMMEDIATE
-                    is PasscodeTimeout.TimeSpan -> getTimeoutTime(it.milliseconds.toInt())
-                    null -> Constants.REQUIRE_PASSCODE_INVALID
-                }
-            }.first()
-        } else {
-            withContext(ioDispatcher) { databaseHandler.passcodeRequiredTime }
-        }
+        passcodeRepository.monitorPasscodeTimeOut().map {
+            when (it) {
+                PasscodeTimeout.Immediate -> REQUIRE_PASSCODE_IMMEDIATE
+                is PasscodeTimeout.TimeSpan -> getTimeoutTime(it.milliseconds.toInt())
+                null -> Constants.REQUIRE_PASSCODE_INVALID
+            }
+        }.first()
 
     private fun getTimeoutTime(milliseconds: Int): Int {
         return when {
@@ -104,12 +82,8 @@ class PasscodePreferenceWrapper @Inject constructor(
      * @param passcodeRequireTime
      */
     suspend fun setPasscodeTimeOut(passcodeRequireTime: Int) {
-        if (newImplementation()) {
-            val timeout = getTimeout(passcodeRequireTime)
-            passcodeRepository.setPasscodeTimeOut(timeout)
-        } else {
-            withContext(ioDispatcher) { databaseHandler.passcodeRequiredTime = passcodeRequireTime }
-        }
+        val timeout = getTimeout(passcodeRequireTime)
+        passcodeRepository.setPasscodeTimeOut(timeout)
     }
 
     private fun getTimeout(timeSpan: Int) = when (timeSpan) {
@@ -124,17 +98,11 @@ class PasscodePreferenceWrapper @Inject constructor(
      * @param enabled
      */
     suspend fun setFingerprintLockEnabled(enabled: Boolean) {
-        if (newImplementation()) {
-            val current = getCurrentPasscodeTypeOrFallback()
-            if (enabled) {
-                passcodeRepository.setPasscodeType(PasscodeType.Biometric(current))
-            } else {
-                passcodeRepository.setPasscodeType(current)
-            }
+        val current = getCurrentPasscodeTypeOrFallback()
+        if (enabled) {
+            passcodeRepository.setPasscodeType(PasscodeType.Biometric(current))
         } else {
-            withContext(ioDispatcher) {
-                databaseHandler.isFingerprintLockEnabled = enabled
-            }
+            passcodeRepository.setPasscodeType(current)
         }
     }
 
@@ -149,11 +117,7 @@ class PasscodePreferenceWrapper @Inject constructor(
      *
      */
     suspend fun isFingerPrintLockEnabled() =
-        if (newImplementation()) {
-            passcodeTypeIsBiometric()
-        } else {
-            withContext(ioDispatcher) { databaseHandler.isFingerprintLockEnabled }
-        }
+        passcodeTypeIsBiometric()
 
     private suspend fun passcodeTypeIsBiometric() = passcodeRepository.monitorPasscodeType().map {
         it is PasscodeType.Biometric
@@ -165,11 +129,7 @@ class PasscodePreferenceWrapper @Inject constructor(
      * @param enable
      */
     suspend fun setPasscodeEnabled(enable: Boolean) {
-        if (newImplementation()) {
-            passcodeRepository.setPasscodeEnabled(enable)
-        } else {
-            withContext(ioDispatcher) { databaseHandler.isPasscodeLockEnabled = enable }
-        }
+        passcodeRepository.setPasscodeEnabled(enable)
     }
 
     /**
@@ -178,12 +138,8 @@ class PasscodePreferenceWrapper @Inject constructor(
      * @param type
      */
     suspend fun setPasscodeLockType(type: String) {
-        if (newImplementation()) {
-            val newType = getNewPasscodeType(type)
-            passcodeRepository.setPasscodeType(newType)
-        } else {
-            withContext(ioDispatcher) { databaseHandler.passcodeLockType = type }
-        }
+        val newType = getNewPasscodeType(type)
+        passcodeRepository.setPasscodeType(newType)
     }
 
     private suspend fun getNewPasscodeType(
@@ -203,11 +159,7 @@ class PasscodePreferenceWrapper @Inject constructor(
      * @param passcode
      */
     suspend fun setPasscode(passcode: String) {
-        if (newImplementation()) {
-            passcodeRepository.setPasscode(passcode)
-        } else {
-            withContext(ioDispatcher) { databaseHandler.passcodeLockCode = passcode }
-        }
+        passcodeRepository.setPasscode(passcode)
     }
 
     /**
@@ -216,11 +168,7 @@ class PasscodePreferenceWrapper @Inject constructor(
      * @return
      */
     suspend fun getFailedAttemptsCount() =
-        if (newImplementation()) {
-            passcodeRepository.monitorFailedAttempts().firstOrNull() ?: 0
-        } else {
-            withContext(ioDispatcher) { databaseHandler.attributes?.attempts ?: 0 }
-        }
+        passcodeRepository.monitorFailedAttempts().firstOrNull() ?: 0
 
     /**
      * Get passcode type
@@ -228,16 +176,9 @@ class PasscodePreferenceWrapper @Inject constructor(
      * @return
      */
     suspend fun getPasscodeType(): String =
-        if (newImplementation()) {
-            passcodeRepository.monitorPasscodeType().map {
-                getPasscodeTypeString(it)
-            }.first()
-        } else {
-            withContext(ioDispatcher) {
-                databaseHandler.preferences?.passcodeLockType.takeUnless { it.isNullOrEmpty() }
-                    ?: PIN_4
-            }
-        }
+        passcodeRepository.monitorPasscodeType().map {
+            getPasscodeTypeString(it)
+        }.first()
 
     private fun getPasscodeTypeString(it: PasscodeType?): String = when {
         it is PasscodeType.Biometric -> getPasscodeTypeString(it.fallback)
@@ -253,11 +194,7 @@ class PasscodePreferenceWrapper @Inject constructor(
      * @param attempts
      */
     suspend fun setFailedAttemptsCount(attempts: Int) {
-        if (newImplementation()) {
-            passcodeRepository.setFailedAttempts(attempts)
-        } else {
-            withContext(ioDispatcher) { databaseHandler.setAttrAttempts(attempts) }
-        }
+        passcodeRepository.setFailedAttempts(attempts)
     }
 
     /**
@@ -267,12 +204,5 @@ class PasscodePreferenceWrapper @Inject constructor(
      * @return
      */
     suspend fun checkPassword(password: String): Boolean =
-        if (newImplementation()) {
-            accountRepository.isCurrentPassword(password)
-        } else {
-            withContext(ioDispatcher) { megaApi.isCurrentPassword(password) }
-        }
-
-    private suspend fun newImplementation() =
-        getFeatureFlagValueUseCase(AppFeatures.PasscodeBackend)
+        accountRepository.isCurrentPassword(password)
 }
