@@ -50,4 +50,12 @@ data class ChatSession(
     val canReceiveVideoLowRes: Boolean,
     val isModerator: Boolean,
     val isRecording: Boolean,
-)
+) {
+    /**
+     * Checks if the session has a change.
+     *
+     * @param change [ChatSessionChanges] to check.
+     * @return True if the session has the change in question, false otherwise.
+     */
+    fun hasChanged(change: ChatSessionChanges) = changes?.contains(change) == true
+}
