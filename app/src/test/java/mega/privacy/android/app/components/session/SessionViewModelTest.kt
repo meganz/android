@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.chat.RetryConnectionsAndSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.login.CheckChatSessionUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -26,18 +27,25 @@ internal class SessionViewModelTest {
 
     private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
     private val checkChatSessionUseCase: CheckChatSessionUseCase = mock()
+    private val retryConnectionsAndSignalPresenceUseCase: RetryConnectionsAndSignalPresenceUseCase =
+        mock()
 
     @BeforeAll
     fun setUp() {
         underTest = SessionViewModel(
             rootNodeExistsUseCase = rootNodeExistsUseCase,
-            checkChatSessionUseCase = checkChatSessionUseCase
+            checkChatSessionUseCase = checkChatSessionUseCase,
+            retryConnectionsAndSignalPresenceUseCase = retryConnectionsAndSignalPresenceUseCase
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(rootNodeExistsUseCase, checkChatSessionUseCase)
+        reset(
+            rootNodeExistsUseCase,
+            checkChatSessionUseCase,
+            retryConnectionsAndSignalPresenceUseCase
+        )
     }
 
     @Test
@@ -80,5 +88,12 @@ internal class SessionViewModelTest {
         underTest.state.test {
             assertThat(awaitItem().isChatSessionValid).isTrue()
         }
+    }
+
+    @Test
+    fun `test that retry connections and signal presence is called`() = runTest {
+        underTest.retryConnectionsAndSignalPresence()
+
+        verify(retryConnectionsAndSignalPresenceUseCase).invoke()
     }
 }

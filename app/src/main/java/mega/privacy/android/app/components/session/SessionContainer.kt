@@ -2,9 +2,14 @@ package mega.privacy.android.app.components.session
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -33,7 +38,20 @@ internal fun SessionContainer(
     when {
         // if root node exists and chat session is valid, show the content
         // in case shouldCheckChatSession is false, we don't need to check chat session
-        state.isRootNodeExists == true && (!shouldCheckChatSession || state.isChatSessionValid) -> content()
+        state.isRootNodeExists == true && (!shouldCheckChatSession || state.isChatSessionValid) ->
+            Box(modifier = Modifier.pointerInput(Unit) {
+                awaitEachGesture {
+                    do {
+                        val event = awaitPointerEvent()
+                        if (event.type == PointerEventType.Press) {
+                            viewModel.retryConnectionsAndSignalPresence()
+                        }
+                    } while (event.changes.any { it.pressed })
+                }
+            }) {
+                content()
+            }
+
         state.isRootNodeExists == false -> navigateToLogin(context)
     }
 }
