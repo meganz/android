@@ -119,6 +119,7 @@ import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
+import mega.privacy.android.shared.sync.featuretoggle.SyncFeatures
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -134,7 +135,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -1296,7 +1296,7 @@ class ManagerViewModelTest {
                 SyncStatus.SYNCING
             )
             testScheduler.advanceUntilIdle()
-            whenever(getFeatureFlagValueUseCase(AppFeatures.AndroidSync)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(SyncFeatures.AndroidSync)).thenReturn(true)
             monitorSyncsUseCaseFakeFlow.emit(listOf(mockFolderPair))
             testScheduler.advanceUntilIdle()
             underTest
@@ -1309,7 +1309,7 @@ class ManagerViewModelTest {
     @Test
     fun `test that if Android Sync feature is on and syncs are empty Sync service is disabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.AndroidSync)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(SyncFeatures.AndroidSync)).thenReturn(true)
             monitorSyncsUseCaseFakeFlow.emit(listOf())
             testScheduler.advanceUntilIdle()
 
@@ -1323,7 +1323,7 @@ class ManagerViewModelTest {
     @Test
     fun `test that if Android Sync feature is off Sync service is disabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.AndroidSync)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(SyncFeatures.AndroidSync)).thenReturn(false)
             testScheduler.advanceUntilIdle()
 
             underTest

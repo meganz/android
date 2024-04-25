@@ -71,6 +71,8 @@ android.testVariants.all {
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":shared:sync"))
+    implementation("com.google.guava:guava:31.0.1-jre")
     preBuiltSdkDependency(rootProject.extra)
 
     implementation(lib.coroutines.core)

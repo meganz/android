@@ -295,6 +295,7 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":navigation"))
     implementation("androidx.profileinstaller:profileinstaller:1.3.1")
+    implementation(project(":shared:sync"))
     "baselineProfile"(project(":baselineprofile"))
     implementation(project(":liveeventbus-x"))
     implementation(project(":analytics"))

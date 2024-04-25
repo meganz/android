@@ -26,7 +26,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.databinding.NavigationViewLayoutBinding
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.NavigationDrawerManager
@@ -48,6 +47,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.shared.sync.featuretoggle.SyncFeatures
 import mega.privacy.mobile.analytics.event.AndroidSyncNavigationItemEvent
 import mega.privacy.mobile.analytics.event.DeviceCenterEntrypointButtonEvent
 import nz.mega.sdk.MegaApiAndroid
@@ -159,7 +159,7 @@ internal class ManagerDrawerFragment : Fragment() {
             binding.backupsSection.isVisible = false
             setDrawerLayout(uiState.isRootNodeExist && uiState.isConnected)
             binding.navigationDrawerAddPhoneNumberContainer.isVisible = uiState.canVerifyPhoneNumber
-            binding.syncSection.isVisible = uiState.enabledFlags.contains(AppFeatures.AndroidSync)
+            binding.syncSection.isVisible = uiState.enabledFlags.contains(SyncFeatures.AndroidSync)
             binding.deviceCenterSection.isVisible = true
             binding.notificationSectionPromoTag.isVisible = uiState.showPromoTag
         }

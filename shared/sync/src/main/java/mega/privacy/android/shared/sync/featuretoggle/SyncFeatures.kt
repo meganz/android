@@ -1,27 +1,27 @@
-package mega.privacy.android.data.featuretoggle
+package mega.privacy.android.shared.sync.featuretoggle
 
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 
 /**
- * Data features
+ * Sync features
  *
  * @property description
  * @property defaultValue
  *
  * Note: Please register your feature flag to the top of the list to minimize git-diff changes.
  */
-enum class DataFeatures(
+enum class SyncFeatures(
     override val description: String,
     private val defaultValue: Boolean,
 ) : Feature {
 
     /**
-     * Use new camera uploads records
+     * Android Sync toggle
      */
-    UseCameraUploadsRecords(
-        "Use Camera Uploads Records",
-        true
+    AndroidSync(
+        description = "Enable a synchronization between folders on local storage and folders on MEGA cloud",
+        defaultValue = false,
     );
 
     companion object : FeatureFlagValueProvider {

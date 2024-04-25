@@ -172,14 +172,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Android Sync toggle
-     */
-    AndroidSync(
-        "Enable a synchronization between folders on local storage and folders on MEGA cloud",
-        false
-    ),
-
-    /**
      * Permanent logging toggle
      */
     PermanentLogging("Permanently enable logging, removing functionality to turn it on/off", true),
