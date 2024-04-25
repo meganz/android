@@ -1,14 +1,10 @@
 package mega.privacy.android.app.presentation.documentsection.view
 
-import mega.privacy.android.core.R as coreR
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -20,15 +16,16 @@ import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEnt
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
+import mega.privacy.android.core.ui.controls.dividers.DividerType
+import mega.privacy.android.core.ui.controls.dividers.MegaDivider
+import mega.privacy.android.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.icon.pack.R
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
-import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.shared.theme.MegaAppTheme
 import nz.mega.sdk.MegaNode
 
@@ -42,7 +39,8 @@ internal fun DocumentListView(
     onClick: (item: DocumentUiEntity, index: Int) -> Unit,
     onMenuClick: (DocumentUiEntity) -> Unit,
     onSortOrderClick: () -> Unit,
-    onLongClick: ((item: DocumentUiEntity, index: Int) -> Unit) = { _, _ -> },
+    isSelectionMode: Boolean,
+    onLongClick: (item: DocumentUiEntity, index: Int) -> Unit = { _, _ -> },
 ) {
     LazyColumn(state = lazyListState, modifier = modifier) {
         item(
@@ -66,44 +64,38 @@ internal fun DocumentListView(
             NodeListViewItem(
                 modifier = Modifier.testTag("$DOCUMENT_SECTION_ITEM_VIEW_TEST_TAG$it"),
                 isSelected = documentItem.isSelected,
-                folderInfo = null,
                 icon = documentItem.icon,
-                infoIcon = if (documentItem.hasVersions) coreR.drawable.ic_version_small else null,
-                fileSize = formatFileSize(documentItem.size, LocalContext.current),
-                modifiedDate = formatModifiedDate(
-                    java.util.Locale(
-                        Locale.current.language, Locale.current.region
+                showVersion = documentItem.hasVersions,
+                subtitle = formatFileSize(documentItem.size, LocalContext.current).plus(" • ")
+                    .plus(
+                        formatModifiedDate(
+                            java.util.Locale(
+                                Locale.current.language, Locale.current.region
+                            ),
+                            documentItem.modificationTime
+                        )
                     ),
-                    documentItem.modificationTime
-                ),
-                name = documentItem.name,
+                title = documentItem.name,
                 isTakenDown = documentItem.isTakenDown,
-                showMenuButton = true,
                 thumbnailData = if (documentItem.thumbnail?.exists() == true) {
                     documentItem.thumbnail
                 } else {
                     ThumbnailRequest(documentItem.id)
                 },
-                isFavourite = documentItem.isFavourite,
-                isSharedWithPublicLink = documentItem.isExported,
+                showFavourite = documentItem.isFavourite,
+                showLink = documentItem.isExported,
                 labelColor = if (documentItem.label != MegaNode.NODE_LBL_UNKNOWN)
                     colorResource(
                         id = MegaNodeUtil.getNodeLabelColor(
                             documentItem.label
                         )
                     ) else null,
-                nodeAvailableOffline = documentItem.nodeAvailableOffline,
-                onClick = { onClick(documentItem, it) },
+                showOffline = documentItem.nodeAvailableOffline,
+                onItemClicked = { onClick(documentItem, it) },
                 onLongClick = { onLongClick(documentItem, it) },
-                onMenuClick = { onMenuClick(documentItem) },
+                onMoreClicked = { onMenuClick(documentItem) }.takeIf { isSelectionMode.not() },
             )
-            Divider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 72.dp),
-                color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
-                thickness = 1.dp
-            )
+            MegaDivider(dividerType = DividerType.BigStartPadding)
         }
     }
 }
@@ -122,6 +114,7 @@ private fun DocumentListViewPreview() {
             onMenuClick = {},
             onSortOrderClick = {},
             onLongClick = { _, _ -> },
+            isSelectionMode = true,
         )
     }
 }

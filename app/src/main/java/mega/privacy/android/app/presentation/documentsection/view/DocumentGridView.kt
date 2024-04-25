@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
+import mega.privacy.android.core.ui.controls.lists.NodeGridViewItem
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 
@@ -25,6 +26,7 @@ internal fun DocumentGridView(
     onMenuClick: (DocumentUiEntity) -> Unit,
     onSortOrderClick: () -> Unit,
     spanCount: Int = 2,
+    isSelectionMode: Boolean = false,
     onLongClick: ((item: DocumentUiEntity, index: Int) -> Unit) = { _, _ -> },
 ) {
     LazyVerticalGrid(
@@ -55,11 +57,11 @@ internal fun DocumentGridView(
 
         items(count = items.size, key = { items[it].id.longValue }) {
             val documentItem = items[it]
-            DocumentGridViewItem(
+            NodeGridViewItem(
                 modifier = Modifier.testTag("$DOCUMENT_SECTION_GRID_ITEM_VIEW_TEST_TAG$it"),
                 isSelected = documentItem.isSelected,
                 name = documentItem.name,
-                icon = documentItem.icon,
+                iconRes = documentItem.icon,
                 thumbnailData = if (documentItem.thumbnail?.exists() == true) {
                     documentItem.thumbnail
                 } else {
@@ -67,8 +69,10 @@ internal fun DocumentGridView(
                 },
                 isTakenDown = documentItem.isTakenDown,
                 onClick = { onClick(documentItem, it) },
-                onMenuClick = { onMenuClick(documentItem) },
-                onLongClick = { onLongClick(documentItem, it) }
+                onMenuClick = { onMenuClick(documentItem) }.takeIf { !isSelectionMode },
+                onLongClick = { onLongClick(documentItem, it) },
+                isFolderNode = false,
+                duration = null
             )
         }
     }

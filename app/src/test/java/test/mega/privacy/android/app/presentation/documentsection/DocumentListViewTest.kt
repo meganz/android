@@ -63,6 +63,7 @@ class DocumentListViewTest {
                 onMenuClick = onMenuClick,
                 onSortOrderClick = onSortOrderClick,
                 onLongClick = onLongClick,
+                isSelectionMode = false,
             )
         }
     }

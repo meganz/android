@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.rememberScaffoldState
@@ -36,6 +35,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.documentsection.model.DocumentSectionUiState
 import mega.privacy.android.app.presentation.documentsection.model.DocumentUiEntity
+import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.white_black
@@ -74,7 +74,7 @@ internal fun DocumentSectionComposeView(
         }
     }
 
-    Scaffold(
+    MegaScaffold(
         modifier = modifier.semantics { testTagsAsResourceId = true },
         scaffoldState = rememberScaffoldState(),
         floatingActionButton = {
@@ -134,6 +134,7 @@ internal fun DocumentSectionComposeView(
                             onMenuClick = onMenuClick,
                             onSortOrderClick = onSortOrderClick,
                             onLongClick = onLongClick,
+                            isSelectionMode = uiState.selectedDocumentHandles.isNotEmpty(),
                         )
                     } else {
                         DocumentGridView(
@@ -146,6 +147,7 @@ internal fun DocumentSectionComposeView(
                             onMenuClick = onMenuClick,
                             onSortOrderClick = onSortOrderClick,
                             onLongClick = onLongClick,
+                            isSelectionMode = uiState.selectedDocumentHandles.isNotEmpty(),
                         )
                     }
                 }
