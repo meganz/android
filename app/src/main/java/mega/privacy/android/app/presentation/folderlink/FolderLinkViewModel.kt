@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.folderlink
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -11,10 +10,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -25,11 +20,10 @@ import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.myAccount.StorageStatusDialogState
-import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
-import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
+import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.errorDialogContentId
 import mega.privacy.android.app.presentation.extensions.errorDialogTitleId
@@ -41,7 +35,6 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Trans
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -80,6 +73,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerSt
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -96,7 +90,7 @@ class FolderLinkViewModel @Inject constructor(
     private val monitorViewType: MonitorViewType,
     private val loginToFolderUseCase: LoginToFolderUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
-    private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
+    private val copyNodesUseCase: CopyNodesUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
     private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
@@ -130,8 +124,6 @@ class FolderLinkViewModel @Inject constructor(
      */
     private val _state = MutableStateFlow(FolderLinkState())
 
-    private val rxSubscriptions = CompositeDisposable()
-
     /**
      * The FolderLink UI State accessible outside the ViewModel
      */
@@ -145,14 +137,6 @@ class FolderLinkViewModel @Inject constructor(
 
     init {
         checkViewType()
-    }
-
-    /**
-     * Clear Rx subscriptions
-     */
-    override fun onCleared() {
-        rxSubscriptions.clear()
-        super.onCleared()
     }
 
     /**
@@ -275,44 +259,41 @@ class FolderLinkViewModel @Inject constructor(
      * @param nodes         List of node handles to copy.
      * @param toHandle      Handle of destination node
      */
-    @SuppressLint("CheckResult")
-    fun checkNameCollision(nodes: List<MegaNode>, toHandle: Long) {
-        checkNameCollisionUseCase.checkNodeList(nodes, toHandle, NameCollisionType.COPY)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { result: Pair<ArrayList<NameCollision>, List<MegaNode>> ->
-                    val collisions: ArrayList<NameCollision> = result.first
-                    if (collisions.isNotEmpty()) {
-                        _state.update {
-                            it.copy(collisions = collisions)
-                        }
+    fun checkNameCollision(nodes: List<MegaNode>, toHandle: Long) = viewModelScope.launch {
+        runCatching {
+            checkNameCollisionUseCase.checkNodeListAsync(
+                nodes = nodes,
+                parentHandle = toHandle,
+                type = NameCollisionType.COPY
+            )
+        }.onSuccess { result ->
+            val collisions = result.first
+            if (collisions.isNotEmpty()) {
+                _state.update {
+                    it.copy(collisions = collisions)
+                }
+            }
+            val nodesWithoutCollisions = result.second.associate {
+                it.handle to toHandle
+            }
+            if (nodesWithoutCollisions.isNotEmpty()) {
+                runCatching {
+                    copyNodesUseCase(nodesWithoutCollisions)
+                }.onSuccess { copyResult ->
+                    _state.update {
+                        it.copy(
+                            copyResultText = copyRequestMessageMapper(copyResult.toCopyRequestResult())
+                        )
                     }
-                    val nodesWithoutCollisions: List<MegaNode> = result.second
-                    if (nodesWithoutCollisions.isNotEmpty()) {
-                        legacyCopyNodeUseCase.copy(nodesWithoutCollisions, toHandle)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe { copyRequestResult: CopyRequestResult?, copyThrowable: Throwable? ->
-                                if (copyThrowable != null) {
-                                    _state.update {
-                                        it.copy(copyThrowable = copyThrowable)
-                                    }
-                                } else {
-                                    _state.update {
-                                        it.copy(
-                                            copyResultText = copyRequestMessageMapper(
-                                                copyRequestResult
-                                            )
-                                        )
-                                    }
-                                }
-                            }.addTo(rxSubscriptions)
+                }.onFailure { throwable ->
+                    _state.update {
+                        it.copy(copyThrowable = throwable)
                     }
-                },
-                { throwable: Throwable -> Timber.e(throwable) }
-            ).addTo(rxSubscriptions)
-
+                }
+            }
+        }.onFailure { throwable ->
+            Timber.e(throwable)
+        }
     }
 
     /**

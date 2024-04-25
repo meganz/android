@@ -164,24 +164,6 @@ class CheckNameCollisionUseCase @Inject constructor(
     }
 
     /**
-     * Checks a list of handles in order to know which names already exist on the parent nodes.
-     *
-     * @param nodes         List of node handles to check.
-     * @param parentHandle  Parent handle node in which to look.
-     * @return Single<Pair<List<NameCollision>, LongArray>> containing:
-     *  - First:    List of NameCollision with name collisions.
-     *  - Second:   Array of handles without name collision.
-     */
-    fun checkNodeList(
-        nodes: List<MegaNode>,
-        parentHandle: Long,
-        type: NameCollisionType,
-    ): Single<Pair<ArrayList<NameCollision>, List<MegaNode>>> =
-        rxSingle(ioDispatcher) {
-            checkNodeListAsync(nodes, parentHandle, type)
-        }
-
-    /**
      * Check node list async
      *
      * @param nodes

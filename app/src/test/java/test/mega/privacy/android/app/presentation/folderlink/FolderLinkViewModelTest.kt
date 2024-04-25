@@ -18,7 +18,6 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.FolderLinkViewModel
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
@@ -53,6 +52,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerSt
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -78,7 +78,7 @@ class FolderLinkViewModelTest {
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val loginToFolderUseCase: LoginToFolderUseCase = mock()
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase = mock()
-    private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase = mock()
+    private val copyNodesUseCase: CopyNodesUseCase = mock()
     private val copyRequestMessageMapper: CopyRequestMessageMapper = mock()
     private val hasCredentialsUseCase: HasCredentialsUseCase = mock()
     private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
@@ -121,7 +121,7 @@ class FolderLinkViewModelTest {
             monitorViewType,
             loginToFolderUseCase,
             checkNameCollisionUseCase,
-            legacyCopyNodeUseCase,
+            copyNodesUseCase,
             copyRequestMessageMapper,
             hasCredentialsUseCase,
             rootNodeExistsUseCase,
@@ -156,7 +156,7 @@ class FolderLinkViewModelTest {
             monitorViewType,
             loginToFolderUseCase,
             checkNameCollisionUseCase,
-            legacyCopyNodeUseCase,
+            copyNodesUseCase,
             copyRequestMessageMapper,
             hasCredentialsUseCase,
             rootNodeExistsUseCase,
