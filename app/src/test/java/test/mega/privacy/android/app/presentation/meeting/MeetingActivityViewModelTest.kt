@@ -20,7 +20,6 @@ import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
-import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveFromChat
@@ -29,6 +28,7 @@ import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
@@ -83,7 +83,7 @@ class MeetingActivityViewModelTest {
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock()
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase = mock()
     private val getChatRoomUseCase: GetChatRoomUseCase = mock()
-    private val monitorChatRoomUpdates: MonitorChatRoomUpdates = mock()
+    private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase = mock()
     private val queryChatLink: QueryChatLink = mock()
     private val setOpenInvite: SetOpenInvite = mock()
     private val chatParticipantMapper: ChatParticipantMapper = mock()
@@ -143,7 +143,7 @@ class MeetingActivityViewModelTest {
             monitorChatCallUpdatesUseCase,
             monitorChatSessionUpdatesUseCase,
             getChatRoomUseCase,
-            monitorChatRoomUpdates,
+            monitorChatRoomUpdatesUseCase,
             queryChatLink,
             setOpenInvite,
             chatParticipantMapper,
@@ -194,7 +194,7 @@ class MeetingActivityViewModelTest {
             monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
             monitorChatSessionUpdatesUseCase = monitorChatSessionUpdatesUseCase,
             getChatRoomUseCase = getChatRoomUseCase,
-            monitorChatRoomUpdates = monitorChatRoomUpdates,
+            monitorChatRoomUpdatesUseCase = monitorChatRoomUpdatesUseCase,
             queryChatLink = queryChatLink,
             setOpenInvite = setOpenInvite,
             chatParticipantMapper = chatParticipantMapper,

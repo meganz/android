@@ -68,7 +68,6 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
@@ -89,6 +88,7 @@ import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatPendingChangesUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeavingChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorParticipatingInACallInOtherChatsUseCase
@@ -161,7 +161,7 @@ const val EXTRA_LINK = "LINK"
  *
  * @property isChatNotificationMuteUseCase
  * @property getChatRoomUseCase
- * @property monitorChatRoomUpdates
+ * @property monitorChatRoomUpdatesUseCase
  * @property monitorUpdatePushNotificationSettingsUseCase
  * @property monitorUserChatStatusByHandleUseCase
  * @property getFeatureFlagValueUseCase
@@ -175,7 +175,7 @@ const val EXTRA_LINK = "LINK"
 class ChatViewModel @Inject constructor(
     private val isChatNotificationMuteUseCase: IsChatNotificationMuteUseCase,
     private val getChatRoomUseCase: GetChatRoomUseCase,
-    private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
+    private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase,
     private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase,
     private val monitorUserChatStatusByHandleUseCase: MonitorUserChatStatusByHandleUseCase,
@@ -574,7 +574,7 @@ class ChatViewModel @Inject constructor(
     private fun monitorChatRoom() {
         monitorChatRoomUpdatesJob?.cancel()
         monitorChatRoomUpdatesJob = viewModelScope.launch {
-            monitorChatRoomUpdates(chatId)
+            monitorChatRoomUpdatesUseCase(chatId)
                 .collect { chat ->
                     with(chat) {
                         _state.update { state -> state.copy(chat = chat) }

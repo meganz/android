@@ -15,12 +15,12 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
-import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.chat.InviteParticipantToChatUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.RemoveParticipantFromChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetOpenInviteUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
@@ -77,7 +77,7 @@ class CreateScheduledMeetingViewModelTest {
     private val setOpenInviteUseCase: SetOpenInviteUseCase = mock()
     private val removeParticipantFromChat: RemoveParticipantFromChatUseCase = mock()
     private val inviteParticipantToChat: InviteParticipantToChatUseCase = mock()
-    private val monitorChatRoomUpdates: MonitorChatRoomUpdates = mock()
+    private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase = mock()
     private val setWaitingRoomUseCase: SetWaitingRoomUseCase = mock()
     private val setWaitingRoomRemindersUseCase: SetWaitingRoomRemindersUseCase = mock()
     private val getFeatureFlagValue: GetFeatureFlagValueUseCase = mock()
@@ -117,7 +117,7 @@ class CreateScheduledMeetingViewModelTest {
             getPluralStringFromStringResMapper = getPluralStringFromStringResMapper,
             removeParticipantFromChat = removeParticipantFromChat,
             inviteParticipantToChat = inviteParticipantToChat,
-            monitorChatRoomUpdates = monitorChatRoomUpdates,
+            monitorChatRoomUpdatesUseCase = monitorChatRoomUpdatesUseCase,
             setWaitingRoomUseCase = setWaitingRoomUseCase,
             setWaitingRoomRemindersUseCase = setWaitingRoomRemindersUseCase,
             setOpenInviteUseCase = setOpenInviteUseCase,
@@ -146,7 +146,7 @@ class CreateScheduledMeetingViewModelTest {
             getPluralStringFromStringResMapper,
             removeParticipantFromChat,
             inviteParticipantToChat,
-            monitorChatRoomUpdates,
+            monitorChatRoomUpdatesUseCase,
             setWaitingRoomUseCase,
             setWaitingRoomRemindersUseCase,
             getFeatureFlagValue,

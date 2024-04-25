@@ -49,13 +49,13 @@ import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.InviteContact
 import mega.privacy.android.domain.usecase.InviteToChat
-import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
@@ -92,7 +92,7 @@ import javax.inject.Inject
  * @property openOrStartCallUseCase                         [OpenOrStartCallUseCase]
  * @property monitorScheduledMeetingUpdatesUseCase          [MonitorScheduledMeetingUpdatesUseCase]
  * @property monitorConnectivityUseCase                     [MonitorConnectivityUseCase]
- * @property monitorChatRoomUpdates                         [MonitorChatRoomUpdates]
+ * @property monitorChatRoomUpdatesUseCase                  [MonitorChatRoomUpdatesUseCase]
  * @property monitorUpdatePushNotificationSettingsUseCase   [MonitorUpdatePushNotificationSettingsUseCase]
  * @property setChatVideoInDeviceUseCase                    [SetChatVideoInDeviceUseCase]
  * @property deviceGateway                                  [DeviceGateway]
@@ -125,7 +125,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val monitorScheduledMeetingUpdatesUseCase: MonitorScheduledMeetingUpdatesUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
-    private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
+    private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase,
     private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val deviceGateway: DeviceGateway,
@@ -374,7 +374,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      */
     private fun getChatRoomUpdates(chatId: Long) =
         viewModelScope.launch {
-            monitorChatRoomUpdates(chatId).collectLatest { chat ->
+            monitorChatRoomUpdatesUseCase(chatId).collectLatest { chat ->
                 _uiState.update { state ->
                     with(state) {
                         val hostValue = if (chat.hasChanged(ChatRoomChange.OwnPrivilege)) {

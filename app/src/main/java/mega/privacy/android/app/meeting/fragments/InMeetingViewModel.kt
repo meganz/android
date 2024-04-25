@@ -71,8 +71,8 @@ import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
-import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.link.JoinPublicChatUseCase
 import mega.privacy.android.domain.usecase.login.ChatLogoutUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastCallEndedUseCase
@@ -127,7 +127,7 @@ import javax.inject.Inject
  * @property stopLowResolutionVideoUseCase      [StopLowResolutionVideoUseCase]
  * @property getChatCallUseCase                 [GetChatCallUseCase]
  * @property getChatRoomUseCase                 [GetChatRoomUseCase]
- * @property monitorChatRoomUpdates             [MonitorChatRoomUpdates]
+ * @property monitorChatRoomUpdatesUseCase      [MonitorChatRoomUpdatesUseCase]
  * @property joinPublicChatUseCase              [JoinPublicChatUseCase]
  * @property joinMeetingAsGuestUseCase          [JoinMeetingAsGuestUseCase]
  * @property chatLogoutUseCase                  [ChatLogoutUseCase]
@@ -153,7 +153,7 @@ class InMeetingViewModel @Inject constructor(
     private val enableAudioLevelMonitorUseCase: EnableAudioLevelMonitorUseCase,
     private val isAudioLevelMonitorEnabledUseCase: IsAudioLevelMonitorEnabledUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
-    private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
+    private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase,
     private val requestHighResolutionVideoUseCase: RequestHighResolutionVideoUseCase,
     private val requestLowResolutionVideoUseCase: RequestLowResolutionVideoUseCase,
     private val stopHighResolutionVideoUseCase: StopHighResolutionVideoUseCase,
@@ -418,7 +418,7 @@ class InMeetingViewModel @Inject constructor(
      */
     private fun startMonitorChatRoomUpdates() =
         viewModelScope.launch {
-            monitorChatRoomUpdates(_state.value.currentChatId).collectLatest { chat ->
+            monitorChatRoomUpdatesUseCase(_state.value.currentChatId).collectLatest { chat ->
                 if (chat.hasChanged(ChatRoomChange.Title)) {
                     Timber.d("Changes in chat title")
                     _state.update { state ->

@@ -20,13 +20,13 @@ import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.chat.RichLinkConfig
 import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
-import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.LoadPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorJoinedSuccessfullyUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorRichLinkPreviewConfigUseCase
@@ -98,7 +98,7 @@ class ChatViewModelTest {
     private val monitorLeaveChatUseCase = mock<MonitorLeaveChatUseCase>()
     private val monitorScheduledMeetingUpdatesUseCase =
         mock<MonitorScheduledMeetingUpdatesUseCase>()
-    private val monitorChatRoomUpdates = mock<MonitorChatRoomUpdates>()
+    private val monitorChatRoomUpdatesUseCase = mock<MonitorChatRoomUpdatesUseCase>()
     private val startMeetingInWaitingRoomChatUseCase = mock<StartMeetingInWaitingRoomChatUseCase>()
     private val leaveChatUseCase = mock<LeaveChatUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
@@ -151,7 +151,7 @@ class ChatViewModelTest {
         wheneverBlocking { monitorJoinedSuccessfullyUseCase() }.thenReturn(flowOf(true))
         wheneverBlocking { monitorLeaveChatUseCase() }.thenReturn(flowOf(1234L))
         wheneverBlocking { monitorScheduledMeetingUpdatesUseCase() }.thenReturn(flowOf())
-        wheneverBlocking { monitorChatRoomUpdates(any()) }.thenReturn(flowOf())
+        wheneverBlocking { monitorChatRoomUpdatesUseCase(any()) }.thenReturn(flowOf())
         wheneverBlocking { loadPendingMessagesUseCase(any()) }.thenReturn(flowOf())
         wheneverBlocking { monitorChatSessionUpdatesUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorCallRecordingConsentEventUseCase() }
@@ -190,7 +190,7 @@ class ChatViewModelTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             loadPendingMessagesUseCase = loadPendingMessagesUseCase,
             monitorScheduledMeetingUpdates = monitorScheduledMeetingUpdatesUseCase,
-            monitorChatRoomUpdates = monitorChatRoomUpdates,
+            monitorChatRoomUpdatesUseCase = monitorChatRoomUpdatesUseCase,
             startMeetingInWaitingRoomChatUseCase = startMeetingInWaitingRoomChatUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             monitorPausedTransfersUseCase = monitorPausedTransfersUseCase,

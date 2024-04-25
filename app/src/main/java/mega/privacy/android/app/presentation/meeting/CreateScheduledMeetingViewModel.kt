@@ -43,11 +43,11 @@ import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
-import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.chat.InviteParticipantToChatUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.RemoveParticipantFromChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetOpenInviteUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
@@ -86,7 +86,7 @@ import javax.inject.Inject
  * @property queryChatLink                              [QueryChatLink]
  * @property removeParticipantFromChat                  [RemoveParticipantFromChatUseCase]
  * @property inviteParticipantToChat                    [InviteParticipantToChatUseCase]
- * @property monitorChatRoomUpdates                     [MonitorChatRoomUpdates]
+ * @property monitorChatRoomUpdatesUseCase              [MonitorChatRoomUpdatesUseCase]
  * @property setWaitingRoomUseCase                      [SetWaitingRoomUseCase]
  * @property setWaitingRoomRemindersUseCase             [SetWaitingRoomRemindersUseCase]
  * @property state                                      Current view state as [CreateScheduledMeetingState]
@@ -113,7 +113,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     private val setOpenInviteUseCase: SetOpenInviteUseCase,
     private val removeParticipantFromChat: RemoveParticipantFromChatUseCase,
     private val inviteParticipantToChat: InviteParticipantToChatUseCase,
-    private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
+    private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase,
     private val setWaitingRoomUseCase: SetWaitingRoomUseCase,
     private val setWaitingRoomRemindersUseCase: SetWaitingRoomRemindersUseCase,
 ) : ViewModel() {
@@ -818,7 +818,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      */
     private fun getChatRoomUpdates(chatId: Long) =
         viewModelScope.launch {
-            monitorChatRoomUpdates(chatId).collectLatest { chat ->
+            monitorChatRoomUpdatesUseCase(chatId).collectLatest { chat ->
                 _state.update { state ->
                     with(state) {
                         val waitingRoomValue = if (chat.hasChanged(ChatRoomChange.WaitingRoom)) {

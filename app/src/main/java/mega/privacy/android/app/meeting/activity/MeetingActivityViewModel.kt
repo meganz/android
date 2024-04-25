@@ -86,7 +86,6 @@ import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
-import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveFromChat
@@ -95,6 +94,7 @@ import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
@@ -148,7 +148,7 @@ import javax.inject.Inject
  * @property getChatCallUseCase                             [GetChatCallUseCase]
  * @property setOpenInvite                                  [SetOpenInvite]
  * @property chatParticipantMapper                          [ChatParticipantMapper]
- * @property monitorChatRoomUpdates                         [MonitorChatRoomUpdates]
+ * @property monitorChatRoomUpdatesUseCase                  [MonitorChatRoomUpdatesUseCase]
  * @property queryChatLink                                  [QueryChatLink]
  * @property isEphemeralPlusPlusUseCase                     [IsEphemeralPlusPlusUseCase]
  * @property createChatLink                                 [CreateChatLink]
@@ -191,7 +191,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
     private val getChatRoomUseCase: GetChatRoomUseCase,
-    private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
+    private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase,
     private val queryChatLink: QueryChatLink,
     private val setOpenInvite: SetOpenInvite,
     private val chatParticipantMapper: ChatParticipantMapper,
@@ -1442,7 +1442,7 @@ class MeetingActivityViewModel @Inject constructor(
      */
     private fun startMonitorChatRoomUpdates(chatId: Long) =
         viewModelScope.launch {
-            monitorChatRoomUpdates(chatId).collectLatest { chat ->
+            monitorChatRoomUpdatesUseCase(chatId).collectLatest { chat ->
                 _state.update { state ->
                     with(state) {
                         val permissionValue = if (chat.hasChanged(ChatRoomChange.OwnPrivilege)) {

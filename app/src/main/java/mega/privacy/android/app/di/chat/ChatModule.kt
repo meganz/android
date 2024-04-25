@@ -19,7 +19,6 @@ import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.InviteContact
 import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
-import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.RemoveFromChat
@@ -128,13 +127,6 @@ abstract class ChatModule {
         @Provides
         fun provideQueryChatLink(chatRepository: ChatRepository): QueryChatLink =
             QueryChatLink(chatRepository::queryChatLink)
-
-        /**
-         * Provides the Use Case [MonitorChatRoomUpdates]
-         */
-        @Provides
-        fun provideMonitorChatRoomUpdates(chatRepository: ChatRepository): MonitorChatRoomUpdates =
-            MonitorChatRoomUpdates(chatRepository::monitorChatRoomUpdates)
 
         /**
          * Provides the Use Case [MonitorChatListItemUpdates]

@@ -50,13 +50,13 @@ import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
-import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.LoadPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorJoinedSuccessfullyUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.link.MonitorRichLinkPreviewConfigUseCase
@@ -113,7 +113,7 @@ import javax.inject.Inject
  * @property monitorJoinedSuccessfullyUseCase               [MonitorJoinedSuccessfullyUseCase]
  * @property monitorLeaveChatUseCase                        [MonitorLeaveChatUseCase]
  * @property monitorScheduledMeetingUpdates                 [MonitorScheduledMeetingUpdatesUseCase]
- * @property monitorChatRoomUpdates                         [MonitorChatRoomUpdates]
+ * @property monitorChatRoomUpdatesUseCase                  [MonitorChatRoomUpdatesUseCase]
  * @property leaveChatUseCase                               [LeaveChatUseCase]
  * @property monitorChatSessionUpdatesUseCase               [MonitorChatSessionUpdatesUseCase]
  * @property hangChatCallUseCase                            [HangChatCallUseCase]
@@ -151,7 +151,7 @@ class ChatViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val loadPendingMessagesUseCase: LoadPendingMessagesUseCase,
     private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdatesUseCase,
-    private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
+    private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
