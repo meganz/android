@@ -34,6 +34,7 @@ class NodeGridViewItemTest {
         thumbnailData: Any? = null,
         isTakenDown: Boolean = false,
         isFolderNode: Boolean = false,
+        isVideoNode: Boolean = false,
         duration: String? = null,
         modifier: Modifier = Modifier,
         onClick: () -> Unit = {},
@@ -52,7 +53,8 @@ class NodeGridViewItemTest {
                 onMenuClick = onMenuClick,
                 onLongClick = onLongClick,
                 isFolderNode = isFolderNode,
-                duration = duration
+                duration = duration,
+                isVideoNode = isVideoNode
             )
         }
     }
@@ -110,7 +112,7 @@ class NodeGridViewItemTest {
 
     @Test
     fun `test that play button is visible when duration is not null`() {
-        setComposeContent(duration = "1:00")
+        setComposeContent(duration = "1:00", isVideoNode = true)
         composeTestRule.onNodeWithTag(VIDEO_PLAY_ICON_TEST_TAG, useUnmergedTree = true)
             .assertExists()
         composeTestRule.onNodeWithTag(VIDEO_DURATION_TEST_TAG, useUnmergedTree = true)

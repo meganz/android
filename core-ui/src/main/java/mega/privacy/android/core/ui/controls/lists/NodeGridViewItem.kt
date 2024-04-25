@@ -30,6 +30,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
@@ -74,6 +76,7 @@ fun NodeGridViewItem(
     modifier: Modifier = Modifier,
     duration: String? = null,
     isFolderNode: Boolean = false,
+    isVideoNode: Boolean = false,
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {},
     onMenuClick: (() -> Unit)? = null,
@@ -108,38 +111,45 @@ fun NodeGridViewItem(
                         .align(Alignment.Center)
                         .testTag(THUMBNAIL_FILE_TEST_TAG),
                     contentDescription = name,
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
                 )
+                if (isVideoNode) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MegaTheme.colors.background.blur)
+                    ) {
+                        Icon(
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .size(32.dp)
+                                .testTag(VIDEO_PLAY_ICON_TEST_TAG),
+                            painter = painterResource(id = IconPackR.drawable.ic_play_circle_medium_regular_solid),
+                            contentDescription = "Play Icon",
+                            tint = MegaTheme.colors.icon.onColor,
+                        )
+                    }
+                }
 
                 // Video/Audio duration
                 if (duration != null) {
                     Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .background(MegaTheme.colors.background.blur)
-                    )
-                    Row(
-                        modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .align(Alignment.BottomEnd)
+                            .padding(8.dp)
+                            .clip(
+                                shape = RoundedCornerShape(size = 16.dp)
+                            )
+                            .background(
+                                color = Color.Black.copy(alpha = 0.7f)
+                            )
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
                     ) {
-                        Icon(
-                            modifier = Modifier
-                                .padding(start = 8.dp)
-                                .size(16.dp)
-                                .testTag(VIDEO_PLAY_ICON_TEST_TAG),
-                            painter = painterResource(id = R.drawable.ic_play_medium_regular_solid),
-                            tint = MegaTheme.colors.icon.onColor,
-                            contentDescription = "Play Icon",
-                        )
                         MegaText(
                             text = duration,
                             style = MaterialTheme.typography.body2,
                             textColor = TextColor.OnColor,
                             modifier = Modifier
-                                .padding(start = 4.dp)
                                 .testTag(VIDEO_DURATION_TEST_TAG),
                         )
                     }
@@ -257,7 +267,8 @@ private fun NodeGridViewItemPreview(
                         },
                         onMenuClick = { }.takeIf { selectionMode.not() },
                         isFolderNode = data.isFolderNode,
-                        duration = data.duration
+                        duration = data.duration,
+                        isVideoNode = data.isVideoNode,
                     )
                 }
             }
@@ -272,6 +283,7 @@ private data class NodeGridViewItemData(
     val isTakenDown: Boolean,
     val iconRes: Int,
     val isFolderNode: Boolean,
+    val isVideoNode: Boolean = false,
 )
 
 private class NodeGridViewItemDataProvider : PreviewParameterProvider<NodeGridViewItemData> {
@@ -306,7 +318,8 @@ private class NodeGridViewItemDataProvider : PreviewParameterProvider<NodeGridVi
             duration = "12:3",
             isTakenDown = false,
             iconRes = IconPackR.drawable.ic_video_medium_solid,
-            isFolderNode = false
+            isFolderNode = false,
+            isVideoNode = true
         ),
         NodeGridViewItemData(
             name = "NodeGridViewItem4",

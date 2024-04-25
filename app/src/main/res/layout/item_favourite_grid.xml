@@ -42,6 +42,7 @@
             android:ellipsize="middle"
             android:singleLine="true"
             android:textSize="14sp"
+            android:paddingHorizontal="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/folder_grid_taken_down"
             app:layout_constraintStart_toEndOf="@id/folder_icon_layout"
@@ -61,8 +62,8 @@
 
         <ImageButton
             android:id="@+id/folder_grid_three_dots"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:background="@null"
             android:src="@drawable/ic_dots_vertical_grey"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -72,8 +73,8 @@
             tools:ignore="ContentDescription" />
         <RadioButton
             android:id="@+id/folder_grid_radio_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:background="@null"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -101,32 +102,62 @@
             android:paddingLeft="1dp"
             android:paddingTop="1dp"
             android:paddingRight="1dp"
-            android:scaleType="fitCenter" />
+            android:scaleType="fitCenter"
+            tools:ignore="ContentDescription" />
 
         <!-- For Video only, video icon and duration -->
         <FrameLayout
             android:id="@+id/video_info"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="147dp"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="47dp"
             android:background="@drawable/gradient_cam_uploads">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:id="@+id/video_play_icon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:background="@null"
-                android:src="@drawable/ic_play_arrow_white_24dp"
-                app:tint="?android:attr/textColorPrimary"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_play_circle_medium_regular_solid"
+                app:tint="@color/white"
                 tools:ignore="ContentDescription" />
 
             <TextView
                 android:id="@+id/videoDuration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="33dp"
-                android:layout_marginTop="2dp"
+                android:layout_gravity="bottom|end"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/background_duration"
+                android:textColor="@color/white"
                 android:textAppearance="@style/TextAppearance.Mega.Body2.Variant" />
         </FrameLayout>
+
+        <!-- For Audio only, duration -->
+        <FrameLayout
+            android:id="@+id/audio_info"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="47dp">
+
+            <TextView
+                android:id="@+id/audioDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/background_duration"
+                android:textColor="@color/white"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Variant" />
+        </FrameLayout>
+
 
         <View
             android:layout_width="match_parent"

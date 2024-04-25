@@ -177,10 +177,17 @@ class FavouritesGridViewHolder(
                             }
                             if (MimeTypeList.typeForName(info.typedNode.name).isVideo) {
                                 videoInfo.isVisible = true
+                                audioInfo.isVisible = false
                                 videoDuration.text =
+                                    TimeUtils.getVideoDuration((info.node.duration))
+                            } else if (MimeTypeList.typeForName(info.typedNode.name).isAudio) {
+                                audioInfo.isVisible = true
+                                videoInfo.isVisible = false
+                                audioDuration.text =
                                     TimeUtils.getVideoDuration((info.node.duration))
                             } else {
                                 videoInfo.isVisible = false
+                                audioInfo.isVisible = false
                             }
                             takenDown.isVisible = info.typedNode.isTakenDown
                             textViewSettings(filename, info)

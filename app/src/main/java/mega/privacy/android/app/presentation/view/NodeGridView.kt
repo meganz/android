@@ -14,10 +14,15 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.view.extension.getIcon
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
+import mega.privacy.android.core.ui.controls.lists.NodeGridViewItem
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 
 /**
 This method will show [NodeUIItem] in Grid manner based on span and getting thumbnail using [ThumbnailRequest]
@@ -62,7 +67,9 @@ fun <T : TypedNode> NodeGridView(
     LazyVerticalGrid(
         state = gridState,
         columns = GridCells.Fixed(spanCount),
-        modifier = modifier.padding(horizontal = 2.dp).semantics { testTagsAsResourceId = true },
+        modifier = modifier
+            .padding(horizontal = 4.dp)
+            .semantics { testTagsAsResourceId = true },
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         contentPadding = listContentPadding
@@ -96,14 +103,17 @@ fun <T : TypedNode> NodeGridView(
                 }
             }) {
             NodeGridViewItem(
-                modifier = modifier,
-                nodeUIItem = nodeUIItems[it],
-                onMenuClick = onMenuClick,
-                onItemClicked = onItemClicked,
-                onLongClick = onLongClick,
+                isSelected = nodeUIItems[it].isSelected,
+                name = nodeUIItems[it].node.name,
+                iconRes = nodeUIItems[it].node.getIcon(fileTypeIconMapper = fileTypeIconMapper),
                 thumbnailData = ThumbnailRequest(nodeUIItems[it].node.id, isPublicNode),
-                fileTypeIconMapper = fileTypeIconMapper,
-                inSelectionMode = inSelectionMode
+                duration = nodeUIItems[it].fileDuration,
+                isTakenDown = nodeUIItems[it].isTakenDown,
+                onClick = { onItemClicked(nodeUIItems[it]) },
+                onLongClick = { onLongClick(nodeUIItems[it]) },
+                onMenuClick = { onMenuClick(nodeUIItems[it]) }.takeIf { !inSelectionMode },
+                isVideoNode = (nodeUIItems[it].node as? FileNode)?.type is VideoFileTypeInfo,
+                isFolderNode = nodeUIItems[it].node is TypedFolderNode
             )
         }
     }

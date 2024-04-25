@@ -123,6 +123,7 @@ fun <T : TypedNode> NodeListView(
                 showFavourite = nodeUiItem.isFavourite && nodeUiItem.isIncomingShare.not(),
                 showIsVerified = nodeUiItem.isIncomingShare && (nodeUiItem.node as? ShareFolderNode)?.shareData?.isContactCredentialsVerified == true,
                 showVersion = nodeUiItem.hasVersion,
+                isTakenDown = nodeUiItem.isTakenDown,
             )
             MegaDivider(dividerType = DividerType.BigStartPadding)
         }
