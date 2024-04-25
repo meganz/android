@@ -613,7 +613,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      *
      * @return true if the device has not enough cloud storage space
      */
-    private fun isStorageQuotaExceeded() = isStorageOverQuotaUseCase().also {
+    private suspend fun isStorageQuotaExceeded() = isStorageOverQuotaUseCase().also {
         if (it) Timber.e("Storage Quota exceeded")
     }
 

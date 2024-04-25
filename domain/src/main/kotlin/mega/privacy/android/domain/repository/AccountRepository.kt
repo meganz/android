@@ -643,4 +643,16 @@ interface AccountRepository {
      * @return The corresponding email
      */
     suspend fun cancelCreateAccount(): String
+
+    /**
+     * Get storage size occupied by the user in bytes
+     */
+    suspend fun getUsedStorage(): Long
+
+    /**
+     * Total storage size in bytes
+     *
+     * @return
+     */
+    suspend fun getMaxStorage(): Long
 }

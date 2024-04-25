@@ -1334,6 +1334,46 @@ internal class DefaultAccountRepository @Inject constructor(
         }
     }
 
+    override suspend fun getUsedStorage(): Long {
+        val request = suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        continuation.resumeWith(Result.success(request))
+                    } else {
+                        continuation.failWithError(error, "requestAccount")
+                    }
+                },
+            )
+            megaApiGateway.getAccountDetails(listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+        val accountDetails = request.megaAccountDetails
+        return accountDetails.storageUsed
+    }
+
+    override suspend fun getMaxStorage(): Long {
+        val request = suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        continuation.resumeWith(Result.success(request))
+                    } else {
+                        continuation.failWithError(error, "requestAccount")
+                    }
+                },
+            )
+            megaApiGateway.getAccountDetails(listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+        val accountDetails = request.megaAccountDetails
+        return accountDetails.storageMax
+    }
+
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
         private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"
