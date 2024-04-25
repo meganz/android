@@ -53,7 +53,7 @@ import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
-import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumber
+import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumberUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import org.junit.After
@@ -88,7 +88,7 @@ internal class MyAccountViewModelTest {
     private val cancelSubscriptionsUseCase: CancelSubscriptionsUseCase = mock()
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase = mock()
     private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase = mock()
-    private val resetSMSVerifiedPhoneNumber: ResetSMSVerifiedPhoneNumber = mock()
+    private val resetSMSVerifiedPhoneNumberUseCase: ResetSMSVerifiedPhoneNumberUseCase = mock()
     private val getUserDataUseCase: GetUserDataUseCase = mock()
     private val getFileVersionsOption: GetFileVersionsOption = mock()
     private val queryCancelLinkUseCase: QueryCancelLinkUseCase = mock()
@@ -155,7 +155,7 @@ internal class MyAccountViewModelTest {
             cancelSubscriptionsUseCase = cancelSubscriptionsUseCase,
             getMyAvatarFileUseCase = getMyAvatarFileUseCase,
             checkPasswordReminderUseCase = checkPasswordReminderUseCase,
-            resetSMSVerifiedPhoneNumber = resetSMSVerifiedPhoneNumber,
+            resetSMSVerifiedPhoneNumberUseCase = resetSMSVerifiedPhoneNumberUseCase,
             getUserDataUseCase = getUserDataUseCase,
             getFileVersionsOption = getFileVersionsOption,
             queryCancelLinkUseCase = queryCancelLinkUseCase,
@@ -189,7 +189,7 @@ internal class MyAccountViewModelTest {
     fun `test that action invoked when successfully get user data and the phone number is modified`() =
         runTest {
             // Given
-            whenever(resetSMSVerifiedPhoneNumber()).thenReturn(Unit)
+            whenever(resetSMSVerifiedPhoneNumberUseCase()).thenReturn(Unit)
             whenever(getUserDataUseCase()).thenReturn(Unit)
 
             // When
@@ -208,7 +208,7 @@ internal class MyAccountViewModelTest {
     fun `test that should not navigate to sms verification after navigated once the state`() =
         runTest {
             // Given
-            whenever(resetSMSVerifiedPhoneNumber()).thenReturn(Unit)
+            whenever(resetSMSVerifiedPhoneNumberUseCase()).thenReturn(Unit)
             whenever(getUserDataUseCase()).thenReturn(Unit)
 
             // When
@@ -230,7 +230,7 @@ internal class MyAccountViewModelTest {
             // Given
             val snackBarShower = mock<SnackbarShower>()
 
-            whenever(resetSMSVerifiedPhoneNumber()).thenReturn(Unit)
+            whenever(resetSMSVerifiedPhoneNumberUseCase()).thenReturn(Unit)
             whenever(getUserDataUseCase()).thenReturn(Unit)
 
             // When
@@ -298,7 +298,7 @@ internal class MyAccountViewModelTest {
             // Given
             val snackBarShower = mock<SnackbarShower>()
 
-            whenever(resetSMSVerifiedPhoneNumber()).thenReturn(Unit)
+            whenever(resetSMSVerifiedPhoneNumberUseCase()).thenReturn(Unit)
             whenever(getUserDataUseCase()).thenThrow(RuntimeException())
 
             // When
@@ -515,7 +515,7 @@ internal class MyAccountViewModelTest {
             cancelSubscriptionsUseCase,
             getMyAvatarFileUseCase,
             checkPasswordReminderUseCase,
-            resetSMSVerifiedPhoneNumber,
+            resetSMSVerifiedPhoneNumberUseCase,
             getUserDataUseCase,
             getFileVersionsOption,
             queryCancelLinkUseCase,

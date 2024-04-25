@@ -104,7 +104,7 @@ import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
-import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumber
+import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumberUseCase
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -128,7 +128,7 @@ import javax.inject.Inject
  * @property cancelSubscriptionsUseCase
  * @property getMyAvatarFileUseCase
  * @property checkPasswordReminderUseCase
- * @property resetSMSVerifiedPhoneNumber
+ * @property resetSMSVerifiedPhoneNumberUseCase
  * @property getUserDataUseCase
  * @property getFileVersionsOption
  * @property queryCancelLinkUseCase Queries information on an Account Cancellation Link
@@ -162,7 +162,7 @@ class MyAccountViewModel @Inject constructor(
     private val cancelSubscriptionsUseCase: CancelSubscriptionsUseCase,
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
     private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase,
-    private val resetSMSVerifiedPhoneNumber: ResetSMSVerifiedPhoneNumber,
+    private val resetSMSVerifiedPhoneNumberUseCase: ResetSMSVerifiedPhoneNumberUseCase,
     private val getUserDataUseCase: GetUserDataUseCase,
     private val getFileVersionsOption: GetFileVersionsOption,
     private val queryCancelLinkUseCase: QueryCancelLinkUseCase,
@@ -954,7 +954,7 @@ class MyAccountViewModel @Inject constructor(
      */
     fun resetPhoneNumber(isModify: Boolean, snackbarShower: SnackbarShower) {
         resetJob = viewModelScope.launch {
-            runCatching { resetSMSVerifiedPhoneNumber() }
+            runCatching { resetSMSVerifiedPhoneNumberUseCase() }
                 .onSuccess {
                     getUserData(isModify, snackbarShower)
                 }
