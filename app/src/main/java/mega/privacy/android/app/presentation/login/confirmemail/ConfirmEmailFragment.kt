@@ -10,7 +10,6 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -20,7 +19,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentConfirmEmailBinding
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiAndroid
@@ -37,7 +35,6 @@ import timber.log.Timber
 class ConfirmEmailFragment : Fragment() {
 
     private val viewModel: ConfirmEmailViewModel by viewModels()
-    private val loginViewModel: LoginViewModel by activityViewModels()
 
     private var _binding: FragmentConfirmEmailBinding? = null
 
@@ -77,7 +74,7 @@ class ConfirmEmailFragment : Fragment() {
         ) { registeredEmail ->
             registeredEmail?.let {
                 (requireActivity() as LoginActivity).setTemporalEmail(it)
-                loginViewModel.saveLastRegisteredEmail(it)
+                viewModel.saveLastRegisteredEmail(it)
             }
         }
     }
