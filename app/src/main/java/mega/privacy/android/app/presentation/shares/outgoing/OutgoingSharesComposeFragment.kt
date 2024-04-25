@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.shares.outgoing
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -34,7 +35,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -63,18 +63,16 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartT
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
-import mega.privacy.android.domain.entity.node.shares.ShareNode
-import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.shares.ShareNode
+import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.shared.theme.MegaAppTheme
 import timber.log.Timber
 import javax.inject.Inject
@@ -475,7 +473,7 @@ class OutgoingSharesComposeFragment : Fragment() {
                 viewModel.state.value.selectedNodes.takeUnless { it.isEmpty() }
                     ?: return false
             menu.findItem(R.id.cab_menu_share_link).title =
-                resources.getQuantityString(R.plurals.get_links, selected.size)
+                resources.getQuantityString(sharedR.plurals.label_share_links, selected.size)
             lifecycleScope.launch {
                 val control = getOptionsForToolbarMapper(
                     selectedNodeHandleList = viewModel.state.value.selectedNodeHandles,

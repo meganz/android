@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.search
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -404,7 +405,10 @@ class SearchFragment : RotatableFragment() {
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             val selected = adapter.selectedNodes
             menu?.findItem(R.id.cab_menu_share_link)?.title =
-                requireContext().resources.getQuantityString(R.plurals.get_links, selected.size)
+                requireContext().resources.getQuantityString(
+                    sharedR.plurals.label_share_links,
+                    selected.size
+                )
 
             val unselect = menu?.findItem(R.id.cab_menu_unselect_all)
             var showDownload = false

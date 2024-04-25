@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.audiosection
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
@@ -37,7 +38,10 @@ internal class AudioSectionActionModeCallback(
             audioSectionViewModel.state.value.selectedAudioHandles.takeUnless { it.isEmpty() }
                 ?: return false
         menu?.findItem(R.id.cab_menu_share_link)?.title =
-            managerActivity.resources.getQuantityString(R.plurals.get_links, selected.size)
+            managerActivity.resources.getQuantityString(
+                sharedR.plurals.label_share_links,
+                selected.size
+            )
         managerActivity.lifecycleScope.launch {
             val control = getOptionsForToolbarMapper(
                 selectedNodeHandleList = audioSectionViewModel.state.value.selectedAudioHandles,
@@ -47,12 +51,13 @@ internal class AudioSectionActionModeCallback(
         }
 
         managerActivity.lifecycleScope.launch {
-            val isHiddenNodesEnabled = managerActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+            val isHiddenNodesEnabled =
+                managerActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
             val hasNonSensitiveNode =
                 audioSectionViewModel.getSelectedNodes().any { !it.isMarkedSensitive }
             val isPaid =
-            audioSectionViewModel.state.value.accountDetail?.levelDetail?.accountType?.isPaid
-                ?: false
+                audioSectionViewModel.state.value.accountDetail?.levelDetail?.accountType?.isPaid
+                    ?: false
 
             menu?.findItem(R.id.cab_menu_hide)?.isVisible =
                 isHiddenNodesEnabled && (hasNonSensitiveNode || !isPaid)

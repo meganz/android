@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.pdfviewer
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -854,7 +855,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         val propertiesMenuItem = menu.findItem(R.id.pdf_viewer_properties)
         val getLinkMenuItem = menu.findItem(R.id.pdf_viewer_get_link)
         getLinkMenuItem.title =
-            resources.getQuantityString(R.plurals.get_links, 1)
+            resources.getQuantityString(sharedR.plurals.label_share_links, 1)
         val renameMenuItem = menu.findItem(R.id.pdf_viewer_rename)
         val hideMenuItem = menu.findItem(R.id.pdf_viewer_hide)
         val unhideMenuItem = menu.findItem(R.id.pdf_viewer_unhide)

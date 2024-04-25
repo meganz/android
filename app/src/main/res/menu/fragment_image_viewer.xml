@@ -48,7 +48,7 @@
         android:id="@+id/action_get_link"
         android:icon="@drawable/ic_link01_medium_regular_outline"
         android:orderInCategory="130"
-        android:title="@{@plurals/get_links(one)}"
+        android:title="@{@plurals/label_share_links(one)}"
         android:visible="false"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always"

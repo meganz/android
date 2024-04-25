@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
@@ -105,7 +106,7 @@ class GetLinkViewModel @Inject constructor(
                 if (node?.isExported == true) {
                     context.getString(R.string.edit_link_option)
                 } else {
-                    context.resources.getQuantityString(R.plurals.get_links, 1)
+                    context.resources.getQuantityString(sharedR.plurals.label_share_links, 1)
                 }
         }
 

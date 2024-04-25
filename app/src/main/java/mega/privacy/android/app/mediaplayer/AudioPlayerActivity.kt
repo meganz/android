@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
@@ -598,7 +599,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
         menuInflater.inflate(R.menu.media_player, menu)
 
-        menu.findItem(R.id.get_link).title = resources.getQuantityString(R.plurals.get_links, 1)
+        menu.findItem(R.id.get_link).title =
+            resources.getQuantityString(sharedR.plurals.label_share_links, 1)
 
         searchMenuItem = menu.findItem(R.id.action_search).apply {
             actionView?.let { searchView ->

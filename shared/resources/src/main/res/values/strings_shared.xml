@@ -249,4 +249,9 @@
     <string name="dialog_onboarding_button_continue">Continue</string>
     <!-- Title of navigation bar on Onboarding dialog. -->
     <string name="dialog_onboarding_app_bar_title">Choose your MEGA plan</string>
+    <!-- Text of button label or title of the screen to share only one or several links -->
+    <plurals name="label_share_links">
+        <item quantity="one">Share Link</item>
+        <item quantity="other">Share Links</item>
+    </plurals>
 </resources>

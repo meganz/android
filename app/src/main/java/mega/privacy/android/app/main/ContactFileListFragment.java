@@ -189,7 +189,7 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
             List<MegaNode> selected = adapter.getSelectedNodes();
 
             menu.findItem(R.id.cab_menu_share_link)
-                    .setTitle(getResources().getQuantityString(R.plurals.get_links, selected.size()));
+                    .setTitle(getResources().getQuantityString(mega.privacy.android.shared.resources.R.plurals.label_share_links, selected.size()));
 
             boolean areAllNotTakenDown = MegaNodeUtil.areAllNotTakenDown(selected);
             boolean showRename = false;
@@ -395,7 +395,7 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
             itemClick(currNodePosition);
         }
         showFabButton(megaApi.getNodeByHandle(parentHandle));
-        addStartDownloadTransferView( v);
+        addStartDownloadTransferView(v);
         return v;
     }
 

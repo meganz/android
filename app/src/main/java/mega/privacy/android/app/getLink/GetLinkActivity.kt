@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.GetLinkActivityLayoutBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -161,7 +162,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
                     viewModelNode.setElevation(true)
                     supportActionBar?.apply {
                         title = resources.getQuantityString(
-                            R.plurals.get_links,
+                            sharedR.plurals.label_share_links,
                             viewModelList.getLinksNumber()
                         )
 

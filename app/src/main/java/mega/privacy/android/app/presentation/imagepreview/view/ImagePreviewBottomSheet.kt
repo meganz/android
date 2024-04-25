@@ -3,8 +3,8 @@
 package mega.privacy.android.app.presentation.imagepreview.view
 
 import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.core.R as RCore
 import mega.privacy.android.icon.pack.R as Rpack
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -51,7 +51,6 @@ import mega.privacy.android.core.ui.theme.teal_200
 import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.tokens.TextColor
 import mega.privacy.android.core.ui.theme.white_alpha_070
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
@@ -361,7 +360,7 @@ internal fun ImagePreviewBottomSheet(
                             stringResource(id = R.string.edit_link_option)
                         } else {
                             LocalContext.current.resources.getQuantityString(
-                                R.plurals.get_links,
+                                sharedR.plurals.label_share_links,
                                 1,
                             )
                         },
@@ -498,7 +497,7 @@ internal fun ImagePreviewBottomSheet(
 
                 if (isRemoveOfflineMenuVisible) {
                     MenuActionListTile(
-                        icon = painterResource(id =IconPackR.drawable.ic_x_medium_regular_outline),
+                        icon = painterResource(id = IconPackR.drawable.ic_x_medium_regular_outline),
                         text = stringResource(id = R.string.context_delete_offline),
                         onActionClicked = { onSwitchAvailableOffline(false) },
                         isDestructive = true,

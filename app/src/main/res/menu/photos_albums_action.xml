@@ -5,7 +5,7 @@
         android:icon="@drawable/ic_link01_medium_regular_outline"
         android:orderInCategory="0"
         app:iconTint="?attr/colorSecondary"
-        android:title="@{@plurals/get_links(one)}"
+        android:title="@{@plurals/label_share_links(one)}"
         app:showAsAction="always" />
 
     <item

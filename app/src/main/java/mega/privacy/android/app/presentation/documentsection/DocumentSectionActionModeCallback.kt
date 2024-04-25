@@ -1,10 +1,8 @@
 package mega.privacy.android.app.presentation.documentsection
 
-import android.content.Intent
+import mega.privacy.android.shared.resources.R as sharedR
 import android.view.Menu
 import android.view.MenuItem
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
@@ -16,7 +14,6 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFragment
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.main.dialog.shares.RemoveAllSharingContactDialogFragment
-import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -40,7 +37,10 @@ internal class DocumentSectionActionModeCallback(
         val selectedHandles = documentSectionViewModel.uiState.value.selectedDocumentHandles
         val selected = selectedHandles.takeUnless { it.isEmpty() } ?: return false
         menu?.findItem(R.id.cab_menu_share_link)?.title =
-            managerActivity.resources.getQuantityString(R.plurals.get_links, selected.size)
+            managerActivity.resources.getQuantityString(
+                sharedR.plurals.label_share_links,
+                selected.size
+            )
         managerActivity.lifecycleScope.launch {
             val control = getOptionsForToolbarMapper(
                 selectedNodeHandleList = selectedHandles,
@@ -50,7 +50,8 @@ internal class DocumentSectionActionModeCallback(
         }
 
         managerActivity.lifecycleScope.launch {
-            val isHiddenNodesEnabled = managerActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
+            val isHiddenNodesEnabled =
+                managerActivity.getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)
             val hasNonSensitiveNode =
                 documentSectionViewModel.getSelectedNodes().any { !it.isMarkedSensitive }
             val isPaid =

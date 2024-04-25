@@ -1,6 +1,7 @@
 package mega.privacy.android.app.imageviewer.dialog
 
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
@@ -331,7 +332,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             if (node?.isExported == true) {
                 optionManageLink.text = getString(R.string.edit_link_option)
             } else {
-                optionManageLink.text = resources.getQuantityString(R.plurals.get_links, 1)
+                optionManageLink.text =
+                    resources.getQuantityString(sharedR.plurals.label_share_links, 1)
             }
             optionManageLink.setOnClickListener {
                 LinksUtil.showGetLinkActivity(this@ImageBottomSheetDialogFragment, nodeHandle!!)
@@ -363,7 +365,11 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
                     imageItem is ImageItem.PublicNode -> {
                         trackOnShareClicked()
-                        MegaNodeUtil.shareLink(requireActivity(), imageItem.nodePublicLink, imageItem.name)
+                        MegaNodeUtil.shareLink(
+                            requireActivity(),
+                            imageItem.nodePublicLink,
+                            imageItem.name
+                        )
                     }
 
                     node != null -> {
@@ -418,10 +424,20 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 isVisible = imageItem.shouldShowRubbishBinOption()
                 if (nodeItem?.isFromRubbishBin == true) {
                     setText(R.string.general_remove)
-                    setCompoundDrawablesWithIntrinsicBounds(iconPackR.drawable.ic_x_medium_regular_outline, 0, 0, 0)
+                    setCompoundDrawablesWithIntrinsicBounds(
+                        iconPackR.drawable.ic_x_medium_regular_outline,
+                        0,
+                        0,
+                        0
+                    )
                 } else {
                     setText(R.string.context_move_to_trash)
-                    setCompoundDrawablesWithIntrinsicBounds(iconPackR.drawable.ic_trash_medium_regular_outline, 0, 0, 0)
+                    setCompoundDrawablesWithIntrinsicBounds(
+                        iconPackR.drawable.ic_trash_medium_regular_outline,
+                        0,
+                        0,
+                        0
+                    )
                 }
                 setOnClickListener { showAlertDialog(AlertDialogType.TYPE_RUBBISH_BIN) }
             }

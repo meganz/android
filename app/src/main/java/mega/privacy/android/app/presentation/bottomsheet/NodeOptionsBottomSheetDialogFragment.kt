@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.bottomsheet
 
 import mega.privacy.android.icon.pack.R as RPack
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
@@ -486,7 +487,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         optionLink.setText(R.string.edit_link_option)
                         optionRemoveLink.visibility = View.VISIBLE
                     } else {
-                        optionLink.text = resources.getQuantityString(R.plurals.get_links, 1)
+                        optionLink.text =
+                            resources.getQuantityString(sharedR.plurals.label_share_links, 1)
                         counterShares--
                         optionRemoveLink.visibility = View.GONE
                     }

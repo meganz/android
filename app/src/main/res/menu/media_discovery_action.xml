@@ -13,7 +13,7 @@
         android:id="@+id/cab_menu_share_link"
         android:icon="@drawable/ic_link01_medium_regular_outline"
         android:orderInCategory="160"
-        android:title="@{@plurals/get_links(one)}"
+        android:title="@{@plurals/label_share_links(one)}"
         app:iconTint="?attr/colorSecondary"
         app:showAsAction="always"/>
 

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.shares.links
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -566,7 +567,7 @@ class LinksComposeFragment : Fragment() {
                 viewModel.state.value.selectedNodeHandles.takeUnless { it.isEmpty() }
                     ?: return false
             menu.findItem(R.id.cab_menu_share_link).title =
-                resources.getQuantityString(R.plurals.get_links, selected.size)
+                resources.getQuantityString(sharedR.plurals.label_share_links, selected.size)
             lifecycleScope.launch {
                 val control = getOptionsForToolbarMapper(
                     selectedNodeHandleList = viewModel.state.value.selectedNodeHandles,

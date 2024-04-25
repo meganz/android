@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.shares
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -651,7 +652,7 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
         override fun onPrepareActionMode(actionMode: ActionMode, menu: Menu): Boolean {
             selected = megaNodeAdapter?.selectedNodes ?: return false
             menu.findItem(R.id.cab_menu_share_link).title =
-                resources.getQuantityString(R.plurals.get_links, selected.size)
+                resources.getQuantityString(sharedR.plurals.label_share_links, selected.size)
             return false
         }
 

@@ -112,7 +112,7 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
             List<MegaNode> selected = adapter.getSelectedNodes();
 
             menu.findItem(R.id.cab_menu_share_link)
-                    .setTitle(getResources().getQuantityString(R.plurals.get_links, selected.size()));
+                    .setTitle(getResources().getQuantityString(mega.privacy.android.shared.resources.R.plurals.label_share_links, selected.size()));
 
             boolean showDownload = false;
             boolean showRename = false;

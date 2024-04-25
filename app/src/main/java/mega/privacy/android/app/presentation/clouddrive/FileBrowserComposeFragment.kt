@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.clouddrive
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -73,6 +74,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -81,7 +83,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.mobile.analytics.event.CloudDriveScreenEvent
 import timber.log.Timber
@@ -488,7 +489,7 @@ class FileBrowserComposeFragment : Fragment() {
                 fileBrowserViewModel.state.value.selectedNodeHandles.takeUnless { it.isEmpty() }
                     ?: return false
             menu.findItem(R.id.cab_menu_share_link).title =
-                resources.getQuantityString(R.plurals.get_links, selected.size)
+                resources.getQuantityString(sharedR.plurals.label_share_links, selected.size)
             lifecycleScope.launch {
                 val control = getOptionsForToolbarMapper(
                     selectedNodeHandleList = fileBrowserViewModel.state.value.selectedNodeHandles,

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.textEditor
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
@@ -404,7 +405,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         this.menu = menu
 
         menu.findItem(R.id.action_get_link)?.title =
-            resources.getQuantityString(R.plurals.get_links, 1)
+            resources.getQuantityString(sharedR.plurals.label_share_links, 1)
 
         refreshMenuOptionsVisibility()
 

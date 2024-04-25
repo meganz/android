@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.homepage
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
@@ -120,7 +121,10 @@ class ActionModeCallback constructor(
         val areAllNotTakenDown = selectedNodes.areAllNotTakenDown()
 
         menu?.findItem(R.id.cab_menu_share_link)?.title =
-            mainActivity.resources.getQuantityString(R.plurals.get_links, selectedNodes.size)
+            mainActivity.resources.getQuantityString(
+                sharedR.plurals.label_share_links,
+                selectedNodes.size
+            )
 
         if (areAllNotTakenDown) {
             if (selectedNodes.size == 1

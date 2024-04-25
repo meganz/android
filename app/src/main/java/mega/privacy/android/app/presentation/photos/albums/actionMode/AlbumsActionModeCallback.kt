@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.actionMode
 
+import mega.privacy.android.shared.resources.R as sharedR
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
@@ -41,7 +42,8 @@ class AlbumsActionModeCallback(
             it.isVisible = isAlbumSharingEnabled
             it.isEnabled = isAlbumSharingEnabled
             it.title = fragment.context?.resources?.getQuantityString(
-                R.plurals.get_links, fragment.albumsViewModel.state.value.selectedAlbumIds.size
+                sharedR.plurals.label_share_links,
+                fragment.albumsViewModel.state.value.selectedAlbumIds.size
             )
         }
 
