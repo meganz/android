@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
 import mega.privacy.android.domain.usecase.file.IsVideoFileUseCase
-import mega.privacy.android.domain.usecase.transfers.chatuploads.CompressFileForChatUseCase.Companion.VIDEO_COMPRESSION_ISSUE_FIXED
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,10 +22,13 @@ class CompressFileForChatUseCaseTest {
     private val isVideoFileUseCase = mock<IsVideoFileUseCase>()
     private val downscaleImageForChatUseCase = mock<DownscaleImageForChatUseCase>()
     private val compressVideoForChatUseCase = mock<CompressVideoForChatUseCase>()
+    private val chatAttachmentNeedsCompressionUseCase =
+        mock<ChatAttachmentNeedsCompressionUseCase>()
 
     @BeforeAll
     fun setup() {
         underTest = CompressFileForChatUseCase(
+            chatAttachmentNeedsCompressionUseCase,
             isImageFileUseCase,
             isVideoFileUseCase,
             downscaleImageForChatUseCase,
@@ -37,11 +39,23 @@ class CompressFileForChatUseCaseTest {
     @BeforeEach
     fun resetMocks() =
         reset(
+            chatAttachmentNeedsCompressionUseCase,
             isImageFileUseCase,
             isVideoFileUseCase,
             downscaleImageForChatUseCase,
             compressVideoForChatUseCase,
         )
+
+    @Test
+    fun `test that null is returned when chat attachment doesn't need compression`() = runTest {
+        val file = mock<File>()
+        whenever(chatAttachmentNeedsCompressionUseCase(file)) doReturn false
+
+        val actual = underTest(file)
+
+        assertThat(actual).isNull()
+    }
+
 
     @Test
     fun `test that DownscaleImageForChatUseCase result is returned when file is an image`() =
@@ -50,10 +64,13 @@ class CompressFileForChatUseCaseTest {
             val original = mock<File> {
                 on { it.absolutePath } doReturn path
             }
+            whenever(chatAttachmentNeedsCompressionUseCase(original)) doReturn true
             val expected = mock<File>()
             whenever(isImageFileUseCase(original.absolutePath)) doReturn true
             whenever(downscaleImageForChatUseCase(original)) doReturn expected
+
             val actual = underTest(original)
+
             assertThat(actual).isEqualTo(expected)
         }
 
@@ -65,12 +82,13 @@ class CompressFileForChatUseCaseTest {
                 on { it.absolutePath } doReturn path
             }
             val expected = mock<File>()
+            whenever(chatAttachmentNeedsCompressionUseCase(original)) doReturn true
             whenever(isImageFileUseCase(original.absolutePath)) doReturn false
             whenever(isVideoFileUseCase(original.absolutePath)) doReturn true
             whenever(compressVideoForChatUseCase(original)) doReturn expected
+
             val actual = underTest(original)
-            if (VIDEO_COMPRESSION_ISSUE_FIXED) {
-                assertThat(actual).isEqualTo(expected)
-            }
+
+            assertThat(actual).isEqualTo(expected)
         }
 }

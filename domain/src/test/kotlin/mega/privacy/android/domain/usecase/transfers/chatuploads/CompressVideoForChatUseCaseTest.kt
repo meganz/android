@@ -8,7 +8,6 @@ import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.video.CompressVideoUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -48,22 +47,9 @@ class CompressVideoForChatUseCaseTest {
             compressVideoUseCase,
         )
 
-    @Test
-    fun `test that it returns null when extension is not 'mp4'`() = runTest {
-        val file = File("file.mpeg")
-        assertThat(underTest(file)).isNull()
-    }
-
-    @Test
-    fun `test that it returns null when settings is original`() = runTest {
-        val file = File("file.mp4")
-        whenever(defaultSettingsRepository.getChatVideoQualityPreference()) doReturn VideoQuality.ORIGINAL
-        assertThat(underTest(file)).isNull()
-    }
-
     @ParameterizedTest
     @MethodSource("provideParams")
-    fun `test that it returns compressed video when settings is not original`(
+    fun `test that it returns compressed video in the chat cache folder`(
         videoQuality: VideoQuality,
     ) = runTest {
         val path = "path"

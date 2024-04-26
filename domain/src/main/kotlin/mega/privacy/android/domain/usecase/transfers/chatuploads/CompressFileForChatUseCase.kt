@@ -9,6 +9,7 @@ import javax.inject.Inject
  * Compress a file before uploading it to the chat
  */
 class CompressFileForChatUseCase @Inject constructor(
+    private val chatAttachmentNeedsCompressionUseCase: ChatAttachmentNeedsCompressionUseCase,
     private val isImageFileUseCase: IsImageFileUseCase,
     private val isVideoFileUseCase: IsVideoFileUseCase,
     private val downscaleImageForChatUseCase: DownscaleImageForChatUseCase,
@@ -20,22 +21,16 @@ class CompressFileForChatUseCase @Inject constructor(
     suspend operator fun invoke(original: File): File? {
         val path = original.absolutePath
         return when {
+            !chatAttachmentNeedsCompressionUseCase(original) -> null
             isImageFileUseCase(path) -> {
                 downscaleImageForChatUseCase(original)
             }
 
-            isVideoFileUseCase(path) && VIDEO_COMPRESSION_ISSUE_FIXED -> {
+            isVideoFileUseCase(path) -> {
                 compressVideoForChatUseCase(original)
             }
 
             else -> null
         }
-    }
-
-    companion object {
-        /**
-         * Video compression has an issue with landscape videos, this flag will be removed once solved
-         */
-        internal const val VIDEO_COMPRESSION_ISSUE_FIXED = false
     }
 }
