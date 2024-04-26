@@ -88,7 +88,6 @@ import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.GetUsersCallLimitRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorUpgradeDialogClosedUseCase
@@ -304,10 +303,6 @@ class ManagerViewModelTest {
     private lateinit var monitorSyncsUseCaseFakeFlow: MutableSharedFlow<List<FolderPair>>
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase = mock()
     private val hangChatCallUseCase: HangChatCallUseCase = mock()
-    private val monitorCallRecordingConsentEventUseCase: MonitorCallRecordingConsentEventUseCase =
-        mock {
-            onBlocking { invoke() }.thenReturn(MutableStateFlow(null))
-        }
     private val monitorCallEndedUseCase: MonitorCallEndedUseCase = mock {
         onBlocking { invoke() }.thenReturn(emptyFlow())
     }
@@ -397,7 +392,6 @@ class ManagerViewModelTest {
             },
             monitorChatSessionUpdatesUseCase = monitorChatSessionUpdatesUseCase,
             hangChatCallUseCase = hangChatCallUseCase,
-            monitorCallRecordingConsentEventUseCase = monitorCallRecordingConsentEventUseCase,
             monitorCallEndedUseCase = monitorCallEndedUseCase,
             monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
             getUsersCallLimitRemindersUseCase = getUsersCallLimitRemindersUseCase,
@@ -457,7 +451,6 @@ class ManagerViewModelTest {
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(flowOf(UsersCallLimitReminders.Enabled))
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(true)
         whenever(monitorUserUpdates()).thenReturn(emptyFlow())
-        whenever(monitorCallRecordingConsentEventUseCase()).thenReturn(MutableStateFlow(null))
         whenever(monitorCallEndedUseCase()).thenReturn(emptyFlow())
         whenever(monitorChatArchivedUseCase()).thenReturn(flowOf("Chat Title"))
         whenever(monitorPushNotificationSettingsUpdate()).thenReturn(flowOf(true))

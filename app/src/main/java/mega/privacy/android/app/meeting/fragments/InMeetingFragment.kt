@@ -94,10 +94,12 @@ import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
-import mega.privacy.android.app.presentation.meeting.view.sheet.LeaveMeetingBottomSheetView
+import mega.privacy.android.app.presentation.meeting.CallRecordingViewModel
+import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
+import mega.privacy.android.app.presentation.meeting.view.sheet.LeaveMeetingBottomSheetView
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
@@ -163,6 +165,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     @Inject
     lateinit var chatManagement: ChatManagement
+
+    private val callRecordingViewModel: CallRecordingViewModel by activityViewModels()
 
     val args: InMeetingFragmentArgs by navArgs()
 
@@ -1196,16 +1200,18 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
 
             setRecIndicatorVisibility()
+        }
 
-            if (state.startOrStopRecordingParticipantName != null && !state.showRecordingConsentDialog && state.isRecordingConsentAccepted) {
+        viewLifecycleOwner.collectFlow(callRecordingViewModel.state) { state: CallRecordingUIState ->
+            if (state.participantRecording != null) {
                 showSnackbar(
                     SNACKBAR_TYPE, getString(
                         if (state.isSessionOnRecording) R.string.meetings_call_recording_started_snackbar_message else R.string.meetings_call_recording_stopped_snackbar_message,
-                        state.startOrStopRecordingParticipantName
+                        state.participantRecording
                     ),
                     MEGACHAT_INVALID_HANDLE
                 )
-                sharedModel.setStartOrStopRecordingParticipantNameConsumed()
+                callRecordingViewModel.setParticipantRecordingConsumed()
             }
         }
 
@@ -1254,11 +1260,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * and the visibility of the toolbar and the floating bottom sheet
      */
     private fun setRecIndicatorVisibility() {
-        with(sharedModel.state.value) {
+        with(callRecordingViewModel.state.value) {
             binding.recIndicator.visibility =
-                if (isSessionOnRecording && !showRecordingConsentDialog && isRecordingConsentAccepted &&
-                    !toolbar.isVisible && !floatingBottomSheet.isVisible
-                ) View.VISIBLE else View.GONE
+                if (isSessionOnRecording && !toolbar.isVisible && !floatingBottomSheet.isVisible) View.VISIBLE
+                else View.GONE
         }
     }
 

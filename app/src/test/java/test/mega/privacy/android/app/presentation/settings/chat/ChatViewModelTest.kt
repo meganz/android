@@ -3,7 +3,6 @@ package test.mega.privacy.android.app.presentation.settings.chat
 import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -35,12 +34,10 @@ import mega.privacy.android.domain.usecase.contact.GetContactLinkUseCase
 import mega.privacy.android.domain.usecase.contact.IsContactRequestSentUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.BroadcastCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
@@ -106,10 +103,6 @@ class ChatViewModelTest {
     private val monitorPausedTransfersUseCase = mock<MonitorPausedTransfersUseCase>()
     private val monitorChatSessionUpdatesUseCase = mock<MonitorChatSessionUpdatesUseCase>()
     private val hangChatCallUseCase = mock<HangChatCallUseCase>()
-    private val broadcastCallRecordingConsentEventUseCase =
-        mock<BroadcastCallRecordingConsentEventUseCase>()
-    private val monitorCallRecordingConsentEventUseCase =
-        mock<MonitorCallRecordingConsentEventUseCase>()
     private val monitorCallEndedUseCase = mock<MonitorCallEndedUseCase>()
     private val monitorRichLinkPreviewConfigUseCase = mock<MonitorRichLinkPreviewConfigUseCase> {
         on { invoke() } doReturn emptyFlow()
@@ -142,7 +135,6 @@ class ChatViewModelTest {
             leaveChatUseCase,
             getFeatureFlagValueUseCase,
             hangChatCallUseCase,
-            broadcastCallRecordingConsentEventUseCase,
             setRichLinkWarningCounterUseCase
         )
         wheneverBlocking { monitorPausedTransfersUseCase() }.thenReturn(emptyFlow())
@@ -154,8 +146,6 @@ class ChatViewModelTest {
         wheneverBlocking { monitorChatRoomUpdatesUseCase(any()) }.thenReturn(flowOf())
         wheneverBlocking { loadPendingMessagesUseCase(any()) }.thenReturn(flowOf())
         wheneverBlocking { monitorChatSessionUpdatesUseCase() }.thenReturn(emptyFlow())
-        wheneverBlocking { monitorCallRecordingConsentEventUseCase() }
-            .thenReturn(MutableStateFlow(null))
         wheneverBlocking { monitorCallEndedUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking { monitorRichLinkPreviewConfigUseCase() }.thenReturn(emptyFlow())
         initTestClass()
@@ -196,8 +186,6 @@ class ChatViewModelTest {
             monitorPausedTransfersUseCase = monitorPausedTransfersUseCase,
             monitorChatSessionUpdatesUseCase = monitorChatSessionUpdatesUseCase,
             hangChatCallUseCase = hangChatCallUseCase,
-            broadcastCallRecordingConsentEventUseCase = broadcastCallRecordingConsentEventUseCase,
-            monitorCallRecordingConsentEventUseCase = monitorCallRecordingConsentEventUseCase,
             monitorCallEndedUseCase = monitorCallEndedUseCase,
             monitorRichLinkPreviewConfigUseCase = monitorRichLinkPreviewConfigUseCase,
             setRichLinkWarningCounterUseCase = setRichLinkWarningCounterUseCase

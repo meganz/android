@@ -10,11 +10,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallByChatIdUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorCallFinishedByChatIdUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallSessionOnRecordingUseCase
 import timber.log.Timber
@@ -31,7 +32,7 @@ class CallRecordingViewModel @Inject constructor(
     private val hangChatCallByChatIdUseCase: HangChatCallByChatIdUseCase,
     private val broadcastCallRecordingConsentEventUseCase: BroadcastCallRecordingConsentEventUseCase,
     private val monitorCallRecordingConsentEventUseCase: MonitorCallRecordingConsentEventUseCase,
-    private val monitorCallFinishedByChatIdUseCase: MonitorCallFinishedByChatIdUseCase,
+    private val monitorCallInChatUseCase: MonitorCallInChatUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -41,21 +42,17 @@ class CallRecordingViewModel @Inject constructor(
     private var chatId: Long? = savedStateHandle[Constants.CHAT_ID]
 
     private var monitorCallSessionOnRecordingJob: Job? = null
-    private var monitorCallHungUpByChatIdJob: Job? = null
+    private var monitorCallInChatJob: Job? = null
 
     init {
         chatId?.let {
             monitorCallSessionOnRecording(it)
-            monitorCallFinishedByChatById(it)
+            monitorCallInChat(it)
         }
         viewModelScope.launch {
             monitorCallRecordingConsentEventUseCase().collectLatest { isRecordingConsentAccepted ->
                 _state.update { state ->
-                    if (isRecordingConsentAccepted == null) {
-                        CallRecordingUIState()
-                    } else {
-                        state.copy(isRecordingConsentAccepted = isRecordingConsentAccepted)
-                    }
+                    state.copy(isRecordingConsentAccepted = isRecordingConsentAccepted)
                 }
             }
         }
@@ -67,7 +64,7 @@ class CallRecordingViewModel @Inject constructor(
     fun setChatId(chatId: Long) {
         this.chatId = chatId
         monitorCallSessionOnRecording(chatId)
-        monitorCallFinishedByChatById(chatId)
+        monitorCallInChat(chatId)
     }
 
     /**
@@ -79,24 +76,37 @@ class CallRecordingViewModel @Inject constructor(
             monitorCallSessionOnRecordingUseCase(chatId).collectLatest { callRecordingEvent ->
                 callRecordingEvent?.let {
                     _state.update { state ->
-                        if (callRecordingEvent.isSessionOnRecording) {
-                            state.copy(callRecordingEvent = callRecordingEvent)
-                        } else {
-                            state.copy(
-                                callRecordingEvent = callRecordingEvent,
-                                isRecordingConsentAccepted = null
-                            )
-                        }
+                        state.copy(callRecordingEvent = callRecordingEvent)
+                    }
+                    if (!it.isSessionOnRecording) {
+                        broadcastCallRecordingConsentEvent(null)
                     }
                 }
             }
         }
     }
 
-    private fun monitorCallFinishedByChatById(chatId: Long) {
-        monitorCallHungUpByChatIdJob?.cancel()
-        monitorCallHungUpByChatIdJob = viewModelScope.launch {
-            monitorCallFinishedByChatIdUseCase(chatId)
+    private fun monitorCallInChat(chatId: Long) {
+        monitorCallInChatJob?.cancel()
+        monitorCallInChatJob = viewModelScope.launch {
+            monitorCallInChatUseCase(chatId).collectLatest { call ->
+                _state.update { state ->
+                    call?.let {
+                        val isParticipatingInCall = call.status?.isJoined == true
+                        val isRecording = call.sessionByClientId
+                            .filter { it.value.isRecording }.isNotEmpty()
+
+                        if (!isRecording || !isParticipatingInCall) {
+                            broadcastCallRecordingConsentEvent(null)
+                        }
+
+                        state.copy(
+                            callRecordingEvent = state.callRecordingEvent.copy(isSessionOnRecording = isRecording),
+                            isParticipatingInCall = isParticipatingInCall,
+                        )
+                    } ?: CallRecordingUIState()
+                }
+            }
         }
     }
 
@@ -115,9 +125,6 @@ class CallRecordingViewModel @Inject constructor(
      * Sets isRecordingConsentAccepted.
      */
     fun setIsRecordingConsentAccepted(accepted: Boolean) {
-        _state.update { state ->
-            state.copy(isRecordingConsentAccepted = accepted)
-        }
         broadcastCallRecordingConsentEvent(accepted)
         if (!accepted) {
             chatId?.let { chatId ->

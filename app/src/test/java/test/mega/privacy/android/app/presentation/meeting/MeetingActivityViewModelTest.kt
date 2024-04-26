@@ -38,11 +38,9 @@ import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AllowUsersJoinCallUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.BroadcastCallEndedUseCase
-import mega.privacy.android.domain.usecase.meeting.BroadcastCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
@@ -96,9 +94,6 @@ class MeetingActivityViewModelTest {
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private val hangChatCallUseCase: HangChatCallUseCase = mock()
-    private val broadcastCallRecordingConsentEventUseCase: BroadcastCallRecordingConsentEventUseCase =
-        mock()
-    private val monitorCallEndedUseCase: MonitorCallEndedUseCase = mock()
     private val broadcastCallEndedUseCase: BroadcastCallEndedUseCase = mock()
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat = mock()
     private val getMyFullNameUseCase: GetMyFullNameUseCase = mock()
@@ -156,8 +151,6 @@ class MeetingActivityViewModelTest {
             isConnectedToInternetUseCase,
             monitorStorageStateEventUseCase,
             hangChatCallUseCase,
-            broadcastCallRecordingConsentEventUseCase,
-            monitorCallEndedUseCase,
             broadcastCallEndedUseCase,
             getScheduledMeetingByChat,
             getMyFullNameUseCase,
@@ -207,8 +200,6 @@ class MeetingActivityViewModelTest {
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             hangChatCallUseCase = hangChatCallUseCase,
-            broadcastCallRecordingConsentEventUseCase = broadcastCallRecordingConsentEventUseCase,
-            monitorCallEndedUseCase = monitorCallEndedUseCase,
             broadcastCallEndedUseCase = broadcastCallEndedUseCase,
             getScheduledMeetingByChat = getScheduledMeetingByChat,
             getMyFullNameUseCase = getMyFullNameUseCase,

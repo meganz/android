@@ -8,7 +8,6 @@ import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_RINGING;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_START;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_AUDIO_ENABLE;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_CALL_RECORDING;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_CHAT_ID;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_IS_GUEST;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_NAME;
@@ -193,7 +192,6 @@ public class CallUtil {
         meetingIntent.setAction(MEETING_ACTION_IN);
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
         meetingIntent.putExtra(MEETING_IS_GUEST, MegaApplication.getInstance().getMegaApi().isEphemeralPlusPlus());
-        meetingIntent.putExtra(MEETING_CALL_RECORDING, isSessionOnRecording);
         if (isNewTask) {
             Timber.d("New task");
             meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -388,30 +386,18 @@ public class CallUtil {
      * @param context               From which the action is done.
      * @param chatId                Chat ID.
      * @param passcodeManagement    To disable passcode.
-     * @param isSessionOnRecording  True if call is already being recorded of False otherwise.
      */
-    public static void returnCall(Context context, long chatId, PasscodeManagement passcodeManagement, Boolean isSessionOnRecording) {
+    public static void returnCall(Context context, long chatId, PasscodeManagement passcodeManagement) {
         ArrayList<Long> currentCalls = getCallsParticipating();
         if (currentCalls == null || currentCalls.isEmpty())
             return;
 
         for (Long chatIdCall : currentCalls) {
             if (chatIdCall == chatId) {
-                openMeetingInProgress(context, chatId, false, passcodeManagement, isSessionOnRecording);
+                openMeetingInProgress(context, chatId, false, passcodeManagement);
                 return;
             }
         }
-    }
-
-    /**
-     * Opens the call that is in progress.
-     *
-     * @param context            From which the action is done.
-     * @param chatId             ID chat.
-     * @param passcodeManagement To disable passcode.
-     */
-    public static void returnCall(Context context, long chatId, PasscodeManagement passcodeManagement) {
-        returnCall(context, chatId, passcodeManagement, false);
     }
 
     /**

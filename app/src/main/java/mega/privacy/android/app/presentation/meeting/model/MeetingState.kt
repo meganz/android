@@ -47,9 +47,6 @@ import mega.privacy.android.domain.entity.meeting.ParticipantsSection
  * @property chatIdToOpen                               Chat Id of the chat that should be opened.
  * @property callType                                   [CallType]
  * @property isParticipantSharingScreen                 True, if a participant is sharing the screen. False, if not.
- * @property isSessionOnRecording                       True if a host is recording or False otherwise.
- * @property showRecordingConsentDialog                 True if should show the recording consent dialog or False otherwise.
- * @property isRecordingConsentAccepted                 True if recording consent dialog has been already accepted or False otherwise.
  * @property startOrStopRecordingParticipantName        Name of the [Participant] who has started/stopped the recording.
  * @property isNecessaryToUpdateCall                    True, it is necessary to update call. False, it's not necessary.
  * @property isScheduledMeeting                         True, if it is a scheduled meeting. False, if not.
@@ -98,10 +95,6 @@ data class MeetingState(
     val chatIdToOpen: Long = -1L,
     val callType: CallType = CallType.OneToOne,
     val isParticipantSharingScreen: Boolean = false,
-    val isSessionOnRecording: Boolean = false,
-    val showRecordingConsentDialog: Boolean = false,
-    val isRecordingConsentAccepted: Boolean = false,
-    val startOrStopRecordingParticipantName: String? = null,
     val isNecessaryToUpdateCall: Boolean = false,
     val isScheduledMeeting: Boolean = false,
     val myFullName: String = "",

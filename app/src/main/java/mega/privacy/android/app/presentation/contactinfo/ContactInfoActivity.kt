@@ -555,7 +555,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 val isDark = themeMode.isDarkMode()
                 MegaAppTheme(isDark = isDark) {
                     UsersInWaitingRoomDialog()
-                    DenyEntryToCallDialog( )
+                    DenyEntryToCallDialog()
                 }
             }
         }

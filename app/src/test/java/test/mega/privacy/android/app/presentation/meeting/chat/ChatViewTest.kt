@@ -14,6 +14,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.meeting.CallRecordingViewModel
+import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_ADD_PARTICIPANTS_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_CLEAR_ACTION
@@ -29,6 +31,8 @@ import mega.privacy.android.app.presentation.meeting.chat.view.dialog.TEST_TAG_E
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatGalleryState
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatGalleryViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.TEST_TAG_ATTACH_FROM_LOCATION
+import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
+import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.core.ui.controls.chat.TEST_TAG_ATTACHMENT_ICON
@@ -70,12 +74,19 @@ class ChatViewTest {
     }
 
     private val chatBottomBarViewModel = mock<ChatBottomBarViewModel>()
-
+    private val callRecordingViewModel = mock<CallRecordingViewModel> {
+        on { state } doReturn MutableStateFlow(CallRecordingUIState())
+    }
+    private val waitingRoomManagementViewModel = mock<WaitingRoomManagementViewModel> {
+        on { state } doReturn MutableStateFlow(WaitingRoomManagementState())
+    }
     private val viewModelStore = mock<ViewModelStore> {
         on { get(argThat<String> { contains(ChatGalleryViewModel::class.java.canonicalName.orEmpty()) }) } doReturn chatGalleryViewModel
         on { get(argThat<String> { contains(StartTransfersComponentViewModel::class.java.canonicalName.orEmpty()) }) } doReturn startTransfersComponentViewModel
         on { get(argThat<String> { contains(MessageListViewModel::class.java.canonicalName.orEmpty()) }) } doReturn messageListViewModel
         on { get(argThat<String> { contains(ChatBottomBarViewModel::class.java.canonicalName.orEmpty()) }) } doReturn chatBottomBarViewModel
+        on { get(argThat<String> { contains(CallRecordingViewModel::class.java.canonicalName.orEmpty()) }) } doReturn callRecordingViewModel
+        on { get(argThat<String> { contains(WaitingRoomManagementViewModel::class.java.canonicalName.orEmpty()) }) } doReturn waitingRoomManagementViewModel
     }
     private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
         on { viewModelStore } doReturn viewModelStore

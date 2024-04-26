@@ -32,7 +32,6 @@ import static mega.privacy.android.app.main.megachat.MapsActivity.MSG_ID;
 import static mega.privacy.android.app.main.megachat.MapsActivity.SNAPSHOT;
 import static mega.privacy.android.app.main.megachat.MapsActivity.getAddresses;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_IN;
-import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_CALL_RECORDING;
 import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_CHAT_ID;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith;
@@ -380,6 +379,7 @@ import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity;
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity;
 import mega.privacy.android.app.presentation.login.LoginActivity;
+import mega.privacy.android.app.presentation.meeting.CallRecordingViewModel;
 import mega.privacy.android.app.presentation.meeting.view.dialog.CallRecordingConsentDialogFragment;
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity;
 import mega.privacy.android.app.presentation.meeting.view.dialog.UsersInWaitingRoomDialogFragment;
@@ -594,6 +594,8 @@ public class ChatActivity extends PasscodeActivity
     private StartDownloadViewModel startDownloadViewModel;
 
     private WaitingRoomManagementViewModel waitingRoomManagementViewModel;
+
+    private CallRecordingViewModel callRecordingViewModel;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -1482,6 +1484,7 @@ public class ChatActivity extends PasscodeActivity
         viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
         startDownloadViewModel = new ViewModelProvider(this).get(StartDownloadViewModel.class);
         waitingRoomManagementViewModel = new ViewModelProvider(this).get(WaitingRoomManagementViewModel.class);
+        callRecordingViewModel = new ViewModelProvider(this).get(CallRecordingViewModel.class);
 
         if (shouldRefreshSessionDueToKarere()) {
             return;
@@ -2128,7 +2131,6 @@ public class ChatActivity extends PasscodeActivity
                 intentMeeting.putExtra(MEETING_CHAT_ID, callChatId);
                 intentMeeting.putExtra(MeetingActivity.MEETING_AUDIO_ENABLE, chatState.getCurrentCallAudioStatus());
                 intentMeeting.putExtra(MeetingActivity.MEETING_VIDEO_ENABLE, chatState.getCurrentCallVideoStatus());
-                intentMeeting.putExtra(MeetingActivity.MEETING_CALL_RECORDING, chatState.isSessionOnRecording());
                 intentMeeting.putExtra(MeetingActivity.MEETING_IS_RINGIN_ALL, chatState.isRingingAll());
                 startActivity(intentMeeting);
             }
@@ -2160,12 +2162,6 @@ public class ChatActivity extends PasscodeActivity
                 viewModel.onContactInvitationConsumed();
             }
 
-            if (chatState.getShowRecordingConsentDialog() && !chatState.isRecordingConsentAccepted()) {
-                showCallRecordingConsentDialog();
-            } else if (callRecordingConsentDialogFragment != null) {
-                callRecordingConsentDialogFragment.dismissAllowingStateLoss();
-            }
-
             if (chatState.getShowForceUpdateDialog()) {
                 showForceUpdateAppDialog();
             }
@@ -2186,6 +2182,15 @@ public class ChatActivity extends PasscodeActivity
                 usersInWaitingRoomDialogFragment.dismissAllowingStateLoss();
             }
 
+            return Unit.INSTANCE;
+        });
+        callRecordingViewModel.setChatId(idChat);
+        ViewExtensionsKt.collectFlow(this, callRecordingViewModel.getState(), Lifecycle.State.STARTED, callRecordingUIState -> {
+            if (callRecordingUIState.isSessionOnRecording()) {
+                showCallRecordingConsentDialog();
+            } else if (callRecordingConsentDialogFragment != null) {
+                callRecordingConsentDialogFragment.dismissAllowingStateLoss();
+            }
             return Unit.INSTANCE;
         });
     }
@@ -2226,7 +2231,6 @@ public class ChatActivity extends PasscodeActivity
                     if (savedInstanceState != null) {
 
                         Timber.d("Bundle is NOT NULL");
-                        viewModel.setIsSessionOnRecording(savedInstanceState.getBoolean(MEETING_CALL_RECORDING, false));
                         selectedMessageId = savedInstanceState.getLong("selectedMessageId", -1);
                         Timber.d("Handle of the message: %s", selectedMessageId);
                         selectedPosition = savedInstanceState.getInt("selectedPosition", -1);
@@ -4533,7 +4537,7 @@ public class ChatActivity extends PasscodeActivity
                     startVideo = false;
                     checkCallInThisChat();
                 } else {
-                    returnCall(this, chatIdBanner, passcodeManagement, viewModel.getState().getValue().isSessionOnRecording());
+                    returnCall(this, chatIdBanner, passcodeManagement);
                 }
             }
         } else if (id == R.id.expand_input_text_rl || id == R.id.expand_input_text_icon) {
@@ -8723,7 +8727,6 @@ public class ChatActivity extends PasscodeActivity
         outState.putBoolean(END_CALL_FOR_ALL_DIALOG, AlertDialogUtil.isAlertDialogShown(endCallForAllDialog));
         isOnlyMeInCallDialogShown = AlertDialogUtil.isAlertDialogShown(dialogOnlyMeInCall);
         outState.putBoolean(ONLY_ME_IN_CALL_DIALOG, isOnlyMeInCallDialogShown);
-        outState.putBoolean(MEETING_CALL_RECORDING, viewModel.getState().getValue().isSessionOnRecording());
         hideDialogCall();
     }
 
@@ -9213,7 +9216,6 @@ public class ChatActivity extends PasscodeActivity
     private void hideCallBar(MegaChatCall call) {
         invalidateOptionsMenu();
         stopChronometers(call);
-        viewModel.resetCallRecordingState();
 
         if (callInProgressLayout != null) {
             callInProgressLayout.setVisibility(View.GONE);

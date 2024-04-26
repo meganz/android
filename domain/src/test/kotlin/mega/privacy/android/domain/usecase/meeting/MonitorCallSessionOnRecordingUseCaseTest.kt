@@ -110,10 +110,9 @@ class MonitorCallSessionOnRecordingUseCaseTest {
                 on { this.chatId } doReturn chatId
                 on { this.session } doReturn session
             }
-            val event = CallRecordingEvent(true, peerName)
+            val event = CallRecordingEvent(true, null)
 
             whenever(getChatCallUseCase.invoke(chatId)).thenReturn(null)
-            whenever(getParticipantFullNameUseCase(peerId)).thenReturn(peerName)
 
             underTest.invoke(chatId).test {
                 eventFlow.emit(result)
@@ -168,12 +167,11 @@ class MonitorCallSessionOnRecordingUseCaseTest {
                 on { this.chatId } doReturn chatId
                 on { this.session } doReturn session2
             }
-            val event1 = CallRecordingEvent(true, peerName)
+            val event1 = CallRecordingEvent(true, null)
             val event2 = CallRecordingEvent(false, peerName)
 
             whenever(getChatCallUseCase.invoke(chatId)).thenReturn(call)
             whenever(getParticipantFullNameUseCase(peerId)).thenReturn(peerName)
-                .thenReturn(peerName)
 
             underTest.invoke(chatId).test {
                 Truth.assertThat(awaitItem()).isEqualTo(event1)
@@ -217,11 +215,10 @@ class MonitorCallSessionOnRecordingUseCaseTest {
                 on { this.chatId } doReturn chatId
                 on { sessionByClientId } doReturn map
             }
-            val event = CallRecordingEvent(true, peerName)
+            val event = CallRecordingEvent(true, null)
 
             whenever(monitorChatSessionUpdatesUseCase()).thenReturn(emptyFlow())
             whenever(getChatCallUseCase.invoke(chatId)).thenReturn(call)
-            whenever(getParticipantFullNameUseCase(peerId)).thenReturn(peerName)
 
             underTest.invoke(chatId).test {
                 Truth.assertThat(awaitItem()).isEqualTo(event)

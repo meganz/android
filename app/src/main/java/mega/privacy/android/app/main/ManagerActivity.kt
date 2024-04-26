@@ -204,6 +204,7 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.Tab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.mapper.RestoreNodeResultMapper
+import mega.privacy.android.app.presentation.meeting.CallRecordingViewModel
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.UpgradeProPlanBottomSheet
@@ -403,6 +404,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var transfersToImageViewer = false
 
     internal val viewModel: ManagerViewModel by viewModels()
+    internal val callRecordingViewModel: CallRecordingViewModel by viewModels()
     internal val fileBrowserViewModel: FileBrowserViewModel by viewModels()
     internal val legacyIncomingSharesViewModel: IncomingSharesViewModel by viewModels()
     internal val incomingSharesViewModel: IncomingSharesComposeViewModel by viewModels()
@@ -1188,11 +1190,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             setContent {
                 val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
-                val state by viewModel.state.collectAsStateWithLifecycle()
-                if (state.callInProgressChatId != -1L && state.isSessionOnRecording && state.showRecordingConsentDialog && !state.isRecordingConsentAccepted) {
-                    MegaAppTheme(isDark = isDark) {
-                        CallRecordingConsentDialog()
-                    }
+                MegaAppTheme(isDark = isDark) {
+                    CallRecordingConsentDialog()
                 }
             }
         }
@@ -2178,10 +2177,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             action = MeetingActivity.MEETING_ACTION_IN
             putExtra(MeetingActivity.MEETING_CHAT_ID, chatId)
             putExtra(MeetingActivity.MEETING_BOTTOM_PANEL_EXPANDED, true)
-            putExtra(
-                MeetingActivity.MEETING_CALL_RECORDING,
-                viewModel.state().isSessionOnRecording
-            )
         }
         startActivity(intent)
     }
@@ -2894,7 +2889,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         reconnectDialog?.cancel()
         dismissAlertDialogIfExists(processFileDialog)
         nodeSaver.destroy()
-        viewModel.stopMonitorChatSessionUpdates()
         cookieDialogHandler.onDestroy()
         super.onDestroy()
     }
@@ -5153,7 +5147,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * Method to return to an ongoing call
      */
     fun returnCall() {
-        CallUtil.returnActiveCall(this, passcodeManagement, viewModel.state().isSessionOnRecording)
+        CallUtil.returnActiveCall(this, passcodeManagement)
     }
 
     private fun checkBeforeOpeningQR(openScanQR: Boolean) {
@@ -8431,13 +8425,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      */
     private fun setCallWidget() {
         if (CallUtil.participatingInACall()) {
-            viewModel.stopMonitorChatSessionUpdates()
             CallUtil.getCallInProgress()?.chatid?.let { chatId ->
-                viewModel.startMonitorChatSessionUpdates(chatId)
+                callRecordingViewModel.setChatId(chatId)
             }
-        } else {
-            viewModel.stopMonitorChatSessionUpdates()
-            viewModel.resetCallRecordingState()
         }
         setCallBadge()
         if (drawerItem === DrawerItem.SEARCH || drawerItem === DrawerItem.TRANSFERS || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.HOMEPAGE || !Util.isScreenInPortrait(

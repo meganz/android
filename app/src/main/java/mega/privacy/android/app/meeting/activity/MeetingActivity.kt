@@ -10,13 +10,11 @@ import android.view.ViewGroup
 import android.view.WindowInsets
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph
@@ -39,7 +37,9 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
+import mega.privacy.android.app.presentation.meeting.CallRecordingViewModel
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
+import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsFullListView
@@ -49,7 +49,6 @@ import mega.privacy.android.app.presentation.meeting.view.dialog.UsersInWaitingR
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.app.utils.ScheduledMeetingDateUtil.getAppropriateStringForScheduledMeetingDate
-import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
 import mega.privacy.android.navigation.MegaNavigator
@@ -88,7 +87,6 @@ class MeetingActivity : PasscodeActivity() {
         const val MEETING_GUEST_LAST_NAME = "guest_last_name"
         const val CALL_ACTION = "call_action"
         const val MEETING_BOTTOM_PANEL_EXPANDED = "meeting_bottom_panel_expanded"
-        const val MEETING_CALL_RECORDING = "meeting_call_recording"
         const val MEETING_IS_RINGIN_ALL = "meeting_is_ringing_all"
         const val MEETING_FREE_PLAN_USERS_LIMIT = "meeting_free_plan_users_limit"
 
@@ -116,6 +114,7 @@ class MeetingActivity : PasscodeActivity() {
     lateinit var binding: ActivityMeetingBinding
     private val meetingViewModel: MeetingActivityViewModel by viewModels()
     private val waitingRoomManagementViewModel: WaitingRoomManagementViewModel by viewModels()
+    private val callRecordingViewModel: CallRecordingViewModel by viewModels()
 
     private var meetingAction: String? = null
 
@@ -239,11 +238,8 @@ class MeetingActivity : PasscodeActivity() {
             isVisible = true
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                val state by meetingViewModel.state.collectAsStateWithLifecycle()
-                if (state.isSessionOnRecording && state.showRecordingConsentDialog && !state.isRecordingConsentAccepted) {
-                    MegaAppTheme(isDark = true) {
-                        CallRecordingConsentDialog(meetingViewModel = meetingViewModel)
-                    }
+                MegaAppTheme(isDark = true) {
+                    CallRecordingConsentDialog()
                 }
             }
         }
@@ -314,9 +310,11 @@ class MeetingActivity : PasscodeActivity() {
             if (state.isNecessaryToUpdateCall) {
                 meetingViewModel.getChatCall(false)
             }
+        }
 
+        collectFlow(callRecordingViewModel.state) { state: CallRecordingUIState ->
             binding.recIndicator.visibility =
-                if (state.isSessionOnRecording && !state.showRecordingConsentDialog && state.isRecordingConsentAccepted) View.VISIBLE else View.GONE
+                if (state.isSessionOnRecording) View.VISIBLE else View.GONE
         }
 
         collectFlow(waitingRoomManagementViewModel.state) { state: WaitingRoomManagementState ->
@@ -335,6 +333,12 @@ class MeetingActivity : PasscodeActivity() {
 
     private fun initIntent() {
         intent?.let {
+            val chatId = it.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE).let { chatId ->
+                meetingViewModel.updateChatRoomId(chatId)
+                callRecordingViewModel.setChatId(chatId)
+                chatId
+            }
+
             if (it.action == CallNotificationIntentService.ANSWER) {
                 it.extras?.let { extra ->
                     val chatIdIncomingCall = extra.getLong(
@@ -377,14 +381,6 @@ class MeetingActivity : PasscodeActivity() {
                     finish()
                     return
                 }
-            }
-            val chatId = it.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
-            meetingViewModel.updateChatRoomId(chatId)
-
-            val isSessionOnRecording = it.getBooleanExtra(MEETING_CALL_RECORDING, false)
-            meetingViewModel.setIsSessionOnRecording(isSessionOnRecording)
-            if (isSessionOnRecording) {
-                meetingViewModel.setIsRecordingConsentAccepted(value = true)
             }
 
             if (it.getBooleanExtra(MEETING_IS_RINGIN_ALL, false)) {
@@ -521,12 +517,6 @@ class MeetingActivity : PasscodeActivity() {
             bundle.putBoolean(
                 MEETING_SPEAKER_ENABLE, intent.getBooleanExtra(
                     MEETING_SPEAKER_ENABLE,
-                    false
-                )
-            )
-            bundle.putBoolean(
-                MEETING_CALL_RECORDING, intent.getBooleanExtra(
-                    MEETING_CALL_RECORDING,
                     false
                 )
             )

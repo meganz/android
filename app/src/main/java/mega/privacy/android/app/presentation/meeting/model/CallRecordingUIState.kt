@@ -7,10 +7,12 @@ import mega.privacy.android.domain.entity.meeting.CallRecordingEvent
  *
  * @property callRecordingEvent [CallRecordingEvent]
  * @property isRecordingConsentAccepted True if the recording consent is accepted.
+ * @property isParticipatingInCall True if the user is participating in call.
  */
 data class CallRecordingUIState(
     val callRecordingEvent: CallRecordingEvent = CallRecordingEvent(),
     val isRecordingConsentAccepted: Boolean? = null,
+    val isParticipatingInCall: Boolean = false,
 ) {
     /**
      * True if the session is being recorded.

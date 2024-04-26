@@ -6,6 +6,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -13,9 +14,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
-import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
-import mega.privacy.android.app.presentation.chat.ChatViewModel
+import mega.privacy.android.app.presentation.meeting.CallRecordingViewModel
+import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.core.ui.controls.text.MegaSpannedClickableText
 import mega.privacy.android.core.ui.controls.text.MegaText
@@ -24,6 +26,7 @@ import mega.privacy.android.core.ui.model.MegaSpanStyleWithAnnotation
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.tokens.TextColor
+import mega.privacy.android.domain.entity.meeting.CallRecordingEvent
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
@@ -31,19 +34,17 @@ import mega.privacy.android.shared.theme.MegaAppTheme
  */
 @Composable
 fun CallRecordingConsentDialog(
-    viewModel: ChatViewModel = hiltViewModel(),
-    meetingViewModel: MeetingActivityViewModel? = null
+    viewModel: CallRecordingViewModel = hiltViewModel(),
 ) {
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
+
     CallRecordingConsentDialog(
+        uiState = uiState,
         onConfirm = {
-            viewModel.setIsRecordingConsentAccepted(value = true)
-            viewModel.setShowRecordingConsentDialogConsumed()
-            meetingViewModel?.setShowRecordingConsentDialogConsumed()
+            viewModel.setIsRecordingConsentAccepted(accepted = true)
         },
         onDismiss = {
-            viewModel.setIsRecordingConsentAccepted(value = false)
-            viewModel.setShowRecordingConsentDialogConsumed()
-            meetingViewModel?.setShowRecordingConsentDialogConsumed()
+            viewModel.setIsRecordingConsentAccepted(accepted = false)
         },
     )
 }
@@ -56,17 +57,18 @@ fun CallRecordingConsentDialog(
 @Composable
 fun CallRecordingConsentDialog(
     onDismiss: () -> Unit,
-    viewModel: ChatViewModel = hiltViewModel(),
+    viewModel: CallRecordingViewModel = hiltViewModel(),
 ) {
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
+
     CallRecordingConsentDialog(
+        uiState = uiState,
         onConfirm = {
-            viewModel.setIsRecordingConsentAccepted(value = true)
-            viewModel.setShowRecordingConsentDialogConsumed()
+            viewModel.setIsRecordingConsentAccepted(accepted = true)
             onDismiss()
         },
         onDismiss = {
-            viewModel.setIsRecordingConsentAccepted(value = false)
-            viewModel.setShowRecordingConsentDialogConsumed()
+            viewModel.setIsRecordingConsentAccepted(accepted = false)
             onDismiss()
         },
     )
@@ -80,47 +82,51 @@ fun CallRecordingConsentDialog(
  */
 @Composable
 private fun CallRecordingConsentDialog(
+    uiState: CallRecordingUIState,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-) {
-    val context = LocalContext.current
-    ConfirmationDialog(
-        title = stringResource(id = R.string.meetings_call_recording_consent_dialog_title),
-        text = {
-            Column(modifier = Modifier, content = {
-                MegaText(
-                    text = stringResource(id = R.string.meetings_call_recording_consent_dialog_message),
-                    textColor = TextColor.Secondary,
-                    style = MaterialTheme.typography.subtitle1,
-                )
-                MegaSpannedClickableText(
-                    value = stringResource(id = R.string.meetings_call_recording_consent_dialog_learn_more_option),
-                    styles = hashMapOf(
-                        SpanIndicator('A') to MegaSpanStyleWithAnnotation(
-                            MegaSpanStyle(
-                                SpanStyle(textDecoration = TextDecoration.Underline),
-                                color = TextColor.Secondary,
-                            ), "https://mega.io/privacy"
+) = with(uiState) {
+    if (isSessionOnRecording && isRecordingConsentAccepted == null && isParticipatingInCall) {
+        val context = LocalContext.current
+
+        ConfirmationDialog(
+            title = stringResource(id = R.string.meetings_call_recording_consent_dialog_title),
+            text = {
+                Column(modifier = Modifier, content = {
+                    MegaText(
+                        text = stringResource(id = R.string.meetings_call_recording_consent_dialog_message),
+                        textColor = TextColor.Secondary,
+                        style = MaterialTheme.typography.subtitle1,
+                    )
+                    MegaSpannedClickableText(
+                        value = stringResource(id = R.string.meetings_call_recording_consent_dialog_learn_more_option),
+                        styles = hashMapOf(
+                            SpanIndicator('A') to MegaSpanStyleWithAnnotation(
+                                MegaSpanStyle(
+                                    SpanStyle(textDecoration = TextDecoration.Underline),
+                                    color = TextColor.Secondary,
+                                ), "https://mega.io/privacy"
+                            ),
                         ),
-                    ),
-                    color = TextColor.Secondary,
-                    onAnnotationClick = {
-                        context.startActivity(
-                            Intent(Intent.ACTION_VIEW, Uri.parse("https://mega.io/privacy"))
-                        )
-                    },
-                    baseStyle = MaterialTheme.typography.subtitle1
-                )
-            })
-        },
-        confirmButtonText = stringResource(id = R.string.meetings_call_recording_consent_dialog_positive_button),
-        cancelButtonText = stringResource(id = R.string.meetings_call_recording_consent_dialog_negative_button),
-        onConfirm = onConfirm,
-        onDismiss = onDismiss,
-        modifier = Modifier.testTag(TEST_TAG_CALL_RECORDING_CONSENT_DIALOG),
-        dismissOnClickOutside = false,
-        dismissOnBackPress = false
-    )
+                        color = TextColor.Secondary,
+                        onAnnotationClick = {
+                            context.startActivity(
+                                Intent(Intent.ACTION_VIEW, Uri.parse("https://mega.io/privacy"))
+                            )
+                        },
+                        baseStyle = MaterialTheme.typography.subtitle1
+                    )
+                })
+            },
+            confirmButtonText = stringResource(id = R.string.meetings_call_recording_consent_dialog_positive_button),
+            cancelButtonText = stringResource(id = R.string.meetings_call_recording_consent_dialog_negative_button),
+            onConfirm = onConfirm,
+            onDismiss = onDismiss,
+            modifier = Modifier.testTag(TEST_TAG_CALL_RECORDING_CONSENT_DIALOG),
+            dismissOnClickOutside = false,
+            dismissOnBackPress = false
+        )
+    }
 }
 
 /**
@@ -131,6 +137,9 @@ private fun CallRecordingConsentDialog(
 fun CallRecordingConsentDialogPreview() {
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         CallRecordingConsentDialog(
+            uiState = CallRecordingUIState(
+                callRecordingEvent = CallRecordingEvent(isSessionOnRecording = true),
+            ),
             onConfirm = {},
             onDismiss = {},
         )
