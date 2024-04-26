@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -182,11 +181,10 @@ internal fun SettingsCameraUploadsView(
     }
     EventEffect(
         event = uiState.snackbarMessage,
-        onConsumed = { onSnackbarMessageConsumed.invoke() },
+        onConsumed = { onSnackbarMessageConsumed() },
         action = { messageResId ->
             scaffoldState.snackbarHostState.showSnackbar(
                 message = context.resources.getString(messageResId),
-                duration = SnackbarDuration.Long,
             )
         },
     )

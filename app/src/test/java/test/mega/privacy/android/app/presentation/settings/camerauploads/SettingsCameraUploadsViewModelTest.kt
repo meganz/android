@@ -526,6 +526,21 @@ internal class SettingsCameraUploadsViewModelTest {
             }
 
         @Test
+        fun `test that a snackbar is shown when enabling camera uploads and the user is on a regular or active business administrator account`() =
+            runTest {
+                whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(
+                    EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
+                )
+                initializeUnderTest()
+
+                underTest.onMediaPermissionsGranted()
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.settings_camera_notif_initializing_title))
+                }
+            }
+
+        @Test
         fun `test that a business account prompt is shown when the business account sub user is active`() =
             runTest {
                 whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(

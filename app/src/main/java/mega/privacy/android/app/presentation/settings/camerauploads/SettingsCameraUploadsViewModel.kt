@@ -453,6 +453,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             runCatching {
                 setupCameraUploadsSettingUseCase(isEnabled = true)
                 setCameraUploadsEnabled(true)
+            }.onSuccess {
+                showSnackbar(R.string.settings_camera_notif_initializing_title)
             }.onFailure { exception ->
                 Timber.e("An error occurred when enabling Camera Uploads", exception)
                 showGenericErrorSnackbar()
