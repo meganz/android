@@ -562,8 +562,8 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
 
         listOf(
             launch {
-                setOriginalFingerprintUseCase(
-                    record = record,
+                setOriginalFingerprint(
+                    originalFingerprint = record.originalFingerprint,
                     nodeId = nodeId,
                 ).onFailure { trySend(it) }
             },
@@ -629,22 +629,26 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                 existingNodeId = existingNodeId,
                 newNodeId = newNodeId,
             )
+            setOriginalFingerprint(
+                originalFingerprint = record.originalFingerprint,
+                nodeId = newNodeId,
+            )
         }
     }
 
     /**
      * Set the original fingerprint to the node
      *
-     * @param record
+     * @param originalFingerprint
      * @param nodeId
      */
-    private suspend fun setOriginalFingerprintUseCase(
-        record: CameraUploadsRecord,
+    private suspend fun setOriginalFingerprint(
+        originalFingerprint: String,
         nodeId: NodeId,
     ) = runCatching {
         setOriginalFingerprintUseCase(
             nodeId = nodeId,
-            originalFingerprint = record.originalFingerprint,
+            originalFingerprint = originalFingerprint,
         )
     }
 

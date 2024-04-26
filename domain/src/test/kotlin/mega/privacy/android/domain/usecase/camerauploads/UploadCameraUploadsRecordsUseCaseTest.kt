@@ -271,6 +271,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
                 folderType = cameraUploadFolderType,
                 existsInTargetNode = false,
                 existingNodeId = existingNodeId,
+                originalFingerprint = "originalFingerprint",
             )
             cameraUploadsRecords = listOf(record)
             uploadNodeId = getUploadNodeId(cameraUploadFolderType)
@@ -313,6 +314,26 @@ class UploadCameraUploadsRecordsUseCaseTest {
                 nodeId = newNodeId,
                 latitude = latitude,
                 longitude = longitude,
+            )
+        }
+
+        @ParameterizedTest(name = "when folder type is {0}")
+        @MethodSource("provideParameters")
+        fun `test that the original fingerprint is set if a node is copied`(
+            cameraUploadFolderType: CameraUploadFolderType,
+        ) = runTest {
+            setInput(cameraUploadFolderType)
+            val (latitude, longitude) = Pair(0.0, 0.0)
+            whenever(getNodeGPSCoordinatesUseCase(existingNodeId))
+                .thenReturn(Pair(latitude, longitude))
+            whenever(copyNodeUseCase(existingNodeId, uploadNodeId, record.generatedFileName))
+                .thenReturn(newNodeId)
+
+            executeUnderTest().collect()
+
+            verify(setOriginalFingerprintUseCase).invoke(
+                nodeId = newNodeId,
+                originalFingerprint = record.originalFingerprint,
             )
         }
 
