@@ -96,7 +96,7 @@ internal class KotlinTokensGenerator<T : JsonCoreUiObject>(
 
     private fun addRootObject(file: FileSpec.Builder, rootObject: JsonCoreUiObject) {
         if (rootObject is JsonGroup) {
-            if (rootObject.name == null) {
+            if (rootObject.name.isNullOrEmpty()) {
                 //unnamed root group is discarded, children objects (usually only one) will be created
                 rootObject.children.forEach { child ->
                     if (child is JsonGroup) {

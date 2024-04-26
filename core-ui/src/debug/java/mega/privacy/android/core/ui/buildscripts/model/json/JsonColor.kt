@@ -1,7 +1,6 @@
 package mega.privacy.android.core.ui.buildscripts.model.json
 
 import androidx.compose.ui.graphics.Color
-import com.google.gson.annotations.SerializedName
 import mega.privacy.android.core.ui.buildscripts.kotlingenerator.getPropertyName
 
 /**
@@ -9,7 +8,6 @@ import mega.privacy.android.core.ui.buildscripts.kotlingenerator.getPropertyName
  */
 internal data class JsonColor(
     override var name: String?,
-    @SerializedName("\$value")
     val value: Color?,
 ) : JsonCoreUiObject, JsonLeaf {
     override fun getPropertyName(groupParentName: String?) =

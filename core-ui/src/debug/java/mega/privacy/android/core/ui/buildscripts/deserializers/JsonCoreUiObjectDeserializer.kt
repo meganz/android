@@ -14,8 +14,8 @@ import java.lang.reflect.Type
 
 /**
  * Deserializer to convert an unspecified [JsonCoreUiObject] to its corresponding type.
- * It checks the "$type" field in the json element to determine which type to convert to,
- * if it has no "$type" it presupposes it's a group.
+ * It checks the "type" field in the json element to determine which type to convert to,
+ * if it has no "type" it presupposes it's a group.
  * The name of the parsed object comes from the parent, for example:
  *      "white": {
  *         "$type": "color",
@@ -85,8 +85,8 @@ internal class JsonCoreUiObjectDeserializer : JsonDeserializer<JsonCoreUiObject>
     }
 
     companion object {
-        private const val TYPE_FIELD = "\$type"
-        private const val TYPE_VALUE = "\$value"
+        private const val TYPE_FIELD = "type"
+        private const val TYPE_VALUE = "value"
         private const val TYPE_COLOR = "color"
         private const val TYPE_NUMBER = "number"
     }

@@ -18,108 +18,108 @@ import mega.privacy.android.core.ui.theme.tokens.Support
 import mega.privacy.android.core.ui.theme.tokens.Text
 
 internal object MegaAppSemanticTokensLight : SemanticTokens {
-    override val focus: Focus = Focus(
-            colorFocus = Colors.Secondary.Indigo.n200,
-            )
-
-    override val indicator: Indicator = Indicator(
-            magenta = Colors.Secondary.Magenta.n500,
-            yellow = Colors.Warning.n500,
-            orange = Colors.Secondary.Orange.n500,
-            indigo = Colors.Secondary.Indigo.n500,
-            blue = Colors.Secondary.Blue.n500,
-            green = Colors.Success.n500,
-            pink = Colors.Error.n500,
-            )
-
-    override val support: Support = Support(
-            error = Colors.Error.n600,
-            warning = Colors.Warning.n500,
-            success = Colors.Success.n600,
-            info = Colors.Secondary.Blue.n500,
+    override val background: Background = Background(
+            pageBackground = Colors.Base.white,
+            inverse = Colors.Neutral.n700,
+            surface1 = Colors.Neutral.n025,
+            surface3 = Colors.Neutral.n100,
+            surface2 = Colors.Neutral.n050,
+            blur = Colors.BlackOpacity.n020,
             )
 
     override val button: Button = Button(
-            disabled = Colors.BlackOpacity.n010,
-            errorPressed = Colors.Error.n800,
-            errorHover = Colors.Error.n700,
-            error = Colors.Error.n600,
-            outlineBackgroundHover = Colors.BlackOpacity.n005,
-            outlineHover = Colors.Accent.n700,
-            outline = Colors.Accent.n900,
-            primaryHover = Colors.Accent.n700,
-            secondaryPressed = Colors.Neutral.n200,
-            brandPressed = Colors.Primary.n800,
-            secondaryHover = Colors.Neutral.n100,
-            secondary = Colors.Neutral.n050,
-            brandHover = Colors.Primary.n700,
-            brand = Colors.Primary.n600,
-            primaryPressed = Colors.Accent.n600,
-            outlinePressed = Colors.Accent.n600,
             primary = Colors.Accent.n900,
-            )
-
-    override val text: Text = Text(
-            inverse = Colors.Neutral.n025,
-            disabled = Colors.Neutral.n200,
-            warning = Colors.Warning.n700,
-            info = Colors.Secondary.Blue.n700,
-            success = Colors.Success.n700,
+            primaryPressed = Colors.Accent.n600,
+            brand = Colors.Primary.n600,
+            brandHover = Colors.Primary.n700,
+            brandPressed = Colors.Primary.n800,
+            secondaryPressed = Colors.Neutral.n200,
+            outline = Colors.Accent.n900,
+            outlineHover = Colors.Accent.n700,
+            outlineBackgroundHover = Colors.BlackOpacity.n005,
+            outlinePressed = Colors.Accent.n600,
             error = Colors.Error.n600,
-            onColorDisabled = Colors.Neutral.n300,
-            onColor = Colors.Neutral.n025,
-            placeholder = Colors.Neutral.n600,
-            accent = Colors.Accent.n900,
-            secondary = Colors.Neutral.n600,
-            primary = Colors.Neutral.n800,
-            inverseAccent = Colors.Accent.n025,
-            )
-
-    override val background: Background = Background(
-            blur = Colors.BlackOpacity.n020,
-            surface2 = Colors.Neutral.n050,
-            surface3 = Colors.Neutral.n100,
-            surface1 = Colors.Neutral.n025,
-            inverse = Colors.Neutral.n700,
-            pageBackground = Colors.Base.white,
-            )
-
-    override val icon: Icon = Icon(
-            disabled = Colors.Neutral.n200,
-            inverse = Colors.Neutral.n025,
-            onColorDisabled = Colors.Neutral.n300,
-            onColor = Colors.Neutral.n025,
-            inverseAccent = Colors.Accent.n025,
-            accent = Colors.Accent.n900,
-            secondary = Colors.Neutral.n600,
-            primary = Colors.Neutral.n800,
-            )
-
-    override val components: Components = Components(
-            toastBackground = Colors.Neutral.n700,
-            interactive = Colors.Primary.n600,
-            selectionControl = Colors.Accent.n900,
-            )
-
-    override val link: Link = Link(
-            visited = Colors.Secondary.Indigo.n900,
-            inverse = Colors.Secondary.Indigo.n400,
-            primary = Colors.Secondary.Indigo.n600,
-            )
-
-    override val notifications: Notifications = Notifications(
-            notificationInfo = Colors.Secondary.Blue.n100,
-            notificationError = Colors.Error.n100,
-            notificationWarning = Colors.Warning.n100,
-            notificationSuccess = Colors.Success.n100,
+            errorHover = Colors.Error.n700,
+            errorPressed = Colors.Error.n800,
+            disabled = Colors.BlackOpacity.n010,
+            secondary = Colors.Neutral.n050,
+            primaryHover = Colors.Accent.n700,
+            secondaryHover = Colors.Neutral.n100,
             )
 
     override val border: Border = Border(
-            disabled = Colors.Neutral.n100,
-            strong = Colors.Neutral.n100,
             interactive = Colors.Primary.n600,
-            subtleSelected = Colors.Accent.n900,
-            subtle = Colors.Neutral.n050,
+            strong = Colors.Neutral.n100,
             strongSelected = Colors.Accent.n900,
+            subtle = Colors.Neutral.n050,
+            subtleSelected = Colors.Accent.n900,
+            disabled = Colors.Neutral.n100,
+            )
+
+    override val text: Text = Text(
+            primary = Colors.Neutral.n800,
+            secondary = Colors.Neutral.n600,
+            accent = Colors.Accent.n900,
+            placeholder = Colors.Neutral.n600,
+            inverseAccent = Colors.Accent.n025,
+            onColor = Colors.Neutral.n025,
+            onColorDisabled = Colors.Neutral.n300,
+            error = Colors.Error.n600,
+            success = Colors.Success.n700,
+            info = Colors.Secondary.Blue.n700,
+            warning = Colors.Warning.n700,
+            disabled = Colors.Neutral.n200,
+            inverse = Colors.Neutral.n025,
+            )
+
+    override val icon: Icon = Icon(
+            primary = Colors.Neutral.n800,
+            secondary = Colors.Neutral.n600,
+            accent = Colors.Accent.n900,
+            inverseAccent = Colors.Accent.n025,
+            onColor = Colors.Neutral.n025,
+            onColorDisabled = Colors.Neutral.n300,
+            inverse = Colors.Neutral.n025,
+            disabled = Colors.Neutral.n200,
+            )
+
+    override val support: Support = Support(
+            success = Colors.Success.n600,
+            warning = Colors.Warning.n500,
+            error = Colors.Error.n600,
+            info = Colors.Secondary.Blue.n500,
+            )
+
+    override val components: Components = Components(
+            selectionControl = Colors.Accent.n900,
+            interactive = Colors.Primary.n600,
+            toastBackground = Colors.Neutral.n700,
+            )
+
+    override val notifications: Notifications = Notifications(
+            notificationSuccess = Colors.Success.n100,
+            notificationWarning = Colors.Warning.n100,
+            notificationError = Colors.Error.n100,
+            notificationInfo = Colors.Secondary.Blue.n100,
+            )
+
+    override val indicator: Indicator = Indicator(
+            pink = Colors.Error.n500,
+            yellow = Colors.Warning.n500,
+            green = Colors.Success.n500,
+            blue = Colors.Secondary.Blue.n500,
+            indigo = Colors.Secondary.Indigo.n500,
+            magenta = Colors.Secondary.Magenta.n500,
+            orange = Colors.Secondary.Orange.n500,
+            )
+
+    override val link: Link = Link(
+            primary = Colors.Secondary.Indigo.n600,
+            inverse = Colors.Secondary.Indigo.n400,
+            visited = Colors.Secondary.Indigo.n900,
+            )
+
+    override val focus: Focus = Focus(
+            colorFocus = Colors.Secondary.Indigo.n200,
             )
 }

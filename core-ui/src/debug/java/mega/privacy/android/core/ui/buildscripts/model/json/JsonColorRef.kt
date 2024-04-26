@@ -9,7 +9,7 @@ import mega.privacy.android.core.ui.buildscripts.kotlingenerator.getPropertyName
  */
 internal data class JsonColorRef(
     override var name: String?,
-    @SerializedName("\$value")
+    @SerializedName("value")
     val tokenName: JsonTokenName?,
 ) : JsonCoreUiObject, SemanticValueRef {
 
