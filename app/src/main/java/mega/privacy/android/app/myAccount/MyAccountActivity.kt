@@ -141,7 +141,7 @@ class MyAccountActivity : PasscodeActivity(),
 
                 savedInstanceState.getBoolean(CANCEL_SUBSCRIPTIONS_SHOWN, false) -> {
                     cancelSubscriptionsFeedback = savedInstanceState.getString(TYPED_FEEDBACK)
-                    showCancelSubscriptions()
+                    viewModel.checkForNewCancelSubscriptionFeature()
                 }
 
                 savedInstanceState.getBoolean(CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN, false) -> {
@@ -282,7 +282,7 @@ class MyAccountActivity : PasscodeActivity(),
                 viewModel.setOpenUpgradeFrom()
             }
 
-            R.id.action_cancel_subscriptions -> showCancelSubscriptions()
+            R.id.action_cancel_subscriptions -> viewModel.checkForNewCancelSubscriptionFeature()
             R.id.action_logout -> viewModel.logout(this)
         }
 
@@ -463,6 +463,14 @@ class MyAccountActivity : PasscodeActivity(),
             if (state.showChangeEmailConfirmation) {
                 showConfirmChangeEmailDialog()
                 viewModel.resetChangeEmailConfirmation()
+            }
+            state.showNewCancelSubscriptionFeature?.let { isEnabled ->
+                if (isEnabled) {
+                    // Enable the new cancel subscription feature
+                } else {
+                    showCancelSubscriptions()
+                }
+                viewModel.resetCheckForNewCancelSubscriptionFeature()
             }
         }
     }

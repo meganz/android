@@ -231,6 +231,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     NodeWithDescription(
         "Enable node with description",
         false
+    ),
+
+    /**
+     * To enable the new cancel subscription feature
+     */
+    CancelSubscription(
+        "Enable cancel subscription feature",
+        false
     );
 
     companion object : FeatureFlagValueProvider {

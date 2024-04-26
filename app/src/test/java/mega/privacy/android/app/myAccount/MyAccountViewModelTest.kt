@@ -49,6 +49,7 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
@@ -56,24 +57,27 @@ import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatu
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumberUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.robolectric.RobolectricTestRunner
+import java.util.stream.Stream
 import kotlin.random.Random
 
 /**
  * Test class for [MyAccountViewModel]
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(RobolectricTestRunner::class)
 internal class MyAccountViewModelTest {
 
     private lateinit var underTest: MyAccountViewModel
@@ -113,6 +117,7 @@ internal class MyAccountViewModelTest {
     private val monitorBackupFolder: MonitorBackupFolder = mock()
     private val getFolderTreeInfo: GetFolderTreeInfo = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val testDispatcher = UnconfinedTestDispatcher()
     private val snackBarHandler: SnackBarHandler = mock()
 
@@ -120,7 +125,7 @@ internal class MyAccountViewModelTest {
     private val verificationStatusFlow = MutableSharedFlow<VerificationStatus>()
     private val backupFolderFlow = MutableSharedFlow<Result<NodeId>>()
 
-    @Before
+    @BeforeEach
     fun setup() = runTest {
         Dispatchers.setMain(testDispatcher)
         initializeStubbing()
@@ -180,6 +185,7 @@ internal class MyAccountViewModelTest {
             monitorBackupFolder = monitorBackupFolder,
             getFolderTreeInfo = getFolderTreeInfo,
             getNodeByIdUseCase = getNodeByIdUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             ioDispatcher = testDispatcher,
             snackBarHandler = snackBarHandler
         )
@@ -501,8 +507,53 @@ internal class MyAccountViewModelTest {
         }
     }
 
-    @After
-    fun tearDown() {
+    @Test
+    fun `test that showNewCancelSubscriptionFeature is null`() = runTest {
+        underTest.state.test {
+            assertThat(awaitItem().showNewCancelSubscriptionFeature).isNull()
+        }
+    }
+
+    @ParameterizedTest(name = "when CancelSubscription flag is {0}, showNewCancelSubscriptionFeature is {1}")
+    @MethodSource("provideShowNewCancelSubscriptionFeatureParameters")
+    fun `test that showNewCancelSubscriptionFeature is correct when CancelSubscription flag is provided`(
+        flag: Boolean,
+        expected: Boolean,
+    ) = runTest {
+        whenever(getFeatureFlagValueUseCase(any())).thenReturn(flag)
+        underTest.checkForNewCancelSubscriptionFeature()
+        underTest.state.test {
+            assertThat(awaitItem().showNewCancelSubscriptionFeature).isEqualTo(expected)
+        }
+    }
+
+    private fun provideShowNewCancelSubscriptionFeatureParameters() = Stream.of(
+        Arguments.of(true, true),
+        Arguments.of(false, false)
+    )
+
+    @Test
+    fun `test that showNewCancelSubscriptionFeature is true when CancelSubscription flag is true`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
+            underTest.checkForNewCancelSubscriptionFeature()
+            underTest.state.test {
+                assertThat(awaitItem().showNewCancelSubscriptionFeature).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that showNewCancelSubscriptionFeature is false when CancelSubscription flag is false`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
+            underTest.checkForNewCancelSubscriptionFeature()
+            underTest.state.test {
+                assertThat(awaitItem().showNewCancelSubscriptionFeature).isFalse()
+            }
+        }
+
+    @AfterEach
+    fun resetMocks() {
         Dispatchers.resetMain()
         reset(
             context,
@@ -540,6 +591,7 @@ internal class MyAccountViewModelTest {
             monitorBackupFolder,
             getFolderTreeInfo,
             getNodeByIdUseCase,
+            getFeatureFlagValueUseCase,
             snackBarHandler
         )
     }

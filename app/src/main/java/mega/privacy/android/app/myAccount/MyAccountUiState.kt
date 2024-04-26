@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.Feature
  * @property showInvalidChangeEmailLinkPrompt true if a prompt should be shown explaining that the
  * link to change the User's email is invalid
  * @property showChangeEmailConfirmation true if a confirmation should be shown explaining that the
+ * @property showNewCancelSubscriptionFeature true if the new Cancel Subscription feature should be shown
  * User's Email Address will be changed
  */
 data class MyAccountUiState(
@@ -42,4 +43,5 @@ data class MyAccountUiState(
     val shouldNavigateToSmsVerification: Boolean = false,
     val showInvalidChangeEmailLinkPrompt: Boolean = false,
     val showChangeEmailConfirmation: Boolean = false,
+    val showNewCancelSubscriptionFeature: Boolean? = null,
 )
