@@ -11,9 +11,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.PendingMessage
-import mega.privacy.android.domain.entity.chat.PendingMessageState
-import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
-import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageTransferTagRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.Transfer
@@ -22,8 +19,6 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
-import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
-import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.UploadFilesUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -50,10 +45,9 @@ class StartChatUploadsWithWorkerUseCaseTest {
     private val startChatUploadsWorkerUseCase = mock<StartChatUploadsWorkerUseCase>()
     private val isChatUploadsWorkerStartedUseCase = mock<IsChatUploadsWorkerStartedUseCase>()
     private val compressFileForChatUseCase = mock<CompressFileForChatUseCase>()
-    private val updatePendingMessageUseCase = mock<UpdatePendingMessageUseCase>()
     private val chatMessageRepository = mock<ChatMessageRepository>()
     private val fileSystemRepository = mock<FileSystemRepository>()
-    private val attachNodeWithPendingMessageUseCase = mock<AttachNodeWithPendingMessageUseCase>()
+    private val handleChatUploadTransferEventUseCase = mock<HandleChatUploadTransferEventUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -62,10 +56,9 @@ class StartChatUploadsWithWorkerUseCaseTest {
             startChatUploadsWorkerUseCase,
             isChatUploadsWorkerStartedUseCase,
             compressFileForChatUseCase,
-            updatePendingMessageUseCase,
             chatMessageRepository,
             fileSystemRepository,
-            attachNodeWithPendingMessageUseCase,
+            handleChatUploadTransferEventUseCase,
             cancelCancelTokenUseCase,
         )
     }
@@ -77,10 +70,9 @@ class StartChatUploadsWithWorkerUseCaseTest {
             startChatUploadsWorkerUseCase,
             isChatUploadsWorkerStartedUseCase,
             compressFileForChatUseCase,
-            updatePendingMessageUseCase,
             chatMessageRepository,
             fileSystemRepository,
-            attachNodeWithPendingMessageUseCase,
+            handleChatUploadTransferEventUseCase,
             cancelCancelTokenUseCase,
         )
         commonStub()
@@ -230,72 +222,23 @@ class StartChatUploadsWithWorkerUseCaseTest {
     }
 
     @Test
-    fun `test that pending message tag is updated when start event is received`() = runTest {
-        val file = mockFile()
-        val pendingMessageId = 15L
-        val transferTag = 12
-        val transfer = mock<Transfer> {
-            on { it.tag } doReturn transferTag
-        }
-        val event = MultiTransferEvent.SingleTransferEvent(
-            TransferEvent.TransferStartEvent(transfer), 0, 0
-        )
-        whenever(
-            uploadFilesUseCase(any(), NodeId(any()), any(), any(), any())
-        ) doReturn flowOf(event)
-
-        underTest(file, NodeId(11L), pendingMessageId).test {
-            verify(updatePendingMessageUseCase).invoke(
-                UpdatePendingMessageTransferTagRequest(pendingMessageId, transferTag)
-            )
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `test that pending message node is attached if already uploaded event is received`() =
+    fun `test that handle chat upload transfer event use case is called on each transfer event`() =
         runTest {
             val file = mockFile()
             val pendingMessageId = 15L
-            val nodeHandle = 12L
-            val event = MultiTransferEvent.SingleTransferEvent(
-                mock<TransferEvent.TransferFinishEvent>(),
-                1L, 1L,
-                alreadyTransferredIds = setOf(NodeId(nodeHandle))
-            )
-            whenever(
-                uploadFilesUseCase(any(), NodeId(any()), any(), any(), any())
-            ) doReturn flowOf(event)
-
-            underTest(file, NodeId(11L), pendingMessageId).test {
-                verify(attachNodeWithPendingMessageUseCase).invoke(
-                    pendingMessageId,
-                    NodeId(nodeHandle)
-                )
-                cancelAndIgnoreRemainingEvents()
+            val transferTag = 12
+            val transfer = mock<Transfer> {
+                on { it.tag } doReturn transferTag
             }
-        }
-
-    @Test
-    fun `test that pending message is updated to error uploading when a temporary error is received`() =
-        runTest {
-            val file = mockFile()
-            val pendingMessageId = 15L
             val event = MultiTransferEvent.SingleTransferEvent(
-                mock<TransferEvent.TransferTemporaryErrorEvent>(),
-                1L, 1L,
+                TransferEvent.TransferStartEvent(transfer), 0, 0
             )
             whenever(
                 uploadFilesUseCase(any(), NodeId(any()), any(), any(), any())
             ) doReturn flowOf(event)
 
             underTest(file, NodeId(11L), pendingMessageId).test {
-                verify(updatePendingMessageUseCase).invoke(
-                    UpdatePendingMessageStateRequest(
-                        pendingMessageId,
-                        PendingMessageState.ERROR_UPLOADING
-                    )
-                )
+                verify(handleChatUploadTransferEventUseCase).invoke(event, pendingMessageId)
                 cancelAndIgnoreRemainingEvents()
             }
         }

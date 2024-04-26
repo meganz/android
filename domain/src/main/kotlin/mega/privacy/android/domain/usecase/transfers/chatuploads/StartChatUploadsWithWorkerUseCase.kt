@@ -5,19 +5,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onEach
-import mega.privacy.android.domain.entity.chat.PendingMessageState
-import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
-import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageTransferTagRequest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.MultiTransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
-import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.chat.FoldersNotAllowedAsChatUploadException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
-import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
-import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.shared.AbstractStartTransfersWithWorkerUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.UploadFilesUseCase
 import java.io.File
@@ -36,10 +30,9 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
     private val startChatUploadsWorkerUseCase: StartChatUploadsWorkerUseCase,
     private val isChatUploadsWorkerStartedUseCase: IsChatUploadsWorkerStartedUseCase,
     private val compressFileForChatUseCase: CompressFileForChatUseCase,
-    private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
     private val chatMessageRepository: ChatMessageRepository,
     private val fileSystemRepository: FileSystemRepository,
-    private val attachNodeWithPendingMessageUseCase: AttachNodeWithPendingMessageUseCase,
+    private val handleChatUploadTransferEventUseCase: HandleChatUploadTransferEventUseCase,
     cancelCancelTokenUseCase: CancelCancelTokenUseCase,
 ) : AbstractStartTransfersWithWorkerUseCase(cancelCancelTokenUseCase) {
 
@@ -83,42 +76,7 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
                 uploadFilesUseCase(
                     filesAndNames, chatFilesFolderId, appData, false
                 ).onEach { event ->
-                    val singleTransferEvent = (event as? MultiTransferEvent.SingleTransferEvent)
-                    //update transfer tag on Start event
-                    (singleTransferEvent?.transferEvent as? TransferEvent.TransferStartEvent)?.transfer?.tag?.let { transferTag ->
-                        pendingMessageIds.forEach { pendingMessageId ->
-                            updatePendingMessageUseCase(
-                                UpdatePendingMessageTransferTagRequest(
-                                    pendingMessageId,
-                                    transferTag
-                                )
-                            )
-                        }
-                    }
-                    //attach it if it's already uploaded
-                    singleTransferEvent
-                        ?.alreadyTransferredIds
-                        ?.singleOrNull()
-                        ?.takeIf { it.longValue != -1L }
-                        ?.let { alreadyTransferredNodeId ->
-                            pendingMessageIds.forEach { pendingMessageId ->
-                                attachNodeWithPendingMessageUseCase(
-                                    pendingMessageId,
-                                    alreadyTransferredNodeId
-                                )
-                            }
-                        }
-                    //mark as error if it's a temporary error (typically an over quota error)
-                    if (singleTransferEvent?.transferEvent is TransferEvent.TransferTemporaryErrorEvent) {
-                        pendingMessageIds.forEach { pendingMessageId ->
-                            updatePendingMessageUseCase(
-                                UpdatePendingMessageStateRequest(
-                                    pendingMessageId,
-                                    PendingMessageState.ERROR_UPLOADING
-                                )
-                            )
-                        }
-                    }
+                    handleChatUploadTransferEventUseCase(event, *pendingMessageIds)
                 }
             },
             startWorker = {
