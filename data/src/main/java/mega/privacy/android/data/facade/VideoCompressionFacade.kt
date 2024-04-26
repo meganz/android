@@ -576,12 +576,21 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
                     (metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)
                         ?: return)
                         .toInt()
+
+                // If the rotation is 90 or 270, the video is in portrait mode, so we need to swap the width and height
+                val rotation =
+                    metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION)
+                rotation
+                    ?.toIntOrNull()
+                    ?.takeIf { it == 90 || it == 270 }
+                    ?.let { width = height.also { height = width } }
+                Timber.d("Video original width: $width, original height: $height original rotation: $rotation")
             } catch (e: Exception) {
                 Timber.e("Metadata Retrieval Exception: $e")
             }
             val (newWidth, newHeight) = generateWidthAndHeight(width, height)
-            config.resultWidth = newWidth
-            config.resultHeight = newHeight
+            resultWidth = newWidth
+            resultHeight = newHeight
         }
 
     }
