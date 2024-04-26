@@ -60,7 +60,6 @@ import java.util.Locale
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun ManageChatHistoryRoute(
-    onRetryConnectionsAndSignalPresence: () -> Unit,
     onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ManageChatHistoryViewModel = hiltViewModel(),
@@ -68,7 +67,6 @@ internal fun ManageChatHistoryRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     BackHandler {
-        onRetryConnectionsAndSignalPresence()
         onNavigateUp()
     }
 
