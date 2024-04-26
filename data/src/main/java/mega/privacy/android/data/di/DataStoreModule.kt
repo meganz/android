@@ -8,6 +8,8 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import androidx.security.crypto.EncryptedFile
+import androidx.security.crypto.MasterKey
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,8 +18,11 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.data.preferences.RequestPhoneNumberPreferencesDataStore.Companion.REQUEST_PHONE_NUMBER_FILE
+import mega.privacy.android.data.preferences.base.createEncrypted
 import mega.privacy.android.data.preferences.cameraUploadsSettingsPreferenceDataStoreName
+import mega.privacy.android.data.preferences.credentialDataStoreName
 import mega.privacy.android.data.preferences.migration.CameraUploadsSettingsPreferenceDataStoreMigration
+import mega.privacy.android.data.preferences.migration.CredentialsPreferencesMigration
 import mega.privacy.android.data.preferences.psa.psaPreferenceDataStoreName
 import mega.privacy.android.data.preferences.security.PasscodeDatastoreMigration
 import mega.privacy.android.data.preferences.security.passcodeDatastoreName
@@ -113,4 +118,31 @@ internal object DataStoreModule {
         scope = CoroutineScope(ioDispatcher),
         produceFile = { context.preferencesDataStoreFile(psaPreferenceDataStoreName) }
     )
+
+    @Singleton
+    @Provides
+    @Named(credentialDataStoreName)
+    fun provideCredentialDataStore(
+        @ApplicationContext context: Context,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+        migration: CredentialsPreferencesMigration,
+        masterKey: MasterKey,
+    ): DataStore<Preferences> {
+        val encryptedFile = EncryptedFile.Builder(
+            context,
+            context.preferencesDataStoreFile(credentialDataStoreName),
+            masterKey,
+            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+        ).build()
+        return PreferenceDataStoreFactory.createEncrypted(
+            corruptionHandler = ReplaceFileCorruptionHandler(
+                produceNewData = { emptyPreferences() }
+            ),
+            migrations = listOf(
+                migration
+            ),
+            scope = CoroutineScope(ioDispatcher),
+            produceFile = { encryptedFile }
+        )
+    }
 }

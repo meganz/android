@@ -155,12 +155,10 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun providePassphraseEncryptedFile(
         @ApplicationContext context: Context,
+        masterKey: MasterKey,
         passphraseFile: File,
     ): EncryptedFile? {
         return runCatching {
-            val masterKey = MasterKey.Builder(context)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                .build()
             EncryptedFile.Builder(
                 context,
                 passphraseFile,
@@ -170,6 +168,16 @@ internal object RoomDatabaseModule {
         }.onFailure {
             Timber.e(it)
         }.getOrNull()
+    }
+
+    @Provides
+    @Singleton
+    internal fun provideMasterKey(
+        @ApplicationContext context: Context,
+    ): MasterKey {
+        return MasterKey.Builder(context)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
     }
 
     @Provides
