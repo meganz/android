@@ -2,9 +2,13 @@ package mega.privacy.android.app.presentation.imagepreview.menu
 
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import javax.inject.Inject
 
-internal class CloudDriveImagePreviewMenu @Inject constructor() : ImagePreviewMenu {
+internal class CloudDriveImagePreviewMenu @Inject constructor(
+    private val getNodeAccessPermission: GetNodeAccessPermission,
+) : ImagePreviewMenu {
     override suspend fun isInfoMenuVisible(imageNode: ImageNode): Boolean {
         return true
     }
@@ -58,11 +62,11 @@ internal class CloudDriveImagePreviewMenu @Inject constructor() : ImagePreviewMe
     }
 
     override suspend fun isHideMenuVisible(imageNode: ImageNode): Boolean {
-        return !imageNode.isMarkedSensitive
+        return !imageNode.isMarkedSensitive && haveOwnerAccessPermission(imageNode)
     }
 
     override suspend fun isUnhideMenuVisible(imageNode: ImageNode): Boolean {
-        return imageNode.isMarkedSensitive
+        return imageNode.isMarkedSensitive && haveOwnerAccessPermission(imageNode)
     }
 
     override suspend fun isMoveMenuVisible(imageNode: ImageNode): Boolean {
@@ -96,4 +100,10 @@ internal class CloudDriveImagePreviewMenu @Inject constructor() : ImagePreviewMe
     override suspend fun isMoveToRubbishBinMenuVisible(imageNode: ImageNode): Boolean {
         return true
     }
+
+    private suspend fun haveOwnerAccessPermission(
+        imageNode: ImageNode,
+    ) = getNodeAccessPermission(imageNode.id)?.let { accessPermission ->
+        accessPermission == AccessPermission.OWNER
+    } ?: false
 }

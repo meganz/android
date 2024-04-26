@@ -326,11 +326,11 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     suspend fun isHideMenuVisible(imageNode: ImageNode): Boolean {
-        return menu?.isHideMenuVisible(imageNode) ?: false && !imageNode.isIncomingShare
+        return menu?.isHideMenuVisible(imageNode) ?: false
     }
 
     suspend fun isUnhideMenuVisible(imageNode: ImageNode): Boolean {
-        return menu?.isUnhideMenuVisible(imageNode) ?: false && !imageNode.isIncomingShare
+        return menu?.isUnhideMenuVisible(imageNode) ?: false
     }
 
     suspend fun isMoveMenuVisible(imageNode: ImageNode): Boolean {

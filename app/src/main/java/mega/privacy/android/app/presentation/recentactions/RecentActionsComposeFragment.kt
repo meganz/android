@@ -41,6 +41,7 @@ import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -92,6 +93,10 @@ class RecentActionsComposeFragment : Fragment() {
                     mutableStateOf(null)
                 }
 
+                var parentFolderSharesType: RecentActionsSharesType? by remember {
+                    mutableStateOf(null)
+                }
+
                 MegaAppTheme(isDark = themeMode.isDarkMode()) {
                     Surface(
                         modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
@@ -106,6 +111,7 @@ class RecentActionsComposeFragment : Fragment() {
                                 } else {
                                     if (it.nodes.size == 1) {
                                         clickedFile = it.nodes.first()
+                                        parentFolderSharesType = it.parentFolderSharesType
                                     } else {
                                         openBucketDetails(it)
                                     }
@@ -135,10 +141,14 @@ class RecentActionsComposeFragment : Fragment() {
                 clickedFile?.let {
                     HandleNodeAction(
                         typedFileNode = it,
-                        nodeSourceType = Constants.FILE_BROWSER_ADAPTER,
+                        nodeSourceType = when (parentFolderSharesType) {
+                            RecentActionsSharesType.INCOMING_SHARES -> Constants.INCOMING_SHARES_ADAPTER
+                            else -> Constants.FILE_BROWSER_ADAPTER
+                        },
                         snackBarHostState = snackbarHostState,
                         onActionHandled = {
                             clickedFile = null
+                            parentFolderSharesType = null
                         },
                         nodeActionsViewModel = nodeActionsViewModel
                     )
