@@ -52,6 +52,7 @@ class GenerateTokens {
         destinationPath: String,
         generateInterfaces: Boolean,
         assetsFolder: String = DEFAULT_ASSETS_FOLDER,
+        coreColorsTokensGroupName: String = "Core/Android-temp"
     ) {
         //for now we only have color tokens
         generateColorsTokens(
@@ -60,6 +61,7 @@ class GenerateTokens {
             destinationPath = destinationPath,
             generateInterfaces = generateInterfaces,
             assetsFolder = assetsFolder,
+            coreColorsTokensGroupName = coreColorsTokensGroupName,
         )
     }
 
@@ -69,6 +71,7 @@ class GenerateTokens {
         destinationPath: String,
         generateInterfaces: Boolean,
         assetsFolder: String,
+        coreColorsTokensGroupName: String,
     ) = generateTokens(
         appPrefix = appPrefix,
         packageName = packageName,
@@ -78,6 +81,7 @@ class GenerateTokens {
         coreType = JsonColor::class,
         semanticType = JsonColorRef::class,
         exposeGroupsAsEnums = ExposeGroupsAsEnums(listOf("Text"), enumSuffix = "Color"),
+        coreTokensGroupName = coreColorsTokensGroupName,
     )
 
     private fun <T : JsonCoreUiObject, E : JsonCoreUiObject> generateTokens(
@@ -89,13 +93,14 @@ class GenerateTokens {
         coreType: KClass<T>,
         semanticType: KClass<E>,
         exposeGroupsAsEnums: ExposeGroupsAsEnums?,
+        coreTokensGroupName: String,
     ) {
         //generate color core tokens
         generateTokensKotlinFile(
             type = coreType,
             assetsFolder = assetsFolder,
             jsonFileName = DEFAULT_JSON_CORE_FILE_NAME,
-            jsonChild = "Core/Android-temp",
+            jsonChild = coreTokensGroupName,
             kotlinOutputName = "CoreColors",
             generationType = TokenGenerationType.NestedObjects,
             rootGroupName = "", //we only want children

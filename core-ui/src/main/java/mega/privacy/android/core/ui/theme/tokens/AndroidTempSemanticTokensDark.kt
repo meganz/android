@@ -4,7 +4,7 @@
 //
 package mega.privacy.android.core.ui.theme.tokens
 
-internal object DefaultSemanticTokensDark : SemanticTokens {
+internal object AndroidTempSemanticTokensDark : SemanticTokens {
     override val background: Background = Background(
             pageBackground = Colors.Neutral.n900,
             inverse = Colors.Neutral.n050,

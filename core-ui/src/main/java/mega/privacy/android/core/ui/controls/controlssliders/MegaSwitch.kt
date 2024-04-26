@@ -45,6 +45,7 @@ import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
+import mega.privacy.android.core.ui.theme.PreviewWithTempAndNewCoreColorTokens
 
 
 /**
@@ -236,7 +237,7 @@ private val rippleSize = 32.dp
 private fun MegaSwitchPreview(
     @PreviewParameter(BooleanProvider::class) initialChecked: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    PreviewWithTempAndNewCoreColorTokens(isDark = isSystemInDarkTheme()) {
         var checked by remember {
             mutableStateOf(initialChecked)
         }
@@ -251,7 +252,7 @@ private fun MegaSwitchPreview(
 private fun MegaSwitchDisabledPreview(
     @PreviewParameter(BooleanProvider::class) initialChecked: Boolean,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    PreviewWithTempAndNewCoreColorTokens(isDark = isSystemInDarkTheme()) {
         var checked by remember {
             mutableStateOf(initialChecked)
         }

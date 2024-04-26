@@ -3,8 +3,6 @@ package mega.privacy.android.core.ui.controls.buttons
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,10 +27,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
-import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.MegaTheme
+import mega.privacy.android.core.ui.theme.PreviewWithTempAndNewCoreColorTokens
 
 /**
  * Plain button with an outlined border
@@ -116,56 +113,19 @@ fun OutlinedMegaButton(
 
 @CombinedTextAndThemePreviews
 @Composable
-private fun PreviewOutlinedMegaButton(
-    @PreviewParameter(BooleanProvider::class) withIcon: Boolean,
-) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
-        Column(
-            modifier = Modifier.padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            listOf(true, false).forEach {
-                Text(
-                    style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.onSurface),
-                    text = if (it) "Enabled" else "Disabled",
-                )
-                var count by remember { mutableIntStateOf(0) }
-                OutlinedMegaButton(
-                    text = stringResource(id = androidx.appcompat.R.string.search_menu_title) + if (count > 0) " $count" else "",
-                    onClick = { count++ },
-                    rounded = false,
-                    enabled = it,
-                    iconId = if (withIcon) R.drawable.checked else null
-                )
-            }
-        }
-    }
-}
-
-@CombinedTextAndThemePreviews
-@Composable
 private fun PreviewOutlinedRoundedMegaButton(
     @PreviewParameter(OutlinedMegaButtonPreviewProvider::class) state: OutlinedMegaButtonState,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
-        Column(
-            modifier = Modifier.padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            with(state) {
-                Text(
-                    style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.onSurface),
-                    text = if (enabled) "Enabled" else "Disabled",
-                )
-                var count by remember { mutableIntStateOf(0) }
-                OutlinedMegaButton(
-                    text = stringResource(id = androidx.appcompat.R.string.search_menu_title) + if (count > 0) " $count" else "",
-                    onClick = { count++ },
-                    rounded = rounded,
-                    enabled = enabled,
-                    iconId = if (icon) R.drawable.checked else null
-                )
-            }
+    PreviewWithTempAndNewCoreColorTokens(isDark = isSystemInDarkTheme()) {
+        with(state) {
+            var count by remember { mutableIntStateOf(0) }
+            OutlinedMegaButton(
+                text = stringResource(id = androidx.appcompat.R.string.search_menu_title) + if (count > 0) " $count" else "",
+                onClick = { count++ },
+                rounded = rounded,
+                enabled = enabled,
+                iconId = if (icon) R.drawable.checked else null
+            )
         }
     }
 }

@@ -7,10 +7,21 @@ import mega.privacy.android.core.ui.buildscripts.GenerateTokens.Companion.DEFAUL
  */
 fun main(args: Array<String>) {
     //this can be set by arguments using Clikt in the future
+
+    //generate the tokens with TEMP core tokens
     GenerateTokens().generate(
-        appPrefix = "Default",
+        appPrefix = "AndroidTemp",
         packageName = DEFAULT_PACKAGE,
         destinationPath = "core-ui/src/main/java",
         generateInterfaces = true,
+    )
+
+    //generate the tokens with NEW core tokens
+    GenerateTokens().generate(
+        appPrefix = "AndroidNew",
+        packageName = "$DEFAULT_PACKAGE.new",
+        destinationPath = "core-ui/src/main/java",
+        generateInterfaces = false,
+        coreColorsTokensGroupName = "Core/Main"
     )
 }

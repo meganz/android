@@ -2,6 +2,9 @@ package mega.privacy.android.core.ui.theme
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -10,14 +13,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import mega.privacy.android.core.ui.controls.text.MegaText
+import mega.privacy.android.core.ui.theme.tokens.AndroidTempSemanticTokensDark
+import mega.privacy.android.core.ui.theme.tokens.AndroidTempSemanticTokensLight
 import mega.privacy.android.core.ui.theme.tokens.Background
 import mega.privacy.android.core.ui.theme.tokens.Border
 import mega.privacy.android.core.ui.theme.tokens.Button
 import mega.privacy.android.core.ui.theme.tokens.Components
-import mega.privacy.android.core.ui.theme.tokens.DefaultSemanticTokensDark
-import mega.privacy.android.core.ui.theme.tokens.DefaultSemanticTokensLight
 import mega.privacy.android.core.ui.theme.tokens.Focus
 import mega.privacy.android.core.ui.theme.tokens.Icon
 import mega.privacy.android.core.ui.theme.tokens.Indicator
@@ -27,6 +33,8 @@ import mega.privacy.android.core.ui.theme.tokens.SemanticTokens
 import mega.privacy.android.core.ui.theme.tokens.Support
 import mega.privacy.android.core.ui.theme.tokens.Text
 import mega.privacy.android.core.ui.theme.tokens.TextColor
+import mega.privacy.android.core.ui.theme.tokens.new.AndroidNewSemanticTokensDark
+import mega.privacy.android.core.ui.theme.tokens.new.AndroidNewSemanticTokensLight
 
 
 /**
@@ -42,10 +50,52 @@ internal fun AndroidTheme(
     content: @Composable () -> Unit,
 ) = AndroidTheme(
     isDark = isDark,
-    darkColorTokens = DefaultSemanticTokensDark,
-    lightColorTokens = DefaultSemanticTokensLight,
+    darkColorTokens = AndroidTempSemanticTokensDark,
+    lightColorTokens = AndroidTempSemanticTokensLight,
     content = content,
 )
+
+/**
+ * Helper function to create preview with both, Android TEMP and Android NEW tokens.
+ * This should only be used for previews with the objective of compare the differences between the 2 core-tokens and how they work with the components.
+ */
+@SuppressLint("IsSystemInDarkTheme")
+@Composable
+internal fun PreviewWithTempAndNewCoreColorTokens(
+    isDark: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit,
+) = Column {
+    AndroidTheme(
+        isDark = isDark,
+        darkColorTokens = AndroidTempSemanticTokensDark,
+        lightColorTokens = AndroidTempSemanticTokensLight,
+        content = {
+            PreviewWithTitle(title = "TEMP", content)
+        }
+    )
+    AndroidTheme(
+        isDark = isDark,
+        darkColorTokens = AndroidNewSemanticTokensDark,
+        lightColorTokens = AndroidNewSemanticTokensLight,
+        content = {
+            PreviewWithTitle(title = "NEW", content)
+        }
+    )
+}
+
+@Composable
+private fun PreviewWithTitle(title: String, content: @Composable () -> Unit) =
+    Column(
+        modifier = Modifier.padding(24.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        MegaText(
+            text = title,
+            textColor = TextColor.Accent,
+            style = MaterialTheme.typography.body2,
+        )
+        content()
+    }
 
 /**
  * Android theme
@@ -112,7 +162,6 @@ internal object MegaTheme {
         LocalMegaColors.current.text.getTextColor(textColor)
 }
 
-@Suppress("PrivatePropertyName") //convention for staticCompositionLocalOf is Uppercase
 private val LocalMegaColors = staticCompositionLocalOf {
     testColorPalette
 }
