@@ -120,6 +120,7 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
         Timber.d("activateActionMode");
         if (!adapter.isMultipleSelect()) {
             adapter.setMultipleSelect(true);
+            adapter.notifyDataSetChanged();
             actionMode = ((AppCompatActivity) context).startSupportActionMode(new ActionBarCallBack());
         }
     }
@@ -180,6 +181,7 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
             Timber.d("onDestroyActionMode");
             clearSelections();
             adapter.setMultipleSelect(false);
+            adapter.notifyDataSetChanged();
             setFabVisibility(megaApi.getNodeByHandle(parentHandle));
             checkScroll();
         }

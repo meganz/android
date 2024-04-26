@@ -1038,7 +1038,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.versionsIcon.setVisibility(View.GONE);
 
             setFolderListSelected(holder, position, getFolderIcon(node, type == OUTGOING_SHARES_ADAPTER ? DrawerItem.SHARED_ITEMS : DrawerItem.CLOUD_DRIVE));
-
+            if (isMultipleSelect()) {
+                holder.threeDotsLayout.setVisibility(View.GONE);
+            } else {
+                holder.threeDotsLayout.setVisibility(View.VISIBLE);
+            }
             if (type == CONTACT_FILE_ADAPTER || type == CONTACT_SHARED_FOLDER_ADAPTER) {
                 boolean firstLevel;
                 if (type == CONTACT_FILE_ADAPTER) {
@@ -1150,6 +1154,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     Timber.d("Node NOT thumbnail");
                     getThumbAndSetViewOrCreate(holder, node);
                 }
+                holder.threeDotsLayout.setVisibility(View.VISIBLE);
             } else {
                 Timber.d("Multiselection ON");
                 if (this.isItemChecked(position)) {
@@ -1171,6 +1176,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                         getThumbAndSetViewOrCreate(holder, node);
                     }
                 }
+                holder.threeDotsLayout.setVisibility(View.GONE);
             }
         }
 

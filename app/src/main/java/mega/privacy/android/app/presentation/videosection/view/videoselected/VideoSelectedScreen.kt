@@ -40,8 +40,8 @@ internal fun VideoSelectedNavHost(
     onBackPressed: () -> Unit,
     onSortOrderClick: () -> Unit,
     onVideoSelected: (List<Long>) -> Unit,
-    startDestination: String = videoSelectedRoute,
     fileTypeIconMapper: FileTypeIconMapper,
+    startDestination: String = videoSelectedRoute,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
     NavHost(
