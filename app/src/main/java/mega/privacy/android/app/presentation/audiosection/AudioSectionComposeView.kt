@@ -87,7 +87,8 @@ fun AudioSectionComposeView(
                     onSortOrderClick = onSortOrderClick,
                     onClick = onClick,
                     onLongClick = onLongClick,
-                    onMenuClick = onMenuClick
+                    onMenuClick = onMenuClick,
+                    inSelectionMode = uiState.isInSelection
                 )
             }
         }

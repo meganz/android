@@ -19,6 +19,7 @@ fun AudiosView(
     onClick: (item: AudioUiEntity, index: Int) -> Unit,
     onMenuClick: (AudioUiEntity) -> Unit,
     onSortOrderClick: () -> Unit,
+    inSelectionMode: Boolean = false,
     listState: LazyListState = LazyListState(),
     gridState: LazyGridState = LazyGridState(),
     onLongClick: ((item: AudioUiEntity, index: Int) -> Unit) = { _, _ -> },
@@ -34,6 +35,7 @@ fun AudiosView(
             onMenuClick = onMenuClick,
             onSortOrderClick = onSortOrderClick,
             onLongClick = onLongClick,
+            inSelectionMode = inSelectionMode,
         )
     } else {
         AudioGridView(
@@ -46,6 +48,7 @@ fun AudiosView(
             onMenuClick = onMenuClick,
             onSortOrderClick = onSortOrderClick,
             onLongClick = onLongClick,
+            inSelectionMode = inSelectionMode,
         )
     }
 }

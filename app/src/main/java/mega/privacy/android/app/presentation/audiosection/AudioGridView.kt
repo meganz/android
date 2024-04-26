@@ -10,7 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
+import mega.privacy.android.core.ui.controls.lists.NodeGridViewItem
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.icon.pack.R
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 
 @Composable
@@ -24,6 +26,7 @@ internal fun AudioGridView(
     onMenuClick: (AudioUiEntity) -> Unit,
     onSortOrderClick: () -> Unit,
     spanCount: Int = 2,
+    inSelectionMode: Boolean = false,
     onLongClick: ((item: AudioUiEntity, index: Int) -> Unit) = { _, _ -> },
 ) {
     LazyVerticalGrid(
@@ -54,7 +57,7 @@ internal fun AudioGridView(
 
         items(count = items.size, key = { items[it].id.longValue }) {
             val audioItem = items[it]
-            AudioGridViewItem(
+            NodeGridViewItem(
                 isSelected = audioItem.isSelected,
                 name = audioItem.name,
                 thumbnailData = if (audioItem.thumbnail?.exists() == true) {
@@ -65,8 +68,9 @@ internal fun AudioGridView(
                 duration = audioItem.duration,
                 isTakenDown = audioItem.isTakenDown,
                 onClick = { onClick(audioItem, it) },
-                onMenuClick = { onMenuClick(audioItem) },
-                onLongClick = { onLongClick(audioItem, it) }
+                onMenuClick = { onMenuClick(audioItem) }.takeIf { !inSelectionMode },
+                onLongClick = { onLongClick(audioItem, it) },
+                iconRes = R.drawable.ic_audio_medium_solid,
             )
         }
     }

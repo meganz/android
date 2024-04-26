@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.audiosection
 
-import mega.privacy.android.core.R as coreR
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,11 +16,11 @@ import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
+import mega.privacy.android.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.icon.pack.R
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
-import mega.privacy.android.legacy.core.ui.controls.lists.NodeListViewItem
 import nz.mega.sdk.MegaNode
 
 @Composable
@@ -34,6 +33,7 @@ internal fun AudioListView(
     onClick: (item: AudioUiEntity, index: Int) -> Unit,
     onMenuClick: (AudioUiEntity) -> Unit,
     onSortOrderClick: () -> Unit,
+    inSelectionMode: Boolean = false,
     onLongClick: ((item: AudioUiEntity, index: Int) -> Unit) = { _, _ -> },
 ) {
     LazyColumn(state = lazyListState, modifier = modifier) {
@@ -56,37 +56,37 @@ internal fun AudioListView(
         items(count = items.size, key = { items[it].id.longValue }) {
             val audioItem = items[it]
             NodeListViewItem(
-                isSelected = audioItem.isSelected,
-                folderInfo = null,
-                icon = R.drawable.ic_audio_medium_solid,
-                infoIcon = if (audioItem.hasVersions) coreR.drawable.ic_version_small else null,
-                fileSize = formatFileSize(audioItem.size, LocalContext.current),
-                modifiedDate = formatModifiedDate(
-                    java.util.Locale(
-                        Locale.current.language, Locale.current.region
+                title = audioItem.name,
+                subtitle = formatFileSize(audioItem.size, LocalContext.current).plus(" · ")
+                    .plus(
+                        formatModifiedDate(
+                            java.util.Locale(
+                                Locale.current.language, Locale.current.region
+                            ),
+                            audioItem.modificationTime
+                        )
                     ),
-                    audioItem.modificationTime
-                ),
-                name = audioItem.name,
-                isTakenDown = audioItem.isTakenDown,
-                showMenuButton = true,
+                icon = R.drawable.ic_audio_medium_solid,
                 thumbnailData = if (audioItem.thumbnail?.exists() == true) {
                     audioItem.thumbnail
                 } else {
                     ThumbnailRequest(audioItem.id)
                 },
-                isFavourite = audioItem.isFavourite,
-                isSharedWithPublicLink = audioItem.isExported,
+                isTakenDown = audioItem.isTakenDown,
+                isSelected = audioItem.isSelected,
+                showFavourite = audioItem.isFavourite,
+                showLink = audioItem.isExported,
                 labelColor = if (audioItem.label != MegaNode.NODE_LBL_UNKNOWN)
                     colorResource(
                         id = MegaNodeUtil.getNodeLabelColor(
                             audioItem.label
                         )
                     ) else null,
-                nodeAvailableOffline = audioItem.nodeAvailableOffline,
-                onClick = { onClick(audioItem, it) },
+                onMoreClicked = { onMenuClick(audioItem) }.takeIf { inSelectionMode.not() },
+                onItemClicked = { onClick(audioItem, it) },
                 onLongClick = { onLongClick(audioItem, it) },
-                onMenuClick = { onMenuClick(audioItem) },
+                showOffline = audioItem.nodeAvailableOffline,
+                showVersion = audioItem.hasVersions,
             )
             Divider(
                 modifier = Modifier
