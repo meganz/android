@@ -14,6 +14,7 @@
         <import type="mega.privacy.android.app.utils.OfflineUtils" />
 
         <import type="mega.privacy.android.app.MimeTypeThumbnail" />
+        <import type="mega.privacy.android.app.MimeTypeList" />
 
         <variable
             name="itemOperationViewModel"
@@ -56,36 +57,33 @@
         <FrameLayout
             android:id="@+id/video_info"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="147dp"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="47dp"
             android:background="@drawable/gradient_cam_uploads"
-            app:visibleGone="@{item.video}">
+            app:visibleGone="@{MimeTypeList.typeForName(item.node.name).isVideo}">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:background="@null"
-                android:src="@drawable/ic_play_arrow_white_24dp"
-                app:tint="?android:attr/textColorPrimary"
+                android:layout_gravity="center"
+                app:tint="@color/white"
+                android:src="@drawable/ic_play_circle_medium_regular_solid"
                 tools:ignore="ContentDescription" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="33dp"
-                android:layout_marginTop="2dp"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:paddingVertical="4dp"
+                android:paddingHorizontal="8dp"
+                android:background="@drawable/background_duration"
                 android:text="@{TimeUtils.getVideoDuration(item.node.duration)}"
+                android:textColor="@color/white"
                 android:textAppearance="@style/TextAppearance.Mega.Body2.Variant" />
         </FrameLayout>
-
-        <ImageView
-            android:id="@+id/ic_selected"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginStart="7dp"
-            android:layout_marginTop="7dp"
-            android:src="@drawable/ic_select_folder"
-            android:visibility="@{item.selected ? View.VISIBLE : View.GONE}" />
 
         <View
             android:layout_width="match_parent"
@@ -124,16 +122,29 @@
                 android:background="@null"
                 android:src="@drawable/ic_alert_triangle_medium_regular_outline"
                 app:tint="@color/color_button_brand"
-                android:visibility="@{item.node.isTakenDown() ? View.VISIBLE : View.GONE}" />
+                android:visibility="@{item.node.isTakenDown() ? View.VISIBLE : View.GONE}"
+                tools:ignore="ContentDescription" />
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_gravity="end|center_vertical"
                 android:background="@null"
+                android:paddingHorizontal="8dp"
+                android:layout_marginEnd="8dp"
                 android:src="@drawable/ic_dots_vertical_grey"
                 app:tint="?android:attr/textColorSecondary"
-                android:visibility="@{item.selected ? View.INVISIBLE : View.VISIBLE}"/>
+                android:visibility="@{item.selected ? View.GONE : View.VISIBLE}"
+                tools:ignore="ContentDescription" />
+
+            <RadioButton
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:paddingHorizontal="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_gravity="end|center_vertical"
+                checked="@{item.selected}"
+                android:visibility="@{item.selected ? View.VISIBLE : View.GONE}" />
         </LinearLayout>
     </FrameLayout>
 </layout>

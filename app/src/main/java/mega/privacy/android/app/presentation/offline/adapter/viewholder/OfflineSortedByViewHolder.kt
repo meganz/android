@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.offline.adapter.viewholder
 
-import androidx.core.view.isVisible
 import mega.privacy.android.app.databinding.SortByHeaderBinding
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.offline.model.OfflineNode
@@ -12,7 +11,7 @@ class OfflineSortedByViewHolder(
     onNodeLongClicked: (Int, OfflineNode) -> Unit,
 ) : OfflineViewHolder(binding.root, onNodeClicked, onNodeLongClicked) {
 
-    override fun bind(position: Int, node: OfflineNode) {
+    override fun bind(position: Int, node: OfflineNode, selectionMode: Boolean) {
         binding.apply {
             this.orderNameStringId =
                 SortByHeaderViewModel.orderNameMap[sortByViewModel.order.third]!!

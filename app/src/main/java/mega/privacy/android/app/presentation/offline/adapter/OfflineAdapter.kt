@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.offline.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
@@ -27,6 +28,7 @@ class OfflineAdapter(
 ) : ListAdapter<OfflineNode, OfflineViewHolder>(OfflineNodeDiffCallback()), DragThumbnailGetter {
 
     fun getOfflineNodes(): List<MegaOffline> = currentList.map { it.node }
+    private var selectionMode = false
 
     override fun getNodePosition(handle: Long) =
         currentList.indexOfFirst { it.node.handle == handle.toString() }
@@ -93,7 +95,18 @@ class OfflineAdapter(
     }
 
     override fun onBindViewHolder(holder: OfflineViewHolder, position: Int) {
-        holder.bind(position, getItem(position))
+        holder.bind(position, getItem(position), selectionMode)
+    }
+
+    /**
+     * Updates the selection mode
+     *
+     * @param selecting True if the adapter is in selection mode, false otherwise
+     */
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateSelection(selecting: Boolean) {
+        selectionMode = selecting
+        notifyDataSetChanged()
     }
 
     companion object {

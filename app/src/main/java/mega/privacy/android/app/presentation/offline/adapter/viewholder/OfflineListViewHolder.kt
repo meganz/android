@@ -19,50 +19,27 @@ class OfflineListViewHolder(
     onNodeLongClicked: (Int, OfflineNode) -> Unit,
     private val onNodeOptionsClicked: (Int, OfflineNode) -> Unit,
 ) : OfflineViewHolder(binding.root, onNodeClicked, onNodeLongClicked) {
-    override fun bind(position: Int, node: OfflineNode) {
-        super.bind(position, node)
+    override fun bind(position: Int, node: OfflineNode, selectionMode: Boolean) {
+        super.bind(position, node, selectionMode)
         binding.threeDots.setOnClickListener {
             onNodeOptionsClicked(bindingAdapterPosition, node)
         }
+
+        binding.threeDots.isVisible = selectionMode.not()
         binding.thumbnail.apply {
             isVisible = true
-
             if (node.selected) {
-                hierarchy.setOverlayImage(
-                    ContextCompat.getDrawable(
-                        context,
-                        CoreUiR.drawable.ic_select_folder
-                    )
-                )
+                setActualImageResource(CoreUiR.drawable.ic_select_folder)
             } else {
-                hierarchy.setOverlayImage(null)
+                setActualImageResource(0)
                 val placeHolderRes = MimeTypeList.typeForName(node.node.name).iconResourceId
-
                 if (node.thumbnail != null) {
                     setImageURI(Uri.fromFile(node.thumbnail))
                 } else {
                     hierarchy.setPlaceholderImage(if (node.node.isFolder) IconPackR.drawable.ic_folder_medium_solid else placeHolderRes)
                 }
-
-                hierarchy.roundingParams = RoundingParams.fromCornersRadius(5F)
             }
         }
-
-        val res = binding.root.resources.displayMetrics
-        val param = binding.thumbnail.layoutParams as FrameLayout.LayoutParams
-
-        if (node.thumbnail == null || node.selected) {
-            param.width = dp2px(LARGE_IMAGE_WIDTH, res)
-            param.height = param.width
-            param.marginStart = dp2px(LARGE_IMAGE_MARGIN_LEFT, res)
-        } else {
-            param.width = dp2px(SMALL_IMAGE_WIDTH, res)
-            param.height = param.width
-            param.marginStart = dp2px(SMALL_IMAGE_MARGIN_LEFT, res)
-        }
-
-        binding.thumbnail.layoutParams = param
-
         binding.filename.text = node.node.name
         binding.nodeInfo.text = node.nodeInfo
     }
@@ -74,7 +51,5 @@ class OfflineListViewHolder(
     companion object {
         const val LARGE_IMAGE_WIDTH = 48F
         const val LARGE_IMAGE_MARGIN_LEFT = 12F
-        private const val SMALL_IMAGE_WIDTH = 36F
-        private const val SMALL_IMAGE_MARGIN_LEFT = 18F
     }
 }

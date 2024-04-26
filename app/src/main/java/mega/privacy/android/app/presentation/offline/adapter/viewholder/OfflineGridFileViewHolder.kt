@@ -11,6 +11,7 @@ import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.OfflineItemGridFileBinding
 import mega.privacy.android.app.presentation.offline.model.OfflineNode
+import mega.privacy.android.data.model.MimeTypeList
 
 class OfflineGridFileViewHolder(
     private val binding: OfflineItemGridFileBinding,
@@ -18,8 +19,8 @@ class OfflineGridFileViewHolder(
     onNodeLongClicked: (Int, OfflineNode) -> Unit,
     private val onNodeOptionsClicked: (Int, OfflineNode) -> Unit,
 ) : OfflineViewHolder(binding.root, onNodeClicked, onNodeLongClicked) {
-    override fun bind(position: Int, node: OfflineNode) {
-        super.bind(position, node)
+    override fun bind(position: Int, node: OfflineNode, selectionMode: Boolean) {
+        super.bind(position, node, selectionMode)
         binding.filenameContainer.setOnClickListener {
             onNodeOptionsClicked(bindingAdapterPosition, node)
         }
@@ -49,6 +50,24 @@ class OfflineGridFileViewHolder(
             binding.thumbnail.layoutParams = params
         }
 
+        if (selectionMode) {
+            binding.threeDots.isVisible = false
+            binding.selectRadioButton.isVisible = true
+            binding.selectRadioButton.isChecked = node.selected
+        } else {
+            binding.threeDots.isVisible = true
+            binding.selectRadioButton.isVisible = false
+        }
+        if (MimeTypeList.typeForName(node.node.name).isVideo) {
+            binding.playButton.isVisible = true
+            binding.playButtonGradient.isVisible = true
+        } else if (MimeTypeList.typeForName(node.node.name).isAudio) {
+            binding.playButton.isVisible = false
+            binding.playButtonGradient.isVisible = false
+        } else {
+            binding.playButton.isVisible = false
+            binding.playButtonGradient.isVisible = false
+        }
         val radius =
             binding.root.resources.getDimensionPixelSize(R.dimen.homepage_node_grid_round_corner_radius)
                 .toFloat()
@@ -56,8 +75,6 @@ class OfflineGridFileViewHolder(
             RoundingParams.fromCornersRadii(radius, radius, 0F, 0F)
 
         binding.filename.text = node.node.name
-
-        binding.icSelected.isVisible = node.selected
 
         binding.root.background = ContextCompat.getDrawable(
             binding.root.context,

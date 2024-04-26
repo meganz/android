@@ -11,7 +11,7 @@ abstract class OfflineViewHolder(
 ) : RecyclerView.ViewHolder(itemView) {
 
 
-    open fun bind(position: Int, node: OfflineNode) {
+    open fun bind(position: Int, node: OfflineNode, selectionMode: Boolean) {
         node.uiDirty = false
         itemView.setOnClickListener {
             handleNodeClicked(bindingAdapterPosition, node)

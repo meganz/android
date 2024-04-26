@@ -377,14 +377,13 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
     private fun setupView() {
         setupOfflineWarning()
 
-        adapter =
-            OfflineAdapter(
-                isList = isListViewOrRootFolder(),
-                sortByHeaderViewModel = sortByHeaderViewModel,
-                onNodeClicked = this::onNodeClicked,
-                onNodeLongClicked = this::onNodeLongClicked,
-                onNodeOptionsClicked = this::onNodeOptionsClicked
-            )
+        adapter = OfflineAdapter(
+            isList = isListViewOrRootFolder(),
+            sortByHeaderViewModel = sortByHeaderViewModel,
+            onNodeClicked = this::onNodeClicked,
+            onNodeLongClicked = this::onNodeLongClicked,
+            onNodeOptionsClicked = this::onNodeOptionsClicked,
+        )
 
         adapter?.setHasStableIds(true)
         adapter?.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
@@ -556,6 +555,7 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
         }
 
         viewModel.actionMode.observe(viewLifecycleOwner) { visible ->
+            adapter?.updateSelection(visible)
             val actionModeVal = actionMode
 
             if (visible) {
