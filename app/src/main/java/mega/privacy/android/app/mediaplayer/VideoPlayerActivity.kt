@@ -1164,11 +1164,42 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                         }
 
                         adapterType == FOLDER_LINK_ADAPTER
-                                || adapterType == FROM_IMAGE_VIEWER
                                 || adapterType == FROM_ALBUM_SHARING
                                 || adapterType == VERSIONS_ADAPTER -> {
                             menu.toggleAllMenuItemsVisibility(false)
                             menu.findItem(R.id.save_to_device).isVisible = true
+                        }
+
+                        adapterType == FROM_IMAGE_VIEWER -> {
+                            menu.toggleAllMenuItemsVisibility(false)
+                            menu.findItem(R.id.save_to_device).isVisible = true
+                            val node =
+                                megaApi.getNodeByHandle(videoViewModel.getCurrentPlayingHandle())
+
+                            if (node == null) {
+                                Timber.d("refreshMenuOptionsVisibility node is null")
+
+                                menu.toggleAllMenuItemsVisibility(false)
+                                return
+                            }
+                            val shouldShowHideNode =
+                                isHiddenNodesEnabled
+                                        && !isInSharedItems
+                                        && !megaApi.getRootParentNode(node).isInShare
+                                        && !node.isMarkedSensitive
+
+                            val shouldShowUnhideNode =
+                                isHiddenNodesEnabled
+                                        && !isInSharedItems
+                                        && !megaApi.getRootParentNode(node).isInShare
+                                        && node.isMarkedSensitive
+
+                            menu.findItem(R.id.hide).isVisible = shouldShowHideNode
+                            menu.findItem(R.id.hide).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+
+                            menu.findItem(R.id.unhide).isVisible = shouldShowUnhideNode
+                            menu.findItem(R.id.unhide)
+                                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
                         }
 
                         else -> {

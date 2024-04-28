@@ -44,9 +44,12 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatImageFile
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.favourites.AddFavouritesUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
@@ -66,6 +69,7 @@ import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ResetTotalDownloadsUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import nz.mega.sdk.MegaNode
@@ -109,6 +113,10 @@ class ImagePreviewViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
+    private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
+    private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
+    private val getParentNodeUseCase: GetParentNodeUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
@@ -129,6 +137,8 @@ class ImagePreviewViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(ImagePreviewState())
 
+    private var isHidingActionAllowed: Boolean = false
+
     val state: StateFlow<ImagePreviewState> = _state
 
     private val menu: ImagePreviewMenu?
@@ -142,6 +152,7 @@ class ImagePreviewViewModel @Inject constructor(
                 monitorImageNodes()
             }
             monitorOfflineNodeUpdates()
+            isHidingActionAllowed = isHidingActionAllowed()
         }
     }
 
@@ -326,11 +337,11 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     suspend fun isHideMenuVisible(imageNode: ImageNode): Boolean {
-        return menu?.isHideMenuVisible(imageNode) ?: false
+        return menu?.isHideMenuVisible(imageNode) ?: false && isHidingActionAllowed
     }
 
     suspend fun isUnhideMenuVisible(imageNode: ImageNode): Boolean {
-        return menu?.isUnhideMenuVisible(imageNode) ?: false
+        return menu?.isUnhideMenuVisible(imageNode) ?: false && isHidingActionAllowed
     }
 
     suspend fun isMoveMenuVisible(imageNode: ImageNode): Boolean {
@@ -845,6 +856,14 @@ class ImagePreviewViewModel @Inject constructor(
             source = imagePreviewFetcherSource
         )
     }
+
+    private suspend fun isHidingActionAllowed(): Boolean =
+        (getParentNodeUseCase(NodeId(currentImageNodeIdValue))?.id?.longValue ?: 0) !in listOf(
+            getPrimarySyncHandleUseCase(),
+            getSecondarySyncHandleUseCase(),
+            getMyChatsFilesFolderIdUseCase(),
+        )
+
 
     companion object {
         const val IMAGE_NODE_FETCHER_SOURCE = "image_node_fetcher_source"

@@ -97,13 +97,17 @@
         android:orderInCategory="121"
         android:title="@string/general_hide_node"
         android:visible="false"
+        android:icon="@drawable/ic_eye_off_medium_regular_outline"
+        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/unhide"
-        android:orderInCategory="123"
+        android:orderInCategory="122"
         android:title="@string/general_unhide_node"
         android:visible="false"
+        android:icon="@drawable/ic_eye_medium_regular_outline"
+        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="never" />
 
     <item

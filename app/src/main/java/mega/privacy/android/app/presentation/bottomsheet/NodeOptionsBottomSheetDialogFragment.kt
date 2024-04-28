@@ -429,7 +429,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionLabel.visibility = if (isTakenDown) View.GONE else View.VISIBLE
                 optionFavourite.visibility = if (isTakenDown) View.GONE else View.VISIBLE
                 optionHideLayout.visibility =
-                    if (isHiddenNodesEnabled && accountType != null && isHiddenNodesOnboarded != null) View.VISIBLE else View.GONE
+                    if (isHiddenNodesEnabled && accountType != null && isHiddenNodesOnboarded != null && state.isHidingActionAllowed)
+                        View.VISIBLE
+                    else
+                        View.GONE
                 optionHideProLabel.visibility =
                     if (accountType?.isPaid == false) View.VISIBLE else View.GONE
                 optionHideHelp.visibility =

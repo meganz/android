@@ -14,6 +14,7 @@ import nz.mega.sdk.MegaNode
  * @property shareKeyCreated
  * @property accountDetail
  * @property isHiddenNodesOnboarded
+ * @property isHidingActionAllowed
  */
 data class NodeBottomSheetUIState(
     val canMoveNode: Boolean = false,
@@ -25,4 +26,5 @@ data class NodeBottomSheetUIState(
     val shareKeyCreated: Boolean? = null,
     val accountDetail: AccountDetail? = null,
     val isHiddenNodesOnboarded: Boolean? = null,
+    val isHidingActionAllowed: Boolean = false,
 )

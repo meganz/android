@@ -22,14 +22,18 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactUserNameFromDatabaseUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.GetMyChatsFilesFolderIdUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -73,6 +77,14 @@ class NodeOptionsViewModelTest {
             runBlocking { invoke() }
         }.thenReturn(false)
     }
+    private val getPrimarySyncHandleUseCase = mock<GetPrimarySyncHandleUseCase>()
+    private val getSecondarySyncHandleUseCase = mock<GetSecondarySyncHandleUseCase>()
+    private val getMyChatsFilesFolderIdUseCase = mock<GetMyChatsFilesFolderIdUseCase> {
+        onGeneric {
+            runBlocking { invoke() }
+        }.thenReturn(NodeId(0))
+    }
+    private val getParentNodeUseCase = mock<GetParentNodeUseCase>()
 
     private val nodeIdFlow = MutableStateFlow(-1L)
 
@@ -115,6 +127,10 @@ class NodeOptionsViewModelTest {
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
+            getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
+            getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
+            getMyChatsFilesFolderIdUseCase = getMyChatsFilesFolderIdUseCase,
+            getParentNodeUseCase = getParentNodeUseCase,
         )
     }
 

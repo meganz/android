@@ -21,9 +21,12 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.favourites.AddFavouritesUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
@@ -43,6 +46,7 @@ import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.transfers.chatuploads.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ResetTotalDownloadsUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -98,6 +102,10 @@ class ImagePreviewViewModelTest {
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase = mock()
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
+    private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase = mock()
+    private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase = mock()
+    private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase = mock()
+    private val getParentNodeUseCase: GetParentNodeUseCase = mock()
 
     @BeforeAll
     fun setup() {
@@ -137,7 +145,11 @@ class ImagePreviewViewModelTest {
         imagePreviewVideoLauncher,
         monitorAccountDetailUseCase,
         isHiddenNodesOnboardedUseCase,
-        monitorShowHiddenItemsUseCase
+        monitorShowHiddenItemsUseCase,
+        getPrimarySyncHandleUseCase,
+        getSecondarySyncHandleUseCase,
+        getMyChatsFilesFolderIdUseCase,
+        getParentNodeUseCase,
     )
 
     private fun initViewModel() {
@@ -175,7 +187,11 @@ class ImagePreviewViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-            defaultDispatcher = UnconfinedTestDispatcher()
+            getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
+            getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
+            getMyChatsFilesFolderIdUseCase =  getMyChatsFilesFolderIdUseCase,
+            getParentNodeUseCase = getParentNodeUseCase,
+            defaultDispatcher = UnconfinedTestDispatcher(),
         )
     }
 
