@@ -7,12 +7,10 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.NotificationManager
 import android.app.SearchManager
-import android.content.BroadcastReceiver
 import android.content.ComponentCallbacks2
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -120,12 +118,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CREDENTIALS
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FIRST_NAME
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_NAME
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE
-import mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
@@ -243,7 +235,6 @@ import mega.privacy.android.app.presentation.settings.startscreen.util.StartScre
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.getStartDrawerItem
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.setStartScreenTimeStamp
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.shouldCloseApp
-import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment
 import mega.privacy.android.app.presentation.shares.SharesActionListener
 import mega.privacy.android.app.presentation.shares.SharesPageAdapter
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesComposeFragment
@@ -253,8 +244,6 @@ import mega.privacy.android.app.presentation.shares.links.LinksComposeFragment
 import mega.privacy.android.app.presentation.shares.links.LinksViewModel
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesComposeFragment
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesComposeViewModel
-import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel
-import mega.privacy.android.app.presentation.shares.outgoing.model.LegacyOutgoingSharesState
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
@@ -404,7 +393,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     internal val callRecordingViewModel: CallRecordingViewModel by viewModels()
     internal val fileBrowserViewModel: FileBrowserViewModel by viewModels()
     internal val incomingSharesViewModel: IncomingSharesComposeViewModel by viewModels()
-    internal val legacyOutgoingSharesViewModel: OutgoingSharesViewModel by viewModels()
     internal val outgoingSharesViewModel: OutgoingSharesComposeViewModel by viewModels()
     internal val linksViewModel: LinksViewModel by viewModels()
     internal val rubbishBinViewModel: RubbishBinViewModel by viewModels()
@@ -574,10 +562,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     //Tabs in Shares
     private lateinit var tabLayoutShares: TabLayout
     private val sharesPageAdapter: SharesPageAdapter by lazy {
-        SharesPageAdapter(
-            enabledOutgoingSharesCompose = enabledOutgoingSharesCompose,
-            activity = this
-        )
+        SharesPageAdapter(activity = this)
     }
     private lateinit var viewPagerShares: ViewPager2
 
@@ -604,7 +589,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var rubbishBinComposeFragment: RubbishBinComposeFragment? = null
     private var syncFragment: SyncFragment? = null
     private var incomingSharesComposeFragment: IncomingSharesComposeFragment? = null
-    private var outgoingSharesFragment: MegaNodeBaseFragment? = null
     private var outgoingSharesComposeFragment: OutgoingSharesComposeFragment? = null
     private var linksComposeFragment: LinksComposeFragment? = null
     private var searchFragment: SearchFragment? = null
@@ -676,17 +660,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private var showDialogStorageStatusJob: Job? = null
 
-    private val contactUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == null) return
-            val userHandle = intent.getLongExtra(EXTRA_USER_HANDLE, INVALID_HANDLE)
-            if (intent.action == ACTION_UPDATE_NICKNAME || intent.action == ACTION_UPDATE_FIRST_NAME || intent.action == ACTION_UPDATE_LAST_NAME) {
-                if (!enabledOutgoingSharesCompose && isOutgoingAdded && getOutgoingSharesFragmentItemCount() > 0) {
-                    outgoingSharesFragment?.updateContact(userHandle)
-                }
-            }
-        }
-    }
     private val callStatusObserver: Observer<MegaChatCall> =
         Observer { call: MegaChatCall ->
             when (call.status) {
@@ -726,11 +699,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var enableOfflineCompose: Boolean = false
 
     /**
-     * Feature Flag for OutgoingSharesComposeFragment
-     */
-    private var enabledOutgoingSharesCompose: Boolean = false
-
-    /**
      * Method for updating the visible elements related to a call.
      *
      * @param chatIdReceived The chat ID of a call.
@@ -741,13 +709,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         } else {
             invalidateOptionsMenu()
         }
-    }
-
-    /**
-     * Update current tab in shares page
-     */
-    fun updateCurrentSharesTab(tab: SharesTab) {
-        currentSharesTab = tab
     }
 
     override fun onRequestPermissionsResult(
@@ -949,8 +910,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         runBlocking {
             enableOfflineCompose =
                 getFeatureFlagValueUseCase(AppFeatures.OfflineCompose)
-            enabledOutgoingSharesCompose =
-                getFeatureFlagValueUseCase(AppFeatures.OutgoingSharesCompose)
         }
 
         Timber.d("onCreate after call super")
@@ -964,7 +923,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             Timber.d("Bundle is NULL")
             pathNavigationOffline = Constants.OFFLINE_ROOT
         }
-        registerBroadcastReceivers()
         registerEventBusObservers()
         CacheFolderManager.createCacheFolders()
         checkChatChanges()
@@ -1285,7 +1243,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     SharesTab.INCOMING_TAB -> {
                         Analytics.tracker.trackEvent(IncomingSharesTabEvent)
                         if (isOutgoingAdded) {
-                            hideActionModeInOutgoingSharesFragment()
+                            outgoingSharesComposeFragment?.disableSelectMode()
                         } else if (isLinksAdded) {
                             linksComposeFragment?.disableSelectMode()
                         }
@@ -1305,7 +1263,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         if (isIncomingAdded) {
                             incomingSharesComposeFragment?.disableSelectMode()
                         } else if (isOutgoingAdded) {
-                            hideActionModeInOutgoingSharesFragment()
+                            outgoingSharesComposeFragment?.disableSelectMode()
                         }
                     }
 
@@ -1866,20 +1824,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         ).observe(this, sessionOnHoldObserver)
     }
 
-    private fun registerBroadcastReceivers() {
-        registerContactUpdateReceiver()
-    }
-
-    private fun registerContactUpdateReceiver() {
-        val contactUpdateFilter =
-            IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE)
-        contactUpdateFilter.addAction(ACTION_UPDATE_NICKNAME)
-        contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME)
-        contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME)
-        contactUpdateFilter.addAction(ACTION_UPDATE_CREDENTIALS)
-        registerReceiver(contactUpdateReceiver, contactUpdateFilter)
-    }
-
     private fun restoreFromSavedInstanceState(savedInstanceState: Bundle) {
         Timber.d("Bundle is NOT NULL")
         askPermissions = savedInstanceState.getBoolean(IntentConstants.EXTRA_ASK_PERMISSIONS)
@@ -2051,25 +1995,15 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 incomingSharesState.nodesList.count { it.node.shareData?.isUnverifiedDistinctNode == true })
         }
 
-        if (enabledOutgoingSharesCompose) {
-            this.collectFlow(
-                outgoingSharesViewModel.state,
-                Lifecycle.State.STARTED
-            ) { outgoingSharesState: OutgoingSharesState ->
-                addUnverifiedOutgoingCountBadge(
-                    outgoingSharesState.nodesList.count { it.node.shareData?.isUnverifiedDistinctNode == true },
-                )
-            }
-        } else {
-            this.collectFlow(
-                legacyOutgoingSharesViewModel.state,
-                Lifecycle.State.STARTED
-            ) { outgoingSharesState: LegacyOutgoingSharesState ->
-                addUnverifiedOutgoingCountBadge(
-                    outgoingSharesState.nodes.count { it.second != null },
-                )
-            }
+        this.collectFlow(
+            outgoingSharesViewModel.state,
+            Lifecycle.State.STARTED
+        ) { outgoingSharesState: OutgoingSharesState ->
+            addUnverifiedOutgoingCountBadge(
+                outgoingSharesState.nodesList.count { it.node.shareData?.isUnverifiedDistinctNode == true },
+            )
         }
+
         this.collectFlow(
             viewModel.monitorFinishActivityEvent,
             Lifecycle.State.CREATED
@@ -2829,7 +2763,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         dbH.removeSentPendingMessages()
         megaApi.removeRequestListener(this)
         composite.clear()
-        unregisterReceiver(contactUpdateReceiver)
         cancelSearch()
         reconnectDialog?.cancel()
         dismissAlertDialogIfExists(processFileDialog)
@@ -4300,15 +4233,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     private val isOutgoingAdded: Boolean
         get() {
-            return if (enabledOutgoingSharesCompose) {
-                outgoingSharesComposeFragment =
-                    sharesPageAdapter.getFragment(SharesTab.OUTGOING_TAB.position) as? OutgoingSharesComposeFragment
-                outgoingSharesComposeFragment != null && outgoingSharesComposeFragment?.isAdded == true
-            } else {
-                outgoingSharesFragment =
-                    sharesPageAdapter.getFragment(SharesTab.OUTGOING_TAB.position) as? MegaNodeBaseFragment
-                outgoingSharesFragment != null && outgoingSharesFragment?.isAdded == true
-            }
+            outgoingSharesComposeFragment =
+                sharesPageAdapter.getFragment(SharesTab.OUTGOING_TAB.position) as? OutgoingSharesComposeFragment
+            return outgoingSharesComposeFragment != null && outgoingSharesComposeFragment?.isAdded == true
         }
     private val isLinksAdded: Boolean
         get() {
@@ -4395,10 +4322,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             tabItemShares === SharesTab.OUTGOING_TAB && isOutgoingAdded -> {
-                if (enabledOutgoingSharesCompose)
-                    outgoingSharesComposeFragment?.checkScroll(true)
-                else
-                    outgoingSharesFragment?.checkScroll()
+                outgoingSharesComposeFragment?.checkScroll(true)
             }
 
             tabItemShares === SharesTab.LINKS_TAB && isLinksAdded -> {
@@ -4722,7 +4646,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             searchMenuItem?.isVisible = true
                         }
                     } else if (tabItemShares === SharesTab.OUTGOING_TAB && isOutgoingAdded) {
-                        if (isOutgoingAdded && getOutgoingSharesFragmentItemCount() > 0) {
+                        if (isOutgoingAdded && outgoingSharesViewModel.getNodeCount() > 0) {
                             searchMenuItem?.isVisible = true
                         }
                     } else if (tabItemShares === SharesTab.LINKS_TAB && isLinksAdded) {
@@ -4871,7 +4795,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         if (tabItemShares == SharesTab.INCOMING_TAB && isIncomingAdded) {
                             incomingSharesViewModel.performBackNavigation()
                         } else if (tabItemShares == SharesTab.OUTGOING_TAB && isOutgoingAdded) {
-                            onBackPressedOutgoingShares()
+                            outgoingSharesViewModel.performBackNavigation()
                         } else if (tabItemShares == SharesTab.LINKS_TAB && isLinksAdded) {
                             linksViewModel.performBackNavigation()
                         }
@@ -5035,11 +4959,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
 
                     SharesTab.OUTGOING_TAB -> if (isOutgoingAdded) {
-                        if (enabledOutgoingSharesCompose) {
-                            outgoingSharesViewModel.selectAllNodes()
-                        } else {
-                            outgoingSharesFragment?.selectAll()
-                        }
+                        outgoingSharesViewModel.selectAllNodes()
                     }
 
                     SharesTab.LINKS_TAB -> if (isLinksAdded) {
@@ -5466,12 +5386,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     if (tabItemShares == SharesTab.INCOMING_TAB && getHandleFromIncomingSharesViewModel() != INVALID_HANDLE) {
                         incomingSharesViewModel.goBackToRootLevel()
                     } else if (tabItemShares == SharesTab.OUTGOING_TAB && getHandleFromOutgoingSharesViewModel() != INVALID_HANDLE) {
-                        if (enabledOutgoingSharesCompose) {
-                            outgoingSharesViewModel.goBackToRootLevel()
-                        } else {
-                            legacyOutgoingSharesViewModel.resetOutgoingTreeDepth()
-                            refreshOutgoingShares()
-                        }
+                        outgoingSharesViewModel.goBackToRootLevel()
                     } else if (tabItemShares == SharesTab.LINKS_TAB && getHandleFromLinksViewModel() != INVALID_HANDLE) {
                         linksViewModel.resetToRoot()
                     }
@@ -5634,15 +5549,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         }
 
                         SharesTab.OUTGOING_TAB -> {
-                            if (enabledOutgoingSharesCompose) {
-                                outgoingSharesViewModel.setCurrentHandle(
-                                    if (outgoingSharesViewModel.outgoingTreeDepth() == 0) INVALID_HANDLE else oldParentHandle
-                                )
-                            } else {
-                                legacyOutgoingSharesViewModel.decreaseOutgoingTreeDepth(
-                                    if (legacyOutgoingSharesViewModel.state().outgoingTreeDepth == 0) INVALID_HANDLE else oldParentHandle
-                                )
-                            }
+                            outgoingSharesViewModel.setCurrentHandle(
+                                if (outgoingSharesViewModel.outgoingTreeDepth() == 0) INVALID_HANDLE else oldParentHandle
+                            )
+
                             if (getHandleFromOutgoingSharesViewModel() == INVALID_HANDLE) {
                                 hideTabs(false, SharesTab.OUTGOING_TAB)
                             }
@@ -7493,11 +7403,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             }
 
                             SharesTab.OUTGOING_TAB -> if (isOutgoingAdded) {
-                                if (enabledOutgoingSharesCompose) {
-                                    outgoingSharesViewModel.setCurrentHandle(folderNode.handle)
-                                } else {
-                                    outgoingSharesFragment?.navigateToFolder(folderNode)
-                                }
+                                outgoingSharesViewModel.setCurrentHandle(folderNode.handle)
                             }
 
                             SharesTab.LINKS_TAB -> if (isLinksAdded) {
@@ -7712,10 +7618,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun refreshOutgoingShares() {
-        if (enabledOutgoingSharesCompose)
-            outgoingSharesViewModel.refreshNodes()
-        else
-            legacyOutgoingSharesViewModel.refreshOutgoingSharesNode()
+        outgoingSharesViewModel.refreshNodes()
     }
 
     fun refreshSharesFragments() {
@@ -7739,16 +7642,15 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     fun setDeepBrowserTreeIncoming(deep: Int, parentHandle: Long?) {
         parentHandle?.let {
-                if (deep == 0)
-                    incomingSharesViewModel.goBackToRootLevel()
-                else
-                    incomingSharesViewModel.setCurrentHandle(it)
+            if (deep == 0)
+                incomingSharesViewModel.goBackToRootLevel()
+            else
+                incomingSharesViewModel.setCurrentHandle(it)
         }
     }
 
     val deepBrowserTreeOutgoing: Int
-        get() = if (enabledOutgoingSharesCompose) outgoingSharesViewModel.outgoingTreeDepth() else
-            legacyOutgoingSharesViewModel.state().outgoingTreeDepth
+        get() = outgoingSharesViewModel.outgoingTreeDepth()
 
     var tabItemShares: SharesTab
         get() = viewPagerShares.currentItem.takeUnless { it == -1 }
@@ -7773,44 +7675,15 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     /**
      * Methods for outgoing shares
      */
-    fun getHandleFromOutgoingSharesViewModel() = if (enabledOutgoingSharesCompose) {
-        outgoingSharesViewModel.getCurrentNodeHandle()
-    } else {
-        legacyOutgoingSharesViewModel.state().outgoingHandle
-    }
+    fun getHandleFromOutgoingSharesViewModel() = outgoingSharesViewModel.getCurrentNodeHandle()
 
-    private fun hideActionModeInOutgoingSharesFragment() {
-        if (enabledOutgoingSharesCompose) {
-            outgoingSharesComposeFragment?.disableSelectMode()
-        } else {
-            outgoingSharesFragment?.hideActionMode()
-        }
-    }
-
-    private fun getOutgoingSharesFragmentItemCount() = if (enabledOutgoingSharesCompose) {
-        outgoingSharesViewModel.getNodeCount()
-    } else {
-        outgoingSharesFragment?.itemCount ?: 0
-    }
-
-    private fun onBackPressedOutgoingShares() {
-        if (enabledOutgoingSharesCompose) {
-            outgoingSharesViewModel.performBackNavigation()
-        } else {
-            outgoingSharesFragment?.onBackPressed()
-        }
-    }
-
-    private fun isOutgoingSharesBackPressPerformed() = if (enabledOutgoingSharesCompose) {
+    private fun isOutgoingSharesBackPressPerformed() =
         if (outgoingSharesViewModel.getCurrentNodeHandle() == INVALID_HANDLE)
             true
         else {
             outgoingSharesViewModel.performBackNavigation()
             false
         }
-    } else {
-        outgoingSharesFragment?.onBackPressed() == 0
-    }
 
     /**
      * Returns the current node handle from links viewmodel
@@ -8149,10 +8022,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 if (tabItemShares === SharesTab.INCOMING_TAB) {
                     incomingSharesViewModel.setCurrentHandle(handle)
                 } else if (tabItemShares === SharesTab.OUTGOING_TAB) {
-                    if (enabledOutgoingSharesCompose)
-                        outgoingSharesViewModel.setCurrentHandle(handle)
-                    else
-                        legacyOutgoingSharesViewModel.increaseOutgoingTreeDepth(handle)
+                    outgoingSharesViewModel.setCurrentHandle(handle)
                 } else if (tabItemShares === SharesTab.LINKS_TAB) {
                     linksViewModel.openFolderByHandle(handle)
                 }

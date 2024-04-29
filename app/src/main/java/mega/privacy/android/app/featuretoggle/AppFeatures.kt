@@ -74,14 +74,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enables new outgoing shares compose page
-     */
-    OutgoingSharesCompose(
-        "Enable new Outgoing Shares Compose page (requires app restart)",
-        true
-    ),
-
-    /**
      * Enables new video section flag
      */
     NewVideoSection(

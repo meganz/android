@@ -7,7 +7,6 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesComposeFragment
 import mega.privacy.android.app.presentation.shares.links.LinksComposeFragment
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesComposeFragment
-import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragment
 
 /**
  * Pager adapter for shares pages
@@ -15,7 +14,6 @@ import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragm
  * @param activity FragmentActivity where the viewPager2 lives
  */
 class SharesPageAdapter(
-    private val enabledOutgoingSharesCompose: Boolean,
     private val activity: FragmentActivity,
 ) :
     FragmentStateAdapter(activity) {
@@ -25,7 +23,7 @@ class SharesPageAdapter(
      */
     private val fragments = mutableMapOf(
         SharesTab.INCOMING_TAB to IncomingSharesComposeFragment(),
-        SharesTab.OUTGOING_TAB to if (enabledOutgoingSharesCompose) OutgoingSharesComposeFragment() else OutgoingSharesFragment(),
+        SharesTab.OUTGOING_TAB to OutgoingSharesComposeFragment(),
         SharesTab.LINKS_TAB to LinksComposeFragment()
     )
 
@@ -55,7 +53,7 @@ class SharesPageAdapter(
     fun refreshFragment(position: Int) {
         val fragment = when (SharesTab.fromPosition(position)) {
             SharesTab.INCOMING_TAB -> IncomingSharesComposeFragment()
-            SharesTab.OUTGOING_TAB -> if (enabledOutgoingSharesCompose) OutgoingSharesComposeFragment() else OutgoingSharesFragment()
+            SharesTab.OUTGOING_TAB -> OutgoingSharesComposeFragment()
             SharesTab.LINKS_TAB -> LinksComposeFragment()
             else -> throw Exception("Invalid position")
         }
