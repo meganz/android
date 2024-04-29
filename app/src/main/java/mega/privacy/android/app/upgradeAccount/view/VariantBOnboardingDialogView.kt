@@ -1,19 +1,8 @@
 package mega.privacy.android.app.upgradeAccount.view
 
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
-import mega.privacy.android.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,8 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -32,9 +23,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.view.ChooseAccountPreviewProvider.Companion.localisedSubscriptionsList
 import mega.privacy.android.app.upgradeAccount.view.ChooseAccountPreviewProvider.Companion.subscriptionProLite
 import mega.privacy.android.app.upgradeAccount.view.components.ChoosePlanTitleText
@@ -44,7 +39,13 @@ import mega.privacy.android.app.upgradeAccount.view.components.MonthlyYearlyTabs
 import mega.privacy.android.app.upgradeAccount.view.components.ProPlanInfoCard
 import mega.privacy.android.app.upgradeAccount.view.components.SaveUpToLabel
 import mega.privacy.android.app.upgradeAccount.view.components.SubscriptionDetails
+import mega.privacy.android.core.ui.controls.appbar.AppBarType
+import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.shared.resources.R.string.dialog_onboarding_feature_storage_description
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 
@@ -87,8 +88,9 @@ internal fun VariantBOnboardingDialogColumn(
     var isMonthly by rememberSaveable { mutableStateOf(false) }
     val cheapestSubscriptionAvailable = uiState.cheapestSubscriptionAvailable
     val isLoading = cheapestSubscriptionAvailable == null
-    val formattedStorage = cheapestSubscriptionAvailable?.formatStorageSize()
-    val minimalStorageString = formattedStorage?.let { stringResource(id = it.unit, it.size) }
+    val formattedStorage = cheapestSubscriptionAvailable?.formatStorageSize(usePlaceholder = false)
+    val minimalStorageUnitString = formattedStorage?.let { stringResource(id = it.unit) } ?: ""
+    val minimalStorageSizeString = formattedStorage?.size ?: ""
     var chosenPlan by rememberSaveable { mutableStateOf(AccountType.FREE) }
     var isPreselectedPlanOnce by rememberSaveable { mutableStateOf(false) }
     val isPaymentMethodAvailable = uiState.isPaymentMethodAvailable
@@ -115,11 +117,11 @@ internal fun VariantBOnboardingDialogColumn(
                 FeatureRow(
                     drawableID = painterResource(id = R.drawable.ic_storage_onboarding_dialog),
                     title = stringResource(id = R.string.dialog_onboarding_feature_title_storage),
-                    description = if (minimalStorageString != null) stringResource(
-                        id = R.string.dialog_onboarding_feature_description_storage,
-                        minimalStorageString
-                    )
-                    else stringResource(id = R.string.dialog_onboarding_feature_description_storage),
+                    description = stringResource(
+                        id = dialog_onboarding_feature_storage_description,
+                        minimalStorageSizeString,
+                        minimalStorageUnitString
+                    ),
                     testTag = STORAGE_DESCRIPTION_ROW,
                     isLoading = isLoading,
                 )

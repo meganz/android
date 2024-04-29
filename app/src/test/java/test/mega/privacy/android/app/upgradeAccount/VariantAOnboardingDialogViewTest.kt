@@ -1,9 +1,11 @@
 package test.mega.privacy.android.app.upgradeAccount
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.printToString
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
@@ -26,8 +28,7 @@ import mega.privacy.android.app.upgradeAccount.view.VariantAOnboardingDialogView
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyAmount
-import mega.privacy.android.shared.resources.R as sharedR
-import androidx.compose.ui.test.printToString
+import mega.privacy.android.shared.resources.R.string.dialog_onboarding_feature_storage_description
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -71,7 +72,7 @@ class VariantAOnboardingDialogViewTest {
         composeRule.onNodeWithText(fromId(R.string.dialog_onboarding_feature_title_storage))
             .assertIsDisplayed()
         composeRule.onNodeWithText(
-            fromId(R.string.dialog_onboarding_feature_description_storage, "400 GB")
+            fromId(dialog_onboarding_feature_storage_description, "400", "GB")
         )
             .assertIsDisplayed()
     }

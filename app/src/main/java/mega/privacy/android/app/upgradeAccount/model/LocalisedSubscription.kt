@@ -58,7 +58,8 @@ data class LocalisedSubscription(
      *
      * @return Pair<Int, String>
      */
-    fun formatStorageSize(): FormattedSize = formattedSize(storage)
+    fun formatStorageSize(usePlaceholder: Boolean = true): FormattedSize =
+        formattedSize(size = storage, usePlaceholder = usePlaceholder)
 
     /**
      * method to call FormattedSizeMapper to return pair of int and string containing correctly formatted size for transfer
@@ -68,7 +69,7 @@ data class LocalisedSubscription(
      */
     fun formatTransferSize(isMonthly: Boolean): FormattedSize =
         when (isMonthly) {
-            true -> formattedSize(monthlyTransfer)
-            false -> formattedSize(yearlyTransfer)
+            true -> formattedSize(size = monthlyTransfer)
+            false -> formattedSize(size = yearlyTransfer)
         }
 }

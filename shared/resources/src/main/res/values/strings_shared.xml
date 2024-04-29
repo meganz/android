@@ -262,4 +262,10 @@
     <string name="transfers_dialog_save_download_location_always_here_option">Always save here</string>
     <!-- Option to don't use the selected location as default location for next downloads and don't ask again-->
     <string name="transfers_dialog_save_download_location_always_ask_option">Always ask for destination</string>
+    <!-- Size unit in gigabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
+    <string name="general_giga_byte_standalone">GB</string>
+    <!-- Size unit in terabytes. It can be used for file/folder size or storage/transfer quota as a standalone size unit to be added to the size number-->
+    <string name="general_tera_byte_standalone">TB</string>
+    <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
+    <string name="dialog_onboarding_feature_storage_description">Starting from %1$s %2$s, find the perfect fit for your storage needs.</string>
 </resources>

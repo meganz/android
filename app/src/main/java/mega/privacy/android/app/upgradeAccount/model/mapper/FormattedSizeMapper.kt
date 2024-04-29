@@ -13,14 +13,25 @@ class FormattedSizeMapper @Inject constructor() {
      * Invoke
      * Convert Int to Pair<Int, String>
      * @param size [Int]
+     * @param usePlaceholder [Boolean]
      * @return FormattedSize
      */
-    internal operator fun invoke(size: Int): FormattedSize {
+    internal operator fun invoke(size: Int, usePlaceholder: Boolean = true): FormattedSize {
         val decimalFormatter = DecimalFormat("###.##")
         return if (size < 1024) {
-            FormattedSize(R.string.label_file_size_giga_byte, decimalFormatter.format(size))
+            FormattedSize(
+                if (usePlaceholder) R.string.label_file_size_giga_byte
+                else
+                    mega.privacy.android.shared.resources.R.string.general_giga_byte_standalone,
+                decimalFormatter.format(size)
+            )
         } else {
-            FormattedSize(R.string.label_file_size_tera_byte, decimalFormatter.format(size / 1024))
+            FormattedSize(
+                if (usePlaceholder) R.string.label_file_size_tera_byte
+                else
+                    mega.privacy.android.shared.resources.R.string.general_tera_byte_standalone,
+                decimalFormatter.format(size / 1024)
+            )
         }
     }
 }

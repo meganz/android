@@ -1,5 +1,6 @@
 package mega.privacy.android.app.upgradeAccount.view
 
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -21,21 +21,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.placeholder.PlaceholderHighlight
-import com.google.accompanist.placeholder.fade
-import com.google.accompanist.placeholder.placeholder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
+import mega.privacy.android.app.upgradeAccount.view.ChooseAccountPreviewProvider.Companion.subscriptionProLite
 import mega.privacy.android.app.upgradeAccount.view.components.ButtonsRow
 import mega.privacy.android.app.upgradeAccount.view.components.FeatureRow
 import mega.privacy.android.app.upgradeAccount.view.components.GetProPlanColumn
-import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_900
-import mega.privacy.android.core.ui.theme.extensions.subtitle1medium
-import mega.privacy.android.core.ui.theme.tokens.TextColor
-import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.android.app.upgradeAccount.view.ChooseAccountPreviewProvider.Companion.subscriptionProLite
+import mega.privacy.android.shared.resources.R.string.dialog_onboarding_feature_storage_description
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
@@ -51,8 +44,10 @@ fun VariantAOnboardingDialogView(
     val scrollState = rememberScrollState()
     val cheapestSubscriptionAvailable = state.cheapestSubscriptionAvailable
     val isLoading = cheapestSubscriptionAvailable == null
-    val formattedStorage = cheapestSubscriptionAvailable?.formatStorageSize()
-    val minimalStorageString = formattedStorage?.let { stringResource(id = it.unit, it.size) }
+    val formattedStorage = cheapestSubscriptionAvailable?.formatStorageSize(usePlaceholder = false)
+    val minimalStorageUnitString = formattedStorage?.let { stringResource(id = it.unit) } ?: ""
+    val minimalStorageSizeString = formattedStorage?.size ?: ""
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -83,11 +78,11 @@ fun VariantAOnboardingDialogView(
             FeatureRow(
                 drawableID = painterResource(id = R.drawable.ic_storage_onboarding_dialog),
                 title = stringResource(id = R.string.dialog_onboarding_feature_title_storage),
-                description = if (minimalStorageString != null) stringResource(
-                    id = R.string.dialog_onboarding_feature_description_storage,
-                    minimalStorageString
-                )
-                else stringResource(id = R.string.dialog_onboarding_feature_description_storage),
+                description = stringResource(
+                    id = dialog_onboarding_feature_storage_description,
+                    minimalStorageSizeString,
+                    minimalStorageUnitString
+                ),
                 testTag = STORAGE_DESCRIPTION_ROW,
                 isLoading = isLoading,
             )

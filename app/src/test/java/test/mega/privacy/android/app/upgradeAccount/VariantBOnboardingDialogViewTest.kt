@@ -1,38 +1,39 @@
 package test.mega.privacy.android.app.upgradeAccount
 
+import mega.privacy.android.shared.resources.R as sharedR
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasAnyChild
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.printToString
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
+import mega.privacy.android.app.upgradeAccount.model.UIAccountType
 import mega.privacy.android.app.upgradeAccount.view.BACKUP_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.CHAT_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.FILE_SHARING_DESCRIPTION_ROW
-import mega.privacy.android.app.upgradeAccount.view.PRO_PLAN_TEXT
-import mega.privacy.android.app.upgradeAccount.view.PRO_PLAN_TITLE
-import mega.privacy.android.app.upgradeAccount.view.STORAGE_DESCRIPTION_ROW
-import mega.privacy.android.app.upgradeAccount.view.VPN_DESCRIPTION_ROW
-import mega.privacy.android.shared.resources.R as sharedR
-import androidx.compose.ui.test.assert
-import androidx.compose.ui.test.hasAnyChild
-import androidx.compose.ui.test.hasTestTag
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.printToString
-import mega.privacy.android.app.upgradeAccount.model.UIAccountType
 import mega.privacy.android.app.upgradeAccount.view.GOOGLE_PLAY_STORE_SUBSCRIPTION_LINK_TAG
 import mega.privacy.android.app.upgradeAccount.view.ONBOARDING_SCREEN_VARIANT_B
 import mega.privacy.android.app.upgradeAccount.view.PRO_PLAN_CARD_VARIANT_B
+import mega.privacy.android.app.upgradeAccount.view.PRO_PLAN_TEXT
+import mega.privacy.android.app.upgradeAccount.view.PRO_PLAN_TITLE
+import mega.privacy.android.app.upgradeAccount.view.STORAGE_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.SUBSCRIPTION_DETAILS_DESCRIPTION_TAG
 import mega.privacy.android.app.upgradeAccount.view.SUBSCRIPTION_DETAILS_TITLE_TAG
+import mega.privacy.android.app.upgradeAccount.view.VPN_DESCRIPTION_ROW
 import mega.privacy.android.app.upgradeAccount.view.VariantBOnboardingDialogView
 import mega.privacy.android.app.upgradeAccount.view.components.MONTHLY_CHECK_ICON_TAG
 import mega.privacy.android.app.upgradeAccount.view.components.MONTHLY_TAB_TAG
 import mega.privacy.android.app.upgradeAccount.view.components.RECOMMENDED_PLAN_TAG
 import mega.privacy.android.app.upgradeAccount.view.components.YEARLY_CHECK_ICON_TAG
 import mega.privacy.android.app.upgradeAccount.view.components.YEARLY_TAB_TAG
+import mega.privacy.android.shared.resources.R.string.dialog_onboarding_feature_storage_description
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -72,7 +73,11 @@ class VariantBOnboardingDialogViewTest {
         composeRule.onNodeWithText(fromId(R.string.dialog_onboarding_feature_title_storage))
             .assertIsDisplayed()
         composeRule.onNodeWithText(
-            fromId(R.string.dialog_onboarding_feature_description_storage, "400 GB")
+            fromId(
+                dialog_onboarding_feature_storage_description,
+                "400",
+                "GB"
+            )
         )
             .assertIsDisplayed()
     }

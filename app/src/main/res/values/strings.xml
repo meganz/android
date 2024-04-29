@@ -1122,7 +1122,7 @@
     <!-- Title of the settings section to configure the status persistence of chat presence -->
     <string name="settings_persistence_title">Status persistence</string>
     <!-- Subtitle of the settings section to configure the status persistence of chat presence -->
-    <string name="settings_persistence_subtitle">Maintain my chosen status appearance even when I have no connected devices</string>
+    <string name="settings_persistence_subtitle">Always show selected status appearance, even when I disconnect</string>
     <!-- Title of the dialog to set the value of the auto away preference -->
     <string name="title_dialog_set_autoaway_value">Set time limit</string>
     <!-- Button to set a value -->
@@ -2235,9 +2235,9 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name_hint">file name</string>
     <!-- Option in Settings section to enable the last active connection in chat -->
-    <string name="option_enable_last_green_chat">Show Last seen&#8230;</string>
+    <string name="option_enable_last_green_chat">Show last seen</string>
     <!-- Subtitle of the option in Settings section to enable the last active connection in chat -->
-    <string name="subtitle_option_enable_last_green_chat">Allow your contacts to see the last time you were active on MEGA.</string>
+    <string name="subtitle_option_enable_last_green_chat">Allow your contacts to see the last time you were active on MEGA</string>
     <!-- title of notification when device is out of storage during camera upload -->
     <string name="title_out_of_space">Not enough storage space</string>
     <!-- message will be shown when there is not enough space to perform camera upload. -->
