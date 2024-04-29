@@ -131,6 +131,135 @@ HEADERS= sdk/include/mega.h \
 		sdk/include/mega/textchat.h \
 		sdk/include/mega/setandelement.h
 
+# FUSE (Common headers.)
+HEADERS += \
+    sdk/include/mega/fuse/common/fuse/common/activity_monitor.h \
+    sdk/include/mega/fuse/common/fuse/common/activity_monitor_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/any_lock.h \
+    sdk/include/mega/fuse/common/fuse/common/any_lock_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/any_lock_set.h \
+    sdk/include/mega/fuse/common/fuse/common/any_lock_set_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/bind_handle.h \
+    sdk/include/mega/fuse/common/fuse/common/bind_handle_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/client.h \
+    sdk/include/mega/fuse/common/fuse/common/client_adapter.h \
+    sdk/include/mega/fuse/common/fuse/common/client_callbacks.h \
+    sdk/include/mega/fuse/common/fuse/common/client_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/database.h \
+    sdk/include/mega/fuse/common/fuse/common/date_time.h \
+    sdk/include/mega/fuse/common/fuse/common/date_time_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/error_or.h \
+    sdk/include/mega/fuse/common/fuse/common/error_or_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/file_open_flag.h \
+    sdk/include/mega/fuse/common/fuse/common/file_open_flag_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/inode_cache_flags.h \
+    sdk/include/mega/fuse/common/fuse/common/inode_cache_flags_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/inode_id.h \
+    sdk/include/mega/fuse/common/fuse/common/inode_id_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/inode_info.h \
+    sdk/include/mega/fuse/common/fuse/common/inode_info_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/lock.h \
+    sdk/include/mega/fuse/common/fuse/common/lock_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/lockable.h \
+    sdk/include/mega/fuse/common/fuse/common/lockable_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/log_level.h \
+    sdk/include/mega/fuse/common/fuse/common/log_level_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/logger.h \
+    sdk/include/mega/fuse/common/fuse/common/logger_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/logging.h \
+    sdk/include/mega/fuse/common/fuse/common/mount_event.h \
+    sdk/include/mega/fuse/common/fuse/common/mount_event_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/mount_event_type.h \
+    sdk/include/mega/fuse/common/fuse/common/mount_event_type_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/mount_flags.h \
+    sdk/include/mega/fuse/common/fuse/common/mount_flags_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/mount_info.h \
+    sdk/include/mega/fuse/common/fuse/common/mount_info_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/mount_inode_id.h \
+    sdk/include/mega/fuse/common/fuse/common/mount_inode_id_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/mount_result.h \
+    sdk/include/mega/fuse/common/fuse/common/mount_result_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/node_event.h \
+    sdk/include/mega/fuse/common/fuse/common/node_event_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/node_event_observer.h \
+    sdk/include/mega/fuse/common/fuse/common/node_event_observer_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/node_event_queue.h \
+    sdk/include/mega/fuse/common/fuse/common/node_event_queue_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/node_event_type.h \
+    sdk/include/mega/fuse/common/fuse/common/node_event_type_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/node_info.h \
+    sdk/include/mega/fuse/common/fuse/common/node_info_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/normalized_path.h \
+    sdk/include/mega/fuse/common/fuse/common/normalized_path_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/pending_callbacks.h \
+    sdk/include/mega/fuse/common/fuse/common/query.h \
+    sdk/include/mega/fuse/common/fuse/common/query_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/scoped_query.h \
+    sdk/include/mega/fuse/common/fuse/common/scoped_query_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/service.h \
+    sdk/include/mega/fuse/common/fuse/common/service_callbacks.h \
+    sdk/include/mega/fuse/common/fuse/common/service_context.h \
+    sdk/include/mega/fuse/common/fuse/common/service_context_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/service_flags.h \
+    sdk/include/mega/fuse/common/fuse/common/service_flags_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/service_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/shared_mutex.h \
+    sdk/include/mega/fuse/common/fuse/common/shared_mutex_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/task_executor.h \
+    sdk/include/mega/fuse/common/fuse/common/task_executor_flags.h \
+    sdk/include/mega/fuse/common/fuse/common/task_executor_flags_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/task_executor_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/task_queue.h \
+    sdk/include/mega/fuse/common/fuse/common/task_queue_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/transaction.h \
+    sdk/include/mega/fuse/common/fuse/common/transaction_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/type_traits.h \
+    sdk/include/mega/fuse/common/fuse/common/upload.h \
+    sdk/include/mega/fuse/common/fuse/common/upload_forward.h \
+    sdk/include/mega/fuse/common/fuse/common/utility.h
+
+# FUSE (Common sources.)
+CPP_SOURCES += \
+    sdk/src/fuse/common/activity_monitor.cpp \
+    sdk/src/fuse/common/any_lock_set.cpp \
+    sdk/src/fuse/common/bind_handle.cpp \
+    sdk/src/fuse/common/client.cpp \
+    sdk/src/fuse/common/client_adapter.cpp \
+    sdk/src/fuse/common/client_adapter_with_sync.cpp \
+    sdk/src/fuse/common/database.cpp \
+    sdk/src/fuse/common/date_time.cpp \
+    sdk/src/fuse/common/inode_id.cpp \
+    sdk/src/fuse/common/inode_info.cpp \
+    sdk/src/fuse/common/log_level.cpp \
+    sdk/src/fuse/common/logger.cpp \
+    sdk/src/fuse/common/mount_event.cpp \
+    sdk/src/fuse/common/mount_event_type.cpp \
+    sdk/src/fuse/common/mount_flags.cpp \
+    sdk/src/fuse/common/mount_info.cpp \
+    sdk/src/fuse/common/mount_inode_id.cpp \
+    sdk/src/fuse/common/mount_result.cpp \
+    sdk/src/fuse/common/node_event_type.cpp \
+    sdk/src/fuse/common/normalized_path.cpp \
+    sdk/src/fuse/common/pending_callbacks.cpp \
+    sdk/src/fuse/common/query.cpp \
+    sdk/src/fuse/common/scoped_query.cpp \
+    sdk/src/fuse/common/service.cpp \
+    sdk/src/fuse/common/service_context.cpp \
+    sdk/src/fuse/common/shared_mutex.cpp \
+    sdk/src/fuse/common/task_executor.cpp \
+    sdk/src/fuse/common/task_queue.cpp \
+    sdk/src/fuse/common/transaction.cpp \
+    sdk/src/fuse/common/utility.cpp
+
+# FUSE (Dummy headers.)
+HEADERS += \
+    sdk/src/fuse/unsupported/mega/fuse/platform/service_context.h
+
+# FUSE (Dummy sources.)
+CPP_SOURCES += \
+    sdk/src/fuse/unsupported/service.cpp \
+    sdk/src/fuse/unsupported/service_context.cpp
+
 OBJECTS=$(CPP_SOURCES:.cpp=.o) $(C_SOURCES:.c=.o)
 C_WRAPPER_SOURCES = sdk/src/megaapi.cpp sdk/src/megaapi_impl.cpp
 C_WRAPPER_OBJECTS = sdk/src/megaapi.o sdk/src/megaapi_impl.o
