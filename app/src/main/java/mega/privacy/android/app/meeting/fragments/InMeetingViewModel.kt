@@ -494,11 +494,6 @@ class InMeetingViewModel @Inject constructor(
                 Timber.d("Call will end in $minutes minutes")
                 startMeetingEndWarningTimer(if (minutes == 0L) 1 else minutes.toInt())
             }
-            if (call.isOwnModerator) {
-                _state.update {
-                    it.copy(showMeetingEndWarningDialog = true)
-                }
-            }
         }
     }
 
