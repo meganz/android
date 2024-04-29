@@ -43,7 +43,7 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
  * @property moveRequestResult
  * @property showForceUpdateDialog                      True, shows force update dialog to the user
  */
-data class ContactInfoState(
+data class ContactInfoUiState(
     val error: Int? = null,
     val userChatStatus: UserChatStatus = UserChatStatus.Invalid,
     val lastGreen: Int = 0,
@@ -95,11 +95,6 @@ data class ContactInfoState(
     val secondaryDisplayName: String? by lazy(LazyThreadSafetyMode.NONE) {
         if (hasAlias) contactItem?.contactData?.fullName else null
     }
-
-    /**
-     * user email
-     */
-    val email by lazy(LazyThreadSafetyMode.NONE) { chatRoom?.let { contactItem?.email } }
 
     /**
      * shows edit or add nick name

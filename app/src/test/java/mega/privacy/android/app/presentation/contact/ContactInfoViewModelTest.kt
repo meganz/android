@@ -246,7 +246,7 @@ class ContactInfoViewModelTest {
             initViewModel()
             underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
             underTest.getUserStatusAndRequestForLastGreen()
-            underTest.state.test {
+            underTest.uiState.test {
                 assertThat(awaitItem().userChatStatus).isEqualTo(UserChatStatus.Online)
                 verifyNoInteractions(requestUserLastGreenUseCase)
             }
@@ -259,7 +259,7 @@ class ContactInfoViewModelTest {
             initViewModel()
             underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
             underTest.getUserStatusAndRequestForLastGreen()
-            underTest.state.test {
+            underTest.uiState.test {
                 assertThat(awaitItem().userChatStatus).isEqualTo(UserChatStatus.Away)
                 verify(requestUserLastGreenUseCase).invoke(userHandle = anyLong())
             }
@@ -272,7 +272,7 @@ class ContactInfoViewModelTest {
             initViewModel()
             underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
             underTest.updateLastGreen(testHandle, lastGreen = 5)
-            underTest.state.test {
+            underTest.uiState.test {
                 val nextState = awaitItem()
                 assertThat(nextState.userChatStatus).isEqualTo(UserChatStatus.Online)
                 assertThat(nextState.lastGreen).isEqualTo(5)
@@ -291,11 +291,11 @@ class ContactInfoViewModelTest {
             ).thenReturn(contactItem)
             initViewModel()
             underTest.updateContactInfo(testHandle)
-            underTest.state.test {
+            underTest.uiState.test {
                 val nextState = awaitItem()
                 assertThat(nextState.primaryDisplayName).isEqualTo("Iron Man")
                 assertThat(nextState.isFromContacts).isFalse()
-                assertThat(nextState.email).isEqualTo("test@gmail.com")
+                assertThat(nextState.contactItem?.email).isEqualTo("test@gmail.com")
             }
         }
 
@@ -305,11 +305,11 @@ class ContactInfoViewModelTest {
             whenever(getChatRoomByUserUseCase(testHandle)).thenReturn(chatRoom)
             initViewModel()
             underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
-            underTest.state.test {
+            underTest.uiState.test {
                 val nextState = awaitItem()
                 assertThat(nextState.primaryDisplayName).isEqualTo("Iron Man")
                 assertThat(nextState.isFromContacts).isTrue()
-                assertThat(nextState.email).isEqualTo("test@gmail.com")
+                assertThat(nextState.contactItem?.email).isEqualTo("test@gmail.com")
             }
         }
 
@@ -322,14 +322,14 @@ class ContactInfoViewModelTest {
             underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
             verifyInitialData()
             underTest.updateNickName("Spider Man")
-            underTest.state.test {
+            underTest.uiState.test {
                 val nextState = awaitItem()
                 assertThat(nextState.snackBarMessage).isNotNull()
                 assertThat(nextState.isFromContacts).isTrue()
-                assertThat(nextState.email).isEqualTo("test@gmail.com")
+                assertThat(nextState.contactItem?.email).isEqualTo("test@gmail.com")
             }
             underTest.onConsumeSnackBarMessageEvent()
-            underTest.state.test {
+            underTest.uiState.test {
                 val nextState = awaitItem()
                 assertThat(nextState.snackBarMessage).isNull()
             }
@@ -343,7 +343,7 @@ class ContactInfoViewModelTest {
         underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         verifyInitialData()
         underTest.removeContact()
-        underTest.state.test {
+        underTest.uiState.test {
             val nextState = awaitItem()
             assertThat(nextState.isUserRemoved).isTrue()
         }
@@ -357,14 +357,14 @@ class ContactInfoViewModelTest {
         underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         verifyInitialData()
         underTest.getInShares()
-        underTest.state.test {
+        underTest.uiState.test {
             val nextState = awaitItem()
             assertThat(nextState.inShares.size).isEqualTo(1)
         }
     }
 
     private suspend fun verifyInitialData() {
-        underTest.state.test {
+        underTest.uiState.test {
             val initialState = awaitItem()
             assertThat(initialState.primaryDisplayName).isEqualTo("Iron Man")
             assertThat(initialState.snackBarMessage).isNull()
@@ -379,7 +379,7 @@ class ContactInfoViewModelTest {
             underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
             verifyInitialData()
             underTest.chatNotificationsClicked()
-            underTest.state.test {
+            underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.isChatNotificationChange).isTrue()
             }
@@ -403,7 +403,7 @@ class ContactInfoViewModelTest {
             underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
             verifyInitialData()
             underTest.chatNotificationsClicked()
-            underTest.state.test {
+            underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.isChatNotificationChange).isTrue()
                 assertThat(state.chatRoom?.chatId).isEqualTo(newChatId)
@@ -432,7 +432,7 @@ class ContactInfoViewModelTest {
         underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         verifyInitialData()
         underTest.sendMessageToChat()
-        underTest.state.test {
+        underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.chatRoom?.chatId).isEqualTo(123456L)
             assertThat(state.shouldNavigateToChat).isTrue()
@@ -453,7 +453,7 @@ class ContactInfoViewModelTest {
         whenever(getChatRoomByUserUseCase(testHandle)).thenReturn(chatRoom)
         initViewModel()
         underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
-        underTest.state.test {
+        underTest.uiState.test {
             val initialState = awaitItem()
             assertThat(initialState.primaryDisplayName).isEqualTo("Iron Man")
             assertThat(initialState.snackBarMessage).isNull()
@@ -470,7 +470,7 @@ class ContactInfoViewModelTest {
         underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         verifyInitialData()
         underTest.onConsumeNameCollisions()
-        underTest.state.test {
+        underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.nameCollisions).isEmpty()
         }
@@ -482,7 +482,7 @@ class ContactInfoViewModelTest {
         underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         verifyInitialData()
         underTest.onConsumeCopyException()
-        underTest.state.test {
+        underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.copyError).isNull()
         }
@@ -494,7 +494,7 @@ class ContactInfoViewModelTest {
         underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         verifyInitialData()
         underTest.onConsumeNodeUpdateEvent()
-        underTest.state.test {
+        underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.isNodeUpdated).isFalse()
         }
@@ -506,7 +506,7 @@ class ContactInfoViewModelTest {
         underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         verifyInitialData()
         underTest.onConsumeStorageOverQuotaEvent()
-        underTest.state.test {
+        underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.isStorageOverQuota).isFalse()
         }
@@ -519,7 +519,7 @@ class ContactInfoViewModelTest {
             underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
             verifyInitialData()
             underTest.onConsumeChatNotificationChangeEvent()
-            underTest.state.test {
+            underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.isChatNotificationChange).isFalse()
             }
@@ -531,7 +531,7 @@ class ContactInfoViewModelTest {
         underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         verifyInitialData()
         underTest.onConsumeNavigateToChatEvent()
-        underTest.state.test {
+        underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.shouldNavigateToChat).isFalse()
         }
@@ -544,7 +544,7 @@ class ContactInfoViewModelTest {
             underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
             verifyInitialData()
             underTest.onConsumePushNotificationSettingsUpdateEvent()
-            underTest.state.test {
+            underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.isPushNotificationSettingsUpdated).isFalse()
             }
@@ -556,7 +556,7 @@ class ContactInfoViewModelTest {
         underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         verifyInitialData()
         underTest.onConsumeSnackBarMessageEvent()
-        underTest.state.test {
+        underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.snackBarMessage).isNull()
             assertThat(state.snackBarMessageString).isNull()
@@ -569,7 +569,7 @@ class ContactInfoViewModelTest {
         underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
         verifyInitialData()
         underTest.onConsumeChatCallStatusChangeEvent()
-        underTest.state.test {
+        underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.callStatusChanged).isFalse()
         }
@@ -582,7 +582,7 @@ class ContactInfoViewModelTest {
         initViewModel()
         with(underTest) {
             removeContact()
-            state.test {
+            uiState.test {
                 assertFalse(awaitItem().isUserRemoved)
             }
         }

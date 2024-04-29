@@ -17,7 +17,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoState
+import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.isAwayOrOffline
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
@@ -131,13 +131,13 @@ class ContactInfoViewModel @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(ContactInfoState())
+    private val _uiState = MutableStateFlow(ContactInfoUiState())
 
     /**
      * UI State ContactInfo
-     * Flow of [ContactInfoState]
+     * Flow of [ContactInfoUiState]
      */
-    val state = _state.asStateFlow()
+    val uiState = _uiState.asStateFlow()
 
     /**
      * Parent Handle
@@ -148,38 +148,38 @@ class ContactInfoViewModel @Inject constructor(
      * Checks if contact info launched from contacts screen
      */
     val isFromContacts: Boolean
-        get() = state.value.isFromContacts
+        get() = uiState.value.isFromContacts
 
     /**
      * User status
      */
     val userChatStatus: UserChatStatus
-        get() = state.value.userChatStatus
+        get() = uiState.value.userChatStatus
 
     /**
      * User status
      */
     val userHandle: Long?
-        get() = state.value.contactItem?.handle
+        get() = uiState.value.contactItem?.handle
 
     /**
      * User email
      */
     val userEmail: String?
-        get() = state.value.contactItem?.email
+        get() = uiState.value.contactItem?.email
 
     /**
      * chat id
      */
     val chatId: Long?
-        get() = state.value.chatRoom?.chatId
+        get() = uiState.value.chatRoom?.chatId
 
 
     /**
      * Nick name
      */
     val nickName: String?
-        get() = state.value.contactItem?.contactData?.alias
+        get() = uiState.value.contactItem?.contactData?.alias
 
     init {
         getContactUpdates()
@@ -201,7 +201,7 @@ class ContactInfoViewModel @Inject constructor(
                 userWaitingForCall = MegaApplication.userWaitingForCall,
             )
             if (shouldInitiateCall && chatId != INVALID_CHAT_HANDLE) {
-                _state.update { state -> state.copy(shouldInitiateCall = true) }
+                _uiState.update { state -> state.copy(shouldInitiateCall = true) }
             }
         }
     }
@@ -231,7 +231,7 @@ class ContactInfoViewModel @Inject constructor(
 
     private fun chatMuteUpdates() = viewModelScope.launch {
         monitorUpdatePushNotificationSettingsUseCase().collect {
-            _state.update { it.copy(isPushNotificationSettingsUpdated = true) }
+            _uiState.update { it.copy(isPushNotificationSettingsUpdated = true) }
         }
     }
 
@@ -254,7 +254,7 @@ class ContactInfoViewModel @Inject constructor(
                                 contains(ChatSessionChanges.SessionOnHold) ||
                                 contains(ChatSessionChanges.AudioLevel)
                             ) {
-                                _state.update { it.copy(callStatusChanged = true) }
+                                _uiState.update { it.copy(callStatusChanged = true) }
                             }
                         }
                     }
@@ -267,7 +267,7 @@ class ContactInfoViewModel @Inject constructor(
                 call.changes?.apply {
                     if (contains(Status)) observeCallStatus(call)
                     if (shouldShowForceUpdateDialog(call)) showForceUpdateDialog()
-                    if (contains(OnHold)) _state.update { it.copy(callStatusChanged = true) }
+                    if (contains(OnHold)) _uiState.update { it.copy(callStatusChanged = true) }
                 }
             }
     }
@@ -284,14 +284,14 @@ class ContactInfoViewModel @Inject constructor(
     }
 
     private fun showForceUpdateDialog() {
-        _state.update { it.copy(showForceUpdateDialog = true) }
+        _uiState.update { it.copy(showForceUpdateDialog = true) }
     }
 
     /**
      * Set to false to hide the dialog
      */
     fun onForceUpdateDialogDismissed() {
-        _state.update { it.copy(showForceUpdateDialog = false) }
+        _uiState.update { it.copy(showForceUpdateDialog = false) }
     }
 
     private fun observeCallStatus(call: ChatCall) {
@@ -303,11 +303,11 @@ class ContactInfoViewModel @Inject constructor(
                 ChatCallStatus.UserNoPresent
             )
         ) {
-            _state.update { it.copy(callStatusChanged = true) }
+            _uiState.update { it.copy(callStatusChanged = true) }
             if (call.status == ChatCallStatus.TerminatingUserParticipation &&
                 call.termCode == ChatCallTermCodeType.TooManyParticipants
             ) {
-                _state.update { it.copy(snackBarMessage = R.string.call_error_too_many_participants) }
+                _uiState.update { it.copy(snackBarMessage = R.string.call_error_too_many_participants) }
             }
         }
     }
@@ -317,11 +317,12 @@ class ContactInfoViewModel @Inject constructor(
      */
     private fun getContactUpdates() = viewModelScope.launch {
         monitorContactUpdates().collectLatest { updates ->
-            val userInfo = state.value.contactItem?.let { applyContactUpdatesUseCase(it, updates) }
+            val userInfo =
+                uiState.value.contactItem?.let { applyContactUpdatesUseCase(it, updates) }
             if (updates.changes.containsValue(listOf(UserChanges.Avatar))) {
                 updateAvatar(userInfo)
             } else {
-                _state.update { it.copy(contactItem = userInfo) }
+                _uiState.update { it.copy(contactItem = userInfo) }
             }
         }
     }
@@ -332,11 +333,11 @@ class ContactInfoViewModel @Inject constructor(
      * User online status, Credential verification, User info change will be updated
      */
     fun refreshUserInfo() = viewModelScope.launch {
-        val email = state.value.email ?: return@launch
+        val email = uiState.value.contactItem?.email ?: return@launch
         runCatching {
             getContactFromEmailUseCase(email, isOnline())
         }.onSuccess {
-            _state.update { state -> state.copy(contactItem = it) }
+            _uiState.update { state -> state.copy(contactItem = it) }
             it?.handle?.let { handle -> runCatching { requestUserLastGreenUseCase(handle) } }
         }
     }
@@ -362,7 +363,7 @@ class ContactInfoViewModel @Inject constructor(
     fun joinCall(hasVideo: Boolean) = viewModelScope.launch {
         val chatId = chatId ?: return@launch
         Timber.d("Start call")
-        _state.update { it.copy(enableCallLayout = false, shouldInitiateCall = false) }
+        _uiState.update { it.copy(enableCallLayout = false, shouldInitiateCall = false) }
         MegaApplication.isWaitingForCall = false
         runCatching {
             setChatVideoInDeviceUseCase()
@@ -371,9 +372,9 @@ class ContactInfoViewModel @Inject constructor(
             call?.let { chatCall ->
                 Timber.d("Call started")
                 openCurrentCall(call = chatCall)
-            } ?: _state.update { it.copy(enableCallLayout = true) }
+            } ?: _uiState.update { it.copy(enableCallLayout = true) }
         }.onFailure {
-            _state.update { state -> state.copy(enableCallLayout = true) }
+            _uiState.update { state -> state.copy(enableCallLayout = true) }
             Timber.w("Exception opening or starting call: $it")
         }
     }
@@ -388,7 +389,7 @@ class ContactInfoViewModel @Inject constructor(
         chatManagement.setRequestSentCall(call.callId, call.isOutgoing)
         passcodeManagement.showPasscodeScreen = true
         MegaApplication.getInstance().openCallService(call.chatId)
-        _state.update {
+        _uiState.update {
             it.copy(
                 currentCallChatId = call.chatId,
                 currentCallAudioStatus = call.hasLocalAudio,
@@ -403,12 +404,12 @@ class ContactInfoViewModel @Inject constructor(
      * Requests for lastGreen
      */
     fun getUserStatusAndRequestForLastGreen() = viewModelScope.launch {
-        val handle = state.value.contactItem?.handle ?: return@launch
+        val handle = uiState.value.contactItem?.handle ?: return@launch
         runCatching { getUserOnlineStatusByHandleUseCase(handle) }.onSuccess { status ->
             if (status.isAwayOrOffline()) {
                 requestUserLastGreenUseCase(handle)
             }
-            _state.update { it.copy(userChatStatus = status) }
+            _uiState.update { it.copy(userChatStatus = status) }
         }
     }
 
@@ -422,7 +423,7 @@ class ContactInfoViewModel @Inject constructor(
         runCatching {
             getUserOnlineStatusByHandleUseCase(userHandle = userHandle)
         }.onSuccess { status ->
-            _state.update {
+            _uiState.update {
                 it.copy(
                     lastGreen = lastGreen,
                     userChatStatus = status,
@@ -439,7 +440,7 @@ class ContactInfoViewModel @Inject constructor(
      */
     fun updateContactInfo(chatHandle: Long, email: String? = null) = viewModelScope.launch {
         val isFromContacts = chatHandle == -1L
-        _state.update { it.copy(isFromContacts = isFromContacts) }
+        _uiState.update { it.copy(isFromContacts = isFromContacts) }
         var userInfo: ContactItem? = null
         var chatRoom: ChatRoom? = null
         if (isFromContacts) {
@@ -458,7 +459,7 @@ class ContactInfoViewModel @Inject constructor(
             }
         }
 
-        _state.update {
+        _uiState.update {
             it.copy(
                 lastGreen = userInfo?.lastSeen ?: 0,
                 userChatStatus = userInfo?.status ?: UserChatStatus.Invalid,
@@ -473,7 +474,7 @@ class ContactInfoViewModel @Inject constructor(
     private fun updateAvatar(userInfo: ContactItem?) = viewModelScope.launch(ioDispatcher) {
         val avatarFile = userInfo?.contactData?.avatarUri?.let { File(it) }
         val avatar = AvatarUtil.getAvatarBitmap(avatarFile)
-        _state.update { it.copy(avatar = avatar) }
+        _uiState.update { it.copy(avatar = avatar) }
     }
 
     /**
@@ -491,12 +492,12 @@ class ContactInfoViewModel @Inject constructor(
      * @param newNickname new nick name given by the user
      */
     fun updateNickName(newNickname: String?) = viewModelScope.launch {
-        val handle = state.value.contactItem?.handle
+        val handle = uiState.value.contactItem?.handle
         if (handle == null || (nickName != null && nickName == newNickname)) return@launch
         runCatching {
             setUserAliasUseCase(newNickname, handle)
         }.onSuccess { alias ->
-            _state.update {
+            _uiState.update {
                 it.copy(
                     snackBarMessage = alias?.let { R.string.snackbar_nickname_added }
                         ?: run { R.string.snackbar_nickname_removed },
@@ -510,7 +511,7 @@ class ContactInfoViewModel @Inject constructor(
      */
     fun onConsumeSnackBarMessageEvent() {
         viewModelScope.launch {
-            _state.update { it.copy(snackBarMessage = null, snackBarMessageString = null) }
+            _uiState.update { it.copy(snackBarMessage = null, snackBarMessageString = null) }
         }
     }
 
@@ -519,7 +520,7 @@ class ContactInfoViewModel @Inject constructor(
      */
     fun onConsumeChatCallStatusChangeEvent() {
         viewModelScope.launch {
-            _state.update { it.copy(callStatusChanged = false) }
+            _uiState.update { it.copy(callStatusChanged = false) }
         }
     }
 
@@ -528,7 +529,7 @@ class ContactInfoViewModel @Inject constructor(
      */
     fun onConsumePushNotificationSettingsUpdateEvent() {
         viewModelScope.launch {
-            _state.update { it.copy(isPushNotificationSettingsUpdated = false) }
+            _uiState.update { it.copy(isPushNotificationSettingsUpdated = false) }
         }
     }
 
@@ -538,7 +539,7 @@ class ContactInfoViewModel @Inject constructor(
      */
     fun onConsumeNavigateToChatEvent() {
         viewModelScope.launch {
-            _state.update { it.copy(shouldNavigateToChat = false) }
+            _uiState.update { it.copy(shouldNavigateToChat = false) }
         }
     }
 
@@ -547,7 +548,7 @@ class ContactInfoViewModel @Inject constructor(
      */
     fun onConsumeChatNotificationChangeEvent() {
         viewModelScope.launch {
-            _state.update { it.copy(isChatNotificationChange = false) }
+            _uiState.update { it.copy(isChatNotificationChange = false) }
         }
     }
 
@@ -556,7 +557,7 @@ class ContactInfoViewModel @Inject constructor(
      */
     fun onConsumeStorageOverQuotaEvent() {
         viewModelScope.launch {
-            _state.update { it.copy(isStorageOverQuota = false) }
+            _uiState.update { it.copy(isStorageOverQuota = false) }
         }
     }
 
@@ -565,7 +566,7 @@ class ContactInfoViewModel @Inject constructor(
      */
     fun onConsumeNodeUpdateEvent() {
         viewModelScope.launch {
-            _state.update { it.copy(isNodeUpdated = false) }
+            _uiState.update { it.copy(isNodeUpdated = false) }
         }
     }
 
@@ -574,7 +575,7 @@ class ContactInfoViewModel @Inject constructor(
      */
     fun onConsumeCopyException() {
         viewModelScope.launch {
-            _state.update { it.copy(copyError = null) }
+            _uiState.update { it.copy(copyError = null) }
         }
     }
 
@@ -583,7 +584,7 @@ class ContactInfoViewModel @Inject constructor(
      */
     fun onConsumeNameCollisions() {
         viewModelScope.launch {
-            _state.update { it.copy(nameCollisions = emptyList()) }
+            _uiState.update { it.copy(nameCollisions = emptyList()) }
         }
     }
 
@@ -592,7 +593,7 @@ class ContactInfoViewModel @Inject constructor(
      */
     fun onConsumeNavigateToMeeting() {
         viewModelScope.launch {
-            _state.update {
+            _uiState.update {
                 it.copy(
                     currentCallChatId = INVALID_CHAT_HANDLE,
                     currentCallAudioStatus = false,
@@ -608,13 +609,13 @@ class ContactInfoViewModel @Inject constructor(
      * Exits from contact info page if succeeds
      */
     fun removeContact() = applicationScope.launch {
-        val isRemoved = state.value.email?.let { email ->
+        val isRemoved = _uiState.value.contactItem?.email?.let { email ->
             runCatching { removeContactByEmailUseCase(email) }.getOrElse {
                 Timber.w("Exception removing contact.", it)
                 false
             }
         } ?: false
-        _state.update {
+        _uiState.update {
             it.copy(isUserRemoved = isRemoved)
         }
     }
@@ -624,25 +625,25 @@ class ContactInfoViewModel @Inject constructor(
      * value is updated to contact info state
      */
     fun getInShares() = viewModelScope.launch {
-        val email = state.value.email ?: return@launch
+        val email = uiState.value.contactItem?.email ?: return@launch
         val inShares = getInSharesUseCase(email)
-        if (inShares == state.value.inShares) return@launch
+        if (inShares == uiState.value.inShares) return@launch
         parentHandle = inShares.firstOrNull()?.parentId?.longValue ?: INVALID_NODE_HANDLE
-        _state.update { it.copy(inShares = inShares, isNodeUpdated = true) }
+        _uiState.update { it.copy(inShares = inShares, isNodeUpdated = true) }
     }
 
     /**
      * Method handles sent message to chat click from UI
      *
      * returns if user is not online
-     * updates [ContactInfoState.isStorageOverQuota] if storage state is [StorageState.PayWall]
+     * updates [ContactInfoUiState.isStorageOverQuota] if storage state is [StorageState.PayWall]
      * creates chatroom exists else returns existing chat room
-     * updates [ContactInfoState.shouldNavigateToChat] to true
+     * updates [ContactInfoUiState.shouldNavigateToChat] to true
      */
     fun sendMessageToChat() = viewModelScope.launch {
         if (!isOnline()) return@launch
         if (getStorageState() === StorageState.PayWall) {
-            _state.update { it.copy(isStorageOverQuota = true) }
+            _uiState.update { it.copy(isStorageOverQuota = true) }
         } else {
             startConversation()
         }
@@ -655,12 +656,12 @@ class ContactInfoViewModel @Inject constructor(
             }.onSuccess {
                 val chatRoom = getChatRoomUseCase(it)
                 chatRoom?.let {
-                    _state.update { state ->
+                    _uiState.update { state ->
                         state.copy(chatRoom = chatRoom, shouldNavigateToChat = true)
                     }
                 }
             }.onFailure {
-                _state.update { state ->
+                _uiState.update { state ->
                     state.copy(snackBarMessage = R.string.create_chat_error)
                 }
             }
@@ -671,13 +672,13 @@ class ContactInfoViewModel @Inject constructor(
      * Method handles chat notification click
      *
      * Creates chatroom if chatroom is not existing
-     * updates [ContactInfoState.isChatNotificationChange] to true
+     * updates [ContactInfoUiState.isChatNotificationChange] to true
      */
     fun chatNotificationsClicked() = viewModelScope.launch {
         if (chatId == null || chatId == INVALID_CHAT_HANDLE) {
             createChatRoom()
         }
-        _state.update { it.copy(isChatNotificationChange = true) }
+        _uiState.update { it.copy(isChatNotificationChange = true) }
     }
 
     private suspend fun createChatRoom() {
@@ -686,11 +687,11 @@ class ContactInfoViewModel @Inject constructor(
                 createChatRoomUseCase(isGroup = false, userHandles = listOf(it))
             }.onSuccess {
                 val chatRoom = getChatRoomUseCase(it)
-                _state.update { state ->
+                _uiState.update { state ->
                     state.copy(chatRoom = chatRoom)
                 }
             }.onFailure {
-                _state.update { state ->
+                _uiState.update { state ->
                     state.copy(snackBarMessage = R.string.create_chat_error)
                 }
             }
@@ -718,13 +719,13 @@ class ContactInfoViewModel @Inject constructor(
      */
     fun checkCopyNameCollision(handles: Pair<LongArray, Long>?) = viewModelScope.launch {
         if (!isOnline()) {
-            _state.update { it.copy(snackBarMessage = R.string.error_server_connection_problem) }
+            _uiState.update { it.copy(snackBarMessage = R.string.error_server_connection_problem) }
             return@launch
         }
         val copyHandles = handles?.first
         val toHandle = handles?.second
         if (copyHandles == null || toHandle == null) return@launch
-        _state.update { it.copy(isCopyInProgress = true) }
+        _uiState.update { it.copy(isCopyInProgress = true) }
         runCatching {
             checkNodesNameCollisionUseCase(
                 nodes = copyHandles.associateWith { toHandle },
@@ -734,7 +735,7 @@ class ContactInfoViewModel @Inject constructor(
             val collisions = result.conflictNodes.values.map {
                 NameCollision.Copy.getCopyCollision(it)
             }
-            _state.update {
+            _uiState.update {
                 it.copy(isCopyInProgress = false, nameCollisions = collisions)
             }
             if (result.noConflictNodes.isNotEmpty()) {
@@ -751,7 +752,7 @@ class ContactInfoViewModel @Inject constructor(
         }.onFailure { error ->
             Timber.e(error)
         }
-        _state.update {
+        _uiState.update {
             it.copy(moveRequestResult = result)
         }
     }
@@ -762,7 +763,7 @@ class ContactInfoViewModel @Inject constructor(
      * @param shouldShow checks if dialog should be visible or not
      */
     fun updateNickNameDialogVisibility(shouldShow: Boolean) {
-        _state.update { it.copy(showUpdateAliasDialog = shouldShow) }
+        _uiState.update { it.copy(showUpdateAliasDialog = shouldShow) }
     }
 
     /**
@@ -770,7 +771,7 @@ class ContactInfoViewModel @Inject constructor(
      *
      */
     fun markHandleNodeNameCollisionResult() {
-        _state.update { it.copy(nameCollisions = emptyList()) }
+        _uiState.update { it.copy(nameCollisions = emptyList()) }
     }
 
     /**
@@ -778,7 +779,7 @@ class ContactInfoViewModel @Inject constructor(
      *
      */
     fun markHandleMoveRequestResult() {
-        _state.update { it.copy(moveRequestResult = null) }
+        _uiState.update { it.copy(moveRequestResult = null) }
     }
 
     companion object {

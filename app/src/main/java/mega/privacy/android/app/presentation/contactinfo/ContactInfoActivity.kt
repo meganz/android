@@ -73,7 +73,7 @@ import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSh
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
-import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoState
+import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
 import mega.privacy.android.app.presentation.extensions.iconRes
 import mega.privacy.android.app.presentation.extensions.isAwayOrOffline
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -818,8 +818,14 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         drawableDots = ContextCompat.getDrawable(this, R.drawable.ic_dots_vertical_white)
             ?.mutate()
         drawableArrow = ContextCompat.getDrawable(this, R.drawable.ic_arrow_back_white)?.mutate()
-        drawableShare = ContextCompat.getDrawable(this, iconPackR.drawable.ic_folder_users_medium_regular_outline)?.mutate()
-        drawableSend = ContextCompat.getDrawable(this, iconPackR.drawable.ic_message_arrow_up_medium_regular_outline)?.mutate()
+        drawableShare = ContextCompat.getDrawable(
+            this,
+            iconPackR.drawable.ic_folder_users_medium_regular_outline
+        )?.mutate()
+        drawableSend = ContextCompat.getDrawable(
+            this,
+            iconPackR.drawable.ic_message_arrow_up_medium_regular_outline
+        )?.mutate()
     }
 
     private fun setColorFilter(isDark: Boolean) {
@@ -883,11 +889,11 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      * Collecting Flows from ViewModel
      */
     private fun collectFlows() {
-        collectFlow(viewModel.state) { contactInfoState: ContactInfoState ->
-            if (contactInfoState.isUserRemoved) {
+        collectFlow(viewModel.uiState) { contactInfoUiState: ContactInfoUiState ->
+            if (contactInfoUiState.isUserRemoved) {
                 finish()
             }
-            if (contactInfoState.error != null) {
+            if (contactInfoUiState.error != null) {
                 showSnackbar(
                     Constants.SNACKBAR_TYPE,
                     getString(R.string.call_error),
@@ -895,13 +901,13 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 )
             }
 
-            enableCallLayouts(contactInfoState.enableCallLayout)
+            enableCallLayouts(contactInfoUiState.enableCallLayout)
 
-            if (contactInfoState.callStatusChanged) {
+            if (contactInfoUiState.callStatusChanged) {
                 checkScreenRotationToShowCall()
             }
-            handleOneOffEvents(contactInfoState)
-            contactInfoState.snackBarMessage?.let {
+            handleOneOffEvents(contactInfoUiState)
+            contactInfoUiState.snackBarMessage?.let {
                 showSnackbar(
                     Constants.SNACKBAR_TYPE,
                     getString(it),
@@ -909,7 +915,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 )
                 viewModel.onConsumeSnackBarMessageEvent()
             }
-            contactInfoState.snackBarMessageString?.let {
+            contactInfoUiState.snackBarMessageString?.let {
                 showSnackbar(
                     Constants.SNACKBAR_TYPE,
                     it,
@@ -917,36 +923,36 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 )
                 viewModel.onConsumeSnackBarMessageEvent()
             }
-            if (contactInfoState.isCopyInProgress) {
+            if (contactInfoUiState.isCopyInProgress) {
                 if (statusDialog == null) {
                     statusDialog = createProgressDialog(this, getString(R.string.context_copying))
                 }
             } else {
                 statusDialog?.dismiss()
             }
-            if (contactInfoState.nameCollisions.isNotEmpty()) {
-                handleNodesNameCollisionResult(contactInfoState.nameCollisions)
+            if (contactInfoUiState.nameCollisions.isNotEmpty()) {
+                handleNodesNameCollisionResult(contactInfoUiState.nameCollisions)
                 viewModel.markHandleNodeNameCollisionResult()
             }
-            if (contactInfoState.moveRequestResult != null) {
-                handleMovementResult(contactInfoState.moveRequestResult)
+            if (contactInfoUiState.moveRequestResult != null) {
+                handleMovementResult(contactInfoUiState.moveRequestResult)
                 viewModel.markHandleMoveRequestResult()
             }
 
-            if (contactInfoState.shouldInitiateCall) {
+            if (contactInfoUiState.shouldInitiateCall) {
                 verifyPermissionAndJoinCall()
             }
 
-            if (contactInfoState.navigateToMeeting) {
-                navigateToMeetingActivity(contactInfoState)
+            if (contactInfoUiState.navigateToMeeting) {
+                navigateToMeetingActivity(contactInfoUiState)
             }
 
-            updateVerifyCredentialsLayout(contactInfoState)
-            updateUserStatusChanges(contactInfoState)
-            updateBasicInfo(contactInfoState)
-            setFoldersButtonText(contactInfoState.inShares)
+            updateVerifyCredentialsLayout(contactInfoUiState)
+            updateUserStatusChanges(contactInfoUiState)
+            updateBasicInfo(contactInfoUiState)
+            setFoldersButtonText(contactInfoUiState.inShares)
             updateUI()
-            if (contactInfoState.showForceUpdateDialog) {
+            if (contactInfoUiState.showForceUpdateDialog) {
                 showForceUpdateAppDialog()
             }
         }
@@ -1017,18 +1023,18 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         startActivity(intent)
     }
 
-    private fun navigateToMeetingActivity(contactInfoState: ContactInfoState) {
+    private fun navigateToMeetingActivity(contactInfoUiState: ContactInfoUiState) {
         val intentMeeting = Intent(this, MeetingActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             action = MeetingActivity.MEETING_ACTION_IN
-            putExtra(MeetingActivity.MEETING_CHAT_ID, contactInfoState.currentCallChatId)
+            putExtra(MeetingActivity.MEETING_CHAT_ID, contactInfoUiState.currentCallChatId)
             putExtra(
                 MeetingActivity.MEETING_AUDIO_ENABLE,
-                contactInfoState.currentCallAudioStatus
+                contactInfoUiState.currentCallAudioStatus
             )
             putExtra(
                 MeetingActivity.MEETING_VIDEO_ENABLE,
-                contactInfoState.currentCallVideoStatus
+                contactInfoUiState.currentCallVideoStatus
             )
         }
         viewModel.onConsumeNavigateToMeeting()
@@ -1054,24 +1060,24 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         viewModel.joinCall(video)
     }
 
-    private fun handleOneOffEvents(contactInfoState: ContactInfoState) {
+    private fun handleOneOffEvents(contactInfoUiState: ContactInfoUiState) {
         when {
-            contactInfoState.shouldNavigateToChat -> {
+            contactInfoUiState.shouldNavigateToChat -> {
                 viewModel.chatId?.let { navigateToChatActivity(it) }
                 viewModel.onConsumeNavigateToChatEvent()
             }
 
-            contactInfoState.isChatNotificationChange -> {
+            contactInfoUiState.isChatNotificationChange -> {
                 chatNotificationsChange()
                 viewModel.onConsumeChatNotificationChangeEvent()
             }
 
-            contactInfoState.isStorageOverQuota -> {
+            contactInfoUiState.isStorageOverQuota -> {
                 showOverDiskQuotaPaywallWarning()
                 viewModel.onConsumeStorageOverQuotaEvent()
             }
 
-            contactInfoState.isPushNotificationSettingsUpdated -> {
+            contactInfoUiState.isPushNotificationSettingsUpdated -> {
                 viewModel.chatId?.let {
                     ChatUtil.checkSpecificChatNotifications(
                         it,
@@ -1083,7 +1089,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 viewModel.onConsumePushNotificationSettingsUpdateEvent()
             }
 
-            contactInfoState.isNodeUpdated -> {
+            contactInfoUiState.isNodeUpdated -> {
                 sharedFoldersFragment?.let {
                     if (it.isVisible) {
                         viewModel.parentHandle?.let { handle -> it.setNodes(handle) }
@@ -1094,30 +1100,30 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
     }
 
-    private fun updateBasicInfo(contactInfoState: ContactInfoState) = with(contactInfoState) {
-        contentContactProperties.emailText.text = contactInfoState.email
+    private fun updateBasicInfo(contactInfoUiState: ContactInfoUiState) = with(contactInfoUiState) {
+        contentContactProperties.emailText.text = contactInfoUiState.contactItem?.email
         collapsingAppBar.firstLineToolbar.text = primaryDisplayName
         contentContactProperties.nameText.apply {
             text = secondaryDisplayName
             isVisible = !secondaryDisplayName.isNullOrEmpty()
         }
         contentContactProperties.nicknameText.text =
-            getString(contactInfoState.modifyNickNameTextId)
-        updateAvatar(contactInfoState.avatar)
+            getString(contactInfoUiState.modifyNickNameTextId)
+        updateAvatar(contactInfoUiState.avatar)
     }
 
-    private fun updateUserStatusChanges(contactInfoState: ContactInfoState) {
+    private fun updateUserStatusChanges(contactInfoUiState: ContactInfoUiState) {
         contactStateIcon =
-            contactInfoState.userChatStatus.iconRes(isLightTheme = !Util.isDarkMode(this))
+            contactInfoUiState.userChatStatus.iconRes(isLightTheme = !Util.isDarkMode(this))
         collapsingAppBar.secondLineToolbar.apply {
-            if (contactInfoState.userChatStatus.isValid()) {
+            if (contactInfoUiState.userChatStatus.isValid()) {
                 isVisible = true
-                text = getString(contactInfoState.userChatStatus.text)
+                text = getString(contactInfoUiState.userChatStatus.text)
             } else isVisible = false
         }
-        visibilityStateIcon(contactInfoState.userChatStatus)
-        if (contactInfoState.userChatStatus.isAwayOrOffline()) {
-            val formattedDate = TimeUtils.lastGreenDate(this, contactInfoState.lastGreen)
+        visibilityStateIcon(contactInfoUiState.userChatStatus)
+        if (contactInfoUiState.userChatStatus.isAwayOrOffline()) {
+            val formattedDate = TimeUtils.lastGreenDate(this, contactInfoUiState.lastGreen)
             collapsingAppBar.secondLineToolbar.apply {
                 isVisible = true
                 text = formattedDate
@@ -1513,11 +1519,11 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     /**
      * Updates the "Verify credentials" view.
      *
-     * @param state [ContactInfoState].
+     * @param state [ContactInfoUiState].
      */
-    private fun updateVerifyCredentialsLayout(state: ContactInfoState) {
+    private fun updateVerifyCredentialsLayout(state: ContactInfoUiState) {
         contentContactProperties.apply {
-            if (!state.email.isNullOrEmpty()) {
+            if (!state.contactItem?.email.isNullOrEmpty()) {
                 verifyCredentialsLayout.isVisible = true
                 if (state.areCredentialsVerified) {
                     verifyCredentialsInfo.setText(R.string.contact_verify_credentials_verified_text)

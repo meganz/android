@@ -18,7 +18,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoState
+import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
 import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
@@ -34,7 +34,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun ContactInfoContent(
-    uiState: ContactInfoState,
+    uiState: ContactInfoUiState,
     coroutineScope: CoroutineScope,
     modalSheetState: ModalBottomSheetState,
     updateNickNameDialogVisibility: (Boolean) -> Unit,
@@ -44,7 +44,7 @@ internal fun ContactInfoContent(
         primaryDisplayName = uiState.primaryDisplayName,
         secondaryDisplayName = uiState.secondaryDisplayName,
         modifyNickNameTextId = uiState.modifyNickNameTextId,
-        email = uiState.email,
+        email = uiState.contactItem?.email,
         coroutineScope = coroutineScope,
         modalSheetState = modalSheetState,
         hasAlias = uiState.hasAlias,
@@ -115,7 +115,7 @@ private fun PreviewContactInfoContent() {
     )
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ContactInfoContent(
-            uiState = ContactInfoState(
+            uiState = ContactInfoUiState(
                 contactItem = ContactItem(
                     handle = 123456L,
                     email = "test@gmail.com",
@@ -177,7 +177,7 @@ private fun PreviewContactInfoContentWithChatRoom() {
     )
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         ContactInfoContent(
-            uiState = ContactInfoState(
+            uiState = ContactInfoUiState(
                 contactItem = ContactItem(
                     handle = 123456L,
                     email = "test@gmail.com",

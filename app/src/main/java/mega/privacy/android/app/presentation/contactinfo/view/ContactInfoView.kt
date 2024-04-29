@@ -27,7 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoState
+import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
@@ -37,7 +37,7 @@ import mega.privacy.android.domain.entity.user.UserVisibility
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun ContactInfoView(
-    uiState: ContactInfoState,
+    uiState: ContactInfoUiState,
     onBackPress: () -> Unit,
     statusBarHeight: Float,
     updateNickName: (String?) -> Unit,
@@ -161,7 +161,7 @@ private fun ContactInfoPreview() {
         fullName = "Tony Stark",
     )
     ContactInfoView(
-        uiState = ContactInfoState(
+        uiState = ContactInfoUiState(
             contactItem = ContactItem(
                 handle = 123456L,
                 email = "test@gmail.com",
