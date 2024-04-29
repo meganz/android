@@ -1162,6 +1162,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         viewLifecycleOwner.collectFlow(sharedModel.state) { state: MeetingState ->
             Timber.d("Chat has changed")
             inMeetingViewModel.setChatId(state.chatId)
+            callRecordingViewModel.setChatId(state.chatId)
 
             if (state.shouldPinToSpeakerView) {
                 state.chatParticipantSelected?.let {

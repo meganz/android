@@ -335,7 +335,6 @@ class MeetingActivity : PasscodeActivity() {
         intent?.let {
             val chatId = it.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE).let { chatId ->
                 meetingViewModel.updateChatRoomId(chatId)
-                callRecordingViewModel.setChatId(chatId)
                 chatId
             }
 
