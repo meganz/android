@@ -186,7 +186,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:tint="?android:attr/textColorSecondary"
-            android:visibility="@{item.selected ? View.INVISIBLE : View.VISIBLE}"/>
+            android:visibility="@{actionModeViewModel.selectedNodes.empty ? View.VISIBLE : View.GONE}"/>
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline"

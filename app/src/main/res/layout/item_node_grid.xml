@@ -134,7 +134,7 @@
                 android:layout_marginEnd="8dp"
                 android:src="@drawable/ic_dots_vertical_grey"
                 app:tint="?android:attr/textColorSecondary"
-                android:visibility="@{item.selected ? View.GONE : View.VISIBLE}"
+                android:visibility="@{actionModeViewModel.selectedNodes.empty ? View.VISIBLE : View.GONE}"
                 tools:ignore="ContentDescription" />
 
             <RadioButton
@@ -144,7 +144,7 @@
                 android:layout_marginEnd="8dp"
                 android:layout_gravity="end|center_vertical"
                 checked="@{item.selected}"
-                android:visibility="@{item.selected ? View.VISIBLE : View.GONE}" />
+                android:visibility="@{actionModeViewModel.selectedNodes.empty ? View.GONE : View.VISIBLE}" />
         </LinearLayout>
     </FrameLayout>
 </layout>

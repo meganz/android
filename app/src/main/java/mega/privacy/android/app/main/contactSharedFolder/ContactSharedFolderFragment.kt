@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.resources.R as sharedR
+import android.annotation.SuppressLint
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentContactSharedFolderListBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
@@ -425,16 +426,20 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
             return false
         }
 
+        @SuppressLint("NotifyDataSetChanged")
         override fun onDestroyActionMode(mode: ActionMode?) {
             clearSelections()
             adapter?.isMultipleSelect = false
+            adapter?.notifyDataSetChanged()
         }
 
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun activateActionMode() {
         Timber.d("activateActionMode")
         if (adapter?.isMultipleSelect == false) {
+            adapter?.notifyDataSetChanged()
             adapter?.isMultipleSelect = true
             actionMode =
                 (requireActivity() as AppCompatActivity).startSupportActionMode(ActionBarCallBack())

@@ -115,7 +115,8 @@ fun <T : TypedNode> NodeGridView(
                 onLongClick = { onLongClick(nodeUIItems[it]) },
                 onMenuClick = { onMenuClick(nodeUIItems[it]) }.takeIf { !inSelectionMode },
                 isVideoNode = (nodeUIItems[it].node as? FileNode)?.type is VideoFileTypeInfo,
-                isFolderNode = nodeUIItems[it].node is TypedFolderNode
+                isFolderNode = nodeUIItems[it].node is TypedFolderNode,
+                inVisible = nodeUIItems[it].isInvisible,
             )
         }
     }

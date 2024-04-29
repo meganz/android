@@ -1030,7 +1030,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             setFolderListSelected(holder, position, getFolderIcon(node, type == OUTGOING_SHARES_ADAPTER ? DrawerItem.SHARED_ITEMS : DrawerItem.CLOUD_DRIVE));
             if (isMultipleSelect()) {
-                holder.threeDotsLayout.setVisibility(View.GONE);
+                holder.threeDotsLayout.setVisibility(View.INVISIBLE);
             } else {
                 holder.threeDotsLayout.setVisibility(View.VISIBLE);
             }
@@ -1167,7 +1167,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                         getThumbAndSetViewOrCreate(holder, node);
                     }
                 }
-                holder.threeDotsLayout.setVisibility(View.GONE);
+                holder.threeDotsLayout.setVisibility(View.INVISIBLE);
             }
         }
 

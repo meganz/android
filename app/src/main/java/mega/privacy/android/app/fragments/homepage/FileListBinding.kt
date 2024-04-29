@@ -36,8 +36,8 @@ fun setListItemThumbnail(
     with(imageView) {
         when {
             selected -> {
-                hierarchy.setOverlayImage(ContextCompat.getDrawable(context,
-                    CoreUiR.drawable.ic_select_folder))
+                hierarchy.setOverlayImage(null)
+                setActualImageResource(CoreUiR.drawable.ic_select_folder)
             }
             isFileAvailable(file) -> {
                 hierarchy.setOverlayImage(null)

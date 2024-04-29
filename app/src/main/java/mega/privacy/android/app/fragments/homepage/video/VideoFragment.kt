@@ -1,8 +1,10 @@
 package mega.privacy.android.app.fragments.homepage.video
 
+import mega.privacy.android.core.R as CoreUiR
 import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -18,7 +20,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
@@ -318,6 +319,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
                     adapter = listAdapter
                     if (itemDecorationCount == 0) addItemDecoration(itemDecoration)
                 }
+
                 ViewType.GRID -> {
                     switchBackToGrid()
                     adapter = gridAdapter
@@ -353,18 +355,26 @@ class VideoFragment : Fragment(), HomepageSearchable {
     /**
      * Performs certain behavior when a long press is observed
      */
+    @SuppressLint("NotifyDataSetChanged")
     private fun observeItemLongClick() =
         actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
-            doIfOnline { actionModeViewModel.enterActionMode(it) }
+            doIfOnline {
+                gridAdapter.notifyDataSetChanged()
+                listAdapter.notifyDataSetChanged()
+                actionModeViewModel.enterActionMode(it)
+            }
         })
 
     /**
      * Observe selected Nodes from [ActionModeViewModel]
      */
+    @SuppressLint("NotifyDataSetChanged")
     private fun observeSelectedItems() =
         actionModeViewModel.selectedNodes.observe(viewLifecycleOwner) {
             if (it.isEmpty()) {
                 actionMode?.apply {
+                    gridAdapter.notifyDataSetChanged()
+                    listAdapter.notifyDataSetChanged()
                     finish()
                 }
             } else {

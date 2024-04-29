@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -80,92 +81,102 @@ fun NodeGridViewItem(
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {},
     onMenuClick: (() -> Unit)? = null,
+    inVisible: Boolean = false,
 ) {
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = if (isSelected) MegaTheme.colors.border.subtleSelected
-                else MegaTheme.colors.border.subtle,
-                shape = RoundedCornerShape(5.dp),
-            )
-            .background(MegaTheme.colors.background.pageBackground)
-            .combinedClickable(
-                onClick = { onClick() },
-                onLongClick = { onLongClick() },
-            )
-    ) {
-        if (isFolderNode.not()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(172.dp)
-            ) {
-                GridThumbnailView(
-                    data = thumbnailData,
-                    defaultImage = iconRes,
+    if (inVisible) {
+        Spacer(
+            modifier = Modifier
+                .height(48.dp)
+                .fillMaxWidth(),
+        )
+    } else {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .border(
+                    width = 1.dp,
+                    color = if (isSelected) MegaTheme.colors.border.subtleSelected
+                    else MegaTheme.colors.border.subtle,
+                    shape = RoundedCornerShape(5.dp),
+                )
+                .background(MegaTheme.colors.background.pageBackground)
+                .combinedClickable(
+                    onClick = { onClick() },
+                    onLongClick = { onLongClick() },
+                )
+        ) {
+            if (isFolderNode.not()) {
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .align(Alignment.Center)
-                        .testTag(THUMBNAIL_FILE_TEST_TAG),
-                    contentDescription = name,
-                    contentScale = ContentScale.Crop,
-                )
-                if (isVideoNode) {
-                    Box(
+                        .height(172.dp)
+                ) {
+                    GridThumbnailView(
+                        data = thumbnailData,
+                        defaultImage = iconRes,
                         modifier = Modifier
-                            .fillMaxSize()
-                            .background(MegaTheme.colors.background.blur)
-                    ) {
-                        Icon(
+                            .fillMaxWidth()
+                            .align(Alignment.Center)
+                            .testTag(THUMBNAIL_FILE_TEST_TAG),
+                        contentDescription = name,
+                        contentScale = ContentScale.Crop,
+                    )
+                    if (isVideoNode) {
+                        Box(
                             modifier = Modifier
-                                .align(Alignment.Center)
-                                .size(32.dp)
-                                .testTag(VIDEO_PLAY_ICON_TEST_TAG),
-                            painter = painterResource(id = IconPackR.drawable.ic_play_circle_medium_regular_solid),
-                            contentDescription = "Play Icon",
-                            tint = MegaTheme.colors.icon.onColor,
-                        )
+                                .fillMaxSize()
+                                .background(MegaTheme.colors.background.blur)
+                        ) {
+                            Icon(
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+                                    .size(32.dp)
+                                    .testTag(VIDEO_PLAY_ICON_TEST_TAG),
+                                painter = painterResource(id = IconPackR.drawable.ic_play_circle_medium_regular_solid),
+                                contentDescription = "Play Icon",
+                                tint = MegaTheme.colors.icon.onColor,
+                            )
+                        }
                     }
-                }
 
-                // Video/Audio duration
-                if (duration != null) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(8.dp)
-                            .clip(
-                                shape = RoundedCornerShape(size = 16.dp)
-                            )
-                            .background(
-                                color = Color.Black.copy(alpha = 0.7f)
-                            )
-                            .padding(horizontal = 8.dp, vertical = 4.dp),
-                    ) {
-                        MegaText(
-                            text = duration,
-                            style = MaterialTheme.typography.body2,
-                            textColor = TextColor.OnColor,
+                    // Video/Audio duration
+                    if (duration != null) {
+                        Box(
                             modifier = Modifier
-                                .testTag(VIDEO_DURATION_TEST_TAG),
-                        )
+                                .align(Alignment.BottomEnd)
+                                .padding(8.dp)
+                                .clip(
+                                    shape = RoundedCornerShape(size = 16.dp)
+                                )
+                                .background(
+                                    color = Color.Black.copy(alpha = 0.7f)
+                                )
+                                .padding(horizontal = 8.dp, vertical = 4.dp),
+                        ) {
+                            MegaText(
+                                text = duration,
+                                style = MaterialTheme.typography.body2,
+                                textColor = TextColor.OnColor,
+                                modifier = Modifier
+                                    .testTag(VIDEO_DURATION_TEST_TAG),
+                            )
+                        }
                     }
                 }
+                MegaDivider(dividerType = DividerType.FullSize)
             }
-            MegaDivider(dividerType = DividerType.FullSize)
+
+            Footer(
+                isFolderNode = isFolderNode,
+                iconRes = iconRes,
+                name = name,
+                isTakenDown = isTakenDown,
+                onMenuClick = onMenuClick,
+                isSelected = isSelected,
+                onClick = onClick
+            )
         }
-        Footer(
-            isFolderNode = isFolderNode,
-            iconRes = iconRes,
-            name = name,
-            isTakenDown = isTakenDown,
-            onMenuClick = onMenuClick,
-            isSelected = isSelected,
-            onClick = onClick
-        )
     }
 }
 

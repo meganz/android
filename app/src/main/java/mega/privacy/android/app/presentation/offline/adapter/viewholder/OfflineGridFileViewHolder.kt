@@ -24,6 +24,7 @@ class OfflineGridFileViewHolder(
         binding.filenameContainer.setOnClickListener {
             onNodeOptionsClicked(bindingAdapterPosition, node)
         }
+        binding.threeDots.setOnClickListener { onNodeOptionsClicked(bindingAdapterPosition, node) }
         binding.thumbnail.isVisible = true
 
         val placeHolderRes = MimeTypeThumbnail.typeForName(node.node.name).iconResourceId
