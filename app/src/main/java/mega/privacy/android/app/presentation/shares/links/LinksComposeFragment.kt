@@ -602,7 +602,7 @@ class LinksComposeFragment : Fragment() {
 
         override fun onDestroyActionMode(mode: ActionMode) {
             viewModel.clearAllNodesSelection()
-            (activity as ManagerActivity).let {
+            (activity as? ManagerActivity)?.let {
                 it.hideTabs(false, currentTab)
                 it.showFabButton()
                 it.showHideBottomNavigationView(false)

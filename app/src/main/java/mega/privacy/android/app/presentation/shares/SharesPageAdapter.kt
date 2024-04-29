@@ -7,7 +7,6 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesComposeFragment
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment
 import mega.privacy.android.app.presentation.shares.links.LinksComposeFragment
-import mega.privacy.android.app.presentation.shares.links.LinksFragment
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesComposeFragment
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragment
 
@@ -17,7 +16,6 @@ import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragm
  * @param activity FragmentActivity where the viewPager2 lives
  */
 class SharesPageAdapter(
-    private val enabledLinksCompose: Boolean,
     private val enabledOutgoingSharesCompose: Boolean,
     private val enabledIncomingSharesCompose: Boolean,
     private val activity: FragmentActivity,
@@ -30,7 +28,7 @@ class SharesPageAdapter(
     private val fragments = mutableMapOf(
         SharesTab.INCOMING_TAB to if (enabledIncomingSharesCompose) IncomingSharesComposeFragment() else IncomingSharesFragment(),
         SharesTab.OUTGOING_TAB to if (enabledOutgoingSharesCompose) OutgoingSharesComposeFragment() else OutgoingSharesFragment(),
-        SharesTab.LINKS_TAB to if (enabledLinksCompose) LinksComposeFragment() else LinksFragment()
+        SharesTab.LINKS_TAB to LinksComposeFragment()
     )
 
     /**
@@ -60,7 +58,7 @@ class SharesPageAdapter(
         val fragment = when (SharesTab.fromPosition(position)) {
             SharesTab.INCOMING_TAB -> if (enabledIncomingSharesCompose) IncomingSharesComposeFragment() else IncomingSharesFragment()
             SharesTab.OUTGOING_TAB -> if (enabledOutgoingSharesCompose) OutgoingSharesComposeFragment() else OutgoingSharesFragment()
-            SharesTab.LINKS_TAB -> if (enabledLinksCompose) LinksComposeFragment() else LinksFragment()
+            SharesTab.LINKS_TAB -> LinksComposeFragment()
             else -> throw Exception("Invalid position")
         }
         fragments[SharesTab.fromPosition(position)] = fragment

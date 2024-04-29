@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.shares.links
 import android.view.MenuItem
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.awaitCancellation
@@ -28,7 +27,6 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
-import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
@@ -67,7 +65,6 @@ internal class LinksViewModelTest {
     private val monitorFolderNodeDeleteUpdatesUseCase: MonitorFolderNodeDeleteUpdatesUseCase =
         mock()
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase = mock()
-    private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
 
     @BeforeAll
     internal fun initialise() {
@@ -87,7 +84,6 @@ internal class LinksViewModelTest {
             handleOptionClickMapper = handleOptionClickMapper,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
-            getNodeByIdUseCase = getNodeByIdUseCase
         )
     }
 
@@ -111,7 +107,6 @@ internal class LinksViewModelTest {
             handleOptionClickMapper,
             getFeatureFlagValueUseCase,
             isNodeInRubbishBinUseCase,
-            getNodeByIdUseCase
         )
     }
 

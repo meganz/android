@@ -28,12 +28,10 @@ import mega.privacy.android.app.presentation.shares.links.model.LinksUiState
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
-import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetLinksSortOrder
-import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
@@ -56,7 +54,6 @@ class LinksViewModel @Inject constructor(
     private val handleOptionClickMapper: HandleOptionClickMapper,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
-    private val getNodeByIdUseCase: GetNodeByIdUseCase,
 ) : ViewModel() {
 
     private val currentFlow = Channel<Flow<LinksUiState>>()

@@ -81,21 +81,11 @@ enum class AppFeatures(override val description: String, private val defaultValu
         true
     ),
 
-
     /**
      * Enables new outgoing shares compose page
      */
     OutgoingSharesCompose(
         "Enable new Outgoing Shares Compose page (requires app restart)",
-        true
-    ),
-
-
-    /**
-     * Enables new links compose page
-     */
-    LinksCompose(
-        "Enable new Shared Links Compose page (requires app restart)",
         true
     ),
 
