@@ -3,6 +3,7 @@ package mega.privacy.android.data.repository
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -25,10 +26,14 @@ class DefaultSupportRepositoryTest {
     private lateinit var underTest: SupportRepository
 
     private val megaApiGateway = mock<MegaApiGateway>()
+    private val ioDispatcher = UnconfinedTestDispatcher()
 
     @Before
     fun setUp() {
-        underTest = DefaultSupportRepository(megaApi = megaApiGateway)
+        underTest = DefaultSupportRepository(
+            megaApi = megaApiGateway,
+            ioDispatcher = ioDispatcher
+        )
     }
 
     @Test

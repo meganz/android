@@ -19,10 +19,11 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -31,9 +32,9 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIssueResult
 import mega.privacy.android.app.presentation.settings.reportissue.view.DiscardReportDialog
 import mega.privacy.android.app.presentation.settings.reportissue.view.ReportIssueView
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.shared.theme.MegaAppTheme
 import javax.inject.Inject
 
 /**
@@ -63,7 +64,7 @@ class ReportIssueFragment : Fragment() {
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
-        val valid = viewModel.state.value.canSubmit
+        val valid = viewModel.uiState.value.canSubmit
         menu.findItem(R.id.menu_report_issue_submit)?.let {
             it.isEnabled = valid
             it.icon?.alpha = if (valid) 255 else 125
@@ -96,7 +97,7 @@ class ReportIssueFragment : Fragment() {
         setHasOptionsMenu(true)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state
+                viewModel.uiState
                     .distinctUntilChanged { old, new -> old.canSubmit == new.canSubmit && old.result == new.result }
                     .collect { state ->
                         if (state.result != null) {
@@ -125,12 +126,12 @@ class ReportIssueFragment : Fragment() {
      */
     @Composable
     fun ReportIssueView(
-        viewModel: ReportIssueViewModel = viewModel(),
+        viewModel: ReportIssueViewModel = hiltViewModel(),
     ) {
-        val uiState by viewModel.state.collectAsState()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
         ReportIssueView(
-            state = uiState,
+            uiState = uiState,
             onDescriptionChanged = viewModel::setDescription,
             onIncludeLogsChanged = viewModel::setIncludeLogsEnabled,
             cancelUpload = viewModel::cancelUpload,

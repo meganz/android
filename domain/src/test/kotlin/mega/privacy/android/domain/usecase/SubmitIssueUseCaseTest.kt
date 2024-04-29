@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.SubmitIssueRequest
@@ -55,6 +56,7 @@ class SubmitIssueUseCaseTest {
     private val formatSupportTicketUseCase = mock<FormatSupportTicketUseCase>()
     private val getZippedLogsUseCase = mock<GetZippedLogsUseCase>()
     private val getAccountDetailsUseCase = mock<GetAccountDetailsUseCase>()
+    private val defaultDispatcher = UnconfinedTestDispatcher()
 
     @BeforeEach
     fun setUp() {
@@ -94,6 +96,7 @@ class SubmitIssueUseCaseTest {
             formatSupportTicketUseCase = formatSupportTicketUseCase,
             getZippedLogsUseCase = getZippedLogsUseCase,
             getAccountDetailsUseCase = getAccountDetailsUseCase,
+            defaultDispatcher = defaultDispatcher
         )
     }
 
@@ -187,7 +190,7 @@ class SubmitIssueUseCaseTest {
     }
 
     @Test
-    fun `test that ticket is not created if cancelled`() = runTest {
+    fun `test that ticket is not created if cancelled`() = runTest(defaultDispatcher) {
         underTest.call(true).first()
 
         verify(getZippedLogsUseCase).invoke()

@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,10 +22,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getStateFlow
-import mega.privacy.android.app.presentation.settings.reportissue.model.ReportIssueState
+import mega.privacy.android.app.presentation.settings.reportissue.model.ReportIssueUiState
 import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIssueResult
 import mega.privacy.android.domain.entity.SubmitIssueRequest
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.GetSupportEmailUseCase
@@ -42,12 +40,11 @@ import javax.inject.Inject
  * @property areSdkLogsEnabled
  * @property areChatLogsEnabled
  * @property submitIssueUseCase
- * @property ioDispatcher
  *
  * @param monitorConnectivityUseCase
  * @param savedStateHandle
  *
- * @property state current view state
+ * @property uiState current view state
  */
 @HiltViewModel
 class ReportIssueViewModel @Inject constructor(
@@ -56,7 +53,6 @@ class ReportIssueViewModel @Inject constructor(
     private val submitIssueUseCase: SubmitIssueUseCase,
     private val getSupportEmailUseCase: GetSupportEmailUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -88,15 +84,15 @@ class ReportIssueViewModel @Inject constructor(
 
     private var submitReportJob: Job? = null
 
-    private val _state = MutableStateFlow(ReportIssueState())
+    private val _uiState = MutableStateFlow(ReportIssueUiState())
 
-    val state: StateFlow<ReportIssueState> = _state
+    val uiState: StateFlow<ReportIssueUiState> = _uiState
 
     init {
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch {
             merge(
                 description.map {
-                    { state: ReportIssueState ->
+                    { state: ReportIssueUiState ->
                         state.copy(
                             description = it,
                             canSubmit = it.isNotEmpty()
@@ -104,17 +100,17 @@ class ReportIssueViewModel @Inject constructor(
                     }
                 },
                 includeLogsVisible.map {
-                    { state: ReportIssueState -> state.copy(includeLogsVisible = it) }
+                    { state: ReportIssueUiState -> state.copy(includeLogsVisible = it) }
                 },
                 includeLogs.map {
-                    { state: ReportIssueState -> state.copy(includeLogs = it) }
+                    { state: ReportIssueUiState -> state.copy(includeLogs = it) }
                 },
             ).collect {
-                _state.update(it)
+                _uiState.update(it)
             }
         }
 
-        viewModelScope.launch(ioDispatcher) {
+        viewModelScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.PermanentLogging)) {
                 includeLogsVisible.update { _ -> true }
                 includeLogs.update { _ -> true }
@@ -156,7 +152,7 @@ class ReportIssueViewModel @Inject constructor(
     fun submit() {
         if (isConnected.value) {
             if (submitReportJob?.isActive != true) {
-                submitReportJob = viewModelScope.launch(ioDispatcher) {
+                submitReportJob = viewModelScope.launch {
                     try {
                         submitIssueUseCase(SubmitIssueRequest(description.value, includeLogs.value))
                             .cancellable()
@@ -165,7 +161,7 @@ class ReportIssueViewModel @Inject constructor(
                             }
                             .catch { Timber.e(it) }
                             .collect { progress ->
-                                _state.update { it.copy(uploadProgress = progress.floatValue) }
+                                _uiState.update { it.copy(uploadProgress = progress.floatValue) }
                             }
                     } catch (exception: Throwable) {
                         onSubmitCompleted(exception)
@@ -173,18 +169,18 @@ class ReportIssueViewModel @Inject constructor(
                 }
             }
         } else {
-            _state.update { it.copy(error = R.string.check_internet_connection_error) }
+            _uiState.update { it.copy(error = R.string.check_internet_connection_error) }
         }
     }
 
     private suspend fun onSubmitCompleted(error: Throwable?) {
         when (error) {
             is CancellationException -> {
-                _state.update { it.copy(uploadProgress = null) }
+                _uiState.update { it.copy(uploadProgress = null) }
             }
 
             null -> {
-                _state.update {
+                _uiState.update {
                     it.copy(
                         result = SubmitIssueResult.Success,
                         uploadProgress = null,
@@ -194,7 +190,7 @@ class ReportIssueViewModel @Inject constructor(
             }
 
             else -> {
-                _state.update {
+                _uiState.update {
                     it.copy(
                         result = SubmitIssueResult.Failure(getSupportEmailUseCase()),
                         uploadProgress = null

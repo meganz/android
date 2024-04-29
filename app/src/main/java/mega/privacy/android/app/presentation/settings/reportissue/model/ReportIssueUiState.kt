@@ -12,7 +12,7 @@ package mega.privacy.android.app.presentation.settings.reportissue.model
  * @property uploadProgress progress of the log upload
  * @constructor Create empty Report issue state
  */
-data class ReportIssueState(
+data class ReportIssueUiState(
     val description: String = "",
     val includeLogsVisible: Boolean = false,
     val includeLogs: Boolean = false,

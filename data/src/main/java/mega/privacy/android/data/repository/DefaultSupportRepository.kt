@@ -1,15 +1,19 @@
 package mega.privacy.android.data.repository
 
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SupportRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaTransfer
@@ -24,20 +28,23 @@ import javax.inject.Inject
  */
 internal class DefaultSupportRepository @Inject constructor(
     private val megaApi: MegaApiGateway,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : SupportRepository {
     override suspend fun logTicket(ticketContent: String) =
-        suspendCancellableCoroutine { continuation ->
-            val listener = OptionalMegaRequestListenerInterface(
-                onRequestFinish = { _, error ->
-                    if (error.errorCode == MegaError.API_OK) {
-                        continuation.resumeWith(Result.success(Unit))
-                    } else {
-                        continuation.failWithError(error, "logTicket")
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { _, error ->
+                        if (error.errorCode == MegaError.API_OK) {
+                            continuation.resumeWith(Result.success(Unit))
+                        } else {
+                            continuation.failWithError(error, "logTicket")
+                        }
                     }
-                }
-            )
-            megaApi.createSupportTicket(ticketContent, listener)
-            continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
+                )
+                megaApi.createSupportTicket(ticketContent, listener)
+                continuation.invokeOnCancellation { megaApi.removeRequestListener(listener) }
+            }
         }
 
     override fun uploadFile(file: File): Flow<Float> = callbackFlow {
@@ -49,7 +56,7 @@ internal class DefaultSupportRepository @Inject constructor(
         awaitClose {
             transfer?.let { megaApi.cancelTransfer(transfer = it, listener = null) }
         }
-    }
+    }.flowOn(ioDispatcher)
 
     private fun uploadFileInterface(
         channel: SendChannel<Float>,

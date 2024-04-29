@@ -1,15 +1,18 @@
 package mega.privacy.android.domain.usecase
 
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.isActive
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.SubmitIssueRequest
 import mega.privacy.android.domain.entity.UserAccount
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.repository.SupportRepository
 import mega.privacy.android.domain.usecase.logging.GetZippedLogsUseCase
 import javax.inject.Inject
@@ -28,6 +31,7 @@ class SubmitIssueUseCase @Inject constructor(
     private val formatSupportTicketUseCase: FormatSupportTicketUseCase,
     private val getZippedLogsUseCase: GetZippedLogsUseCase,
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) {
     /**
      * Invoke
@@ -35,7 +39,7 @@ class SubmitIssueUseCase @Inject constructor(
      * @param request
      * @return
      */
-    suspend operator fun invoke(request: SubmitIssueRequest): Flow<Progress> {
+    operator fun invoke(request: SubmitIssueRequest): Flow<Progress> {
         return flow {
             val logFileName = uploadLogs(request.includeLogs)
             if (currentCoroutineContext().isActive) {
@@ -44,7 +48,7 @@ class SubmitIssueUseCase @Inject constructor(
                     createFormattedSupportTicket(request.description, logFileName, account)
                 supportRepository.logTicket(formattedTicket)
             }
-        }
+        }.flowOn(defaultDispatcher)
     }
 
     private suspend fun FlowCollector<Progress>.uploadLogs(

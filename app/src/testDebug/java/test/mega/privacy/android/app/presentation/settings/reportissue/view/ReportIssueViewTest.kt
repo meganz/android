@@ -1,10 +1,19 @@
 package test.mega.privacy.android.app.presentation.settings.reportissue.view
 
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.hasAnyDescendant
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.settings.reportissue.model.ReportIssueState
+import mega.privacy.android.app.presentation.settings.reportissue.model.ReportIssueUiState
 import mega.privacy.android.app.presentation.settings.reportissue.view.ReportIssueView
 import org.junit.Rule
 import org.junit.Test
@@ -22,7 +31,7 @@ class ReportIssueViewTest {
     @Test
     fun test_that_label_is_shown() {
         composeTestRule.setContent {
-            ReportIssueView(state = ReportIssueState())
+            ReportIssueView(uiState = ReportIssueUiState())
         }
 
         composeTestRule.onNodeWithText(fromId(R.string.settings_help_report_issue_instructions))
@@ -32,7 +41,7 @@ class ReportIssueViewTest {
     @Test
     fun test_that_description_text_field_has_the_correct_hint_text() {
         composeTestRule.setContent {
-            ReportIssueView(state = ReportIssueState())
+            ReportIssueView(uiState = ReportIssueUiState())
         }
 
         composeTestRule.onNodeWithText(fromId(id = R.string.settings_help_report_issue_description_label))
@@ -43,7 +52,7 @@ class ReportIssueViewTest {
     fun test_that_description_text_is_shown_if_present() {
         val description = "A description!"
         composeTestRule.setContent {
-            ReportIssueView(state = ReportIssueState(description = description))
+            ReportIssueView(uiState = ReportIssueUiState(description = description))
         }
 
         composeTestRule.onNodeWithText(description)
@@ -55,7 +64,7 @@ class ReportIssueViewTest {
         val onDescriptionChanged = mock<(String) -> Unit>()
         composeTestRule.setContent {
             ReportIssueView(
-                state = ReportIssueState(),
+                uiState = ReportIssueUiState(),
                 onDescriptionChanged = onDescriptionChanged,
             )
         }
@@ -72,7 +81,7 @@ class ReportIssueViewTest {
     fun test_that_toggle_is_displayed_if_include_logs_visible_is_true() {
         composeTestRule.setContent {
             ReportIssueView(
-                state = ReportIssueState(includeLogsVisible = true),
+                uiState = ReportIssueUiState(includeLogsVisible = true),
             )
         }
 
@@ -84,7 +93,7 @@ class ReportIssueViewTest {
     fun test_that_toggle_is_hidden_if_include_logs_visible_is_false() {
         composeTestRule.setContent {
             ReportIssueView(
-                state = ReportIssueState(includeLogsVisible = false),
+                uiState = ReportIssueUiState(includeLogsVisible = false),
             )
         }
 
@@ -96,7 +105,7 @@ class ReportIssueViewTest {
     fun test_that_toggle_is_checked_if_include_logs_is_set_to_true() {
         composeTestRule.setContent {
             ReportIssueView(
-                state = ReportIssueState(includeLogsVisible = true, includeLogs = true),
+                uiState = ReportIssueUiState(includeLogsVisible = true, includeLogs = true),
             )
         }
 
@@ -108,7 +117,7 @@ class ReportIssueViewTest {
     fun test_that_toggle_is_not_checked_if_include_logs_is_set_to_false() {
         composeTestRule.setContent {
             ReportIssueView(
-                state = ReportIssueState(includeLogsVisible = true, includeLogs = false),
+                uiState = ReportIssueUiState(includeLogsVisible = true, includeLogs = false),
             )
         }
 
@@ -121,7 +130,7 @@ class ReportIssueViewTest {
         val onIncludeLogsChanged = mock<(Boolean) -> Unit>()
         composeTestRule.setContent {
             ReportIssueView(
-                state = ReportIssueState(includeLogs = true, includeLogsVisible = true),
+                uiState = ReportIssueUiState(includeLogs = true, includeLogsVisible = true),
                 onIncludeLogsChanged = onIncludeLogsChanged,
             )
         }
@@ -139,7 +148,7 @@ class ReportIssueViewTest {
         val error = R.string.check_internet_connection_error
         composeTestRule.setContent {
             ReportIssueView(
-                state = ReportIssueState(error = error),
+                uiState = ReportIssueUiState(error = error),
             )
         }
 
@@ -150,7 +159,7 @@ class ReportIssueViewTest {
     fun test_that_upload_progress_dialog_is_displayed_if_file_is_being_uploaded() {
         composeTestRule.setContent {
             ReportIssueView(
-                state = ReportIssueState(
+                uiState = ReportIssueUiState(
                     includeLogs = true,
                     includeLogsVisible = true,
                     uploadProgress = 0.5f
