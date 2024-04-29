@@ -28,6 +28,7 @@ import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinatesUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.environment.GetAvailableProcessorsUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
@@ -88,6 +89,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
     private val isChargingRequiredForVideoCompressionUseCase: IsChargingRequiredForVideoCompressionUseCase =
         mock()
     private val monitorConcurrentUploadsLimitUseCase: MonitorConcurrentUploadsLimitUseCase = mock()
+    private val getAvailableProcessorsUseCase: GetAvailableProcessorsUseCase = mock()
 
     private val primaryUploadNodeId = NodeId(1111L)
     private val secondaryUploadNodeId = NodeId(2222L)
@@ -140,6 +142,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
             monitorBatteryInfoUseCase = monitorBatteryInfoUseCase,
             isChargingRequiredForVideoCompressionUseCase = isChargingRequiredForVideoCompressionUseCase,
             monitorConcurrentUploadsLimitUseCase = monitorConcurrentUploadsLimitUseCase,
+            getAvailableProcessorsUseCase = getAvailableProcessorsUseCase,
         )
     }
 
@@ -166,6 +169,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
             addCompletedTransferUseCase,
             getNodeByIdUseCase,
             monitorConcurrentUploadsLimitUseCase,
+            getAvailableProcessorsUseCase,
         )
     }
 
@@ -175,6 +179,7 @@ class UploadCameraUploadsRecordsUseCaseTest {
         whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(false)
         whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(100, true)))
         whenever(monitorConcurrentUploadsLimitUseCase(8)).thenReturn(flowOf(8))
+        whenever(getAvailableProcessorsUseCase()).thenReturn(8)
     }
 
     private fun getUploadNodeId(cameraUploadFolderType: CameraUploadFolderType) =

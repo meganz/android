@@ -5,7 +5,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.BatteryInfo
-import mega.privacy.android.domain.entity.camerauploads.CameraUploadsConcurrentUploadsLimit
 import mega.privacy.android.domain.entity.environment.ThermalState
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorDeviceThermalStateUseCase
@@ -48,14 +47,14 @@ class MonitorConcurrentUploadsLimitUseCaseTest {
     fun `test that the concurrent uploads limit adjust correctly based on thermal device`(
         thermalState: ThermalState
     ) = runTest {
-        val defaultLimit = CameraUploadsConcurrentUploadsLimit.Default.limit
+        val defaultLimit = 8
         whenever(monitorDeviceThermalStateUseCase()).thenReturn(flowOf(thermalState))
         whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(100, true)))
 
         val expected = when (thermalState) {
             ThermalState.ThermalStateNone, ThermalState.ThermalStateLight -> defaultLimit
-            ThermalState.ThermalStateModerate -> CameraUploadsConcurrentUploadsLimit.ThermalStateModerate.limit
-            else -> CameraUploadsConcurrentUploadsLimit.ThermalStateSevere.limit
+            ThermalState.ThermalStateModerate -> defaultLimit / 2
+            else -> 1
         }
 
         underTest(defaultLimit).test {
@@ -69,14 +68,13 @@ class MonitorConcurrentUploadsLimitUseCaseTest {
     fun `test that the concurrent uploads limit adjust correctly based on battery level`(
         batteryLevel: Int
     ) = runTest {
-        val defaultLimit = CameraUploadsConcurrentUploadsLimit.Default.limit
+        val defaultLimit = 8
         whenever(monitorDeviceThermalStateUseCase()).thenReturn(flowOf(ThermalState.ThermalStateNone))
         whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(batteryLevel, false)))
 
         val expected = when {
-            batteryLevel >= 75 -> defaultLimit
-            batteryLevel >= 50 -> CameraUploadsConcurrentUploadsLimit.BatteryLevelOver50.limit
-            else -> CameraUploadsConcurrentUploadsLimit.BatteryLevelOver20.limit
+            batteryLevel >= 50 -> defaultLimit
+            else -> defaultLimit / 2
         }
 
         underTest(defaultLimit).test {
@@ -90,13 +88,13 @@ class MonitorConcurrentUploadsLimitUseCaseTest {
     fun `test that the concurrent uploads limit adjust correctly based on charging state`(
         isCharging: Boolean
     ) = runTest {
-        val defaultLimit = CameraUploadsConcurrentUploadsLimit.Default.limit
+        val defaultLimit = 8
         whenever(monitorDeviceThermalStateUseCase()).thenReturn(flowOf(ThermalState.ThermalStateNone))
-        whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(51, isCharging)))
+        whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(49, isCharging)))
 
         val expected = when (isCharging) {
             true -> defaultLimit
-            else -> CameraUploadsConcurrentUploadsLimit.BatteryLevelOver50.limit
+            else -> defaultLimit / 2
         }
 
         underTest(defaultLimit).test {
@@ -108,14 +106,11 @@ class MonitorConcurrentUploadsLimitUseCaseTest {
     @Test
     fun `test that the concurrent uploads limit adjust correctly based on thermal device and battery level`() =
         runTest {
-            val defaultLimit = CameraUploadsConcurrentUploadsLimit.Default.limit
+            val defaultLimit = 8
             whenever(monitorDeviceThermalStateUseCase()).thenReturn(flowOf(ThermalState.ThermalStateSevere))
-            whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(51, false)))
+            whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(BatteryInfo(25, false)))
 
-            val expected = minOf(
-                CameraUploadsConcurrentUploadsLimit.ThermalStateSevere.limit,
-                CameraUploadsConcurrentUploadsLimit.BatteryLevelOver50.limit
-            )
+            val expected = 1
 
             underTest(defaultLimit).test {
                 assertThat(awaitItem()).isEqualTo(expected)

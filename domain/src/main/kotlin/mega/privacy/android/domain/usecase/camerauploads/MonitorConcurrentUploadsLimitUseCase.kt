@@ -2,11 +2,12 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import mega.privacy.android.domain.entity.camerauploads.CameraUploadsConcurrentUploadsLimit
+import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.environment.ThermalState
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorDeviceThermalStateUseCase
 import javax.inject.Inject
+import kotlin.math.max
 import kotlin.math.min
 
 /**
@@ -23,23 +24,50 @@ class MonitorConcurrentUploadsLimitUseCase @Inject constructor(
      */
     operator fun invoke(defaultLimit: Int): Flow<Int> = combine(
         monitorBatteryInfoUseCase(),
-        monitorDeviceThermalStateUseCase()
+        monitorDeviceThermalStateUseCase(),
     ) { batteryLevel, thermalState ->
-        val concurrentUploadsBasedOnThermalState = when (thermalState) {
-            ThermalState.ThermalStateNone, ThermalState.ThermalStateLight -> defaultLimit
-            ThermalState.ThermalStateModerate -> CameraUploadsConcurrentUploadsLimit.ThermalStateModerate.limit
-            else -> CameraUploadsConcurrentUploadsLimit.ThermalStateSevere.limit
-        }
-        val concurrentUploadsBasedOnBatteryLevel = when {
-            batteryLevel.isCharging -> defaultLimit
-            batteryLevel.level >= 75 -> defaultLimit
-            batteryLevel.level >= 50 -> CameraUploadsConcurrentUploadsLimit.BatteryLevelOver50.limit
-            else -> CameraUploadsConcurrentUploadsLimit.BatteryLevelOver20.limit
-        }
+        val concurrentUploadsBasedOnBatteryLevel =
+            getConcurrentUploadsBasedOnBatteryLevel(batteryLevel, defaultLimit)
+        val concurrentUploadsBasedOnThermalState =
+            getConcurrentUploadsBasedOnThermalState(thermalState, defaultLimit)
 
         min(
+            concurrentUploadsBasedOnBatteryLevel,
             concurrentUploadsBasedOnThermalState,
-            concurrentUploadsBasedOnBatteryLevel
         )
+    }
+
+    /**
+     * Calculate the number of concurrent uploads based on the device thermal state
+     *
+     * @param thermalState the device thermal state
+     * @param defaultLimit the default concurrent uploads limit
+     *
+     * @return an [Int] representing the number of concurrent uploads calculated based on thermal condition
+     */
+    private fun getConcurrentUploadsBasedOnThermalState(
+        thermalState: ThermalState,
+        defaultLimit: Int,
+    ) = when (thermalState) {
+        ThermalState.ThermalStateNone, ThermalState.ThermalStateLight -> defaultLimit
+        ThermalState.ThermalStateModerate -> max(1, defaultLimit / 2)
+        else -> 1
+    }
+
+    /**
+     * Calculate the number of concurrent uploads based on the battery level
+     *
+     * @param batteryLevel the battery level
+     * @param defaultLimit the default concurrent uploads limit
+     *
+     * @return an [Int] representing the number of concurrent uploads calculated based on battery condition
+     */
+    private fun getConcurrentUploadsBasedOnBatteryLevel(
+        batteryLevel: BatteryInfo,
+        defaultLimit: Int,
+    ) = when {
+        batteryLevel.isCharging -> defaultLimit
+        batteryLevel.level >= 50 -> defaultLimit
+        else -> max(1, defaultLimit / 2)
     }
 }
