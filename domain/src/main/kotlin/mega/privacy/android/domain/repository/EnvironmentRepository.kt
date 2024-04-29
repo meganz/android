@@ -100,4 +100,9 @@ interface EnvironmentRepository {
      * Monitor battery info
      */
     fun monitorBatteryInfo(): Flow<BatteryInfo>
+
+    /**
+     * Get the number of available processors
+     */
+    fun availableProcessors(): Int
 }

@@ -110,4 +110,9 @@ interface DeviceGateway {
      * Monitor thermal state
      */
     val monitorThermalState: Flow<Int>
+
+    /**
+     * Get the number of available processors
+     */
+    fun getAvailableProcessors(): Int
 }

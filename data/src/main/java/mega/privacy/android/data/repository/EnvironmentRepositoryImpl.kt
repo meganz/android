@@ -100,4 +100,8 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
 
     override fun monitorBatteryInfo() =
         deviceGateway.monitorBatteryInfo
+
+    override fun availableProcessors() =
+        deviceGateway.getAvailableProcessors()
+
 }

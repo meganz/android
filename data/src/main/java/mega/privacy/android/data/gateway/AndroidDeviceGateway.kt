@@ -125,6 +125,9 @@ internal class AndroidDeviceGateway @Inject constructor(
         }
     }
 
+    override fun getAvailableProcessors() =
+        Runtime.getRuntime().availableProcessors()
+
     override fun getCurrentHourOfDay(): Int = LocalTime.now().hour
 
     override fun getCurrentMinute(): Int = LocalTime.now().minute
