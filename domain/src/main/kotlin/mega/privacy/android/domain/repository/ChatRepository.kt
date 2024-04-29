@@ -280,13 +280,13 @@ interface ChatRepository {
      * Update chat permissions
      *
      * @param chatId        The chat id.
-     * @param handle        User handle.
+     * @param nodeId        The node id.
      * @param permission    User privilege.
      * @return              The Chat Request.
      */
     suspend fun updateChatPermissions(
         chatId: Long,
-        handle: Long,
+        nodeId: NodeId,
         permission: ChatRoomPermission,
     ): ChatRequest
 

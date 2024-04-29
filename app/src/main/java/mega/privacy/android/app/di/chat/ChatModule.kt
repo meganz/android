@@ -26,7 +26,6 @@ import mega.privacy.android.domain.usecase.SetMyChatFilesFolder
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
-import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeeting
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
@@ -126,13 +125,6 @@ abstract class ChatModule {
         @Provides
         fun provideMonitorChatListItemUpdates(chatRepository: ChatRepository): MonitorChatListItemUpdates =
             MonitorChatListItemUpdates(chatRepository::monitorChatListItemUpdates)
-
-        /**
-         * Provides the Use Case [UpdateChatPermissions]
-         */
-        @Provides
-        fun provideUpdateChatPermissions(chatRepository: ChatRepository): UpdateChatPermissions =
-            UpdateChatPermissions(chatRepository::updateChatPermissions)
 
         /**
          * Provides the Use Case [RemoveFromChat]

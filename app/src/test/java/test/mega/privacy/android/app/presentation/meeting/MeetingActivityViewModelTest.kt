@@ -24,12 +24,12 @@ import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInvite
-import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
+import mega.privacy.android.domain.usecase.chat.UpdateChatPermissionsUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -88,7 +88,7 @@ class MeetingActivityViewModelTest {
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase = mock()
     private val createChatLink: CreateChatLink = mock()
     private val inviteContactUseCase: InviteContactUseCase = mock()
-    private val updateChatPermissionsUseCase: UpdateChatPermissions = mock()
+    private val updateChatPermissionsUseCase: UpdateChatPermissionsUseCase = mock()
     private val removeFromChaUseCase: RemoveFromChat = mock()
     private val startConversationUseCase: StartConversationUseCase = mock()
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()

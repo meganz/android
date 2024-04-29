@@ -79,6 +79,7 @@ import mega.privacy.android.domain.entity.meeting.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
 import mega.privacy.android.domain.entity.meeting.MeetingParticipantNotInCallStatus
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.CheckChatLinkUseCase
 import mega.privacy.android.domain.usecase.CreateChatLink
@@ -88,12 +89,12 @@ import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInvite
-import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.IsEphemeralPlusPlusUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
+import mega.privacy.android.domain.usecase.chat.UpdateChatPermissionsUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -149,7 +150,7 @@ import javax.inject.Inject
  * @property isEphemeralPlusPlusUseCase                     [IsEphemeralPlusPlusUseCase]
  * @property createChatLink                                 [CreateChatLink]
  * @property inviteContactUseCase                           [InviteContactUseCase]
- * @property updateChatPermissionsUseCase                   [UpdateChatPermissions]
+ * @property updateChatPermissionsUseCase                   [UpdateChatPermissionsUseCase]
  * @property removeFromChaUseCase                           [RemoveFromChat]
  * @property startConversationUseCase                       [StartConversationUseCase]
  * @property isConnectedToInternetUseCase                   [IsConnectedToInternetUseCase]
@@ -192,7 +193,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val isEphemeralPlusPlusUseCase: IsEphemeralPlusPlusUseCase,
     private val createChatLink: CreateChatLink,
     private val inviteContactUseCase: InviteContactUseCase,
-    private val updateChatPermissionsUseCase: UpdateChatPermissions,
+    private val updateChatPermissionsUseCase: UpdateChatPermissionsUseCase,
     private val removeFromChaUseCase: RemoveFromChat,
     private val startConversationUseCase: StartConversationUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
@@ -1801,7 +1802,11 @@ class MeetingActivityViewModel @Inject constructor(
         _state.value.chatParticipantSelected?.let { participant ->
             viewModelScope.launch {
                 runCatching {
-                    updateChatPermissionsUseCase(state.value.chatId, participant.handle, permission)
+                    updateChatPermissionsUseCase(
+                        chatId = state.value.chatId,
+                        nodeId = NodeId(participant.handle),
+                        permission = permission
+                    )
                 }.onFailure { exception ->
                     Timber.e(exception)
                 }.onSuccess {}

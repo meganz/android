@@ -43,6 +43,7 @@ import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
@@ -53,10 +54,10 @@ import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
-import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
+import mega.privacy.android.domain.usecase.chat.UpdateChatPermissionsUseCase
 import mega.privacy.android.domain.usecase.contact.GetMyFullNameUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
@@ -84,7 +85,7 @@ import javax.inject.Inject
  * @property removeFromChat                                 [RemoveFromChat]
  * @property inviteContact                                  [InviteContact]
  * @property setOpenInvite                                  [SetOpenInvite]
- * @property updateChatPermissions                          [UpdateChatPermissions]
+ * @property updateChatPermissionsUseCase                   [UpdateChatPermissionsUseCase]
  * @property getPublicChatToPrivate                         [SetPublicChatToPrivate]
  * @property passcodeManagement                             [PasscodeManagement]
  * @property chatManagement                                 [ChatManagement]
@@ -116,7 +117,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val removeFromChat: RemoveFromChat,
     private val inviteContact: InviteContact,
     private val setOpenInvite: SetOpenInvite,
-    private val updateChatPermissions: UpdateChatPermissions,
+    private val updateChatPermissionsUseCase: UpdateChatPermissionsUseCase,
     private val getPublicChatToPrivate: SetPublicChatToPrivate,
     private val passcodeManagement: PasscodeManagement,
     private val chatManagement: ChatManagement,
@@ -1092,7 +1093,11 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         _uiState.value.selected?.let { participant ->
             viewModelScope.launch {
                 runCatching {
-                    updateChatPermissions(uiState.value.chatId, participant.handle, permission)
+                    updateChatPermissionsUseCase(
+                        chatId = uiState.value.chatId,
+                        nodeId = NodeId(participant.handle),
+                        permission = permission
+                    )
                 }.onFailure { exception ->
                     Timber.e(exception)
                     triggerSnackbarMessage(

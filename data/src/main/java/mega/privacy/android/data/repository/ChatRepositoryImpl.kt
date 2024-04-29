@@ -612,25 +612,24 @@ internal class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun updateChatPermissions(
         chatId: Long,
-        handle: Long,
+        nodeId: NodeId,
         permission: ChatRoomPermission,
-    ) =
-        withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                val privilege = when (permission) {
-                    ChatRoomPermission.Moderator -> MegaChatRoom.PRIV_MODERATOR
-                    ChatRoomPermission.Standard -> MegaChatRoom.PRIV_STANDARD
-                    ChatRoomPermission.ReadOnly -> MegaChatRoom.PRIV_RO
-                    else -> MegaChatRoom.PRIV_UNKNOWN
-                }
-                megaChatApiGateway.updateChatPermissions(
-                    chatId, handle, privilege,
-                    OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = onRequestCompleted(continuation)
-                    )
-                )
+    ) = withContext(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            val privilege = when (permission) {
+                ChatRoomPermission.Moderator -> MegaChatRoom.PRIV_MODERATOR
+                ChatRoomPermission.Standard -> MegaChatRoom.PRIV_STANDARD
+                ChatRoomPermission.ReadOnly -> MegaChatRoom.PRIV_RO
+                else -> MegaChatRoom.PRIV_UNKNOWN
             }
+            megaChatApiGateway.updateChatPermissions(
+                chatId, nodeId.longValue, privilege,
+                OptionalMegaChatRequestListenerInterface(
+                    onRequestFinish = onRequestCompleted(continuation)
+                )
+            )
         }
+    }
 
     override suspend fun removeFromChat(
         chatId: Long, handle: Long,

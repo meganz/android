@@ -50,6 +50,7 @@ import mega.privacy.android.domain.entity.chat.ChatPreview
 import mega.privacy.android.domain.entity.chat.ConnectionState
 import mega.privacy.android.domain.entity.chat.messages.reactions.ReactionUpdate
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.ChatRepository
 import nz.mega.sdk.MegaChatApi
@@ -411,7 +412,11 @@ class ChatRepositoryImplTest {
                 )
             }
 
-            underTest.updateChatPermissions(chatId, userHandle, permissions.first)
+            underTest.updateChatPermissions(
+                chatId,
+                NodeId(userHandle),
+                permissions.first
+            )
 
             verify(megaChatApiGateway).updateChatPermissions(
                 eq(chatId),
