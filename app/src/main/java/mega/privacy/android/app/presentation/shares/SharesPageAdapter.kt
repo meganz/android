@@ -5,7 +5,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesComposeFragment
-import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment
 import mega.privacy.android.app.presentation.shares.links.LinksComposeFragment
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesComposeFragment
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragment
@@ -17,7 +16,6 @@ import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragm
  */
 class SharesPageAdapter(
     private val enabledOutgoingSharesCompose: Boolean,
-    private val enabledIncomingSharesCompose: Boolean,
     private val activity: FragmentActivity,
 ) :
     FragmentStateAdapter(activity) {
@@ -26,7 +24,7 @@ class SharesPageAdapter(
      * The list of fragments hold by the adapter
      */
     private val fragments = mutableMapOf(
-        SharesTab.INCOMING_TAB to if (enabledIncomingSharesCompose) IncomingSharesComposeFragment() else IncomingSharesFragment(),
+        SharesTab.INCOMING_TAB to IncomingSharesComposeFragment(),
         SharesTab.OUTGOING_TAB to if (enabledOutgoingSharesCompose) OutgoingSharesComposeFragment() else OutgoingSharesFragment(),
         SharesTab.LINKS_TAB to LinksComposeFragment()
     )
@@ -56,7 +54,7 @@ class SharesPageAdapter(
      */
     fun refreshFragment(position: Int) {
         val fragment = when (SharesTab.fromPosition(position)) {
-            SharesTab.INCOMING_TAB -> if (enabledIncomingSharesCompose) IncomingSharesComposeFragment() else IncomingSharesFragment()
+            SharesTab.INCOMING_TAB -> IncomingSharesComposeFragment()
             SharesTab.OUTGOING_TAB -> if (enabledOutgoingSharesCompose) OutgoingSharesComposeFragment() else OutgoingSharesFragment()
             SharesTab.LINKS_TAB -> LinksComposeFragment()
             else -> throw Exception("Invalid position")

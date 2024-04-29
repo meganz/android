@@ -9,11 +9,9 @@ import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.di.GetNodeModule
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.DefaultGetBackupsChildrenNodes
-import mega.privacy.android.app.domain.usecase.DefaultGetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.DefaultGetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetBackupsChildrenNodes
 import mega.privacy.android.app.domain.usecase.GetBackupsNode
-import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.data.repository.MegaNodeRepository
@@ -33,9 +31,6 @@ abstract class ManagerUseCases {
 
     @Binds
     abstract fun bindGetBackupsChildrenNodes(useCase: DefaultGetBackupsChildrenNodes): GetBackupsChildrenNodes
-
-    @Binds
-    abstract fun bindGetIncomingSharesChildrenNode(useCase: DefaultGetIncomingSharesChildrenNode): GetIncomingSharesChildrenNode
 
     @Binds
     abstract fun bindGetOutgoingSharesChildrenNode(useCase: DefaultGetOutgoingSharesChildrenNode): GetOutgoingSharesChildrenNode

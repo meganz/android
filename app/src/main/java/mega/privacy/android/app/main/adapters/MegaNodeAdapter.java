@@ -88,7 +88,6 @@ import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFrag
 import mega.privacy.android.app.presentation.backups.BackupsFragment;
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
-import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment;
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesFragment;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
@@ -401,8 +400,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         if (selectedItems.size() <= 0) {
             if (type == BACKUPS_ADAPTER) {
                 ((BackupsFragment) fragment).hideMultipleSelect();
-            } else if (type == INCOMING_SHARES_ADAPTER) {
-                ((IncomingSharesFragment) fragment).hideMultipleSelect();
             } else if (type == OUTGOING_SHARES_ADAPTER) {
                 ((OutgoingSharesFragment) fragment).hideMultipleSelect();
             } else if (type == CONTACT_FILE_ADAPTER) {
@@ -1294,8 +1291,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     private void fileClicked(int currentPosition) {
         if (type == BACKUPS_ADAPTER) {
             ((BackupsFragment) fragment).onNodeSelected(currentPosition);
-        } else if (type == INCOMING_SHARES_ADAPTER) {
-            ((IncomingSharesFragment) fragment).itemClick(currentPosition);
         } else if (type == OUTGOING_SHARES_ADAPTER) {
             ((OutgoingSharesFragment) fragment).itemClick(currentPosition);
         } else if (type == CONTACT_FILE_ADAPTER) {
@@ -1316,8 +1311,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         if (isMultipleSelect()) {
             if (type == BACKUPS_ADAPTER) {
                 ((BackupsFragment) fragment).onNodeSelected(currentPosition);
-            } else if (type == INCOMING_SHARES_ADAPTER) {
-                ((IncomingSharesFragment) fragment).itemClick(currentPosition);
             } else if (type == OUTGOING_SHARES_ADAPTER) {
                 ((OutgoingSharesFragment) fragment).itemClick(currentPosition);
             } else if (type == CONTACT_FILE_ADAPTER) {
@@ -1351,9 +1344,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         if (type == BACKUPS_ADAPTER) {
             ((BackupsFragment) fragment).activateActionMode();
             ((BackupsFragment) fragment).onNodeSelected(currentPosition);
-        } else if (type == INCOMING_SHARES_ADAPTER) {
-            ((IncomingSharesFragment) fragment).activateActionMode();
-            ((IncomingSharesFragment) fragment).itemClick(currentPosition);
         } else if (type == CONTACT_SHARED_FOLDER_ADAPTER) {
             ((ContactSharedFolderFragment) fragment).activateActionMode();
             ((ContactSharedFolderFragment) fragment).itemClick(currentPosition);
