@@ -205,6 +205,20 @@ internal abstract class MegaDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_85_86 = object : Migration(85, 86) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.beginTransaction()
+                try {
+                    database.execSQL("DROP TABLE IF EXISTS camerauploadsrecords")
+                    database.execSQL("CREATE TABLE IF NOT EXISTS camerauploadsrecords (`media_id` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `folder_type` TEXT NOT NULL, `file_name` TEXT NOT NULL, `file_path` TEXT NOT NULL, `file_type` TEXT NOT NULL, `upload_status` TEXT NOT NULL, `original_fingerprint` TEXT NOT NULL, `generated_fingerprint` TEXT, `temp_file_path` TEXT NOT NULL, PRIMARY KEY(`media_id`, `timestamp`, `folder_type`))")
+                    database.setTransactionSuccessful()
+                } finally {
+                    database.endTransaction()
+                }
+            }
+        }
+
+
         val MIGRATIONS = arrayOf(
             MIGRATION_67_68,
             MIGRATION_68_69,
@@ -214,6 +228,7 @@ internal abstract class MegaDatabase : RoomDatabase() {
             MIGRATION_75_76,
             MIGRATION_76_77,
             MIGRATION_77_78,
+            MIGRATION_85_86,
         )
     }
 }

@@ -2,7 +2,6 @@ package mega.privacy.android.data.facade
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.test.runTest
@@ -50,18 +49,12 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.util.stream.Stream
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class MegaLocalRoomFacadeTest {
 
@@ -476,106 +469,50 @@ internal class MegaLocalRoomFacadeTest {
                 .isEqualTo(expected)
         }
 
-    @ParameterizedTest(name = "when encrypted media id is {0} and encrypted timestamp is {1}")
-    @MethodSource("provideEncryptedUpdateCameraUploadsRecordUploadStatusParameters")
-    fun `test that updateCameraUploadsRecordUploadStatus update the upload status of the corresponding item or throw an error`(
-        encryptedMediaId: String?,
-        encryptedTimestamp: String?,
-    ) = runTest {
-        val mediaId = 0L
-        val timestamp = 1L
-        val folderType = CameraUploadFolderType.Primary
-        val uploadStatus = CameraUploadsRecordUploadStatus.LOCAL_FILE_NOT_EXIST
+    @Test
+    fun `test that updateCameraUploadsRecordUploadStatus update the upload status of the corresponding item`() =
+        runTest {
+            val mediaId = 1234L
+            val timestamp = 5678L
+            val folderType = CameraUploadFolderType.Primary
+            val uploadStatus = CameraUploadsRecordUploadStatus.LOCAL_FILE_NOT_EXIST
 
-        whenever(encryptData(mediaId.toString())).thenReturn(encryptedMediaId)
-        whenever(encryptData(timestamp.toString())).thenReturn(encryptedTimestamp)
+            underTest.updateCameraUploadsRecordUploadStatus(
+                mediaId,
+                timestamp,
+                folderType,
+                uploadStatus,
+            )
 
-        when {
-            encryptedMediaId != null && encryptedTimestamp != null -> {
-                underTest.updateCameraUploadsRecordUploadStatus(
-                    mediaId,
-                    timestamp,
-                    folderType,
-                    uploadStatus,
-                )
-                verify(cameraUploadsRecordDao).updateCameraUploadsRecordUploadStatus(
-                    encryptedMediaId,
-                    encryptedTimestamp,
-                    folderType,
-                    uploadStatus,
-                )
-            }
-
-            else -> {
-                assertThrows<IllegalArgumentException> {
-                    underTest.updateCameraUploadsRecordUploadStatus(
-                        mediaId,
-                        timestamp,
-                        folderType,
-                        uploadStatus,
-                    )
-                }
-            }
+            verify(cameraUploadsRecordDao).updateCameraUploadsRecordUploadStatus(
+                mediaId,
+                timestamp,
+                folderType,
+                uploadStatus,
+            )
         }
-    }
 
-    private fun provideEncryptedUpdateCameraUploadsRecordUploadStatusParameters() = Stream.of(
-        Arguments.of("encryptedMediaId", "encryptedTimestamp"),
-        Arguments.of(null, "encryptedTimestamp"),
-        Arguments.of("encryptedMediaId", null),
-    )
+    @Test
+    fun `test that setCameraUploadsRecordGeneratedFingerprint set the upload status of the corresponding item`() =
+        runTest {
+            val mediaId = 1234L
+            val timestamp = 5678L
+            val folderType = CameraUploadFolderType.Primary
+            val generatedFingerprint = "generatedFingerprint"
 
-    @ParameterizedTest(name = "when encrypted media id is {0}, encrypted timestamp is {1} and encrypted generated fingerprint is {2}")
-    @MethodSource("provideEncryptedSetCameraUploadsRecordGeneratedFingerprintParameters")
-    fun `test that setCameraUploadsRecordGeneratedFingerprint set the upload status of the corresponding item or throw an error`(
-        encryptedMediaId: String?,
-        encryptedTimestamp: String?,
-        encryptedGeneratedFingerprint: String?,
-    ) = runTest {
-        val mediaId = 0L
-        val timestamp = 1L
-        val folderType = CameraUploadFolderType.Primary
-        val generatedFingerprint = "generatedFingerprint"
-
-        whenever(encryptData(mediaId.toString())).thenReturn(encryptedMediaId)
-        whenever(encryptData(timestamp.toString())).thenReturn(encryptedTimestamp)
-        whenever(encryptData(generatedFingerprint)).thenReturn(encryptedGeneratedFingerprint)
-
-        when {
-            encryptedMediaId != null && encryptedTimestamp != null && encryptedGeneratedFingerprint != null -> {
-                underTest.setCameraUploadsRecordGeneratedFingerprint(
-                    mediaId,
-                    timestamp,
-                    folderType,
-                    generatedFingerprint,
-                )
-                verify(cameraUploadsRecordDao).updateCameraUploadsRecordGeneratedFingerprint(
-                    encryptedMediaId,
-                    encryptedTimestamp,
-                    folderType,
-                    encryptedGeneratedFingerprint,
-                )
-            }
-
-            else -> {
-                assertThrows<IllegalArgumentException> {
-                    underTest.setCameraUploadsRecordGeneratedFingerprint(
-                        mediaId,
-                        timestamp,
-                        folderType,
-                        generatedFingerprint,
-                    )
-                }
-            }
+            underTest.setCameraUploadsRecordGeneratedFingerprint(
+                mediaId,
+                timestamp,
+                folderType,
+                generatedFingerprint,
+            )
+            verify(cameraUploadsRecordDao).updateCameraUploadsRecordGeneratedFingerprint(
+                mediaId,
+                timestamp,
+                folderType,
+                generatedFingerprint,
+            )
         }
-    }
-
-    private fun provideEncryptedSetCameraUploadsRecordGeneratedFingerprintParameters() = Stream.of(
-        Arguments.of("encryptedMediaId", "encryptedTimestamp", "encryptedGeneratedFingerprint"),
-        Arguments.of(null, "encryptedTimestamp", "encryptedGeneratedFingerprint"),
-        Arguments.of("encryptedMediaId", null, "encryptedGeneratedFingerprint"),
-        Arguments.of("encryptedMediaId", "encryptedTimestamp", null),
-    )
 
     @Test
     fun `test that deleteCameraUploadsRecords deletes the corresponding items`() =

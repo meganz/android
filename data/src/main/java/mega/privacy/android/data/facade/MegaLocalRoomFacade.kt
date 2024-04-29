@@ -254,14 +254,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
         folderType: CameraUploadFolderType,
         uploadStatus: CameraUploadsRecordUploadStatus,
     ) {
-        val encryptedMediaId = encryptData(mediaId.toString())
-        requireNotNull(encryptedMediaId)
-        val encryptedTimestamp = encryptData(timestamp.toString())
-        requireNotNull(encryptedTimestamp)
-
         cameraUploadsRecordDao.updateCameraUploadsRecordUploadStatus(
-            encryptedMediaId,
-            encryptedTimestamp,
+            mediaId,
+            timestamp,
             folderType,
             uploadStatus
         )
@@ -273,18 +268,11 @@ internal class MegaLocalRoomFacade @Inject constructor(
         folderType: CameraUploadFolderType,
         generatedFingerprint: String,
     ) {
-        val encryptedMediaId = encryptData(mediaId.toString())
-        requireNotNull(encryptedMediaId)
-        val encryptedTimestamp = encryptData(timestamp.toString())
-        requireNotNull(encryptedTimestamp)
-        val encryptedGeneratedFingerprint = encryptData(generatedFingerprint)
-        requireNotNull(encryptedGeneratedFingerprint)
-
         cameraUploadsRecordDao.updateCameraUploadsRecordGeneratedFingerprint(
-            encryptedMediaId,
-            encryptedTimestamp,
+            mediaId,
+            timestamp,
             folderType,
-            encryptedGeneratedFingerprint
+            generatedFingerprint
         )
     }
 

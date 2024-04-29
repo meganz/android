@@ -5,7 +5,6 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.MegaDatabase
 import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
@@ -17,7 +16,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class CameraUploadsRecordDaoTest {
     private lateinit var cameraUploadsRecordDao: CameraUploadsRecordDao
@@ -39,20 +37,20 @@ class CameraUploadsRecordDaoTest {
 
     private fun generateEntities() = (1..10).map {
         val entity = CameraUploadsRecordEntity(
-            encryptedMediaId = "encryptedMediaId$it",
-            encryptedTimestamp = "encryptedTimestamp$it",
+            mediaId = it.toLong(),
+            timestamp = it.toLong(),
             folderType = if (it % 2 == 0) CameraUploadFolderType.Primary else CameraUploadFolderType.Secondary,
-            encryptedFileName = "encryptedFileName$it",
-            encryptedFilePath = "encryptedFilePath$it",
+            fileName = "encryptedFileName$it",
+            filePath = "encryptedFilePath$it",
             fileType = if (it < 6) CameraUploadsRecordType.TYPE_PHOTO else CameraUploadsRecordType.TYPE_VIDEO,
             uploadStatus = when {
                 it < 3 -> CameraUploadsRecordUploadStatus.UPLOADED
                 it < 7 -> CameraUploadsRecordUploadStatus.PENDING
                 else -> CameraUploadsRecordUploadStatus.FAILED
             },
-            encryptedOriginalFingerprint = "encryptedOriginalFingerprint$it",
-            encryptedGeneratedFingerprint = "encryptedGeneratedFingerprint$it",
-            encryptedTempFilePath = "encryptedTempFilePath$it",
+            originalFingerprint = "encryptedOriginalFingerprint$it",
+            generatedFingerprint = "encryptedGeneratedFingerprint$it",
+            tempFilePath = "encryptedTempFilePath$it",
         )
         entity
     }
@@ -120,16 +118,16 @@ class CameraUploadsRecordDaoTest {
 
             val recordToUpdate = entities[0]
             cameraUploadsRecordDao.updateCameraUploadsRecordUploadStatus(
-                recordToUpdate.encryptedMediaId,
-                recordToUpdate.encryptedTimestamp,
+                recordToUpdate.mediaId,
+                recordToUpdate.timestamp,
                 recordToUpdate.folderType,
                 expected,
             )
 
             assertThat(
                 cameraUploadsRecordDao.getAllCameraUploadsRecords().single {
-                    it.encryptedMediaId == recordToUpdate.encryptedMediaId
-                            && it.encryptedTimestamp == recordToUpdate.encryptedTimestamp
+                    it.mediaId == recordToUpdate.mediaId
+                            && it.timestamp == recordToUpdate.timestamp
                             && it.folderType == recordToUpdate.folderType
                 }.uploadStatus
             ).isEqualTo(expected)
@@ -145,18 +143,18 @@ class CameraUploadsRecordDaoTest {
 
             val recordToUpdate = entities[0]
             cameraUploadsRecordDao.updateCameraUploadsRecordGeneratedFingerprint(
-                recordToUpdate.encryptedMediaId,
-                recordToUpdate.encryptedTimestamp,
+                recordToUpdate.mediaId,
+                recordToUpdate.timestamp,
                 recordToUpdate.folderType,
                 expected,
             )
 
             assertThat(
                 cameraUploadsRecordDao.getAllCameraUploadsRecords().single {
-                    it.encryptedMediaId == recordToUpdate.encryptedMediaId
-                            && it.encryptedTimestamp == recordToUpdate.encryptedTimestamp
+                    it.mediaId == recordToUpdate.mediaId
+                            && it.timestamp == recordToUpdate.timestamp
                             && it.folderType == recordToUpdate.folderType
-                }.encryptedGeneratedFingerprint
+                }.generatedFingerprint
             ).isEqualTo(expected)
         }
 

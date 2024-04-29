@@ -29,16 +29,16 @@ internal interface CameraUploadsRecordDao {
 
     @Query("UPDATE ${MegaDatabaseConstant.TABLE_CAMERA_UPLOADS_RECORDS} SET upload_status = :uploadStatus WHERE media_id = :mediaId AND timestamp = :timestamp AND folder_type = :folderType")
     suspend fun updateCameraUploadsRecordUploadStatus(
-        mediaId: String,
-        timestamp: String,
+        mediaId: Long,
+        timestamp: Long,
         folderType: CameraUploadFolderType,
         uploadStatus: CameraUploadsRecordUploadStatus,
     )
 
     @Query("UPDATE ${MegaDatabaseConstant.TABLE_CAMERA_UPLOADS_RECORDS} SET generated_fingerprint = :generatedFingerprint WHERE media_id = :mediaId AND timestamp = :timestamp AND folder_type = :folderType")
     suspend fun updateCameraUploadsRecordGeneratedFingerprint(
-        mediaId: String,
-        timestamp: String,
+        mediaId: Long,
+        timestamp: Long,
         folderType: CameraUploadFolderType,
         generatedFingerprint: String,
     )
