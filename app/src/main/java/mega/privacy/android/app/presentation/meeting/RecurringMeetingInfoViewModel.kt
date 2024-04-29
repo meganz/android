@@ -15,9 +15,9 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.usecase.GetChatParticipants
-import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
-import mega.privacy.android.domain.usecase.meeting.FetchScheduledMeetingOccurrencesByChat
+import mega.privacy.android.domain.usecase.meeting.FetchScheduledMeetingOccurrencesByChatUseCase
+import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdatesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -29,7 +29,7 @@ import javax.inject.Inject
  * RecurringMeetingInfoActivity view model.
  * @property monitorConnectivityUseCase                             [MonitorConnectivityUseCase]
  * @property getScheduledMeetingByChat                              [GetScheduledMeetingByChat]
- * @property fetchScheduledMeetingOccurrencesByChat                 [FetchScheduledMeetingOccurrencesByChat]
+ * @property fetchScheduledMeetingOccurrencesByChatUseCase          [FetchScheduledMeetingOccurrencesByChatUseCase]
  * @property fetchNumberOfScheduledMeetingOccurrencesByChat         [FetchNumberOfScheduledMeetingOccurrencesByChat]
  * @property getChatParticipants                                    [GetChatParticipants]
  * @property monitorScheduledMeetingUpdates                         [MonitorScheduledMeetingUpdatesUseCase]
@@ -41,7 +41,7 @@ class RecurringMeetingInfoViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
-    private val fetchScheduledMeetingOccurrencesByChat: FetchScheduledMeetingOccurrencesByChat,
+    private val fetchScheduledMeetingOccurrencesByChatUseCase: FetchScheduledMeetingOccurrencesByChatUseCase,
     private val fetchNumberOfScheduledMeetingOccurrencesByChat: FetchNumberOfScheduledMeetingOccurrencesByChat,
     private val getChatParticipants: GetChatParticipants,
     private val deviceGateway: DeviceGateway,
@@ -150,14 +150,14 @@ class RecurringMeetingInfoViewModel @Inject constructor(
                     }
 
                     state.value.isEmptyOccurrencesList() -> {
-                        fetchScheduledMeetingOccurrencesByChat(
-                            state.value.chatId,
-                            0
+                        fetchScheduledMeetingOccurrencesByChatUseCase(
+                            chatId = state.value.chatId,
+                            since = 0
                         )
                     }
 
                     else -> state.value.occurrencesList.last().startDateTime?.let {
-                        fetchScheduledMeetingOccurrencesByChat(state.value.chatId, it)
+                        fetchScheduledMeetingOccurrencesByChatUseCase(state.value.chatId, it)
                     }
                 }
             }.onFailure { exception ->

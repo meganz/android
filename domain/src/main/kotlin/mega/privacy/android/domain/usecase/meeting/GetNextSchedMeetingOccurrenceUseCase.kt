@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.usecase.meeting
 
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
-import mega.privacy.android.domain.repository.CallRepository
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -10,7 +9,7 @@ import javax.inject.Inject
  * Get next scheduled meeting occurrence
  */
 class GetNextSchedMeetingOccurrenceUseCase @Inject constructor(
-    private val callRepository: CallRepository,
+    private val fetchScheduledMeetingOccurrencesByChatUseCase: FetchScheduledMeetingOccurrencesByChatUseCase,
 ) {
 
     /**
@@ -21,9 +20,9 @@ class GetNextSchedMeetingOccurrenceUseCase @Inject constructor(
      */
     suspend operator fun invoke(chatId: Long): ChatScheduledMeetingOccurr? {
         val now = Instant.now()
-        return callRepository.fetchScheduledMeetingOccurrencesByChat(
-            chatId,
-            now.minus(1L, ChronoUnit.HALF_DAYS).epochSecond
+        return fetchScheduledMeetingOccurrencesByChatUseCase(
+            chatId = chatId,
+            since = now.minus(1L, ChronoUnit.HALF_DAYS).epochSecond
         ).sortedBy(ChatScheduledMeetingOccurr::startDateTime)
             .firstOrNull { occurrence ->
                 !occurrence.isCancelled
@@ -32,6 +31,5 @@ class GetNextSchedMeetingOccurrenceUseCase @Inject constructor(
             }
     }
 
-    private fun Long.toInstant(): Instant =
-        Instant.ofEpochSecond(this)
+    private fun Long.toInstant(): Instant = Instant.ofEpochSecond(this)
 }

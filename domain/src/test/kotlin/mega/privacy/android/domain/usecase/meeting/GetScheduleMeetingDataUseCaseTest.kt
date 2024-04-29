@@ -10,7 +10,6 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
-import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import org.junit.After
 import org.junit.Before
@@ -28,7 +27,8 @@ internal class GetScheduleMeetingDataUseCaseTest {
     private lateinit var underTest: GetScheduleMeetingDataUseCase
 
     private val getScheduledMeetingByChat = mock<GetScheduledMeetingByChat>()
-    private val callRepository = mock<CallRepository>()
+    private val fetchScheduledMeetingOccurrencesByChatUseCase =
+        mock<FetchScheduledMeetingOccurrencesByChatUseCase>()
     private val getChatRoomUseCase = mock<GetChatRoomUseCase>()
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -37,7 +37,7 @@ internal class GetScheduleMeetingDataUseCaseTest {
         Dispatchers.setMain(testDispatcher)
         underTest = GetScheduleMeetingDataUseCase(
             getScheduledMeetingByChat,
-            GetNextSchedMeetingOccurrenceUseCase(callRepository),
+            GetNextSchedMeetingOccurrenceUseCase(fetchScheduledMeetingOccurrencesByChatUseCase),
             getChatRoomUseCase,
         )
     }
@@ -125,11 +125,11 @@ internal class GetScheduleMeetingDataUseCaseTest {
             )
 
             whenever(
-                callRepository.fetchScheduledMeetingOccurrencesByChat(chatId, now)
+                fetchScheduledMeetingOccurrencesByChatUseCase(chatId, now)
             ).thenReturn(listOf(meetingOccurrence))
 
             underTest.invoke(chatId) { _, _ -> "" }
 
-            verify(callRepository).fetchScheduledMeetingOccurrencesByChat(chatId, now)
+            verify(fetchScheduledMeetingOccurrencesByChatUseCase).invoke(chatId, now)
         }
 }

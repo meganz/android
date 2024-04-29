@@ -1,30 +1,35 @@
 package mega.privacy.android.domain.usecase.meeting
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
-import mega.privacy.android.domain.repository.CallRepository
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import java.time.Instant
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class GetNextSchedMeetingOccurrenceUseCaseTest {
 
     private lateinit var underTest: GetNextSchedMeetingOccurrenceUseCase
 
-    private val callRepository = mock<CallRepository>()
+    private val fetchScheduledMeetingOccurrencesByChatUseCase =
+        mock<FetchScheduledMeetingOccurrencesByChatUseCase>()
 
-    @Before
+    @BeforeEach
     fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-        underTest = GetNextSchedMeetingOccurrenceUseCase(callRepository)
+        underTest = GetNextSchedMeetingOccurrenceUseCase(
+            fetchScheduledMeetingOccurrencesByChatUseCase = fetchScheduledMeetingOccurrencesByChatUseCase
+        )
+    }
+
+    @AfterEach
+    fun tearDown() {
+        reset(fetchScheduledMeetingOccurrencesByChatUseCase)
     }
 
     @Test
@@ -34,7 +39,7 @@ internal class GetNextSchedMeetingOccurrenceUseCaseTest {
             val pastTimestamp = Instant.now().minusSeconds(43200).epochSecond
 
             whenever(
-                callRepository.fetchScheduledMeetingOccurrencesByChat(chatId, pastTimestamp)
+                fetchScheduledMeetingOccurrencesByChatUseCase(chatId, pastTimestamp)
             ).thenReturn(emptyList())
 
             val result = underTest.invoke(chatId)
@@ -55,7 +60,7 @@ internal class GetNextSchedMeetingOccurrenceUseCaseTest {
             )
 
             whenever(
-                callRepository.fetchScheduledMeetingOccurrencesByChat(
+                fetchScheduledMeetingOccurrencesByChatUseCase(
                     chatId,
                     now.minusSeconds(43200).epochSecond
                 )
