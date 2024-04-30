@@ -36,6 +36,7 @@ import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.canBeHandled
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -85,6 +86,8 @@ class LoginFragment : Fragment() {
     lateinit var loginMutex: Mutex
 
     private val viewModel: LoginViewModel by activityViewModels()
+
+    private val billingViewModel by activityViewModels<BillingViewModel>()
 
     private var insertMKDialog: AlertDialog? = null
     private var confirmLogoutDialog: AlertDialog? = null
@@ -138,6 +141,8 @@ class LoginFragment : Fragment() {
                 onLoginClicked = {
                     LoginActivity.isBackFromLoginPage = false
                     viewModel.onLoginClicked(false)
+                    billingViewModel.loadSkus()
+                    billingViewModel.loadPurchases()
                 },
                 onForgotPassword = { onForgotPassword(uiState.accountSession?.email) },
                 onCreateAccount = ::onCreateAccount,

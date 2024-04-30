@@ -33,7 +33,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 
 /**
  *  Compose UI for new Onboarding dialog (Choose account screen), this is Variant A
- *  User will see this account when the registration was finished and user signs in for the first time ever
+ *  User will see this screen when the registration was finished and user signs in for the first time ever
  */
 @Composable
 fun VariantAOnboardingDialogView(

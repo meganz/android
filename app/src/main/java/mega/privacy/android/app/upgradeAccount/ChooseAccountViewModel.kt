@@ -10,15 +10,34 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.upgradeAccount.model.ChooseAccountState
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.billing.GetCheapestSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
+import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
+import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * Choose account view model
+ *
+ * @params getPricing use case to get the pricing list of products
+ * @param getMonthlySubscriptionsUseCase use case to get the list of monthly subscriptions available in the app
+ * @param getYearlySubscriptionsUseCase use case to get the list of yearly subscriptions available in the app
+ * @param localisedSubscriptionMapper mapper to map Subscription class to LocalisedSubscription class
+ * @param getCheapestSubscriptionUseCase use case to get the cheapest subscription available in the app
+ * @param getFeatureFlagValueUseCase use case to get the value of a feature flag
+ * @param isBillingAvailableUseCase use case to check if billing is available
+ * @param getPaymentMethodUseCase use case to to get available payment method (Google Wallet)
+ *
+ * @property state The current UI state
+ */
 @HiltViewModel
 internal class ChooseAccountViewModel @Inject constructor(
     private val getPricing: GetPricing,
@@ -27,6 +46,8 @@ internal class ChooseAccountViewModel @Inject constructor(
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
     private val getCheapestSubscriptionUseCase: GetCheapestSubscriptionUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getPaymentMethodUseCase: GetPaymentMethodUseCase,
+    private val isBillingAvailableUseCase: IsBillingAvailableUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChooseAccountState())
@@ -72,10 +93,29 @@ internal class ChooseAccountViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            val getFeatureFlag =
-                getFeatureFlagValueUseCase(ABTestFeatures.ChooseAccountScreenVariantA)
+            runCatching {
+                getFeatureFlagValueUseCase(ABTestFeatures.ChooseAccountScreenVariantA) to
+                        getFeatureFlagValueUseCase(ABTestFeatures.ChooseAccountScreenVariantB)
+            }.onSuccess { (variantA, variantB) ->
+                _state.update {
+                    it.copy(
+                        enableVariantAUI = variantA,
+                        enableVariantBUI = variantB
+                    )
+                }
+            }.onFailure { Timber.e("Failed to fetch feature flags with error: ${it.message}") }
+        }
+
+        viewModelScope.launch {
+            val paymentMethod =
+                runCatching { getPaymentMethodUseCase(false) }.getOrElse { PaymentMethodFlags(0L) }
+            if (paymentMethod.flag == 0L) {
+                Timber.w("Payment method flag is not received: ${paymentMethod.flag}")
+            }
+            val isBillingAvailable = isBillingAvailableUseCase()
+                    && ((paymentMethod.flag and (1L shl MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET)) != 0L) // check bit enable
             _state.update {
-                it.copy(enableVariantAUI = getFeatureFlag)
+                it.copy(isPaymentMethodAvailable = isBillingAvailable)
             }
         }
         refreshPricing()
@@ -95,4 +135,24 @@ internal class ChooseAccountViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * On selecting monthly or yearly plan
+     *
+     * @param isMonthly
+     */
+    fun onSelectingMonthlyPlan(isMonthly: Boolean) =
+        _state.update {
+            it.copy(isMonthlySelected = isMonthly)
+        }
+
+    /**
+     * On selecting monthly or yearly plan
+     *
+     * @param chosenPlan
+     */
+    fun onSelectingPlanType(chosenPlan: AccountType) =
+        _state.update {
+            it.copy(chosenPlan = chosenPlan)
+        }
 }

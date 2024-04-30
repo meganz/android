@@ -45,16 +45,22 @@ import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.shared.resources.R.string.dialog_onboarding_feature_storage_description
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 
+/**
+ *  Compose UI for new Onboarding dialog (Choose account screen), this is Variant B
+ *  User will see this screen when the registration was finished and user signs in for the first time ever
+ */
 @Composable
 fun VariantBOnboardingDialogView(
     state: ChooseAccountState,
+    onBackPressed: () -> Unit,
+    onContinueClicked: () -> Unit,
     onChoosingMonthlyYearlyPlan: (isMonthly: Boolean) -> Unit,
     onChoosingPlanType: (chosenPlan: AccountType) -> Unit,
     onPlayStoreLinkClicked: (String) -> Unit,
+    onProIIIVisible: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
 
@@ -62,6 +68,7 @@ fun VariantBOnboardingDialogView(
         topBar = {
             MegaAppBar(
                 appBarType = AppBarType.BACK_NAVIGATION,
+                onNavigationPressed = onBackPressed,
                 title = stringResource(id = sharedR.string.dialog_onboarding_app_bar_title),
             )
         },
@@ -69,9 +76,11 @@ fun VariantBOnboardingDialogView(
             VariantBOnboardingDialogColumn(
                 uiState = state,
                 scrollState = scrollState,
+                onContinueClicked = onContinueClicked,
                 onChoosingMonthlyYearlyPlan = onChoosingMonthlyYearlyPlan,
                 onChoosingPlanType = onChoosingPlanType,
                 onPlayStoreLinkClicked = onPlayStoreLinkClicked,
+                onProIIIVisible = onProIIIVisible,
             )
         }
     )
@@ -81,9 +90,11 @@ fun VariantBOnboardingDialogView(
 internal fun VariantBOnboardingDialogColumn(
     uiState: ChooseAccountState,
     scrollState: ScrollState,
+    onContinueClicked: () -> Unit,
     onChoosingMonthlyYearlyPlan: (isMonthly: Boolean) -> Unit,
     onChoosingPlanType: (chosenPlan: AccountType) -> Unit,
     onPlayStoreLinkClicked: (String) -> Unit,
+    onProIIIVisible: () -> Unit,
 ) {
     var isMonthly by rememberSaveable { mutableStateOf(false) }
     val cheapestSubscriptionAvailable = uiState.cheapestSubscriptionAvailable
@@ -91,7 +102,7 @@ internal fun VariantBOnboardingDialogColumn(
     val formattedStorage = cheapestSubscriptionAvailable?.formatStorageSize(usePlaceholder = false)
     val minimalStorageUnitString = formattedStorage?.let { stringResource(id = it.unit) } ?: ""
     val minimalStorageSizeString = formattedStorage?.size ?: ""
-    var chosenPlan by rememberSaveable { mutableStateOf(AccountType.FREE) }
+    var chosenPlan by rememberSaveable { mutableStateOf(AccountType.PRO_I) }
     var isPreselectedPlanOnce by rememberSaveable { mutableStateOf(false) }
     val isPaymentMethodAvailable = uiState.isPaymentMethodAvailable
     val coroutineScope = rememberCoroutineScope()
@@ -101,12 +112,13 @@ internal fun VariantBOnboardingDialogColumn(
             .verticalScroll(state = scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(modifier = Modifier.fillMaxWidth()) {
+        Row {
             Column(
                 modifier = Modifier
                     .width(390.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                Spacer(modifier = Modifier.height(12.dp))
                 GetProPlanColumn(
                     state = uiState,
                     isLoading = isLoading,
@@ -118,7 +130,7 @@ internal fun VariantBOnboardingDialogColumn(
                     drawableID = painterResource(id = R.drawable.ic_storage_onboarding_dialog),
                     title = stringResource(id = R.string.dialog_onboarding_feature_title_storage),
                     description = stringResource(
-                        id = dialog_onboarding_feature_storage_description,
+                        id = sharedR.string.dialog_onboarding_feature_storage_description,
                         minimalStorageSizeString,
                         minimalStorageUnitString
                     ),
@@ -160,9 +172,7 @@ internal fun VariantBOnboardingDialogColumn(
             }
         }
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
+            modifier = Modifier.padding(top = 16.dp),
         ) {
             Column(
                 modifier = Modifier.width(390.dp)
@@ -184,41 +194,52 @@ internal fun VariantBOnboardingDialogColumn(
                         proPlan = AccountType.FREE,
                         subscription = cheapestSubscriptionAvailable!!,
                         isRecommended = false,
-                        onPlanClicked = { /*TODO*/ },
-                        isMonthly = true,
+                        onPlanClicked = {
+                            chosenPlan = AccountType.FREE
+                            isPreselectedPlanOnce = true
+                            onChoosingPlanType(AccountType.FREE)
+                            onChoosingMonthlyYearlyPlan(isMonthly)
+                        },
+                        isMonthly = isMonthly,
                         isClicked = chosenPlan == AccountType.FREE,
                         showCurrentPlanLabel = false,
                         testTag = PRO_PLAN_CARD_VARIANT_B,
                     )
-                    uiState.localisedSubscriptionsList.forEach {
+                    uiState.localisedSubscriptionsList.forEach { localisedSubscription ->
                         val isRecommended =
-                            it.accountType == AccountType.PRO_I
+                            when (uiState.cheapestSubscriptionAvailable.accountType) {
+                                AccountType.PRO_LITE -> localisedSubscription.accountType == AccountType.PRO_I
+                                AccountType.PRO_I -> localisedSubscription.accountType == AccountType.PRO_II
+                                AccountType.PRO_II -> localisedSubscription.accountType == AccountType.PRO_III
+                                else -> false
+                            }
                         val disableCardClick = false
                         val isClicked =
-                            (chosenPlan == it.accountType) && isPaymentMethodAvailable && !disableCardClick
+                            (chosenPlan == localisedSubscription.accountType) && isPaymentMethodAvailable && !disableCardClick
                         if (isRecommended && !isPreselectedPlanOnce && isPaymentMethodAvailable) {
-                            chosenPlan = it.accountType
+                            chosenPlan = localisedSubscription.accountType
                             onChoosingMonthlyYearlyPlan(isMonthly)
-                            onChoosingPlanType(it.accountType)
+                            onChoosingPlanType(localisedSubscription.accountType)
                         }
                         ProPlanInfoCard(
-                            proPlan = it.accountType,
-                            subscription = it,
+                            proPlan = localisedSubscription.accountType,
+                            subscription = localisedSubscription,
                             isRecommended = isRecommended,
                             onPlanClicked = {
                                 if (!isPaymentMethodAvailable) {
                                     chosenPlan = AccountType.FREE
-                                    onChoosingPlanType(it.accountType)
+                                    onChoosingPlanType(AccountType.FREE)
+                                    onChoosingMonthlyYearlyPlan(isMonthly)
                                     coroutineScope.launch {
                                         scrollState.animateScrollTo(0)
                                     }
                                 }
                                 if (isPaymentMethodAvailable) {
                                     if (!disableCardClick) {
-                                        chosenPlan = it.accountType
+                                        chosenPlan = localisedSubscription.accountType
                                         isPreselectedPlanOnce = true
                                         onChoosingMonthlyYearlyPlan(isMonthly)
-                                        onChoosingPlanType(it.accountType)
+                                        onChoosingPlanType(localisedSubscription.accountType)
                                     }
                                 }
                             },
@@ -230,7 +251,7 @@ internal fun VariantBOnboardingDialogColumn(
                     }
                     RaisedDefaultMegaButton(
                         textId = sharedR.string.dialog_onboarding_button_continue,
-                        onClick = { /*TODO*/ },
+                        onClick = onContinueClicked,
                         modifier = Modifier
                             .padding(17.dp)
                             .fillMaxWidth()
@@ -259,9 +280,12 @@ private fun PreviewVariantBOnboardingDialogView(
     MegaAppTheme(isDark = isSystemInDarkTheme()) {
         VariantBOnboardingDialogView(
             state = state,
+            onBackPressed = {},
+            onContinueClicked = {},
             onChoosingMonthlyYearlyPlan = {},
             onChoosingPlanType = {},
             onPlayStoreLinkClicked = {},
+            onProIIIVisible = {},
         )
     }
 }

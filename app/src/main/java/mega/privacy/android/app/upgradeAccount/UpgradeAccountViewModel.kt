@@ -230,20 +230,22 @@ class UpgradeAccountViewModel @Inject constructor(
             it.copy(chosenPlan = chosenPlan)
         }
 
-    /**
-     * Get product id for payment
-     *
-     */
-    fun getProductId(isMonthly: Boolean, upgradeType: Int): String {
-        val skus = getSkus(upgradeType)
-        return if (isMonthly) skus.first else skus.second
-    }
+    companion object {
+        /**
+         * Get product id for payment
+         *
+         */
+        fun getProductId(isMonthly: Boolean, upgradeType: Int): String {
+            val skus = getSkus(upgradeType)
+            return if (isMonthly) skus.first else skus.second
+        }
 
-    private fun getSkus(upgradeType: Int) = when (upgradeType) {
-        Constants.PRO_I -> Skus.SKU_PRO_I_MONTH to Skus.SKU_PRO_I_YEAR
-        Constants.PRO_II -> Skus.SKU_PRO_II_MONTH to Skus.SKU_PRO_II_YEAR
-        Constants.PRO_III -> Skus.SKU_PRO_III_MONTH to Skus.SKU_PRO_III_YEAR
-        Constants.PRO_LITE -> Skus.SKU_PRO_LITE_MONTH to Skus.SKU_PRO_LITE_YEAR
-        else -> "" to ""
+        private fun getSkus(upgradeType: Int) = when (upgradeType) {
+            Constants.PRO_I -> Skus.SKU_PRO_I_MONTH to Skus.SKU_PRO_I_YEAR
+            Constants.PRO_II -> Skus.SKU_PRO_II_MONTH to Skus.SKU_PRO_II_YEAR
+            Constants.PRO_III -> Skus.SKU_PRO_III_MONTH to Skus.SKU_PRO_III_YEAR
+            Constants.PRO_LITE -> Skus.SKU_PRO_LITE_MONTH to Skus.SKU_PRO_LITE_YEAR
+            else -> "" to ""
+        }
     }
 }

@@ -193,9 +193,12 @@ class VariantBOnboardingDialogViewTest {
     private fun setContent() = composeRule.setContent {
         VariantBOnboardingDialogView(
             state = getChooseAccountState(),
+            onBackPressed = {},
+            onContinueClicked = {},
             onChoosingMonthlyYearlyPlan = {},
             onChoosingPlanType = {},
             onPlayStoreLinkClicked = {},
+            onProIIIVisible = {},
         )
     }
 

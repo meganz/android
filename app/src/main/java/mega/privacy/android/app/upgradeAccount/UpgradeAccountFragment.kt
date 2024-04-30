@@ -24,6 +24,7 @@ import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountViewModel.Companion.getProductId
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
 import mega.privacy.android.app.upgradeAccount.view.UpgradeAccountView
 import mega.privacy.android.app.utils.Constants
@@ -142,21 +143,11 @@ class UpgradeAccountFragment : Fragment() {
     ) {
         billingViewModel.startPurchase(
             upgradeAccountActivity,
-            upgradeAccountViewModel.getProductId(
+            getProductId(
                 isMonthlySelected,
                 chosenPlan
             )
         )
-    }
-
-    private fun convertAccountTypeToInt(accountType: AccountType): Int {
-        return when (accountType) {
-            AccountType.PRO_LITE -> Constants.PRO_LITE
-            AccountType.PRO_I -> Constants.PRO_I
-            AccountType.PRO_II -> Constants.PRO_II
-            AccountType.PRO_III -> Constants.PRO_III
-            else -> Constants.INVALID_VALUE
-        }
     }
 
     private fun redirectToPlayStoreSubscription(link: String) {
@@ -215,5 +206,15 @@ class UpgradeAccountFragment : Fragment() {
 
     companion object {
         const val PRIVACY_POLICY_URL = "https://mega.nz/privacy"
+
+        internal fun convertAccountTypeToInt(accountType: AccountType): Int {
+            return when (accountType) {
+                AccountType.PRO_LITE -> Constants.PRO_LITE
+                AccountType.PRO_I -> Constants.PRO_I
+                AccountType.PRO_II -> Constants.PRO_II
+                AccountType.PRO_III -> Constants.PRO_III
+                else -> Constants.INVALID_VALUE
+            }
+        }
     }
 }
