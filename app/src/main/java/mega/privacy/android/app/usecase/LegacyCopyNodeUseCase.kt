@@ -198,6 +198,8 @@ class LegacyCopyNodeUseCase @Inject constructor(
     /**
      * Copies nodes.
      *
+     * Should be removed when [mega.privacy.android.app.main.megachat.ChatActivity] is removed from the codebase
+     *
      * @param nodes         List of MegaNodes to copy.
      * @param parentHandle  Parent MegaNode handle in which the nodes have to be copied.
      * @return Single with the [CopyRequestResult].

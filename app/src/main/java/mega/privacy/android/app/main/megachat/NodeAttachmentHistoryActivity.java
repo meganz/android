@@ -57,6 +57,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.content.FileProvider;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -84,6 +85,7 @@ import kotlin.Unit;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.arch.extensions.ViewExtensionsKt;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
@@ -104,7 +106,6 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetc
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel;
-import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
@@ -133,10 +134,10 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
     @Inject
     CheckNameCollisionUseCase checkNameCollisionUseCase;
-    @Inject
-    LegacyCopyNodeUseCase legacyCopyNodeUseCase;
+
     @Inject
     CopyRequestMessageMapper copyRequestMessageMapper;
+
     @Inject
     GetFeatureFlagValueUseCase getFeatureFlagUseCase;
 
@@ -379,6 +380,24 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                 Timber.e("ERROR: node is NULL");
             }
         }
+
+        // Observe copy request result
+        ViewExtensionsKt.collectFlow(this, viewModel.getCopyResultFlow(), Lifecycle.State.STARTED, copyResult -> {
+            if (copyResult == null) return Unit.INSTANCE;
+            dismissAlertDialogIfExists(statusDialog);
+
+            Throwable copyThrowable = copyResult.getError();
+            if (copyThrowable != null) {
+                manageCopyMoveException(copyThrowable);
+            }
+
+            showSnackbar(SNACKBAR_TYPE, copyResult.getResult() != null
+                            ? copyRequestMessageMapper.invoke(copyResult.getResult())
+                            : getString(R.string.import_success_error),
+                    MEGACHAT_INVALID_HANDLE);
+            viewModel.copyResultConsumed();
+            return Unit.INSTANCE;
+        });
     }
 
     private void addStartDownloadTransferView() {
@@ -1149,30 +1168,16 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                 .subscribe((result, throwable) -> {
                     if (throwable == null) {
                         ArrayList<NameCollision> collisions = result.getFirst();
-
-                        if (!collisions.isEmpty()) {
+                        if (nameCollisionActivityContract != null && !collisions.isEmpty()) {
                             dismissAlertDialogIfExists(statusDialog);
                             nameCollisionActivityContract.launch(collisions);
                         }
 
                         List<MegaNode> nodesWithoutCollision = result.getSecond();
-
                         if (!nodesWithoutCollision.isEmpty()) {
-                            composite.add(legacyCopyNodeUseCase.copy(nodesWithoutCollision, toHandle)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe((copyResult, copyThrowable) -> {
-                                        dismissAlertDialogIfExists(statusDialog);
-
-                                        if (copyThrowable != null) {
-                                            manageCopyMoveException(copyThrowable);
-                                        }
-
-                                        showSnackbar(SNACKBAR_TYPE, copyThrowable == null
-                                                        ? copyRequestMessageMapper.invoke(copyResult)
-                                                        : getString(R.string.import_success_error),
-                                                MEGACHAT_INVALID_HANDLE);
-                                    }));
+                            List<Long> messageIds = new ArrayList<>();
+                            for (long id : importMessagesHandles) messageIds.add(id);
+                            viewModel.copyChatNodes(chatId, messageIds, toHandle);
                         }
                     } else {
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error), MEGACHAT_INVALID_HANDLE);
