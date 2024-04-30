@@ -22,6 +22,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.presentation.chat.dialog.view.ChatRoomItemBottomSheetView
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.data.SnackBarItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
@@ -142,14 +143,24 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private fun onInfoClick() {
         val item = viewModel.getChatItem(chatId) ?: return
         val intent =
-            if (item is MeetingChatRoomItem && item.isPending && item.isActive) {
-                Intent(context, ScheduledMeetingInfoActivity::class.java).apply {
-                    putExtra(Constants.CHAT_ID, chatId)
-                    putExtra(Constants.SCHEDULED_MEETING_ID, item.schedId)
+            when {
+                item is ChatRoomItem.IndividualChatRoomItem -> {
+                    Intent(context, ContactInfoActivity::class.java).apply {
+                        putExtra(Constants.NAME, item.peerEmail)
+                    }
                 }
-            } else {
-                Intent(context, GroupChatInfoActivity::class.java).apply {
-                    putExtra(Constants.HANDLE, chatId)
+
+                item is MeetingChatRoomItem && item.isPending && item.isActive -> {
+                    Intent(context, ScheduledMeetingInfoActivity::class.java).apply {
+                        putExtra(Constants.CHAT_ID, chatId)
+                        putExtra(Constants.SCHEDULED_MEETING_ID, item.schedId)
+                    }
+                }
+
+                else -> {
+                    Intent(context, GroupChatInfoActivity::class.java).apply {
+                        putExtra(Constants.HANDLE, chatId)
+                    }
                 }
             }
         startActivity(intent)
