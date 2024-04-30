@@ -3,8 +3,9 @@ package mega.privacy.android.app.camera
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
@@ -16,10 +17,11 @@ import mega.privacy.android.app.presentation.extensions.parcelable
 import mega.privacy.android.shared.theme.MegaAppTheme
 
 @AndroidEntryPoint
-internal class CameraActivity : ComponentActivity() {
+internal class CameraActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
         setContent {
             val navController = rememberNavController()
             val args = intent.parcelable<CameraArg>(EXTRA_ARGS) as CameraArg

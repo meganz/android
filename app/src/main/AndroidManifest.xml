@@ -722,7 +722,8 @@
             android:launchMode="singleTop" />
         <activity
             android:name="mega.privacy.android.app.camera.CameraActivity"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
