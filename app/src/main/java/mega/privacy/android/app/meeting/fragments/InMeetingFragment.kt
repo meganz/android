@@ -54,7 +54,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANG
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_CONNECTION_STATUS
 import mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_ERROR_STARTING_CALL
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_GET_AVATAR
 import mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL
@@ -249,13 +248,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (chatId != MEGACHAT_INVALID_HANDLE && inMeetingViewModel.getCall() != null && shouldBeEnabled != camIsEnable) {
             MegaApplication.getChatManagement().isDisablingLocalVideo = true
             sharedModel.clickCamera(shouldBeEnabled)
-        }
-    }
-
-    private val errorStatingCallObserver = Observer<Long> {
-        if (inMeetingViewModel.isSameChatRoom(it)) {
-            Timber.e("Error starting a call")
-            showMeetingFailedDialog()
         }
     }
 
@@ -873,9 +865,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun initLiveEventBus() {
         LiveEventBus.get(EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE, Boolean::class.java)
             .observe(this, enableOrDisableLocalVideoObserver)
-
-        LiveEventBus.get(EVENT_ERROR_STARTING_CALL, Long::class.java)
-            .observe(this, errorStatingCallObserver)
 
         LiveEventBus.get(EVENT_NOT_OUTGOING_CALL, Long::class.java)
             .observe(this, noOutgoingCallObserver)

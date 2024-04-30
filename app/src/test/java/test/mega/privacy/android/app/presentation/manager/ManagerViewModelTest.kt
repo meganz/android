@@ -87,7 +87,6 @@ import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.GetUsersCallLimitRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorUpgradeDialogClosedUseCase
@@ -303,9 +302,6 @@ class ManagerViewModelTest {
     private lateinit var monitorSyncsUseCaseFakeFlow: MutableSharedFlow<List<FolderPair>>
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase = mock()
     private val hangChatCallUseCase: HangChatCallUseCase = mock()
-    private val monitorCallEndedUseCase: MonitorCallEndedUseCase = mock {
-        onBlocking { invoke() }.thenReturn(emptyFlow())
-    }
     private val fakeCallUpdatesFlow = MutableSharedFlow<ChatCall>()
 
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock {
@@ -392,7 +388,6 @@ class ManagerViewModelTest {
             },
             monitorChatSessionUpdatesUseCase = monitorChatSessionUpdatesUseCase,
             hangChatCallUseCase = hangChatCallUseCase,
-            monitorCallEndedUseCase = monitorCallEndedUseCase,
             monitorChatCallUpdatesUseCase = monitorChatCallUpdatesUseCase,
             getUsersCallLimitRemindersUseCase = getUsersCallLimitRemindersUseCase,
             setUsersCallLimitRemindersUseCase = setUsersCallLimitRemindersUseCase,
@@ -448,10 +443,9 @@ class ManagerViewModelTest {
             monitorUpgradeDialogClosedUseCase
         )
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-        whenever(getUsersCallLimitRemindersUseCase()).thenReturn(flowOf(UsersCallLimitReminders.Enabled))
+        whenever(getUsersCallLimitRemindersUseCase()).thenReturn(emptyFlow())
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(true)
         whenever(monitorUserUpdates()).thenReturn(emptyFlow())
-        whenever(monitorCallEndedUseCase()).thenReturn(emptyFlow())
         whenever(monitorChatArchivedUseCase()).thenReturn(flowOf("Chat Title"))
         whenever(monitorPushNotificationSettingsUpdate()).thenReturn(flowOf(true))
         wheneverBlocking { getPrimarySyncHandleUseCase() }.thenReturn(0L)
@@ -465,6 +459,24 @@ class ManagerViewModelTest {
         monitorMyAccountUpdateFakeFlow = MutableSharedFlow()
         initViewModel()
     }
+
+    @Test
+    fun `test that the option returned by getUsersCallLimitRemindersUseCase is set as enabled`() =
+        runTest {
+            whenever(getUsersCallLimitRemindersUseCase()).thenReturn(flowOf(UsersCallLimitReminders.Enabled))
+            underTest.state.map { it.usersCallLimitReminders }.distinctUntilChanged().test {
+                testScheduler.advanceUntilIdle()
+                assertThat(awaitItem()).isEqualTo(UsersCallLimitReminders.Enabled)
+            }
+        }
+
+    @Test
+    fun `test that setUsersCallLimitRemindersUseCase calls the set use case with the correct value`() =
+        runTest {
+            underTest.setUsersCallLimitReminder(false)
+            testScheduler.advanceUntilIdle()
+            verify(setUsersCallLimitRemindersUseCase).invoke(UsersCallLimitReminders.Disabled)
+        }
 
     @Test
     fun `test that the user root backups folder node id is set when an update is received`() =

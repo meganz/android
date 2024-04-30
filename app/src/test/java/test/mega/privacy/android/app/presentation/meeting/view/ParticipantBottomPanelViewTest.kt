@@ -21,6 +21,8 @@ class ParticipantBottomPanelViewTest {
     @get:Rule
     var composeRule = createAndroidComposeRule<ComponentActivity>()
 
+    private val users: List<Long> = listOf(12L, 34L, 56L)
+
     @Test
     fun `test that mute all button is shown`() {
         initComposeRuleContent(
@@ -44,6 +46,23 @@ class ParticipantBottomPanelViewTest {
     }
 
     @Test
+    fun `test that warning banner is shown when is waiting room section`() {
+        initComposeRuleContent(
+            uiState = MeetingState(
+                myPermission = ChatRoomPermission.Moderator,
+                participantsSection = ParticipantsSection.WaitingRoomSection
+            ),
+            waitingRoomManagementState = WaitingRoomManagementState(
+                isCallUnlimitedProPlanFeatureFlagEnabled = true,
+                usersInWaitingRoomIDs = users,
+                callUsersLimit = users.size,
+                numUsersInCall = users.size
+            ),
+        )
+        composeRule.onNodeWithTag(TEST_TAG_PARTICIPANTS_WARNING).assertIsDisplayed()
+    }
+
+    @Test
     fun `test that warning banner is not shown when in call tab is not selected`() {
         initComposeRuleContent(
             MeetingState(
@@ -61,6 +80,32 @@ class ParticipantBottomPanelViewTest {
             BottomPanelView(
                 uiState = uiState,
                 waitingRoomManagementState = WaitingRoomManagementState(),
+                onWaitingRoomClick = { },
+                onInCallClick = { },
+                onNotInCallClick = { },
+                onAdmitAllClick = { },
+                onSeeAllClick = { },
+                onInviteParticipantsClick = { },
+                onShareMeetingLinkClick = { },
+                onAllowAddParticipantsClick = { },
+                onAdmitParticipantClicked = { },
+                onDenyParticipantClicked = { },
+                onParticipantMoreOptionsClicked = { },
+                onRingParticipantClicked = { },
+                onRingAllParticipantsClicked = { },
+                onMuteAllParticipantsClick = { },
+            )
+        }
+    }
+
+    private fun initComposeRuleContent(
+        uiState: MeetingState,
+        waitingRoomManagementState: WaitingRoomManagementState
+    ) {
+        composeRule.setContent {
+            BottomPanelView(
+                uiState = uiState,
+                waitingRoomManagementState = waitingRoomManagementState,
                 onWaitingRoomClick = { },
                 onInCallClick = { },
                 onNotInCallClick = { },

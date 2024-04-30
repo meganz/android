@@ -332,9 +332,11 @@ class ChatViewModel @Inject constructor(
     /**
      * Enable or disable users call limit reminder
      */
-    private fun setUsersCallLimitReminder(enabled: Boolean) = viewModelScope.launch {
+    fun setUsersCallLimitReminder(enabled: Boolean) = viewModelScope.launch {
         runCatching {
             setUsersCallLimitRemindersUseCase(if (enabled) UsersCallLimitReminders.Enabled else UsersCallLimitReminders.Disabled)
+        }.onFailure { exception ->
+            Timber.e("An error occurred when setting the call limit reminder", exception)
         }
     }
 

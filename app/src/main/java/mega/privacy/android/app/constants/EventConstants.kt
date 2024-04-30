@@ -10,7 +10,6 @@ object EventConstants {
     const val EVENT_CHAT_OPEN_INVITE = "chat_open_invite"
 
     /** Event Keys related to calls*/
-    const val EVENT_ERROR_STARTING_CALL = "error_starting_call"
     const val EVENT_UPDATE_CALL = "update_call"
     const val EVENT_CALL_STATUS_CHANGE = "call_status_change"
     const val EVENT_LOCAL_AVFLAGS_CHANGE = "local_avflags_change"
@@ -26,7 +25,6 @@ object EventConstants {
     const val EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT = "call_answered_in_another_client"
     const val EVENT_AUDIO_OUTPUT_CHANGE = "audio_output_change"
     const val EVENT_MEETING_CREATED = "meeting_created"
-    const val EVENT_LINK_RECOVERED = "meeting_link_recovered"
     const val EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE = "enable_or_disable_local_video_change"
     const val EVENT_REMOVE_CALL_NOTIFICATION = "remove_call_notification"
     const val EVENT_CALL_OUTGOING_RINGING_CHANGE = "call_outgoing_ringing_change"

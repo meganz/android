@@ -1,7 +1,6 @@
 package mega.privacy.android.app.main.listeners;
 
 
-import static mega.privacy.android.app.constants.EventConstants.EVENT_LINK_RECOVERED;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED;
 
 import android.content.Context;
@@ -62,7 +61,6 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
             }
         } else if (request.getType() == MegaChatRequest.TYPE_CHAT_LINK_HANDLE) {
             Pair<Long, String> chatAndLink = Pair.create(request.getChatHandle(), request.getText());
-            LiveEventBus.get(EVENT_LINK_RECOVERED, Pair.class).post(chatAndLink);
 
             if (request.getFlag() == false) {
                 if (request.getNumRetry() == 1) {

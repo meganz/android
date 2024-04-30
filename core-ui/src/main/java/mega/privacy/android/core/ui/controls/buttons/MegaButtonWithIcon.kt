@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import mega.privacy.android.core.R
@@ -29,20 +30,25 @@ import mega.privacy.android.core.ui.theme.MegaTheme
  */
 @Composable
 fun MegaButtonWithIcon(
-    iconColor: Color,
-    @DrawableRes icon: Int,
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    iconColor: Color,
+    @DrawableRes icon: Int? = null,
+    onClick: () -> Unit,
     enabled: Boolean = true,
 ) {
-    Column(modifier.clickable(enabled = enabled) { onClick() }) {
-        Image(
-            painter = painterResource(icon),
-            contentDescription = null,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally),
-            colorFilter = ColorFilter.tint(color = if (enabled) iconColor else MegaTheme.colors.icon.disabled)
-        )
+    Column(
+        modifier
+            .testTag(TEST_TAG_MEGA_BUTTON_WITH_ICON)
+            .clickable(enabled = enabled) { onClick() }) {
+        icon?.let {
+            Image(
+                painter = painterResource(it),
+                contentDescription = null,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally),
+                colorFilter = ColorFilter.tint(color = if (enabled) iconColor else MegaTheme.colors.icon.disabled)
+            )
+        }
     }
 }
 
@@ -60,3 +66,7 @@ private fun MegaButtonWithIconPreview(
         )
     }
 }
+
+internal const val TEST_TAG_MEGA_BUTTON_WITH_ICON =
+    "mega_button_with_icon"
+

@@ -17,7 +17,7 @@ class SetUsersCallLimitRemindersUseCase @Inject constructor(
      *
      * @param usersCallLimitReminder users call limit reminders.
      */
-    suspend operator fun invoke(usersCallLimitReminder: UsersCallLimitReminders) {
+    suspend operator fun invoke(usersCallLimitReminder: UsersCallLimitReminders) =
         settingsRepository.setUsersCallLimitReminders(usersCallLimitReminder)
-    }
+
 }

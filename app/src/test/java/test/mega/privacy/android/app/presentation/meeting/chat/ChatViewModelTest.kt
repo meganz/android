@@ -11,9 +11,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -302,17 +304,18 @@ internal class ChatViewModelTest {
     private val getChatFromContactMessagesUseCase = mock<GetChatFromContactMessagesUseCase>()
     private val getCacheFileUseCase = mock<GetCacheFileUseCase>()
     private val setUsersCallLimitRemindersUseCase = mock<SetUsersCallLimitRemindersUseCase>()
-    private val getUsersCallLimitRemindersUseCase = mock<GetUsersCallLimitRemindersUseCase>()
     private val recordAudioUseCase = mock<RecordAudioUseCase>()
     private val deleteFileUseCase = mock<DeleteFileUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getUsersCallLimitRemindersUseCase = mock<GetUsersCallLimitRemindersUseCase> {
+        on { invoke() }.thenReturn(emptyFlow())
+    }
     private val monitorLeaveChatUseCase = mock<MonitorLeaveChatUseCase> {
         on { invoke() } doReturn emptyFlow()
     }
     private val leaveChatUseCase = mock<LeaveChatUseCase>()
     private val broadcastChatArchivedUseCase = mock<BroadcastChatArchivedUseCase>()
     private val broadcastUpgradeDialogClosedUseCase = mock<BroadcastUpgradeDialogClosedUseCase>()
-
 
     @BeforeEach
     fun resetMocks() {
@@ -382,7 +385,7 @@ internal class ChatViewModelTest {
             broadcastUpgradeDialogClosedUseCase
         )
         whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
-        whenever(getUsersCallLimitRemindersUseCase()).thenReturn(flowOf(UsersCallLimitReminders.Enabled))
+        whenever(getUsersCallLimitRemindersUseCase()).thenReturn(emptyFlow())
         wheneverBlocking { isAnonymousModeUseCase() } doReturn false
         wheneverBlocking { monitorChatRoomUpdatesUseCase(any()) } doReturn emptyFlow()
         wheneverBlocking { monitorUpdatePushNotificationSettingsUseCase() } doReturn emptyFlow()
@@ -494,6 +497,26 @@ internal class ChatViewModelTest {
             broadcastUpgradeDialogClosedUseCase = broadcastUpgradeDialogClosedUseCase
         )
     }
+
+    @Test
+    fun `test that the option returned by getUsersCallLimitRemindersUseCase is set as enabled`() =
+        runTest {
+            initTestClass()
+            whenever(getUsersCallLimitRemindersUseCase()).thenReturn(flowOf(UsersCallLimitReminders.Enabled))
+            underTest.state.map { it.usersCallLimitReminders }.distinctUntilChanged().test {
+                testScheduler.advanceUntilIdle()
+                assertThat(awaitItem()).isEqualTo(UsersCallLimitReminders.Enabled)
+            }
+        }
+
+    @Test
+    fun `test that setUsersCallLimitRemindersUseCase calls the set use case with the correct value`() =
+        runTest {
+            initTestClass()
+            underTest.setUsersCallLimitReminder(false)
+            testScheduler.advanceUntilIdle()
+            verify(setUsersCallLimitRemindersUseCase).invoke(UsersCallLimitReminders.Disabled)
+        }
 
     @Test
     fun `test that title update when we passing the chatId`() = runTest {
@@ -2995,6 +3018,17 @@ internal class ChatViewModelTest {
             advanceUntilIdle()
             underTest.state.test {
                 assertThat(awaitItem().shouldUpgradeToProPlan).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that when consumeShowFreePlanParticipantsLimitDialogEvent is invoked it updates the state`() =
+        runTest {
+            initTestClass()
+            underTest.consumeShowFreePlanParticipantsLimitDialogEvent()
+            underTest.state.test {
+                assertThat(awaitItem().callEndedDueToFreePlanLimits).isFalse()
+                verify(setUsersCallLimitRemindersUseCase).invoke(UsersCallLimitReminders.Disabled)
             }
         }
 

@@ -14,7 +14,6 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.model.AddContactState
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
-import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
@@ -28,7 +27,6 @@ import javax.inject.Inject
  * @param getFeatureFlagValueUseCase [GetFeatureFlagValueUseCase]
  * @param getChatCallUseCase [GetChatCallUseCase]
  * @param monitorChatCallUpdatesUseCase [MonitorChatCallUpdatesUseCase]
- * @param getCurrentSubscriptionPlanUseCase [GetCurrentSubscriptionPlanUseCase]
  */
 @HiltViewModel
 class AddContactViewModel @Inject constructor(
@@ -36,7 +34,6 @@ class AddContactViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getChatCallUseCase: GetChatCallUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
-    private val getCurrentSubscriptionPlanUseCase: GetCurrentSubscriptionPlanUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddContactState())

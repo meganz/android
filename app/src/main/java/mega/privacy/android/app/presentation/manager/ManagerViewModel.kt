@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -78,7 +77,6 @@ import mega.privacy.android.domain.usecase.meeting.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.meeting.GetUsersCallLimitRemindersUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorCallEndedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorUpgradeDialogClosedUseCase
@@ -240,7 +238,6 @@ class ManagerViewModel @Inject constructor(
     private val monitorSyncsUseCase: MonitorSyncsUseCase,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
     private val hangChatCallUseCase: HangChatCallUseCase,
-    private val monitorCallEndedUseCase: MonitorCallEndedUseCase,
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val setUsersCallLimitRemindersUseCase: SetUsersCallLimitRemindersUseCase,
     private val getUsersCallLimitRemindersUseCase: GetUsersCallLimitRemindersUseCase,
@@ -326,8 +323,6 @@ class ManagerViewModel @Inject constructor(
         key = isFirstLoginKey,
         initialValue = false
     )
-
-    private var monitorChatSessionUpdatesJob: Job? = null
 
     init {
         checkUsersCallLimitReminders()
@@ -723,8 +718,19 @@ class ManagerViewModel @Inject constructor(
      *
      */
     fun onConsumeShowFreePlanParticipantsLimitDialogEvent() {
-        setUsersCallLimitReminderDisabled()
+        setUsersCallLimitReminder(enabled = false)
         _state.update { state -> state.copy(callEndedDueToFreePlanLimits = false) }
+    }
+
+    /**
+     * Enable or disable users call limit reminder
+     */
+    fun setUsersCallLimitReminder(enabled: Boolean) = viewModelScope.launch {
+        runCatching {
+            setUsersCallLimitRemindersUseCase(if (enabled) UsersCallLimitReminders.Enabled else UsersCallLimitReminders.Disabled)
+        }.onFailure { exception ->
+            Timber.e("An error occurred when setting the call limit reminder", exception)
+        }
     }
 
     /**
@@ -1220,15 +1226,6 @@ class ManagerViewModel @Inject constructor(
             getUsersCallLimitRemindersUseCase().collectLatest { result ->
                 _state.update { it.copy(usersCallLimitReminders = result) }
             }
-        }
-    }
-
-    /**
-     * Disable users call limit reminder
-     */
-    private fun setUsersCallLimitReminderDisabled() = viewModelScope.launch {
-        runCatching {
-            setUsersCallLimitRemindersUseCase(UsersCallLimitReminders.Disabled)
         }
     }
 
