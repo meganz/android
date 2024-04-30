@@ -71,6 +71,8 @@ class AudioQueueViewModelTest {
             assertThat(initial.isPaused).isFalse()
             assertThat(initial.currentPlayingPosition).isEqualTo("00:00")
             assertThat(initial.indexOfCurrentPlayingItem).isEqualTo(-1)
+            assertThat(initial.selectedItemHandles).isEmpty()
+            assertThat(initial.isSearchMode).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -120,9 +122,13 @@ class AudioQueueViewModelTest {
     private fun getMockedMediaQueueItem(
         nodeId: NodeId,
         itemType: MediaQueueItemType = testType,
+        name: String = testName,
+        testIsSelected: Boolean = false,
     ) = mock<MediaQueueItemUiEntity> {
         on { id }.thenReturn(nodeId)
         on { type }.thenReturn(itemType)
+        on { nodeName }.thenReturn(name)
+        on { isSelected }.thenReturn(testIsSelected)
     }
 
     @Test
@@ -228,4 +234,149 @@ class AudioQueueViewModelTest {
             )
         ).thenReturn(mediaQueueItemUiEntity)
     }
+
+    @Test
+    fun `test that state is updated correctly after the item is clicked`() =
+        runTest {
+            val item = getMockedMediaQueueItem(NodeId(1L))
+            val testItem = getMockedMediaQueueItem(NodeId(1L), testIsSelected = true)
+            val list = (1..3).map {
+                if (it == 1) {
+                    initMediaQueueItemMapperResult(it.toLong(), item)
+                } else {
+                    initMediaQueueItemMapperResult(it.toLong())
+                }
+                getPlaylistItem(it.toLong())
+            }
+            whenever(item.copy(isSelected = true)).thenReturn(testItem)
+            initUnderTest()
+
+            underTest.initMediaQueueItemList(list)
+            underTest.onItemClicked(0, item)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.items.size).isEqualTo(3)
+                assertThat(actual.selectedItemHandles).isNotEmpty()
+                assertThat(actual.selectedItemHandles.size).isEqualTo(1)
+                assertThat(actual.selectedItemHandles[0]).isEqualTo(1)
+                assertThat(actual.items[0].isSelected).isTrue()
+                assertThat(actual.items[1].isSelected).isFalse()
+                assertThat(actual.items[2].isSelected).isFalse()
+            }
+        }
+
+    private fun initMediaQueueItemMapperResult(
+        handle: Long,
+        item: MediaQueueItemUiEntity,
+        itemType: MediaQueueItemType = testType,
+    ) {
+        whenever(
+            mediaQueueItemUiEntityMapper(
+                icon = 0,
+                thumbnailFile = null,
+                id = NodeId(handle),
+                name = testName,
+                type = itemType,
+                duration = testDuration
+            )
+        ).thenReturn(item)
+    }
+
+    @Test
+    fun `test that state is updated correctly after clearing all selected items`() =
+        runTest {
+            val item = getMockedMediaQueueItem(NodeId(1L))
+            val testItem = getMockedMediaQueueItem(NodeId(1L), testIsSelected = true)
+            val list = (1..3).map {
+                if (it == 1) {
+                    initMediaQueueItemMapperResult(it.toLong(), item)
+                } else {
+                    initMediaQueueItemMapperResult(it.toLong())
+                }
+                getPlaylistItem(it.toLong())
+            }
+            whenever(item.copy(isSelected = true)).thenReturn(testItem)
+            initUnderTest()
+
+            underTest.initMediaQueueItemList(list)
+            underTest.onItemClicked(0, item)
+            underTest.uiState.test {
+                assertThat(awaitItem().selectedItemHandles).isNotEmpty()
+                underTest.clearAllSelectedItems()
+                assertThat(awaitItem().selectedItemHandles).isEmpty()
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly after removing selected items`() =
+        runTest {
+            val item = getMockedMediaQueueItem(NodeId(1L))
+            val testItem = getMockedMediaQueueItem(NodeId(1L), testIsSelected = true)
+            val list = (1..3).map {
+                if (it == 1) {
+                    initMediaQueueItemMapperResult(it.toLong(), item)
+                } else {
+                    initMediaQueueItemMapperResult(it.toLong())
+                }
+                getPlaylistItem(it.toLong())
+            }
+            whenever(item.copy(isSelected = true)).thenReturn(testItem)
+            initUnderTest()
+
+            underTest.initMediaQueueItemList(list)
+            underTest.onItemClicked(0, item)
+            underTest.uiState.test {
+                awaitItem().let {
+                    assertThat(it.items.size).isEqualTo(3)
+                    assertThat(it.selectedItemHandles).isNotEmpty()
+                }
+                underTest.removeSelectedItems()
+                awaitItem().let {
+                    assertThat(it.items.size).isEqualTo(2)
+                    assertThat(it.selectedItemHandles).isEmpty()
+                }
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly after updateSearchMode is called`() =
+        runTest {
+            initUnderTest()
+            underTest.uiState.test {
+                assertThat(awaitItem().isSearchMode).isFalse()
+                underTest.updateSearchMode(true)
+                assertThat(awaitItem().isSearchMode).isTrue()
+                underTest.updateSearchMode(false)
+                assertThat(awaitItem().isSearchMode).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that state is updated correctly after searchQueryUpdate is called`() =
+        runTest {
+            val item = getMockedMediaQueueItem(NodeId(1L), name = "Test")
+            val list = (1..3).map {
+                if (it == 1) {
+                    initMediaQueueItemMapperResult(it.toLong(), item)
+                } else {
+                    initMediaQueueItemMapperResult(it.toLong())
+                }
+                getPlaylistItem(it.toLong())
+            }
+            initUnderTest()
+
+            underTest.initMediaQueueItemList(list)
+            underTest.uiState.test {
+                awaitItem().let {
+                    assertThat(it.items.size).isEqualTo(3)
+                }
+                underTest.searchQueryUpdate("Test")
+                awaitItem().let {
+                    assertThat(it.items.size).isEqualTo(1)
+                    assertThat(it.items[0].nodeName).isEqualTo("Test")
+                }
+                underTest.updateSearchMode(false)
+                assertThat(awaitItem().items.size).isEqualTo(3)
+            }
+        }
 }

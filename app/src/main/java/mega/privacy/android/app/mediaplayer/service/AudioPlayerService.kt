@@ -374,10 +374,12 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         }
 
         lifecycleScope.launch {
-            viewModelGateway.mediaItemToRemoveUpdate().collect { index ->
-                mediaPlayerGateway.mediaItemRemoved(index)?.let { handle ->
-                    val nodeName = viewModelGateway.getPlaylistItem(handle)?.nodeName ?: ""
-                    metadata.value = Metadata(null, null, null, nodeName)
+            viewModelGateway.mediaItemToRemoveUpdate().collect { (index, _) ->
+                if (index != -1) {
+                    mediaPlayerGateway.mediaItemRemoved(index)?.let { handle ->
+                        val nodeName = viewModelGateway.getPlaylistItem(handle)?.nodeName ?: ""
+                        metadata.value = Metadata(null, null, null, nodeName)
+                    }
                 }
             }
         }

@@ -17,7 +17,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
@@ -209,7 +208,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     private val playerSource = MutableLiveData<MediaPlaySources>()
 
-    private val mediaItemToRemove = MutableSharedFlow<Int>()
+    private val mediaItemToRemove = MutableStateFlow<Pair<Int, Long>>(Pair(-1, -1))
 
     private val nodeNameUpdate = MutableLiveData<String>()
 
@@ -1150,6 +1149,8 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     override fun playlistUpdate() = playlistItemsFlow
 
+    override fun getUpdatedPlaylistItems() = playlistItemsFlow.value.first
+
     override fun mediaPlaybackUpdate() = mediaPlayback.asFlow()
 
     override fun errorUpdate() = error.asFlow()
@@ -1184,10 +1185,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
             }.takeIf { index ->
                 index in playlistItems.indices
             }?.let { index ->
-                cancellableJobs[JOB_KEY_REMOVE_ITEM]?.cancel()
-                cancellableJobs[JOB_KEY_REMOVE_ITEM] = sharingScope.launch {
-                    mediaItemToRemove.emit(index)
-                }
+                mediaItemToRemove.update { Pair(index, handle) }
                 newItems.removeIf { (nodeHandle) ->
                     nodeHandle == handle
                 }
@@ -1203,6 +1201,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     override fun removeAllSelectedItems() {
         if (itemsSelectedMap.isNotEmpty()) {
+            initPlayerSourceChanged()
             itemsSelectedMap.forEach {
                 removeSingleItem(it.value.nodeHandle).let { newItems ->
                     playlistItemsFlow.update { flow ->
@@ -1210,6 +1209,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                     }
                 }
             }
+            updatePlaySource()
             itemsSelectedMap.clear()
             itemsSelectedCount.value = itemsSelectedMap.size
             actionMode.value = false
@@ -1467,7 +1467,6 @@ class AudioPlayerServiceViewModel @Inject constructor(
         private const val JOB_KEY_BUILD_PLAYER_SOURCES = "KEY_JOB_BUILD_PLAYER_SOURCES"
         private const val JOB_KEY_UPDATE_THUMBNAIL = "JOB_KEY_UPDATE_THUMBNAIL"
         private const val JOB_KEY_UPDATE_PLAYLIST = "KEY_JOB_UPDATE_PLAYLIST"
-        private const val JOB_KEY_REMOVE_ITEM = "JOB_KEY_REMOVE_ITEM"
         private const val JOB_KEY_TOGGLE_BACKGROUND_PLAY = "JOB_KEY_TOGGLE_BACKGROUND_PLAY"
         private const val JOB_KEY_SET_SHUFFLE = "JOB_KEY_SET_SHUFFLE"
         private const val JOB_KEY_SET_AUDIO_REPEAT_MODE = "JOB_KEY_SET_AUDIO_REPEAT_MODE"

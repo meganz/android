@@ -63,6 +63,13 @@ interface PlayerServiceViewModelGateway {
     fun playlistUpdate(): Flow<Pair<List<PlaylistItem>, Int>>
 
     /**
+     * Get updated playlist items
+     *
+     * @return updated playlist items
+     */
+    fun getUpdatedPlaylistItems(): List<PlaylistItem>
+
+    /**
      * Update item name
      *
      * @param handle MegaNode handle
@@ -222,9 +229,9 @@ interface PlayerServiceViewModelGateway {
     /**
      * Update when item is removed
      *
-     * @return Flow<Int>
+     * @return Flow<Pair<Int, Long>> Int is the position of removed item, Long is the handle of removed item
      */
-    fun mediaItemToRemoveUpdate(): Flow<Int>
+    fun mediaItemToRemoveUpdate(): Flow<Pair<Int, Long>>
 
     /**
      * Update node name

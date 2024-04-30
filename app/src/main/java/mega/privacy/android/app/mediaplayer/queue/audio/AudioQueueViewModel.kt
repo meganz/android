@@ -30,13 +30,30 @@ class AudioQueueViewModel @Inject constructor(
 
     internal val uiState = _uiState.asStateFlow()
 
+    private var searchQuery: String = ""
+
+    private val originalData = mutableListOf<MediaQueueItemUiEntity>()
+
     internal fun initMediaQueueItemList(items: List<PlaylistItem>) {
-        val queueItems = items.convertToMediaQueueItemList()
+        val queueItems =
+            items.convertToMediaQueueItemList().updateOriginalData().filterItemBySearchQuery()
         val playingIndex = queueItems.indexOfFirst { it.type == MediaQueueItemType.Playing }
         _uiState.update {
             it.copy(items = queueItems, indexOfCurrentPlayingItem = playingIndex)
         }
     }
+
+    private fun List<MediaQueueItemUiEntity>.updateOriginalData() = also { data ->
+        if (originalData.isNotEmpty()) {
+            originalData.clear()
+        }
+        originalData.addAll(data)
+    }
+
+    private fun List<MediaQueueItemUiEntity>.filterItemBySearchQuery() =
+        filter { item ->
+            item.nodeName.contains(searchQuery, true)
+        }
 
     private fun List<PlaylistItem>.convertToMediaQueueItemList() =
         map { item ->
@@ -74,12 +91,13 @@ class AudioQueueViewModel @Inject constructor(
     internal fun updateMediaQueueAfterReorder(from: Int, to: Int) {
         val list = uiState.value.items.toMutableList()
         list.add(to, list.removeAt(from))
+        list.updateOriginalData()
         _uiState.update { it.copy(items = list) }
     }
 
     internal fun updateMediaQueueAfterMediaItemTransition(playingHandle: Long) {
         val index = uiState.value.items.indexOfFirst { playingHandle == it.id.longValue }
-        val newItems = uiState.value.items.updateMediaQueueItemType(index)
+        val newItems = uiState.value.items.updateMediaQueueItemType(index).updateOriginalData()
         val playingIndex = newItems.indexOfFirst { it.type == MediaQueueItemType.Playing }
         _uiState.update { it.copy(items = newItems, indexOfCurrentPlayingItem = playingIndex) }
     }
@@ -100,4 +118,98 @@ class AudioQueueViewModel @Inject constructor(
         } else this
 
     internal suspend fun isParticipatingInChatCall() = isParticipatingInChatCallUseCase()
+
+    internal fun onItemClicked(index: Int, item: MediaQueueItemUiEntity) =
+        updateItemInSelectionState(item = item, index = index)
+
+    private fun updateItemInSelectionState(index: Int, item: MediaQueueItemUiEntity) {
+        val isSelected = !item.isSelected
+        val selectedHandles = _uiState.value.selectedItemHandles.updateSelectedHandles(
+            id = item.id.longValue,
+            isSelected = isSelected
+        )
+        val updateItems =
+            _uiState.value.items.updateItemSelectedState(index, isSelected).updateOriginalData()
+        _uiState.update {
+            it.copy(
+                items = updateItems,
+                selectedItemHandles = selectedHandles
+            )
+        }
+    }
+
+    private fun List<Long>.updateSelectedHandles(
+        id: Long,
+        isSelected: Boolean,
+    ) = toMutableList().also { handles ->
+        if (isSelected) {
+            handles.add(id)
+        } else {
+            handles.remove(id)
+        }
+    }
+
+    private fun List<MediaQueueItemUiEntity>.updateItemSelectedState(
+        index: Int,
+        isSelected: Boolean,
+    ) =
+        if (index in indices) {
+            toMutableList().also { list ->
+                list[index] = list[index].copy(isSelected = isSelected)
+            }
+        } else this
+
+    internal fun clearAllSelectedItems() {
+        val updatedItems = clearItemsSelected()
+        _uiState.update {
+            it.copy(
+                items = updatedItems,
+                selectedItemHandles = emptyList()
+            )
+        }
+    }
+
+    private fun clearItemsSelected() = _uiState.value.items.map {
+        it.copy(isSelected = false)
+    }
+
+    internal fun removeSelectedItems() {
+        val updatedItems = _uiState.value.items.filterNot { item ->
+            _uiState.value.selectedItemHandles.any { it == item.id.longValue }
+        }.updateOriginalData()
+        val playingIndex = updatedItems.indexOfFirst { it.type == MediaQueueItemType.Playing }
+        _uiState.update {
+            it.copy(
+                items = updatedItems,
+                selectedItemHandles = emptyList(),
+                indexOfCurrentPlayingItem = playingIndex
+            )
+        }
+    }
+
+    internal fun updateSearchMode(isSearchMode: Boolean) {
+        if (isSearchMode.not()) {
+            searchQuery = ""
+            searchItemByQueryString()
+        }
+        _uiState.update {
+            it.copy(isSearchMode = isSearchMode)
+        }
+    }
+
+    internal fun searchQueryUpdate(query: String) {
+        searchQuery = query
+        searchItemByQueryString()
+    }
+
+    private fun searchItemByQueryString() {
+        val items = originalData.filter { item ->
+            item.nodeName.contains(searchQuery, true)
+        }
+        _uiState.update {
+            it.copy(
+                items = items
+            )
+        }
+    }
 }
