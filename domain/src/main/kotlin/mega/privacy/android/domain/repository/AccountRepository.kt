@@ -655,4 +655,18 @@ interface AccountRepository {
      * @return
      */
     suspend fun getMaxStorage(): Long
+
+    /**
+     * Monitor credentials
+     *
+     * @return Flow of UserCredentials
+     */
+    fun monitorCredentials(): Flow<UserCredentials?>
+
+    /**
+     * Set credentials
+     *
+     * @param credentials
+     */
+    suspend fun setCredentials(credentials: UserCredentials)
 }

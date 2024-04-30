@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -34,6 +35,7 @@ import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -65,6 +67,7 @@ import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
+import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.ChangeEmailException
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
@@ -162,6 +165,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway,
     private val cookieSettingsMapper: CookieSettingsMapper,
     private val cookieSettingsIntMapper: CookieSettingsIntMapper,
+    private val credentialsPreferencesGateway: CredentialsPreferencesGateway,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -1373,6 +1377,14 @@ internal class DefaultAccountRepository @Inject constructor(
         val accountDetails = request.megaAccountDetails
         return accountDetails.storageMax
     }
+
+    override suspend fun setCredentials(credentials: UserCredentials) = withContext(ioDispatcher) {
+        credentialsPreferencesGateway.save(credentials)
+    }
+
+    override fun monitorCredentials(): Flow<UserCredentials?> =
+        credentialsPreferencesGateway.monitorCredentials()
+            .flowOn(ioDispatcher)
 
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"

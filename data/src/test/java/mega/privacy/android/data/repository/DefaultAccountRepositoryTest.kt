@@ -21,6 +21,7 @@ import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -48,6 +49,7 @@ import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
+import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.ChangeEmailException
@@ -126,6 +128,7 @@ class DefaultAccountRepositoryTest {
         mock<CameraUploadsSettingsPreferenceGateway>()
     private val cookieSettingsMapper = mock<CookieSettingsMapper>()
     private val cookieSettingsIntMapper = mock<CookieSettingsIntMapper>()
+    private val credentialsPreferencesGateway = mock<CredentialsPreferencesGateway>()
 
     private val pricing = mock<MegaPricing> {
         on { numProducts }.thenReturn(1)
@@ -183,6 +186,7 @@ class DefaultAccountRepositoryTest {
             cameraUploadsSettingsPreferenceGateway,
             cookieSettingsMapper,
             cookieSettingsIntMapper,
+            credentialsPreferencesGateway
         )
     }
 
@@ -222,6 +226,7 @@ class DefaultAccountRepositoryTest {
             cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway,
             cookieSettingsMapper = cookieSettingsMapper,
             cookieSettingsIntMapper = cookieSettingsIntMapper,
+            credentialsPreferencesGateway = credentialsPreferencesGateway
         )
 
     }
@@ -1882,5 +1887,15 @@ class DefaultAccountRepositoryTest {
 
         assertThat(actual).isEqualTo(email)
         verify(megaApiGateway).cancelCreateAccount(any())
+    }
+
+    @Test
+    fun `test that monitor credentials returns correctly`() = runTest {
+        val credentials = mock<UserCredentials>()
+        whenever(credentialsPreferencesGateway.monitorCredentials()).thenReturn(flowOf(credentials))
+        underTest.monitorCredentials().test {
+            assertThat(awaitItem()).isEqualTo(credentials)
+            awaitComplete()
+        }
     }
 }
