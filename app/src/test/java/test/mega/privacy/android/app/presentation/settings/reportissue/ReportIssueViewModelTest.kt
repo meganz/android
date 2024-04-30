@@ -22,10 +22,10 @@ import mega.privacy.android.app.presentation.settings.reportissue.ReportIssueVie
 import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIssueResult
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
-import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.GetSupportEmailUseCase
 import mega.privacy.android.domain.usecase.SubmitIssueUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.logging.AreChatLogsEnabledUseCase
 import mega.privacy.android.domain.usecase.logging.AreSdkLogsEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import org.junit.jupiter.api.AfterEach
@@ -54,7 +54,7 @@ class ReportIssueViewModelTest {
 
     private val submitIssueUseCase = mock<SubmitIssueUseCase>()
     private val areSdkLogsEnabledUseCase = mock<AreSdkLogsEnabledUseCase>()
-    private val areChatLogsEnabled = mock<AreChatLogsEnabled>()
+    private val areChatLogsEnabledUseCase = mock<AreChatLogsEnabledUseCase>()
 
     private var savedStateHandle = SavedStateHandle(mapOf())
 
@@ -73,7 +73,7 @@ class ReportIssueViewModelTest {
         areSdkLogsEnabledUseCase.stub {
             on { invoke() } doReturn false.asHotFlow()
         }
-        areChatLogsEnabled.stub {
+        areChatLogsEnabledUseCase.stub {
             on { invoke() } doReturn false.asHotFlow()
         }
         getFeatureFlagValueUseCase.stub {
@@ -86,7 +86,7 @@ class ReportIssueViewModelTest {
         underTest = ReportIssueViewModel(
             submitIssueUseCase = submitIssueUseCase,
             areSdkLogsEnabledUseCase = areSdkLogsEnabledUseCase,
-            areChatLogsEnabled = areChatLogsEnabled,
+            areChatLogsEnabledUseCase = areChatLogsEnabledUseCase,
             savedStateHandle = savedStateHandle,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             getSupportEmailUseCase = getSupportEmail,
@@ -100,7 +100,7 @@ class ReportIssueViewModelTest {
         reset(
             submitIssueUseCase,
             areSdkLogsEnabledUseCase,
-            areChatLogsEnabled,
+            areChatLogsEnabledUseCase,
             monitorConnectivityUseCase,
             getSupportEmail,
             getFeatureFlagValueUseCase,
@@ -142,7 +142,7 @@ class ReportIssueViewModelTest {
     @Test
     fun `test that when logging is enabled include logs toggle is shown`() = runTest {
         whenever(areSdkLogsEnabledUseCase()).thenReturn(flowOf(true))
-        whenever(areChatLogsEnabled()).thenReturn(flowOf(true))
+        whenever(areChatLogsEnabledUseCase()).thenReturn(flowOf(true))
 
         initViewModel()
         underTest.uiState.map { it.includeLogsVisible }.distinctUntilChanged()
@@ -155,7 +155,7 @@ class ReportIssueViewModelTest {
     @Test
     fun `test that include logs is set to true if logging is enabled`() = runTest {
         whenever(areSdkLogsEnabledUseCase()).thenReturn(flowOf(true))
-        whenever(areChatLogsEnabled()).thenReturn(flowOf(true))
+        whenever(areChatLogsEnabledUseCase()).thenReturn(flowOf(true))
 
         initViewModel()
         underTest.uiState.map { it.includeLogs }.distinctUntilChanged()
@@ -180,7 +180,7 @@ class ReportIssueViewModelTest {
     @Test
     fun `test that include logs is updated if new boolean is provided`() = runTest {
         whenever(areSdkLogsEnabledUseCase()).thenReturn(flowOf(true))
-        whenever(areChatLogsEnabled()).thenReturn(flowOf(true))
+        whenever(areChatLogsEnabledUseCase()).thenReturn(flowOf(true))
 
         initViewModel()
 
@@ -382,7 +382,7 @@ class ReportIssueViewModelTest {
             areSdkLogsEnabledUseCase.stub {
                 on { invoke() } doReturn flowOf(false)
             }
-            areChatLogsEnabled.stub {
+            areChatLogsEnabledUseCase.stub {
                 on { invoke() } doReturn flowOf(false)
             }
 

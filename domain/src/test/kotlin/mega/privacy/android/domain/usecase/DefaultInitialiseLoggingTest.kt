@@ -7,6 +7,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.logging.LogEntry
 import mega.privacy.android.domain.repository.LoggingRepository
+import mega.privacy.android.domain.usecase.logging.AreChatLogsEnabledUseCase
 import mega.privacy.android.domain.usecase.logging.AreSdkLogsEnabledUseCase
 import org.junit.Before
 import org.junit.Test
@@ -22,7 +23,7 @@ import org.mockito.kotlin.whenever
 class DefaultInitialiseLoggingTest {
     private lateinit var underTest: InitialiseLogging
     private val areSdkLogsEnabledUseCase = mock<AreSdkLogsEnabledUseCase>()
-    private val areChatLogsEnabled = mock<AreChatLogsEnabled>()
+    private val areChatLogsEnabledUseCase = mock<AreChatLogsEnabledUseCase>()
     private val sdkMessage = LogEntry(message = "sdk", priority = 1)
     private val chatMessage = LogEntry(message = "chat", priority = 1)
 
@@ -36,7 +37,7 @@ class DefaultInitialiseLoggingTest {
         underTest = DefaultInitialiseLogging(
             loggingRepository = loggingRepository,
             areSdkLogsEnabledUseCase = areSdkLogsEnabledUseCase,
-            areChatLogsEnabled = areChatLogsEnabled,
+            areChatLogsEnabledUseCase = areChatLogsEnabledUseCase,
             coroutineDispatcher = UnconfinedTestDispatcher()
         )
     }
@@ -44,7 +45,7 @@ class DefaultInitialiseLoggingTest {
     @Test
     fun `test that setting sdk logs setting true, enables sdk logs`() = runTest {
         whenever(areSdkLogsEnabledUseCase()).thenReturn(flowOf(true))
-        whenever(areChatLogsEnabled()).thenReturn(emptyFlow())
+        whenever(areChatLogsEnabledUseCase()).thenReturn(emptyFlow())
 
         underTest(false)
 
@@ -57,7 +58,7 @@ class DefaultInitialiseLoggingTest {
     @Test
     fun `test that setting chat logs setting true, enables sdk logs`() = runTest {
         whenever(areSdkLogsEnabledUseCase()).thenReturn(emptyFlow())
-        whenever(areChatLogsEnabled()).thenReturn(flowOf(true))
+        whenever(areChatLogsEnabledUseCase()).thenReturn(flowOf(true))
 
         underTest(false)
 
@@ -70,7 +71,7 @@ class DefaultInitialiseLoggingTest {
     @Test
     fun `test that setting sdk logs setting false, disables sdk logs`() = runTest {
         whenever(areSdkLogsEnabledUseCase()).thenReturn(flowOf(false))
-        whenever(areChatLogsEnabled()).thenReturn(emptyFlow())
+        whenever(areChatLogsEnabledUseCase()).thenReturn(emptyFlow())
 
         underTest(false)
 
@@ -82,7 +83,7 @@ class DefaultInitialiseLoggingTest {
     @Test
     fun `test that setting chat logs setting false, disables chat logs`() = runTest {
         whenever(areSdkLogsEnabledUseCase()).thenReturn(emptyFlow())
-        whenever(areChatLogsEnabled()).thenReturn(flowOf(false))
+        whenever(areChatLogsEnabledUseCase()).thenReturn(flowOf(false))
 
         underTest(false)
 
@@ -94,7 +95,7 @@ class DefaultInitialiseLoggingTest {
     @Test
     fun `test that override supersedes chat and sdk setting`() = runTest{
         whenever(areSdkLogsEnabledUseCase()).thenReturn(flowOf(false))
-        whenever(areChatLogsEnabled()).thenReturn(flowOf(false))
+        whenever(areChatLogsEnabledUseCase()).thenReturn(flowOf(false))
 
         underTest(true)
 

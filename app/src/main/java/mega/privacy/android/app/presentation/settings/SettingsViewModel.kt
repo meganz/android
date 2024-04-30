@@ -21,7 +21,6 @@ import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.settings.model.SettingsState
 import mega.privacy.android.domain.entity.UserAccount
-import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.CanDeleteAccount
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
@@ -41,6 +40,7 @@ import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCa
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.logging.AreChatLogsEnabledUseCase
 import mega.privacy.android.domain.usecase.logging.AreSdkLogsEnabledUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -59,7 +59,7 @@ class SettingsViewModel @Inject constructor(
     private val canDeleteAccount: CanDeleteAccount,
     private val refreshPasscodeLockPreference: RefreshPasscodeLockPreference,
     areSdkLogsEnabledUseCase: AreSdkLogsEnabledUseCase,
-    areChatLogsEnabled: AreChatLogsEnabled,
+    areChatLogsEnabledUseCase: AreChatLogsEnabledUseCase,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val isMultiFactorAuthAvailable: IsMultiFactorAuthAvailable,
@@ -92,7 +92,7 @@ class SettingsViewModel @Inject constructor(
     private val sdkLogsEnabled =
         areSdkLogsEnabledUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, false)
     private val chatLogsEnabled =
-        areChatLogsEnabled().stateIn(viewModelScope, SharingStarted.Eagerly, false)
+        areChatLogsEnabledUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private fun initialiseState(): SettingsState {
         return SettingsState(

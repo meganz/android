@@ -21,7 +21,6 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.SettingNotFoundException
-import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
@@ -36,6 +35,7 @@ import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCa
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.logging.AreChatLogsEnabledUseCase
 import mega.privacy.android.domain.usecase.logging.AreSdkLogsEnabledUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionTransferURLUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -85,7 +85,7 @@ class SettingsViewModelTest {
     private val monitorStartScreenPreference = mock<MonitorStartScreenPreference>()
     private val isMultiFactorAuthAvailable = mock<IsMultiFactorAuthAvailable>()
     private val areSdkLogsEnabledUseCase = mock<AreSdkLogsEnabledUseCase>()
-    private val areChatLogsEnabled = mock<AreChatLogsEnabled>()
+    private val areChatLogsEnabledUseCase = mock<AreChatLogsEnabledUseCase>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val setSubFolderMediaDiscoveryEnabledUseCase =
         mock<SetSubFolderMediaDiscoveryEnabledUseCase>()
@@ -144,7 +144,7 @@ class SettingsViewModelTest {
 
         areSdkLogsEnabledUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
 
-        areChatLogsEnabled.stub { on { invoke() }.thenReturn(emptyFlow()) }
+        areChatLogsEnabledUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
 
         isCameraUploadsEnabledUseCase.stub { onBlocking { invoke() }.thenReturn(false) }
 
@@ -164,7 +164,7 @@ class SettingsViewModelTest {
             canDeleteAccount = mock { on { invoke(TEST_USER_ACCOUNT) }.thenReturn(true) },
             refreshPasscodeLockPreference = refreshPasscodeLockPreference,
             areSdkLogsEnabledUseCase = areSdkLogsEnabledUseCase,
-            areChatLogsEnabled = areChatLogsEnabled,
+            areChatLogsEnabledUseCase = areChatLogsEnabledUseCase,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             rootNodeExistsUseCase = mock { on { runBlocking { invoke() } }.thenReturn(true) },
             isMultiFactorAuthAvailable = isMultiFactorAuthAvailable,
