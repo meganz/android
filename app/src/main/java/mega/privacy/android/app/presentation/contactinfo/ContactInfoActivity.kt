@@ -45,7 +45,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getChatManagement
 import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.ManageChatHistoryActivity
 import mega.privacy.android.app.activities.contract.SelectFileToShareActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToShareActivityContract
@@ -649,12 +648,10 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     }
 
     private fun contactPropertiesClicked() {
-        val intentManageChat = Intent(this, ManageChatHistoryActivity::class.java).apply {
-            putExtra(Constants.EMAIL, viewModel.userEmail)
-            putExtra(Constants.CHAT_ID, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
-            putExtra(Constants.IS_FROM_CONTACTS, viewModel.isFromContacts)
-        }
-        startActivity(intentManageChat)
+        navigator.openManageChatHistoryActivity(
+            context = this,
+            email = viewModel.userEmail
+        )
     }
 
     private fun sharedFilesClicked() {

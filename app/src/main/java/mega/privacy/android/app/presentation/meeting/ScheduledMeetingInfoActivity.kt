@@ -21,7 +21,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.ManageChatHistoryActivity
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -82,6 +81,10 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
+
+    /**
+     * The centralized navigator in the :app module
+     */
     @Inject
     lateinit var navigator: MegaNavigator
 
@@ -453,13 +456,10 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
      * Open manage chat history
      */
     private fun openManageChatHistory() {
-        val intentManageChat = Intent(
-            this@ScheduledMeetingInfoActivity,
-            ManageChatHistoryActivity::class.java
+        navigator.openManageChatHistoryActivity(
+            context = this,
+            chatId = chatRoomId
         )
-        intentManageChat.putExtra(CHAT_ID, chatRoomId)
-        intentManageChat.putExtra(Constants.IS_FROM_CONTACTS, true)
-        startActivity(intentManageChat)
     }
 
     /**

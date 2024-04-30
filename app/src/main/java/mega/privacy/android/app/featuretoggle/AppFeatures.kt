@@ -213,6 +213,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     CancelSubscription(
         "Enable cancel subscription feature",
         false
+    ),
+
+    /**
+     * Enables new manage chat history compose page
+     */
+    NewManageChatHistoryActivity(
+        "Enable new manage chat history activity",
+        false
     );
 
     companion object : FeatureFlagValueProvider {

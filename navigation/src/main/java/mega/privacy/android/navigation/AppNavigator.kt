@@ -60,4 +60,17 @@ interface AppNavigator {
         isOverQuota: Int? = null,
         flags: Int = 0,
     )
+
+    /**
+     * Navigates to the new [mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivityV2]
+     *
+     * @param context The context that call this method
+     * @param chatId The chat ID of the chat or meeting room
+     * @param email The email of the current user
+     */
+    fun openManageChatHistoryActivity(
+        context: Context,
+        chatId: Long = -1L,
+        email: String? = null,
+    )
 }

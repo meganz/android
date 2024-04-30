@@ -16,8 +16,6 @@ import static mega.privacy.android.app.utils.ChatUtil.setContactStatusParticipan
 import static mega.privacy.android.app.utils.ChatUtil.updateRetentionTimeLayout;
 import static mega.privacy.android.app.utils.Constants.AVATAR_GROUP_CHAT_COLOR;
 import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
-import static mega.privacy.android.app.utils.Constants.CHAT_ID;
-import static mega.privacy.android.app.utils.Constants.IS_FROM_CONTACTS;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_ENABLED;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.isOnline;
@@ -46,7 +44,6 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.activities.ManageChatHistoryActivity;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -657,10 +654,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         } else if (id == R.id.chat_group_contact_properties_end_call_layout) {
             groupChatInfoActivity.showEndCallForAllDialog();
         } else if (id == R.id.manage_chat_history_group_info_layout) {
-            Intent intentManageChat = new Intent(groupChatInfoActivity, ManageChatHistoryActivity.class);
-            intentManageChat.putExtra(CHAT_ID, chatId);
-            intentManageChat.putExtra(IS_FROM_CONTACTS, false);
-            groupChatInfoActivity.startActivity(intentManageChat);
+            groupChatInfoActivity.openManageChatHistory(chatId);
         } else if (id == R.id.chat_group_contact_properties_archive_layout) {
             new ChatController(groupChatInfoActivity).archiveChat(groupChatInfoActivity.getChat());
         } else if (id == R.id.chat_group_contact_properties_layout) {

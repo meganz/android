@@ -9,10 +9,9 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomUiMapper
 import mega.privacy.android.app.presentation.meeting.managechathistory.ManageChatHistoryViewModel
-import mega.privacy.android.app.presentation.meeting.managechathistory.navigation.manageChatHistoryChatIdArg
-import mega.privacy.android.app.presentation.meeting.managechathistory.navigation.manageChatHistoryEmailIdArg
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
@@ -165,7 +164,7 @@ class ManageChatHistoryViewModelTest {
             setRetentionTime(chatRoomId = newChatRoomId, retentionTime = retentionTime)
 
             val actual =
-                savedStateHandle.get<Long>(manageChatHistoryChatIdArg) ?: MEGACHAT_INVALID_HANDLE
+                savedStateHandle.get<Long>(Constants.CHAT_ID) ?: MEGACHAT_INVALID_HANDLE
             assertThat(actual).isEqualTo(newChatRoomId)
         }
 
@@ -291,8 +290,8 @@ class ManageChatHistoryViewModelTest {
     ) {
         savedStateHandle = SavedStateHandle(
             mapOf(
-                manageChatHistoryChatIdArg to chatRoomId,
-                manageChatHistoryEmailIdArg to email
+                Constants.CHAT_ID to chatRoomId,
+                Constants.EMAIL to email
             )
         )
         initializeViewModel()

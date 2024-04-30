@@ -1609,6 +1609,16 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         outState.putBoolean(END_CALL_FOR_ALL_DIALOG, isAlertDialogShown(endCallForAllDialog))
     }
 
+    /**
+     * Open manage chat history
+     */
+    fun openManageChatHistory(chatId: Long) {
+        navigator.openManageChatHistoryActivity(
+            context = this,
+            chatId = chatId
+        )
+    }
+
     companion object {
         private const val TIMEOUT = 300
         private const val MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100

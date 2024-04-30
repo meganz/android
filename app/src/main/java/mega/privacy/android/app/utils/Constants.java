@@ -513,7 +513,6 @@ public class Constants {
     public static final String EXTRA_VOLUME_STREAM_VALUE = "android.media.EXTRA_VOLUME_STREAM_VALUE";
     public static final String EXTRA_VOLUME_STREAM_TYPE = "android.media.EXTRA_VOLUME_STREAM_TYPE";
     public static final String COPIED_TEXT_LABEL = "Copied Text";
-    public static final String IS_FROM_CONTACTS = "IS_FROM_CONTACTS";
     public static final String IS_FLOATING_WINDOW = "IS_FLOATING_WINDOW";
     public static final String SCHEDULED_MEETING_ID = "SCHEDULED_MEETING_ID";
     public static final String SCHEDULED_MEETING_CREATED = "SCHEDULED_MEETING_CREATED";

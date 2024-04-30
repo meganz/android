@@ -14,9 +14,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomUiMapper
 import mega.privacy.android.app.presentation.meeting.managechathistory.model.ManageChatHistoryUIState
 import mega.privacy.android.app.presentation.meeting.managechathistory.navigation.ManageChatHistoryArgs
-import mega.privacy.android.app.presentation.meeting.managechathistory.navigation.manageChatHistoryChatIdArg
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarDuration
 import mega.privacy.android.app.presentation.snackbar.SnackBarHandler
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
@@ -116,9 +116,9 @@ class ManageChatHistoryViewModel @Inject constructor(
     }
 
     private fun setChatRoomId(chatId: Long) {
-        savedStateHandle[manageChatHistoryChatIdArg] = chatId
+        savedStateHandle[Constants.CHAT_ID] = chatId
         chatRoomId =
-            savedStateHandle.get<Long>(manageChatHistoryChatIdArg) ?: MEGACHAT_INVALID_HANDLE
+            savedStateHandle.get<Long>(Constants.CHAT_ID) ?: MEGACHAT_INVALID_HANDLE
     }
 
     private fun setChatRoomUiState(chatRoom: ChatRoom?) {
