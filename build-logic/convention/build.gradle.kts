@@ -31,6 +31,12 @@ gradlePlugin {
         }
     }
     plugins {
+        register("androidApplication") {
+            id = "mega.android.app"
+            implementationClass = "AndroidApplicationConventionPlugin"
+        }
+    }
+    plugins {
         register("jvmTest") {
             id = "mega.jvm.test"
             implementationClass = "JvmTestConventionPlugin"
