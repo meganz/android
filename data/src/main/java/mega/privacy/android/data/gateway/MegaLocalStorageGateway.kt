@@ -70,18 +70,6 @@ interface MegaLocalStorageGateway {
     suspend fun setOthersSortOrder(order: Int)
 
     /**
-     * Get user credentials
-     *
-     * @return user credentials or null
-     */
-    suspend fun getUserCredentials(): UserCredentials?
-
-    /**
-     * Do user credentials exist
-     */
-    suspend fun doCredentialsExist(): Boolean
-
-    /**
      * Do user preferences exist
      */
     suspend fun doPreferencesExist(): Boolean

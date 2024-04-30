@@ -282,7 +282,7 @@ internal class DefaultAccountRepository @Inject constructor(
     }
 
     override suspend fun getSession(): String? = withContext(ioDispatcher) {
-        localStorageGateway.getUserCredentials()?.session
+        getAccountCredentials()?.session
     }
 
     override suspend fun retryChatPendingConnections(disconnect: Boolean) =
@@ -585,13 +585,14 @@ internal class DefaultAccountRepository @Inject constructor(
         val session = megaApiGateway.dumpSession
         val credentials = userCredentialsMapper(email, session, null, null, myUserHandle.toString())
         localStorageGateway.saveCredentials(credentials)
+        credentialsPreferencesGateway.save(credentials)
         ephemeralCredentialsGateway.clear()
 
         accountSessionMapper(email, session, myUserHandle)
     }
 
     override suspend fun getAccountCredentials() = withContext(ioDispatcher) {
-        localStorageGateway.getUserCredentials()
+        credentialsPreferencesGateway.monitorCredentials().firstOrNull()
     }
 
     override suspend fun changeEmail(email: String): String = withContext(ioDispatcher) {

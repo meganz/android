@@ -1,15 +1,14 @@
 package mega.privacy.android.domain.usecase
 
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.AccountRepository
 import javax.inject.Inject
 
 /**
  * Use case to check if credentials exist
  *
- * @property cameraUploadRepository [CameraUploadRepository]
  */
 class HasCredentialsUseCase @Inject constructor(
-    private val cameraUploadRepository: CameraUploadRepository,
+    private val accountRepository: AccountRepository
 ) {
 
     /**
@@ -17,5 +16,5 @@ class HasCredentialsUseCase @Inject constructor(
      *
      * @return do credentials exist
      */
-    suspend operator fun invoke(): Boolean = cameraUploadRepository.hasCredentials()
+    suspend operator fun invoke(): Boolean = accountRepository.getAccountCredentials() != null
 }

@@ -284,17 +284,6 @@ class DefaultCameraUploadRepositoryTest {
     }
 
     @Nested
-    @DisplayName("Credentials")
-    inner class CredentialsTest {
-        @ParameterizedTest(name = "credentials exist: {0}")
-        @ValueSource(booleans = [true, false])
-        fun `test that the credentials exist or not`(credentialsExist: Boolean) = runTest {
-            whenever(localStorageGateway.doCredentialsExist()).thenReturn(credentialsExist)
-            assertThat(underTest.hasCredentials()).isEqualTo(credentialsExist)
-        }
-    }
-
-    @Nested
     @DisplayName("Preferences")
     inner class PreferencesTest {
         @ParameterizedTest(name = "preferences exist: {0}")

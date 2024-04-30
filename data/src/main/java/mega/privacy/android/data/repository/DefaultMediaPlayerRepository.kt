@@ -150,8 +150,6 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             }
         }
 
-    override suspend fun areCredentialsNull(): Boolean = dbHandler.credentials == null
-
     override suspend fun getAudioNodesByParentHandle(
         parentHandle: Long,
         order: SortOrder,

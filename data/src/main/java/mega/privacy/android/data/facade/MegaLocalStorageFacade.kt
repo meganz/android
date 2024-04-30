@@ -71,10 +71,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.setPreferredSortOthers(order.toString())
     }
 
-    override suspend fun getUserCredentials(): UserCredentials? = dbHandler.credentials
-
-    override suspend fun doCredentialsExist(): Boolean = dbHandler.credentials != null
-
     override suspend fun doPreferencesExist(): Boolean = dbHandler.preferences != null
 
     override suspend fun getNonContactByHandle(userHandle: Long): NonContactInfo? =

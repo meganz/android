@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -31,6 +32,7 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.contact.ContactGateway
+import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ContactRequestMapper
 import mega.privacy.android.data.mapper.InviteContactRequestMapper
@@ -104,7 +106,7 @@ internal class DefaultContactsRepository @Inject constructor(
     private val contactDataMapper: ContactDataMapper,
     private val contactCredentialsMapper: ContactCredentialsMapper,
     private val inviteContactRequestMapper: InviteContactRequestMapper,
-    private val localStorageGateway: MegaLocalStorageGateway,
+    private val credentialsPreferencesGateway: CredentialsPreferencesGateway,
     private val contactWrapper: ContactWrapper,
     private val databaseHandler: DatabaseHandler,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
@@ -570,11 +572,11 @@ internal class DefaultContactsRepository @Inject constructor(
         withContext(ioDispatcher) {
             if (forceRefresh) {
                 getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_FIRSTNAME)
-                    .also { localStorageGateway.saveMyFirstName(it) }
+                    .also { credentialsPreferencesGateway.saveFirstName(it) }
             } else {
-                localStorageGateway.getUserCredentials()?.firstName
+                credentialsPreferencesGateway.monitorCredentials().firstOrNull()?.firstName
                     ?: getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_FIRSTNAME)
-                        .also { localStorageGateway.saveMyFirstName(it) }
+                        .also { credentialsPreferencesGateway.saveFirstName(it) }
             }
         }
 
@@ -582,11 +584,11 @@ internal class DefaultContactsRepository @Inject constructor(
         withContext(ioDispatcher) {
             if (forceRefresh) {
                 getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_LASTNAME)
-                    .also { localStorageGateway.saveMyLastName(it) }
+                    .also { credentialsPreferencesGateway.saveLastName(it) }
             } else {
-                localStorageGateway.getUserCredentials()?.lastName
+                credentialsPreferencesGateway.monitorCredentials().firstOrNull()?.lastName
                     ?: getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_LASTNAME)
-                        .also { localStorageGateway.saveMyLastName(it) }
+                        .also { credentialsPreferencesGateway.saveLastName(it) }
             }
         }
 
@@ -635,13 +637,13 @@ internal class DefaultContactsRepository @Inject constructor(
         MegaApiJava.USER_ATTR_FIRSTNAME,
         "setUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME)",
         value
-    ) { localStorageGateway.saveMyFirstName(it) }
+    ) { credentialsPreferencesGateway.saveFirstName(it) }
 
     override suspend fun updateCurrentUserLastName(value: String): String = executeNameUpdate(
         MegaApiJava.USER_ATTR_LASTNAME,
         "setUserAttribute(MegaApiJava.USER_ATTR_LASTNAME)",
         value
-    ) { localStorageGateway.saveMyLastName(it) }
+    ) { credentialsPreferencesGateway.saveLastName(it) }
 
     private suspend inline fun executeNameUpdate(
         type: Int,

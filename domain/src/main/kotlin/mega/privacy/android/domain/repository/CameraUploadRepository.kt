@@ -94,13 +94,6 @@ interface CameraUploadRepository {
     suspend fun setUploadOption(uploadOption: UploadOption)
 
     /**
-     * Do user credentials exist
-     *
-     * @return true if user credentials exist
-     */
-    suspend fun hasCredentials(): Boolean
-
-    /**
      * Do preferences exist
      *
      * @return true if preferences exist

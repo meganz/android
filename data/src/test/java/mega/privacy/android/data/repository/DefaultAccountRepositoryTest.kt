@@ -865,8 +865,9 @@ class DefaultAccountRepositoryTest {
     @Test
     fun `test that MegaLocalStorageGateway is invoked for getting account credentials`() =
         runTest {
+            whenever(credentialsPreferencesGateway.monitorCredentials()).thenReturn(flowOf(null))
             underTest.getAccountCredentials()
-            verify(localStorageGateway).getUserCredentials()
+            verify(credentialsPreferencesGateway).monitorCredentials()
         }
 
     @Test
