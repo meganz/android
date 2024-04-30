@@ -19,7 +19,6 @@ import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPOR
 import static mega.privacy.android.app.utils.Constants.SELECTED_CHATS;
 import static mega.privacy.android.app.utils.Constants.SELECTED_USERS;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.CoroutinesBridgeKt.onResult;
 import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
 import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.Util.changeToolBarElevation;
@@ -58,7 +57,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.content.FileProvider;
-import androidx.lifecycle.LifecycleOwnerKt;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -83,15 +81,12 @@ import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
-import kotlinx.coroutines.CoroutineScope;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
-import mega.privacy.android.app.featuretoggle.AppFeatures;
-import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -711,43 +706,30 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     }
 
     public void showFullScreenViewer(long msgId) {
-        CoroutineScope lifecycleScope = LifecycleOwnerKt.getLifecycleScope(this);
-        getFeatureFlagUseCase.invoke(AppFeatures.ImagePreview, onResult(lifecycleScope, (isEnabled) -> {
-            long currentNodeHandle = INVALID_HANDLE;
-            List<Long> messageIds = new ArrayList<>();
+        long currentNodeHandle = INVALID_HANDLE;
+        List<Long> messageIds = new ArrayList<>();
 
-            for (MegaChatMessage message : messages) {
-                messageIds.add(message.getMsgId());
-                if (message.getMsgId() == msgId) {
-                    currentNodeHandle = message.getMegaNodeList().get(0).getHandle();
-                }
+        for (MegaChatMessage message : messages) {
+            messageIds.add(message.getMsgId());
+            if (message.getMsgId() == msgId) {
+                currentNodeHandle = message.getMegaNodeList().get(0).getHandle();
             }
-            if (isEnabled != null && isEnabled) {
-                Map<String, Object> previewParams = new HashMap<>();
-                previewParams.put(ChatImageNodeFetcher.CHAT_ROOM_ID, chatId);
-                previewParams.put(ChatImageNodeFetcher.MESSAGE_IDS, Longs.toArray(messageIds));
+        }
 
-                Intent intent = ImagePreviewActivity.Companion.createSecondaryIntent(
-                        this,
-                        ImagePreviewFetcherSource.CHAT,
-                        ImagePreviewMenuSource.CHAT,
-                        currentNodeHandle,
-                        previewParams,
-                        false,
-                        true
-                );
-                startActivity(intent);
-            } else {
-                Intent intent = ImageViewerActivity.getIntentForChatMessages(
-                        this,
-                        chatId,
-                        Longs.toArray(messageIds),
-                        currentNodeHandle
-                );
-                startActivity(intent);
-            }
-            return Unit.INSTANCE;
-        }));
+        Map<String, Object> previewParams = new HashMap<>();
+        previewParams.put(ChatImageNodeFetcher.CHAT_ROOM_ID, chatId);
+        previewParams.put(ChatImageNodeFetcher.MESSAGE_IDS, Longs.toArray(messageIds));
+
+        Intent intent = ImagePreviewActivity.Companion.createSecondaryIntent(
+                this,
+                ImagePreviewFetcherSource.CHAT,
+                ImagePreviewMenuSource.CHAT,
+                currentNodeHandle,
+                previewParams,
+                false,
+                false
+        );
+        startActivity(intent);
     }
 
     private void updateActionModeTitle() {

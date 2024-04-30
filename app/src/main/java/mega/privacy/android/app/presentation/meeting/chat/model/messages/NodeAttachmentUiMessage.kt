@@ -12,7 +12,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
@@ -73,21 +72,12 @@ data class NodeAttachmentUiMessage(
                 }.onSuccess { content ->
                     when (content) {
                         is FileNodeContent.ImageForChat -> {
-                            if (viewModel.useImagePreview()) {
-                                openImagePreview(
-                                    context,
-                                    message.chatId,
-                                    content.allAttachmentMessageIds.toLongArray(),
-                                    message.fileNode.id.longValue
-                                )
-                            } else {
-                                openImageViewer(
-                                    context,
-                                    message.chatId,
-                                    content.allAttachmentMessageIds.toLongArray(),
-                                    message.fileNode.id.longValue
-                                )
-                            }
+                            openImagePreview(
+                                context,
+                                message.chatId,
+                                content.allAttachmentMessageIds.toLongArray(),
+                                message.fileNode.id.longValue
+                            )
                         }
 
                         is FileNodeContent.AudioOrVideo -> openVideoOrAudioFile(
@@ -206,21 +196,6 @@ data class NodeAttachmentUiMessage(
         context.startActivity(pdfIntent)
     }
 
-    private fun openImageViewer(
-        context: Context,
-        chatId: Long,
-        messageIds: LongArray,
-        nodeId: Long,
-    ) {
-        val intent = ImageViewerActivity.getIntentForChatMessages(
-            context = context,
-            chatRoomId = chatId,
-            messageIds = messageIds,
-            currentNodeHandle = nodeId
-        )
-        context.startActivity(intent)
-    }
-
     private fun openImagePreview(
         context: Context,
         chatId: Long,
@@ -232,6 +207,7 @@ data class NodeAttachmentUiMessage(
             imageSource = ImagePreviewFetcherSource.CHAT,
             menuOptionsSource = ImagePreviewMenuSource.CHAT,
             anchorImageNodeId = nodeId,
+            showScreenLabel = false,
             params = mapOf(
                 ChatImageNodeFetcher.CHAT_ROOM_ID to chatId,
                 ChatImageNodeFetcher.MESSAGE_IDS to messageIds

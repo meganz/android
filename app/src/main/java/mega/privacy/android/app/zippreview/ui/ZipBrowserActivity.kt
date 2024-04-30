@@ -33,8 +33,6 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.ChatDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityZipBrowserBinding
-import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ZipImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -296,31 +294,15 @@ class ZipBrowserActivity : PasscodeActivity() {
     private fun imageFileOpen(position: Int, file: File) {
         Timber.d("isImage")
         lifecycleScope.launch {
-            if (getFeatureFlagUseCase(AppFeatures.ImagePreview)) {
-                val intent = ImagePreviewActivity.createIntent(
-                    context = this@ZipBrowserActivity,
-                    imageSource = ImagePreviewFetcherSource.ZIP,
-                    menuOptionsSource = ImagePreviewMenuSource.ZIP,
-                    anchorImageNodeId = NodeId(file.hashCode().toLong()),
-                    params = mapOf(ZipImageNodeFetcher.URI to "${file.toUri()}")
-                )
-                startActivity(intent)
-            } else {
-                val intent = ImageViewerActivity.getIntentForFile(
-                    this@ZipBrowserActivity,
-                    file.toUri(),
-                    true
-                )
-                DragToExitSupport.putThumbnailLocation(
-                    intent,
-                    recyclerView,
-                    position,
-                    VIEWER_FROM_ZIP_BROWSER,
-                    zipAdapter
-                )
-                startActivity(intent)
-                overridePendingTransition(0, 0)
-            }
+            val intent = ImagePreviewActivity.createIntent(
+                context = this@ZipBrowserActivity,
+                imageSource = ImagePreviewFetcherSource.ZIP,
+                menuOptionsSource = ImagePreviewMenuSource.ZIP,
+                anchorImageNodeId = NodeId(file.hashCode().toLong()),
+                showScreenLabel = false,
+                params = mapOf(ZipImageNodeFetcher.URI to "${file.toUri()}")
+            )
+            startActivity(intent)
         }
     }
 
