@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivityV2
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsComposeActivity
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -77,6 +78,13 @@ internal class MegaNavigatorImpl @Inject constructor(
                     flags = flags
                 )
             }
+            context.startActivity(intent)
+        }
+    }
+
+    override fun openUpgradeAccount(context: Context) {
+        applicationScope.launch {
+            val intent = Intent(context, UpgradeAccountActivity::class.java)
             context.startActivity(intent)
         }
     }

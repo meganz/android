@@ -14,13 +14,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.shared.theme.MegaAppTheme
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.feature.sync.navigation.syncNavGraph
 import mega.privacy.android.feature.sync.navigation.syncRoute
-import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.theme.MegaAppTheme
 import javax.inject.Inject
 
 /**
@@ -36,6 +37,12 @@ class SyncFragment : Fragment() {
         @JvmStatic
         fun newInstance(): SyncFragment = SyncFragment()
     }
+
+    /**
+     * Allows navigation to specific features in the monolith :app
+     */
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     /**
      * Get Theme Mode
@@ -76,7 +83,10 @@ class SyncFragment : Fragment() {
                                 showOnboardingScreen = showOnboarding,
                                 navController = animatedNavController,
                                 fileTypeIconMapper = fileTypeIconMapper,
-                                syncPermissionsManager = syncPermissionsManager
+                                syncPermissionsManager = syncPermissionsManager,
+                                openUpgradeAccountPage = {
+                                    megaNavigator.openUpgradeAccount(requireContext())
+                                }
                             )
                         }
                     }

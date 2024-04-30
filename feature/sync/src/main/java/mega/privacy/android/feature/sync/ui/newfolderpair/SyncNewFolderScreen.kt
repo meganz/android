@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.newfolderpair
 
+import mega.privacy.android.shared.resources.R as sharedResR
 import android.Manifest
 import android.content.res.Configuration
 import android.net.Uri
@@ -28,11 +29,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.core.ui.controls.banners.WarningBanner
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
+import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.core.ui.controls.text.MegaText
 import mega.privacy.android.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.core.ui.theme.tokens.TextColor
@@ -41,8 +43,7 @@ import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.ui.megapicker.AllFilesAccessDialog
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.views.InputSyncInformationView
-import mega.privacy.android.shared.resources.R as sharedResR
-import mega.privacy.android.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.theme.MegaAppTheme
 
 @Composable
 internal fun SyncNewFolderScreen(
@@ -53,6 +54,9 @@ internal fun SyncNewFolderScreen(
     syncClicked: () -> Unit,
     syncPermissionsManager: SyncPermissionsManager,
     onBackClicked: () -> Unit,
+    showStorageOverQuota: Boolean,
+    onDismissStorageOverQuota: () -> Unit,
+    onOpenUpgradeAccount: () -> Unit,
 ) {
     MegaScaffold(topBar = {
         MegaAppBar(
@@ -74,7 +78,10 @@ internal fun SyncNewFolderScreen(
                 selectedLocalFolder = selectedLocalFolder,
                 selectedMegaFolder = selectedMegaFolder,
                 syncClicked = syncClicked,
-                syncPermissionsManager = syncPermissionsManager
+                syncPermissionsManager = syncPermissionsManager,
+                showStorageOverQuota = showStorageOverQuota,
+                onDismissStorageOverQuota = onDismissStorageOverQuota,
+                onOpenUpgradeAccount = onOpenUpgradeAccount
             )
         }
     })
@@ -88,6 +95,9 @@ private fun SyncNewFolderScreenContent(
     selectedMegaFolder: RemoteFolder?,
     syncClicked: () -> Unit,
     syncPermissionsManager: SyncPermissionsManager,
+    showStorageOverQuota: Boolean,
+    onDismissStorageOverQuota: () -> Unit,
+    onOpenUpgradeAccount: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showSyncPermissionBanner by rememberSaveable {
@@ -139,6 +149,21 @@ private fun SyncNewFolderScreenContent(
             modifier = Modifier.padding(start = 16.dp, top = 16.dp),
             style = MaterialTheme.typography.subtitle2
         )
+
+        if (showStorageOverQuota) {
+            MegaAlertDialog(
+                title = stringResource(sharedResR.string.sync_error_dialog_insufficient_storage_title),
+                text = stringResource(sharedResR.string.sync_error_dialog_insufficient_storage_body),
+                confirmButtonText = stringResource(sharedResR.string.sync_error_dialog_insufficient_storage_confirm_button),
+                cancelButtonText = stringResource(sharedResR.string.sync_error_dialog_insufficient_storage_cancel_button),
+                onConfirm = {
+                    onOpenUpgradeAccount()
+                },
+                onDismiss = {
+                    onDismissStorageOverQuota()
+                }
+            )
+        }
 
         InputSyncInformationView(
             selectDeviceFolderClicked = {
@@ -201,6 +226,9 @@ private fun PreviewSyncNewFolderScreen() {
             selectMegaFolderClicked = {},
             syncClicked = {},
             syncPermissionsManager = SyncPermissionsManager(LocalContext.current),
+            showStorageOverQuota = false,
+            onDismissStorageOverQuota = {},
+            onOpenUpgradeAccount = {},
             onBackClicked = {},
         )
     }

@@ -43,6 +43,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":navigation"))
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
     lintChecks(project(":lint"))

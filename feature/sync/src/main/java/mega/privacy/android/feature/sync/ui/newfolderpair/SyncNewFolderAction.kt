@@ -9,5 +9,9 @@ internal sealed interface SyncNewFolderAction {
      */
     data class LocalFolderSelected(val path: Uri) : SyncNewFolderAction
 
-    object NextClicked : SyncNewFolderAction
+    data object NextClicked : SyncNewFolderAction
+
+    data object StorageOverquotaShown : SyncNewFolderAction
+
+    data object SyncListScreenOpened : SyncNewFolderAction
 }

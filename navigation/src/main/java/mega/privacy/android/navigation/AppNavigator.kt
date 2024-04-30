@@ -73,4 +73,10 @@ interface AppNavigator {
         chatId: Long = -1L,
         email: String? = null,
     )
+
+    /**
+     * Open upgrade account screen.
+     * This screen allows users to upgrade to a paid plan
+     */
+    fun openUpgradeAccount(context: Context)
 }

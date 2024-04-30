@@ -6,8 +6,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.feature.sync.ui.SyncEmptyScreen
 import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
+import mega.privacy.android.feature.sync.ui.SyncEmptyScreen
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerRoute
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRoute
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
@@ -27,7 +27,8 @@ internal fun NavGraphBuilder.syncNavGraph(
     showOnboardingScreen: Boolean,
     navController: NavController,
     fileTypeIconMapper: FileTypeIconMapper,
-    syncPermissionsManager: SyncPermissionsManager
+    syncPermissionsManager: SyncPermissionsManager,
+    openUpgradeAccountPage: () -> Unit
 ) {
     navigation(
         startDestination = if (showOnboardingScreen) {
@@ -52,7 +53,10 @@ internal fun NavGraphBuilder.syncNavGraph(
                     navController.navigate(syncMegaPicker)
                 }, openNextScreen = {
                     navController.navigate(syncList)
-                }, onBackClicked = {
+                }, openUpgradeAccount = {
+                    openUpgradeAccountPage()
+                },
+                onBackClicked = {
                     navController.popBackStack()
                 }
             )

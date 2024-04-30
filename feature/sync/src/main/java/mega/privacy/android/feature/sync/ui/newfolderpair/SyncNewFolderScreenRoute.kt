@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.ui.newfolderpair
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction.LocalFolderSelected
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction.NextClicked
@@ -15,6 +16,7 @@ internal fun SyncNewFolderScreenRoute(
     syncPermissionsManager: SyncPermissionsManager,
     openSelectMegaFolderScreen: () -> Unit,
     openNextScreen: (SyncNewFolderState) -> Unit,
+    openUpgradeAccount: () -> Unit,
     onBackClicked: () -> Unit,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
@@ -27,11 +29,19 @@ internal fun SyncNewFolderScreenRoute(
         syncClicked = {
             Analytics.tracker.trackEvent(AndroidSyncStartSyncButtonEvent)
             viewModel.handleAction(NextClicked)
-            openNextScreen(state.value)
         },
         syncPermissionsManager = syncPermissionsManager,
         onBackClicked = onBackClicked,
+        showStorageOverQuota = state.value.showStorageOverQuota,
+        onDismissStorageOverQuota = { viewModel.handleAction(SyncNewFolderAction.StorageOverquotaShown) },
+        onOpenUpgradeAccount = { openUpgradeAccount() },
     )
+
+    EventEffect(event = state.value.openSyncListScreen, onConsumed = {
+        viewModel.handleAction(SyncNewFolderAction.SyncListScreenOpened)
+    }) {
+        openNextScreen(state.value)
+    }
 
     val onBack = {
         onBackClicked()

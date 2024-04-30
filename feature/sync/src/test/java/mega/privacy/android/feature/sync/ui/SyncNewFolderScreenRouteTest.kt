@@ -8,8 +8,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.StateFlow
-import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.R
+import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRoute
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderState
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
@@ -46,6 +46,7 @@ class SyncNewFolderScreenRouteTest {
                 syncPermissionsManager = syncPermissionsManager,
                 openNextScreen = {},
                 openSelectMegaFolderScreen = {},
+                openUpgradeAccount = {},
                 onBackClicked = {}
             )
         }
@@ -73,6 +74,7 @@ class SyncNewFolderScreenRouteTest {
                 syncPermissionsManager = syncPermissionsManager,
                 openNextScreen = {},
                 openSelectMegaFolderScreen = {},
+                openUpgradeAccount = {},
                 onBackClicked = {}
             )
         }
@@ -99,6 +101,7 @@ class SyncNewFolderScreenRouteTest {
                 openNextScreen = {},
                 syncPermissionsManager = syncPermissionsManager,
                 openSelectMegaFolderScreen = {},
+                openUpgradeAccount = {},
                 onBackClicked = {}
             )
         }
@@ -119,6 +122,7 @@ class SyncNewFolderScreenRouteTest {
                 syncPermissionsManager = syncPermissionsManager,
                 openNextScreen = openNextScreenCallback,
                 openSelectMegaFolderScreen = {},
+                openUpgradeAccount = {},
                 onBackClicked = {}
             )
         }
@@ -141,6 +145,7 @@ class SyncNewFolderScreenRouteTest {
                 openNextScreen = {},
                 syncPermissionsManager = syncPermissionsManager,
                 openSelectMegaFolderScreen = openSelectMegaFolderScreenLambda,
+                openUpgradeAccount = {},
                 onBackClicked = {}
             )
         }
@@ -166,6 +171,7 @@ class SyncNewFolderScreenRouteTest {
                 openNextScreen = {},
                 syncPermissionsManager = syncPermissionsManager,
                 openSelectMegaFolderScreen = { },
+                openUpgradeAccount = {},
                 onBackClicked = {}
             )
         }

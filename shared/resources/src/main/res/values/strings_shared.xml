@@ -268,4 +268,12 @@
     <string name="general_tera_byte_standalone">TB</string>
     <!-- Description about Storage feature on Onboarding dialog (for user to choose account - Free or Pro). %1$s placeholder will be replaced with correct localised storage size (e.g. 400 or 2), and the %2$s placeholder will be replaced with correct localised storage unit (e.g. GB or TB), so combining both placeholders will show storage size+storage unit (e.g. 400 GB or 2 TB)-->
     <string name="dialog_onboarding_feature_storage_description">Starting from %1$s %2$s, find the perfect fit for your storage needs.</string>
+    <!-- Title of the insufficient storage error dialog -->
+    <string name="sync_error_dialog_insufficient_storage_title">Insufficient storage space</string>
+    <!-- Body text of the insufficient storage error dialog -->
+    <string name="sync_error_dialog_insufficient_storage_body">The size of this folder will take your MEGA account over its storage limit. In order to be able to sync it, you will need to either free up some space or upgrade your MEGA account.</string>
+    <!-- Confirm button text of the insufficient storage error dialog -->
+    <string name="sync_error_dialog_insufficient_storage_confirm_button">See plans</string>
+    <!-- Cancel button text of the insufficient storage error dialog -->
+    <string name="sync_error_dialog_insufficient_storage_cancel_button">Not now</string>
 </resources>
