@@ -107,7 +107,8 @@ internal class SearchRepositoryImpl @Inject constructor(
 
     override suspend fun getOutShares() = withContext(ioDispatcher) {
         val searchNodes = ArrayList<MegaNode>()
-        val outShares = megaApiGateway.getOutgoingSharesNode(null)
+        val outShares =
+            megaApiGateway.getOutgoingSharesNode(sortOrderIntMapper(getCloudSortOrder()))
         val addedHandles = mutableSetOf<Long>()
         for (outShare in outShares) {
             if (!addedHandles.contains(outShare.nodeHandle)) {

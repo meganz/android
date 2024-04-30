@@ -199,11 +199,14 @@ class SearchRepositoryImplTest {
 
     @Test
     fun `test that getOutShares returns list of untyped nodes`() = runTest {
+        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
         val share = mock<MegaShare> {
             on { nodeHandle } doReturn 123456L
         }
         val shares = listOf(share)
-        whenever(megaApiGateway.getOutgoingSharesNode(null)).thenReturn(shares)
+        whenever(megaApiGateway.getOutgoingSharesNode(sortOrderIntMapper(SortOrder.ORDER_NONE))).thenReturn(
+            shares
+        )
         whenever(megaApiGateway.getMegaNodeByHandle(megaNode.handle)).thenReturn(megaNode)
         whenever(megaNode.handle).thenReturn(123456L)
         whenever(nodeMapper(megaNode)).thenReturn(typedNode)
