@@ -16,6 +16,7 @@ import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.offline.view.OfflineFeatureScreen
 import mega.privacy.android.app.utils.callManager
+import mega.privacy.android.core.ui.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.theme.MegaAppTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -29,6 +30,9 @@ class OfflineFragmentCompose : Fragment(), Scrollable {
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    @Inject
+    lateinit var fileTypeIconMapper: FileTypeIconMapper
 
     private val viewModel: OfflineComposeViewModel by viewModels()
     private val args: OfflineFragmentComposeArgs by navArgs()
@@ -51,8 +55,12 @@ class OfflineFragmentCompose : Fragment(), Scrollable {
                 val themeMode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDarkMode = themeMode.isDarkMode()
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 MegaAppTheme(isDark = isDarkMode) {
-                    OfflineFeatureScreen(viewModel)
+                    OfflineFeatureScreen(
+                        uiState = uiState,
+                        fileTypeIconMapper = fileTypeIconMapper
+                    )
                 }
             }
         }

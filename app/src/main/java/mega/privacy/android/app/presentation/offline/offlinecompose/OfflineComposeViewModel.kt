@@ -14,13 +14,16 @@ import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.mode
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
+import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileTotalSizeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFolderInformationUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineWarningMessageVisibilityUseCase
 import mega.privacy.android.domain.usecase.offline.SetOfflineWarningMessageVisibilityUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersFinishedUseCase
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -35,6 +38,7 @@ class OfflineComposeViewModel @Inject constructor(
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val offlineFolderInformationUseCase: GetOfflineFolderInformationUseCase,
     private val getOfflineFileUseCase: GetOfflineFileUseCase,
+    private val getThumbnailUseCase: GetThumbnailUseCase,
     private val getOfflineFileTotalSizeUseCase: GetOfflineFileTotalSizeUseCase,
 ) : ViewModel() {
 
@@ -120,6 +124,15 @@ class OfflineComposeViewModel @Inject constructor(
         val totalSize = getOfflineFileTotalSizeUseCase(offlineFile)
         val folderInfo = getFolderInfoOrNull(offlineNodeInfo)
         val addedTime = offlineNodeInfo.lastModifiedTime?.div(1000L)
+        val thumbnail = runCatching {
+            getThumbnailPathOrNull(
+                isFolder = offlineNodeInfo.isFolder,
+                handle = offlineNodeInfo.handle.toLong(),
+            )
+        }.getOrElse {
+            Timber.e(it)
+            null
+        }
 
         return OfflineFileInfoUiState(
             title = offlineNodeInfo.name,
@@ -127,7 +140,20 @@ class OfflineComposeViewModel @Inject constructor(
             addedTime = addedTime,
             totalSize = totalSize,
             folderInfo = folderInfo,
+            thumbnail = thumbnail
         )
+    }
+
+    private suspend fun getThumbnailPathOrNull(
+        isFolder: Boolean,
+        handle: Long,
+    ): String? {
+        if (isFolder) return null
+
+        return getThumbnailUseCase(handle)
+            ?.takeIf { it.exists() }
+            ?.toURI()
+            ?.toString()
     }
 
     private suspend fun getFolderInfoOrNull(

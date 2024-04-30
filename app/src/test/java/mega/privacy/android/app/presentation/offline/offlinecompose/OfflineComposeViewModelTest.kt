@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.offline.offlinecompose
 
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
@@ -8,7 +7,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
-import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.usecase.GetOfflineNodesByParentIdUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
@@ -17,6 +15,7 @@ import mega.privacy.android.domain.usecase.offline.GetOfflineFolderInformationUs
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineWarningMessageVisibilityUseCase
 import mega.privacy.android.domain.usecase.offline.SetOfflineWarningMessageVisibilityUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransfersFinishedUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -44,6 +43,7 @@ class OfflineComposeViewModelTest {
     private val offlineFolderInformationUseCase: GetOfflineFolderInformationUseCase = mock()
     private val getOfflineFileUseCase: GetOfflineFileUseCase = mock()
     private val getOfflineFileTotalSizeUseCase: GetOfflineFileTotalSizeUseCase = mock()
+    private val getThumbnailUseCase: GetThumbnailUseCase = mock()
     private lateinit var underTest: OfflineComposeViewModel
 
     @BeforeEach
@@ -64,6 +64,7 @@ class OfflineComposeViewModelTest {
             offlineFolderInformationUseCase = offlineFolderInformationUseCase,
             getOfflineFileUseCase = getOfflineFileUseCase,
             getOfflineFileTotalSizeUseCase = getOfflineFileTotalSizeUseCase,
+            getThumbnailUseCase = getThumbnailUseCase
         )
     }
 
@@ -132,6 +133,7 @@ class OfflineComposeViewModelTest {
             offlineFolderInformationUseCase,
             getOfflineFileUseCase,
             getOfflineFileTotalSizeUseCase,
+            getThumbnailUseCase
         )
     }
 }
