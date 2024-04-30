@@ -2,8 +2,11 @@
 
 package mega.privacy.android.app.presentation.clouddrive.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -79,7 +82,12 @@ fun FileBrowserComposeView(
         )
     }
 
-    Column(modifier = Modifier.semantics { testTagsAsResourceId = true }) {
+    Column(
+        modifier = Modifier
+            .semantics { testTagsAsResourceId = true }
+            .fillMaxSize()
+            .background(MaterialTheme.colors.background),
+    ) {
         uiState.errorMessage?.let { errorMessage ->
             WarningBanner(textString = stringResource(id = errorMessage), onCloseClick = null)
         }
