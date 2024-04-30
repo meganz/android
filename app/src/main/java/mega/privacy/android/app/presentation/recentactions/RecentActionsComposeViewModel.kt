@@ -10,9 +10,12 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.recentactions.mapper.RecentActionBucketUiEntityMapper
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsUiState
 import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
@@ -32,6 +35,8 @@ class RecentActionsComposeViewModel @Inject constructor(
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     monitorHideRecentActivityUseCase: MonitorHideRecentActivityUseCase,
     monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
+    getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
 ) : ViewModel() {
 
     /** private mutable UI state */
@@ -74,6 +79,17 @@ class RecentActionsComposeViewModel @Inject constructor(
         viewModelScope.launch {
             monitorConnectivityUseCase().collect {
                 _uiState.update { state -> state.copy(isConnected = it) }
+            }
+        }
+
+        viewModelScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.HiddenNodes)) {
+                monitorAccountDetailUseCase()
+                    .collectLatest {
+                        _uiState.update { state ->
+                            state.copy(accountType = it.levelDetail?.accountType)
+                        }
+                    }
             }
         }
     }

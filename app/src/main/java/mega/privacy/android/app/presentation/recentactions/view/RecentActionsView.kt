@@ -38,6 +38,7 @@ fun RecentActionsView(
         } else {
             RecentActionsListView(
                 groupedRecentActions = uiState.groupedRecentActionItems,
+                accountType = uiState.accountType,
                 onItemClick = onItemClick,
                 onMenuClick = onMenuClick,
                 onScrollStateChanged = onScrollStateChanged,

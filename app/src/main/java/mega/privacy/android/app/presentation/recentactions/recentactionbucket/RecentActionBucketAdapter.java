@@ -39,6 +39,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.AbstractDraweeController;
 import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.postprocessors.BlurPostProcessor;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
@@ -221,6 +222,7 @@ public class RecentActionBucketAdapter
 
         if (isMedia) {
             holder.mediaView.setVisibility(View.VISIBLE);
+            holder.mediaView.setAlpha(node.isSensitive() ? 0.5f : 1f);
             holder.listView.setVisibility(View.GONE);
             holder.imgLabel.setVisibility(View.GONE);
             holder.imgFavourite.setVisibility(View.GONE);
@@ -247,8 +249,11 @@ public class RecentActionBucketAdapter
             holder.thumbnailMedia.getLayoutParams().height = size;
 
             if (node.getThumbnail() != null) {
-                ImageRequest request =
-                        ImageRequestBuilder.newBuilderWithSource(Uri.fromFile(node.getThumbnail())).build();
+                ImageRequestBuilder builder = ImageRequestBuilder.newBuilderWithSource(Uri.fromFile(node.getThumbnail()));
+                if (node.isSensitive()) {
+                    builder.setPostprocessor(new BlurPostProcessor(20, context));
+                }
+                ImageRequest request = builder.build();
                 AbstractDraweeController controller = Fresco.newDraweeControllerBuilder()
                         .setImageRequest(request)
                         .setOldController(holder.thumbnailMedia.getController())
@@ -281,6 +286,7 @@ public class RecentActionBucketAdapter
         } else {
             holder.mediaView.setVisibility(View.GONE);
             holder.listView.setVisibility(View.VISIBLE);
+            holder.listView.setAlpha(node.isSensitive() ? 0.5f : 1f);
             holder.nameText.setText(megaNode.getName());
             holder.infoText.setText(getSizeString(megaNode.getSize(), context) + " · " + formatTime(megaNode.getCreationTime()));
 

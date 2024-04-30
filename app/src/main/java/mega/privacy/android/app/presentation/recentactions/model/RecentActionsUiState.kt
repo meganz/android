@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.recentactions.model
 
+import mega.privacy.android.domain.entity.AccountType
+
 /**
  * Recent actions UI state
  *
@@ -7,10 +9,12 @@ package mega.privacy.android.app.presentation.recentactions.model
  * @param hideRecentActivity true if recent activity should be hidden
  * @param isLoading true if loading
  * @param isConnected true if connected to internet
+ * @param accountType
  */
 data class RecentActionsUiState(
     val groupedRecentActionItems: Map<String, List<RecentActionBucketUiEntity>> = emptyMap(),
     val hideRecentActivity: Boolean = false,
     val isLoading: Boolean = true,
     val isConnected: Boolean = false,
+    val accountType: AccountType? = null,
 )

@@ -22,6 +22,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
@@ -59,6 +60,7 @@ fun RecentActionListViewItem(
     updatedByText: String? = null,
     isFavourite: Boolean = false,
     @ColorRes labelColor: Int? = null,
+    isSensitive: Boolean = false,
     onMenuClick: () -> Unit = {},
     onItemClick: () -> Unit = {},
 ) {
@@ -70,7 +72,8 @@ fun RecentActionListViewItem(
                 .clickable {
                     onItemClick()
                 }
-                .padding(horizontal = 12.dp, vertical = 10.dp),
+                .padding(horizontal = 12.dp, vertical = 10.dp)
+                .alpha(1f.takeIf { !isSensitive } ?: 0.5f),
         ) {
             Image(
                 modifier = Modifier

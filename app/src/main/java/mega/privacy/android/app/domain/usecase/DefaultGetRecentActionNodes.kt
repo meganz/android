@@ -4,11 +4,13 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import nz.mega.sdk.MegaNodeList
 import timber.log.Timber
@@ -21,6 +23,7 @@ class DefaultGetRecentActionNodes @Inject constructor(
     private val getThumbnailUseCase: GetThumbnailUseCase,
     private val getNodeByHandle: GetNodeByHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
 ) : GetRecentActionNodes {
 
     /**
@@ -50,12 +53,14 @@ class DefaultGetRecentActionNodes @Inject constructor(
     private suspend fun createNodeItem(node: TypedFileNode): NodeItem? =
         runCatching {
             val megaNode = getNodeByHandle.invoke(node.id.longValue)
+            val accountType = monitorAccountDetailUseCase().firstOrNull()?.levelDetail?.accountType
             NodeItem(
                 node = megaNode,
                 thumbnail = getThumbnailUseCase(node.id.longValue),
                 index = -1,
                 isVideo = node.type is VideoFileTypeInfo,
                 modifiedDate = node.modificationTime.toString(),
+                isSensitive = accountType?.isPaid == true && (node.isMarkedSensitive || node.isSensitiveInherited),
             )
         }.onFailure {
             Timber.e(it)

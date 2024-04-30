@@ -18,6 +18,7 @@ import mega.privacy.android.app.presentation.recentactions.model.RecentActionBuc
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -48,6 +50,9 @@ class RecentActionsComposeViewModelTest {
     private val megaRecentActionBucket = mock<RecentActionBucket>()
     private val megaRecentActionBucket2 = mock<RecentActionBucket>()
     private val megaRecentActionBucket3 = mock<RecentActionBucket>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
+        onBlocking { invoke(any()) }.thenReturn(false)
+    }
 
     @BeforeEach
     fun resetMocks() {
@@ -68,7 +73,9 @@ class RecentActionsComposeViewModelTest {
             monitorHideRecentActivityUseCase = monitorHideRecentActivityUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             recentActionBucketUiEntityMapper = recentActionBucketUiEntityMapper,
-            monitorConnectivityUseCase = monitorConnectivityUseCase
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            monitorAccountDetailUseCase = mock(),
         )
     }
 

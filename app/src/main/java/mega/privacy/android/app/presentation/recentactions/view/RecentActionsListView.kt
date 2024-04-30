@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionBucketUiEntity
 import mega.privacy.android.app.presentation.recentactions.view.previewdataprovider.SampleRecentActionDataProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.shared.theme.MegaAppTheme
@@ -38,6 +39,7 @@ import mega.privacy.android.shared.theme.MegaAppTheme
 @Composable
 fun RecentActionsListView(
     groupedRecentActions: Map<String, List<RecentActionBucketUiEntity>>,
+    accountType: AccountType? = null,
     onMenuClick: (TypedFileNode) -> Unit = {},
     onItemClick: (RecentActionBucket) -> Unit = {},
     onScrollStateChanged: (isScrolling: Boolean) -> Unit = {},
@@ -69,6 +71,10 @@ fun RecentActionsListView(
             }
 
             items(list) { item ->
+                val isSensitive = item.bucket.nodes.firstOrNull()?.let { node ->
+                    node.isMarkedSensitive || node.isSensitiveInherited
+                }?.takeIf { item.showMenuButton } ?: false
+
                 RecentActionListViewItem(
                     firstLineText = item.firstLineText,
                     icon = item.icon,
@@ -80,6 +86,7 @@ fun RecentActionsListView(
                     updatedByText = item.updatedByText,
                     isFavourite = item.isFavourite,
                     labelColor = item.labelColor,
+                    isSensitive = accountType?.isPaid == true && isSensitive,
                     onItemClick = { onItemClick(item.bucket) },
                     onMenuClick = { onMenuClick(item.bucket.nodes.first()) }
                 )

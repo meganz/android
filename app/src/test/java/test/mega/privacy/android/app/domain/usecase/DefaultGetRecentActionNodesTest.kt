@@ -2,12 +2,15 @@ package test.mega.privacy.android.app.domain.usecase
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.DefaultGetRecentActionNodes
 import mega.privacy.android.app.domain.usecase.GetRecentActionNodes
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import org.junit.Before
 import org.junit.Test
@@ -28,13 +31,17 @@ class DefaultGetRecentActionNodesTest {
             on { id }.thenReturn(NodeId(value))
         }
     }
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
+        on { invoke() }.thenReturn(flowOf(AccountDetail()))
+    }
 
     @Before
     fun setUp() {
         underTest = DefaultGetRecentActionNodes(
             getThumbnailUseCase = getThumbnailUseCase,
             ioDispatcher = UnconfinedTestDispatcher(),
-            getNodeByHandle = mock()
+            getNodeByHandle = mock(),
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
         )
     }
 
