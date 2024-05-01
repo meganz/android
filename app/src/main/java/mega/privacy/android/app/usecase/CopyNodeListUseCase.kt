@@ -5,13 +5,13 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.presentation.copynode.CopyRequestResult
-import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
 import mega.privacy.android.app.usecase.exception.toMegaException
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
 import nz.mega.sdk.MegaError
@@ -26,6 +26,10 @@ import javax.inject.Inject
  * @property ioDispatcher
  * @constructor Create empty Copy node list use case
  */
+@Deprecated(
+    message = "This use case will be removed sooon",
+    replaceWith = ReplaceWith("CopyNodesUseCase")
+)
 class CopyNodeListUseCase @Inject constructor(
     private val megaApi: MegaApiGateway,
     private val megaApiFolder: MegaApiFolderGateway,

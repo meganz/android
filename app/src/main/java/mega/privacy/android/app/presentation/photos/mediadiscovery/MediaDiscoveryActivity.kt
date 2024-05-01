@@ -195,22 +195,11 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
             statusDialog?.show()
 
             lifecycleScope.launch {
-                val selectedNodes = mediaDiscoveryViewModel.getSelectedNodes()
-                if (selectedNodes.isNotEmpty()) {
-                    // Import the selected nodes
-                    Timber.d("Is multiple select")
-                    val authorizedNodes =
-                        selectedNodes.mapNotNull { megaApiFolder.authorizeNode(it) }
-                    mediaDiscoveryViewModel.checkNameCollision(authorizedNodes, toHandle)
-                } else {
-                    // No selection, import the whole folder
-                    val node = with(megaApiFolder) {
-                        authorizeNode(rootNode)
-                    }
-                    node?.let {
-                        mediaDiscoveryViewModel.checkNameCollision(listOf(it), toHandle)
-                    }
-                }
+                val selectedNodes = mediaDiscoveryViewModel.getSelectedNodes().let {
+                    // When there are no selected nodes, import the whole folder
+                    it.ifEmpty { listOf(megaApiFolder.rootNode) }
+                }.mapNotNull { it }
+                mediaDiscoveryViewModel.checkNameCollision(selectedNodes, toHandle)
             }
         }
 

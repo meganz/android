@@ -26,10 +26,10 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
+import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.INTENT_KEY_CURRENT_FOLDER_ID
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.PARAM_ERROR_MESSAGE
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
@@ -45,7 +45,6 @@ import mega.privacy.android.app.presentation.photos.util.createYearsCardList
 import mega.privacy.android.app.presentation.photos.util.groupPhotosByDay
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
-import mega.privacy.android.app.usecase.CopyNodeListUseCase
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.entity.SortOrder
@@ -70,6 +69,7 @@ import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUs
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdInFolderLinkUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
@@ -101,7 +101,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val authorizeNode: AuthorizeNode,
-    private val copyNodeListUseCase: CopyNodeListUseCase,
+    private val copyNodesUseCase: CopyNodesUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
     private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val getPublicNodeListByIds: GetPublicNodeListByIds,
@@ -613,34 +613,46 @@ class MediaDiscoveryViewModel @Inject constructor(
             }
         }
 
-    suspend fun checkNameCollision(nodes: List<MegaNode>, toHandle: Long) {
+    /**
+     * Checks the list of nodes to copy in order to know which names already exist
+     *
+     * @param nodes         List of node handles to copy.
+     * @param toHandle      Handle of destination node
+     */
+    fun checkNameCollision(nodes: List<MegaNode>, toHandle: Long) = viewModelScope.launch {
         runCatching {
             checkNameCollisionUseCase.checkNodeListAsync(
                 nodes = nodes,
                 parentHandle = toHandle,
                 type = NameCollisionType.COPY
             )
-        }.map { result: Pair<ArrayList<NameCollision>, List<MegaNode>> ->
-            if (result.first.isNotEmpty()) {
+        }.onSuccess { result ->
+            val collisions = result.first
+            if (collisions.isNotEmpty()) {
                 _state.update {
-                    it.copy(collisions = result.first)
+                    it.copy(collisions = collisions)
                 }
             }
-            copyNodeListUseCase(result.second, toHandle)
-        }.onSuccess { copyRequestResult ->
-            _state.update {
-                it.copy(
-                    copyResultText = copyRequestMessageMapper(
-                        copyRequestResult
-                    )
-                )
+            val nodesWithoutCollisions = result.second.associate {
+                it.handle to toHandle
+            }
+            if (nodesWithoutCollisions.isNotEmpty()) {
+                runCatching {
+                    copyNodesUseCase(nodesWithoutCollisions)
+                }.onSuccess { copyResult ->
+                    _state.update {
+                        it.copy(
+                            copyResultText = copyRequestMessageMapper(copyResult.toCopyRequestResult())
+                        )
+                    }
+                }.onFailure { throwable ->
+                    _state.update {
+                        it.copy(copyThrowable = throwable)
+                    }
+                }
             }
         }.onFailure { throwable ->
-            _state.update {
-                it.copy(
-                    copyThrowable = throwable
-                )
-            }
+            Timber.e(throwable)
         }
     }
 

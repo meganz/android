@@ -21,7 +21,6 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.TransferTriggerEvent
-import mega.privacy.android.app.usecase.CopyNodeListUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
@@ -47,6 +46,7 @@ import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUs
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdInFolderLinkUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
@@ -92,7 +92,7 @@ class MediaDiscoveryViewModelTest {
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val checkNameCollisionUseCase = mock<CheckNameCollisionUseCase>()
     private val authorizeNode = mock<AuthorizeNode>()
-    private val copyNodeListUseCase = mock<CopyNodeListUseCase>()
+    private val copyNodesUseCase = mock<CopyNodesUseCase>()
     private val copyRequestMessageMapper = mock<CopyRequestMessageMapper>()
     private val hasCredentialsUseCase = mock<HasCredentialsUseCase>()
     private val getPublicNodeListByIds = mock<GetPublicNodeListByIds>()
@@ -142,7 +142,7 @@ class MediaDiscoveryViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             checkNameCollisionUseCase = checkNameCollisionUseCase,
             authorizeNode = authorizeNode,
-            copyNodeListUseCase = copyNodeListUseCase,
+            copyNodesUseCase = copyNodesUseCase,
             copyRequestMessageMapper = copyRequestMessageMapper,
             hasCredentialsUseCase = hasCredentialsUseCase,
             getPublicNodeListByIds = getPublicNodeListByIds,
@@ -190,7 +190,7 @@ class MediaDiscoveryViewModelTest {
         monitorConnectivityUseCase,
         checkNameCollisionUseCase,
         authorizeNode,
-        copyNodeListUseCase,
+        copyNodesUseCase,
         copyRequestMessageMapper,
         hasCredentialsUseCase,
         getPublicNodeListByIds,
